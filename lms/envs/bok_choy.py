@@ -11,7 +11,7 @@ from the same directory.
 """
 
 import os
-from path import path
+from path import Path as path
 from tempfile import mkdtemp
 
 # Pylint gets confused by path.py instances, which report themselves as class

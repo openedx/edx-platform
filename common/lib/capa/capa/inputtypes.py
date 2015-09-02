@@ -85,7 +85,6 @@ class Status(object):
         names = {
             'correct': _('correct'),
             'incorrect': _('incorrect'),
-            'partially-correct': _('partially correct'),
             'incomplete': _('incomplete'),
             'unanswered': _('unanswered'),
             'unsubmitted': _('unanswered'),
@@ -95,7 +94,6 @@ class Status(object):
             # Translators: these are tooltips that indicate the state of an assessment question
             'correct': _('This is correct.'),
             'incorrect': _('This is incorrect.'),
-            'partially-correct': _('This is partially correct.'),
             'unanswered': _('This is unanswered.'),
             'unsubmitted': _('This is unanswered.'),
             'queued': _('This is being processed.'),
@@ -898,7 +896,7 @@ class MatlabInput(CodeInput):
         Right now, we only want this button to show up when a problem has not been
         checked.
         """
-        if self.status in ['correct', 'incorrect', 'partially-correct']:
+        if self.status in ['correct', 'incorrect']:
             return False
         else:
             return True

@@ -11,12 +11,14 @@ from shoppingcart.models import (
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from opaque_keys.edx.keys import UsageKey
+import xmodule.graders as xmgraders
 from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
 from edx_proctoring.api import get_all_exam_attempts
+from courseware.models import StudentModule
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -315,6 +317,41 @@ def coupon_codes_features(features, coupons_list, course_id):
         coupon_dict['course_id'] = coupon_dict['course_id'].to_deprecated_string()
         return coupon_dict
     return [extract_coupon(coupon, features) for coupon in coupons_list]
+
+
+def list_problem_responses(course_key, problem_location):
+    """
+    Return responses to a given problem as a dict.
+
+    list_problem_responses(course_key, problem_location)
+
+    would return [
+        {'username': u'user1', 'state': u'...'},
+        {'username': u'user2', 'state': u'...'},
+        {'username': u'user3', 'state': u'...'},
+    ]
+
+    where `state` represents a student's response to the problem
+    identified by `problem_location`.
+    """
+    problem_key = UsageKey.from_string(problem_location)
+    # Are we dealing with an "old-style" problem location?
+    run = getattr(problem_key, 'run')
+    if not run:
+        problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
+    if problem_key.course_key != course_key:
+        return []
+
+    smdat = StudentModule.objects.filter(
+        course_id=course_key,
+        module_state_key=problem_key
+    )
+    smdat = smdat.order_by('student')
+
+    return [
+        {'username': response.student.username, 'state': response.state}
+        for response in smdat
+    ]
 
 
 def course_registration_features(features, registration_codes, csv_type):

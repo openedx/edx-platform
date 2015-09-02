@@ -8,14 +8,14 @@
             defaults: {
                 id: null,
                 name: '',
-                is_active: null,
                 course_id: '',
                 topic_id: '',
                 date_created: '',
                 description: '',
                 country: '',
                 language: '',
-                membership: []
+                membership: [],
+                last_activity_at: ''
             },
 
             initialize: function(options) {

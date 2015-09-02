@@ -794,6 +794,7 @@
         'lms/include/teams/js/spec/teams_tab_factory_spec.js',
         'lms/include/teams/js/spec/views/edit_team_spec.js',
         'lms/include/teams/js/spec/views/my_teams_spec.js',
+        'lms/include/teams/js/spec/views/team_card_spec.js',
         'lms/include/teams/js/spec/views/team_discussion_spec.js',
         'lms/include/teams/js/spec/views/team_profile_spec.js',
         'lms/include/teams/js/spec/views/teams_spec.js',
@@ -801,7 +802,7 @@
         'lms/include/teams/js/spec/views/topic_card_spec.js',
         'lms/include/teams/js/spec/views/topic_teams_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js',
-        'lms/include/teams/js/spec/views/team_join_spec.js'
+        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js'
     ]);
 
 }).call(this, requirejs, define);

@@ -22,6 +22,8 @@ class DataDownload
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']'")
     @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
+    @$list_problem_responses_csv_input = @$section.find("input[name='problem-location']")
+    @$list_problem_responses_csv_btn = @$section.find("input[name='list-problem-responses-csv']")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
@@ -116,6 +118,22 @@ class DataDownload
           @$download_display_table.append $table_placeholder
           grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
           # grid.autosizeColumns()
+
+    @$list_problem_responses_csv_btn.click (e) =>
+      @clear_display()
+
+      url = @$list_problem_responses_csv_btn.data 'endpoint'
+      $.ajax
+        dataType: 'json'
+        url: url
+        data:
+          problem_location: @$list_problem_responses_csv_input.val()
+        error: (std_ajax_err) =>
+          @$reports_request_response_error.text JSON.parse(std_ajax_err['responseText'])
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @$reports_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
 
     @$list_may_enroll_csv_btn.click (e) =>
       @clear_display()

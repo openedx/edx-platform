@@ -1,7 +1,7 @@
 """
 Performance test for asset metadata in the modulestore.
 """
-from path import path
+from path import Path as path
 import unittest
 from tempfile import mkdtemp
 import itertools

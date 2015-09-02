@@ -10,29 +10,32 @@ from nose.plugins.attrib import attr
 
 from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
-class TestProctoringDashboardViews(ModuleStoreTestCase):
+class TestProctoringDashboardViews(SharedModuleStoreTestCase):
     """
     Check for Proctoring view on the new instructor dashboard
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestProctoringDashboardViews, cls).setUpClass()
+        cls.course = CourseFactory.create(enable_proctored_exams=True)
+
+        # URL for instructor dash
+        cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
+        cls.proctoring_link = '<a href="" data-section="proctoring">Proctoring</a>'
+
     def setUp(self):
         super(TestProctoringDashboardViews, self).setUp()
-        self.course = CourseFactory.create()
-        self.course.enable_proctored_exams = True
 
         # Create instructor account
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
-        self.course = self.update_course(self.course, self.instructor.id)
 
-        # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        self.proctoring_link = '<a href="" data-section="proctoring">Proctoring</a>'
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
 
     def test_pass_proctoring_tab_in_instructor_dashboard(self):

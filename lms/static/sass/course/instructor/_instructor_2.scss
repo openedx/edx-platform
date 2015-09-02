@@ -1927,9 +1927,8 @@ input[name="subject"] {
       height: 40px;
       border-bottom: 1px solid #BEBEBE;
 
-      th:nth-child(5){
+      th:nth-child(5), th:nth-child(4){
         text-align: center;
-        width: 120px;
       }
       th:first-child{
         padding-left: $baseline;
@@ -1939,8 +1938,7 @@ input[name="subject"] {
         border-bottom: 1px solid $border-color-1;
         font-size: 16px;
         &.attempt-allowed-time {
-            width: 140px;
-            word-wrap: break-word;
+            width: 90px;
         }
         &.attempt-started-at {
           width: 160px;
@@ -1950,6 +1948,7 @@ input[name="subject"] {
         }
         &.attempt-status {
           width: 100px;
+          text-align: center;
         }
         &.exam-name {
           width: 150px;
@@ -1980,7 +1979,7 @@ input[name="subject"] {
         line-height: normal;
         font-size: 14px;
       }
-      td:nth-child(5),td:first-child{
+      td:nth-child(5), td:first-child{
         @include padding-left($baseline);
       }
       td:nth-child(2){
@@ -1988,16 +1987,31 @@ input[name="subject"] {
         @include padding-right(0px);
         word-wrap: break-word;
       }
-      td:nth-child(5){
+      td:nth-child(5), td:nth-child(4){
         @include padding-left(0);
         text-align: center;
       }
+      td:nth-child(3){
+        text-align: center;
+      }
+      td:nth-child(6){
+        word-wrap: break-word;
+        text-align: center;
+      }
+
       td{
         a.remove_allowance{
           @include margin-left(15px);
         }
       }
+      td:last-child {
+        padding-left: 17px;
+      }
     }
+  }
+  .exam-attempts-content {
+    padding-left: 0;
+    padding-right: 0;
   }
   .top-header {
     margin-top: -30px;
@@ -2012,7 +2026,7 @@ input[name="subject"] {
         box-shadow: none;
         border-radius: 5px;
         font-size: 14px;
-        width: 240px;
+        width: 285px;
       }
       span:first-child {
         margin-right: -5px;
@@ -2020,7 +2034,7 @@ input[name="subject"] {
       span {
         background-color: #ccc;
         display: inline-block;
-        padding: 4px 12px;
+        padding: 6px 12px;
         cursor: pointer;
       }
     }

@@ -33,6 +33,7 @@ FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 CERTIFICATE_JSON = {
     u'name': u'Test certificate',
     u'description': u'Test description',
+    u'is_active': True,
     u'version': CERTIFICATE_SCHEMA_VERSION,
 }
 
@@ -41,6 +42,7 @@ CERTIFICATE_JSON_WITH_SIGNATORIES = {
     u'description': u'Test description',
     u'version': CERTIFICATE_SCHEMA_VERSION,
     u'course_title': 'Course Title Override',
+    u'is_active': True,
     u'signatories': [
         {
             "name": "Bob Smith",
@@ -217,6 +219,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
+            u'is_active': True,
             u'signatories': []
         }
         response = self.client.ajax_post(
@@ -332,6 +335,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
             u'description': u'New test description',
+            u'is_active': True,
             u'signatories': []
         }
 
@@ -383,6 +387,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
+            u'is_active': True,
             u'course_title': u'Course Title Override',
             u'signatories': []
         }
@@ -413,6 +418,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
             u'description': u'New test description',
+            u'is_active': True,
             u'course_title': u'Course Title Override',
             u'signatories': []
 

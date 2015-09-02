@@ -108,7 +108,7 @@ class SurveyModelsTests(ModuleStoreTestCase):
         """
         Assert that a new course which has a required survey and user has answers for it
         """
-        self.survey.save_user_answers(self.student, self.student_answers)
+        self.survey.save_user_answers(self.student, self.student_answers, None)
         self.assertFalse(must_answer_survey(self.course, self.student))
 
     def test_staff_must_answer_survey(self):

@@ -3,7 +3,7 @@ Unittests for importing a course via management command
 """
 
 import os
-from path import path
+from path import Path as path
 import shutil
 import tempfile
 

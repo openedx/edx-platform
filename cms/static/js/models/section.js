@@ -1,4 +1,4 @@
-define(["backbone", "gettext", "js/views/feedback_notification", "js/utils/module"],
+define(["backbone", "gettext", "common/js/components/views/feedback_notification", "js/utils/module"],
     function(Backbone, gettext, NotificationView, ModuleUtils) {
 
     var Section = Backbone.Model.extend({

@@ -359,7 +359,7 @@ def _section_course_info(course, access):
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'start_date': get_default_time_display(course.start),
-        'end_date': get_default_time_display(course.end),
+        'end_date': get_default_time_display(course.end) or _('No end date set'),
         'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }
@@ -495,6 +495,7 @@ def _section_data_download(course, access):
         'section_display_name': _('Data Download'),
         'access': access,
         'show_generate_proctored_exam_report_button': settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False),
+        'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
         'get_students_who_may_enroll_url': reverse(

@@ -8,7 +8,7 @@ import unittest
 import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.test.utils import override_settings
 from mock import patch
 from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
@@ -379,6 +379,34 @@ class CreditCourseViewSetTests(TestCase):
         user.save()  # pylint: disable=no-member
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
+
+    def test_session_auth_post_requires_csrf_token(self):
+        """ Verify non-GET requests require a CSRF token be attached to the request. """
+        user = UserFactory(password=self.password, is_staff=True)
+        client = Client(enforce_csrf_checks=True)
+        self.assertTrue(client.login(username=user.username, password=self.password))
+
+        data = {
+            'course_key': 'a/b/c',
+            'enabled': True
+        }
+
+        # POSTs without a CSRF token should fail.
+        response = client.post(self.path, data=json.dumps(data), content_type=JSON)
+
+        # NOTE (CCB): Ordinarily we would expect a 403; however, since the CSRF validation and session authentication
+        # fail, DRF considers the request to be unauthenticated.
+        self.assertEqual(response.status_code, 401)
+        self.assertIn('CSRF', response.content)
+
+        # Retrieve a CSRF token
+        response = client.get('/dashboard')
+        csrf_token = response.cookies[settings.CSRF_COOKIE_NAME].value  # pylint: disable=no-member
+        self.assertGreater(len(csrf_token), 0)
+
+        # Ensure POSTs made with the token succeed.
+        response = client.post(self.path, data=json.dumps(data), content_type=JSON, HTTP_X_CSRFTOKEN=csrf_token)
+        self.assertEqual(response.status_code, 201)
 
     def test_oauth(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """

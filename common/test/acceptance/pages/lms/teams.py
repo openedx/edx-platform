@@ -6,16 +6,37 @@ Teams pages.
 from .course_page import CoursePage
 from .discussion import InlineDiscussionPage
 from ..common.paging import PaginatedUIMixin
+from ...pages.studio.utils import confirm_prompt
 
 from .fields import FieldsMixin
 
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
+CARD_TITLE_CSS = 'h3.card-title'
 MY_TEAMS_BUTTON_CSS = 'a.nav-item[data-index="0"]'
 BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
 TEAMS_LINK_CSS = '.action-view'
 TEAMS_HEADER_CSS = '.teams-header'
 CREATE_TEAM_LINK_CSS = '.create-team'
+
+
+class TeamCardsMixin(object):
+    """Provides common operations on the team card component."""
+
+    @property
+    def team_cards(self):
+        """Get all the team cards on the page."""
+        return self.q(css='.team-card')
+
+    @property
+    def team_names(self):
+        """Return the names of each team on the page."""
+        return self.q(css='h3.card-title').map(lambda e: e.text).results
+
+    @property
+    def team_descriptions(self):
+        """Return the names of each team on the page."""
+        return self.q(css='p.card-description').map(lambda e: e.text).results
 
 
 class TeamsPage(CoursePage):
@@ -82,7 +103,7 @@ class TeamsPage(CoursePage):
         self.q(css='a.nav-item').filter(text=topic)[0].click()
 
 
-class MyTeamsPage(CoursePage, PaginatedUIMixin):
+class MyTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
     """
     The 'My Teams' tab of the Teams page.
     """
@@ -95,11 +116,6 @@ class MyTeamsPage(CoursePage, PaginatedUIMixin):
         if len(button_classes) == 0:
             return False
         return 'is-active' in button_classes[0]
-
-    @property
-    def team_cards(self):
-        """Get all the team cards on the page."""
-        return self.q(css='.team-card')
 
 
 class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
@@ -121,6 +137,16 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         """Return a list of the topic cards present on the page."""
         return self.q(css=TOPIC_CARD_CSS).results
 
+    @property
+    def topic_names(self):
+        """Return a list of the topic names present on the page."""
+        return self.q(css=CARD_TITLE_CSS).map(lambda e: e.text).results
+
+    @property
+    def topic_descriptions(self):
+        """Return a list of the topic descriptions present on the page."""
+        return self.q(css='p.card-description').map(lambda e: e.text).results
+
     def browse_teams_for_topic(self, topic_name):
         """
         Show the teams list for `topic_name`.
@@ -130,44 +156,51 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         )[0].click()
         self.wait_for_ajax()
 
+    def sort_topics_by(self, sort_order):
+        """Sort the list of topics by the given `sort_order`."""
+        self.q(
+            css='#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
+        ).click()
+        self.wait_for_ajax()
 
-class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
+
+class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
     """
     The paginated UI for browsing teams within a Topic on the Teams
     page.
     """
     def __init__(self, browser, course_id, topic):
         """
-        Set up `self.url_path` on instantiation, since it dynamically
-        reflects the current topic.  Note that `topic` is a dict
-        representation of a topic following the same convention as a
-        course module's topic.
+        Note that `topic` is a dict representation of a topic following
+        the same convention as a course module's topic.
         """
-        super(BrowseTeamsPage, self).__init__(browser, course_id)
+        super(BaseTeamsPage, self).__init__(browser, course_id)
         self.topic = topic
-        self.url_path = "teams/#topics/{topic_id}".format(topic_id=self.topic['id'])
 
     def is_browser_on_page(self):
-        """Check if we're on the teams list page for a particular topic."""
-        self.wait_for_element_presence('.team-actions', 'Wait for the bottom links to be present')
+        """Check if we're on a teams list page for a particular topic."""
         has_correct_url = self.url.endswith(self.url_path)
         teams_list_view_present = self.q(css='.teams-main').present
         return has_correct_url and teams_list_view_present
 
     @property
-    def header_topic_name(self):
+    def header_name(self):
         """Get the topic name displayed by the page header"""
         return self.q(css=TEAMS_HEADER_CSS + ' .page-title')[0].text
 
     @property
-    def header_topic_description(self):
+    def header_description(self):
         """Get the topic description displayed by the page header"""
         return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text
 
     @property
-    def team_cards(self):
-        """Get all the team cards on the page."""
-        return self.q(css='.team-card')
+    def sort_order(self):
+        """Return the current sort order on the page."""
+        return self.q(
+            css='#paging-header-select option'
+        ).filter(
+            lambda e: e.is_selected()
+        ).results[0].text.strip()
 
     def click_create_team_link(self):
         """ Click on create team link."""
@@ -190,8 +223,57 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
             query.first.click()
             self.wait_for_ajax()
 
+    def sort_teams_by(self, sort_order):
+        """Sort the list of teams by the given `sort_order`."""
+        self.q(
+            css='#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
+        ).click()
+        self.wait_for_ajax()
 
-class CreateTeamPage(CoursePage, FieldsMixin):
+    @property
+    def _showing_search_results(self):
+        """
+        Returns true if showing search results.
+        """
+        return self.header_description.startswith(u"Showing results for")
+
+    def search(self, string):
+        """
+        Searches for the specified string, and returns a SearchTeamsPage
+        representing the search results page.
+        """
+        self.q(css='.search-field').first.fill(string)
+        self.q(css='.action-search').first.click()
+        self.wait_for(
+            lambda: self._showing_search_results,
+            description="Showing search results"
+        )
+        page = SearchTeamsPage(self.browser, self.course_id, self.topic)
+        page.wait_for_page()
+        return page
+
+
+class BrowseTeamsPage(BaseTeamsPage):
+    """
+    The paginated UI for browsing teams within a Topic on the Teams
+    page.
+    """
+    def __init__(self, browser, course_id, topic):
+        super(BrowseTeamsPage, self).__init__(browser, course_id, topic)
+        self.url_path = "teams/#topics/{topic_id}".format(topic_id=self.topic['id'])
+
+
+class SearchTeamsPage(BaseTeamsPage):
+    """
+    The paginated UI for showing team search results.
+    page.
+    """
+    def __init__(self, browser, course_id, topic):
+        super(SearchTeamsPage, self).__init__(browser, course_id, topic)
+        self.url_path = "teams/#topics/{topic_id}/search".format(topic_id=self.topic['id'])
+
+
+class CreateOrEditTeamPage(CoursePage, FieldsMixin):
     """
     Create team page.
     """
@@ -202,7 +284,7 @@ class CreateTeamPage(CoursePage, FieldsMixin):
         representation of a topic following the same convention as a
         course module's topic.
         """
-        super(CreateTeamPage, self).__init__(browser, course_id)
+        super(CreateOrEditTeamPage, self).__init__(browser, course_id)
         self.topic = topic
         self.url_path = "teams/#topics/{topic_id}/create-team".format(topic_id=self.topic['id'])
 
@@ -321,14 +403,17 @@ class TeamPage(CoursePage, PaginatedUIMixin):
         """Verifies that team leave link is present"""
         return self.q(css='.leave-team-link').present
 
-    def click_leave_team_link(self, remaining_members=0):
+    def click_leave_team_link(self, remaining_members=0, cancel=False):
         """ Click on Leave Team link"""
         self.q(css='.leave-team-link').first.click()
-        self.wait_for(
-            lambda: self.join_team_button_present,
-            description="Join Team button did not become present"
-        )
-        self.wait_for_capacity_text(remaining_members)
+        confirm_prompt(self, cancel, require_notification=False)
+
+        if cancel is False:
+            self.wait_for(
+                lambda: self.join_team_button_present,
+                description="Join Team button did not become present"
+            )
+            self.wait_for_capacity_text(remaining_members)
 
     @property
     def team_members(self):
@@ -388,3 +473,17 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def new_post_button_present(self):
         """ Returns True if New Post button is present else False """
         return self.q(css='.discussion-module .new-post-btn').present
+
+    def click_all_topics_breadcrumb(self):
+        """Navigate to the 'All Topics' page."""
+        self.q(css='.breadcrumbs a').results[0].click()
+        self.wait_for_ajax()
+
+    @property
+    def edit_team_button_present(self):
+        """ Returns True if Edit Team button is present else False """
+        return self.q(css='.form-actions .action-edit-team').present
+
+    def click_edit_team_button(self):
+        """ Click on Edit Team button"""
+        self.q(css='.form-actions .action-edit-team').first.click()

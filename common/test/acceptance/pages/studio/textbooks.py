@@ -3,7 +3,7 @@ Course Textbooks page.
 """
 
 import requests
-from path import path  # pylint: disable=no-name-in-module
+from path import Path as path
 from .course_page import CoursePage
 from .utils import click_css
 
@@ -49,23 +49,15 @@ class TextbooksPage(CoursePage):
         file_input = self.q(css=".upload-dialog input").results[0]
         file_input.send_keys(file_path)
         click_css(self, ".wrapper-modal-window-assetupload .action-upload", require_notification=False)
-        self.wait_for_element_absence(".upload dialog", "Upload modal closed")
+        self.wait_for_element_absence(".modal-window-overlay", "Upload modal closed")
 
     def click_textbook_submit_button(self):
         """
         Submit the new textbook form and check if it is rendered properly.
         """
-        def click_save():
-            """
-            Continue to click the save button until the form is no longer present. Without this,
-            the test sporadically fails because the click is too early.
-            """
-            save_button = self.q(css='#edit_textbook_form button[type="submit"]').results
-            if len(save_button) > 0:
-                save_button[0].click()
-            return not self.q(css="#edit_textbook_form").present
-
-        self.wait_for(click_save, "Editing form should close.")
+        self.wait_for_element_visibility('#edit_textbook_form button[type="submit"]', 'Save button visibility')
+        self.q(css='#edit_textbook_form button[type="submit"]').first.click()
+        self.wait_for_element_absence(".wrapper-form", "Add/Edit form closed")
 
     def is_view_live_link_worked(self):
         """

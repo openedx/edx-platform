@@ -4,21 +4,22 @@ import json
 import pytz
 from datetime import datetime
 from dateutil import parser
-
 import ddt
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.db.models.signals import post_save
 from nose.plugins.attrib import attr
 from rest_framework.test import APITestCase, APIClient
 
 from courseware.tests.factories import StaffFactory
+from common.test.utils import skip_signal
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
-from ..search_indexes import CourseTeamIndexer
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
@@ -121,7 +122,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'id': 'topic_{}'.format(i),
                     'name': name,
                     'description': 'Description for topic {}.'.format(i)
-                } for i, name in enumerate([u'sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
+                } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
             ]
         }
         cls.test_course_1 = CourseFactory.create(
@@ -194,39 +195,41 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             username='student_enrolled_other_course_not_on_team'
         )
 
-        # clear the teams search index before rebuilding teams
-        CourseTeamIndexer.engine().destroy()
-
-        # 'solar team' is intentionally lower case to test case insensitivity in name ordering
-        self.test_team_1 = CourseTeamFactory.create(
-            name=u'sólar team',
-            course_id=self.test_course_1.id,
-            topic_id='topic_0'
-        )
-        self.test_team_2 = CourseTeamFactory.create(name='Wind Team', course_id=self.test_course_1.id)
-        self.test_team_3 = CourseTeamFactory.create(name='Nuclear Team', course_id=self.test_course_1.id)
-        self.test_team_4 = CourseTeamFactory.create(name='Coal Team', course_id=self.test_course_1.id, is_active=False)
-        self.test_team_5 = CourseTeamFactory.create(name='Another Team', course_id=self.test_course_2.id)
-        self.test_team_6 = CourseTeamFactory.create(
-            name='Public Profile Team',
-            course_id=self.test_course_2.id,
-            topic_id='topic_6'
-        )
-        self.test_team_7 = CourseTeamFactory.create(
-            name='Search',
-            description='queryable text',
-            country='GS',
-            language='to',
-            course_id=self.test_course_2.id,
-            topic_id='topic_7'
-        )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            self.solar_team = CourseTeamFactory.create(
+                name=u'Sólar team',
+                course_id=self.test_course_1.id,
+                topic_id='topic_0'
+            )
+            self.wind_team = CourseTeamFactory.create(name='Wind Team', course_id=self.test_course_1.id)
+            self.nuclear_team = CourseTeamFactory.create(name='Nuclear Team', course_id=self.test_course_1.id)
+            self.another_team = CourseTeamFactory.create(name='Another Team', course_id=self.test_course_2.id)
+            self.public_profile_team = CourseTeamFactory.create(
+                name='Public Profile Team',
+                course_id=self.test_course_2.id,
+                topic_id='topic_6'
+            )
+            self.search_team = CourseTeamFactory.create(
+                name='Search',
+                description='queryable text',
+                country='GS',
+                language='to',
+                course_id=self.test_course_2.id,
+                topic_id='topic_7'
+            )
 
         self.test_team_name_id_map = {team.name: team for team in (
-            self.test_team_1,
-            self.test_team_2,
-            self.test_team_3,
-            self.test_team_4,
-            self.test_team_5,
+            self.solar_team,
+            self.wind_team,
+            self.nuclear_team,
+            self.another_team,
+            self.public_profile_team,
+            self.search_team,
         )}
 
         for user, course in [('staff', self.test_course_1), ('course_staff', self.test_course_1)]:
@@ -234,10 +237,10 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 self.users[user], course.id, check_access=True
             )
 
-        self.test_team_1.add_user(self.users['student_enrolled'])
-        self.test_team_3.add_user(self.users['student_enrolled_both_courses_other_team'])
-        self.test_team_5.add_user(self.users['student_enrolled_both_courses_other_team'])
-        self.test_team_6.add_user(self.users['student_enrolled_public_profile'])
+        self.solar_team.add_user(self.users['student_enrolled'])
+        self.nuclear_team.add_user(self.users['student_enrolled_both_courses_other_team'])
+        self.another_team.add_user(self.users['student_enrolled_both_courses_other_team'])
+        self.public_profile_team.add_user(self.users['student_enrolled_public_profile'])
 
     def build_membership_data_raw(self, username, team):
         """Assembles a membership creation payload based on the raw values provided."""
@@ -391,7 +394,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     def verify_expanded_team(self, team):
         """Verifies that fields exist on the returned team json indicating that it is expanded."""
-        for field in ['id', 'name', 'is_active', 'course_id', 'topic_id', 'date_created', 'description']:
+        for field in ['id', 'name', 'course_id', 'topic_id', 'date_created', 'description']:
             self.assertIn(field, team)
 
 
@@ -435,29 +438,32 @@ class TestListTeamsAPI(TeamAPITestCase):
         )
 
     def test_filter_topic_id(self):
-        self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'sólar team'])
-
-    def test_filter_include_inactive(self):
-        self.verify_names({'include_inactive': True}, 200, ['Coal Team', 'Nuclear Team', u'sólar team', 'Wind Team'])
+        self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
 
     @ddt.data(
-        (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
-        ('name', 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
-        # Note that "Nuclear Team" and "solar team" have the same open_slots.
-        # "solar team" comes first due to secondary sort by last_activity_at.
-        ('open_slots', 200, ['Wind Team', u'sólar team', 'Nuclear Team']),
+        (None, 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
+        ('name', 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
+        # Note that "Nuclear Team" and "Solar team" have the same open_slots.
+        # "Solar team" comes first due to secondary sort by last_activity_at.
+        ('open_slots', 200, ['Wind Team', u'Sólar team', 'Nuclear Team']),
         # Note that "Wind Team" and "Nuclear Team" have the same last_activity_at.
         # "Wind Team" comes first due to secondary sort by open_slots.
-        ('last_activity_at', 200, [u'sólar team', 'Wind Team', 'Nuclear Team']),
+        ('last_activity_at', 200, [u'Sólar team', 'Wind Team', 'Nuclear Team']),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names):
-        # Make "solar team" the most recently active team.
+        # Make "Solar team" the most recently active team.
         # The CourseTeamFactory sets the last_activity_at to a fixed time (in the past), so all of the
         # other teams have the same last_activity_at.
-        solar_team = self.test_team_name_id_map[u'sólar team']
-        solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
-        solar_team.save()
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            solar_team = self.test_team_name_id_map[u'Sólar team']
+            solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+            solar_team.save()
 
         data = {'order_by': field} if field else {}
         self.verify_names(data, status, names)
@@ -508,6 +514,12 @@ class TestListTeamsAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
+        # clear out the teams search index before reindexing
+        CourseTeamIndexer.engine().destroy()
+
+        for team in self.test_team_name_id_map.values():
+            CourseTeamIndexer.index(team)
+
         self.verify_names(
             {'course_id': self.test_course_2.id, 'text_search': text_search},
             200,
@@ -533,20 +545,28 @@ class TestCreateTeamAPI(TeamAPITestCase):
     def test_access(self, user, status):
         team = self.post_create_team(status, self.build_team_data(name="New Team"), user=user)
         if status == 200:
-            self.assertEqual(team['id'], 'new-team')
-            self.assertIn('discussion_topic_id', team)
+            self.verify_expected_team_id(team, 'new-team')
             teams = self.get_teams_list(user=user)
             self.assertIn("New Team", [team['name'] for team in teams['results']])
+
+    def verify_expected_team_id(self, team, expected_prefix):
+        """ Verifies that the team id starts with the specified prefix and ends with the discussion_topic_id """
+        self.assertIn('id', team)
+        self.assertIn('discussion_topic_id', team)
+        self.assertEqual(team['id'], expected_prefix + '-' + team['discussion_topic_id'])
 
     def test_naming(self):
         new_teams = [
             self.post_create_team(data=self.build_team_data(name=name), user=self.create_and_enroll_student())
-            for name in ["The Best Team", "The Best Team", "The Best Team", "The Best Team 2"]
+            for name in ["The Best Team", "The Best Team", "A really long team name"]
         ]
-        self.assertEquals(
-            [team['id'] for team in new_teams],
-            ['the-best-team', 'the-best-team-2', 'the-best-team-3', 'the-best-team-2-2']
-        )
+        # Check that teams with the same name have unique IDs.
+        self.verify_expected_team_id(new_teams[0], 'the-best-team')
+        self.verify_expected_team_id(new_teams[1], 'the-best-team')
+        self.assertNotEqual(new_teams[0]['id'], new_teams[1]['id'])
+
+        # Verify expected truncation behavior with names > 20 characters.
+        self.verify_expected_team_id(new_teams[2], 'a-really-long-team-n')
 
     @ddt.data((400, {
         'name': 'Bad Course ID',
@@ -582,7 +602,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
         # First add the privileged user to a team.
         self.post_create_membership(
             200,
-            self.build_membership_data(user, self.test_team_1),
+            self.build_membership_data(user, self.solar_team),
             user=user
         )
 
@@ -616,6 +636,10 @@ class TestCreateTeamAPI(TeamAPITestCase):
             language='fr'
         ), user=creator)
 
+        # Verify the id (it ends with a unique hash, which is the same as the discussion_id).
+        self.verify_expected_team_id(team, 'fully-specified-team')
+        del team['id']
+
         # Remove date_created and discussion_topic_id because they change between test runs
         del team['date_created']
         del team['discussion_topic_id']
@@ -640,10 +664,8 @@ class TestCreateTeamAPI(TeamAPITestCase):
             'name': 'Fully specified team',
             'language': 'fr',
             'country': 'CA',
-            'is_active': True,
             'topic_id': 'great-topic',
             'course_id': str(self.test_course_1.id),
-            'id': 'fully-specified-team',
             'description': 'Another fantastic team'
         })
 
@@ -675,10 +697,10 @@ class TestDetailTeamAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_access(self, user, status):
-        team = self.get_team_detail(self.test_team_1.team_id, status, user=user)
+        team = self.get_team_detail(self.solar_team.team_id, status, user=user)
         if status == 200:
-            self.assertEqual(team['description'], self.test_team_1.description)
-            self.assertEqual(team['discussion_topic_id'], self.test_team_1.discussion_topic_id)
+            self.assertEqual(team['description'], self.solar_team.description)
+            self.assertEqual(team['discussion_topic_id'], self.solar_team.discussion_topic_id)
             self.assertEqual(parser.parse(team['last_activity_at']), LAST_ACTIVITY_AT)
 
     def test_does_not_exist(self):
@@ -686,12 +708,12 @@ class TestDetailTeamAPI(TeamAPITestCase):
 
     def test_expand_private_user(self):
         # Use the default user which is already private because to year_of_birth is set
-        result = self.get_team_detail(self.test_team_1.team_id, 200, {'expand': 'user'})
+        result = self.get_team_detail(self.solar_team.team_id, 200, {'expand': 'user'})
         self.verify_expanded_private_user(result['membership'][0]['user'])
 
     def test_expand_public_user(self):
         result = self.get_team_detail(
-            self.test_team_6.team_id,
+            self.public_profile_team.team_id,
             200,
             {'expand': 'user'},
             user='student_enrolled_public_profile'
@@ -714,7 +736,7 @@ class TestUpdateTeamAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_access(self, user, status):
-        team = self.patch_team_detail(self.test_team_1.team_id, status, {'name': 'foo'}, user=user)
+        team = self.patch_team_detail(self.solar_team.team_id, status, {'name': 'foo'}, user=user)
         if status == 200:
             self.assertEquals(team['name'], 'foo')
 
@@ -739,12 +761,12 @@ class TestUpdateTeamAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_bad_requests(self, key, value):
-        self.patch_team_detail(self.test_team_1.team_id, 400, {key: value}, user='staff')
+        self.patch_team_detail(self.solar_team.team_id, 400, {key: value}, user='staff')
 
     @ddt.data(('country', 'US'), ('language', 'en'), ('foo', 'bar'))
     @ddt.unpack
     def test_good_requests(self, key, value):
-        self.patch_team_detail(self.test_team_1.team_id, 200, {key: value}, user='staff')
+        self.patch_team_detail(self.solar_team.team_id, 200, {key: value}, user='staff')
 
     def test_does_not_exist(self):
         self.patch_team_detail('no_such_team', 404, user='staff')
@@ -777,22 +799,28 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.get_topics_list(400)
 
     @ddt.data(
-        (None, 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
-        ('name', 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
-        # Note that "Nuclear Power" and "solar power" both have 2 teams. "Coal Power" and "Window Power"
+        (None, 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        ('name', 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        # Note that "Nuclear Power" and "Solar power" both have 2 teams. "Coal Power" and "Window Power"
         # both have 0 teams. The secondary sort is alphabetical by name.
-        ('team_count', 200, ['Nuclear Power', u'sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
+        ('team_count', 200, ['Nuclear Power', u'Sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names, expected_ordering):
-        # Add 2 teams to "Nuclear Power", which previously had no teams.
-        CourseTeamFactory.create(
-            name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
-        )
-        CourseTeamFactory.create(
-            name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
-        )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            # Add 2 teams to "Nuclear Power", which previously had no teams.
+            CourseTeamFactory.create(
+                name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
+            )
+            CourseTeamFactory.create(
+                name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
+            )
         data = {'course_id': self.test_course_1.id}
         if field:
             data['order_by'] = field
@@ -806,13 +834,19 @@ class TestListTopicsAPI(TeamAPITestCase):
         Ensure that the secondary sort (alphabetical) when primary sort is team_count
         works across pagination boundaries.
         """
-        # Add 2 teams to "Wind Power", which previously had no teams.
-        CourseTeamFactory.create(
-            name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
-        )
-        CourseTeamFactory.create(
-            name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
-        )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            # Add 2 teams to "Wind Power", which previously had no teams.
+            CourseTeamFactory.create(
+                name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
+            )
+            CourseTeamFactory.create(
+                name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
+            )
 
         topics = self.get_topics_list(data={
             'course_id': self.test_course_1.id,
@@ -820,7 +854,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             'page': 1,
             'order_by': 'team_count'
         })
-        self.assertEqual(["Wind Power", u'sólar power'], [topic['name'] for topic in topics['results']])
+        self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
 
         topics = self.get_topics_list(data={
             'course_id': self.test_course_1.id,
@@ -908,7 +942,7 @@ class TestListMembershipAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_access(self, user, status):
-        membership = self.get_membership_list(status, {'team_id': self.test_team_1.team_id}, user=user)
+        membership = self.get_membership_list(status, {'team_id': self.solar_team.team_id}, user=user)
         if status == 200:
             self.assertEqual(membership['count'], 1)
             self.assertEqual(membership['results'][0]['user']['username'], self.users['student_enrolled'].username)
@@ -929,14 +963,14 @@ class TestListMembershipAPI(TeamAPITestCase):
         if status == 200:
             if has_content:
                 self.assertEqual(membership['count'], 1)
-                self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_1.team_id)
+                self.assertEqual(membership['results'][0]['team']['team_id'], self.solar_team.team_id)
             else:
                 self.assertEqual(membership['count'], 0)
 
     @ddt.data(
         ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
         ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
-        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'sólar team'),
+        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'Sólar team'),
         ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
     )
     @ddt.unpack
@@ -959,10 +993,10 @@ class TestListMembershipAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_course_filter_with_team_id(self, course_id, status):
-        membership = self.get_membership_list(status, {'team_id': self.test_team_1.team_id, 'course_id': course_id})
+        membership = self.get_membership_list(status, {'team_id': self.solar_team.team_id, 'course_id': course_id})
         if status == 200:
             self.assertEqual(membership['count'], 1)
-            self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_1.team_id)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.solar_team.team_id)
 
     def test_bad_course_id(self):
         self.get_membership_list(404, {'course_id': 'no_such_course'})
@@ -975,19 +1009,19 @@ class TestListMembershipAPI(TeamAPITestCase):
 
     def test_expand_private_user(self):
         # Use the default user which is already private because to year_of_birth is set
-        result = self.get_membership_list(200, {'team_id': self.test_team_1.team_id, 'expand': 'user'})
+        result = self.get_membership_list(200, {'team_id': self.solar_team.team_id, 'expand': 'user'})
         self.verify_expanded_private_user(result['results'][0]['user'])
 
     def test_expand_public_user(self):
         result = self.get_membership_list(
             200,
-            {'team_id': self.test_team_6.team_id, 'expand': 'user'},
+            {'team_id': self.public_profile_team.team_id, 'expand': 'user'},
             user='student_enrolled_public_profile'
         )
         self.verify_expanded_public_user(result['results'][0]['user'])
 
     def test_expand_team(self):
-        result = self.get_membership_list(200, {'team_id': self.test_team_1.team_id, 'expand': 'team'})
+        result = self.get_membership_list(200, {'team_id': self.solar_team.team_id, 'expand': 'team'})
         self.verify_expanded_team(result['results'][0]['team'])
 
 
@@ -1010,17 +1044,17 @@ class TestCreateMembershipAPI(TeamAPITestCase):
     def test_access(self, user, status):
         membership = self.post_create_membership(
             status,
-            self.build_membership_data('student_enrolled_not_on_team', self.test_team_1),
+            self.build_membership_data('student_enrolled_not_on_team', self.solar_team),
             user=user
         )
         if status == 200:
             self.assertEqual(membership['user']['username'], self.users['student_enrolled_not_on_team'].username)
-            self.assertEqual(membership['team']['team_id'], self.test_team_1.team_id)
-            memberships = self.get_membership_list(200, {'team_id': self.test_team_1.team_id})
+            self.assertEqual(membership['team']['team_id'], self.solar_team.team_id)
+            memberships = self.get_membership_list(200, {'team_id': self.solar_team.team_id})
             self.assertEqual(memberships['count'], 2)
 
     def test_no_username(self):
-        response = self.post_create_membership(400, {'team_id': self.test_team_1.team_id})
+        response = self.post_create_membership(400, {'team_id': self.solar_team.team_id})
         self.assertIn('username', json.loads(response.content)['field_errors'])
 
     def test_no_team(self):
@@ -1036,7 +1070,7 @@ class TestCreateMembershipAPI(TeamAPITestCase):
     def test_bad_username(self):
         self.post_create_membership(
             404,
-            self.build_membership_data_raw('no_such_user', self.test_team_1.team_id),
+            self.build_membership_data_raw('no_such_user', self.solar_team.team_id),
             user='staff'
         )
 
@@ -1044,7 +1078,7 @@ class TestCreateMembershipAPI(TeamAPITestCase):
     def test_join_twice(self, user):
         response = self.post_create_membership(
             400,
-            self.build_membership_data('student_enrolled', self.test_team_1),
+            self.build_membership_data('student_enrolled', self.solar_team),
             user=user
         )
         self.assertIn('already a member', json.loads(response.content)['developer_message'])
@@ -1052,7 +1086,7 @@ class TestCreateMembershipAPI(TeamAPITestCase):
     def test_join_second_team_in_course(self):
         response = self.post_create_membership(
             400,
-            self.build_membership_data('student_enrolled_both_courses_other_team', self.test_team_1),
+            self.build_membership_data('student_enrolled_both_courses_other_team', self.solar_team),
             user='student_enrolled_both_courses_other_team'
         )
         self.assertIn('already a member', json.loads(response.content)['developer_message'])
@@ -1061,7 +1095,7 @@ class TestCreateMembershipAPI(TeamAPITestCase):
     def test_not_enrolled_in_team_course(self, user):
         response = self.post_create_membership(
             400,
-            self.build_membership_data('student_unenrolled', self.test_team_1),
+            self.build_membership_data('student_unenrolled', self.solar_team),
             user=user
         )
         self.assertIn('not enrolled', json.loads(response.content)['developer_message'])
@@ -1069,7 +1103,7 @@ class TestCreateMembershipAPI(TeamAPITestCase):
     def test_over_max_team_size_in_course_2(self):
         response = self.post_create_membership(
             400,
-            self.build_membership_data('student_enrolled_other_course_not_on_team', self.test_team_5),
+            self.build_membership_data('student_enrolled_other_course_not_on_team', self.another_team),
             user='student_enrolled_other_course_not_on_team'
         )
         self.assertIn('full', json.loads(response.content)['developer_message'])
@@ -1092,7 +1126,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
     @ddt.unpack
     def test_access(self, user, status):
         self.get_membership_detail(
-            self.test_team_1.team_id,
+            self.solar_team.team_id,
             self.users['student_enrolled'].username,
             status,
             user=user
@@ -1102,11 +1136,11 @@ class TestDetailMembershipAPI(TeamAPITestCase):
         self.get_membership_detail('no_such_team', self.users['student_enrolled'].username, 404)
 
     def test_bad_username(self):
-        self.get_membership_detail(self.test_team_1.team_id, 'no_such_user', 404)
+        self.get_membership_detail(self.solar_team.team_id, 'no_such_user', 404)
 
     def test_no_membership(self):
         self.get_membership_detail(
-            self.test_team_1.team_id,
+            self.solar_team.team_id,
             self.users['student_enrolled_not_on_team'].username,
             404
         )
@@ -1114,7 +1148,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
     def test_expand_private_user(self):
         # Use the default user which is already private because to year_of_birth is set
         result = self.get_membership_detail(
-            self.test_team_1.team_id,
+            self.solar_team.team_id,
             self.users['student_enrolled'].username,
             200,
             {'expand': 'user'}
@@ -1123,7 +1157,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
 
     def test_expand_public_user(self):
         result = self.get_membership_detail(
-            self.test_team_6.team_id,
+            self.public_profile_team.team_id,
             self.users['student_enrolled_public_profile'].username,
             200,
             {'expand': 'user'},
@@ -1133,7 +1167,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
 
     def test_expand_team(self):
         result = self.get_membership_detail(
-            self.test_team_1.team_id,
+            self.solar_team.team_id,
             self.users['student_enrolled'].username,
             200,
             {'expand': 'team'}
@@ -1158,7 +1192,7 @@ class TestDeleteMembershipAPI(TeamAPITestCase):
     @ddt.unpack
     def test_access(self, user, status):
         self.delete_membership(
-            self.test_team_1.team_id,
+            self.solar_team.team_id,
             self.users['student_enrolled'].username,
             status,
             user=user
@@ -1168,7 +1202,7 @@ class TestDeleteMembershipAPI(TeamAPITestCase):
         self.delete_membership('no_such_team', self.users['student_enrolled'].username, 404)
 
     def test_bad_username(self):
-        self.delete_membership(self.test_team_1.team_id, 'no_such_user', 404)
+        self.delete_membership(self.solar_team.team_id, 'no_such_user', 404)
 
     def test_missing_membership(self):
-        self.delete_membership(self.test_team_2.team_id, self.users['student_enrolled'].username, 404)
+        self.delete_membership(self.wind_team.team_id, self.users['student_enrolled'].username, 404)

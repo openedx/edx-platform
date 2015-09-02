@@ -4,6 +4,7 @@
     define(['backbone',
             'underscore',
             'gettext',
+            'common/js/components/views/search_field',
             'js/components/header/views/header',
             'js/components/header/models/header',
             'js/components/tabbed/views/tabbed_view',
@@ -17,14 +18,14 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
-            'teams/js/views/team_join',
+            'teams/js/views/team_profile_header_actions',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
+        function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamJoinView, teamsTemplate) {
+                  TeamProfileHeaderActionsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
-                initialize: function (attributes) {
+                initialize: function () {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
                     HeaderModel.prototype.initialize.call(this);
                 }
@@ -48,17 +49,7 @@
             var TeamTabView = Backbone.View.extend({
                 initialize: function(options) {
                     var router;
-                    this.courseID = options.courseID;
-                    this.topics = options.topics;
-                    this.topicUrl = options.topicUrl;
-                    this.teamsUrl = options.teamsUrl;
-                    this.teamMembershipsUrl = options.teamMembershipsUrl;
-                    this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
-                    this.maxTeamSize = options.maxTeamSize;
-                    this.languages = options.languages;
-                    this.countries = options.countries;
-                    this.userInfo = options.userInfo;
-                    this.teamsBaseUrl = options.teamsBaseUrl;
+                    this.context = options.context;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
@@ -73,7 +64,9 @@
                             // being picked up by the backbone router.
                         }, this)],
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
+                        ['topics/:topic_id/search(/)', _.bind(this.searchTeams, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
+                        ['topics/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
@@ -85,14 +78,14 @@
                     this.teamEvents = _.clone(Backbone.Events);
 
                     this.teamMemberships = new TeamMembershipCollection(
-                        this.userInfo.team_memberships_data,
+                        this.context.userInfo.team_memberships_data,
                         {
                             teamEvents: this.teamEvents,
-                            url: this.teamMembershipsUrl,
-                            course_id: this.courseID,
-                            username: this.userInfo.username,
-                            privileged: this.userInfo.privileged,
-                            staff: this.userInfo.staff,
+                            url: this.context.teamMembershipsUrl,
+                            course_id: this.context.courseID,
+                            username: this.context.userInfo.username,
+                            privileged: this.context.userInfo.privileged,
+                            staff: this.context.userInfo.staff,
                             parse: true
                         }
                     ).bootstrap();
@@ -100,23 +93,17 @@
                     this.myTeamsView = new MyTeamsView({
                         router: this.router,
                         teamEvents: this.teamEvents,
+                        context: this.context,
                         collection: this.teamMemberships,
-                        teamMemberships: this.teamMemberships,
-                        maxTeamSize: this.maxTeamSize,
-                        teamParams: {
-                            courseID: this.courseID,
-                            teamsUrl: this.teamsUrl,
-                            languages: this.languages,
-                            countries: this.countries
-                        }
+                        teamMemberships: this.teamMemberships
                     });
 
                     this.topicsCollection = new TopicCollection(
-                        this.topics,
+                        this.context.topics,
                         {
                             teamEvents: this.teamEvents,
-                            url: options.topicsUrl,
-                            course_id: this.courseID,
+                            url: this.context.topicsUrl,
+                            course_id: this.context.courseID,
                             parse: true
                         }
                     ).bootstrap();
@@ -127,21 +114,19 @@
                         collection: this.topicsCollection
                     });
 
-                    this.mainView = this.tabbedView = new ViewWithHeader({
-                        header: new HeaderView({
-                            model: new TeamsHeaderModel({
-                                description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),
-                                title: gettext("Teams")
-                            })
-                        }),
-                        main: new TabbedView({
+                    this.mainView = this.tabbedView = this.createViewWithHeader({
+                        title: gettext("Teams"),
+                        description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),
+                        mainView: new TabbedView({
                             tabs: [{
                                 title: gettext('My Team'),
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
                                 title: interpolate(
-                                    // Translators: sr_start and sr_end surround text meant only for screen readers.  The whole string will be shown to users as "Browse teams" if they are using a screenreader, and "Browse" otherwise.
+                                    // Translators: sr_start and sr_end surround text meant only for screen readers.
+                                    // The whole string will be shown to users as "Browse teams" if they are using a
+                                    // screenreader, and "Browse" otherwise.
                                     gettext("Browse %(sr_start)s teams %(sr_end)s"),
                                     {"sr_start": '<span class="sr">', "sr_end": '</span>'}, true
                                 ),
@@ -189,32 +174,77 @@
                 },
 
                 /**
+                 * Show the search results for a team.
+                 */
+                searchTeams: function (topicID) {
+                    var view = this;
+                    if (!this.teamsCollection) {
+                        this.router.navigate('topics/' + topicID, {trigger: true});
+                    } else {
+                        this.getTopic(topicID).done(function (topic) {
+                            view.mainView = view.createTeamsListView({
+                                topic: topic,
+                                collection: view.teamsCollection,
+                                title: gettext('Team Search'),
+                                description: interpolate(
+                                    gettext('Showing results for "%(searchString)s"'),
+                                    { searchString: view.teamsCollection.searchString },
+                                    true
+                                ),
+                                breadcrumbs: view.createBreadcrumbs(topic),
+                                showSortControls: false
+                            });
+                            view.render();
+                        });
+                    }
+                },
+
+                /**
                  * Render the create new team form.
                  */
                 newTeam: function (topicID) {
-                    var self = this;
-                    this.getTeamsView(topicID).done(function (teamsView) {
-                        self.mainView = new ViewWithHeader({
-                            header: new HeaderView({
-                                model: new TeamsHeaderModel({
-                                    description: gettext("Create a new team if you can't find existing teams to join, or if you would like to learn with friends you know."),
-                                    title: gettext("Create a New Team"),
-                                    breadcrumbs: [
-                                        {
-                                            title: teamsView.main.teamParams.topicName,
-                                            url: '#topics/' + teamsView.main.teamParams.topicID
-                                        }
-                                    ]
-                                })
-                            }),
-                            main: new TeamEditView({
-                                teamEvents: self.teamEvents,
-                                tagName: 'create-new-team',
-                                teamParams: teamsView.main.teamParams,
-                                primaryButtonTitle: 'Create'
+                    var view = this;
+                    this.getTopic(topicID).done(function (topic) {
+                        view.mainView = view.createViewWithHeader({
+                            topic: topic,
+                            title: gettext("Create a New Team"),
+                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
+                            mainView: new TeamEditView({
+                                action: 'create',
+                                teamEvents: view.teamEvents,
+                                context: view.context,
+                                topic: topic
                             })
                         });
-                        self.render();
+                        view.render();
+                    });
+                },
+
+                /**
+                 * Render the edit team form.
+                 */
+                editTeam: function (topicID, teamID) {
+                    var self = this,
+                        editViewWithHeader;
+                    this.getTopic(topicID).done(function (topic) {
+                        self.getTeam(teamID, false).done(function(team) {
+                            var view = new TeamEditView({
+                                action: 'edit',
+                                teamEvents: self.teamEvents,
+                                context: self.context,
+                                topic: topic,
+                                model: team
+                            });
+                            editViewWithHeader = self.createViewWithHeader({
+                                title: gettext("Edit Team"),
+                                description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                                mainView: view,
+                                topic: topic,
+                                team: team
+                            });
+                            self.mainView = editViewWithHeader;
+                            self.render();
+                        });
                     });
                 },
 
@@ -224,51 +254,72 @@
                 getTeamsView: function (topicID) {
                     // Lazily load the teams-for-topic view in
                     // order to avoid making an extra AJAX call.
-                    var self = this,
-                        router = this.router,
+                    var view = this,
                         deferred = $.Deferred();
-                    if (this.teamsCollection && this.teamsCollection.topic_id === topicID) {
+                    if (this.teamsView && this.teamsCollection && this.teamsCollection.topic_id === topicID) {
+                        this.teamsCollection.setSearchString('');
                         deferred.resolve(this.teamsView);
                     } else {
                         this.getTopic(topicID)
                             .done(function(topic) {
                                 var collection = new TeamCollection([], {
-                                    teamEvents: self.teamEvents,
-                                    course_id: self.courseID,
+                                    teamEvents: view.teamEvents,
+                                    course_id: view.context.courseID,
                                     topic_id: topicID,
-                                    url: self.teamsUrl,
+                                    url: view.context.teamsUrl,
                                     per_page: 10
                                 });
-                                self.teamsCollection = collection;
+                                view.teamsCollection = collection;
                                 collection.goTo(1)
                                     .done(function() {
-                                        var teamsView = new TopicTeamsView({
-                                            router: self.router,
+                                        var teamsView = view.createTeamsListView({
                                             topic: topic,
                                             collection: collection,
-                                            teamMemberships: self.teamMemberships,
-                                            maxTeamSize: self.maxTeamSize,
-                                            teamParams: {
-                                                courseID: self.courseID,
-                                                topicID: topic.get('id'),
-                                                teamsUrl: self.teamsUrl,
-                                                topicName: topic.get('name'),
-                                                languages: self.languages,
-                                                countries: self.countries
-                                            }
+                                            showSortControls: true
                                         });
-                                        deferred.resolve(
-                                            self.createViewWithHeader(
-                                                {
-                                                    mainView: teamsView,
-                                                    subject: topic
-                                                }
-                                            )
-                                        );
+                                        deferred.resolve(teamsView);
                                     });
                             });
                     }
                     return deferred.promise();
+                },
+
+                createTeamsListView: function(options) {
+                    var topic = options.topic,
+                        collection = options.collection,
+                        teamsView = new TopicTeamsView({
+                            router: this.router,
+                            context: this.context,
+                            model: topic,
+                            collection: collection,
+                            teamMemberships: this.teamMemberships,
+                            showSortControls: options.showSortControls
+                        }),
+                        searchFieldView = new SearchFieldView({
+                            type: 'teams',
+                            label: gettext('Search teams'),
+                            collection: collection
+                        }),
+                        viewWithHeader = this.createViewWithHeader({
+                            subject: topic,
+                            mainView: teamsView,
+                            headerActionsView: searchFieldView,
+                            title: options.title,
+                            description: options.description,
+                            breadcrumbs: options.breadcrumbs
+                        });
+                    // Listen to requests to sync the collection and redirect it as follows:
+                    // 1. If the collection includes a search, show the search results page
+                    // 2. If not, then show the regular topic teams page
+                    // Note: Backbone makes this a no-op if redirecting to the current page.
+                    this.listenTo(collection, 'sync', function() {
+                        if (collection.searchString) {
+                            Backbone.history.navigate('topics/' + topic.get('id') + '/search', {trigger: true});
+                        } else {
+                            Backbone.history.navigate('topics/' + topic.get('id'), {trigger: true});
+                        }
+                    });
+                    return viewWithHeader;
                 },
 
                 /**
@@ -283,42 +334,42 @@
                 },
 
                 /**
+                 * Sets focus to teams header.
+                 */
+                setFocusToHeader: function() {
+                    $('.page-header-main .sr-is-focusable').focus();
+                },
+
+                /**
                  * Return a promise for the team view for the given team ID.
                  */
                 getBrowseTeamView: function (topicID, teamID) {
                     var self = this,
-                        deferred = $.Deferred(),
-                        courseID = this.courseID;
+                        deferred = $.Deferred();
                     self.getTopic(topicID).done(function(topic) {
                         self.getTeam(teamID, true).done(function(team) {
                             var view = new TeamProfileView({
                                 teamEvents: self.teamEvents,
                                 router: self.router,
-                                courseID: courseID,
+                                context: self.context,
                                 model: team,
-                                maxTeamSize: self.maxTeamSize,
-                                isPrivileged: self.userInfo.privileged,
-                                requestUsername: self.userInfo.username,
-                                countries: self.countries,
-                                languages: self.languages,
-                                teamMembershipDetailUrl: self.teamMembershipDetailUrl
+                                setFocusToHeaderFunc: self.setFocusToHeader
                             });
-                            var teamJoinView = new TeamJoinView({
+
+                            var TeamProfileActionsView = new TeamProfileHeaderActionsView({
                                 teamEvents: self.teamEvents,
-                                    courseID: courseID,
-                               model: team,
-                                teamsUrl: self.teamsUrl,
-                                maxTeamSize: self.maxTeamSize,
-                                currentUsername: self.userInfo.username,
-                                teamMembershipsUrl: self.teamMembershipsUrl
+                                context: self.context,
+                                model: team,
+                                topic: topic,
+                                showEditButton: self.context.userInfo.privileged || self.context.userInfo.staff
                             });
                             deferred.resolve(
                                 self.createViewWithHeader(
                                     {
                                         mainView: view,
                                         subject: team,
-                                        parentTopic: topic,
-                                        headerActionsView: teamJoinView
+                                        topic: topic,
+                                        headerActionsView: TeamProfileActionsView
                                     }
                                 )
                             );
@@ -327,36 +378,55 @@
                     return deferred.promise();
                 },
 
-                createViewWithHeader: function (options) {
-                    var router = this.router,
-                        breadcrumbs, headerView;
-                    breadcrumbs = [{
+                createBreadcrumbs: function(topic, team) {
+                    var breadcrumbs = [{
                         title: gettext('All Topics'),
                         url: '#browse'
                     }];
-                    if (options.parentTopic) {
+                    if (topic) {
                         breadcrumbs.push({
-                            title: options.parentTopic.get('name'),
-                            url: '#topics/' + options.parentTopic.id
+                            title: topic.get('name'),
+                            url: '#topics/' + topic.id
                         });
-                    }
-                    headerView = new HeaderView({
-                        model: new TeamsHeaderModel({
-                            description: options.subject.get('description'),
-                            title: options.subject.get('name'),
-                            breadcrumbs: breadcrumbs
-                        }),
-                        headerActionsView: options.headerActionsView,
-                        events: {
-                            'click nav.breadcrumbs a.nav-item': function (event) {
-                                var url = $(event.currentTarget).attr('href');
-                                event.preventDefault();
-                                router.navigate(url, {trigger: true});
-                            }
+                        if (team) {
+                            breadcrumbs.push({
+                                title: team.get('name'),
+                                url: '#teams/' + topic.id + '/' + team.id
+                            });
                         }
+                    }
+                    return breadcrumbs;
+                },
+
+                createHeaderModel: function(options) {
+                    var subject = options.subject,
+                        breadcrumbs = options.breadcrumbs,
+                        title = options.title || subject.get('name'),
+                        description = options.description || subject.get('description');
+                    if (!breadcrumbs) {
+                        breadcrumbs = this.createBreadcrumbs(options.topic, options.team);
+                    }
+                    return new TeamsHeaderModel({
+                        breadcrumbs: breadcrumbs,
+                        title: title,
+                        description: description
                     });
+                },
+
+                createViewWithHeader: function(options) {
+                    var router = this.router;
                     return new ViewWithHeader({
-                        header: headerView,
+                        header: new HeaderView({
+                            model: this.createHeaderModel(options),
+                            headerActionsView: options.headerActionsView,
+                            events: {
+                                'click nav.breadcrumbs a.nav-item': function (event) {
+                                    var url = $(event.currentTarget).attr('href');
+                                    event.preventDefault();
+                                    router.navigate(url, {trigger: true});
+                                }
+                            }
+                        }),
                         main: options.mainView
                     });
                 },
@@ -379,7 +449,7 @@
                     } else {
                         topic = new TopicModel({
                             id: topicID,
-                            url: self.topicUrl.replace('topic_id', topicID)
+                            url: self.context.topicUrl.replace('topic_id', topicID)
                         });
                         topic.fetch()
                             .done(function() {
@@ -405,7 +475,7 @@
                     var team = this.teamsCollection ? this.teamsCollection.get(teamID) : null,
                         self = this,
                         deferred = $.Deferred(),
-                        teamUrl = this.teamsUrl + teamID + (expandUser ? '?expand=user': '');
+                        teamUrl = this.context.teamsUrl + teamID + (expandUser ? '?expand=user': '');
                     if (team) {
                         team.url = teamUrl;
                         deferred.resolve(team);
@@ -499,11 +569,11 @@
                  * belongs to the team.
                  */
                 readOnlyDiscussion: function (team) {
-                    var self = this;
+                    var userInfo = this.context.userInfo;
                     return !(
-                        self.userInfo.privileged ||
+                        userInfo.privileged ||
                         _.any(team.attributes.membership, function (membership) {
-                            return membership.user.username === self.userInfo.username;
+                            return membership.user.username === userInfo.username;
                         })
                     );
                 }

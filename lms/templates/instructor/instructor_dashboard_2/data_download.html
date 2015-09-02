@@ -39,6 +39,19 @@
       <p>${_("Click to generate a CSV file of all proctored exam results in this course.")}</p>
       <p><input type="button" name="proctored-exam-results-report" value="${_("Generate Proctored Exam Results Report")}" data-endpoint="${ section_data['list_proctored_results_url'] }"/></p>
     %endif
+
+    <p>${_("To generate a CSV file that lists all student answers to a given problem, enter the location of the problem (from its Staff Debug Info).")}</p>
+
+    <p>
+      <label>
+        <span>${_("Problem location: ")}</span>
+        <input type="text" name="problem-location" />
+      </label>
+    </p>
+    <p>
+      <input type="button" name="list-problem-responses-csv" value="${_("Download a CSV of problem responses")}" data-endpoint="${ section_data['get_problem_responses_url'] }" data-csv="true">
+    </p>
+
   % if not disable_buttons:
     <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
     <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
@@ -54,7 +67,7 @@
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
-    <div class="request-response-error msg msg-warning copy" id="report-request-response-error"></div>
+    <div class="request-response-error msg msg-error copy" id="report-request-response-error"></div>
     <br>
 
     <p><b>${_("Reports Available for Download")}</b></p>

@@ -404,7 +404,35 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertTrue(self.video.is_video_rendered('html5'))
 
-    @skip('Failing on master; To see remove is_youtube_available() form base class')
+    def test_html5_video_rendered_with_youtube_captions(self):
+        """
+        Scenario: User should see Youtube captions for If there are no transcripts
+        available for HTML5 mode
+        Given that I have uploaded a .srt.sjson file to assets for Youtube mode
+        And the YouTube API is blocked
+        And the course has a Video component in "Youtube_HTML5" mode
+        And Video component rendered in HTML5 mode
+        And Html5 mode video has no transcripts
+        When I see the captions for HTML5 mode video
+        Then I should see the Youtube captions
+        """
+        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+        # configure youtube server
+        self.youtube_configuration.update({
+            'time_to_response': 2.0,
+            'youtube_api_blocked': True,
+        })
+
+        data = {'sub': '3_yD_cEKoCk'}
+        self.metadata = self.metadata_for_mode('youtube_html5', additional_data=data)
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
+        # check if caption button is visible
+        self.assertTrue(self.video.is_button_shown('CC'))
+        self._verify_caption_text('Welcome to edX.')
+
     def test_download_transcript_button_works_correctly(self):
         """
         Scenario: Download Transcript button works correctly
@@ -713,7 +741,6 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
 
-    @skip('Failing on master; To see remove is_youtube_available() form base class')
     def test_video_bumper_render(self):
         """
         Scenario: Multiple videos with bumper in sequentials all load and work, switching between sequentials
@@ -738,7 +765,7 @@ class YouTubeVideoTest(VideoBaseTest):
             u'video_bumper': {
                 u'value': {
                     "transcripts": {},
-                    "video_id": "edx_video_id"
+                    "video_id": "video_001"
                 }
             }
         }

@@ -2,7 +2,10 @@
 Acceptance tests for the teams feature.
 """
 import json
+import random
+import time
 
+from dateutil.parser import parse
 import ddt
 from flaky import flaky
 from nose.plugins.attrib import attr
@@ -19,7 +22,10 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
+from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateOrEditTeamPage, TeamPage
+
+
+TOPICS_PER_PAGE = 12
 
 
 class TeamsTabBase(UniqueCourseTest):
@@ -34,7 +40,7 @@ class TeamsTabBase(UniqueCourseTest):
         """Create `num_topics` test topics."""
         return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
 
-    def create_teams(self, topic, num_teams):
+    def create_teams(self, topic, num_teams, time_between_creation=0):
         """Create `num_teams` teams belonging to `topic`."""
         teams = []
         for i in xrange(num_teams):
@@ -51,6 +57,10 @@ class TeamsTabBase(UniqueCourseTest):
                 data=json.dumps(team),
                 headers=self.course_fixture.headers
             )
+            # Sadly, this sleep is necessary in order to ensure that
+            # sorting by last_activity_at works correctly when running
+            # in Jenkins.
+            time.sleep(time_between_creation)
             teams.append(json.loads(response.text))
         return teams
 
@@ -103,15 +113,8 @@ class TeamsTabBase(UniqueCourseTest):
             self.assertEqual(expected_team['name'], team_card_name)
             self.assertEqual(expected_team['description'], team_card_description)
 
-        team_cards = page.team_cards
-        team_card_names = [
-            team_card.find_element_by_css_selector('.card-title').text
-            for team_card in team_cards.results
-        ]
-        team_card_descriptions = [
-            team_card.find_element_by_css_selector('.card-description').text
-            for team_card in team_cards.results
-        ]
+        team_card_names = page.team_names
+        team_card_descriptions = page.team_descriptions
         map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
 
     def verify_my_team_count(self, expected_number_of_teams):
@@ -274,6 +277,7 @@ class MyTeamsTest(TeamsTabBase):
 
 
 @attr('shard_5')
+@ddt.ddt
 class BrowseTopicsTest(TeamsTabBase):
     """
     Tests for the Browse tab of the Teams page.
@@ -282,6 +286,66 @@ class BrowseTopicsTest(TeamsTabBase):
     def setUp(self):
         super(BrowseTopicsTest, self).setUp()
         self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
+
+    @ddt.data(('name', False), ('team_count', True))
+    @ddt.unpack
+    def test_sort_topics(self, sort_order, reverse):
+        """
+        Scenario: the user should be able to sort the list of topics by name or team count
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        Then I should see a list of topics for the course
+        When I choose a sort order
+        Then I should see the paginated list of topics in that order
+        """
+        topics = self.create_topics(TOPICS_PER_PAGE + 1)
+        self.set_team_configuration({u"max_team_size": 100, u"topics": topics})
+        for i, topic in enumerate(random.sample(topics, len(topics))):
+            self.create_teams(topic, i)
+            topic['team_count'] = i
+        self.topics_page.visit()
+        self.topics_page.sort_topics_by(sort_order)
+        topic_names = self.topics_page.topic_names
+        self.assertEqual(len(topic_names), TOPICS_PER_PAGE)
+        self.assertEqual(
+            topic_names,
+            [t['name'] for t in sorted(topics, key=lambda t: t[sort_order], reverse=reverse)][:TOPICS_PER_PAGE]
+        )
+
+    def test_sort_topics_update(self):
+        """
+        Scenario: the list of topics should remain sorted after updates
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics and choose a sort order
+        Then I should see the paginated list of topics in that order
+        When I create a team in one of those topics
+        And I return to the topics list
+        Then I should see the topics in the correct sorted order
+        """
+        topics = self.create_topics(3)
+        self.set_team_configuration({u"max_team_size": 100, u"topics": topics})
+        self.topics_page.visit()
+        self.topics_page.sort_topics_by('team_count')
+        topic_name = self.topics_page.topic_names[-1]
+        topic = [t for t in topics if t['name'] == topic_name][0]
+        self.topics_page.browse_teams_for_topic(topic_name)
+        browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
+        self.assertTrue(browse_teams_page.is_browser_on_page())
+        browse_teams_page.click_create_team_link()
+        create_team_page = CreateOrEditTeamPage(self.browser, self.course_id, topic)
+        create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
+        create_team_page.value_for_textarea_field(
+            field_id='description',
+            value='Team description.'
+        )
+        create_team_page.submit_form()
+        team_page = TeamPage(self.browser, self.course_id)
+        self.assertTrue(team_page.is_browser_on_page)
+        team_page.click_all_topics_breadcrumb()
+        self.assertTrue(self.topics_page.is_browser_on_page())
+        self.assertEqual(topic_name, self.topics_page.topic_names[0])
 
     def test_list_topics(self):
         """
@@ -294,7 +358,7 @@ class BrowseTopicsTest(TeamsTabBase):
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(2)})
         self.topics_page.visit()
         self.assertEqual(len(self.topics_page.topic_cards), 2)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 1-2 out of 2 total')
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-2 out of 2 total'))
         self.assertFalse(self.topics_page.pagination_controls_visible())
         self.assertFalse(self.topics_page.is_previous_page_button_enabled())
         self.assertFalse(self.topics_page.is_next_page_button_enabled())
@@ -309,8 +373,8 @@ class BrowseTopicsTest(TeamsTabBase):
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(20)})
         self.topics_page.visit()
-        self.assertEqual(len(self.topics_page.topic_cards), 12)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 1-12 out of 20 total')
+        self.assertEqual(len(self.topics_page.topic_cards), TOPICS_PER_PAGE)
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-12 out of 20 total'))
         self.assertTrue(self.topics_page.pagination_controls_visible())
         self.assertFalse(self.topics_page.is_previous_page_button_enabled())
         self.assertTrue(self.topics_page.is_next_page_button_enabled())
@@ -360,10 +424,10 @@ class BrowseTopicsTest(TeamsTabBase):
         self.topics_page.visit()
         self.topics_page.press_next_page_button()
         self.assertEqual(len(self.topics_page.topic_cards), 1)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 13-13 out of 13 total')
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 13-13 out of 13 total'))
         self.topics_page.press_previous_page_button()
-        self.assertEqual(len(self.topics_page.topic_cards), 12)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 1-12 out of 13 total')
+        self.assertEqual(len(self.topics_page.topic_cards), TOPICS_PER_PAGE)
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-12 out of 13 total'))
 
     def test_topic_description_truncation(self):
         """
@@ -380,7 +444,7 @@ class BrowseTopicsTest(TeamsTabBase):
             {u"max_team_size": 1, u"topics": [{"name": "", "id": "", "description": initial_description}]}
         )
         self.topics_page.visit()
-        truncated_description = self.topics_page.topic_cards[0].text
+        truncated_description = self.topics_page.topic_descriptions[0]
         self.assertLess(len(truncated_description), len(initial_description))
         self.assertTrue(truncated_description.endswith('...'))
         self.assertIn(truncated_description.split('...')[0], initial_description)
@@ -403,11 +467,12 @@ class BrowseTopicsTest(TeamsTabBase):
         self.topics_page.browse_teams_for_topic('Example Topic')
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
         self.assertTrue(browse_teams_page.is_browser_on_page())
-        self.assertEqual(browse_teams_page.header_topic_name, 'Example Topic')
-        self.assertEqual(browse_teams_page.header_topic_description, 'Description')
+        self.assertEqual(browse_teams_page.header_name, 'Example Topic')
+        self.assertEqual(browse_teams_page.header_description, 'Description')
 
 
 @attr('shard_5')
+@ddt.ddt
 class BrowseTeamsWithinTopicTest(TeamsTabBase):
     """
     Tests for browsing Teams within a Topic on the Teams page.
@@ -417,21 +482,45 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
     def setUp(self):
         super(BrowseTeamsWithinTopicTest, self).setUp()
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
-        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.max_team_size = 10
+        self.set_team_configuration({
+            'course_id': self.course_id,
+            'max_team_size': self.max_team_size,
+            'topics': [self.topic]
+        })
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
 
+    def teams_with_default_sort_order(self, teams):
+        """Return a list of teams sorted according to the default ordering
+        (last_activity_at, with a secondary sort by open slots).
+        """
+        return sorted(
+            sorted(teams, key=lambda t: len(t['membership']), reverse=True),
+            key=lambda t: parse(t['last_activity_at']).replace(microsecond=0),
+            reverse=True
+        )
+
     def verify_page_header(self):
         """Verify that the page header correctly reflects the current topic's name and description."""
-        self.assertEqual(self.browse_teams_page.header_topic_name, self.topic['name'])
-        self.assertEqual(self.browse_teams_page.header_topic_description, self.topic['description'])
+        self.assertEqual(self.browse_teams_page.header_name, self.topic['name'])
+        self.assertEqual(self.browse_teams_page.header_description, self.topic['description'])
 
-    def verify_on_page(self, page_num, total_teams, pagination_header_text, footer_visible):
+    def verify_search_header(self, search_results_page, search_query):
+        """Verify that the page header correctly reflects the current topic's name and description."""
+        self.assertEqual(search_results_page.header_name, 'Team Search')
+        self.assertEqual(
+            search_results_page.header_description,
+            'Showing results for "{search_query}"'.format(search_query=search_query)
+        )
+
+    def verify_on_page(self, teams_page, page_num, total_teams, pagination_header_text, footer_visible):
         """
         Verify that we are on the correct team list page.
 
         Arguments:
-            page_num (int): The one-indexed page we expect to be on
+            teams_page (BaseTeamsPage): The teams page object that should be the current page.
+            page_num (int): The one-indexed page number that we expect to be on
             total_teams (list): An unsorted list of all the teams for the
                 current topic
             pagination_header_text (str): Text we expect to see in the
@@ -439,17 +528,74 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             footer_visible (bool): Whether we expect to see the pagination
                 footer controls.
         """
-        alphabetized_teams = sorted(total_teams, key=lambda team: team['name'])
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), pagination_header_text)
+        sorted_teams = self.teams_with_default_sort_order(total_teams)
+        self.assertTrue(teams_page.get_pagination_header_text().startswith(pagination_header_text))
         self.verify_teams(
-            self.browse_teams_page,
-            alphabetized_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
+            teams_page,
+            sorted_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
         )
         self.assertEqual(
-            self.browse_teams_page.pagination_controls_visible(),
+            teams_page.pagination_controls_visible(),
             footer_visible,
             msg='Expected paging footer to be ' + 'visible' if footer_visible else 'invisible'
         )
+
+    @ddt.data(
+        ('open_slots', 'last_activity_at', True),
+        ('last_activity_at', 'open_slots', True)
+    )
+    @ddt.unpack
+    def test_sort_teams(self, sort_order, secondary_sort_order, reverse):
+        """
+        Scenario: the user should be able to sort the list of teams by open slots or last activity
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse teams within a topic
+        Then I should see a list of teams for that topic
+        When I choose a sort order
+        Then I should see the paginated list of teams in that order
+        """
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
+        for i, team in enumerate(random.sample(teams, len(teams))):
+            for _ in range(i):
+                user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
+                self.create_membership(user_info['username'], team['id'])
+            team['open_slots'] = self.max_team_size - i
+            # Parse last activity date, removing microseconds because
+            # the Django ORM does not support them. Will be fixed in
+            # Django 1.8.
+            team['last_activity_at'] = parse(team['last_activity_at']).replace(microsecond=0)
+        # Re-authenticate as staff after creating users
+        AutoAuthPage(
+            self.browser,
+            course_id=self.course_id,
+            staff=True
+        ).visit()
+        self.browse_teams_page.visit()
+        self.browse_teams_page.sort_teams_by(sort_order)
+        team_names = self.browse_teams_page.team_names
+        self.assertEqual(len(team_names), self.TEAMS_PAGE_SIZE)
+        sorted_teams = [
+            team['name']
+            for team in sorted(
+                sorted(teams, key=lambda t: t[secondary_sort_order], reverse=reverse),
+                key=lambda t: t[sort_order],
+                reverse=reverse
+            )
+        ][:self.TEAMS_PAGE_SIZE]
+        self.assertEqual(team_names, sorted_teams)
+
+    def test_default_sort_order(self):
+        """
+        Scenario: the list of teams should be sorted by last activity by default
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse teams within a topic
+        Then I should see a list of teams for that topic, sorted by last activity
+        """
+        self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
+        self.browse_teams_page.visit()
+        self.assertEqual(self.browse_teams_page.sort_order, 'last activity')
 
     def test_no_teams(self):
         """
@@ -464,7 +610,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         """
         self.browse_teams_page.visit()
         self.verify_page_header()
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
         self.assertEqual(len(self.browse_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertFalse(
             self.browse_teams_page.pagination_controls_visible(),
@@ -483,10 +629,12 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And I should see a button to add a team
         And I should not see a pagination footer
         """
-        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE)
+        teams = self.teams_with_default_sort_order(
+            self.create_teams(self.topic, self.TEAMS_PAGE_SIZE, time_between_creation=1)
+        )
         self.browse_teams_page.visit()
         self.verify_page_header()
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1-10 out of 10 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 1-10 out of 10 total'))
         self.verify_teams(self.browse_teams_page, teams)
         self.assertFalse(
             self.browse_teams_page.pagination_controls_visible(),
@@ -506,14 +654,14 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And when I click on the previous page button
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1, time_between_creation=1)
         self.browse_teams_page.visit()
         self.verify_page_header()
-        self.verify_on_page(1, teams, 'Showing 1-10 out of 11 total', True)
+        self.verify_on_page(self.browse_teams_page, 1, teams, 'Showing 1-10 out of 11 total', True)
         self.browse_teams_page.press_next_page_button()
-        self.verify_on_page(2, teams, 'Showing 11-11 out of 11 total', True)
+        self.verify_on_page(self.browse_teams_page, 2, teams, 'Showing 11-11 out of 11 total', True)
         self.browse_teams_page.press_previous_page_button()
-        self.verify_on_page(1, teams, 'Showing 1-10 out of 11 total', True)
+        self.verify_on_page(self.browse_teams_page, 1, teams, 'Showing 1-10 out of 11 total', True)
 
     def test_teams_page_input(self):
         """
@@ -528,28 +676,24 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         When I input the first page
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 10)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 10, time_between_creation=1)
         self.browse_teams_page.visit()
         self.verify_page_header()
-        self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
+        self.verify_on_page(self.browse_teams_page, 1, teams, 'Showing 1-10 out of 20 total', True)
         self.browse_teams_page.go_to_page(2)
-        self.verify_on_page(2, teams, 'Showing 11-20 out of 20 total', True)
+        self.verify_on_page(self.browse_teams_page, 2, teams, 'Showing 11-20 out of 20 total', True)
         self.browse_teams_page.go_to_page(1)
-        self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
+        self.verify_on_page(self.browse_teams_page, 1, teams, 'Showing 1-10 out of 20 total', True)
 
-    def test_navigation_links(self):
+    def test_browse_team_topics(self):
         """
         Scenario: User should be able to navigate to "browse all teams" and "search team description" links.
-        Given I am enrolled in a course with a team configuration and a topic
-            containing one team
-        When I visit the Teams page for that topic
+        Given I am enrolled in a course with teams enabled
+        When I visit the Teams page for a topic
         Then I should see the correct page header
-        And I should see the link to "browse all team"
-        And I should navigate to that link
-        And I see the relevant page loaded
-        And I should see the link to "search teams"
-        And I should navigate to that link
-        And I see the relevant page loaded
+        And I should see the link to "browse teams in other topics"
+        When I should navigate to that link
+        Then I should see the topic browse page
         """
         self.browse_teams_page.visit()
         self.verify_page_header()
@@ -557,54 +701,129 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
+    def test_search(self):
+        """
+        Scenario: User should be able to search for a team
+        Given I am enrolled in a course with teams enabled
+        When I visit the Teams page for that topic
+        And I search for 'banana'
+        Then I should see the search result page
+        And the search header should be shown
+        And 0 results should be shown
+        """
+        # Note: all searches will return 0 results with the mock search server
+        # used by Bok Choy.
+        self.create_teams(self.topic, 5)
         self.browse_teams_page.visit()
-        self.verify_page_header()
-        self.browse_teams_page.click_search_team_link()
-        # TODO Add search page expectation once that implemented.
+        search_results_page = self.browse_teams_page.search('banana')
+        self.verify_search_header(search_results_page, 'banana')
+        self.assertTrue(search_results_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
 
 @attr('shard_5')
-class CreateTeamTest(TeamsTabBase):
+class TeamFormActions(TeamsTabBase):
+    """
+    Base class for create & edit team.
+    """
+    TEAM_DESCRIPTION = 'The Avengers are a fictional team of superheroes.'
+
+    topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
+    TEAMS_NAME = 'Avengers'
+
+    def verify_page_header(self, title, description, breadcrumbs):
+        """
+        Verify that the page header correctly reflects the
+        create team header, description and breadcrumb.
+        """
+        self.assertEqual(self.create_or_edit_team_page.header_page_name, title)
+        self.assertEqual(self.create_or_edit_team_page.header_page_description, description)
+        self.assertEqual(self.create_or_edit_team_page.header_page_breadcrumbs, breadcrumbs)
+
+    def verify_and_navigate_to_create_team_page(self):
+        """Navigates to the create team page and verifies."""
+        self.browse_teams_page.click_create_team_link()
+        self.verify_page_header(
+            title='Create a New Team',
+            description='Create a new team if you can\'t find an existing team to join, '
+                        'or if you would like to learn with friends you know.',
+            breadcrumbs='All Topics {topic_name}'.format(topic_name=self.topic['name'])
+        )
+
+    def verify_and_navigate_to_edit_team_page(self):
+        """Navigates to the edit team page and verifies."""
+        # pylint: disable=no-member
+        self.assertEqual(self.team_page.team_name, self.team['name'])
+        self.assertTrue(self.team_page.edit_team_button_present)
+
+        self.team_page.click_edit_team_button()
+
+        self.create_or_edit_team_page.wait_for_page()
+
+        # Edit page header.
+        self.verify_page_header(
+            title='Edit Team',
+            description='If you make significant changes, make sure you notify '
+                        'members of the team before making these changes.',
+            breadcrumbs='All Topics {topic_name} {team_name}'.format(
+                topic_name=self.topic['name'],
+                team_name=self.team['name']
+            )
+        )
+
+    def verify_team_info(self, name, description, location, language):
+        """Verify the team information on team page."""
+        # pylint: disable=no-member
+        self.assertEqual(self.team_page.team_name, name)
+        self.assertEqual(self.team_page.team_description, description)
+        self.assertEqual(self.team_page.team_location, location)
+        self.assertEqual(self.team_page.team_language, language)
+
+    def fill_create_or_edit_form(self):
+        """Fill the create/edit team form fields with appropriate values."""
+        self.create_or_edit_team_page.value_for_text_field(field_id='name', value=self.TEAMS_NAME, press_enter=False)
+        self.create_or_edit_team_page.value_for_textarea_field(
+            field_id='description',
+            value=self.TEAM_DESCRIPTION
+        )
+        self.create_or_edit_team_page.value_for_dropdown_field(field_id='language', value='English')
+        self.create_or_edit_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+
+    def verify_all_fields_exist(self):
+        """
+        Verify the fields for create/edit page.
+        """
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_field('name'),
+            'A name that identifies your team (maximum 255 characters).'
+        )
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_textarea_field('description'),
+            'A short description of the team to help other learners understand '
+            'the goals or direction of the team (maximum 300 characters).'
+        )
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_field('country'),
+            'The country that team members primarily identify with.'
+        )
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_field('language'),
+            'The language that team members primarily use to communicate with each other.'
+        )
+
+
+@ddt.ddt
+class CreateTeamTest(TeamFormActions):
     """
     Tests for creating a new Team within a Topic on the Teams page.
     """
 
     def setUp(self):
         super(CreateTeamTest, self).setUp()
-        self.topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+
+        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page.visit()
-        self.create_team_page = CreateTeamPage(self.browser, self.course_id, self.topic)
-        self.team_name = 'Avengers'
-
-    def verify_page_header(self):
-        """
-        Verify that the page header correctly reflects the
-        create team header, description and breadcrumb.
-        """
-        self.assertEqual(self.create_team_page.header_page_name, 'Create a New Team')
-        self.assertEqual(
-            self.create_team_page.header_page_description,
-            'Create a new team if you can\'t find existing teams to join, '
-            'or if you would like to learn with friends you know.'
-        )
-        self.assertEqual(self.create_team_page.header_page_breadcrumbs, self.topic['name'])
-
-    def verify_and_navigate_to_create_team_page(self):
-        """Navigates to the create team page and verifies."""
-        self.browse_teams_page.click_create_team_link()
-        self.verify_page_header()
-
-    def fill_create_form(self):
-        """Fill the create team form fields with appropriate values."""
-        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name, press_enter=False)
-        self.create_team_page.value_for_textarea_field(
-            field_id='description',
-            value='The Avengers are a fictional team of superheroes.'
-        )
-        self.create_team_page.value_for_dropdown_field(field_id='language', value='English')
-        self.create_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
 
     def test_user_can_see_create_team_page(self):
         """
@@ -618,23 +837,7 @@ class CreateTeamTest(TeamsTabBase):
         And I should also see the help messages for fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.assertEqual(
-            self.create_team_page.message_for_field('name'),
-            'A name that identifies your team (maximum 255 characters).'
-        )
-        self.assertEqual(
-            self.create_team_page.message_for_textarea_field('description'),
-            'A short description of the team to help other learners understand '
-            'the goals or direction of the team (maximum 300 characters).'
-        )
-        self.assertEqual(
-            self.create_team_page.message_for_field('country'),
-            'The country that team members primarily identify with.'
-        )
-        self.assertEqual(
-            self.create_team_page.message_for_field('language'),
-            'The language that team members primarily use to communicate with each other.'
-        )
+        self.verify_all_fields_exist()
 
     def test_user_can_see_error_message_for_missing_data(self):
         """
@@ -646,14 +849,14 @@ class CreateTeamTest(TeamsTabBase):
         Then I should see the error message and highlighted fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.create_team_page.submit_form()
+        self.create_or_edit_team_page.submit_form()
 
         self.assertEqual(
-            self.create_team_page.validation_message_text,
+            self.create_or_edit_team_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
-        self.assertTrue(self.create_team_page.error_for_field(field_id='description'))
+        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='description'))
 
     def test_user_can_see_error_message_for_incorrect_data(self):
         """
@@ -668,7 +871,7 @@ class CreateTeamTest(TeamsTabBase):
         self.verify_and_navigate_to_create_team_page()
 
         # Fill the name field with >255 characters to see validation message.
-        self.create_team_page.value_for_text_field(
+        self.create_or_edit_team_page.value_for_text_field(
             field_id='name',
             value='EdX is a massive open online course (MOOC) provider and online learning platform. '
                   'It hosts online university-level courses in a wide range of disciplines to a worldwide '
@@ -680,13 +883,13 @@ class CreateTeamTest(TeamsTabBase):
                   'edX has more than 4 million users taking more than 500 courses online.',
             press_enter=False
         )
-        self.create_team_page.submit_form()
+        self.create_or_edit_team_page.submit_form()
 
         self.assertEqual(
-            self.create_team_page.validation_message_text,
+            self.create_or_edit_team_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
 
     def test_user_can_create_new_team_successfully(self):
         """
@@ -702,16 +905,19 @@ class CreateTeamTest(TeamsTabBase):
         And the number of teams should be updated on the topic card
         And if I switch to "My Team", the newly created team is displayed
         """
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.browse_teams_page.visit()
+
         self.verify_and_navigate_to_create_team_page()
 
-        self.fill_create_form()
-        self.create_team_page.submit_form()
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.submit_form()
 
         # Verify that the page is shown for the new team
         team_page = TeamPage(self.browser, self.course_id)
         team_page.wait_for_page()
-        self.assertEqual(team_page.team_name, self.team_name)
-        self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
+        self.assertEqual(team_page.team_name, self.TEAMS_NAME)
+        self.assertEqual(team_page.team_description, self.TEAM_DESCRIPTION)
         self.assertEqual(team_page.team_user_membership_text, 'You are a member of this team.')
 
         # Verify the new team was added to the topic list
@@ -734,18 +940,169 @@ class CreateTeamTest(TeamsTabBase):
         Then I should see teams list page without any new team.
         And if I switch to "My Team", it shows no teams
         """
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.verify_and_navigate_to_create_team_page()
-        self.create_team_page.cancel_team()
+        self.create_or_edit_team_page.cancel_team()
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.teams_page.click_all_topics()
         self.teams_page.verify_team_count_in_first_topic(0)
 
         self.verify_my_team_count(0)
+
+
+@ddt.ddt
+class EditTeamTest(TeamFormActions):
+    """
+    Tests for editing the team.
+    """
+
+    def setUp(self):
+        super(EditTeamTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
+
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+        self.team_page.visit()
+
+    def test_staff_can_navigate_to_edit_team_page(self):
+        """
+        Scenario: The user should be able to see and navigate to the edit team page.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the edit team page
+        And I should see the edit team header
+        And I should also see the help messages for fields
+        """
+        self.verify_and_navigate_to_edit_team_page()
+        self.verify_all_fields_exist()
+
+    def test_staff_can_edit_team_successfully(self):
+        """
+        Scenario: The staff should be able to edit team successfully.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the edit team page
+        When I edit all the fields with appropriate data
+        And I click Update button
+        Then I should see the page for my team with updated data
+        """
+        self.verify_team_info(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+        self.verify_and_navigate_to_edit_team_page()
+
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.submit_form()
+
+        self.team_page.wait_for_page()
+
+        self.verify_team_info(
+            name=self.TEAMS_NAME,
+            description=self.TEAM_DESCRIPTION,
+            location='Pakistan',
+            language='English'
+        )
+
+    def test_staff_can_cancel_the_team_edit(self):
+        """
+        Scenario: The user should be able to cancel the editing of team.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the edit team page
+        Then I should see the Edit Team header
+        When I click Cancel button
+        Then I should see team page page without changes.
+        """
+        self.verify_team_info(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+
+        self.verify_and_navigate_to_edit_team_page()
+
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.cancel_team()
+
+        self.team_page.wait_for_page()
+
+        self.verify_team_info(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+
+    def test_student_cannot_see_edit_button(self):
+        """
+        Scenario: The student should not see the edit team button.
+        Given I am student for a course with a team
+        When I visit the Team profile page
+        Then I should not see the Edit Team button
+        """
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.team_page.visit()
+        self.assertFalse(self.team_page.edit_team_button_present)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator')
+    def test_discussion_privileged_user_can_edit_team(self, role):
+        """
+        Scenario: The user with specified role should see the edit team button.
+        Given I am user with privileged role for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        """
+        kwargs = {
+            'course_id': self.course_id,
+            'staff': False
+        }
+        if role is not None:
+            kwargs['roles'] = role
+
+        AutoAuthPage(self.browser, **kwargs).visit()
+
+        self.team_page.visit()
+        self.teams_page.wait_for_page()
+        self.assertTrue(self.team_page.edit_team_button_present)
+
+        self.verify_team_info(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+        self.verify_and_navigate_to_edit_team_page()
+
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.submit_form()
+
+        self.team_page.wait_for_page()
+
+        self.verify_team_info(
+            name=self.TEAMS_NAME,
+            description=self.TEAM_DESCRIPTION,
+            location='Pakistan',
+            language='English'
+        )
 
 
 @attr('shard_5')

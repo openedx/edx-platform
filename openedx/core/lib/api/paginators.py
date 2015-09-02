@@ -1,7 +1,6 @@
 """ Paginatator methods for edX API implementations."""
 
 from django.http import Http404
-from django.utils.translation import ugettext as _
 from django.core.paginator import Paginator, InvalidPage
 
 
@@ -26,15 +25,17 @@ def paginate_search_results(object_class, search_results, page_size, page):
         if page == 'last':
             page_number = paginator.num_pages
         else:
-            raise Http404(_("Page is not 'last', nor can it be converted to an int."))
+            raise Http404("Page is not 'last', nor can it be converted to an int.")
 
     try:
         paged_results = paginator.page(page_number)
-    except InvalidPage as e:  # pylint: disable=invalid-name
-        raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
-            'page_number': page_number,
-            'message': str(e)
-        })
+    except InvalidPage as exception:
+        raise Http404(
+            "Invalid page {page_number}: {message}".format(
+                page_number=page_number,
+                message=str(exception)
+            )
+        )
 
     search_queryset_pks = [item['data']['pk'] for item in paged_results.object_list]
     queryset = object_class.objects.filter(pk__in=search_queryset_pks)

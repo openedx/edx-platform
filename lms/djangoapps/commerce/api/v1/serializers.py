@@ -2,10 +2,16 @@
 from datetime import datetime
 
 import pytz
+from django.utils.translation import ugettext as _
+
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
 from commerce.api.v1.models import Course
 from course_modes.models import CourseMode
+
+from xmodule.modulestore.django import modulestore
 
 
 class CourseModeSerializer(serializers.ModelSerializer):
@@ -25,9 +31,30 @@ class CourseModeSerializer(serializers.ModelSerializer):
         fields = ('name', 'currency', 'price', 'sku', 'expires')
 
 
+def validate_course_id(course_id):
+    """
+    Check that course id is valid and exists in modulestore.
+    """
+    try:
+        course_key = CourseKey.from_string(unicode(course_id))
+    except InvalidKeyError:
+        raise serializers.ValidationError(
+            _("{course_id} is not a valid course key.").format(
+                course_id=course_id
+            )
+        )
+
+    if not modulestore().has_course(course_key):
+        raise serializers.ValidationError(
+            _('Course {course_id} does not exist.').format(
+                course_id=course_id
+            )
+        )
+
+
 class CourseSerializer(serializers.Serializer):
     """ Course serializer. """
-    id = serializers.CharField()  # pylint: disable=invalid-name
+    id = serializers.CharField(validators=[validate_course_id])  # pylint: disable=invalid-name
     name = serializers.CharField(read_only=True)
     verification_deadline = serializers.DateTimeField(blank=True)
     modes = CourseModeSerializer(many=True, allow_add_remove=True)

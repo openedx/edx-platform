@@ -87,12 +87,14 @@ def _update_certificate_context(context, course, user, user_certificate):
     user_fullname = user.profile.name
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     certificate_type = context.get('certificate_type')
-    partner_name = course.org
+    partner_short_name = course.org
+    partner_long_name = None
     organizations = organization_api.get_course_organizations(course_id=course.id)
     if organizations:
         #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
         organization = organizations[0]
-        partner_name = organization.get('name', course.org)
+        partner_long_name = organization.get('name', None)
+        partner_short_name = organization.get('short_name', course.org)
         context['organization_logo'] = organization.get('logo', None)
 
     context['username'] = user.username
@@ -100,7 +102,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     context['accomplishment_user_id'] = user.id
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
-    context['accomplishment_copy_course_org'] = partner_name
+    context['accomplishment_copy_course_org'] = partner_short_name
     context['accomplishment_copy_course_name'] = course.display_name
     context['course_image_url'] = course_image_url(course)
     context['share_settings'] = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
@@ -126,11 +128,20 @@ def _update_certificate_context(context, course, user, user_certificate):
         year=user_certificate.modified_date.year
     )
 
-    context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_name}, '
-                                                          'through {platform_name}.').format(
-        partner_name=partner_name,
-        platform_name=platform_name
-    )
+    if partner_long_name:
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, an '
+                                                              'online learning initiative of {partner_long_name} '
+                                                              'through {platform_name}.').format(
+            partner_short_name=partner_short_name,
+            partner_long_name=partner_long_name,
+            platform_name=platform_name
+        )
+    else:
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
+                                                              'through {platform_name}.').format(
+            partner_short_name=partner_short_name,
+            platform_name=platform_name
+        )
 
     # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
     context['accomplishment_copy_about'] = _('About {platform_name} Accomplishments').format(
@@ -201,16 +212,16 @@ def _update_certificate_context(context, course, user, user_certificate):
 
     # Translators:  This text represents the verification of the certificate
     context['document_meta_description'] = _('This is a valid {platform_name} certificate for {user_name}, '
-                                             'who participated in {partner_name} {course_number}').format(
+                                             'who participated in {partner_short_name} {course_number}').format(
         platform_name=platform_name,
         user_name=user_fullname,
-        partner_name=partner_name,
+        partner_short_name=partner_short_name,
         course_number=course.number
     )
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
-    context['document_title'] = _("{partner_name} {course_number} Certificate | {platform_name}").format(
-        partner_name=partner_name,
+    context['document_title'] = _("{partner_short_name} {course_number} Certificate | {platform_name}").format(
+        partner_short_name=partner_short_name,
         course_number=course.number,
         platform_name=platform_name
     )
@@ -227,21 +238,6 @@ def _update_certificate_context(context, course, user, user_certificate):
     certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
     if certificate_type_description:
         context['certificate_type_description'] = certificate_type_description
-
-    # If enabled, show the LinkedIn "add to profile" button
-    # Clicking this button sends the user to LinkedIn where they
-    # can add the certificate information to their profile.
-    linkedin_config = LinkedInAddToProfileConfiguration.current()
-    if linkedin_config.enabled:
-        context['linked_in_url'] = linkedin_config.add_to_profile_url(
-            course.id,
-            course.display_name,
-            user_certificate.mode,
-            get_certificate_url(
-                user_id=user.id,
-                course_id=unicode(course.id)
-            )
-        )
 
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
     context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
@@ -376,6 +372,21 @@ def render_html_view(request, user_id, course_id):
 
     # Append/Override the existing view context values with request-time values
     _update_certificate_context(context, course, user, user_certificate)
+
+    # If enabled, show the LinkedIn "add to profile" button
+    # Clicking this button sends the user to LinkedIn where they
+    # can add the certificate information to their profile.
+    linkedin_config = LinkedInAddToProfileConfiguration.current()
+    if linkedin_config.enabled:
+        context['linked_in_url'] = linkedin_config.add_to_profile_url(
+            course.id,
+            course.display_name,
+            user_certificate.mode,
+            request.build_absolute_uri(get_certificate_url(
+                user_id=user.id,
+                course_id=unicode(course.id)
+            ))
+        )
 
     # Microsites will need to be able to override any hard coded
     # content that was put into the context in the

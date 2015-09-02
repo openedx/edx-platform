@@ -60,7 +60,7 @@ import logging
 from contracts import contract, new_contract
 from importlib import import_module
 from mongodb_proxy import autoretry_read
-from path import path
+from path import Path as path
 from pytz import UTC
 from bson.objectid import ObjectId
 

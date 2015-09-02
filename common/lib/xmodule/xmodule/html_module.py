@@ -5,7 +5,7 @@ import copy
 import logging
 import textwrap
 from lxml import etree
-from path import path
+from path import Path as path
 from fs.errors import ResourceNotFoundError
 from pkg_resources import resource_string
 

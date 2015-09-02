@@ -284,6 +284,59 @@ def set_credit_requirement_status(username, course_key, req_namespace, req_name,
                 log.error("Error sending email")
 
 
+# pylint: disable=invalid-name
+def remove_credit_requirement_status(username, course_key, req_namespace, req_name):
+    """
+    Remove the user's requirement status.
+
+    This will remove the record from the credit requirement status table.
+    The user will still be eligible for the credit in a course.
+
+    Args:
+        username (str): Username of the user
+        course_key (CourseKey): Identifier for the course associated
+                                with the requirement.
+        req_namespace (str): Namespace of the requirement
+                            (e.g. "grade" or "reverification")
+        req_name (str): Name of the requirement
+                        (e.g. "grade" or the location of the ICRV XBlock)
+
+    Example:
+        >>> remove_credit_requirement_status(
+                "staff",
+                CourseKey.from_string("course-v1-edX-DemoX-1T2015"),
+                "reverification",
+                "i4x://edX/DemoX/edx-reverification-block/assessment_uuid".
+            )
+
+    """
+
+    # Find the requirement we're trying to remove
+    req_to_remove = CreditRequirement.get_course_requirements(course_key, namespace=req_namespace, name=req_name)
+
+    # If we can't find the requirement, then the most likely explanation
+    # is that there was a lag removing the credit requirements after the course
+    # was published.  We *could* attempt to remove the requirement here,
+    # but that could cause serious performance issues if many users attempt to
+    # lock the row at the same time.
+    # Instead, we skip removing the requirement and log an error.
+    if req_to_remove is None:
+        log.error(
+            (
+                u'Could not remove credit requirement in course "%s" '
+                u'with namespace "%s" and name "%s" '
+                u'because the requirement does not exist. '
+            ),
+            unicode(course_key), req_namespace, req_name
+        )
+        return
+
+    # Remove the requirement status
+    CreditRequirementStatus.remove_requirement_status(
+        username, req_to_remove
+    )
+
+
 def get_credit_requirement_status(course_key, username, namespace=None, name=None):
     """ Retrieve the user's status for each credit requirement in the course.
 

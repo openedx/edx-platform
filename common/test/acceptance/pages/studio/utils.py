@@ -59,7 +59,7 @@ def press_the_notification_button(page, name):
     # the "Save" button at the UI level.
     # Instead, we use JavaScript to reliably click
     # the button.
-    btn_css = 'div#page-notification a.action-%s' % name.lower()
+    btn_css = 'div#page-notification button.action-%s' % name.lower()
     page.browser.execute_script("$('{}').focus().click()".format(btn_css))
     page.wait_for_ajax()
 
@@ -72,7 +72,7 @@ def add_discussion(page, menu_index=0):
     placement within the page).
     """
     page.wait_for_component_menu()
-    click_css(page, 'a>span.large-discussion-icon', menu_index)
+    click_css(page, 'button>span.large-discussion-icon', menu_index)
 
 
 def add_advanced_component(page, menu_index, name):
@@ -84,7 +84,7 @@ def add_advanced_component(page, menu_index, name):
     """
     # Click on the Advanced icon.
     page.wait_for_component_menu()
-    click_css(page, 'a>span.large-advanced-icon', menu_index, require_notification=False)
+    click_css(page, 'button>span.large-advanced-icon', menu_index, require_notification=False)
 
     # This does an animation to hide the first level of buttons
     # and instead show the Advanced buttons that are available.
@@ -95,7 +95,7 @@ def add_advanced_component(page, menu_index, name):
     page.wait_for_element_visibility('.new-component-advanced', 'Advanced component menu is visible')
 
     # Now click on the component to add it.
-    component_css = 'a[data-category={}]'.format(name)
+    component_css = 'button[data-category={}]'.format(name)
     page.wait_for_element_visibility(component_css, 'Advanced component {} is visible'.format(name))
 
     # Adding some components, e.g. the Discussion component, will make an ajax call
@@ -123,7 +123,7 @@ def add_component(page, item_type, specific_type):
             'Wait for the add component menu to disappear'
         )
 
-        all_options = page.q(css='.new-component-{} ul.new-component-template li a span'.format(item_type))
+        all_options = page.q(css='.new-component-{} ul.new-component-template li button span'.format(item_type))
         chosen_option = all_options.filter(lambda el: el.text == specific_type).first
         chosen_option.click()
     wait_for_notification(page)
@@ -139,13 +139,13 @@ def add_html_component(page, menu_index, boilerplate=None):
     """
     # Click on the HTML icon.
     page.wait_for_component_menu()
-    click_css(page, 'a>span.large-html-icon', menu_index, require_notification=False)
+    click_css(page, 'button>span.large-html-icon', menu_index, require_notification=False)
 
     # Make sure that the menu of HTML components is visible before clicking
     page.wait_for_element_visibility('.new-component-html', 'HTML component menu is visible')
 
     # Now click on the component to add it.
-    component_css = 'a[data-category=html]'
+    component_css = 'button[data-category=html]'
     if boilerplate:
         component_css += '[data-boilerplate={}]'.format(boilerplate)
     else:
@@ -177,7 +177,7 @@ def get_codemirror_value(page, index=0, find_prefix="$"):
     )
 
 
-def confirm_prompt(page, cancel=False):
+def confirm_prompt(page, cancel=False, require_notification=None):
     """
     Ensures that a modal prompt and confirmation button are visible, then clicks the button. The prompt is canceled iff
     cancel is True.
@@ -185,7 +185,8 @@ def confirm_prompt(page, cancel=False):
     page.wait_for_element_visibility('.prompt', 'Prompt is visible')
     confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
-    click_css(page, confirmation_button_css, require_notification=(not cancel))
+    require_notification = (not cancel) if require_notification is None else require_notification
+    click_css(page, confirmation_button_css, require_notification=require_notification)
 
 
 def set_input_value(page, css, value):

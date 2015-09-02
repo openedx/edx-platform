@@ -13,15 +13,19 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @attr('shard_1')
-class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
+class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     """
     Test whether the enroll, unenroll and beta role emails are sent in the
     proper language, i.e: the student's language.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIEnrollmentEmailLocalization, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()
@@ -29,7 +33,6 @@ class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
         # Platform language is English, instructor's language is Chinese,
         # student's language is French, so the emails should all be sent in
         # French.
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
         self.client.login(username=self.instructor.username, password='test')

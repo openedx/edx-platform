@@ -132,7 +132,10 @@ def compile_coffeescript(*files):
 
 @task
 @no_help
-@cmdopts([('debug', 'd', 'Debug mode')])
+@cmdopts([
+    ('debug', 'd', 'Debug mode'),
+    ('force', '', 'Force full compilation'),
+])
 def compile_sass(options):
     """
     Compile Sass to CSS.
@@ -146,6 +149,9 @@ def compile_sass(options):
         parts.append("--sourcemap")
     else:
         parts.append("--style compressed --quiet")
+    if options.get('force'):
+        parts.append("--force")
+    parts.append("--load-path .")
     for load_path in SASS_LOAD_PATHS + SASS_DIRS.keys():
         parts.append("--load-path {path}".format(path=load_path))
 

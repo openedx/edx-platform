@@ -28,7 +28,7 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
             });
 
             it('passes a course_id to the server', function () {
-                testRequestParam(this, 'course_id', 'my/course/id');
+                testRequestParam(this, 'course_id', TeamSpecHelpers.testCourseID);
             });
 
             it('URL encodes its course_id ', function () {

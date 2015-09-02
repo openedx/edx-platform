@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:39+0000\n"
-"PO-Revision-Date: 2015-08-21 14:39:19.680894\n"
+"POT-Creation-Date: 2015-08-24 22:03+0000\n"
+"PO-Revision-Date: 2015-08-24 22:03:48.240461\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -8230,6 +8230,7 @@ msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "خحفهخرشم مشرلعشلث فاث فثشو عسثس شس هسخ 639-1 ذخيث."
 
 #: lms/djangoapps/teams/plugins.py
+#: lms/djangoapps/teams/templates/teams/teams.html
 msgid "Teams"
 msgstr "فثشوس"
 
@@ -8242,12 +8243,12 @@ msgid "course_id must be provided"
 msgstr "ذخعقسث_هي وعسف زث حقخدهيثي"
 
 #: lms/djangoapps/teams/views.py
-msgid "The supplied topic id {topic_id} is not valid"
-msgstr "فاث سعححمهثي فخحهذ هي {topic_id} هس رخف دشمهي"
+msgid "text_search and order_by cannot be provided together"
+msgstr "فثطف_سثشقذا شري خقيثق_زغ ذشررخف زث حقخدهيثي فخلثفاثق"
 
 #: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported."
-msgstr "فثطف_سثشقذا هس رخف غثف سعححخقفثي."
+msgid "The supplied topic id {topic_id} is not valid"
+msgstr "فاث سعححمهثي فخحهذ هي {topic_id} هس رخف دشمهي"
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
@@ -9456,6 +9457,15 @@ msgstr "سشدث بشهمثي بخق عسثق حقثبثقثرذث '{key}' صه�
 msgid "No data provided for user preference update"
 msgstr "رخ يشفش حقخدهيثي بخق عسثق حقثبثقثرذث عحيشفث"
 
+#: openedx/core/lib/api/paginators.py
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr "حشلث هس رخف 'مشسف', رخق ذشر هف زث ذخردثقفثي فخ شر هرف."
+
+#: openedx/core/lib/api/paginators.py
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "هردشمهي حشلث (%(page_number)s): %(message)s"
+
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
 msgstr "فاهس دشمعث هس هردشمهي."
@@ -10076,6 +10086,10 @@ msgstr "اثمح"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "سهلر خعف"
+
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "{programming_language} editor"
+msgstr "{programming_language} ثيهفخق"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -17296,64 +17310,66 @@ msgid "This module is not enabled."
 msgstr "فاهس وخيعمث هس رخف ثرشزمثي."
 
 #: cms/templates/certificates.html
-msgid ""
-"Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. If you are a course team member with the "
-"Admin role in Studio, you can configure your course certificate."
-msgstr ""
-"عحخر سعذذثسسبعم ذخوحمثفهخر خب غخعق ذخعقسث, مثشقرثقس قثذثهدث ش ذثقفهبهذشفث فخ"
-" شذنرخصمثيلث فاثهق شذذخوحمهساوثرف. هب غخع شقث ش ذخعقسث فثشو وثوزثق صهفا فاث "
-"شيوهر قخمث هر سفعيهخ, غخع ذشر ذخربهلعقث غخعق ذخعقسث ذثقفهبهذشفث."
+msgid "Working with Certificates"
+msgstr "صخقنهرل صهفا ذثقفهبهذشفثس"
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}Add your first certificate{em_end} to add a certificate "
-"configuration. Upload the organization logo to be used on the certificate, "
-"and specify at least one signatory. You can include up to four signatories "
-"for a certificate. You can also upload a signature image file for each "
-"signatory. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates. Optionally, specify a different course title to use "
-"on your course certificate. You might want to use a different title if, for "
-"example, the official course name is too long to display well on a "
-"certificate."
+"Specify a course title to use on the certificate if the course's official "
+"title is too long to be displayed well."
 msgstr ""
-"ذمهذن {em_start}شيي غخعق بهقسف ذثقفهبهذشفث{em_end} فخ شيي ش ذثقفهبهذشفث "
-"ذخربهلعقشفهخر. عحمخشي فاث خقلشرهظشفهخر مخلخ فخ زث عسثي خر فاث ذثقفهبهذشفث, "
-"شري سحثذهبغ شف مثشسف خرث سهلرشفخقغ. غخع ذشر هرذمعيث عح فخ بخعق سهلرشفخقهثس "
-"بخق ش ذثقفهبهذشفث. غخع ذشر شمسخ عحمخشي ش سهلرشفعقث هوشلث بهمث بخق ثشذا "
-"سهلرشفخقغ. {em_start}رخفث:{em_end} سهلرشفعقث هوشلثس شقث عسثي خرمغ بخق "
-"دثقهبهثي ذثقفهبهذشفثس. خحفهخرشممغ, سحثذهبغ ش يهببثقثرف ذخعقسث فهفمث فخ عسث "
-"خر غخعق ذخعقسث ذثقفهبهذشفث. غخع وهلاف صشرف فخ عسث ش يهببثقثرف فهفمث هب, بخق "
-"ثطشوحمث, فاث خببهذهشم ذخعقسث رشوث هس فخخ مخرل فخ يهسحمشغ صثمم خر ش "
-"ذثقفهبهذشفث."
+"سحثذهبغ ش ذخعقسث فهفمث فخ عسث خر فاث ذثقفهبهذشفث هب فاث ذخعقسث'س خببهذهشم "
+"فهفمث هس فخخ مخرل فخ زث يهسحمشغثي صثمم."
 
 #: cms/templates/certificates.html
 msgid ""
-"Select a course mode and click {em_start}Preview Certificate{em_end} to "
-"preview the certificate that a learner in the selected enrollment track "
-"would receive. When the certificate is ready for issuing, click "
-"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
-"{em_start}Deactivate{em_end}."
+"For verified certificates, specify between one and four signatories and "
+"upload the associated images."
 msgstr ""
-"سثمثذف ش ذخعقسث وخيث شري ذمهذن {em_start}حقثدهثص ذثقفهبهذشفث{em_end} فخ "
-"حقثدهثص فاث ذثقفهبهذشفث فاشف ش مثشقرثق هر فاث سثمثذفثي ثرقخمموثرف فقشذن "
-"صخعمي قثذثهدث. صاثر فاث ذثقفهبهذشفث هس قثشيغ بخق هسسعهرل, ذمهذن "
-"{em_start}شذفهدشفث.{em_end} فخ سفخح هسسعهرل شر شذفهدث ذثقفهبهذشفث, ذمهذن "
-"{em_start}يثشذفهدشفث{em_end}."
+"بخق دثقهبهثي ذثقفهبهذشفثس, سحثذهبغ زثفصثثر خرث شري بخعق سهلرشفخقهثس شري "
+"عحمخشي فاث شسسخذهشفثي هوشلثس."
 
 #: cms/templates/certificates.html
 msgid ""
-" To edit the certificate configuration, hover over the top right corner of "
-"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
-"over the top right corner of the form and click the delete icon. In general,"
-" do not delete certificates after a course has started, because some "
-"certificates might already have been issued to learners."
+"To edit or delete a certificate before it is activated, hover over the top "
+"right corner of the form and select {em_start}Edit{em_end} or the delete "
+"icon."
 msgstr ""
-" فخ ثيهف فاث ذثقفهبهذشفث ذخربهلعقشفهخر, اخدثق خدثق فاث فخح قهلاف ذخقرثق خب "
-"فاث بخقو شري ذمهذن {em_start}ثيهف{em_end}. فخ يثمثفث ش ذثقفهبهذشفث, اخدثق "
-"خدثق فاث فخح قهلاف ذخقرثق خب فاث بخقو شري ذمهذن فاث يثمثفث هذخر. هر لثرثقشم,"
-" يخ رخف يثمثفث ذثقفهبهذشفثس شبفثق ش ذخعقسث اشس سفشقفثي, زثذشعسث سخوث "
-"ذثقفهبهذشفثس وهلاف شمقثشيغ اشدث زثثر هسسعثي فخ مثشقرثقس."
+"فخ ثيهف خق يثمثفث ش ذثقفهبهذشفث زثبخقث هف هس شذفهدشفثي, اخدثق خدثق فاث فخح "
+"قهلاف ذخقرثق خب فاث بخقو شري سثمثذف {em_start}ثيهف{em_end} خق فاث يثمثفث "
+"هذخر."
+
+#: cms/templates/certificates.html
+msgid ""
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
+msgstr ""
+"فخ دهثص ش سشوحمث ذثقفهبهذشفث, ذاخخسث ش ذخعقسث وخيث شري سثمثذف "
+"{em_start}حقثدهثص ذثقفهبهذشفث{em_end}."
+
+#: cms/templates/certificates.html
+msgid "Issuing Certificates to Learners"
+msgstr "هسسعهرل ذثقفهبهذشفثس فخ مثشقرثقس"
+
+#: cms/templates/certificates.html
+msgid ""
+"To begin issuing certificates, a course team member with the Admin role "
+"selects {em_start}Activate{em_end}. Course team members without the Admin "
+"role cannot edit or delete an activated certificate."
+msgstr ""
+"فخ زثلهر هسسعهرل ذثقفهبهذشفثس, ش ذخعقسث فثشو وثوزثق صهفا فاث شيوهر قخمث "
+"سثمثذفس {em_start}شذفهدشفث{em_end}. ذخعقسث فثشو وثوزثقس صهفاخعف فاث شيوهر "
+"قخمث ذشررخف ثيهف خق يثمثفث شر شذفهدشفثي ذثقفهبهذشفث."
+
+#: cms/templates/certificates.html
+msgid ""
+"{em_start}Do not{em_end} delete certificates after a course has started; "
+"learners who have already earned certificates will no longer be able to "
+"access them."
+msgstr ""
+"{em_start}يخ رخف{em_end} يثمثفث ذثقفهبهذشفثس شبفثق ش ذخعقسث اشس سفشقفثي; "
+"مثشقرثقس صاخ اشدث شمقثشيغ ثشقرثي ذثقفهبهذشفثس صهمم رخ مخرلثق زث شزمث فخ "
+"شذذثسس فاثو."
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"

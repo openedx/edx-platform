@@ -2,7 +2,7 @@
 Tests for paver quality tasks
 """
 import os
-from path import path  # pylint: disable=no-name-in-module
+from path import Path as path
 import tempfile
 import unittest
 from mock import patch, MagicMock, mock_open
@@ -187,7 +187,7 @@ class TestPaverRunQuality(unittest.TestCase):
     @patch('__builtin__.open', mock_open())
     def test_failure_on_diffquality_pep8(self):
         """
-        If pep8 finds errors, pylint should still be run
+        If pep8 finds errors, pylint and jshint should still be run
         """
         # Mock _get_pep8_violations to return a violation
         _mock_pep8_violations = MagicMock(
@@ -198,10 +198,10 @@ class TestPaverRunQuality(unittest.TestCase):
                 pavelib.quality.run_quality("")
                 self.assertRaises(BuildFailure)
 
-        # Test that both pep8 and pylint were called by counting the calls to _get_pep8_violations
-        # (for pep8) and sh (for diff-quality pylint)
+        # Test that pep8, pylint, and jshint were called by counting the calls to
+        # _get_pep8_violations (for pep8) and sh (for diff-quality pylint & jshint)
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
     def test_failure_on_diffquality_pylint(self):
@@ -219,8 +219,28 @@ class TestPaverRunQuality(unittest.TestCase):
         # Test that both pep8 and pylint were called by counting the calls
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called once (for the call to "pylint")
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        # And assert that sh was called twice (for the calls to pylint & jshint). This means that even in
+        # the event of a diff-quality pylint failure, jshint is still called.
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
+
+    @patch('__builtin__.open', mock_open())
+    def test_failure_on_diffquality_jshint(self):
+        """
+        If diff-quality fails on jshint, the paver task should also fail
+        """
+
+        # Underlying sh call must fail when it is running the jshint diff-quality task
+        self._mock_paver_sh.side_effect = CustomShMock().fail_on_jshint
+        _mock_pep8_violations = MagicMock(return_value=(0, []))
+        with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
+            with self.assertRaises(SystemExit):
+                pavelib.quality.run_quality("")
+                self.assertRaises(BuildFailure)
+        # Test that both pep8 and pylint were called by counting the calls
+        # Assert that _get_pep8_violations (which calls "pep8") is called once
+        self.assertEqual(_mock_pep8_violations.call_count, 1)
+        # And assert that sh was called twice (for the calls to pep8 and pylint)
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
     def test_other_exception(self):
@@ -243,8 +263,8 @@ class TestPaverRunQuality(unittest.TestCase):
             pavelib.quality.run_quality("")
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called once (for the call to "pylint")
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        # And assert that sh was called twice (for the call to "pylint" & "jshint")
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
 
 class CustomShMock(object):
@@ -259,6 +279,17 @@ class CustomShMock(object):
         is going to fail when we pass in a percentage ("p") requirement.
         """
         if "pylint" in arg:
+            # Essentially mock diff-quality exiting with 1
+            paver.easy.sh("exit 1")
+        else:
+            return
+
+    def fail_on_jshint(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        if "jshint" in arg:
             # Essentially mock diff-quality exiting with 1
             paver.easy.sh("exit 1")
         else:

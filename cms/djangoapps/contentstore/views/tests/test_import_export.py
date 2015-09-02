@@ -9,7 +9,7 @@ import os
 import shutil
 import tarfile
 import tempfile
-from path import path
+from path import Path as path
 from uuid import uuid4
 
 from django.test.utils import override_settings

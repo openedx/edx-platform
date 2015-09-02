@@ -39,6 +39,8 @@ from certificates.tests.factories import (
     BadgeAssertionFactory,
 )
 from util import organizations_helpers as organizations_api
+from django.test.client import RequestFactory
+import urllib
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -379,6 +381,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.user.profile.name = "Joe User"
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
+        self.request = RequestFactory().request()
 
         self.cert = GeneratedCertificate.objects.create(
             user=self.user,
@@ -458,12 +461,26 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         template.save()
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_linkedin_share_url(self):
+        """
+        Test: LinkedIn share URL.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertTrue(urllib.quote_plus(self.request.build_absolute_uri(test_url)) in response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_rendering_course_organization_data(self):
         """
         Test: organization data should render on certificate web view if course has organization.
         """
         test_organization_data = {
-            'name': 'test_organization',
+            'name': 'test organization',
+            'short_name': 'test_organization',
             'description': 'Test Organization Description',
             'active': True,
             'logo': '/logo_test1.png/'
@@ -477,7 +494,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         response = self.client.get(test_url)
         self.assertIn(
-            'a course of study offered by test_organization',
+            'a course of study offered by test_organization, an online learning initiative of test organization',
             response.content
         )
         self.assertNotIn(

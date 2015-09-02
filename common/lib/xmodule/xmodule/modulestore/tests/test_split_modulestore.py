@@ -4,7 +4,7 @@
 from mock import patch
 import datetime
 from importlib import import_module
-from path import path
+from path import Path as path
 import random
 import re
 import unittest
