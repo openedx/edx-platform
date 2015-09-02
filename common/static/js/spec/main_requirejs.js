@@ -20,7 +20,7 @@
             'jquery.immediateDescendents': 'coffee/src/jquery.immediateDescendents',
             'jquery.simulate': 'js/vendor/jquery.simulate',
             'jquery.url': 'js/vendor/url.min',
-            'sinon': 'js/vendor/sinon-1.7.1',
+            'sinon': 'js/vendor/sinon-1.17.0',
             'text': 'js/vendor/requirejs/text',
             'underscore': 'js/vendor/underscore-min',
             'underscore.string': 'js/vendor/underscore.string.min',

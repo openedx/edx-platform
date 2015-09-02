@@ -341,7 +341,7 @@ def get_thread_list(
     if result_page != page:
         raise Http404
 
-    results = [ThreadSerializer(thread, context=context).data for thread in threads]
+    results = [ThreadSerializer(thread, remove_fields=['response_count'], context=context).data for thread in threads]
     ret = get_paginated_data(request, results, page, num_pages)
     ret["text_search_rewrite"] = text_search_rewrite
     return ret
@@ -515,8 +515,10 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 signal.send(sender=None, user=context["request"].user, post=cc_content)
                 if form_value:
                     context["cc_requester"].vote(cc_content, "up")
+                    api_content["vote_count"] += 1
                 else:
                     context["cc_requester"].unvote(cc_content)
+                    api_content["vote_count"] -= 1
 
 
 def create_thread(request, thread_data):
@@ -553,7 +555,7 @@ def create_thread(request, thread_data):
     ):
         thread_data = thread_data.copy()
         thread_data["group_id"] = get_cohort_id(user, course_key)
-    serializer = ThreadSerializer(data=thread_data, context=context)
+    serializer = ThreadSerializer(data=thread_data, remove_fields=['response_count'], context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
@@ -640,13 +642,15 @@ def update_thread(request, thread_id, update_data):
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
     _check_editable_fields(cc_thread, update_data, context)
-    serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
+    serializer = ThreadSerializer(cc_thread, remove_fields=['response_count'], data=update_data, partial=True,
+                                  context=context)
     actions_form = ThreadActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
     # Only save thread object if some of the edited fields are in the thread data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
+        # signal to update Teams when a user edits a thread
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)

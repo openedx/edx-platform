@@ -94,6 +94,8 @@ from student.helpers import (
             ${_("Started - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE"))}
           % elif course_overview.start_date_is_still_default: # Course start date TBD
             ${_("Coming Soon")}
+          % elif course_overview.starts_within(days=5):   # hasn't started yet
+            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("DAY_AND_TIME"))}
           % else:   # hasn't started yet
             ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE"))}
           % endif

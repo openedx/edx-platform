@@ -94,9 +94,6 @@ STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
 PIPELINE_ENABLED = False
 
-TENDER_DOMAIN = "help.edge.edx.org"
-TENDER_SUBDOMAIN = "edxedge"
-
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,
@@ -214,8 +211,8 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 
-# dummy segment-io key
-SEGMENT_IO_KEY = '***REMOVED***'
+# No segment key
+CMS_SEGMENT_KEY = None
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 

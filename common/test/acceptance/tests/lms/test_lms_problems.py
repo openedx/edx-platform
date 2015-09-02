@@ -288,3 +288,35 @@ class ProblemWithMathjax(ProblemsTest):
 
         self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.hint_text)
         self.assertTrue(problem_page.mathjax_rendered_in_hint, "MathJax did not rendered in problem hint")
+
+
+class ProblemPartialCredit(ProblemsTest):
+    """
+    Makes sure that the partial credit is appearing properly.
+    """
+    def get_problem(self):
+        """
+        Create a problem with partial credit.
+        """
+        xml = dedent("""
+            <problem>
+                <p>The answer is 1. Partial credit for -1.</p>
+                <numericalresponse answer="1" partial_credit="list">
+                    <formulaequationinput label="How many miles away from Earth is the sun? Use scientific notation to answer." />
+                    <responseparam type="tolerance" default="0.01" />
+                    <responseparam partial_answers="-1" />
+                </numericalresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'PARTIAL CREDIT TEST PROBLEM', data=xml)
+
+    def test_partial_credit(self):
+        """
+        Test that we can see the partial credit value and feedback.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
+        problem_page.fill_answer_numerical('-1')
+        problem_page.click_check()
+        self.assertTrue(problem_page.simpleprob_is_partially_correct())

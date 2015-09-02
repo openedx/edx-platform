@@ -84,7 +84,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 $('.form-create.create-user .action-primary').click();
                 expect($(errorPromptSelector).length).toEqual(1);
                 expect($(errorPromptSelector)).toContainText('You must enter a valid email address');
-                expect(requests.length).toEqual(0);
+                AjaxHelpers.expectNoRequests(requests);
             });
 
             it("displays an error when the user has already been added", function () {
@@ -94,7 +94,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 $('.user-email-input').val('honor@example.com');
                 $('.form-create.create-user .action-primary').click();
                 ViewHelpers.verifyPromptShowing(promptSpy, 'Already a library team member');
-                expect(requests.length).toEqual(0);
+                AjaxHelpers.expectNoRequests(requests);
             });
 
 

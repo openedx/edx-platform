@@ -20,10 +20,11 @@ from discussion_api.api import (
     get_comment_list,
     get_course,
     get_course_topics,
+    get_thread,
     get_thread_list,
     update_comment,
     update_thread,
-    get_thread)
+)
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
@@ -358,8 +359,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           comment is anonymous
 
         * author_label: A label indicating whether the author has a special
-          role in the course, either "staff" for moderators and
-          administrators or "community_ta" for community TAs
+          role in the course, either "Staff" for moderators and
+          administrators or "Community TA" for community TAs
 
         * created_at: The ISO 8601 timestamp for the creation of the comment
 

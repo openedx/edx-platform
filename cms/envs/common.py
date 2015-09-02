@@ -36,7 +36,7 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT,
+    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT, COMP_THEME_DIR,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
@@ -77,8 +77,8 @@ FEATURES = {
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
 
-    # Segment.io - must explicitly turn it on for production
-    'SEGMENT_IO': False,
+    # Segment - must explicitly turn it on for production
+    'CMS_SEGMENT_KEY': None,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
@@ -410,6 +410,7 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SAVE_EVERY_REQUEST = False
 
 # Site info
 SITE_ID = 1
@@ -481,8 +482,8 @@ STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCa
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 ]
 
@@ -639,18 +640,6 @@ REQUIRE_ENVIRONMENT = "node"
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
-################################# TENDER ######################################
-
-# If you want to enable Tender integration (http://tenderapp.com/),
-# put in the subdomain where Tender hosts tender_widget.js. For example,
-# if you want to use the URL https://example.tenderapp.com/tender_widget.js,
-# you should use "example".
-TENDER_SUBDOMAIN = None
-# If you want to have a vanity domain that points to Tender, put that here.
-# For example, "help.myapp.com". Otherwise, should should be your full
-# tenderapp domain name: for example, "example.tenderapp.com".
-TENDER_DOMAIN = None
-
 ################################# CELERY ######################################
 
 # Message configuration
@@ -769,8 +758,12 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
+    'django.contrib.staticfiles',
     'static_replace',
     'require',
+
+    # Theming
+    'openedx.core.djangoapps.theming',
 
     # comment common
     'django_comment_common',
@@ -1025,6 +1018,9 @@ ADVANCED_COMPONENT_TYPES = [
 
     # In-course reverification checkpoint
     'edx-reverification-block',
+
+    # Peer instruction tool
+    'ubcpi',
 ]
 
 # Adding components in this list will disable the creation of new problem for

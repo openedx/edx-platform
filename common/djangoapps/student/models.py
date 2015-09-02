@@ -281,6 +281,26 @@ class UserProfile(models.Model):
         """
         return self.profile_image_uploaded_at is not None
 
+    @property
+    def age(self):
+        """ Convenience method that returns the age given a year_of_birth. """
+        year_of_birth = self.year_of_birth
+        year = datetime.now(UTC).year
+        if year_of_birth is not None:
+            return year - year_of_birth
+
+    @property
+    def level_of_education_display(self):
+        """ Convenience method that returns the human readable level of education. """
+        if self.level_of_education:
+            return self.__enumerable_to_display(self.LEVEL_OF_EDUCATION_CHOICES, self.level_of_education)
+
+    @property
+    def gender_display(self):
+        """ Convenience method that returns the human readable gender. """
+        if self.gender:
+            return self.__enumerable_to_display(self.GENDER_CHOICES, self.gender)
+
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
         if not js_str:
@@ -335,9 +355,17 @@ class UserProfile(models.Model):
         year_of_birth = self.year_of_birth
         if year_of_birth is None:
             return default_requires_consent
+
         if date is None:
-            date = datetime.now(UTC)
-        return date.year - year_of_birth <= age_limit
+            age = self.age
+        else:
+            age = date.year - year_of_birth
+
+        return age <= age_limit
+
+    def __enumerable_to_display(self, enumerables, enum_value):
+        """ Get the human readable value from an enumerable list of key-value pairs. """
+        return dict(enumerables)[enum_value]
 
 
 @receiver(pre_save, sender=UserProfile)
@@ -1023,7 +1051,7 @@ class CourseEnrollment(models.Model):
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
 
-                if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+                if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
                     tracking_context = tracker.get_tracker().resolve_context()
                     analytics.track(self.user_id, event_name, {
                         'category': 'conversion',

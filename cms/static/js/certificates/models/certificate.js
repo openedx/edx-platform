@@ -62,6 +62,10 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
             // Remember the current state of this model (enables edit->cancel use cases)
             this._originalAttributes = this.parse(this.toJSON());
 
+            this.get("signatories").each(function (modelSignatory) {
+                modelSignatory.setOriginalAttributes();
+            });
+
             // If no url is defined for the signatories child collection we'll need to create that here as well
             if(!this.isNew() && !this.get('signatories').url) {
                 this.get('signatories').url = this.collection.url + '/' + this.get('id') + '/signatories';

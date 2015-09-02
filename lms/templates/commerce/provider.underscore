@@ -1,9 +1,15 @@
 <div class="provider-wrapper">
   <div class="provider-info">
-    <%= interpolate(gettext("You still need to visit the %s website to complete the credit process."), [display_name]) %>
+    <%= interpolate(
+          gettext("You still need to visit the %(display_name)s website to complete the credit process."),
+          { display_name: display_name }, true
+        ) %>
   </div>
   <div class="provider-more-info">
-    <%= interpolate(gettext("To finalize course credit, %s requires %s learners to submit a credit request."), [provider_id.toUpperCase(), platformName]) %>
+    <%= interpolate(
+          gettext("To finalize course credit, %(provider_id)s requires %(platform_name)s learners to submit a credit request."),
+          { provider_id: provider_id.toUpperCase(), platform_name: platformName }, true
+        ) %>
   </div>
   <div class="provider-instructions">
     <%= fulfillment_instructions %>
@@ -15,6 +21,7 @@
     <%= interpolate("<img src='%s' alt='%s'></image>", [thumbnail_url, display_name]) %>
   </div>
   <div class="complete-order">
-    <%= interpolate('<button data-provider="%s" data-course-key="%s" data-username="%s" class="complete-course" onClick=completeOrder(this)>%s</button>', [provider_id, course_key, username, gettext( "Complete Order")]) %>
+    <%= interpolate('<button data-provider="%s" data-course-key="%s" data-username="%s" class="complete-course" onClick=completeOrder(this)>%s</button>', [provider_id, course_key, username,
+        gettext( "Get Credit")]) %>
   </div>
 </div>

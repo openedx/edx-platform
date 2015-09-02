@@ -80,7 +80,8 @@ MOCK_MODULES = [
     'ratelimitbackend',
     'analytics',
     'courseware.courses',
-    'storage',
+    'django.contrib.staticfiles',
+    'django.contrib.staticfiles.storage',
     'content',
     'xmodule.contentstore',
     'xmodule.contentstore.content',
@@ -267,7 +268,7 @@ extensions = [
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
     'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
 
-project = u'EdX Platform APIs'
+project = u'Open edX Platform APIs'
 copyright = u'2015, edX'
 
 exclude_patterns = ['build', 'links.rst']

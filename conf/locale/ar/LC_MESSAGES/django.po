@@ -131,7 +131,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-11 12:16+0000\n"
+"POT-Creation-Date: 2015-09-18 13:23+0000\n"
 "PO-Revision-Date: 2015-08-12 08:13+0000\n"
 "Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -3751,25 +3751,16 @@ msgid "Request user's username"
 msgstr "يُرجى طلب اسم المستخدم الخاص بالمستخدم"
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's username. You must also set Open in New "
-"Page to True to get the user's information."
+msgid "Select True to request the user's username."
 msgstr ""
-"يُرجى اختيار \"صحيح\" لطلب اسم المستخدم الخاص بالمستخدم، ويجب أيضًا ضبط "
-"خاصية \"فتح في صفحة جديدة\" على خيار \"صحيح\" للحصول على معلومات المستخدم."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Request user's email"
 msgstr "يُرجى طلب البريد الإلكتروني للمستخدم"
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's email address. You must also set Open in "
-"New Page to True to get the user's information."
+msgid "Select True to request the user's email address."
 msgstr ""
-"يُرجى اختيار \"صحيح\" لطلب عنوان البريد الإلكتروني الخاص بالمستخدم. ويجب "
-"أيضًا ضبط خاصية \"فتح في صفحة جديدة\" على خيار \"صحيح\" أيضًا للحصول على "
-"معلومات المستخدم."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI Application Information"
@@ -8405,10 +8396,6 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "الرقم التعريفي الذي جرى توفيره حول الموضوع {topic_id} غير صالح."
 
-#: lms/djangoapps/teams/views.py
-msgid "Error connecting to elasticsearch"
-msgstr ""
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -12513,8 +12500,6 @@ msgstr "إرسال تغريدة حول أنّك سجَّلت في هذا الم�
 msgid "Email someone to say you've registered for this course"
 msgstr "مراسلة شخص ما عبر البريد الإلكتروني لإخباره أنّك سجّلت في هذا المساق "
 
-#. Translators: This text will be automatically posted to the student's
-#. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {account}: {url}"
 msgstr "سجّلتُ لتوّي في {number} {title} من خلال {url} :{account}"
@@ -13018,6 +13003,8 @@ msgstr "سوف يفتح ملف PDF في نافذة متصفح جديدة أو ت
 msgid "Download Your Certificate"
 msgstr "تنزيل شهادتك"
 
+#. Translators: This message appears to users when the system is processessing
+#. course certificates, which can take a few hours.
 #: lms/templates/courseware/progress.html
 msgid "We're working on it..."
 msgstr "جاري العمل على ذلك..."
@@ -17689,9 +17676,8 @@ msgstr ""
 msgid "Required Information to Create a re-run of a course"
 msgstr "المعلومات المطلوبة لإنشاء تشغيل ثانٍ لمساق ما"
 
-#. Translators: This is an example name for a new course, seen when filling
-#. out
-#. the form to create a new course.
+#. Translators: This is an example name for a new course, seen when
+#. filling out the form to create a new course.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
 msgstr "مثلًا، مقدّمة لعلوم الكمبيوتر"
@@ -19064,8 +19050,8 @@ msgid "Library Name"
 msgstr "اسم المكتبة"
 
 #. Translators: This is an example name for a new content library, seen when
-#. filling out the form to create a new library. (A library is a collection of
-#. content or problems.)
+#. filling out the form to create a new library.
+#. (A library is a collection of content or problems.)
 #: cms/templates/index.html
 msgid "e.g. Computer Science Problems"
 msgstr "مثلًا، مسائل علوم الكمبيوتر"
@@ -19088,8 +19074,9 @@ msgstr "رمز المكتبة"
 
 #. Translators: This is an example for the "code" used to identify a library,
 #. seen when filling out the form to create a new library. This example is
-#. short for "Computer Science Problems". The example number may contain
-#. letters but must not contain spaces.
+#. short
+#. for "Computer Science Problems". The example number may contain letters
+#. but must not contain spaces.
 #: cms/templates/index.html
 msgid "e.g. CSPROB"
 msgstr "مثلًا، CSPROB"
@@ -19118,10 +19105,11 @@ msgstr "تشغيل المساق:"
 msgid "This course run is currently being created."
 msgstr "يجري حاليًّا إنشاء تشغيل هذا المساق."
 
-#. Translators: This is a status message, used to inform the user of what the
-#. system is doing. This status means that the user has requested to re-run an
-#. existing course, and the system is currently in the process of duplicating
-#. and configuring the existing course so that it can be re-run.
+#. Translators: This is a status message, used to inform the user of
+#. what the system is doing. This status means that the user has
+#. requested to re-run an existing course, and the system is currently
+#. in the process of duplicating and configuring the existing course
+#. so that it can be re-run.
 #: cms/templates/index.html
 msgid "Configuring as re-run"
 msgstr "الضبط كتشغيل ثانٍ"
@@ -19135,6 +19123,18 @@ msgstr ""
 "سيُضاف المساق الجديد إلى لائحة مساقاتك في غضون 5-10 دقائق. يُرجى العودة إلى "
 "هذه الصفحة أو {link_start}إعادة فتحها{link_end}  لتحديث لائحة المساقات. "
 "وسيتطلّب المساق الجديد ضبط بعض الإعدادات يدويًّا."
+
+#. Translators: This is a status message for the course re-runs feature.
+#. When a course admin indicates that a course should be re-run, the system
+#. needs to process the request and prepare the new course. The status of
+#. the process will follow this text.
+#: cms/templates/index.html
+msgid "This re-run processing status:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Configuration Error"
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
@@ -20153,7 +20153,7 @@ msgstr "يجب أن تزيد عن درجة النجاح في المساق أو �
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"
-msgstr "سياسات قواعد &amp; التقييم"
+msgstr "سياسات وقواعد التقييم"
 
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"

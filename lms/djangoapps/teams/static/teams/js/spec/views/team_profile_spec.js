@@ -85,10 +85,9 @@ define([
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/api/team/v0/teams/test-team');
                 AjaxHelpers.respondWithJson(requests, createTeamModelData({country: 'US', language: 'en'}));
             } else {
-                var requestCount = requests.length;
                 // click on Cancel button on dialog
                 $('.prompt.warning .action-secondary').click();
-                expect(requests.length).toBe(requestCount);
+                AjaxHelpers.expectNoRequests(requests);
             }
         };
 

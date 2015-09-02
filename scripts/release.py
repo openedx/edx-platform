@@ -45,7 +45,7 @@ PROJECT_ROOT = project_root()
 repo = Repo(PROJECT_ROOT)
 git = repo.git
 
-PEOPLE_YAML = "https://raw.githubusercontent.com/edx/repo-tools/master/people.yaml"
+PEOPLE_YAML = "https://raw.githubusercontent.com/edx/repo-tools-data/master/people.yaml"
 
 
 class memoized(object):
@@ -149,7 +149,10 @@ def create_github_creds():
     https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
     """
     headers = {"User-Agent": "edx-release"}
-    payload = {"note": "edx-release"}
+    payload = {
+        "note": "edx-release",
+        "scopes": ["repo"],
+    }
     username = raw_input("Github username: ")
     password = getpass.getpass("Github password: ")
     response = requests.post(
@@ -300,6 +303,7 @@ class DoesNotExist(Exception):
         self.message = message
         self.commit = commit
         self.branch = branch
+        Exception.__init__(self, message)
 
 
 def get_merge_commit(commit, branch="master"):
@@ -371,23 +375,20 @@ def prs_by_email(start_ref, end_ref):
     The dictionary is alphabetically ordered by email address
     The pull request list is ordered by merge date
     """
+    username, token = get_github_creds()
+    headers = {
+        "Authorization": "token {}".format(token),
+        "User-Agent": "edx-release",
+    }
     # `emails` maps from other_emails to primary email, based on people.yaml.
     emails = {}
-    try:
-        people_resp = requests.get(PEOPLE_YAML)
-        people_resp.raise_for_status()
-        people = yaml.safe_load(people_resp.text)
-    except requests.exceptions.RequestException as e:
-        # Hmm, muddle through without canonicalized emails...
-        message = (
-            "Warning: could not fetch people.yaml: {message}".format(message=e.message)
-        )
-        print(colorize("red", message), file=sys.stderr)
-    else:
-        for person in people.itervalues():
-            if 'other_emails' in person:
-                for other_email in person['other_emails']:
-                    emails[other_email] = person['email']
+    people_resp = requests.get(PEOPLE_YAML, headers=headers)
+    people_resp.raise_for_status()
+    people = yaml.safe_load(people_resp.text)
+    for person in people.itervalues():
+        if 'other_emails' in person:
+            for other_email in person['other_emails']:
+                emails[other_email] = person['email']
 
     unordered_data = collections.defaultdict(set)
     for pr_num in get_merged_prs(start_ref, end_ref):

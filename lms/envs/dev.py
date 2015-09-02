@@ -269,12 +269,10 @@ PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
 
-##### Segment.io  ######
+##### Segment  ######
 
-# If there's an environment variable set, grab it and turn on Segment.io
-SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
-if SEGMENT_IO_LMS_KEY:
-    FEATURES['SEGMENT_IO_LMS'] = True
+# If there's an environment variable set, grab it
+LMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
 
 ###################### Payment ######################
 

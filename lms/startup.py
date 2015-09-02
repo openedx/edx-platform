@@ -31,7 +31,7 @@ def run():
     add_mimetypes()
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
-        enable_theme()
+        enable_stanford_theme()
 
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
@@ -39,10 +39,9 @@ def run():
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
 
-    # Initialize Segment.io analytics module. Flushes first time a message is received and
-    # every 50 messages thereafter, or if 10 seconds have passed since last flush
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
-        analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
+    # Initialize Segment analytics module by setting the write_key.
+    if settings.LMS_SEGMENT_KEY:
+        analytics.write_key = settings.LMS_SEGMENT_KEY
 
     # register any dependency injections that we need to support in edx_proctoring
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
@@ -71,7 +70,7 @@ def add_mimetypes():
     mimetypes.add_type('application/font-woff', '.woff')
 
 
-def enable_theme():
+def enable_stanford_theme():
     """
     Enable the settings for a custom theme, whose files should be stored
     in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
@@ -79,7 +78,7 @@ def enable_theme():
     # Workaround for setting THEME_NAME to an empty
     # string which is the default due to this ansible
     # bug: https://github.com/ansible/ansible/issues/4812
-    if settings.THEME_NAME == "":
+    if getattr(settings, "THEME_NAME", "") == "":
         settings.THEME_NAME = None
         return
 

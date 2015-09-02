@@ -1,4 +1,4 @@
-<div class="discussion-article blank-slate">
+<div class="discussion-article view-discussion-home">
   <section class="home-header">
     <span class="label"><%- gettext("DISCUSSION HOME:") %></span>
     <% if (window.courseName) { %>
@@ -8,7 +8,10 @@
 
   <% if (window.ENABLE_DISCUSSION_HOME_PANEL) { %>
     <span class="label label-settings">
-      <%- interpolate(gettext("How to use %(platform_name)s discussions"), {platform_name: window.PLATFORM_NAME}, true) %>
+      <%- interpolate(
+            gettext("How to use %(platform_name)s discussions"),
+            {platform_name: window.PLATFORM_NAME}, true
+          ) %>
     </span>
     <table class="home-helpgrid">
       <tr class="helpgrid-row helpgrid-row-navigation">

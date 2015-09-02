@@ -168,7 +168,7 @@ define([
                 expect(view.$('.join-team-message').text().trim()).toBe(view.teamFullMessage);
 
                 // there should be no request made
-                expect(requests.length).toBe(0);
+                AjaxHelpers.expectNoRequests(requests);
             });
 
             it('shows correct error message if user fails to join team', function () {

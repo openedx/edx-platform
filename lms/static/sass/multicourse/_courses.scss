@@ -376,9 +376,14 @@ $facet-background-color: #007db8;
       @extend %t-strong;
       margin: ($baseline/2);
       width: auto;
-      color: $m-blue-d5;
+      color: $blue-d1; // WCAG 2.0 AA requirements
       text-align: center;
       text-transform: uppercase;
+
+      &:hover,
+      &:focus {
+        background: $gray-l4;
+      }
     }
 
     .flt-right {
@@ -509,7 +514,11 @@ $facet-background-color: #007db8;
         color: $facet-text-color;
 
         .count {
-          color: $gray-l4;
+          color: $gray;
+
+          .count-number {
+            display: none;
+          }
         }
 
         .count:before {

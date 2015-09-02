@@ -40,7 +40,7 @@
             'xmodule': 'xmodule_js/src/xmodule',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.7.1',
+            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
             'jasmine-jquery': 'xmodule_js/common_static/js/vendor/jasmine-jquery',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
@@ -50,7 +50,6 @@
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured',
             'youtube': '//www.youtube.com/player_api?noext',
-            'tender': '//api.tenderapp.com/tender_widget',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
@@ -71,6 +70,7 @@
             'history': 'js/vendor/history',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
+            'js/utils/navigation': 'js/utils/navigation',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -687,6 +687,7 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
+        'lms/include/js/spec/navigation_spec.js',
         'lms/include/js/spec/discovery/collections/filters_spec.js',
         'lms/include/js/spec/discovery/models/course_card_spec.js',
         'lms/include/js/spec/discovery/models/course_directory_spec.js',

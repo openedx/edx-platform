@@ -444,6 +444,8 @@ def run_quality(options):
 
     pylint_files = get_violations_reports("pylint")
     pylint_reports = u' '.join(pylint_files)
+    jshint_files = get_violations_reports("jshint")
+    jshint_reports = u' '.join(jshint_files)
 
     pythonpath_prefix = (
         "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:lms/lib:cms:cms/djangoapps:cms/lib:"
@@ -465,7 +467,7 @@ def run_quality(options):
     if not run_diff_quality(
             violations_type="jshint",
             prefix=pythonpath_prefix,
-            reports=pylint_reports,
+            reports=jshint_reports,
             percentage_string=percentage_string,
             branch_string=compare_branch_string,
             dquality_dir=dquality_dir

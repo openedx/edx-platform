@@ -6,6 +6,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import datetime
 import ddt
 from mock import patch
+from urllib import urlencode
 
 from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
@@ -25,7 +26,6 @@ class RenderXBlockTestMixin(object):
     # DOM elements that appear in the LMS Courseware,
     # but are excluded from the xBlock-only rendering.
     COURSEWARE_CHROME_HTML_ELEMENTS = [
-        '<header id="open_close_accordion"',
         '<ol class="course-tabs"',
         '<footer id="footer-openedx"',
         '<div class="window-wrap"',
@@ -40,9 +40,12 @@ class RenderXBlockTestMixin(object):
     ]
 
     @abstractmethod
-    def get_response(self):
+    def get_response(self, url_encoded_params=None):
         """
         Abstract method to get the response from the endpoint that is being tested.
+
+        Arguments:
+            url_encoded_params - URL encoded parameters that should be appended to the requested URL.
         """
         pass   # pragma: no cover
 
@@ -79,11 +82,13 @@ class RenderXBlockTestMixin(object):
         if login:
             self.login()
 
-    def verify_response(self, expected_response_code=200):
+    def verify_response(self, expected_response_code=200, url_params=None):
         """
         Helper method that calls the endpoint, verifies the expected response code, and returns the response.
         """
-        response = self.get_response()
+        if url_params:
+            url_params = urlencode(url_params)
+        response = self.get_response(url_params)
         if expected_response_code == 200:
             self.assertContains(response, self.html_block.data, status_code=expected_response_code)
             for chrome_element in [self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS]:
@@ -175,3 +180,13 @@ class RenderXBlockTestMixin(object):
         self.html_block.visible_to_staff_only = True
         modulestore().update_item(self.html_block, self.user.id)
         self.verify_response(expected_response_code=404)
+
+    def test_student_view_param(self):
+        self.setup_course()
+        self.setup_user(admin=False, enroll=True, login=True)
+        self.verify_response(url_params={'view': 'student_view'})
+
+    def test_unsupported_view_param(self):
+        self.setup_course()
+        self.setup_user(admin=False, enroll=True, login=True)
+        self.verify_response(url_params={'view': 'author_view'}, expected_response_code=400)

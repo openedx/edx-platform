@@ -56,6 +56,10 @@ def confirm_prompt(page, cancel=False, require_notification=None):
     cancel is True.
     """
     page.wait_for_element_visibility('.prompt', 'Prompt is visible')
+    page.wait_for_element_visibility(
+        '.wrapper-prompt:focus',
+        'Prompt is in focus'
+    )
     confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
     require_notification = (not cancel) if require_notification is None else require_notification

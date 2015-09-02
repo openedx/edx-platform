@@ -579,7 +579,10 @@
 
   .join-team-message {
     @extend %t-copy-sub1;
+    @include text-align(right);
     color: $gray-l1;
+    display: block;
+    margin-bottom: ($baseline/4);
   }
 
   .team-actions {
@@ -720,11 +723,11 @@
 
     .u-field.error {
       input, textarea {
-        border-color: $danger-red;
+        border-color: $error-color;
       }
 
       .u-field-message-help, .u-field-description-message {
-        color: $danger-red !important;
+        color: $error-color !important;
       }
     }
 

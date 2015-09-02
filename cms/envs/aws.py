@@ -140,6 +140,7 @@ SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_SECURE = ENV_TOKENS.get('SESSION_COOKIE_SECURE', SESSION_COOKIE_SECURE)
+SESSION_SAVE_EVERY_REQUEST = ENV_TOKENS.get('SESSION_SAVE_EVERY_REQUEST', SESSION_SAVE_EVERY_REQUEST)
 
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
@@ -199,8 +200,6 @@ LOGGING = get_logger_config(LOG_DIR,
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
 STUDIO_NAME = ENV_TOKENS.get('STUDIO_NAME', 'edX Studio')
 STUDIO_SHORT_NAME = ENV_TOKENS.get('STUDIO_SHORT_NAME', 'Studio')
-TENDER_DOMAIN = ENV_TOKENS.get('TENDER_DOMAIN', TENDER_DOMAIN)
-TENDER_SUBDOMAIN = ENV_TOKENS.get('TENDER_SUBDOMAIN', TENDER_SUBDOMAIN)
 
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
@@ -239,11 +238,8 @@ if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
 
-# If Segment.io key specified, load it and turn on Segment.io if the feature flag is set
-# Note that this is the Studio key. There is a separate key for the LMS.
-SEGMENT_IO_KEY = AUTH_TOKENS.get('SEGMENT_IO_KEY')
-if SEGMENT_IO_KEY:
-    FEATURES['SEGMENT_IO'] = ENV_TOKENS.get('SEGMENT_IO', False)
+# Note that this is the Studio key for Segment. There is a separate key for the LMS.
+CMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
 
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 if AWS_ACCESS_KEY_ID == "":

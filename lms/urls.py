@@ -248,24 +248,62 @@ if settings.COURSEWARE_ENABLED:
         )
     )
     urlpatterns += (
-        url(r'^courses/{}/jump_to/(?P<location>.*)$'.format(settings.COURSE_ID_PATTERN),
-            'courseware.views.jump_to', name="jump_to"),
-        url(r'^courses/{}/jump_to_id/(?P<module_id>.*)$'.format(settings.COURSE_ID_PATTERN),
-            'courseware.views.jump_to_id', name="jump_to_id"),
-        url(r'^courses/{course_key}/xblock/{usage_key}/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
+        # jump_to URLs for direct access to a location in the course
+        url(
+            r'^courses/{}/jump_to/(?P<location>.*)$'.format(settings.COURSE_ID_PATTERN),
+            'courseware.views.jump_to', name="jump_to",
+        ),
+        url(
+            r'^courses/{}/jump_to_id/(?P<module_id>.*)$'.format(settings.COURSE_ID_PATTERN),
+            'courseware.views.jump_to_id', name="jump_to_id",
+        ),
+
+        # xblock Handler APIs
+        url(
+            r'^courses/{course_key}/xblock/{usage_key}/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(
+                course_key=settings.COURSE_ID_PATTERN,
+                usage_key=settings.USAGE_ID_PATTERN,
+            ),
             'courseware.module_render.handle_xblock_callback',
-            name='xblock_handler'),
-        url(r'^courses/{course_key}/xblock/{usage_key}/view/(?P<view_name>[^/]*)$'.format(
-            course_key=settings.COURSE_ID_PATTERN,
-            usage_key=settings.USAGE_ID_PATTERN),
-            'courseware.module_render.xblock_view',
-            name='xblock_view'),
-        url(r'^courses/{course_key}/xblock/{usage_key}/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
+            name='xblock_handler',
+        ),
+        url(
+            r'^courses/{course_key}/xblock/{usage_key}/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(
+                course_key=settings.COURSE_ID_PATTERN,
+                usage_key=settings.USAGE_ID_PATTERN,
+            ),
             'courseware.module_render.handle_xblock_callback_noauth',
-            name='xblock_handler_noauth'),
-        url(r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
+            name='xblock_handler_noauth',
+        ),
+
+        # xblock View API
+        # (unpublished) API that returns JSON with the HTML fragment and related resources
+        # for the xBlock's requested view.
+        url(
+            r'^courses/{course_key}/xblock/{usage_key}/view/(?P<view_name>[^/]*)$'.format(
+                course_key=settings.COURSE_ID_PATTERN,
+                usage_key=settings.USAGE_ID_PATTERN,
+            ),
+            'courseware.module_render.xblock_view',
+            name='xblock_view',
+        ),
+
+        # xblock Rendering View URL
+        # URL to provide an HTML view of an xBlock. The view type (e.g., student_view) is
+        # passed as a "view" parameter to the URL.
+        # Note: This is not an API. Compare this with the xblock_view API above.
+        url(
+            r'^xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
+            'courseware.views.render_xblock',
+            name='render_xblock',
+        ),
+
+        # xblock Resource URL
+        url(
+            r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
             'courseware.module_render.xblock_resource',
-            name='xblock_resource_url'),
+            name='xblock_resource_url',
+        ),
 
         # Software Licenses
 
@@ -438,15 +476,6 @@ if settings.COURSEWARE_ENABLED:
         urlpatterns += (
             url(r'^api/team/', include('lms.djangoapps.teams.api_urls')),
             url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('lms.djangoapps.teams.urls'), name="teams_endpoints"),
-        )
-
-    if settings.FEATURES.get('ENABLE_RENDER_XBLOCK_API'):
-        # TODO (MA-789) This endpoint path still needs to be approved by the arch council.
-        # Until then, keep the version at v0.
-        urlpatterns += (
-            url(r'api/xblock/v0/xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
-                'courseware.views.render_xblock',
-                name='render_xblock'),
         )
 
     # allow course staff to change to student view of courseware
@@ -624,6 +653,7 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     urlpatterns += (
         url(r'', include('third_party_auth.urls')),
+        url(r'api/third_party_auth/', include('third_party_auth.api.urls')),
         # NOTE: The following login_oauth_token endpoint is DEPRECATED.
         # Please use the exchange_access_token endpoint instead.
         url(r'^login_oauth_token/(?P<backend>[^/]+)/$', 'student.views.login_oauth_token'),

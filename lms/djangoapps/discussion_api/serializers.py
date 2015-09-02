@@ -126,12 +126,12 @@ class _ContentSerializer(serializers.Serializer):
 
     def _get_user_label(self, user_id):
         """
-        Returns the role label (i.e. "staff" or "community_ta") for the user
+        Returns the role label (i.e. "Staff" or "Community TA") for the user
         with the given id.
         """
         return (
-            "staff" if user_id in self.context["staff_user_ids"] else
-            "community_ta" if user_id in self.context["ta_user_ids"] else
+            "Staff" if user_id in self.context["staff_user_ids"] else
+            "Community TA" if user_id in self.context["ta_user_ids"] else
             None
         )
 
@@ -197,8 +197,25 @@ class ThreadSerializer(_ContentSerializer):
     non_endorsed_comment_list_url = serializers.SerializerMethodField()
     read = serializers.BooleanField(read_only=True)
     has_endorsed = serializers.BooleanField(read_only=True, source="endorsed")
+    response_count = serializers.IntegerField(source="resp_total", read_only=True)
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
+
+    # TODO: https://openedx.atlassian.net/browse/MA-1359
+    def __init__(self, *args, **kwargs):
+        remove_fields = kwargs.pop('remove_fields', None)
+        super(ThreadSerializer, self).__init__(*args, **kwargs)
+        # type is an invalid class attribute name, so we must declare a
+        # different name above and modify it here
+        self.fields["type"] = self.fields.pop("type_")
+        # Compensate for the fact that some threads in the comments service do
+        # not have the pinned field set
+        if self.object and self.object.get("pinned") is None:
+            self.object["pinned"] = False
+        if remove_fields:
+            # for multiple fields in a list
+            for field_name in remove_fields:
+                self.fields.pop(field_name)
 
     def get_pinned(self, obj):
         """
@@ -293,7 +310,7 @@ class CommentSerializer(_ContentSerializer):
 
     def get_endorsed_by_label(self, obj):
         """
-        Returns the role label (i.e. "staff" or "community_ta") for the
+        Returns the role label (i.e. "Staff" or "Community TA") for the
         endorsing user
         """
         endorsement = obj.get("endorsement")

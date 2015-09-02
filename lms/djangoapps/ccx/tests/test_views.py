@@ -75,6 +75,7 @@ def ccx_dummy_request():
 
 
 @attr('shard_1')
+@ddt.ddt
 class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
@@ -382,6 +383,35 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 course_id=course_key, email=test_email
             ).exists()
         )
+
+    @ddt.data("dummy_student_id", "xyz@gmail.com")
+    def test_manage_add_single_invalid_student(self, student_id):
+        """enroll a single non valid student
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        url = reverse(
+            'ccx_manage_student',
+            kwargs={'course_id': course_key}
+        )
+        redirect_url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': course_key}
+        )
+        data = {
+            'student-action': 'add',
+            'student-id': u','.join([student_id, ]),  # pylint: disable=no-member
+        }
+        response = self.client.post(url, data=data, follow=True)
+
+        error_message = 'Could not find a user with name or email "{student_id}" '.format(
+            student_id=student_id
+        )
+        self.assertContains(response, error_message, status_code=200)
+
+        # we were redirected to our current location
+        self.assertRedirects(response, redirect_url, status_code=302)
 
     def test_manage_add_single_student(self):
         """enroll a single student who is a member of the class already

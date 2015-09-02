@@ -33,8 +33,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from courseware.courses import get_course_with_access, has_access
-from eventtracking import tracker
-from track import contexts
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
@@ -51,22 +49,13 @@ from .serializers import (
 )
 from .search_indexes import CourseTeamIndexer
 from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
+from .utils import emit_team_event
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
 
 log = logging.getLogger(__name__)
-
-
-def emit_team_event(event_name, course_key, event_data):
-    """
-    Emit team events with the correct course id context.
-    """
-    context = contexts.course_context_from_course_id(course_key)
-
-    with tracker.get_tracker().context(event_name, context):
-        tracker.emit(event_name, event_data)
 
 
 @receiver(post_save, sender=CourseTeam)

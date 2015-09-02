@@ -93,7 +93,6 @@
                             });
                         }
                     );
-                    $('.wrapper-prompt').focus();
                 }
             });
 

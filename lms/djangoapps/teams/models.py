@@ -27,7 +27,8 @@ from xmodule_django.models import CourseKeyField
 from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException
-from . import TEAM_DISCUSSION_CONTEXT
+from teams.utils import emit_team_event
+from teams import TEAM_DISCUSSION_CONTEXT
 
 
 @receiver(thread_voted)
@@ -258,3 +259,6 @@ class CourseTeamMembership(models.Model):
         membership.team.last_activity_at = now
         membership.team.save()
         membership.save()
+        emit_team_event('edx.team.activity_updated', membership.team.course_id, {
+            'team_id': membership.team_id,
+        })

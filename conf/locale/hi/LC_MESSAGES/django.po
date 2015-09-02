@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-11 12:16+0000\n"
+"POT-Creation-Date: 2015-09-18 13:23+0000\n"
 "PO-Revision-Date: 2015-06-28 20:21+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -3317,9 +3317,7 @@ msgid "Request user's username"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's username. You must also set Open in New "
-"Page to True to get the user's information."
+msgid "Select True to request the user's username."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3327,9 +3325,7 @@ msgid "Request user's email"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's email address. You must also set Open in "
-"New Page to True to get the user's information."
+msgid "Select True to request the user's email address."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -7551,10 +7547,6 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr ""
 
-#: lms/djangoapps/teams/views.py
-msgid "Error connecting to elasticsearch"
-msgstr ""
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -11517,8 +11509,6 @@ msgstr ""
 msgid "Email someone to say you've registered for this course"
 msgstr ""
 
-#. Translators: This text will be automatically posted to the student's
-#. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {account}: {url}"
 msgstr ""
@@ -11981,6 +11971,8 @@ msgstr ""
 msgid "Download Your Certificate"
 msgstr ""
 
+#. Translators: This message appears to users when the system is processessing
+#. course certificates, which can take a few hours.
 #: lms/templates/courseware/progress.html
 msgid "We're working on it..."
 msgstr ""
@@ -16292,9 +16284,8 @@ msgstr ""
 msgid "Required Information to Create a re-run of a course"
 msgstr ""
 
-#. Translators: This is an example name for a new course, seen when filling
-#. out
-#. the form to create a new course.
+#. Translators: This is an example name for a new course, seen when
+#. filling out the form to create a new course.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
 msgstr ""
@@ -17464,8 +17455,8 @@ msgid "Library Name"
 msgstr ""
 
 #. Translators: This is an example name for a new content library, seen when
-#. filling out the form to create a new library. (A library is a collection of
-#. content or problems.)
+#. filling out the form to create a new library.
+#. (A library is a collection of content or problems.)
 #: cms/templates/index.html
 msgid "e.g. Computer Science Problems"
 msgstr ""
@@ -17488,8 +17479,9 @@ msgstr ""
 
 #. Translators: This is an example for the "code" used to identify a library,
 #. seen when filling out the form to create a new library. This example is
-#. short for "Computer Science Problems". The example number may contain
-#. letters but must not contain spaces.
+#. short
+#. for "Computer Science Problems". The example number may contain letters
+#. but must not contain spaces.
 #: cms/templates/index.html
 msgid "e.g. CSPROB"
 msgstr ""
@@ -17516,10 +17508,11 @@ msgstr ""
 msgid "This course run is currently being created."
 msgstr ""
 
-#. Translators: This is a status message, used to inform the user of what the
-#. system is doing. This status means that the user has requested to re-run an
-#. existing course, and the system is currently in the process of duplicating
-#. and configuring the existing course so that it can be re-run.
+#. Translators: This is a status message, used to inform the user of
+#. what the system is doing. This status means that the user has
+#. requested to re-run an existing course, and the system is currently
+#. in the process of duplicating and configuring the existing course
+#. so that it can be re-run.
 #: cms/templates/index.html
 msgid "Configuring as re-run"
 msgstr ""
@@ -17529,6 +17522,18 @@ msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
 "this page or {link_start}refresh it{link_end} to update the course list. The"
 " new course will need some manual configuration."
+msgstr ""
+
+#. Translators: This is a status message for the course re-runs feature.
+#. When a course admin indicates that a course should be re-run, the system
+#. needs to process the request and prepare the new course. The status of
+#. the process will follow this text.
+#: cms/templates/index.html
+msgid "This re-run processing status:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Configuration Error"
 msgstr ""
 
 #: cms/templates/index.html

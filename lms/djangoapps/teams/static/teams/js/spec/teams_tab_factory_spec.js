@@ -1,6 +1,6 @@
 define(['jquery', 'backbone', 'teams/js/teams_tab_factory',
-        'teams/js/spec_helpers/team_spec_helpers'],
-    function($, Backbone, TeamsTabFactory, TeamSpecHelpers) {
+        'common/js/spec_helpers/page_helpers', 'teams/js/spec_helpers/team_spec_helpers'],
+    function($, Backbone, TeamsTabFactory, PageHelpers, TeamSpecHelpers) {
         'use strict';
 
         describe("Teams Tab Factory", function() {
@@ -10,6 +10,7 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory',
 
             beforeEach(function() {
                 setFixtures('<section class="teams-content"></section>');
+                PageHelpers.preventBackboneChangingUrl();
             });
 
             afterEach(function() {
@@ -17,11 +18,6 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory',
             });
 
             it('can render the "Teams" tab', function() {
-                // Hack to make sure the URL fragments from earlier
-                // tests don't interfere with Backbone routing by the
-                // teams tab view
-                document.location.hash = '';
-
                 initializeTeamsTabFactory();
                 expect($('.teams-content').text()).toContain('See all teams in your course, organized by topic');
             });

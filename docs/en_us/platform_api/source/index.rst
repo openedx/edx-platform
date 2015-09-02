@@ -1,6 +1,8 @@
-##################
-EdX Platform APIs
-##################
+.. _Open edX Platform APIs:
+
+#######################
+Open edX Platform APIs
+#######################
 
 .. toctree::
     :titlesonly:

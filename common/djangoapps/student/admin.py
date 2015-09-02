@@ -1,25 +1,22 @@
-'''
-django admin pages for courseware model
-'''
+""" Django admin pages for student app """
 from django import forms
-from config_models.admin import ConfigurationModelAdmin
 from django.contrib.auth.models import User
-
-from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration
-from student.models import (
-    CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
-)
 from ratelimitbackend import admin
-from student.roles import REGISTERED_ACCESS_ROLES
-
 from xmodule.modulestore.django import modulestore
-
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from config_models.admin import ConfigurationModelAdmin
+from student.models import (
+    UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
+    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
+)
+from student.roles import REGISTERED_ACCESS_ROLES
 
 
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
+
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseAccessRole
         fields = '__all__'
@@ -136,11 +133,38 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     exclude = ('dashboard_tracking_code',)
 
 
-admin.site.register(UserProfile)
+class CourseEnrollmentAdmin(admin.ModelAdmin):
+    """ Admin interface for the CourseEnrollment model. """
+    list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
+    list_filter = ('mode', 'is_active',)
+    search_fields = ('course_id', 'mode', 'user__username',)
+
+    def get_readonly_fields(self, request, obj=None):
+        # The course_id, mode, and user fields should not be editable for an existing enrollment.
+        if obj:
+            return self.readonly_fields + ('course_id', 'mode', 'user',)
+        return self.readonly_fields
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CourseEnrollment
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    """ Admin interface for UserProfile model. """
+    list_display = ('user', 'name',)
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
+
+    def get_readonly_fields(self, request, obj=None):
+        # The user field should not be editable for an existing user profile.
+        if obj:
+            return self.readonly_fields + ('user',)
+        return self.readonly_fields
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = UserProfile
+
 
 admin.site.register(UserTestGroup)
-
-admin.site.register(CourseEnrollment)
 
 admin.site.register(CourseEnrollmentAllowed)
 
@@ -153,3 +177,7 @@ admin.site.register(CourseAccessRole, CourseAccessRoleAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 
 admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
+
+admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)
+
+admin.site.register(UserProfile, UserProfileAdmin)

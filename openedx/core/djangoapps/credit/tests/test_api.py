@@ -2,21 +2,21 @@
 Tests for the API functions in the credit app.
 """
 import datetime
-import ddt
 import json
-from mock import patch
-import pytz
 import unittest
 
+import ddt
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection, transaction
 from django.core.urlresolvers import reverse, NoReverseMatch
-from unittest import skipUnless
-
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
+import pytz
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from util.date_utils import from_timestamp
 from openedx.core.djangoapps.credit import api
@@ -36,9 +36,6 @@ from openedx.core.djangoapps.credit.models import (
     CreditEligibility
 )
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 
@@ -95,7 +92,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         return credit_course
 
 
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
 @ddt.ddt
 class CreditRequirementApiTests(CreditApiTestBase):
     """
@@ -432,7 +429,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertEqual(mail.outbox[0].subject, 'Course Credit Eligibility')
 
         # Now verify them email content
-        email_payload_first = mail.outbox[0].attachments[0]._payload    # pylint: disable=protected-access
+        email_payload_first = mail.outbox[0].attachments[0]._payload  # pylint: disable=protected-access
 
         # Test that email has two payloads [multipart (plain text and html
         # content), attached image]
@@ -446,7 +443,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Now check that html email content has same logo image 'Content-ID'
         # as the attached logo image 'Content-ID'
         email_image = email_payload_first[1]
-        html_content_first = email_payload_first[0]._payload[1]._payload    # pylint: disable=protected-access
+        html_content_first = email_payload_first[0]._payload[1]._payload  # pylint: disable=protected-access
 
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         image_id = email_image.get('Content-ID', '')[1:-1]
@@ -468,8 +465,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertEqual(len(mail.outbox), 2)
         # Now check that on sending eligibility notification again cached
         # logo image is used
-        email_payload_second = mail.outbox[1].attachments[0]._payload   # pylint: disable=protected-access
-        html_content_second = email_payload_second[0]._payload[1]._payload    # pylint: disable=protected-access
+        email_payload_second = mail.outbox[1].attachments[0]._payload  # pylint: disable=protected-access
+        html_content_second = email_payload_second[0]._payload[1]._payload  # pylint: disable=protected-access
         self.assertIn(image_id, html_content_second)
 
         # The user should remain eligible even if the requirement status is later changed
@@ -642,7 +639,28 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         for key in self.USER_INFO.keys():
             param_key = 'user_{key}'.format(key=key)
             self.assertIn(param_key, parameters)
-            self.assertEqual(parameters[param_key], self.USER_INFO[key])
+            expected = '' if key == 'mailing_address' else self.USER_INFO[key]
+            self.assertEqual(parameters[param_key], expected)
+
+    def test_create_credit_request_grade_length(self):
+        """ Verify the length of the final grade is limited to seven (7) characters total.
+
+        This is a hack for ASU.
+        """
+        # Update the user's grade
+        status = CreditRequirementStatus.objects.get(username=self.USER_INFO["username"])
+        status.status = "satisfied"
+        status.reason = {"final_grade": 1.0 / 3.0}
+        status.save()
+
+        # Initiate a credit request
+        request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
+        self.assertEqual(request['parameters']['final_grade'], u'0.33333')
+
+    def test_create_credit_request_address_empty(self):
+        """ Verify the mailing address is always empty. """
+        request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.user.username)
+        self.assertEqual(request['parameters']['user_mailing_address'], '')
 
     def test_credit_request_disable_integration(self):
         CreditProvider.objects.all().update(enable_integration=False)
@@ -843,6 +861,7 @@ class CreditApiFeatureFlagTest(UrlResetMixin, TestCase):
     """
     Base class to test the credit api urls.
     """
+
     def setUp(self, **kwargs):
         enable_credit_api = kwargs.get('enable_credit_api', False)
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREDIT_API': enable_credit_api}):

@@ -86,7 +86,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
     def test_not_eligible_for_credit(self):
         # The user is not yet eligible for credit, so no additional information should be displayed on the dashboard.
         response = self._load_dashboard()
-        self.assertNotContains(response, "credit")
+        self.assertNotContains(response, "credit-eligibility-msg")
+        self.assertNotContains(response, "purchase-credit-btn")
 
     def test_eligible_for_credit(self):
         # Simulate that the user has completed the only requirement in the course

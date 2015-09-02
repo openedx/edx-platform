@@ -68,6 +68,9 @@ from django.core.urlresolvers import reverse
                     </header>
 
                     <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+                        <%
+                        b_tag_kwargs = {'b_start': '<b>', 'b_end': '</b>'}
+                        %>
                         % if "verified" in modes:
                             <div class="register-choice register-choice-certificate">
                                 <div class="wrapper-copy">
@@ -82,9 +85,9 @@ from django.core.urlresolvers import reverse
                                                 <div class="copy-inline">
                                                     <h4>${_("Benefits of a Verified Certificate")}</h4>
                                                     <ul>
-                                                        <li>${_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn").format(b_start='<b>', b_end='</b>')}</li>
+                                                        <li>${_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn").format(**b_tag_kwargs)}</li>
                                                     </ul>
                                                 </div>
                                                 <div class="copy-inline list-actions">
@@ -108,9 +111,12 @@ from django.core.urlresolvers import reverse
                                                 <div class="copy-inline">
                                                     <h4>${_("Benefits of a Verified Certificate")}</h4>
                                                     <ul>
-                                                        <li>${_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course").format(b_start='<b>', b_end='</b>')}</li>
+                                                        <li>${_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course").format(**b_tag_kwargs)}</li>
+                                                        % if settings.FEATURES.get('IS_EDX_DOMAIN', False):
+                                                        <li>${_("{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified certificates to help fund free education for everyone globally").format(**b_tag_kwargs)}</li>
+                                                        % endif
                                                     </ul>
                                                 </div>
                                                 <div class="copy-inline list-actions">

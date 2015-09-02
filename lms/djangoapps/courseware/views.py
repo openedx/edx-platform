@@ -5,12 +5,9 @@ Courseware views functions
 import logging
 import urllib
 import json
-import cgi
 
 from datetime import datetime
-from django.utils import translation
 from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -1386,7 +1383,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
         None
 
     """
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+    if settings.LMS_SEGMENT_KEY:
         event_name = 'edx.bi.user.certificate.generate'
         tracking_context = tracker.get_tracker().resolve_context()
 
@@ -1414,6 +1411,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     usage_key = UsageKey.from_string(usage_key_string)
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     course_key = usage_key.course_key
+
+    requested_view = request.GET.get('view', 'student_view')
+    if requested_view != 'student_view':
+        return HttpResponseBadRequest("Rendering of the xblock view '{}' is not supported.".format(requested_view))
 
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check

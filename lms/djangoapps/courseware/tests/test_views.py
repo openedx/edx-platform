@@ -919,7 +919,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
-    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
@@ -965,7 +965,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertIn("Certificate is being created.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
-    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate
         # then json will return cert generating message with bad request code
@@ -1128,14 +1128,15 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_RENDER_XBLOCK_API': True})
     def setUp(self):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
 
-    def get_response(self):
+    def get_response(self, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
         url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        if url_encoded_params:
+            url += '?' + url_encoded_params
         return self.client.get(url)

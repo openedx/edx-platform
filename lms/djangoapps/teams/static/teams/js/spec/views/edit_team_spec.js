@@ -3,10 +3,11 @@ define([
     'underscore',
     'backbone',
     'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/page_helpers',
     'teams/js/views/edit_team',
     'teams/js/models/team',
     'teams/js/spec_helpers/team_spec_helpers'
-], function ($, _, Backbone, AjaxHelpers, TeamEditView, TeamModel, TeamSpecHelpers) {
+], function ($, _, Backbone, AjaxHelpers, PageHelpers, TeamEditView, TeamModel, TeamSpecHelpers) {
     'use strict';
 
     describe('CreateEditTeam', function() {
@@ -54,7 +55,8 @@ define([
                     }
                 });
 
-                expect(requests.length).toBe(0);
+                AjaxHelpers.expectNoRequests(requests);
+
             },
             editTeamID = 'av',
             teamAction;
@@ -90,6 +92,7 @@ define([
 
         beforeEach(function () {
             setFixtures('<div class="teams-content"></div>');
+            PageHelpers.preventBackboneChangingUrl();
             spyOn(Backbone.history, 'navigate');
         });
 

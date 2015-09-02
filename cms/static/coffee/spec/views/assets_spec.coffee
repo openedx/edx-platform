@@ -290,11 +290,12 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
 
             it "should remove the deleted asset from the view", ->
                 {view: @view, requests: requests} = @createAssetsView(this)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 setup.call(this, requests)
                 # Delete the 2nd asset with success from server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
-                req.respond(200) for req in requests.slice(1)
+                AjaxHelpers.respondWithNoContent(requests)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).not.toContainText("test asset 2")
 
@@ -304,7 +305,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 # Delete the 2nd asset, but mimic a failure from the server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
-                req.respond(404) for req in requests
+                AjaxHelpers.respondWithError(requests)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
 

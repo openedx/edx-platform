@@ -193,7 +193,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 var requests = AjaxHelpers.requests(this);
                 fillInFields('DemoX', 'DM101', '', 'Demo course');
                 $(selectors.save).click();
-                expect(requests.length).toBe(0);
+                AjaxHelpers.expectNoRequests(requests);
             });
 
             it("can be canceled", function () {

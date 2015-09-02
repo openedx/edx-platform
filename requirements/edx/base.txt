@@ -70,7 +70,7 @@ python-social-auth==0.2.12
 pytz==2015.2
 pysrt==0.4.7
 PyYAML==3.10
-requests==2.3.0
+requests==2.7.0
 requests-oauthlib==0.4.1
 scipy==0.14.0
 Shapely==1.2.16
@@ -124,7 +124,7 @@ django_debug_toolbar==1.3.2
 astroid==1.3.8
 bok-choy==0.4.3
 chrono==1.0.2
-coverage==3.7.1
+coverage==4.0
 ddt==0.8.0
 diff-cover==0.8.0
 django-crum==0.5
@@ -149,8 +149,8 @@ selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
 
-# Used for Segment.io analytics
-analytics-python==0.4.4
+# Used for Segment analytics
+analytics-python==1.1.0
 
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2

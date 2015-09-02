@@ -486,6 +486,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'label': 'test',
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
+            'trailing_text': None,
         }
         super(FormulaEquationInputTemplateTest, self).setUp()
 

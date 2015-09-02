@@ -365,7 +365,7 @@
 
         .info-date-block {
           @extend %t-title7;
-          color: $gray-l1;
+          color: $gray; // WCAG 2.0 AA compliant
           display: block;
         }
       }
@@ -546,24 +546,6 @@
       .messages-list {
         margin: 0;
         padding: 0;
-      }
-
-      .credit-btn{
-        @include float(right);
-      }
-
-      .denied-credit-btn{
-        @include float(right);
-      }
-      .credit-request-pending-msg{
-        display: inline-block;
-      }
-
-      .credit-btn {
-        @extend %btn-pl-yellow-base;
-        background-image: none ;
-        text-shadow: none;
-        box-shadow: none;
       }
 
       .message {
@@ -750,19 +732,21 @@
               font-weight: bold;
             }
           }
-          .credit-eligibility-msg {
-            @include float(left);
-            margin-top: 10px;
-          }
 
-          .credit-request-pending-msg {
-            @include float(left);
-            margin-top: 10px;
-          }
+          .credit-action {
+            .credit-msg {
+              @include float(left);
+              width: flex-grid(9, 12);
+            }
 
-          .credit-request-approved-msg{
-            width: flex-grid(10, 12);
-            @include float(left);
+            .credit-btn {
+              @extend %btn-pl-yellow-base;
+              @include float(right);
+              background-image: none ;
+              text-shadow: none;
+              box-shadow: none;
+              text-transform: none;
+            }
           }
 
           .actions {

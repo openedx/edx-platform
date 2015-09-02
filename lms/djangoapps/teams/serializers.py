@@ -42,6 +42,34 @@ class CountryField(serializers.Field):
         return data
 
 
+class CountryField(serializers.Field):
+    """
+    Field to serialize a country code.
+    """
+
+    COUNTRY_CODES = dict(countries).keys()
+
+    def to_representation(self, obj):
+        """
+        Represent the country as a 2-character unicode identifier.
+        """
+        return unicode(obj)
+
+    def to_internal_value(self, data):
+        """
+        Check that the code is a valid country code.
+
+        We leave the data in its original format so that the Django model's
+        CountryField can convert it to the internal representation used
+        by the django-countries library.
+        """
+        if data and data not in self.COUNTRY_CODES:
+            raise serializers.ValidationError(
+                u"{code} is not a valid country code".format(code=data)
+            )
+        return data
+
+
 class UserMembershipSerializer(serializers.ModelSerializer):
     """Serializes CourseTeamMemberships with only user and date_joined
 
@@ -123,6 +151,18 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
         return team
 
 
+class CourseTeamSerializerWithoutMembership(CourseTeamSerializer):
+    """The same as the `CourseTeamSerializer`, but elides the membership field.
+
+    Intended to be used as a sub-serializer for serializing team
+    memberships, since the membership field is redundant in that case.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(CourseTeamSerializerWithoutMembership, self).__init__(*args, **kwargs)
+        del self.fields['membership']
+
+
 class MembershipSerializer(serializers.ModelSerializer):
     """Serializes CourseTeamMemberships with information about both teams and users."""
     profile_configuration = deepcopy(settings.ACCOUNT_VISIBILITY_CONFIGURATION)
@@ -145,8 +185,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             view_name='teams_detail',
             read_only=True,
         ),
-        expanded_serializer=CourseTeamSerializer(read_only=True),
-        exclude_expand_fields={'user'},
+        expanded_serializer=CourseTeamSerializerWithoutMembership(read_only=True),
     )
 
     class Meta(object):

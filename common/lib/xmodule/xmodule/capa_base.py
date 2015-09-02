@@ -193,12 +193,12 @@ class CapaFields(object):
         scope=Scope.settings
     )
     matlab_api_key = String(
-        display_name="Matlab API key",
-        help="Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
-             "This key is granted for exclusive use by this course for the specified duration. "
-             "Please do not share the API key with other courses and notify MathWorks immediately "
-             "if you believe the key is exposed or compromised. To obtain a key for your course, "
-             "or to report an issue, please contact moocsupport@mathworks.com",
+        display_name=_("Matlab API key"),
+        help=_("Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+               "This key is granted for exclusive use by this course for the specified duration. "
+               "Please do not share the API key with other courses and notify MathWorks immediately "
+               "if you believe the key is exposed or compromised. To obtain a key for your course, "
+               "or to report an issue, please contact moocsupport@mathworks.com"),
         scope=Scope.settings
     )
 
@@ -1423,7 +1423,9 @@ class CapaMixin(CapaFields):
         self.track_function_unmask('save_problem_success', event_info)
         msg = _("Your answers have been saved.")
         if not self.max_attempts == 0:
-            msg = _("Your answers have been saved but not graded. Click 'Check' to grade them.")
+            msg = _(
+                "Your answers have been saved but not graded. Click '{button_name}' to grade them."
+            ).format(button_name=self.check_button_name())
         return {
             'success': True,
             'msg': msg,

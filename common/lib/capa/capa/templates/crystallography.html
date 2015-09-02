@@ -9,7 +9,7 @@
     <div class="script_placeholder" data-src="/static/js/sylvester.js"></div>
     <div class="script_placeholder" data-src="/static/js/crystallography.js"></div>
 
-    % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
         <div class="status ${status.classname}" id="status_${id}">
     % endif
 
@@ -25,7 +25,7 @@
         <span class="message">${msg|n}</span>
     % endif
 
-    % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
         </div>
     % endif
 </section>

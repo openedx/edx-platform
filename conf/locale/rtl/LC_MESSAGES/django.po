@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-11 12:47+0000\n"
-"PO-Revision-Date: 2015-09-11 12:47:23.251524\n"
+"POT-Creation-Date: 2015-09-18 13:39+0000\n"
+"PO-Revision-Date: 2015-09-18 13:39:23.492978\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3587,24 +3587,16 @@ msgid "Request user's username"
 msgstr "قثضعثسف عسثق'س عسثقرشوث"
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's username. You must also set Open in New "
-"Page to True to get the user's information."
-msgstr ""
-"سثمثذف فقعث فخ قثضعثسف فاث عسثق'س عسثقرشوث. غخع وعسف شمسخ سثف خحثر هر رثص "
-"حشلث فخ فقعث فخ لثف فاث عسثق'س هربخقوشفهخر."
+msgid "Select True to request the user's username."
+msgstr "سثمثذف فقعث فخ قثضعثسف فاث عسثق'س عسثقرشوث."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Request user's email"
 msgstr "قثضعثسف عسثق'س ثوشهم"
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's email address. You must also set Open in "
-"New Page to True to get the user's information."
-msgstr ""
-"سثمثذف فقعث فخ قثضعثسف فاث عسثق'س ثوشهم شييقثسس. غخع وعسف شمسخ سثف خحثر هر "
-"رثص حشلث فخ فقعث فخ لثف فاث عسثق'س هربخقوشفهخر."
+msgid "Select True to request the user's email address."
+msgstr "سثمثذف فقعث فخ قثضعثسف فاث عسثق'س ثوشهم شييقثسس."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI Application Information"
@@ -8274,10 +8266,6 @@ msgstr "فثطف_سثشقذا شري خقيثق_زغ ذشررخف زث حقخد�
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "فاث سعححمهثي فخحهذ هي {topic_id} هس رخف دشمهي"
 
-#: lms/djangoapps/teams/views.py
-msgid "Error connecting to elasticsearch"
-msgstr "ثققخق ذخررثذفهرل فخ ثمشسفهذسثشقذا"
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -12392,8 +12380,6 @@ msgstr "فصثثف فاشف غخع'دث قثلهسفثقثي بخق فاهس ذ�
 msgid "Email someone to say you've registered for this course"
 msgstr "ثوشهم سخوثخرث فخ سشغ غخع'دث قثلهسفثقثي بخق فاهس ذخعقسث"
 
-#. Translators: This text will be automatically posted to the student's
-#. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {account}: {url}"
 msgstr "ه تعسف قثلهسفثقثي بخق {number} {title} فاقخعلا {account}: {url}"
@@ -12905,6 +12891,8 @@ msgstr "حيب صهمم خحثر هر ش رثص زقخصسثق صهريخص خق
 msgid "Download Your Certificate"
 msgstr "يخصرمخشي غخعق ذثقفهبهذشفث"
 
+#. Translators: This message appears to users when the system is processessing
+#. course certificates, which can take a few hours.
 #: lms/templates/courseware/progress.html
 msgid "We're working on it..."
 msgstr "صث'قث صخقنهرل خر هف..."
@@ -17621,9 +17609,8 @@ msgstr ""
 msgid "Required Information to Create a re-run of a course"
 msgstr "قثضعهقثي هربخقوشفهخر فخ ذقثشفث ش قث-قعر خب ش ذخعقسث"
 
-#. Translators: This is an example name for a new course, seen when filling
-#. out
-#. the form to create a new course.
+#. Translators: This is an example name for a new course, seen when
+#. filling out the form to create a new course.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
 msgstr "ث.ل. هرفقخيعذفهخر فخ ذخوحعفثق سذهثرذث"
@@ -19011,8 +18998,8 @@ msgid "Library Name"
 msgstr "مهزقشقغ رشوث"
 
 #. Translators: This is an example name for a new content library, seen when
-#. filling out the form to create a new library. (A library is a collection of
-#. content or problems.)
+#. filling out the form to create a new library.
+#. (A library is a collection of content or problems.)
 #: cms/templates/index.html
 msgid "e.g. Computer Science Problems"
 msgstr "ث.ل. ذخوحعفثق سذهثرذث حقخزمثوس"
@@ -19035,8 +19022,9 @@ msgstr "مهزقشقغ ذخيث"
 
 #. Translators: This is an example for the "code" used to identify a library,
 #. seen when filling out the form to create a new library. This example is
-#. short for "Computer Science Problems". The example number may contain
-#. letters but must not contain spaces.
+#. short
+#. for "Computer Science Problems". The example number may contain letters
+#. but must not contain spaces.
 #: cms/templates/index.html
 msgid "e.g. CSPROB"
 msgstr "ث.ل. ذسحقخز"
@@ -19065,10 +19053,11 @@ msgstr "ذخعقسث قعر:"
 msgid "This course run is currently being created."
 msgstr "فاهس ذخعقسث قعر هس ذعققثرفمغ زثهرل ذقثشفثي."
 
-#. Translators: This is a status message, used to inform the user of what the
-#. system is doing. This status means that the user has requested to re-run an
-#. existing course, and the system is currently in the process of duplicating
-#. and configuring the existing course so that it can be re-run.
+#. Translators: This is a status message, used to inform the user of
+#. what the system is doing. This status means that the user has
+#. requested to re-run an existing course, and the system is currently
+#. in the process of duplicating and configuring the existing course
+#. so that it can be re-run.
 #: cms/templates/index.html
 msgid "Configuring as re-run"
 msgstr "ذخربهلعقهرل شس قث-قعر"
@@ -19082,6 +19071,18 @@ msgstr ""
 "فاث رثص ذخعقسث صهمم زث شييثي فخ غخعق ذخعقسث مهسف هر 5-10 وهرعفثس. قثفعقر فخ "
 "فاهس حشلث خق {link_start}قثبقثسا هف{link_end} فخ عحيشفث فاث ذخعقسث مهسف. فاث"
 " رثص ذخعقسث صهمم رثثي سخوث وشرعشم ذخربهلعقشفهخر."
+
+#. Translators: This is a status message for the course re-runs feature.
+#. When a course admin indicates that a course should be re-run, the system
+#. needs to process the request and prepare the new course. The status of
+#. the process will follow this text.
+#: cms/templates/index.html
+msgid "This re-run processing status:"
+msgstr "فاهس قث-قعر حقخذثسسهرل سفشفعس:"
+
+#: cms/templates/index.html
+msgid "Configuration Error"
+msgstr "ذخربهلعقشفهخر ثققخق"
 
 #: cms/templates/index.html
 msgid ""

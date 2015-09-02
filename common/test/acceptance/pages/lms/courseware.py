@@ -14,7 +14,7 @@ class CoursewarePage(CoursePage):
     url_path = "courseware/"
     xblock_component_selector = '.vert .xblock'
     section_selector = '.chapter'
-    subsection_selector = '.chapter ul li'
+    subsection_selector = '.chapter-content-container a'
 
     def is_browser_on_page(self):
         return self.q(css='body.courseware').present
@@ -102,7 +102,7 @@ class CoursewarePage(CoursePage):
         """
         return the url of the active subsection in the left nav
         """
-        return self.q(css='.chapter ul li.active a').attrs('href')[0]
+        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]
 
     @property
     def can_start_proctored_exam(self):

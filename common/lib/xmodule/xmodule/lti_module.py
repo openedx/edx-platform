@@ -206,9 +206,8 @@ class LTIFields(object):
     ask_to_send_username = Boolean(
         display_name=_("Request user's username"),
         # Translators: This is used to request the user's username for a third party service.
-        # Usernames can only be requested if "Open in New Page" is set to True.
         help=_(
-            "Select True to request the user's username. You must also set Open in New Page to True to get the user's information."
+            "Select True to request the user's username."
         ),
         default=False,
         scope=Scope.settings
@@ -216,9 +215,8 @@ class LTIFields(object):
     ask_to_send_email = Boolean(
         display_name=_("Request user's email"),
         # Translators: This is used to request the user's email for a third party service.
-        # Emails can only be requested if "Open in New Page" is set to True.
         help=_(
-            "Select True to request the user's email address. You must also set Open in New Page to True to get the user's information."
+            "Select True to request the user's email address."
         ),
         default=False,
         scope=Scope.settings
@@ -603,11 +601,10 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             except AttributeError:
                 self.user_username = ""
 
-        if self.open_in_a_new_page:
-            if self.ask_to_send_username and self.user_username:
-                body["lis_person_sourcedid"] = self.user_username
-            if self.ask_to_send_email and self.user_email:
-                body["lis_person_contact_email_primary"] = self.user_email
+        if self.ask_to_send_username and self.user_username:
+            body["lis_person_sourcedid"] = self.user_username
+        if self.ask_to_send_email and self.user_email:
+            body["lis_person_contact_email_primary"] = self.user_email
 
         # Appending custom parameter for signing.
         body.update(custom_parameters)

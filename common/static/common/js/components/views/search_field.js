@@ -14,12 +14,15 @@
                     'submit .search-form': 'performSearch',
                     'blur .search-form': 'onFocusOut',
                     'keyup .search-field': 'refreshState',
-                    'click .action-clear': 'clearSearch'
+                    'click .action-clear': 'clearSearch',
+                    'mouseover .action-clear': 'setMouseOverState',
+                    'mouseout .action-clear': 'setMouseOutState',
                 },
 
                 initialize: function(options) {
                     this.type = options.type;
                     this.label = options.label;
+                    this.mouseOverClear = false;
                 },
 
                 refreshState: function() {
@@ -43,10 +46,18 @@
                     return this;
                 },
 
+                setMouseOverState: function(event) {
+                    this.mouseOverClear = true;
+                },
+
+                setMouseOutState: function(event) {
+                    this.mouseOverClear = false;
+                },
+
                 onFocusOut: function(event) {
                     // If the focus is going anywhere but the clear search
                     // button then treat it as a request to search.
-                    if (!$(event.relatedTarget).hasClass('action-clear')) {
+                    if (!this.mouseOverClear) {
                         this.performSearch(event);
                     }
                 },

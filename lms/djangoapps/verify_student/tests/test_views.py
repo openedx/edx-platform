@@ -1420,11 +1420,15 @@ class TestSubmitPhotosForVerification(TestCase):
             "Photo ID image is required if the user does not have an initial verification attempt."
         )
 
-        # Create the initial verification attempt
+        # Create the initial verification attempt with some dummy
+        # value set for field 'photo_id_key'
         self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA,
         )
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        attempt.photo_id_key = "dummy_photo_id_key"
+        attempt.save()
 
         # Now the request should succeed
         self._submit_photos(face_image=self.IMAGE_DATA)
@@ -1939,8 +1943,8 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         url += u"?{params}".format(params=urllib.urlencode({"checkpoint": self.reverification_location}))
         self.assertRedirects(response, url)
 
-    @override_settings(SEGMENT_IO_LMS_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True, 'SEGMENT_IO_LMS': True})
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_get(self):
         """
         Test incourse reverification.
@@ -1994,8 +1998,8 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         response = self._submit_photos(self.course_key, self.reverification_location, "")
         self.assertEqual(response.status_code, 400)
 
-    @override_settings(SEGMENT_IO_LMS_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True, 'SEGMENT_IO_LMS': True})
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_post(self):
         self._create_checkpoint()
         self._create_initial_verification()
@@ -2037,7 +2041,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         """
         Helper method for initial verification.
         """
-        attempt = SoftwareSecurePhotoVerification(user=self.user)
+        attempt = SoftwareSecurePhotoVerification(user=self.user, photo_id_key="dummy_photo_id_key")
         attempt.mark_ready()
         attempt.save()
         attempt.submit()

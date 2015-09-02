@@ -152,6 +152,21 @@ class CourseFixture(XBlockContainerFixture):
         """
         return "<CourseFixture: org='{org}', number='{number}', run='{run}'>".format(**self._course_dict)
 
+    def add_course_details(self, course_details):
+        """
+        Add course details to dict of course details to be updated when configure_course or install is called.
+
+        Arguments:
+            Dictionary containing key value pairs for course updates,
+            e.g. {'start_date': datetime.now() }
+        """
+        if 'start_date' in course_details:
+            course_details['start_date'] = course_details['start_date'].isoformat()
+        if 'end_date' in course_details:
+            course_details['end_date'] = course_details['end_date'].isoformat()
+
+        self._course_details.update(course_details)
+
     def add_update(self, update):
         """
         Add an update to the course.  `update` should be a `CourseUpdateDesc`.
@@ -200,6 +215,12 @@ class CourseFixture(XBlockContainerFixture):
         self._create_xblock_children(self._course_location, self.children)
 
         return self
+
+    def configure_course(self):
+        """
+        Configure Course Settings, take new course settings from self._course_details dict object
+        """
+        self._configure_course()
 
     @property
     def _course_location(self):

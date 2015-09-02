@@ -107,7 +107,6 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'chapter': 'Chrome',
                 'section': displayname,
             }))
-            self.assertEquals('open_close_accordion' in response.content, accordion)
             self.assertEquals('course-tabs' in response.content, tabs)
 
         self.assertTabInactive('progress', response)

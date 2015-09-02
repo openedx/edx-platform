@@ -88,7 +88,6 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
 
             it("displays an error when a required field is blank", function () {
                 var requests = AjaxHelpers.requests(this);
-                var requests_count = requests.length;
                 $('.new-library-button').click();
                 var values = ['DemoX', 'DM101', 'Demo library'];
                 // Try making each of these three values empty one at a time and ensure the form won't submit:
@@ -100,7 +99,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                     expect($('.new-library-save')).toHaveClass('is-disabled');
                     expect($('.new-library-save')).toHaveAttr('aria-disabled', 'true');
                     $('.new-library-save').click();
-                    expect(requests.length).toEqual(requests_count); // Expect no new requests
+                    AjaxHelpers.expectNoRequests(requests);
                 }
             });
 

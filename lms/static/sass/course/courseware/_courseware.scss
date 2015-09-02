@@ -1,3 +1,7 @@
+// lms - base courseware styling
+// ====================
+// NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
+
 html {
   height: 100%;
   max-height: 100%;
@@ -614,7 +618,7 @@ div.course-wrapper {
 
     div.staff_actions {
       p.error {
-        color: $error-red
+        color: $error-color
       }
       p.success {
         color: $success-color;
@@ -667,11 +671,11 @@ div.course-wrapper {
 
       header#open_close_accordion {
         a {
-          background-image: url('../images/slide-right-icon.png');
+          background-image: url('#{$static-path}/images/slide-right-icon.png');
         }
       }
 
-      div#accordion {
+      .accordion {
         visibility: hidden;
         width: 10px;
         padding: 0;
@@ -679,11 +683,6 @@ div.course-wrapper {
         nav {
           white-space: pre;
           overflow: hidden;
-
-          ul {
-            overflow: hidden;
-            white-space: nowrap;
-          }
         }
       }
     }

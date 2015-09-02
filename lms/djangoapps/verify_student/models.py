@@ -588,16 +588,23 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     photo_id_key = models.TextField(max_length=1024)
 
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
+    copy_id_photo_from = models.ForeignKey("self", null=True, blank=True)
 
     @classmethod
     def get_initial_verification(cls, user):
-        """Get initial verification for a user
+        """Get initial verification for a user with the 'photo_id_key'.
+
         Arguments:
             user(User): user object
+
         Return:
             SoftwareSecurePhotoVerification (object)
         """
-        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"])
+        init_verification = cls.objects.filter(
+            user=user,
+            status__in=["submitted", "approved"]
+        ).exclude(photo_id_key='')
+
         return init_verification.latest('created_at') if init_verification.exists() else None
 
     @status_before_must_be("created")

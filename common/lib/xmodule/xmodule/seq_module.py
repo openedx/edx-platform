@@ -179,7 +179,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
-            titles = child.get_content_titles()
+            # `titles` is a list of titles to inject into the sequential tooltip display.
+            # We omit any blank titles to avoid blank lines in the tooltip display.
+            titles = [title.strip() for title in child.get_content_titles() if title.strip()]
             childinfo = {
                 'content': rendered_child.content,
                 'title': "\n".join(titles),
@@ -193,13 +195,14 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 childinfo['title'] = child.display_name_with_default
             contents.append(childinfo)
 
-        params = {'items': contents,
-                  'element_id': self.location.html_id(),
-                  'item_id': self.location.to_deprecated_string(),
-                  'position': self.position,
-                  'tag': self.location.category,
-                  'ajax_url': self.system.ajax_url,
-                  }
+        params = {
+            'items': contents,
+            'element_id': self.location.html_id(),
+            'item_id': self.location.to_deprecated_string(),
+            'position': self.position,
+            'tag': self.location.category,
+            'ajax_url': self.system.ajax_url,
+        }
 
         fragment.add_content(self.system.render_template("seq_module.html", params))
 

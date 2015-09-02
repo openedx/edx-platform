@@ -72,7 +72,7 @@ class InstructorDashboardPage(CoursePage):
         """
         self.q(css='a[data-section=proctoring]').first.click()
         proctoring_section = ProctoringPage(self.browser)
-        proctoring_section.wait_for_ajax()
+        proctoring_section.wait_for_page()
         return proctoring_section
 
     @staticmethod

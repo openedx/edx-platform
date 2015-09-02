@@ -67,10 +67,7 @@ class MembershipSerializerTestCase(SerializerTestCase):
                 'has_image': False
             }
         })
-        self.assertEqual(data['team']['membership'][0]['user'], {
-            'url': 'http://testserver/api/user/v1/accounts/' + username,
-            'username': username
-        })
+        self.assertNotIn('membership', data['team'])
 
 
 class TopicSerializerTestCase(SerializerTestCase):

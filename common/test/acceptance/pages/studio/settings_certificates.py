@@ -11,7 +11,9 @@ The methods in these classes are organized into several conceptual buckets:
 import os
 
 from bok_choy.promise import EmptyPromise
+from ...tests.helpers import disable_animations
 from .course_page import CoursePage
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 class CertificatesPage(CoursePage):
@@ -48,6 +50,12 @@ class CertificatesPage(CoursePage):
         ).fulfill()
 
         return True
+
+    def get_first_signatory_title(self):
+        """
+        Return signatory title for the first signatory in certificate.
+        """
+        return self.q(css='.signatory-title-value').first.html[0]
 
     ################
     # Properties
@@ -138,8 +146,10 @@ class CertificatesPage(CoursePage):
         """
         Clicks the main action presented by the prompt (such as 'Delete')
         """
+        disable_animations(self)
         self.wait_for_confirmation_prompt()
-        self.q(css='button.action-primary').first.click()
+        self.q(css='.prompt button.action-primary').first.click()
+        self.wait_for_element_invisibility('.prompt', 'wait for pop up to disappear')
         self.wait_for_ajax()
 
 
@@ -263,7 +273,7 @@ class Certificate(object):
         Returns whether or not the certificate delete icon is present.
         """
         EmptyPromise(
-            lambda: self.find_css('.actions .delete').present,
+            lambda: self.find_css('.actions .delete.action-icon').present,
             'Certificate delete button is displayed'
         ).fulfill()
 
@@ -284,6 +294,7 @@ class Certificate(object):
         """
         Create a new certificate.
         """
+        disable_animations(self.page)
         self.find_css('.action-primary').first.click()
         self.page.wait_for_ajax()
 
@@ -323,8 +334,7 @@ class Certificate(object):
         Remove the first (possibly the only) certificate from the set
         """
         self.wait_for_certificate_delete_button()
-        self.find_css('.actions .delete').first.click()
-        self.page.wait_for_ajax()
+        self.find_css('.actions .delete.action-icon').first.click()
 
 
 class Signatory(object):

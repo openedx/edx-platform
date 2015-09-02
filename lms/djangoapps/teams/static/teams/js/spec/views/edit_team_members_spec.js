@@ -138,7 +138,7 @@ define([
             verifyTeamMembersView(view);
 
             deleteTeamMemember(view, false);
-            expect(requests.length).toBe(0);
+            AjaxHelpers.expectNoRequests(requests);
             expect(view.teamEvents.trigger).not.toHaveBeenCalled();
             verifyTeamMembersView(view);
         });

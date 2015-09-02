@@ -6,6 +6,17 @@
             "backbone",
             "text!common/templates/components/system-feedback.underscore"],
         function($, _, str, Backbone, systemFeedbackTemplate) {
+            var tabbable_elements = [
+                "a[href]:not([tabindex='-1'])",
+                "area[href]:not([tabindex='-1'])",
+                "input:not([disabled]):not([tabindex='-1'])",
+                "select:not([disabled]):not([tabindex='-1'])",
+                "textarea:not([disabled]):not([tabindex='-1'])",
+                "button:not([disabled]):not([tabindex='-1'])",
+                "iframe:not([tabindex='-1'])",
+                "[tabindex]:not([tabindex='-1'])",
+                "[contentEditable=true]:not([tabindex='-1'])"
+            ];
             var SystemFeedback = Backbone.View.extend({
                 options: {
                     title: "",
@@ -16,7 +27,8 @@
                     icon: true,  // should we render an icon related to the message intent?
                     closeIcon: true,  // should we render a close button in the top right corner?
                     minShown: 0,  // length of time after this view has been shown before it can be hidden (milliseconds)
-                    maxShown: Infinity  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
+                    maxShown: Infinity,  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
+                    outFocusElement: null  // element to send focus to on hide
 
                 /* Could also have an "actions" hash: here is an example demonstrating
                    the expected structure. For each action, by default the framework
@@ -61,6 +73,40 @@
                     if (this.options.actions && this.options.actions.secondary &&
                             !_.isArray(this.options.actions.secondary)) {
                         this.options.actions.secondary = [this.options.actions.secondary];
+                    }
+                    return this;
+                },
+
+                inFocus: function() {
+                    this.options.outFocusElement = this.options.outFocusElement || document.activeElement;
+
+                    // Set focus to the container.
+                    this.$(".wrapper").first().focus();
+
+
+                    // Make tabs within the prompt loop rather than setting focus
+                    // back to the main content of the page.
+                    var tabbables = this.$(tabbable_elements.join());
+                    tabbables.on("keydown", function (event) {
+                        // On tab backward from the first tabbable item in the prompt
+                        if (event.which === 9 && event.shiftKey && event.target === tabbables.first()[0]) {
+                            event.preventDefault();
+                            tabbables.last().focus();
+                        }
+                        // On tab forward from the last tabbable item in the prompt
+                        else if (event.which === 9 && !event.shiftKey && event.target === tabbables.last()[0]) {
+                            event.preventDefault();
+                            tabbables.first().focus();
+                        }
+                    });
+
+                    return this;
+                },
+
+                outFocus: function() {
+                    var tabbables = this.$(tabbable_elements.join()).off("keydown");
+                    if (this.options.outFocusElement) {
+                        this.options.outFocusElement.focus();
                     }
                     return this;
                 },
