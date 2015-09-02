@@ -32,7 +32,7 @@ from enrollment.errors import (
 )
 from student.auth import user_has_role
 from student.models import User
-from student.roles import CourseStaffRole
+from student.roles import CourseStaffRole, GlobalStaff
 
 
 log = logging.getLogger(__name__)
@@ -472,7 +472,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     ).format(username=username)
                 }
             )
-        if username == request.user.username or self.has_api_key_permissions(request):
+        if username == request.user.username or GlobalStaff().has_user(request.user) or \
+                self.has_api_key_permissions(request):
             return Response(enrollment_data)
         filtered_data = []
         for enrollment in enrollment_data:

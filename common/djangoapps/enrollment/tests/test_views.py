@@ -32,7 +32,7 @@ from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
-from student.tests.factories import UserFactory, CourseModeFactory
+from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
 from embargo.test_utils import restrict_course
 
 
@@ -353,11 +353,15 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.client.login(username=self.OTHER_USERNAME, password=self.PASSWORD)
         self._assert_enrollments_visible_in_list([])
         # Create a staff user for self.course (but nor for other_course) and log her in.
-        staff_user = UserFactory.create(username='staff', email='staff@example.com', password=self.PASSWORD,)
+        staff_user = UserFactory.create(username='staff', email='staff@example.com', password=self.PASSWORD)
         CourseStaffRole(self.course.id).add_users(staff_user)
         self.client.login(username='staff', password=self.PASSWORD)
         # Verify that she can see only the enrollment in the course she has staff privileges for.
         self._assert_enrollments_visible_in_list([self.course])
+        # Create a global staff user, and verify she can see all enrollments.
+        AdminFactory(username='global_staff', email='global_staff@example.com', password=self.PASSWORD)
+        self.client.login(username='global_staff', password=self.PASSWORD)
+        self._assert_enrollments_visible_in_list([self.course, other_course])
         # Verify the server can see all enrollments.
         self.client.logout()
         self._assert_enrollments_visible_in_list([self.course, other_course], use_server_key=True)
