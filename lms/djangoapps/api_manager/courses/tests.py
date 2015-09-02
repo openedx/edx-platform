@@ -6,6 +6,7 @@ Run these tests @ Devstack:
 from datetime import datetime, timedelta
 import json
 import uuid
+import pytz
 from django.utils import timezone
 import mock
 from random import randint
@@ -2060,7 +2061,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         broken up into individual test cases at some point, although how is uncertain at present.
         """
         # Set some reference dates for anchoring the test case data to specific points in time
-        reference_date = timezone.now()
+        reference_date = datetime(2015, 8, 21, 0, 0, 0, 0, pytz.UTC)
         course_start_date = reference_date + relativedelta(months=-2)
         course_end_date = reference_date + relativedelta(years=5)
 
@@ -2131,7 +2132,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         org_id = response.data['id']
 
         # Enroll the users in the courses using an old datestamp
-        enrolled_time = reference_date - timedelta(days=25)
+        enrolled_time = reference_date - timedelta(days=USER_COUNT, minutes=-30)
         with freeze_time(enrolled_time):
             for user in users:
                 CourseEnrollmentFactory.create(user=user, course_id=course.id)
@@ -2147,7 +2148,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         for j, user in enumerate(users):
             # Ensure all database entries in this block record the same timestamps
             # We record each user on a different day across the series to test the aggregations
-            submit_time = reference_date - timedelta(days=(USER_COUNT - j))
+            submit_time = reference_date - timedelta(days=(USER_COUNT - j), minutes=-30)
             with freeze_time(submit_time):
                 module = self.get_module_for_user(user, course, item)
                 grade_dict['user_id'] = user.id
@@ -2170,7 +2171,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         # Submit scores for the second module for the first five users
         # Pretend the scores were submitted over the course of the final five days
         for j, user in enumerate(users[:5]):
-            submit_time = reference_date - timedelta(days=(5 - j))
+            submit_time = reference_date - timedelta(days=(5 - j), minutes=-30)
             with freeze_time(submit_time):
                 grade_dict['user_id'] = user.id
                 second_module = self.get_module_for_user(user, course, item2)
@@ -2182,11 +2183,14 @@ class CoursesApiTests(ModuleStoreTestCase):
         # There should be one time series entry per day for each category, each day having varying counts
         end_date = reference_date - timedelta(days=(USER_COUNT - 4))
         start_date = reference_date - timedelta(days=USER_COUNT)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&organization={}'.format(
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
             self.base_courses_uri,
             unicode(course.id),
-            start_date,
-            end_date,
+            urlencode(date_parameters),
             org_id
         )
         response = self.do_get(course_metrics_uri)
@@ -2212,13 +2216,16 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(total_enrolled, 25)  # Remember, everyone was enrolled on the first day
 
         # Generate the time series report for the final five days, filtered by organization
-        end_date = reference_date.date()
+        end_date = reference_date
         start_date = end_date - relativedelta(days=4)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&organization={}'.format(
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
             self.base_courses_uri,
             unicode(course.id),
-            start_date,
-            end_date,
+            urlencode(date_parameters),
             org_id
         )
         response = self.do_get(course_metrics_uri)
@@ -2244,13 +2251,16 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(total_enrolled, 0)  # Remember, everyone was enrolled on the first day, so zero is correct here
 
         # Change the time interval to three weeks, so we should now see three entries per category
-        end_date = reference_date.date()
+        end_date = reference_date
         start_date = end_date - relativedelta(weeks=2)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&interval=weeks'.format(
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&interval=weeks'.format(
             self.base_courses_uri,
             unicode(course.id),
-            start_date,
-            end_date
+            urlencode(date_parameters)
         )
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
@@ -2275,19 +2285,22 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(total_enrolled, 0)  # No users enrolled in this series
 
         # Change the time interval to four months, so we're back to four entries per category
-        end_date = reference_date.date() + relativedelta(months=1)
+        end_date = reference_date + relativedelta(months=1)
         start_date = end_date - relativedelta(months=3)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&interval=months'.format(
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&interval=months'.format(
             self.base_courses_uri,
             unicode(course.id),
-            start_date,
-            end_date
+            urlencode(date_parameters)
         )
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['users_not_started']), 4)
         total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 13)
+        self.assertEqual(total_not_started, 20)  # 5 users started in july from 27th to 31st
         self.assertEqual(len(response.data['users_started']), 4)
         total_started = sum([started[1] for started in response.data['users_started']])
         self.assertEqual(total_started, 25)  # All users have started
@@ -2310,13 +2323,16 @@ class CoursesApiTests(ModuleStoreTestCase):
             unenroll_uri = '{}/{}'.format(test_uri, user.id)
             response = self.do_delete(unenroll_uri)
             self.assertEqual(response.status_code, 204)
-        end_date = reference_date.date()
+        end_date = reference_date
         start_date = end_date - relativedelta(days=10)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&organization={}'.format(
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
             self.base_courses_uri,
             unicode(course.id),
-            start_date,
-            end_date,
+            urlencode(date_parameters),
             org_id
         )
         response = self.do_get(course_metrics_uri)
