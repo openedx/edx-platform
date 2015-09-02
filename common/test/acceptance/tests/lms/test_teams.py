@@ -24,6 +24,9 @@ from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
 from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateOrEditTeamPage, TeamPage
 
+#TODO: merge this import into the above line properly once merged with Peter's delete changes
+#do not merge to master as-is
+from ...pages.lms.teams import EditMembershipPage
 
 TOPICS_PER_PAGE = 12
 
@@ -1085,6 +1088,107 @@ class EditTeamTest(TeamFormActions):
             location='Pakistan',
             language='English'
         )
+
+
+@ddt.ddt
+class EditMembershipTest(TeamFormActions):
+    """
+    Tests for administrating from the team membership page
+    """
+
+    def setUp(self):
+        super(EditMembershipTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+        #TODO: update this to whatever it ended up being renamed in Peter's code
+        self.create_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+
+        self.edit_membership_page = EditMembershipPage(self.browser, self.course_id, self.team)
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+        self.team_page.visit()
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator')
+    def test_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and confirm the dialog
+        Then my membership should be removed, and I should remain on the page
+        """
+        user_info = AutoAuthPage(
+            self.browser,
+            course_id=self.course_id,
+            staff=False,
+            roles=role
+        ).visit().user_info
+
+        self.create_membership(user_info['username'], self.team['id'])
+
+        self.team_page.visit()
+        self.team_page.click_edit_team_button()
+
+        #TODO: update name of create_edit_team_page here too
+        self.create_edit_team_page.wait_for_page()
+        self.assertTrue(
+            self.create_edit_team_page.membership_button_present
+        )
+
+        self.create_edit_team_page.click_membership_button()
+        self.edit_membership_page.wait_for_page()
+        self.assertEqual(self.edit_membership_page.team_members, 1)
+        self.edit_membership_page.click_first_remove()
+        self.edit_membership_page.confirm_delete_membership_dialog()
+        self.assertEqual(self.edit_membership_page.team_members, 0)
+        self.assertTrue(self.edit_membership_page.is_browser_on_page)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator')
+    def test_cancel_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and cancel the dialog
+        Then my membership should not be removed, and I should remain on the page
+        """
+        user_info = AutoAuthPage(
+            self.browser,
+            course_id=self.course_id,
+            staff=False,
+            roles=role
+        ).visit().user_info
+
+        self.create_membership(user_info['username'], self.team['id'])
+
+        self.team_page.visit()
+        self.team_page.click_edit_team_button()
+
+        #TODO: update name of create_edit_team_page here too
+        self.create_edit_team_page.wait_for_page()
+        self.assertTrue(
+            self.create_edit_team_page.membership_button_present
+        )
+
+        self.create_edit_team_page.click_membership_button()
+        self.edit_membership_page.wait_for_page()
+        self.edit_membership_page.click_first_remove()
+        self.edit_membership_page.cancel_delete_membership_dialog()
+        self.assertEqual(self.edit_membership_page.team_members, 1)
+        self.assertTrue(self.edit_membership_page.is_browser_on_page)
 
 
 @attr('shard_5')
