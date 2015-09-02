@@ -697,14 +697,27 @@ def update_comment(request, comment_id, update_data):
 
 
 def get_thread(request, thread_id):
+    """
+    Retrieve a thread.
+
+    Arguments:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        thread_id: The id for the thread to retrieve
+
+    Raises:
+
+        PermissionDenied: if user does not have permission to view thread
+
+    """
     cc_thread, context = _get_thread_and_context(request, thread_id)
     if has_permission(cc_thread, context):
         serializer = ThreadSerializer(cc_thread, context=context)
         return serializer.data
     else:
         raise PermissionDenied
-
-
 
 
 def delete_thread(request, thread_id):
