@@ -54,11 +54,18 @@ import calendar
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
+        if (json.redirect_url) location.href = url;
+        else {
+          $('.status.message.submission-error').removeClass('is-shown');
+          $('.status.message.submission-success').addClass('is-shown').focus();
+          $('#register-form .form-actions, #register-form .group-form, #register-form .instructions').hide();
+        }
       });
 
       $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
         toggleSubmitButton(true);
         json = $.parseJSON(jqXHR.responseText);
+        $('.status.message.submission-success').removeClass('is-shown');
         $('.status.message.submission-error').addClass('is-shown').focus();
         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
         $(".field-error").removeClass('field-error');
@@ -108,6 +115,11 @@ import calendar
       <!-- status messages -->
       <div role="alert" class="status message">
         <h3 class="message-title">${_("We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.")}</h3>
+      </div>
+
+      <div role="alert" class="status message submission-success" tabindex="-1">
+        <h3 class="message-title">${_("Registration succeeded.  Please follow the instructions in 'Next Steps' below to proceed.")} </h3>
+        <ul class="message-copy"> </ul>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
