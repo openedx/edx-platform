@@ -33,9 +33,9 @@ class UsersPageMixin(PageObject):
 
     def is_browser_on_page(self):
         """
-        Returns True iff the browser has loaded the page.
+        Returns True if the browser has loaded the page.
         """
-        return self.q(css='body.view-team').present
+        return self.q(css='body.view-team').present and not self.q(css='.ui-loading').present
 
     @property
     def users(self):
