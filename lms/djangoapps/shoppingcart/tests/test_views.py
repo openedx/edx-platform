@@ -25,7 +25,7 @@ from mock import patch, Mock
 import ddt
 
 from common.test.utils import XssTestMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.roles import CourseSalesAdminRole
 from util.date_utils import get_default_time_display
@@ -66,7 +66,21 @@ postpay_mock = Mock()
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
-class ShoppingCartViewsTests(ModuleStoreTestCase, XssTestMixin):
+class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
+    @classmethod
+    def setUpClass(cls):
+        super(ShoppingCartViewsTests, cls).setUpClass()
+        cls.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        cls.course_key = cls.course.id
+
+        verified_course = CourseFactory.create(org='org', number='test', display_name='Test Course')
+        cls.verified_course_key = verified_course.id
+
+        xss_course = CourseFactory.create(org='xssorg', number='test', display_name='<script>alert("XSS")</script>')
+        cls.xss_course_key = xss_course.id
+
+        cls.testing_course = CourseFactory.create(org='edX', number='888', display_name='Testing Super Course')
+
     def setUp(self):
         super(ShoppingCartViewsTests, self).setUp()
 
@@ -80,8 +94,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase, XssTestMixin):
         self.coupon_code = 'abcde'
         self.reg_code = 'qwerty'
         self.percentage_discount = 10
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        self.course_key = self.course.id
         self.course_mode = CourseMode(course_id=self.course_key,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",
@@ -90,18 +102,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase, XssTestMixin):
 
         # Saving another testing course mode
         self.testing_cost = 20
-        self.testing_course = CourseFactory.create(org='edX', number='888', display_name='Testing Super Course')
         self.testing_course_mode = CourseMode(course_id=self.testing_course.id,
                                               mode_slug="honor",
                                               mode_display_name="testing honor cert",
                                               min_price=self.testing_cost)
         self.testing_course_mode.save()
-
-        verified_course = CourseFactory.create(org='org', number='test', display_name='Test Course')
-        self.verified_course_key = verified_course.id
-
-        xss_course = CourseFactory.create(org='xssorg', number='test', display_name='<script>alert("XSS")</script>')
-        self.xss_course_key = xss_course.id
 
         self.cart = Order.get_cart_for_user(self.user)
 
@@ -1361,19 +1366,23 @@ class ShoppingCartViewsTests(ModuleStoreTestCase, XssTestMixin):
         )
 
 
-class ReceiptRedirectTest(ModuleStoreTestCase):
+class ReceiptRedirectTest(SharedModuleStoreTestCase):
     """Test special-case redirect from the receipt page. """
 
     COST = 40
     PASSWORD = 'password'
+
+    @classmethod
+    def setUpClass(cls):
+        super(ReceiptRedirectTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.course_key = cls.course.id
 
     def setUp(self):
         super(ReceiptRedirectTest, self).setUp()
         self.user = UserFactory.create()
         self.user.set_password(self.PASSWORD)
         self.user.save()
-        self.course = CourseFactory.create()
-        self.course_key = self.course.id
         self.course_mode = CourseMode(
             course_id=self.course_key,
             mode_slug="verified",
@@ -1382,7 +1391,6 @@ class ReceiptRedirectTest(ModuleStoreTestCase):
         )
         self.course_mode.save()
         self.cart = Order.get_cart_for_user(self.user)
-
         self.client.login(
             username=self.user.username,
             password=self.PASSWORD
@@ -1429,7 +1437,6 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
     Test suite for ShoppingcartViews Course Enrollments Closed or not
     """
     def setUp(self):
-
         super(ShoppingcartViewsClosedEnrollment, self).setUp()
         self.user = UserFactory.create()
         self.user.set_password('password')
@@ -1560,10 +1567,16 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
+class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
     """
+    @classmethod
+    def setUpClass(cls):
+        super(RegistrationCodeRedemptionCourseEnrollment, cls).setUpClass()
+        cls.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        cls.course_key = cls.course.id
+
     def setUp(self, **kwargs):
         super(RegistrationCodeRedemptionCourseEnrollment, self).setUp()
 
@@ -1571,8 +1584,6 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         self.user.set_password('password')
         self.user.save()
         self.cost = 40
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        self.course_key = self.course.id
         self.course_mode = CourseMode(course_id=self.course_key,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",
@@ -1735,7 +1746,7 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-class DonationViewTest(ModuleStoreTestCase):
+class DonationViewTest(SharedModuleStoreTestCase):
     """Tests for making a donation.
 
     These tests cover both the single-item purchase flow,
@@ -1744,6 +1755,11 @@ class DonationViewTest(ModuleStoreTestCase):
 
     DONATION_AMOUNT = "23.45"
     PASSWORD = "password"
+
+    @classmethod
+    def setUpClass(cls):
+        super(DonationViewTest, cls).setUpClass()
+        cls.course = CourseFactory.create(display_name="Test Course")
 
     def setUp(self):
         """Create a test user and order. """
@@ -1766,8 +1782,7 @@ class DonationViewTest(ModuleStoreTestCase):
         self._assert_receipt_contains("tax purposes")
 
     def test_donation_for_course_receipt(self):
-        # Create a test course and donate to it
-        self.course = CourseFactory.create(display_name="Test Course")
+        # Donate to our course
         self._donate(self.DONATION_AMOUNT, course_id=self.course.id)
 
         # Verify the receipt page
@@ -1891,10 +1906,18 @@ class DonationViewTest(ModuleStoreTestCase):
         return reverse("shoppingcart.views.show_receipt", kwargs={"ordernum": order_id})
 
 
-class CSVReportViewsTest(ModuleStoreTestCase):
+class CSVReportViewsTest(SharedModuleStoreTestCase):
     """
     Test suite for CSV Purchase Reporting
     """
+    @classmethod
+    def setUpClass(cls):
+        super(CSVReportViewsTest, cls).setUpClass()
+        cls.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        cls.course_key = cls.course.id
+        verified_course = CourseFactory.create(org='org', number='test', display_name='Test Course')
+        cls.verified_course_key = verified_course.id
+
     def setUp(self):
         super(CSVReportViewsTest, self).setUp()
 
@@ -1902,8 +1925,6 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.user.set_password('password')
         self.user.save()
         self.cost = 40
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        self.course_key = self.course.id
         self.course_mode = CourseMode(course_id=self.course_key,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",
@@ -1914,9 +1935,7 @@ class CSVReportViewsTest(ModuleStoreTestCase):
                                        mode_display_name="verified cert",
                                        min_price=self.cost)
         self.course_mode2.save()
-        verified_course = CourseFactory.create(org='org', number='test', display_name='Test Course')
 
-        self.verified_course_key = verified_course.id
         self.cart = Order.get_cart_for_user(self.user)
         self.dl_grp = Group(name=settings.PAYMENT_REPORT_GENERATOR_GROUP)
         self.dl_grp.save()

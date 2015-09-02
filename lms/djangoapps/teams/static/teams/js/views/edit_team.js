@@ -30,16 +30,14 @@
                     this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
                     this.action = options.action;
 
-                    _.bindAll(this, 'cancelAndGoBack', 'createOrUpdateTeam');
-
                     if (this.action === 'create') {
                         this.teamModel = new TeamModel({});
                         this.teamModel.url = this.teamsUrl;
-                        this.primaryButtonTitle = 'Create';
+                        this.primaryButtonTitle = gettext("Create");
                     } else if(this.action === 'edit' ) {
                         this.teamModel = options.model;
                         this.teamModel.url = this.teamsDetailUrl.replace('team_id', options.model.get('id')) + '?expand=user';
-                        this.primaryButtonTitle = 'Update';
+                        this.primaryButtonTitle = gettext("Update");
                     }
 
                     this.teamNameField = new FieldViews.TextFieldView({

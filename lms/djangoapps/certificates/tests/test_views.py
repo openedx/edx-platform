@@ -479,7 +479,8 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         Test: organization data should render on certificate web view if course has organization.
         """
         test_organization_data = {
-            'name': 'test_organization',
+            'name': 'test organization',
+            'short_name': 'test_organization',
             'description': 'Test Organization Description',
             'active': True,
             'logo': '/logo_test1.png/'
@@ -493,7 +494,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         response = self.client.get(test_url)
         self.assertIn(
-            'a course of study offered by test_organization',
+            'a course of study offered by test_organization, an online learning initiative of test organization',
             response.content
         )
         self.assertNotIn(

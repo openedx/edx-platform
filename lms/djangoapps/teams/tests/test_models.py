@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=no-member
 """Tests for the teams API at the HTTP request level."""
 from contextlib import contextmanager
 from datetime import datetime
@@ -20,7 +21,7 @@ from django_comment_common.signals import (
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from .factories import CourseTeamFactory, CourseTeamMembershipFactory
 from ..models import CourseTeam, CourseTeamMembership
@@ -42,16 +43,18 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
 
         self.user1 = UserFactory.create(username='user1')
         self.user2 = UserFactory.create(username='user2')
+        self.user3 = UserFactory.create(username='user3')
+
+        for user in (self.user1, self.user2, self.user3):
+            CourseEnrollmentFactory.create(user=user, course_id=COURSE_KEY1)
+        CourseEnrollmentFactory.create(user=self.user1, course_id=COURSE_KEY2)
 
         self.team1 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team1')
         self.team2 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team2')
 
-        self.team_membership11 = CourseTeamMembership(user=self.user1, team=self.team1)
-        self.team_membership11.save()
-        self.team_membership12 = CourseTeamMembership(user=self.user2, team=self.team1)
-        self.team_membership12.save()
-        self.team_membership21 = CourseTeamMembership(user=self.user1, team=self.team2)
-        self.team_membership21.save()
+        self.team_membership11 = self.team1.add_user(self.user1)
+        self.team_membership12 = self.team1.add_user(self.user2)
+        self.team_membership21 = self.team2.add_user(self.user1)
 
     def test_membership_last_activity_set(self):
         current_last_activity = self.team_membership11.last_activity_at
@@ -63,6 +66,24 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         # Verify that we only change the last activity_at when it doesn't
         # already exist.
         self.assertEqual(self.team_membership11.last_activity_at, current_last_activity)
+
+    def test_team_size_delete_membership(self):
+        """Test that the team size field is correctly updated when deleting a
+        team membership.
+        """
+        self.assertEqual(self.team1.team_size, 2)
+        self.team_membership11.delete()
+        team = CourseTeam.objects.get(id=self.team1.id)
+        self.assertEqual(team.team_size, 1)
+
+    def test_team_size_create_membership(self):
+        """Test that the team size field is correctly updated when creating a
+        team membership.
+        """
+        self.assertEqual(self.team1.team_size, 2)
+        self.team1.add_user(self.user3)
+        team = CourseTeam.objects.get(id=self.team1.id)
+        self.assertEqual(team.team_size, 3)
 
     @ddt.data(
         (None, None, None, 3),

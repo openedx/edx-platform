@@ -2,27 +2,29 @@
 Tests for instructor.basic
 """
 
-import json
 import datetime
-from django.db.models import Q
+import json
 import pytz
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from mock import MagicMock, Mock, patch
 from django.core.urlresolvers import reverse
-from mock import patch
+from django.db.models import Q
+
+from course_modes.models import CourseMode
+from courseware.tests.factories import InstructorFactory
+from instructor_analytics.basic import (
+    StudentModule, sale_record_features, sale_order_record_features, enrolled_students_features,
+    course_registration_features, coupon_codes_features, get_proctored_exam_results, list_may_enroll,
+    list_problem_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+)
+from opaque_keys.edx.locator import UsageKey
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory, CourseModeFactory
 from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
     Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
 )
-from course_modes.models import CourseMode
-from instructor_analytics.basic import (
-    sale_record_features, sale_order_record_features, enrolled_students_features,
-    course_registration_features, coupon_codes_features, list_may_enroll,
-    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
-    get_proctored_exam_results)
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from edx_proctoring.api import create_exam
@@ -50,6 +52,48 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             CourseEnrollmentAllowed.objects.create(
                 email=student.email, course_id=self.course_key
             )
+
+    def test_list_problem_responses(self):
+        def result_factory(result_id):
+            """
+            Return a dummy StudentModule object that can be queried for
+            relevant info (student.username and state).
+            """
+            result = Mock(spec=['student', 'state'])
+            result.student.username.return_value = u'user{}'.format(result_id)
+            result.state.return_value = u'state{}'.format(result_id)
+            return result
+
+        # Ensure that UsageKey.from_string returns a problem key that list_problem_responses can work with
+        # (even when called with a dummy location):
+        mock_problem_key = Mock(return_value=u'')
+        mock_problem_key.course_key = self.course_key
+        with patch.object(UsageKey, 'from_string') as patched_from_string:
+            patched_from_string.return_value = mock_problem_key
+
+            # Ensure that StudentModule.objects.filter returns a result set that list_problem_responses can work with
+            # (this keeps us from having to create fixtures for this test):
+            mock_results = MagicMock(return_value=[result_factory(n) for n in range(5)])
+            with patch.object(StudentModule, 'objects') as patched_manager:
+                patched_manager.filter.return_value = mock_results
+
+                mock_problem_location = ''
+                problem_responses = list_problem_responses(self.course_key, problem_location=mock_problem_location)
+
+                # Check if list_problem_responses called UsageKey.from_string to look up problem key:
+                patched_from_string.assert_called_once_with(mock_problem_location)
+                # Check if list_problem_responses called StudentModule.objects.filter to obtain relevant records:
+                patched_manager.filter.assert_called_once_with(
+                    course_id=self.course_key, module_state_key=mock_problem_key
+                )
+
+                # Check if list_problem_responses returned expected results:
+                self.assertEqual(len(problem_responses), len(mock_results))
+                for mock_result in mock_results:
+                    self.assertTrue(
+                        {'username': mock_result.student.username, 'state': mock_result.state} in
+                        problem_responses
+                    )
 
     def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)

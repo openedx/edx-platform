@@ -159,3 +159,54 @@ class CreditService(object):
             status,
             reason
         )
+
+    def remove_credit_requirement_status(self, user_id, course_key_or_id, req_namespace, req_name):
+        """
+        A simple wrapper around the method of the same name in
+        api.eligibility.py. The only difference is that a user_id
+        is passed in.
+
+        For more information, see documentation on this method name
+        in api.eligibility.py
+        """
+
+        # This seems to need to be here otherwise we get
+        # circular references when starting up the app
+        from openedx.core.djangoapps.credit.api.eligibility import (
+            is_credit_course,
+            remove_credit_requirement_status as api_remove_credit_requirement_status
+        )
+
+        course_key = _get_course_key(course_key_or_id)
+
+        # quick exit, if course is not credit enabled
+        if not is_credit_course(course_key):
+            return
+
+        # always log any deleted activity to the credit requirements
+        # table. This will be to help debug any issues that might
+        # arise in production
+        log_msg = (
+            'remove_credit_requirement_status was called with '
+            'user_id={user_id}, course_key_or_id={course_key_or_id} '
+            'req_namespace={req_namespace}, req_name={req_name}, '.format(
+                user_id=user_id,
+                course_key_or_id=course_key_or_id,
+                req_namespace=req_namespace,
+                req_name=req_name
+            )
+        )
+        log.info(log_msg)
+
+        # need to get user_name from the user object
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return None
+
+        api_remove_credit_requirement_status(
+            user.username,
+            course_key,
+            req_namespace,
+            req_name
+        )

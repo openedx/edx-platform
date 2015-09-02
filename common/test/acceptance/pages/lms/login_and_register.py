@@ -127,7 +127,7 @@ class CombinedLoginAndRegisterPage(PageObject):
     @property
     def url(self):
         """Return the URL for the combined login/registration page. """
-        url = "{base}/account/{login_or_register}".format(
+        url = "{base}/{login_or_register}".format(
             base=BASE_URL,
             login_or_register=self._start_page
         )

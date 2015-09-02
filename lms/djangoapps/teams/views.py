@@ -120,7 +120,7 @@ class TeamsDashboardView(View):
             "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_memberships_url": reverse('team_membership_list', request=request),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
-            "languages": settings.ALL_LANGUAGES,
+            "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],  # pylint: disable=translation-of-non-string
             "countries": list(countries),
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
@@ -191,9 +191,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             * page: Page number to retrieve.
 
-            * include_inactive: If true, inactive teams will be returned. The
-              default is to not include inactive teams.
-
             * expand: Comma separated list of types for which to return
               expanded representations. Supports "user" and "team".
 
@@ -219,10 +216,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                   discussion topic associated with this team.
 
                 * name: The name of the team.
-
-                * is_active: True if the team is currently active. If false, the
-                  team is considered "soft deleted" and will not be included by
-                  default in results.
 
                 * course_id: The identifier for the course this team belongs to.
 
@@ -266,8 +259,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             Any logged in user who has verified their email address can create
             a team. The format mirrors that of a GET for an individual team,
-            but does not include the id, is_active, date_created, or membership
-            fields. id is automatically computed based on name.
+            but does not include the id, date_created, or membership fields.
+            id is automatically computed based on name.
 
             If the user is not logged in, a 401 error is returned.
 
@@ -292,9 +285,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
     def get(self, request):
         """GET /api/team/v0/teams/"""
-        result_filter = {
-            'is_active': True
-        }
+        result_filter = {}
 
         if 'course_id' in request.QUERY_PARAMS:
             course_id_string = request.QUERY_PARAMS['course_id']
@@ -335,8 +326,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
             result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
-        if 'include_inactive' in request.QUERY_PARAMS and request.QUERY_PARAMS['include_inactive'].lower() == 'true':
-            del result_filter['is_active']
 
         if 'text_search' in request.QUERY_PARAMS and CourseTeamIndexer.search_is_enabled():
             search_engine = CourseTeamIndexer.engine()
@@ -355,19 +344,16 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 self.get_paginate_by(),
                 self.get_page()
             )
-
             serializer = self.get_pagination_serializer(paginated_results)
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
             if order_by_input == 'name':
-                queryset = queryset.extra(select={'lower_name': "lower(name)"})
-                queryset = queryset.order_by('lower_name')
+                # MySQL does case-insensitive order_by.
+                queryset = queryset.order_by('name')
             elif order_by_input == 'open_slots':
-                queryset = queryset.annotate(team_size=Count('users'))
                 queryset = queryset.order_by('team_size', '-last_activity_at')
             elif order_by_input == 'last_activity_at':
-                queryset = queryset.annotate(team_size=Count('users'))
                 queryset = queryset.order_by('-last_activity_at', 'team_size')
             else:
                 return Response({
@@ -495,10 +481,6 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                   discussion topic associated with this team.
 
                 * name: The name of the team.
-
-                * is_active: True if the team is currently active. If false, the team
-                  is considered "soft deleted" and will not be included by default in
-                  results.
 
                 * course_id: The identifier for the course this team belongs to.
 

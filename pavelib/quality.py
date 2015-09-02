@@ -373,7 +373,9 @@ def run_quality(options):
     # Directory to put the diff reports in.
     # This makes the folder if it doesn't already exist.
     dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
-    diff_quality_percentage_failure = False
+
+    # Save the pass variable. It will be set to false later if failures are detected.
+    diff_quality_percentage_pass = True
 
     def _pep8_output(count, violations_list, is_html=False):
         """
@@ -421,20 +423,20 @@ def run_quality(options):
         f.write(_pep8_output(count, violations_list, is_html=True))
 
     if count > 0:
-        diff_quality_percentage_failure = True
+        diff_quality_percentage_pass = False
 
     # ----- Set up for diff-quality pylint call -----
     # Set the string, if needed, to be used for the diff-quality --compare-branch switch.
     compare_branch = getattr(options, 'compare_branch', None)
-    compare_branch_string = ''
+    compare_branch_string = u''
     if compare_branch:
-        compare_branch_string = '--compare-branch={0}'.format(compare_branch)
+        compare_branch_string = u'--compare-branch={0}'.format(compare_branch)
 
     # Set the string, if needed, to be used for the diff-quality --fail-under switch.
     diff_threshold = int(getattr(options, 'percentage', -1))
-    percentage_string = ''
+    percentage_string = u''
     if diff_threshold > -1:
-        percentage_string = '--fail-under={0}'.format(diff_threshold)
+        percentage_string = u'--fail-under={0}'.format(diff_threshold)
 
     # Generate diff-quality html report for pylint, and print to console
     # If pylint reports exist, use those
@@ -448,27 +450,60 @@ def run_quality(options):
         "common:common/djangoapps:common/lib"
     )
 
+    # run diff-quality for pylint.
+    if not run_diff_quality(
+            violations_type="pylint",
+            prefix=pythonpath_prefix,
+            reports=pylint_reports,
+            percentage_string=percentage_string,
+            branch_string=compare_branch_string,
+            dquality_dir=dquality_dir
+    ):
+        diff_quality_percentage_pass = False
+
+    # run diff-quality for jshint.
+    if not run_diff_quality(
+            violations_type="jshint",
+            prefix=pythonpath_prefix,
+            reports=pylint_reports,
+            percentage_string=percentage_string,
+            branch_string=compare_branch_string,
+            dquality_dir=dquality_dir
+    ):
+        diff_quality_percentage_pass = False
+
+    # If one of the quality runs fails, then paver exits with an error when it is finished
+    if not diff_quality_percentage_pass:
+        raise BuildFailure("Diff-quality failure(s).")
+
+
+def run_diff_quality(
+        violations_type=None, prefix=None, reports=None, percentage_string=None, branch_string=None, dquality_dir=None
+):
+    """
+    This executes the diff-quality commandline tool for the given violation type (e.g., pylint, jshint).
+    If diff-quality fails due to quality issues, this method returns False.
+
+    """
     try:
         sh(
-            "{pythonpath_prefix} diff-quality --violations=pylint "
-            "{pylint_reports} {percentage_string} {compare_branch_string} "
-            "--html-report {dquality_dir}/diff_quality_pylint.html ".format(
-                pythonpath_prefix=pythonpath_prefix,
-                pylint_reports=pylint_reports,
+            "{pythonpath_prefix} diff-quality --violations={type} "
+            "{reports} {percentage_string} {compare_branch_string} "
+            "--html-report {dquality_dir}/diff_quality_{type}.html ".format(
+                type=violations_type,
+                pythonpath_prefix=prefix,
+                reports=reports,
                 percentage_string=percentage_string,
-                compare_branch_string=compare_branch_string,
+                compare_branch_string=branch_string,
                 dquality_dir=dquality_dir,
             )
         )
+        return True
     except BuildFailure, error_message:
         if is_percentage_failure(error_message):
-            diff_quality_percentage_failure = True
+            return False
         else:
             raise BuildFailure(error_message)
-
-    # If one of the diff-quality runs fails, then paver exits with an error when it is finished
-    if diff_quality_percentage_failure:
-        raise BuildFailure("Diff-quality failure(s).")
 
 
 def is_percentage_failure(error_message):

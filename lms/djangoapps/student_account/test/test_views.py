@@ -217,8 +217,8 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.configure_facebook_provider(enabled=True)
 
     @ddt.data(
-        ("account_login", "login"),
-        ("account_register", "register"),
+        ("signin_user", "login"),
+        ("register_user", "register"),
     )
     @ddt.unpack
     def test_login_and_registration_form(self, url_name, initial_mode):
@@ -226,7 +226,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
         self.assertContains(response, expected_data)
 
-    @ddt.data("account_login", "account_register")
+    @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
         # Create/activate a new account and log in
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -239,10 +239,10 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertRedirects(response, reverse("dashboard"))
 
     @ddt.data(
-        (False, "account_login"),
-        (False, "account_register"),
-        (True, "account_login"),
-        (True, "account_register"),
+        (False, "signin_user"),
+        (False, "register_user"),
+        (True, "signin_user"),
+        (True, "register_user"),
     )
     @ddt.unpack
     def test_login_and_registration_form_signin_preserves_params(self, is_edx_domain, url_name):
@@ -275,18 +275,18 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertContains(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
-    @ddt.data("account_login", "account_register")
+    @ddt.data("signin_user", "register_user")
     def test_third_party_auth_disabled(self, url_name):
         response = self.client.get(reverse(url_name))
         self._assert_third_party_auth_data(response, None, None, [])
 
     @ddt.data(
-        ("account_login", None, None),
-        ("account_register", None, None),
-        ("account_login", "google-oauth2", "Google"),
-        ("account_register", "google-oauth2", "Google"),
-        ("account_login", "facebook", "Facebook"),
-        ("account_register", "facebook", "Facebook"),
+        ("signin_user", None, None),
+        ("register_user", None, None),
+        ("signin_user", "google-oauth2", "Google"),
+        ("register_user", "google-oauth2", "Google"),
+        ("signin_user", "facebook", "Facebook"),
+        ("register_user", "facebook", "Facebook"),
     )
     @ddt.unpack
     def test_third_party_auth(self, url_name, current_backend, current_provider):
@@ -329,7 +329,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
     def test_hinted_login(self):
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
-        response = self.client.get(reverse('account_login'), params)
+        response = self.client.get(reverse('signin_user'), params)
         self.assertContains(response, "data-third-party-auth-hint='oa2-google-oauth2'")
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
@@ -337,7 +337,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         # Retrieve the login page from a microsite domain
         # and verify that we're served the old page.
         resp = self.client.get(
-            reverse("account_login"),
+            reverse("signin_user"),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
         )
         self.assertContains(resp, "Log into your Test Microsite Account")
@@ -347,7 +347,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         # Retrieve the register page from a microsite domain
         # and verify that we're served the old page.
         resp = self.client.get(
-            reverse("account_register"),
+            reverse("register_user"),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
         )
         self.assertContains(resp, "Register for Test Microsite")
@@ -474,7 +474,7 @@ class MicrositeLogistrationTests(TestCase):
         """
 
         resp = self.client.get(
-            reverse('account_login'),
+            reverse('signin_user'),
             HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
         )
         self.assertEqual(resp.status_code, 200)
@@ -488,7 +488,7 @@ class MicrositeLogistrationTests(TestCase):
         """
 
         resp = self.client.get(
-            reverse('account_register'),
+            reverse('register_user'),
             HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
         )
         self.assertEqual(resp.status_code, 200)
@@ -502,7 +502,7 @@ class MicrositeLogistrationTests(TestCase):
         """
 
         resp = self.client.get(
-            reverse('account_login'),
+            reverse('signin_user'),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
         )
         self.assertEqual(resp.status_code, 200)
@@ -510,7 +510,7 @@ class MicrositeLogistrationTests(TestCase):
         self.assertNotIn('<div id="login-and-registration-container"', resp.content)
 
         resp = self.client.get(
-            reverse('account_register'),
+            reverse('register_user'),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
         )
         self.assertEqual(resp.status_code, 200)
