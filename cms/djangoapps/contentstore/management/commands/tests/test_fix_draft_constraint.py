@@ -7,6 +7,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 import ddt
+from contextlib import contextmanager
 
 
 @ddt.ddt
@@ -68,31 +69,14 @@ class TestFixDraftConstraint(ModuleStoreTestCase):
         if satisfies:
             course = self.course_satisfies
 
-        draft_location = self.split_store._map_revision_to_branch(
-            course.id, ModuleStoreEnum.RevisionOption.draft_only
-        )
-        draft_structure = self.split_store._lookup_course(draft_location).structure
-        draft_head = self.split_store._get_index_if_valid(draft_location)
-
         args = ['fix_draft_constraint', unicode(course.id)]
         if commit:
             args.append('commit')
 
-        call_command(*args)
-        new_draft_location = self.split_store._map_revision_to_branch(
-            course.id, ModuleStoreEnum.RevisionOption.draft_only
-        )
+        with self.assert_branch_unchanged(self.split_store, course, ModuleStoreEnum.RevisionOption.draft_only):
+            with self.assert_branch_unchanged(self.split_store, course, ModuleStoreEnum.RevisionOption.published_only):
+                call_command(*args)
 
-        new_draft_structure = self.split_store._lookup_course(draft_location).structure
-
-        new_draft_head = self.split_store._get_index_if_valid(draft_location)
-
-        # the location should be the same
-        self.assertEqual(draft_location, new_draft_location)
-        # the structure should be the same
-        self.assertEqual(draft_structure, new_draft_structure)
-        # and the course index should be the same
-        self.assertEqual(draft_head, new_draft_head)
 
     # @SharedModuleStoreTestCase.modifies_courseware
     def test_fix_draft_constraint_commit(self):
@@ -108,11 +92,17 @@ class TestFixDraftConstraint(ModuleStoreTestCase):
             self.split_store, course, ModuleStoreEnum.RevisionOption.draft_only
         )
 
-        call_command(
-            'fix_draft_constraint',
-            unicode(self.course_does_not_satisfy.id),
-            'commit'
-        )
+        with self.assert_branch_unchanged(
+            self.split_store,
+            course,
+            ModuleStoreEnum.RevisionOption.published_only,
+            head_change=True,
+        ):
+            call_command(
+                'fix_draft_constraint',
+                unicode(self.course_does_not_satisfy.id),
+                'commit'
+            )
 
         new_location, new_structure, new_head = self.get_branch_information(
             self.split_store, course, ModuleStoreEnum.RevisionOption.draft_only
@@ -133,3 +123,17 @@ class TestFixDraftConstraint(ModuleStoreTestCase):
         structure = store._lookup_course(location).structure
         head = store._get_index_if_valid(location)
         return location, structure, head
+
+
+    @contextmanager
+    def assert_branch_unchanged(self, store, course, branch, head_change=False):
+        location, structure, head = self.get_branch_information(
+            self.split_store, course, branch
+        )
+        yield
+        new_location, new_structure, new_head = self.get_branch_information(
+            self.split_store, course, branch
+        )
+        self.assertEqual(location, new_location)
+        self.assertEqual(structure, new_structure)
+        self.assertEqual(head != new_head, head_change)
