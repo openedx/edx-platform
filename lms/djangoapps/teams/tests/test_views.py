@@ -14,9 +14,9 @@ from rest_framework.test import APITestCase, APIClient
 
 from courseware.tests.factories import StaffFactory
 from common.test.utils import skip_signal
-from util.testing import EventTestMixin
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
@@ -400,8 +400,11 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class TestListTeamsAPI(TeamAPITestCase):
+class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(TestListTeamsAPI, self).setUp('teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -472,6 +475,7 @@ class TestListTeamsAPI(TeamAPITestCase):
     def test_order_by_with_text_search(self):
         data = {'order_by': 'name', 'text_search': 'search'}
         self.verify_names(data, 400, [])
+        self.assert_no_events_were_emitted()
 
     @ddt.data((404, {'course_id': 'no/such/course'}), (400, {'topic_id': 'no_such_topic'}))
     @ddt.unpack
@@ -510,7 +514,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         ('queryable', ['Search']),
         ('Tonga', ['Search']),
         ('Island', ['Search']),
-        ('search queryable', []),
+        ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
     )
     @ddt.unpack
@@ -526,6 +530,14 @@ class TestListTeamsAPI(TeamAPITestCase):
             200,
             expected_team_names,
             user='student_enrolled_public_profile'
+        )
+
+        self.assert_event_emitted(
+            'edx.team.searched',
+            course_id=unicode(self.test_course_2.id),
+            search_text=text_search,
+            topic_id=None,
+            number_of_results=len(expected_team_names)
         )
 
 
