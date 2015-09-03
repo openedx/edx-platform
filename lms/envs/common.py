@@ -1515,6 +1515,7 @@ PIPELINE_JS = {
         'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
             'js/sticky_filter.js',
             'js/query-params.js',
+            'js/vendor/moment.min.js',
         ],
         'output_filename': 'js/lms-application.js',
     },

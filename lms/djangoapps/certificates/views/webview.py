@@ -93,8 +93,10 @@ def _update_certificate_context(context, course, user, user_certificate):
     if organizations:
         #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
         organization = organizations[0]
-        partner_long_name = organization.get('name', None)
-        partner_short_name = organization.get('short_name', course.org)
+        partner_long_name = organization.get('name', partner_long_name)
+        partner_short_name = organization.get('short_name', partner_short_name)
+        context['organization_long_name'] = partner_long_name
+        context['organization_short_name'] = partner_short_name
         context['organization_logo'] = organization.get('logo', None)
 
     context['username'] = user.username

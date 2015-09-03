@@ -1769,6 +1769,10 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     course_id = request.GET.get('course_id', None)
+
+    # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
+    enrollment_mode = request.GET.get('enrollment_mode', 'honor')
+
     course_key = None
     if course_id:
         course_key = CourseLocator.from_string(course_id)
@@ -1816,7 +1820,7 @@ def auto_auth(request):
 
     # Enroll the user in a course
     if course_key is not None:
-        CourseEnrollment.enroll(user, course_key)
+        CourseEnrollment.enroll(user, course_key, mode=enrollment_mode)
 
     # Apply the roles
     for role_name in role_names:

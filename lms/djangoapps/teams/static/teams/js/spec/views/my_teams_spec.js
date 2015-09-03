@@ -65,7 +65,7 @@ define([
                 requests,
                 TeamSpecHelpers.testContext.teamMembershipsUrl,
                 {
-                    expand : 'team',
+                    expand : 'team,user',
                     username : TeamSpecHelpers.testContext.userInfo.username,
                     course_id : TeamSpecHelpers.testContext.courseID,
                     page : '1',

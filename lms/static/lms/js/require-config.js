@@ -185,8 +185,11 @@
             },
             "tinymce": {
                 exports: "tinymce"
-            }
+            },
             // End of needed by OVA
+            "moment": {
+                exports: "moment"
+            }
         }
     });
 }).call(this, require || RequireJS.require, define || RequireJS.define);

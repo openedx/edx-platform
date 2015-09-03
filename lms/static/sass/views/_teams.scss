@@ -264,8 +264,7 @@
       color: $gray;
 
       .meta-detail {
-        margin-top: ($baseline/4);
-        @include margin-right ($baseline*.75);
+        @include margin(($baseline/4) ($baseline*.75) ($baseline/4) 0);
         color: $gray-d1;
 
         abbr {
@@ -278,19 +277,27 @@
         }
       }
 
+      .member-count {
+        display: inline-block;
+        vertical-align: middle;
+        @include margin-right($baseline/4);
+      }
+
       .list-member-thumbs {
         @extend %ui-no-list;
         display: inline-block;
-        vertical-align: text-bottom;
+        vertical-align: middle;
 
         .item-member-thumb {
           display: inline-block;
+          margin: 0 ($baseline/4);
         }
 
         img {
           width: $baseline;
           height: $baseline;
-          margin: 0 ($baseline/4);
+          border-radius: ($baseline/5);
+          border: 1px solid $gray-l4;
         }
       }
     }
@@ -331,6 +338,7 @@
 
       .meta-detail {
         display: inline-block;
+        vertical-align: middle;
       }
 
       .team-activity {
