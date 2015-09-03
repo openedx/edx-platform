@@ -190,3 +190,7 @@ if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
 # Generate a random UUID so that different runs of acceptance tests don't break each other
 import uuid
 SECRET_KEY = uuid.uuid4().hex
+
+############################### PIPELINE #######################################
+
+PIPELINE_ENABLED = False
