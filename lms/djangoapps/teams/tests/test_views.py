@@ -379,12 +379,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     def delete_membership(self, team_id, username, expected_status=200, **kwargs):
         """Deletes an individual membership record. Verifies expected_status."""
-        return self.make_call(
-            reverse('team_membership_detail', args=[team_id, username]),
-            expected_status,
-            'delete',
-            **kwargs
-        )
+        url = reverse('team_membership_detail', args=[team_id, username]) + '?admin=true'
+        return self.make_call(url, expected_status, 'delete', **kwargs)
 
     def verify_expanded_public_user(self, user):
         """Verifies that fields exist on the returned user json indicating that it is expanded."""
@@ -781,8 +777,11 @@ class TestDetailTeamAPI(TeamAPITestCase):
 
 
 @ddt.ddt
-class TestDeleteTeamAPI(TeamAPITestCase):
+class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team delete endpoint."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(TestDeleteTeamAPI, self).setUp('teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -796,6 +795,19 @@ class TestDeleteTeamAPI(TeamAPITestCase):
     @ddt.unpack
     def test_access(self, user, status):
         self.delete_team(self.solar_team.team_id, status, user=user)
+        if status == 204:
+            self.assert_event_emitted(
+                'edx.team.deleted',
+                team_id=self.solar_team.team_id,
+                course_id=unicode(self.test_course_1.id)
+            )
+            self.assert_event_emitted(
+                'edx.team.learner_removed',
+                team_id=self.solar_team.team_id,
+                course_id=unicode(self.test_course_1.id),
+                remove_method='team_deleted',
+                user_id=self.users['student_enrolled'].id
+            )
 
     def test_does_not_exist(self):
         self.delete_team('nonexistent', 404)
@@ -803,6 +815,18 @@ class TestDeleteTeamAPI(TeamAPITestCase):
     def test_memberships_deleted(self):
         self.assertEqual(CourseTeamMembership.objects.filter(team=self.solar_team).count(), 1)
         self.delete_team(self.solar_team.team_id, 204, user='staff')
+        self.assert_event_emitted(
+            'edx.team.deleted',
+            team_id=self.solar_team.team_id,
+            course_id=unicode(self.test_course_1.id)
+        )
+        self.assert_event_emitted(
+            'edx.team.learner_removed',
+            team_id=self.solar_team.team_id,
+            course_id=unicode(self.test_course_1.id),
+            remove_method='team_deleted',
+            user_id=self.users['student_enrolled'].id
+        )
         self.assertEqual(CourseTeamMembership.objects.filter(team=self.solar_team).count(), 0)
 
 
@@ -1329,16 +1353,31 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
         )
 
         if status == 204:
-            remove_method = 'self_removal' if user == 'student_enrolled' else 'removed_by_admin'
             self.assert_event_emitted(
                 'edx.team.learner_removed',
                 team_id=self.solar_team.team_id,
                 course_id=unicode(self.solar_team.course_id),
                 user_id=self.users['student_enrolled'].id,
-                remove_method=remove_method
+                remove_method='removed_by_admin'
             )
         else:
             self.assert_no_events_were_emitted()
+
+    def test_leave_team(self):
+        """
+        The key difference between this test and test_access above is that
+        removal via "Edit Membership" and "Leave Team" emit different events
+        despite hitting the same API endpoint, due to the 'admin' query string.
+        """
+        url = reverse('team_membership_detail', args=[self.solar_team.team_id, self.users['student_enrolled'].username])
+        self.make_call(url, 204, 'delete', user='student_enrolled')
+        self.assert_event_emitted(
+            'edx.team.learner_removed',
+            team_id=self.solar_team.team_id,
+            course_id=unicode(self.solar_team.course_id),
+            user_id=self.users['student_enrolled'].id,
+            remove_method='self_removal'
+        )
 
     def test_bad_team(self):
         self.delete_membership('no_such_team', self.users['student_enrolled'].username, 404)
