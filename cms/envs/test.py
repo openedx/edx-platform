@@ -92,7 +92,6 @@ STATICFILES_DIRS += [
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
-PIPELINE_ENABLED = False
 
 TENDER_DOMAIN = "help.edge.edx.org"
 TENDER_SUBDOMAIN = "edxedge"
