@@ -84,7 +84,7 @@ define([
         it('can trigger the edit membership view', function () {
             view.$('.action-edit-members').click();
             expect(Backbone.history.navigate).toHaveBeenCalledWith(
-                'topics/' + view.team.get('topic_id') + "/" + view.team.id + "/edit-team/manage-members",
+                'teams/' + view.team.get('topic_id') + "/" + view.team.id + "/edit-team/manage-members",
                 {trigger: true}
             );
         });
