@@ -40,10 +40,10 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 
--e git+https://github.com/Stanford-Online/edx-ora2.git@ba471878b6506cae62302a7310daba08b5d1d0e1#egg=edx-ora2
+-e git+https://github.com/Stanford-Online/edx-ora2.git@6959f6d4e4def1c60bb94f5c52f537bb06b17fd2#egg=edx-ora2
 
 # Forking Submissions repo for ORA2 score override function.
--e git+https://github.com/Stanford-Online/edx-submissions.git@906c52584ff3f2d37ddb1d741a6313525f7547a2#egg=edx-submissions
+-e git+https://github.com/Stanford-Online/edx-submissions.git@1e8d8ea9a15d0f15ea28d1d348c79cfa66016608#egg=edx-submissions
 -e git+https://github.com/edx/edx-analytics-data-api-client.git@4d934a789e3a60a516e70b4bf6617522d6ed153d#egg=edx-analytics-data-api-client
 
 # This portion of requirements.txt is now maintained only for the Stanford fork, i.e. we should update as necessary

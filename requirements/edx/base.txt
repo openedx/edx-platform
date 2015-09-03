@@ -16,13 +16,13 @@ defusedxml==0.4.1
 django-babel-underscore==0.1.0
 django-celery==3.1.16
 django-countries==3.3
-django-extensions==1.2.5
+django-extensions==1.5.5
 django-filter==0.6.0
 django-followit==0.0.3
 django-keyedcache==1.4-6
 django-kombu==0.9.4
 django-mako==0.1.5pre
-django-model-utils==1.4.0
+django-model-utils==2.3.1
 django-masquerade==0.1.6
 django-mptt==0.5.5
 django-openid-auth==0.4
