@@ -244,30 +244,28 @@
                 editTeam: function (topicID, teamID) {
                     var self = this,
                         editViewWithHeader;
-                    this.getTopic(topicID).done(function (topic) {
-                        self.getTeam(teamID, false).done(function(team) {
-                            var view = new TeamEditView({
-                                action: 'edit',
-                                teamEvents: self.teamEvents,
-                                context: self.context,
-                                topic: topic,
-                                model: team
-                            });
-                            var instructorToolsView = new InstructorToolsView({
-                                team: team,
-                                teamEvents: self.teamEvents
-                            });
-                            editViewWithHeader = self.createViewWithHeader({
-                                title: gettext("Edit Team"),
-                                description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
-                                mainView: view,
-                                topic: topic,
-                                team: team,
-                                instructorTools: instructorToolsView
-                            });
-                            self.mainView = editViewWithHeader;
-                            self.render();
+                    $.when(this.getTopic(topicID), this.getTeam(teamID, false)).done(function(topic, team) {
+                        var view = new TeamEditView({
+                            action: 'edit',
+                            teamEvents: self.teamEvents,
+                            context: self.context,
+                            topic: topic,
+                            model: team
                         });
+                        var instructorToolsView = new InstructorToolsView({
+                            team: team,
+                            teamEvents: self.teamEvents
+                        });
+                        editViewWithHeader = self.createViewWithHeader({
+                            title: gettext("Edit Team"),
+                            description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                            mainView: view,
+                            topic: topic,
+                            team: team,
+                            instructorTools: instructorToolsView
+                        });
+                        self.mainView = editViewWithHeader;
+                        self.render();
                     });
                 },
 
@@ -277,23 +275,21 @@
                  */
                 editTeamMembers: function (topicID, teamID) {
                     var self = this;
-                    this.getTopic(topicID).done(function (topic) {
-                        self.getTeam(teamID, true).done(function(team) {
-                            var view = new TeamMembersEditView({
-                                teamEvents: self.teamEvents,
-                                context: self.context,
-                                model: team
-                            });
-                            self.mainView = self.createViewWithHeader({
-                                    mainView: view,
-                                    title: gettext("Membership"),
-                                    description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
-                                    topic: topic,
-                                    team: team
-                                }
-                            );
-                            self.render();
+                    $.when(this.getTopic(topicID), this.getTeam(teamID, true)).done(function(topic, team) {
+                        var view = new TeamMembersEditView({
+                            teamEvents: self.teamEvents,
+                            context: self.context,
+                            model: team
                         });
+                        self.mainView = self.createViewWithHeader({
+                                mainView: view,
+                                title: gettext("Membership"),
+                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
+                                topic: topic,
+                                team: team
+                            }
+                        );
+                        self.render();
                     });
                 },
 
@@ -395,34 +391,33 @@
                 getBrowseTeamView: function (topicID, teamID) {
                     var self = this,
                         deferred = $.Deferred();
-                    self.getTopic(topicID).done(function(topic) {
-                        self.getTeam(teamID, true).done(function(team) {
-                            var view = new TeamProfileView({
-                                teamEvents: self.teamEvents,
-                                router: self.router,
-                                context: self.context,
-                                model: team,
-                                setFocusToHeaderFunc: self.setFocusToHeader
-                            });
 
-                            var TeamProfileActionsView = new TeamProfileHeaderActionsView({
-                                teamEvents: self.teamEvents,
-                                context: self.context,
-                                model: team,
-                                topic: topic,
-                                showEditButton: self.canEditTeam()
-                            });
-                            deferred.resolve(
-                                self.createViewWithHeader(
-                                    {
-                                        mainView: view,
-                                        subject: team,
-                                        topic: topic,
-                                        headerActionsView: TeamProfileActionsView
-                                    }
-                                )
-                            );
+                    $.when(this.getTopic(topicID), this.getTeam(teamID, true)).done(function(topic, team) {
+                        var view = new TeamProfileView({
+                            teamEvents: self.teamEvents,
+                            router: self.router,
+                            context: self.context,
+                            model: team,
+                            setFocusToHeaderFunc: self.setFocusToHeader
                         });
+
+                        var TeamProfileActionsView = new TeamProfileHeaderActionsView({
+                            teamEvents: self.teamEvents,
+                            context: self.context,
+                            model: team,
+                            topic: topic,
+                            showEditButton: self.canEditTeam()
+                        });
+                        deferred.resolve(
+                            self.createViewWithHeader(
+                                {
+                                    mainView: view,
+                                    subject: team,
+                                    topic: topic,
+                                    headerActionsView: TeamProfileActionsView
+                                }
+                            )
+                        );
                     });
                     return deferred.promise();
                 },
