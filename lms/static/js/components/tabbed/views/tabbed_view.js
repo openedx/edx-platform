@@ -59,16 +59,10 @@
                    },
 
                    setActiveTab: function (index) {
-                       var tab, tabEl, view;
-                       if (typeof index === 'string') {
-                           tab = this.urlMap[index];
-                           tabEl = this.$('a[data-url='+index+']');
-                       }
-                       else {
-                           tab = this.tabs[index];
-                           tabEl = this.$('a[data-index='+index+']');
-                       }
-                       view = tab.view;
+                       var tabMeta = this.getTabMeta(index),
+                           tab = tabMeta.tab,
+                           tabEl = tabMeta.element,
+                           view = tab.view;
                        this.$('a.is-active').removeClass('is-active').attr('aria-selected', 'false');
                        tabEl.addClass('is-active').attr('aria-selected', 'true');
                        view.setElement(this.$('.page-content-main')).render();
@@ -81,6 +75,22 @@
                    switchTab: function (event) {
                        event.preventDefault();
                        this.setActiveTab($(event.currentTarget).data('index'));
+                   },
+
+                   /**
+                    * Get the tab by name or index. Returns an object
+                    * encapsulating the tab object and its element.
+                    */
+                   getTabMeta: function (tabNameOrIndex) {
+                       var tab, element;
+                       if (typeof tabNameOrIndex === 'string') {
+                           tab = this.urlMap[tabNameOrIndex];
+                           element = this.$('a[data-url='+tabNameOrIndex+']');
+                       }  else {
+                           tab = this.tabs[tabNameOrIndex];
+                           element = this.$('a[data-index='+tabNameOrIndex+']');
+                       }
+                       return {'tab': tab, 'element': element};
                    }
                });
                return TabbedView;

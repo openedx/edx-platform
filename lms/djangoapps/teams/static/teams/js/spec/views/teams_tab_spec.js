@@ -1,10 +1,12 @@
 define([
     'jquery',
     'backbone',
+    'logger',
     'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/spec_helpers',
     'teams/js/views/teams_tab',
     'teams/js/spec_helpers/team_spec_helpers'
-], function ($, Backbone, AjaxHelpers, TeamsTabView, TeamSpecHelpers) {
+], function ($, Backbone, Logger, AjaxHelpers, SpecHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
     describe('TeamsTab', function () {
@@ -34,25 +36,39 @@ define([
             return teamsTabView;
         };
 
+        /**
+         * Filters out all team events from a list of requests.
+         */
+        var removeTeamEvents = function (requests) {
+            return requests.filter(function (request) {
+                if (request.requestBody && request.requestBody.startsWith('event_type=edx.team')) {
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        };
+
         beforeEach(function () {
             setFixtures('<div class="teams-content"></div>');
             spyOn($.fn, 'focus');
+            spyOn(Logger, 'log');
         });
 
         afterEach(Backbone.history.stop);
 
         describe('Navigation', function () {
+            it('does not interfere with anchor links to #content', function () {
+                var teamsTabView = createTeamsTabView();
+                teamsTabView.router.navigate('#content', {trigger: true});
+                expect(teamsTabView.$('.warning')).toHaveClass('is-hidden');
+            });
+
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('no_such_page', {trigger: true});
                 expectError(teamsTabView, 'The page "no_such_page" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
-            });
-
-            it('does not interfere with anchor links to #content', function () {
-                var teamsTabView = createTeamsTabView();
-                teamsTabView.router.navigate('#content', {trigger: true});
-                expect(teamsTabView.$('.warning')).toHaveClass('is-hidden');
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
@@ -91,6 +107,64 @@ define([
                 AjaxHelpers.respondWithError(requests, 500);
                 expectError(teamsTabView, "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.");
                 expectFocus(teamsTabView.$('.warning'));
+            });
+        });
+
+        describe('Analytics Events', function () {
+            SpecHelpers.withData({
+                'fires a page view event for the topic page': [
+                    'topics/' + TeamSpecHelpers.testTopicID,
+                    {
+                        page_name: 'single-topic',
+                        topic_id: TeamSpecHelpers.testTopicID,
+                        team_id: null
+                    }
+                ],
+                'fires a page view event for the team page': [
+                    'teams/' + TeamSpecHelpers.testTopicID + '/test_team_id',
+                    {
+                        page_name: 'single-team',
+                        topic_id: TeamSpecHelpers.testTopicID,
+                        team_id: 'test_team_id'
+                    }
+                ],
+                'fires a page view event for the search team page': [
+                    'topics/' + TeamSpecHelpers.testTopicID + '/search',
+                    {
+                        page_name: 'search-teams',
+                        topic_id: TeamSpecHelpers.testTopicID,
+                        team_id: null
+                    }
+                ],
+                'fires a page view event for the new team page': [
+                    'topics/' + TeamSpecHelpers.testTopicID + '/create-team',
+                    {
+                        page_name: 'new-team',
+                        topic_id: TeamSpecHelpers.testTopicID,
+                        team_id: null
+                    }
+                ],
+                'fires a page view event for the edit team page': [
+                    'topics/' + TeamSpecHelpers.testTopicID + '/' + 'test_team_id/edit-team',
+                    {
+                        page_name: 'edit-team',
+                        topic_id: TeamSpecHelpers.testTopicID,
+                        team_id: 'test_team_id'
+                    }
+                ]
+            }, function (url, expectedEvent) {
+                if (url.indexOf('search') !== -1
+                        || url.indexOf('create-team') !== -1
+                        || url.indexOf('edit-team') !== -1) {
+                    debugger;
+                }
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.router.navigate(url, {trigger: true});
+                if (requests.length) {
+                    AjaxHelpers.respondWithJson(requests, {});
+                }
+                expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', expectedEvent);
             });
         });
 
@@ -206,7 +280,7 @@ define([
 
                 // Navigate back to the teams list
                 teamsTabView.$('.breadcrumbs a').last().click();
-                verifyTeamsRequest(requests, {
+                verifyTeamsRequest(removeTeamEvents(requests), {
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
