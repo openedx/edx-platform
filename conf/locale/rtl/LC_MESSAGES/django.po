@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-24 22:03+0000\n"
-"PO-Revision-Date: 2015-08-24 22:03:48.240461\n"
+"POT-Creation-Date: 2015-08-31 13:57+0000\n"
+"PO-Revision-Date: 2015-08-31 13:57:43.379327\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5319,6 +5319,14 @@ msgstr ""
 "هب غخعق ذخعقسث يخثس رخف شححثشق خر غخعق يشسازخشقي, ذخرفشذف "
 "{payment_support_link}."
 
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr "{course_id} هس رخف ش دشمهي ذخعقسث نثغ."
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr "ذخعقسث {course_id} يخثس رخف ثطهسف."
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -6291,6 +6299,10 @@ msgstr "ذخعقسثوخيث صهفا فاث وخيث سمعل({mode_slug}) يخ
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "CourseMode price updated successfully"
 msgstr "ذخعقسثوخيث حقهذث عحيشفثي سعذذثسسبعممغ"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr "رخ ثري يشفث سثف"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -9456,15 +9468,6 @@ msgstr "سشدث بشهمثي بخق عسثق حقثبثقثرذث '{key}' صه�
 #: openedx/core/djangoapps/user_api/preferences/views.py
 msgid "No data provided for user preference update"
 msgstr "رخ يشفش حقخدهيثي بخق عسثق حقثبثقثرذث عحيشفث"
-
-#: openedx/core/lib/api/paginators.py
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "حشلث هس رخف 'مشسف', رخق ذشر هف زث ذخردثقفثي فخ شر هرف."
-
-#: openedx/core/lib/api/paginators.py
-#, python-format
-msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr "هردشمهي حشلث (%(page_number)s): %(message)s"
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."

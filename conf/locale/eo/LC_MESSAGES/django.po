@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-24 22:03+0000\n"
-"PO-Revision-Date: 2015-08-24 22:03:48.240461\n"
+"POT-Creation-Date: 2015-08-31 13:57+0000\n"
+"PO-Revision-Date: 2015-08-31 13:57:43.379327\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6194,6 +6194,15 @@ msgstr ""
 "Ìf ýöür çöürsé döés nöt äppéär ön ýöür däshßöärd, çöntäçt "
 "{payment_support_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+"{course_id} ïs nöt ä välïd çöürsé kéý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr "Çöürsé {course_id} döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -7333,6 +7342,10 @@ msgid "CourseMode price updated successfully"
 msgstr ""
 "ÇöürséMödé prïçé üpdätéd süççéssfüllý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr "Nö énd däté sét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -10899,18 +10912,6 @@ msgid "No data provided for user preference update"
 msgstr ""
 "Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: openedx/core/lib/api/paginators.py
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr ""
-"Pägé ïs nöt 'läst', nör çän ït ßé çönvértéd tö än ïnt. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/lib/api/paginators.py
-#, python-format
-msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
-"Ìnvälïd pägé (%(page_number)s): %(message)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
