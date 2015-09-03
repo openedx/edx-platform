@@ -1,64 +1,39 @@
 """Tests running the fix_draft_constraint command"""
 
+from contextlib import contextmanager
+import ddt
 from django.core.management import call_command
 from django.core.management.base import CommandError
+
+from contentstore.views.item import fix_draft_constraint
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-import ddt
-from contextlib import contextmanager
 
 
 @ddt.ddt
-class TestFixDraftConstraint(ModuleStoreTestCase):
+class TestFixDraftConstraint(SharedModuleStoreTestCase):
+    """
+    Tests for the fix_draft_constraint management command.
+    """
 
-    # @classmethod
-    def setUp(self):
-        super(TestFixDraftConstraint, self).setUp()
-        self.course_satisfies = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        self.course_does_not_satisfy = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+    @classmethod
+    def setUpClass(cls):
+        super(TestFixDraftConstraint, cls).setUpClass()
+        # pylint: disable=protected-access
+        cls.split_store = cls.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 
-        ItemFactory.create(
-            parent_location=self.course_does_not_satisfy.location,
-            category="sequential",
-        )
+        # create one course that should satisfy the draft constraint
+        cls.course_satisfies = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
 
-        self.split_store = modulestore()._get_modulestore_for_courselike(self.course_satisfies.id)
-
-        # add something to the published branch of course_does_not_satisfy
-        draft_location = self.split_store._map_revision_to_branch(
-            self.course_does_not_satisfy.id,
-            ModuleStoreEnum.RevisionOption.draft_only,
-        )
-
-        not_sat_draft_structure = self.split_store._lookup_course(draft_location).structure
-        not_sat_head = self.split_store._get_index_if_valid(draft_location)
-
-        new_not_sat_draft_structure = self.split_store.version_structure(
-            draft_location, not_sat_draft_structure, ModuleStoreEnum.UserID.mgmt_command
-        )
-        draft_seq = [
-            key for (key, value) in new_not_sat_draft_structure['blocks'].iteritems()
-            if value.block_type == "sequential"
-        ][0]
-
-        del new_not_sat_draft_structure['blocks'][draft_seq]
-
-        self.split_store.update_structure(draft_location, new_not_sat_draft_structure)
-
-        if not_sat_head is not None:
-            self.split_store._update_head(
-                draft_location,
-                not_sat_head,
-                draft_location.branch,
-                new_not_sat_draft_structure['_id'],
-            )
+        # and one that shouldn't
+        cls.course_does_not_satisfy = cls.create_course_that_fails_constraint()
 
     # (Satisfies Draft Constraint, commit)
     @ddt.data((True, True), (True, False), (False, False))
     @ddt.unpack
-    def test_fix_draft_constraint_no_op(self, satisfies, commit):
+    def test_fix_draft_constraint_noop(self, satisfies, commit):
         """
         Tests that running the command in these scenarios results in a noop:
             1) Course satisfies constraint; we run the command with 'commit'
@@ -78,7 +53,7 @@ class TestFixDraftConstraint(ModuleStoreTestCase):
                 call_command(*args)
 
 
-    # @SharedModuleStoreTestCase.modifies_courseware
+    @SharedModuleStoreTestCase.modifies_courseware
     def test_fix_draft_constraint_commit(self):
         """
         Tests that running the command WITH the 'commit' argument
@@ -88,7 +63,7 @@ class TestFixDraftConstraint(ModuleStoreTestCase):
         """
         course = self.course_does_not_satisfy
 
-        draft_location, draft_structure, draft_head = self.get_branch_information(
+        draft_location, draft_structure = self.get_branch_information(
             self.split_store, course, ModuleStoreEnum.RevisionOption.draft_only
         )
 
@@ -96,7 +71,6 @@ class TestFixDraftConstraint(ModuleStoreTestCase):
             self.split_store,
             course,
             ModuleStoreEnum.RevisionOption.published_only,
-            head_change=True,
         ):
             call_command(
                 'fix_draft_constraint',
@@ -104,36 +78,94 @@ class TestFixDraftConstraint(ModuleStoreTestCase):
                 'commit'
             )
 
-        new_location, new_structure, new_head = self.get_branch_information(
+        new_location, new_structure = self.get_branch_information(
             self.split_store, course, ModuleStoreEnum.RevisionOption.draft_only
         )
 
         self.assertEqual(draft_location, new_location)
         self.assertNotEqual(draft_structure, new_structure)
-        self.assertNotEqual(draft_head, new_head)
 
     def test_fix_draft_constraint_non_split_course(self):
+        """
+        Trying to run fix_draft_constraint on a non split course will
+        result in an error.
+        """
         non_split_course = CourseFactory(default_store=ModuleStoreEnum.Type.mongo)
         with self.assertRaises(SystemExit):
             call_command('fix_draft_constraint', unicode(non_split_course.id), 'commit')
 
 
+    @classmethod
+    def create_course_that_fails_constraint(cls):
+        """
+        Create a course that has a draft-branch block_id that isn't also
+        in the published branch.
+        """
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        item = ItemFactory.create(
+            parent_location=course.location,
+            category="sequential",
+        )
+
+        # pylint: disable=protected-access
+        draft_location = cls.split_store._map_revision_to_branch(
+            course.id,
+            ModuleStoreEnum.RevisionOption.draft_only,
+        )
+
+        # pylint: disable=protected-access
+        draft_structure = cls.split_store._lookup_course(draft_location).structure
+        # pylint: disable=protected-access
+        course_index = cls.split_store._get_index_if_valid(draft_location)
+
+        new_draft_structure = cls.split_store.version_structure(
+            draft_location, draft_structure, ModuleStoreEnum.UserID.mgmt_command
+        )
+
+        draft_item_block_keys = [
+            block_key for block_key in new_draft_structure['blocks']
+            if block_key.id == item.location.block_id
+        ]
+
+        assert len(draft_item_block_keys) == 1
+
+        draft_item_block_key = draft_item_block_keys[0]
+
+        del new_draft_structure['blocks'][draft_item_block_key]
+
+        cls.split_store.update_structure(draft_location, new_draft_structure)
+
+        # pylint: disable=protected-access
+        cls.split_store._update_head(
+            draft_location,
+            course_index,
+            draft_location.branch,
+            new_draft_structure['_id'],
+        )
+
+        return course
+
     def get_branch_information(self, store, course, branch):
+        """
+        Get the location and the structure of a branch.
+        """
+        # pylint: disable=protected-access
         location = store._map_revision_to_branch(course.id, branch)
         structure = store._lookup_course(location).structure
-        head = store._get_index_if_valid(location)
-        return location, structure, head
-
+        return location, structure
 
     @contextmanager
-    def assert_branch_unchanged(self, store, course, branch, head_change=False):
-        location, structure, head = self.get_branch_information(
+    def assert_branch_unchanged(self, store, course, branch):
+        """
+        This is a context manager that asserts that a branch
+        remains unchanged while the code it wraps executes.
+        """
+        location, structure = self.get_branch_information(
             self.split_store, course, branch
         )
         yield
-        new_location, new_structure, new_head = self.get_branch_information(
+        new_location, new_structure = self.get_branch_information(
             self.split_store, course, branch
         )
         self.assertEqual(location, new_location)
         self.assertEqual(structure, new_structure)
-        self.assertEqual(head != new_head, head_change)

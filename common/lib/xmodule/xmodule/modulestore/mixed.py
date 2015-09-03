@@ -732,11 +732,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._verify_modulestore_support(location.course_key, 'delete_item')
         return store.delete_item(location, user_id=user_id, **kwargs)
 
-    # @strip_key
-    # def fix_draft_constraint(self, course_key, user_id, commit):
-    #     store = self._get_modulestore_for_courselike(course_key)
-    #     return store.fix_draft_constraint(course_key, user_id, commit)
-
     def revert_to_published(self, location, user_id):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
