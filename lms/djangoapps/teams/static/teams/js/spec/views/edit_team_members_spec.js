@@ -20,9 +20,9 @@ define([
                             'has_image': true,
                             'image_url_medium': '/frodo-image-url'
                         },
-                        last_activity_at: "2015-08-21T18:53:01.145Z",
-                        date_joined: "2014-01-01T18:53:01.145Z"
-                    }
+                    },
+                    last_activity_at: "2015-08-21T18:53:01.145Z",
+                    date_joined: "2014-01-01T18:53:01.145Z"
                 }
             ],
             deleteTeamMemember = function (view, confirm) {
@@ -40,8 +40,8 @@ define([
                 expect(view.$('.member-profile').attr('href')).toEqual('/u/frodo');
                 expect(view.$('img.image-url').attr('src')).toEqual('/frodo-image-url');
                 expect(view.$('.member-info-container .primary').text()).toBe('frodo');
-                // expect(view.$el.find('#last-active').text()).toBe("2015-08-21T18:53:01.145Z");
-                // expect(view.$el.find('#date-joined').text()).toBe("2014-01-01T18:53:01.145Z");
+                expect(view.$el.find('#last-active abbr').attr('title')).toEqual("2015-08-21T18:53:01.145Z");
+                expect(view.$el.find('#date-joined abbr').attr('title')).toEqual("2014-01-01T18:53:01.145Z");
             },
             verifyNoMembersView = function (view){
                 expect(view.$el.text().trim()).toBe('This team does not have any members.');
@@ -115,7 +115,8 @@ define([
             AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/api/team/v0/team_membership/av,frodo', null);
             AjaxHelpers.respondWithError(requests);
             expect(TeamUtils.showMessage).toHaveBeenCalledWith(
-                'An error occurred while removing the member from the team. Try again.'
+                'An error occurred while removing the member from the team. Try again.',
+                undefined
             );
             expect(view.teamEvents.trigger).not.toHaveBeenCalledWith();
             verifyTeamMembersView(view);
