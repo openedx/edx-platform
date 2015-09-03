@@ -279,6 +279,7 @@
                         });
                         self.mainView = editViewWithHeader;
                         self.render();
+                        TeamAnalytics.emitPageViewed('edit-team', topicID, teamID);
                     });
                 },
 
@@ -303,7 +304,7 @@
                             }
                         );
                         self.render();
-                        TeamAnalytics.emitPageViewed('edit-team', topicID, teamID);
+                        TeamAnalytics.emitPageViewed('edit-team-members', topicID, teamID);
                     });
                 },
 

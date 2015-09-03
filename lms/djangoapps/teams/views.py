@@ -612,9 +612,23 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
         """DELETE /api/team/v0/teams/{team_id}"""
         team = get_object_or_404(CourseTeam, team_id=team_id)
         self.check_object_permissions(request, team)
+        # Note: list() forces the queryset to be evualuated before delete()
+        memberships = list(CourseTeamMembership.get_memberships(team_id=team_id))
+
         # Note: also deletes all team memberships associated with this team
         team.delete()
         log.info('user %d deleted team %s', request.user.id, team_id)
+        tracker.emit('edx.team.deleted', {
+            'team_id': team_id,
+            'course_id': unicode(team.course_id),
+        })
+        for member in memberships:
+            tracker.emit('edx.team.learner_removed', {
+                'team_id': team_id,
+                'course_id': unicode(team.course_id),
+                'remove_method': 'team_deleted',
+                'user_id': member.user_id
+            })
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -1184,6 +1198,9 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         team = self.get_team(team_id)
         if has_team_api_access(request.user, team.course_id, access_username=username):
             membership = self.get_membership(username, team)
+            removal_method = 'self_removal'
+            if 'admin' in request.QUERY_PARAMS:
+                removal_method = 'removed_by_admin'
             membership.delete()
             tracker.emit(
                 'edx.team.learner_removed',
@@ -1191,7 +1208,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
                     'team_id': team.team_id,
                     'course_id': unicode(team.course_id),
                     'user_id': membership.user.id,
-                    'remove_method': 'self_removal' if membership.user == request.user else 'removed_by_admin'
+                    'remove_method': removal_method
                 }
             )
             return Response(status=status.HTTP_204_NO_CONTENT)

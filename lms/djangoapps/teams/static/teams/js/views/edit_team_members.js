@@ -85,7 +85,7 @@
                         function () {
                             $.ajax({
                                 type: 'DELETE',
-                                url: self.teamMembershipDetailUrl + username
+                                url: self.teamMembershipDetailUrl.concat(username, '?admin=true')
                             }).done(function () {
                                 self.teamEvents.trigger('teams:update', {
                                     action: 'leave',

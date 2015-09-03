@@ -145,7 +145,7 @@ define([
                     }
                 ],
                 'fires a page view event for the edit team page': [
-                    'topics/' + TeamSpecHelpers.testTopicID + '/' + 'test_team_id/edit-team',
+                    'teams/' + TeamSpecHelpers.testTopicID + '/' + 'test_team_id/edit-team',
                     {
                         page_name: 'edit-team',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -154,7 +154,9 @@ define([
                 ]
             }, function (url, expectedEvent) {
                 var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
+                    teamsTabView = createTeamsTabView({
+                        userInfo: TeamSpecHelpers.createMockUserInfo({ staff: true })
+                    });
                 teamsTabView.router.navigate(url, {trigger: true});
                 if (requests.length) {
                     AjaxHelpers.respondWithJson(requests, {});
