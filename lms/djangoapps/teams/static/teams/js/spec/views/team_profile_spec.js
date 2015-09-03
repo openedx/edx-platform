@@ -21,7 +21,9 @@ define([
             ];
 
         beforeEach(function () {
-            setFixtures('<div id="page-prompt"></div><div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>');
+            setFixtures('<div id="page-prompt"></div>' +
+                '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>' +
+                '<div class="profile-view"></div>');
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
@@ -40,6 +42,7 @@ define([
         createTeamProfileView = function(requests, options) {
             teamModel = new TeamModel(createTeamModelData(options), { parse: true });
             profileView = new TeamProfileView({
+                el: $('.profile-view'),
                 teamEvents: TeamSpecHelpers.teamEvents,
                 courseID: TeamSpecHelpers.testCourseID,
                 context: TeamSpecHelpers.testContext,
