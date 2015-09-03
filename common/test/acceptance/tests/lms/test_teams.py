@@ -11,7 +11,7 @@ from flaky import flaky
 from nose.plugins.attrib import attr
 from uuid import uuid4
 
-from ..helpers import UniqueCourseTest
+from ..helpers import UniqueCourseTest, EventsTestMixin
 from ...fixtures import LMS_BASE_URL
 from ...fixtures.course import CourseFixture
 from ...fixtures.discussion import (
@@ -28,7 +28,7 @@ from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseT
 TOPICS_PER_PAGE = 12
 
 
-class TeamsTabBase(UniqueCourseTest):
+class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
     """Base class for Teams Tab tests"""
     def setUp(self):
         super(TeamsTabBase, self).setUp()
@@ -122,6 +122,10 @@ class TeamsTabBase(UniqueCourseTest):
 
         # We are doing these operations on this top-level page object to avoid reloading the page.
         self.teams_page.verify_my_team_count(expected_number_of_teams)
+
+    def only_team_events(self, event):
+        """Filter out all non-team events."""
+        return event['event_type'].startswith('edx.team.')
 
 
 @ddt.ddt
@@ -899,7 +903,8 @@ class CreateTeamTest(TeamFormActions):
         Then I should see the Create Team header and form
         When I fill all the fields present with appropriate data
         And I click Create button
-        Then I should see the page for my team
+        Then I expect analytics events to be emitted
+        And I should see the page for my team
         And I should see the message that says "You are member of this team"
         And the new team should be added to the list of teams within the topic
         And the number of teams should be updated on the topic card
@@ -911,7 +916,24 @@ class CreateTeamTest(TeamFormActions):
         self.verify_and_navigate_to_create_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_or_edit_team_page.submit_form()
+
+        expected_events = [
+            {
+                'event_type': 'edx.team.created',
+                'event': {
+                    'course_id': self.course_id,
+                }
+            },
+            {
+                'event_type': 'edx.team.learner_added',
+                'event': {
+                    'course_id': self.course_id,
+                    'add_method': 'added_on_create',
+                }
+            }
+        ]
+        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+            self.create_or_edit_team_page.submit_form()
 
         # Verify that the page is shown for the new team
         team_page = TeamPage(self.browser, self.course_id)
@@ -1330,6 +1352,7 @@ class TeamPageTest(TeamsTabBase):
         And I should not see New Post button
         When I click on Join Team button
         Then there should be no Join Team button and no message
+        And an analytics event should be emitted
         And I should see the updated information under Team Details
         And I should see New Post button
         And if I switch to "My Team", the team I have joined is displayed
@@ -1337,7 +1360,17 @@ class TeamPageTest(TeamsTabBase):
         self._set_team_configuration_and_membership(create_membership=False)
         self.team_page.visit()
         self.assertTrue(self.team_page.join_team_button_present)
-        self.team_page.click_join_team_button()
+        expected_events = [
+            {
+                'event_type': 'edx.team.learner_added',
+                'event': {
+                    'course_id': self.course_id,
+                    'add_method': 'joined_from_team_view'
+                }
+            }
+        ]
+        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+            self.team_page.click_join_team_button()
         self.assertFalse(self.team_page.join_team_button_present)
         self.assertFalse(self.team_page.join_team_message_present)
         self.assert_team_details(num_members=1, is_member=True)
@@ -1397,6 +1430,7 @@ class TeamPageTest(TeamsTabBase):
         Then I should see Leave Team link
         When I click on Leave Team link
         Then user should be removed from team
+        And an analytics event should be emitted
         And I should see Join Team button
         And I should not see New Post button
         And if I switch to "My Team", the team I have left is not displayed
@@ -1405,7 +1439,17 @@ class TeamPageTest(TeamsTabBase):
         self.team_page.visit()
         self.assertFalse(self.team_page.join_team_button_present)
         self.assert_team_details(num_members=1)
-        self.team_page.click_leave_team_link()
+        expected_events = [
+            {
+                'event_type': 'edx.team.learner_removed',
+                'event': {
+                    'course_id': self.course_id,
+                    'remove_method': 'self_removal'
+                }
+            }
+        ]
+        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+            self.team_page.click_leave_team_link()
         self.assert_team_details(num_members=0, is_member=False)
         self.assertTrue(self.team_page.join_team_button_present)
 
