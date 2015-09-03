@@ -54,7 +54,7 @@ define([
             it('does not interfere with anchor links to #content', function () {
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('#content', {trigger: true});
-                expect(teamsTabView.$('.warning')).toHaveClass('is-hidden');
+                expect(teamsTabView.$('.wrapper-msg')).toHaveClass('is-hidden');
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {

@@ -793,6 +793,7 @@
         'lms/include/teams/js/spec/collections/topic_collection_spec.js',
         'lms/include/teams/js/spec/teams_tab_factory_spec.js',
         'lms/include/teams/js/spec/views/edit_team_spec.js',
+        'lms/include/teams/js/spec/views/instructor_tools_spec.js',
         'lms/include/teams/js/spec/views/my_teams_spec.js',
         'lms/include/teams/js/spec/views/team_card_spec.js',
         'lms/include/teams/js/spec/views/team_discussion_spec.js',

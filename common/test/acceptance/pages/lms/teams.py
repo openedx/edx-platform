@@ -6,7 +6,7 @@ Teams pages.
 from .course_page import CoursePage
 from .discussion import InlineDiscussionPage
 from ..common.paging import PaginatedUIMixin
-from ...pages.studio.utils import confirm_prompt
+from ...pages.common.utils import confirm_prompt
 
 from .fields import FieldsMixin
 
@@ -39,7 +39,24 @@ class TeamCardsMixin(object):
         return self.q(css='p.card-description').map(lambda e: e.text).results
 
 
-class TeamsPage(CoursePage):
+class BreadcrumbsMixin(object):
+    """Provides common operations on teams page breadcrumb links."""
+
+    @property
+    def header_page_breadcrumbs(self):
+        """Get the page breadcrumb text displayed by the page header"""
+        return self.q(css='.page-header .breadcrumbs')[0].text
+
+    def click_all_topics(self):
+        """ Click on the "All Topics" breadcrumb """
+        self.q(css='a.nav-item').filter(text='All Topics')[0].click()
+
+    def click_specific_topic(self, topic):
+        """ Click on the breadcrumb for a specific topic """
+        self.q(css='a.nav-item').filter(text=topic)[0].click()
+
+
+class TeamsPage(CoursePage, BreadcrumbsMixin):
     """
     Teams page/tab.
     """
@@ -88,19 +105,11 @@ class TeamsPage(CoursePage):
 
         # Click to "My Team" and verify that it contains the expected number of teams.
         self.q(css=MY_TEAMS_BUTTON_CSS).click()
-
+        self.wait_for_ajax()
         self.wait_for(
             lambda: len(self.q(css='.team-card')) == expected_count,
             description="Expected number of teams is wrong"
         )
-
-    def click_all_topics(self):
-        """ Click on the "All Topics" breadcrumb """
-        self.q(css='a.nav-item').filter(text='All Topics')[0].click()
-
-    def click_specific_topic(self, topic):
-        """ Click on the breadcrumb for a specific topic """
-        self.q(css='a.nav-item').filter(text=topic)[0].click()
 
 
 class MyTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
@@ -164,7 +173,7 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         self.wait_for_ajax()
 
 
-class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
+class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin, BreadcrumbsMixin):
     """
     The paginated UI for browsing teams within a Topic on the Teams
     page.
@@ -201,6 +210,11 @@ class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
         ).filter(
             lambda e: e.is_selected()
         ).results[0].text.strip()
+
+    @property
+    def team_names(self):
+        """Get all the team names on the page."""
+        return self.q(css=CARD_TITLE_CSS).map(lambda e: e.text).results
 
     def click_create_team_link(self):
         """ Click on create team link."""
@@ -273,9 +287,9 @@ class SearchTeamsPage(BaseTeamsPage):
         self.url_path = "teams/#topics/{topic_id}/search".format(topic_id=self.topic['id'])
 
 
-class CreateOrEditTeamPage(CoursePage, FieldsMixin):
+class TeamManagementPage(CoursePage, FieldsMixin, BreadcrumbsMixin):
     """
-    Create team page.
+    Team page for creation, editing, and deletion.
     """
     def __init__(self, browser, course_id, topic):
         """
@@ -284,7 +298,7 @@ class CreateOrEditTeamPage(CoursePage, FieldsMixin):
         representation of a topic following the same convention as a
         course module's topic.
         """
-        super(CreateOrEditTeamPage, self).__init__(browser, course_id)
+        super(TeamManagementPage, self).__init__(browser, course_id)
         self.topic = topic
         self.url_path = "teams/#topics/{topic_id}/create-team".format(topic_id=self.topic['id'])
 
@@ -305,11 +319,6 @@ class CreateOrEditTeamPage(CoursePage, FieldsMixin):
         return self.q(css='.page-header .page-description')[0].text
 
     @property
-    def header_page_breadcrumbs(self):
-        """Get the page breadcrumb text displayed by the page header"""
-        return self.q(css='.page-header .breadcrumbs')[0].text
-
-    @property
     def validation_message_text(self):
         """Get the error message text"""
         return self.q(css='.create-team.wrapper-msg .copy')[0].text
@@ -324,8 +333,13 @@ class CreateOrEditTeamPage(CoursePage, FieldsMixin):
         self.q(css='.create-team .action-cancel').first.click()
         self.wait_for_ajax()
 
+    @property
+    def delete_team_button(self):
+        """Returns the 'delete team' button."""
+        return self.q(css='.action-delete').first
 
-class TeamPage(CoursePage, PaginatedUIMixin):
+
+class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
     """
     The page for a specific Team within the Teams tab
     """
@@ -473,11 +487,6 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def new_post_button_present(self):
         """ Returns True if New Post button is present else False """
         return self.q(css='.discussion-module .new-post-btn').present
-
-    def click_all_topics_breadcrumb(self):
-        """Navigate to the 'All Topics' page."""
-        self.q(css='.breadcrumbs a').results[0].click()
-        self.wait_for_ajax()
 
     @property
     def edit_team_button_present(self):

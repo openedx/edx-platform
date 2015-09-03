@@ -19,6 +19,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
+from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
@@ -328,6 +329,10 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         """Gets detailed team information for team_id. Verifies expected_status."""
         return self.make_call(reverse('teams_detail', args=[team_id]), expected_status, 'get', data, **kwargs)
 
+    def delete_team(self, team_id, expected_status, **kwargs):
+        """Delete the given team. Verifies expected_status."""
+        return self.make_call(reverse('teams_detail', args=[team_id]), expected_status, 'delete', **kwargs)
+
     def patch_team_detail(self, team_id, expected_status, data=None, **kwargs):
         """Patches the team with team_id using data. Verifies expected_status."""
         return self.make_call(
@@ -423,8 +428,9 @@ class TestListTeamsAPI(TeamAPITestCase):
     def verify_names(self, data, status, names=None, **kwargs):
         """Gets a team listing with data as query params, verifies status, and then verifies team names if specified."""
         teams = self.get_teams_list(data=data, expected_status=status, **kwargs)
-        if names:
-            self.assertEqual(names, [team['name'] for team in teams['results']])
+        if names is not None and 200 <= status < 300:
+            results = teams['results']
+            self.assertEqual(names, [team['name'] for team in results])
 
     def test_filter_invalid_course_id(self):
         self.verify_names({'course_id': 'no_such_course'}, 400)
@@ -509,7 +515,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         ('queryable', ['Search']),
         ('Tonga', ['Search']),
         ('Island', ['Search']),
-        ('search queryable', []),
+        ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
     )
     @ddt.unpack
@@ -525,6 +531,26 @@ class TestListTeamsAPI(TeamAPITestCase):
             200,
             expected_team_names,
             user='student_enrolled_public_profile'
+        )
+
+    def test_delete_removed_from_search(self):
+        team = CourseTeamFactory.create(
+            name=u'zoinks',
+            course_id=self.test_course_1.id,
+            topic_id='topic_0'
+        )
+        self.verify_names(
+            {'course_id': self.test_course_1.id, 'text_search': 'zoinks'},
+            200,
+            [team.name],
+            user='staff'
+        )
+        team.delete()
+        self.verify_names(
+            {'course_id': self.test_course_1.id, 'text_search': 'zoinks'},
+            200,
+            [],
+            user='staff'
         )
 
 
@@ -719,6 +745,32 @@ class TestDetailTeamAPI(TeamAPITestCase):
             user='student_enrolled_public_profile'
         )
         self.verify_expanded_public_user(result['membership'][0]['user'])
+
+
+@ddt.ddt
+class TestDeleteTeamAPI(TeamAPITestCase):
+    """Test cases for the team delete endpoint."""
+
+    @ddt.data(
+        (None, 401),
+        ('student_inactive', 401),
+        ('student_unenrolled', 403),
+        ('student_enrolled', 403),
+        ('staff', 204),
+        ('course_staff', 204),
+        ('community_ta', 204)
+    )
+    @ddt.unpack
+    def test_access(self, user, status):
+        self.delete_team(self.solar_team.team_id, status, user=user)
+
+    def test_does_not_exist(self):
+        self.delete_team('nonexistent', 404)
+
+    def test_memberships_deleted(self):
+        self.assertEqual(CourseTeamMembership.objects.filter(team=self.solar_team).count(), 1)
+        self.delete_team(self.solar_team.team_id, 204, user='staff')
+        self.assertEqual(CourseTeamMembership.objects.filter(team=self.solar_team).count(), 0)
 
 
 @ddt.ddt
