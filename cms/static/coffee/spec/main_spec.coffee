@@ -21,10 +21,8 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             expect($.ajaxSettings.headers["X-CSRFToken"]).toEqual("stubCSRFToken")
 
     describe "AJAX Errors", ->
-        tpl = readFixtures('system-feedback.underscore')
 
         beforeEach ->
-            setFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(tpl))
             appendSetFixtures(sandbox({id: "page-notification"}))
 
         it "successful AJAX request does not pop an error notification", ->

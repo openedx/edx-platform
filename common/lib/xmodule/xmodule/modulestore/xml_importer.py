@@ -25,7 +25,7 @@ from abc import abstractmethod
 from opaque_keys.edx.locator import LibraryLocator
 import os
 import mimetypes
-from path import path
+from path import Path as path
 import json
 import re
 from lxml import etree

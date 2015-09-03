@@ -4,20 +4,22 @@ import json
 import pytz
 from datetime import datetime
 from dateutil import parser
-
 import ddt
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.db.models.signals import post_save
 from nose.plugins.attrib import attr
 from rest_framework.test import APITestCase, APIClient
 
 from courseware.tests.factories import StaffFactory
+from common.test.utils import skip_signal
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
@@ -193,21 +195,39 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             username='student_enrolled_other_course_not_on_team'
         )
 
-        # 'solar team' is intentionally lower case to test case insensitivity in name ordering
-        self.test_team_1 = CourseTeamFactory.create(
-            name=u'sólar team',
-            course_id=self.test_course_1.id,
-            topic_id='topic_0'
-        )
-        self.test_team_2 = CourseTeamFactory.create(name='Wind Team', course_id=self.test_course_1.id)
-        self.test_team_3 = CourseTeamFactory.create(name='Nuclear Team', course_id=self.test_course_1.id)
-        self.test_team_4 = CourseTeamFactory.create(name='Coal Team', course_id=self.test_course_1.id, is_active=False)
-        self.test_team_5 = CourseTeamFactory.create(name='Another Team', course_id=self.test_course_2.id)
-        self.test_team_6 = CourseTeamFactory.create(
-            name='Public Profile Team',
-            course_id=self.test_course_2.id,
-            topic_id='topic_6'
-        )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            # 'solar team' is intentionally lower case to test case insensitivity in name ordering
+            self.test_team_1 = CourseTeamFactory.create(
+                name=u'sólar team',
+                course_id=self.test_course_1.id,
+                topic_id='topic_0'
+            )
+            self.test_team_2 = CourseTeamFactory.create(name='Wind Team', course_id=self.test_course_1.id)
+            self.test_team_3 = CourseTeamFactory.create(name='Nuclear Team', course_id=self.test_course_1.id)
+            self.test_team_4 = CourseTeamFactory.create(
+                name='Coal Team',
+                course_id=self.test_course_1.id,
+                is_active=False
+            )
+            self.test_team_5 = CourseTeamFactory.create(name='Another Team', course_id=self.test_course_2.id)
+            self.test_team_6 = CourseTeamFactory.create(
+                name='Public Profile Team',
+                course_id=self.test_course_2.id,
+                topic_id='topic_6'
+            )
+            self.test_team_7 = CourseTeamFactory.create(
+                name='Search',
+                description='queryable text',
+                country='GS',
+                language='to',
+                course_id=self.test_course_2.id,
+                topic_id='topic_7'
+            )
 
         self.test_team_name_id_map = {team.name: team for team in (
             self.test_team_1,
@@ -215,6 +235,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             self.test_team_3,
             self.test_team_4,
             self.test_team_5,
+            self.test_team_6,
+            self.test_team_7,
         )}
 
         for user, course in [('staff', self.test_course_1), ('course_staff', self.test_course_1)]:
@@ -418,7 +440,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         self.verify_names(
             {'course_id': self.test_course_2.id},
             200,
-            ['Another Team', 'Public Profile Team'],
+            ['Another Team', 'Public Profile Team', 'Search'],
             user='staff'
         )
 
@@ -427,11 +449,6 @@ class TestListTeamsAPI(TeamAPITestCase):
 
     def test_filter_include_inactive(self):
         self.verify_names({'include_inactive': True}, 200, ['Coal Team', 'Nuclear Team', u'sólar team', 'Wind Team'])
-
-    # Text search is not yet implemented, so this should return HTTP
-    # 400 for now
-    def test_filter_text_search(self):
-        self.verify_names({'text_search': 'foobar'}, 400)
 
     @ddt.data(
         (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
@@ -448,12 +465,22 @@ class TestListTeamsAPI(TeamAPITestCase):
         # Make "solar team" the most recently active team.
         # The CourseTeamFactory sets the last_activity_at to a fixed time (in the past), so all of the
         # other teams have the same last_activity_at.
-        solar_team = self.test_team_name_id_map[u'sólar team']
-        solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
-        solar_team.save()
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            solar_team = self.test_team_name_id_map[u'sólar team']
+            solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+            solar_team.save()
 
         data = {'order_by': field} if field else {}
         self.verify_names(data, status, names)
+
+    def test_order_by_with_text_search(self):
+        data = {'order_by': 'name', 'text_search': 'search'}
+        self.verify_names(data, 400, [])
 
     @ddt.data((404, {'course_id': 'no/such/course'}), (400, {'topic_id': 'no_such_topic'}))
     @ddt.unpack
@@ -487,6 +514,29 @@ class TestListTeamsAPI(TeamAPITestCase):
         )
         self.verify_expanded_public_user(result['results'][0]['membership'][0]['user'])
 
+    @ddt.data(
+        ('search', ['Search']),
+        ('queryable', ['Search']),
+        ('Tonga', ['Search']),
+        ('Island', ['Search']),
+        ('search queryable', []),
+        ('team', ['Another Team', 'Public Profile Team']),
+    )
+    @ddt.unpack
+    def test_text_search(self, text_search, expected_team_names):
+        # clear out the teams search index before reindexing
+        CourseTeamIndexer.engine().destroy()
+
+        for team in self.test_team_name_id_map.values():
+            CourseTeamIndexer.index(team)
+
+        self.verify_names(
+            {'course_id': self.test_course_2.id, 'text_search': text_search},
+            200,
+            expected_team_names,
+            user='student_enrolled_public_profile'
+        )
+
 
 @ddt.ddt
 class TestCreateTeamAPI(TeamAPITestCase):
@@ -505,20 +555,28 @@ class TestCreateTeamAPI(TeamAPITestCase):
     def test_access(self, user, status):
         team = self.post_create_team(status, self.build_team_data(name="New Team"), user=user)
         if status == 200:
-            self.assertEqual(team['id'], 'new-team')
-            self.assertIn('discussion_topic_id', team)
+            self.verify_expected_team_id(team, 'new-team')
             teams = self.get_teams_list(user=user)
             self.assertIn("New Team", [team['name'] for team in teams['results']])
+
+    def verify_expected_team_id(self, team, expected_prefix):
+        """ Verifies that the team id starts with the specified prefix and ends with the discussion_topic_id """
+        self.assertIn('id', team)
+        self.assertIn('discussion_topic_id', team)
+        self.assertEqual(team['id'], expected_prefix + '-' + team['discussion_topic_id'])
 
     def test_naming(self):
         new_teams = [
             self.post_create_team(data=self.build_team_data(name=name), user=self.create_and_enroll_student())
-            for name in ["The Best Team", "The Best Team", "The Best Team", "The Best Team 2"]
+            for name in ["The Best Team", "The Best Team", "A really long team name"]
         ]
-        self.assertEquals(
-            [team['id'] for team in new_teams],
-            ['the-best-team', 'the-best-team-2', 'the-best-team-3', 'the-best-team-2-2']
-        )
+        # Check that teams with the same name have unique IDs.
+        self.verify_expected_team_id(new_teams[0], 'the-best-team')
+        self.verify_expected_team_id(new_teams[1], 'the-best-team')
+        self.assertNotEqual(new_teams[0]['id'], new_teams[1]['id'])
+
+        # Verify expected truncation behavior with names > 20 characters.
+        self.verify_expected_team_id(new_teams[2], 'a-really-long-team-n')
 
     @ddt.data((400, {
         'name': 'Bad Course ID',
@@ -588,6 +646,10 @@ class TestCreateTeamAPI(TeamAPITestCase):
             language='fr'
         ), user=creator)
 
+        # Verify the id (it ends with a unique hash, which is the same as the discussion_id).
+        self.verify_expected_team_id(team, 'fully-specified-team')
+        del team['id']
+
         # Remove date_created and discussion_topic_id because they change between test runs
         del team['date_created']
         del team['discussion_topic_id']
@@ -615,7 +677,6 @@ class TestCreateTeamAPI(TeamAPITestCase):
             'is_active': True,
             'topic_id': 'great-topic',
             'course_id': str(self.test_course_1.id),
-            'id': 'fully-specified-team',
             'description': 'Another fantastic team'
         })
 
@@ -758,13 +819,19 @@ class TestListTopicsAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_order_by(self, field, status, names, expected_ordering):
-        # Add 2 teams to "Nuclear Power", which previously had no teams.
-        CourseTeamFactory.create(
-            name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
-        )
-        CourseTeamFactory.create(
-            name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
-        )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            # Add 2 teams to "Nuclear Power", which previously had no teams.
+            CourseTeamFactory.create(
+                name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
+            )
+            CourseTeamFactory.create(
+                name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
+            )
         data = {'course_id': self.test_course_1.id}
         if field:
             data['order_by'] = field
@@ -778,13 +845,19 @@ class TestListTopicsAPI(TeamAPITestCase):
         Ensure that the secondary sort (alphabetical) when primary sort is team_count
         works across pagination boundaries.
         """
-        # Add 2 teams to "Wind Power", which previously had no teams.
-        CourseTeamFactory.create(
-            name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
-        )
-        CourseTeamFactory.create(
-            name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
-        )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            # Add 2 teams to "Wind Power", which previously had no teams.
+            CourseTeamFactory.create(
+                name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
+            )
+            CourseTeamFactory.create(
+                name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
+            )
 
         topics = self.get_topics_list(data={
             'course_id': self.test_course_1.id,

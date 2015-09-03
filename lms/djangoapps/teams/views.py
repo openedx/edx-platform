@@ -5,7 +5,6 @@ from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.views.generic.base import View
-import newrelic.agent
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -30,6 +29,7 @@ from openedx.core.lib.api.view_utils import (
     ExpandableFieldViewMixin
 )
 from openedx.core.lib.api.serializers import PaginationSerializer
+from openedx.core.lib.api.paginators import paginate_search_results
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -50,10 +50,12 @@ from .serializers import (
     PaginatedMembershipSerializer,
     add_team_count
 )
+from .search_indexes import CourseTeamIndexer
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
+MAXIMUM_SEARCH_SIZE = 100000
 
 
 class TeamsDashboardView(View):
@@ -115,6 +117,7 @@ class TeamsDashboardView(View):
             ),
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
+            "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_memberships_url": reverse('team_membership_list', request=request),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
             "languages": settings.ALL_LANGUAGES,
@@ -169,9 +172,12 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             * topic_id: Filters the result to teams associated with the given
               topic.
 
-            * text_search: Currently not supported.
+            * text_search: Searches for full word matches on the name, description,
+              country, and language fields. NOTES: Search is on full names for countries
+              and languages, not the ISO codes. Text_search cannot be requested along with
+              with order_by. Searching relies on the ENABLE_TEAMS_SEARCH flag being set to True.
 
-            * order_by: Must be one of the following:
+            * order_by: Cannot be called along with with text_search. Must be one of the following:
 
                 * name: Orders results by case insensitive team name (default).
 
@@ -284,7 +290,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     pagination_serializer_class = PaginationSerializer
     serializer_class = CourseTeamSerializer
 
-    @newrelic.agent.function_trace()
     def get(self, request):
         """GET /api/team/v0/teams/"""
         result_filter = {
@@ -315,6 +320,12 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        if 'text_search' in request.QUERY_PARAMS and 'order_by' in request.QUERY_PARAMS:
+            return Response(
+                build_api_error(ugettext_noop("text_search and order_by cannot be provided together")),
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if 'topic_id' in request.QUERY_PARAMS:
             topic_id = request.QUERY_PARAMS['topic_id']
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
@@ -326,37 +337,52 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
         if 'include_inactive' in request.QUERY_PARAMS and request.QUERY_PARAMS['include_inactive'].lower() == 'true':
             del result_filter['is_active']
-        if 'text_search' in request.QUERY_PARAMS:
-            return Response(
-                build_api_error(ugettext_noop("text_search is not yet supported.")),
-                status=status.HTTP_400_BAD_REQUEST
+
+        if 'text_search' in request.QUERY_PARAMS and CourseTeamIndexer.search_is_enabled():
+            search_engine = CourseTeamIndexer.engine()
+            text_search = request.QUERY_PARAMS['text_search'].encode('utf-8')
+            result_filter.update({'course_id': course_id_string})
+
+            search_results = search_engine.search(
+                query_string=text_search,
+                field_dictionary=result_filter,
+                size=MAXIMUM_SEARCH_SIZE,
             )
 
-        queryset = CourseTeam.objects.filter(**result_filter)
+            paginated_results = paginate_search_results(
+                CourseTeam,
+                search_results,
+                self.get_paginate_by(),
+                self.get_page()
+            )
 
-        order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
-        if order_by_input == 'name':
-            queryset = queryset.extra(select={'lower_name': "lower(name)"})
-            queryset = queryset.order_by('lower_name')
-        elif order_by_input == 'open_slots':
-            queryset = queryset.annotate(team_size=Count('users'))
-            queryset = queryset.order_by('team_size', '-last_activity_at')
-        elif order_by_input == 'last_activity_at':
-            queryset = queryset.annotate(team_size=Count('users'))
-            queryset = queryset.order_by('-last_activity_at', 'team_size')
+            serializer = self.get_pagination_serializer(paginated_results)
         else:
-            return Response({
-                'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
-                # Translators: 'ordering' is a string describing a way
-                # of ordering a list. For example, {ordering} may be
-                # 'name', indicating that the user wants to sort the
-                # list by lower case name.
-                'user_message': _(u"The ordering {ordering} is not supported").format(ordering=order_by_input),
-            }, status=status.HTTP_400_BAD_REQUEST)
+            queryset = CourseTeam.objects.filter(**result_filter)
+            order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
+            if order_by_input == 'name':
+                queryset = queryset.extra(select={'lower_name': "lower(name)"})
+                queryset = queryset.order_by('lower_name')
+            elif order_by_input == 'open_slots':
+                queryset = queryset.annotate(team_size=Count('users'))
+                queryset = queryset.order_by('team_size', '-last_activity_at')
+            elif order_by_input == 'last_activity_at':
+                queryset = queryset.annotate(team_size=Count('users'))
+                queryset = queryset.order_by('-last_activity_at', 'team_size')
+            else:
+                return Response({
+                    'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
+                    # Translators: 'ordering' is a string describing a way
+                    # of ordering a list. For example, {ordering} may be
+                    # 'name', indicating that the user wants to sort the
+                    # list by lower case name.
+                    'user_message': _(u"The ordering {ordering} is not supported").format(ordering=order_by_input),
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_pagination_serializer(page)
-        serializer.context.update({'sort_order': order_by_input})  # pylint: disable=maybe-no-member
+            page = self.paginate_queryset(queryset)
+            serializer = self.get_pagination_serializer(page)
+            serializer.context.update({'sort_order': order_by_input})  # pylint: disable=maybe-no-member
+
         return Response(serializer.data)  # pylint: disable=maybe-no-member
 
     def post(self, request):
@@ -409,6 +435,14 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 # Add the creating user to the team.
                 team.add_user(request.user)
             return Response(CourseTeamSerializer(team).data)
+
+    def get_page(self):
+        """ Returns page number specified in args, params, or defaults to 1. """
+        # This code is taken from within the GenericAPIView#paginate_queryset method.
+        # We need need access to the page outside of that method for our paginate_search_results method
+        page_kwarg = self.kwargs.get(self.page_kwarg)
+        page_query_param = self.request.QUERY_PARAMS.get(self.page_kwarg)
+        return page_kwarg or page_query_param or 1
 
 
 class IsEnrolledOrIsStaff(permissions.BasePermission):

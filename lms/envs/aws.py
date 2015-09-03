@@ -23,7 +23,7 @@ from .common import *
 from openedx.core.lib.logsettings import get_logger_config
 import os
 
-from path import path
+from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
@@ -630,7 +630,8 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = ENV_TOKENS.get(
 
 if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
    FEATURES.get('ENABLE_DASHBOARD_SEARCH') or \
-   FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+   FEATURES.get('ENABLE_COURSE_DISCOVERY') or \
+   FEATURES.get('ENABLE_TEAMS_SEARCH'):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 

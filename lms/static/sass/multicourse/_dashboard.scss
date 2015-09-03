@@ -574,6 +574,7 @@
         padding: ($baseline/2) $baseline;
         background: $gray-l5;
         border: 1px solid $gray-l4;
+        color: $base-font-color; // Overrides the normal white color in this one case
 
         // STATE: shown
         &.is-shown {

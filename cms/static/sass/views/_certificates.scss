@@ -429,7 +429,11 @@
 
 // * +Main - Certificate
 // ====================
-// TO-DO: refactor to use collection styling where possible. 
+// TO-DO: refactor to use collection styling where possible.
+.view-certificates .activate-cert {
+  margin-left: 5px;
+}
+
 .view-certificates .certificates {
 
   .certificate-details, .certificate-edit {

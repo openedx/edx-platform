@@ -5,7 +5,7 @@
                 data-user-create-comment="<%= !readOnly %>"
                 data-user-create-subcomment="<%= !readOnly %>">
             <% if ( !readOnly) { %>
-                <a href="#" class="new-post-btn" role="button"><span class="icon fa fa-edit new-post-icon"></span><%= gettext("New Post") %></a>
+                <button type="button" class="btn new-post-btn"><i class="icon fa fa-edit new-post-icon" aria-hidden="true"></i><%= gettext("New Post") %></button>
             <% } %>
         </div>
     </div>
@@ -18,7 +18,9 @@
             </div>
         <% } %>
         <div class="team-members">
-            <span class="sr"><%- gettext("Team member profiles") %></span>
+            <% if (hasMembers) { %>
+                <span class="sr"><%- gettext("Team member profiles") %></span>
+            <% } %>
             <div class="members-info"></div>
         </div>
 
@@ -48,7 +50,7 @@
 
         <% if (isMember) { %>
             <div class="leave-team">
-                <button class="btn btn-link btn-base btn-secondary leave-team-link"><%- gettext("Leave Team") %></button>
+                <button class="btn btn-link leave-team-link"><%- gettext("Leave Team") %></button>
             </div>
 
             <div class="divider-lv1"></div>

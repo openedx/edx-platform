@@ -228,21 +228,6 @@ def _update_certificate_context(context, course, user, user_certificate):
     if certificate_type_description:
         context['certificate_type_description'] = certificate_type_description
 
-    # If enabled, show the LinkedIn "add to profile" button
-    # Clicking this button sends the user to LinkedIn where they
-    # can add the certificate information to their profile.
-    linkedin_config = LinkedInAddToProfileConfiguration.current()
-    if linkedin_config.enabled:
-        context['linked_in_url'] = linkedin_config.add_to_profile_url(
-            course.id,
-            course.display_name,
-            user_certificate.mode,
-            get_certificate_url(
-                user_id=user.id,
-                course_id=unicode(course.id)
-            )
-        )
-
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
     context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
         fullname=user_fullname
@@ -376,6 +361,21 @@ def render_html_view(request, user_id, course_id):
 
     # Append/Override the existing view context values with request-time values
     _update_certificate_context(context, course, user, user_certificate)
+
+    # If enabled, show the LinkedIn "add to profile" button
+    # Clicking this button sends the user to LinkedIn where they
+    # can add the certificate information to their profile.
+    linkedin_config = LinkedInAddToProfileConfiguration.current()
+    if linkedin_config.enabled:
+        context['linked_in_url'] = linkedin_config.add_to_profile_url(
+            course.id,
+            course.display_name,
+            user_certificate.mode,
+            request.build_absolute_uri(get_certificate_url(
+                user_id=user.id,
+                course_id=unicode(course.id)
+            ))
+        )
 
     # Microsites will need to be able to override any hard coded
     # content that was put into the context in the

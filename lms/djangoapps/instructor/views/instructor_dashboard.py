@@ -359,7 +359,7 @@ def _section_course_info(course, access):
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'start_date': get_default_time_display(course.start),
-        'end_date': get_default_time_display(course.end),
+        'end_date': get_default_time_display(course.end) or _('No end date set'),
         'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }

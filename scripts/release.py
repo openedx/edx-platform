@@ -14,7 +14,7 @@ import json
 import getpass
 
 try:
-    from path import path
+    from path import Path as path
     from git import Repo, Commit
     from git.refs.symbolic import SymbolicReference
     from dateutil.parser import parse as parse_datestring

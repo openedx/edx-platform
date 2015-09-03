@@ -43,7 +43,7 @@ from datetime import datetime
 from pytz import UTC
 from .util import (
     compare_with_tolerance, contextualize_text, convert_files_to_filenames,
-    is_list_of_files, find_with_default, default_tolerance
+    is_list_of_files, find_with_default, default_tolerance, get_inner_html_from_xpath
 )
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
@@ -299,9 +299,10 @@ class LoncapaResponse(object):
         # 1. Establish the hint_texts
         # This can lead to early-exit if the hint is blank.
         if not hint_log:
-            if hint_node is None or hint_node.text is None:  # .text can be None, maybe just in testing
+            # .text can be None when node has immediate children nodes
+            if hint_node is None or (hint_node.text is None and len(hint_node.getchildren()) == 0):
                 return ''
-            hint_text = hint_node.text.strip()
+            hint_text = get_inner_html_from_xpath(hint_node)
             if not hint_text:
                 return ''
             hint_log = [{'text': hint_text}]
@@ -898,7 +899,7 @@ class ChoiceResponse(LoncapaResponse):
             hint_nodes = choice.findall('./choicehint')
             for hint_node in hint_nodes:
                 if hint_node.get('selected', '').lower() == selector:
-                    text = hint_node.text.strip()
+                    text = get_inner_html_from_xpath(hint_node)
                     if hint_node.get('label') is not None:  # tricky: label '' vs None is significant
                         label = hint_node.get('label')
                         label_count += 1

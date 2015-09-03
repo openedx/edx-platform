@@ -17,12 +17,12 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
-            'teams/js/views/team_join',
+            'teams/js/views/team_profile_header_actions',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamJoinView, teamsTemplate) {
+                  TeamProfileHeaderActionsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function (attributes) {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -52,6 +52,7 @@
                     this.topics = options.topics;
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
+                    this.teamsDetailUrl = options.teamsDetailUrl;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
                     this.maxTeamSize = options.maxTeamSize;
@@ -74,6 +75,7 @@
                         }, this)],
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
+                        ['topics/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
@@ -192,29 +194,70 @@
                  * Render the create new team form.
                  */
                 newTeam: function (topicID) {
-                    var self = this;
-                    this.getTeamsView(topicID).done(function (teamsView) {
-                        self.mainView = new ViewWithHeader({
-                            header: new HeaderView({
-                                model: new TeamsHeaderModel({
-                                    description: gettext("Create a new team if you can't find existing teams to join, or if you would like to learn with friends you know."),
-                                    title: gettext("Create a New Team"),
-                                    breadcrumbs: [
-                                        {
-                                            title: teamsView.main.teamParams.topicName,
-                                            url: '#topics/' + teamsView.main.teamParams.topicID
-                                        }
-                                    ]
-                                })
-                            }),
-                            main: new TeamEditView({
-                                teamEvents: self.teamEvents,
-                                tagName: 'create-new-team',
-                                teamParams: teamsView.main.teamParams,
-                                primaryButtonTitle: 'Create'
-                            })
+                    var self = this,
+                        createViewWithHeader;
+                    this.getTopic(topicID).done(function (topic) {
+                        var view = new TeamEditView({
+                            action: 'create',
+                            teamEvents: self.teamEvents,
+                            teamParams: {
+                                courseID: self.courseID,
+                                topicID: topic.get('id'),
+                                teamsUrl: self.teamsUrl,
+                                topicName: topic.get('name'),
+                                languages: self.languages,
+                                countries: self.countries,
+                                teamsDetailUrl: self.teamsDetailUrl
+                            }
                         });
+                        createViewWithHeader = self.createViewWithHeader({
+                            mainView: view,
+                            subject: {
+                                name: gettext("Create a New Team"),
+                                description: gettext("Create a new team if you can't find existing teams to join, or if you would like to learn with friends you know.")
+                            },
+                            parentTopic: topic
+                        });
+                        self.mainView = createViewWithHeader;
                         self.render();
+                    });
+                },
+
+                /**
+                 * Render the edit team form.
+                 */
+                editTeam: function (topicID, teamID) {
+                    var self = this,
+                        editViewWithHeader;
+                    this.getTopic(topicID).done(function (topic) {
+                        self.getTeam(teamID, false).done(function(team) {
+                            var view = new TeamEditView({
+                                action: 'edit',
+                                teamEvents: self.teamEvents,
+                                teamParams: {
+                                    courseID: self.courseID,
+                                    topicID: topic.get('id'),
+                                    teamsUrl: self.teamsUrl,
+                                    topicName: topic.get('name'),
+                                    languages: self.languages,
+                                    countries: self.countries,
+                                    teamsDetailUrl: self.teamsDetailUrl
+                                },
+                                model: team
+                            });
+                            editViewWithHeader = self.createViewWithHeader({
+                                    mainView: view,
+                                    subject: {
+                                        name: gettext("Edit Team"),
+                                        description: gettext("If you make significant changes, make sure you notify members of the team before making these changes.")
+                                    },
+                                    parentTeam: team,
+                                    parentTopic: topic
+                                }
+                            );
+                            self.mainView = editViewWithHeader;
+                            self.render();
+                        });
                     });
                 },
 
@@ -227,7 +270,7 @@
                     var self = this,
                         router = this.router,
                         deferred = $.Deferred();
-                    if (this.teamsCollection && this.teamsCollection.topic_id === topicID) {
+                    if (this.teamsCollection && this.teamsCollection.topic_id === topicID && this.teamsView) {
                         deferred.resolve(this.teamsView);
                     } else {
                         this.getTopic(topicID)
@@ -254,7 +297,8 @@
                                                 teamsUrl: self.teamsUrl,
                                                 topicName: topic.get('name'),
                                                 languages: self.languages,
-                                                countries: self.countries
+                                                countries: self.countries,
+                                                teamsDetailUrl: self.teamsDetailUrl
                                             }
                                         });
                                         deferred.resolve(
@@ -283,6 +327,13 @@
                 },
 
                 /**
+                 * Sets focus to teams header.
+                 */
+                setFocusToHeader: function() {
+                    $('.page-header-main .sr-is-focusable').focus();
+                },
+
+                /**
                  * Return a promise for the team view for the given team ID.
                  */
                 getBrowseTeamView: function (topicID, teamID) {
@@ -301,16 +352,20 @@
                                 requestUsername: self.userInfo.username,
                                 countries: self.countries,
                                 languages: self.languages,
-                                teamMembershipDetailUrl: self.teamMembershipDetailUrl
+                                teamMembershipDetailUrl: self.teamMembershipDetailUrl,
+                                setFocusToHeaderFunc: self.setFocusToHeader
                             });
-                            var teamJoinView = new TeamJoinView({
+
+                            var TeamProfileActionsView = new TeamProfileHeaderActionsView({
                                 teamEvents: self.teamEvents,
-                                    courseID: courseID,
-                               model: team,
+                                courseID: courseID,
+                                model: team,
                                 teamsUrl: self.teamsUrl,
                                 maxTeamSize: self.maxTeamSize,
                                 currentUsername: self.userInfo.username,
-                                teamMembershipsUrl: self.teamMembershipsUrl
+                                teamMembershipsUrl: self.teamMembershipsUrl,
+                                topicID: topicID,
+                                showEditButton: self.userInfo.privileged || self.userInfo.staff
                             });
                             deferred.resolve(
                                 self.createViewWithHeader(
@@ -318,7 +373,7 @@
                                         mainView: view,
                                         subject: team,
                                         parentTopic: topic,
-                                        headerActionsView: teamJoinView
+                                        headerActionsView: TeamProfileActionsView
                                     }
                                 )
                             );
@@ -329,7 +384,8 @@
 
                 createViewWithHeader: function (options) {
                     var router = this.router,
-                        breadcrumbs, headerView;
+                        breadcrumbs, headerView,
+                        viewDescription, viewTitle;
                     breadcrumbs = [{
                         title: gettext('All Topics'),
                         url: '#browse'
@@ -340,10 +396,25 @@
                             url: '#topics/' + options.parentTopic.id
                         });
                     }
+                    if (options.parentTeam) {
+                        breadcrumbs.push({
+                            title: options.parentTeam.get('name'),
+                            url: '#teams/' + options.parentTopic.id + '/' + options.parentTeam.id
+                        });
+                    }
+                    if (options.subject instanceof Backbone.Model) {
+                        viewDescription = options.subject.get('description');
+                        viewTitle = options.subject.get('name');
+
+                    } else if (options.subject) {
+                        viewDescription = options.subject.description;
+                        viewTitle = options.subject.name;
+                    }
+
                     headerView = new HeaderView({
                         model: new TeamsHeaderModel({
-                            description: options.subject.get('description'),
-                            title: options.subject.get('name'),
+                            description: viewDescription,
+                            title: viewTitle,
                             breadcrumbs: breadcrumbs
                         }),
                         headerActionsView: options.headerActionsView,

@@ -21,17 +21,16 @@
 
     <% if(obj.actions) { %>
     <nav class="nav-actions">
-      <h3 class="sr"><%= type %> Actions</h3>
       <ul>
         <% if(actions.primary) { %>
         <li class="nav-item">
-          <a href="#" class="button action-primary <%= actions.primary.class %>"><%= actions.primary.text %></a>
+          <button class="action-primary <%= actions.primary.class %>"><%= actions.primary.text %></button>
         </li>
         <% } %>
         <% if(actions.secondary) {
              _.each(actions.secondary, function(secondary) { %>
         <li class="nav-item">
-          <a href="#" class="button action-secondary <%= secondary.class %>"><%= secondary.text %></a>
+          <button class="action-secondary <%= secondary.class %>"><%= secondary.text %></button>
         </li>
         <%   });
            } %>

@@ -3,7 +3,7 @@ A custom Strategy for python-social-auth that allows us to fetch configuration f
 ConfigurationModels rather than django.settings
 """
 from .models import OAuth2ProviderConfig
-from social.backends.oauth import BaseOAuth2
+from social.backends.oauth import OAuthAuth
 from social.strategies.django_strategy import DjangoStrategy
 
 
@@ -17,11 +17,11 @@ class ConfigurationModelStrategy(DjangoStrategy):
         Load the setting from a ConfigurationModel if possible, or fall back to the normal
         Django settings lookup.
 
-        BaseOAuth2 subclasses will call this method for every setting they want to look up.
+        OAuthAuth subclasses will call this method for every setting they want to look up.
         SAMLAuthBackend subclasses will call this method only after first checking if the
             setting 'name' is configured via SAMLProviderConfig.
         """
-        if isinstance(backend, BaseOAuth2):
+        if isinstance(backend, OAuthAuth):
             provider_config = OAuth2ProviderConfig.current(backend.name)
             if not provider_config.enabled:
                 raise Exception("Can't fetch setting of a disabled backend/provider.")

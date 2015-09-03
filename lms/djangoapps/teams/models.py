@@ -1,18 +1,73 @@
 """Django models related to teams functionality."""
 
+from datetime import datetime
 from uuid import uuid4
 import pytz
 from datetime import datetime
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
 
+from django_comment_common.signals import (
+    thread_created,
+    thread_edited,
+    thread_deleted,
+    thread_voted,
+    comment_created,
+    comment_edited,
+    comment_deleted,
+    comment_voted,
+    comment_endorsed
+)
 from xmodule_django.models import CourseKeyField
-from util.model_utils import generate_unique_readable_id
+from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
+from teams import TEAM_DISCUSSION_CONTEXT
+
+
+@receiver(thread_voted)
+@receiver(thread_created)
+@receiver(comment_voted)
+@receiver(comment_created)
+def post_create_vote_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """Update the user's last activity date upon creating or voting for a
+    post."""
+    handle_activity(kwargs['user'], kwargs['post'])
+
+
+@receiver(thread_edited)
+@receiver(thread_deleted)
+@receiver(comment_edited)
+@receiver(comment_deleted)
+def post_edit_delete_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """Update the user's last activity date upon editing or deleting a
+    post."""
+    post = kwargs['post']
+    handle_activity(kwargs['user'], post, long(post.user_id))
+
+
+@receiver(comment_endorsed)
+def comment_endorsed_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """Update the user's last activity date upon endorsing a comment."""
+    comment = kwargs['post']
+    handle_activity(kwargs['user'], comment, long(comment.thread.user_id))
+
+
+def handle_activity(user, post, original_author_id=None):
+    """Handle user activity from django_comment_client and discussion_api
+    and update the user's last activity date. Checks if the user who
+    performed the action is the original author, and that the
+    discussion has the team context.
+    """
+    if original_author_id is not None and user.id != original_author_id:
+        return
+    if getattr(post, "context", "course") == TEAM_DISCUSSION_CONTEXT:
+        CourseTeamMembership.update_last_activity(user, post.commentable_id)
 
 
 class CourseTeam(models.Model):
@@ -51,9 +106,9 @@ class CourseTeam(models.Model):
               team uses, as ISO 639-1 code.
 
         """
-
-        team_id = generate_unique_readable_id(name, cls.objects.all(), 'team_id')
-        discussion_topic_id = uuid4().hex
+        unique_id = uuid4().hex
+        team_id = slugify(name)[0:20] + '-' + unique_id
+        discussion_topic_id = unique_id
 
         course_team = cls(
             team_id=team_id,
@@ -134,3 +189,22 @@ class CourseTeamMembership(models.Model):
             False if not
         """
         return cls.objects.filter(user=user, team__course_id=course_id).exists()
+
+    @classmethod
+    def update_last_activity(cls, user, discussion_topic_id):
+        """Set the `last_activity_at` for both this user and their team in the
+        given discussion topic. No-op if the user is not a member of
+        the team for this discussion.
+        """
+        try:
+            membership = cls.objects.get(user=user, team__discussion_topic_id=discussion_topic_id)
+        # If a privileged user is active in the discussion of a team
+        # they do not belong to, do not update their last activity
+        # information.
+        except ObjectDoesNotExist:
+            return
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
+        membership.last_activity_at = now
+        membership.team.last_activity_at = now
+        membership.team.save()
+        membership.save()

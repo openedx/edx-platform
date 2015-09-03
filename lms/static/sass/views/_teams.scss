@@ -243,13 +243,13 @@
       @include clearfix();
       @extend %t-copy-sub1;
       padding: ($baseline/2) $baseline;
-      background-color: $gray-l5;
+      background-color: $gray-l6;
       color: $gray;
 
       .meta-detail {
         margin-top: ($baseline/4);
         @include margin-right ($baseline*.75);
-        color: $gray;
+        color: $gray-d1;
 
         .icon {
           @include margin-right ($baseline/4);
@@ -372,7 +372,7 @@
       margin-bottom: $baseline;
 
       @extend %t-copy-sub1;
-      color: $gray-l1;
+      color: $gray;
 
       div, .team-detail-header {
         margin-bottom: ($baseline/4);

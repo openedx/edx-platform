@@ -8,7 +8,7 @@ import os
 import re
 import shutil
 import tarfile
-from path import path
+from path import Path as path
 from tempfile import mkdtemp
 
 from django.conf import settings

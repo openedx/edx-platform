@@ -31,7 +31,7 @@ from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from ..accounts.api import get_account_settings
 from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
@@ -1714,20 +1714,24 @@ class TestGoogleRegistrationView(
 
 
 @ddt.ddt
-class UpdateEmailOptInTestCase(ApiTestCase, ModuleStoreTestCase):
+class UpdateEmailOptInTestCase(ApiTestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 
     USERNAME = "steve"
     EMAIL = "steve@isawesome.com"
     PASSWORD = "steveopolis"
 
+    @classmethod
+    def setUpClass(cls):
+        super(UpdateEmailOptInTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.url = reverse("preferences_email_opt_in")
+
     def setUp(self):
         """ Create a course and user, then log in. """
         super(UpdateEmailOptInTestCase, self).setUp()
-        self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.url = reverse("preferences_email_opt_in")
 
     @ddt.data(
         (u"True", u"True"),

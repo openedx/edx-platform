@@ -3,7 +3,7 @@ Tests for the InstructorService
 """
 
 import json
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.models import StudentModule
 from instructor.services import InstructorService
@@ -15,30 +15,30 @@ from student.tests.factories import UserFactory
 
 
 @attr('shard_1')
-class InstructorServiceTests(ModuleStoreTestCase):
+class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService
     """
+    @classmethod
+    def setUpClass(cls):
+        super(InstructorServiceTests, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.problem_location = msk_from_problem_urlname(
+            cls.course.id,
+            'robot-some-problem-urlname'
+        )
+        cls.other_problem_location = msk_from_problem_urlname(
+            cls.course.id,
+            'robot-some-other_problem-urlname'
+        )
+        cls.problem_urlname = unicode(cls.problem_location)
+        cls.other_problem_urlname = unicode(cls.other_problem_location)
 
     def setUp(self):
         super(InstructorServiceTests, self).setUp()
 
-        self.course = CourseFactory.create()
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
-
-        self.problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-problem-urlname'
-        )
-
-        self.other_problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-other_problem-urlname'
-        )
-
-        self.problem_urlname = unicode(self.problem_location)
-        self.other_problem_urlname = unicode(self.other_problem_location)
 
         self.service = InstructorService()
         self.module_to_reset = StudentModule.objects.create(

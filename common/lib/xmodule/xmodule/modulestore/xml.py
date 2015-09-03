@@ -12,7 +12,7 @@ from cStringIO import StringIO
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
-from path import path
+from path import Path as path
 from contextlib import contextmanager
 from lazy import lazy
 

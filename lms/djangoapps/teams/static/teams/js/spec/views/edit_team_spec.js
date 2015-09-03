@@ -4,13 +4,14 @@ define([
     'backbone',
     'common/js/spec_helpers/ajax_helpers',
     'teams/js/views/edit_team',
+    'teams/js/models/team',
     'teams/js/spec_helpers/team_spec_helpers'
-], function ($, _, Backbone, AjaxHelpers, TeamEditView, TeamSpecHelpers) {
+], function ($, _, Backbone, AjaxHelpers, TeamEditView, TeamModel, TeamSpecHelpers) {
     'use strict';
 
-    describe('EditTeam', function () {
+    describe('CreateEditTeam', function() {
         var teamsUrl = '/api/team/v0/teams/',
-            teamsData = {
+            createTeamData = {
                 id: null,
                 name: "TeamName",
                 is_active: null,
@@ -18,9 +19,16 @@ define([
                 topic_id: "awesomeness",
                 date_created: "",
                 description: "TeamDescription",
-                country: "c",
-                language: "a",
-                membership: []
+                country: "US",
+                language: "en",
+                membership: [],
+                last_activity_at: ''
+            },
+            editTeamData = {
+                name: "UpdatedAvengers",
+                description: "We do not discuss about avengers.",
+                country: "US",
+                language: "en"
             },
             verifyValidation = function (requests, teamEditView, fieldsData) {
                 _.each(fieldsData, function (fieldData) {
@@ -31,33 +39,57 @@ define([
 
                 var message = teamEditView.$('.wrapper-msg');
                 expect(message.hasClass('is-hidden')).toBeFalsy();
-                expect(message.find('.title').text().trim()).toBe("Your team could not be created!");
+                var actionMessage = (teamAction === 'create' ? 'Your team could not be created.' : 'Your team could not be updated.');
+                expect(message.find('.title').text().trim()).toBe(actionMessage);
                 expect(message.find('.copy').text().trim()).toBe(
                     "Check the highlighted fields below and try again."
                 );
 
                 _.each(fieldsData, function (fieldData) {
-                    if(fieldData[2] === 'error') {
+                    if (fieldData[2] === 'error') {
                         expect(teamEditView.$(fieldData[0].split(" ")[0] + '.error').length).toBe(1);
-                    } else if(fieldData[2] === 'success') {
+                    } else if (fieldData[2] === 'success') {
                         expect(teamEditView.$(fieldData[0].split(" ")[0] + '.error').length).toBe(0);
                     }
                 });
 
                 expect(requests.length).toBe(0);
-            };
+            },
+            editTeamID = 'av',
+            teamAction;
 
-        var createTeamEditView = function() {
+        var createEditTeamView = function () {
+            var teamModel = {};
+            if (teamAction === 'edit') {
+                teamModel = new TeamModel(
+                    {
+                        id: editTeamID,
+                        name: 'Avengers',
+                        description: 'Team of dumbs',
+                        language: 'en',
+                        country: 'US',
+                        membership: [],
+                        url: '/api/team/v0/teams/' + editTeamID
+                    },
+                    {
+                        parse: true
+                    }
+                );
+            }
+
             return new TeamEditView({
                 teamEvents: TeamSpecHelpers.teamEvents,
                 el: $('.teams-content'),
+                action: teamAction,
+                model: teamModel,
                 teamParams: {
                     teamsUrl: teamsUrl,
                     courseID: "a/b/c",
                     topicID: 'awesomeness',
                     topicName: 'Awesomeness',
-                    languages: [['a', 'aaa'], ['b', 'bbb']],
-                    countries: [['c', 'ccc'], ['d', 'ddd']]
+                    languages: [['aa', 'Afar'], ['fr', 'French'], ['en', 'English']],
+                    countries: [['af', 'Afghanistan'], ['CA', 'Canada'], ['US', 'United States']],
+                    teamsDetailUrl: teamModel.url
                 }
             }).render();
         };
@@ -67,15 +99,15 @@ define([
             spyOn(Backbone.history, 'navigate');
         });
 
-        it('can render itself correctly', function () {
+        var assertFormRendersCorrectly = function() {
             var fieldClasses = [
-                '.u-field-name',
-                '.u-field-description',
-                '.u-field-optional_description',
-                '.u-field-language',
-                '.u-field-country'
-            ],
-                teamEditView = createTeamEditView();
+                    '.u-field-name',
+                    '.u-field-description',
+                    '.u-field-optional_description',
+                    '.u-field-language',
+                    '.u-field-country'
+                ],
+                teamEditView = createEditTeamView();
 
             _.each(fieldClasses, function (fieldClass) {
                 expect(teamEditView.$el.find(fieldClass).length).toBe(1);
@@ -83,32 +115,46 @@ define([
 
             expect(teamEditView.$('.create-team.form-actions .action-primary').length).toBe(1);
             expect(teamEditView.$('.create-team.form-actions .action-cancel').length).toBe(1);
-        });
 
-        it('can create a team', function () {
-            var requests = AjaxHelpers.requests(this),
-                teamEditView = createTeamEditView();
+            if (teamAction === 'edit') {
+                expect(teamEditView.$el.find('.u-field-name input').val()).toBe('Avengers');
+                expect(teamEditView.$el.find('.u-field-description textarea').val()).toBe('Team of dumbs');
+                expect(teamEditView.$el.find('.u-field-language select option:selected').text()).toBe('English');
+                expect(teamEditView.$el.find('.u-field-country select option:selected').text()).toBe('United States');
+            }
+        };
+
+        var requestMethod = function() {
+          return teamAction === 'create' ? 'POST' : 'PATCH';
+        };
+
+        var assertTeamCreateUpdateInfo = function(that, teamsData, teamsUrl, expectedUrl) {
+            var requests = AjaxHelpers.requests(that),
+                teamEditView = createEditTeamView();
 
             teamEditView.$('.u-field-name input').val(teamsData.name);
             teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
-            teamEditView.$('.u-field-language select').val('a').attr("selected", "selected");
-            teamEditView.$('.u-field-country select').val('c').attr("selected", "selected");
+            teamEditView.$('.u-field-language select').val(teamsData.language).attr("selected", "selected");
+            teamEditView.$('.u-field-country select').val(teamsData.country).attr("selected", "selected");
 
             teamEditView.$('.create-team.form-actions .action-primary').click();
-            AjaxHelpers.expectJsonRequest(requests, 'POST', teamsUrl, teamsData);
-            AjaxHelpers.respondWithJson(requests, _.extend(_.extend({}, teamsData), { id: '123'}));
+
+            AjaxHelpers.expectJsonRequest(requests, requestMethod(), teamsUrl, teamsData);
+            AjaxHelpers.respondWithJson(requests, _.extend(_.extend({}, teamsData), teamAction === 'create' ? {id: '123'} : {}));
 
             expect(teamEditView.$('.create-team.wrapper-msg .copy').text().trim().length).toBe(0);
-            expect(Backbone.history.navigate.calls[0].args).toContain('teams/awesomeness/123');
-        });
+            expect(Backbone.history.navigate.calls[0].args).toContain(expectedUrl);
+        };
 
-        it('shows validation error message when field is empty', function () {
-            var requests = AjaxHelpers.requests(this),
-                teamEditView = createTeamEditView();
+        var assertValidationMessagesWhenFieldsEmpty = function(that) {
+            var requests = AjaxHelpers.requests(that),
+                teamEditView = createEditTeamView();
+
             verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', 'Name', 'success'],
                 ['.u-field-textarea textarea', '', 'error']
             ]);
+
             teamEditView.render();
             verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', '', 'error'],
@@ -119,13 +165,13 @@ define([
                 ['.u-field-name input', '', 'error'],
                 ['.u-field-textarea textarea', '', 'error']
             ]);
-        });
+        };
 
-        it('shows validation error message when field value length exceeded the limit', function () {
-            var requests = AjaxHelpers.requests(this),
-                teamEditView = createTeamEditView(),
-                teamName = new Array(500 + 1).join( '$'),
-                teamDescription = new Array(500 + 1).join( '$' );
+        var assertValidationMessagesWhenInvalidData = function(that) {
+            var requests = AjaxHelpers.requests(that),
+                teamEditView = createEditTeamView(),
+                teamName = new Array(500 + 1).join('$'),
+                teamDescription = new Array(500 + 1).join('$');
 
             verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', teamName, 'error'],
@@ -141,48 +187,114 @@ define([
                 ['.u-field-name input', teamName, 'error'],
                 ['.u-field-textarea textarea', teamDescription, 'error']
             ]);
-        });
+        };
 
-        it("shows an error message for HTTP 500", function () {
-            var teamEditView = createTeamEditView(),
-                requests = AjaxHelpers.requests(this);
-
-            teamEditView.$('.u-field-name input').val(teamsData.name);
-            teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
-
-            teamEditView.$('.create-team.form-actions .action-primary').click();
-            teamsData.country = '';
-            teamsData.language = '';
-            AjaxHelpers.expectJsonRequest(requests, 'POST', teamsUrl, teamsData);
-            AjaxHelpers.respondWithError(requests);
-
-            expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("An error occurred. Please try again.");
-        });
-
-        it("shows correct error message when server returns an error", function () {
-            var requests = AjaxHelpers.requests(this),
-                teamEditView = createTeamEditView();
+        var assertShowMessageOnError = function(that, teamsData, teamsUrl, errorCode) {
+            var teamEditView = createEditTeamView(),
+                requests = AjaxHelpers.requests(that);
 
             teamEditView.$('.u-field-name input').val(teamsData.name);
             teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
 
             teamEditView.$('.create-team.form-actions .action-primary').click();
-            teamsData.country = '';
-            teamsData.language = '';
-            AjaxHelpers.expectJsonRequest(requests, 'POST', teamsUrl, teamsData);
-            AjaxHelpers.respondWithError(
-                    requests,
-                    400,
-                    {'user_message': 'User message', 'developer_message': 'Developer message'}
-            );
 
-            expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("User message");
-        });
+            if (teamAction === 'create') {
+                teamsData.country = '';
+                teamsData.language = '';
+            }
+            AjaxHelpers.expectJsonRequest(requests, requestMethod(), teamsUrl, teamsData);
 
-        it("changes route on cancel click", function () {
-            var teamEditView = createTeamEditView();
+            if (errorCode < 500) {
+                AjaxHelpers.respondWithError(
+                        requests,
+                        errorCode,
+                        {'user_message': 'User message', 'developer_message': 'Developer message'}
+                );
+                expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("User message");
+            } else {
+                AjaxHelpers.respondWithError(requests);
+                expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("An error occurred. Please try again.");
+            }
+        };
+
+        var assertRedirectsToCorrectUrlOnCancel = function(expectedUrl) {
+            var teamEditView = createEditTeamView();
             teamEditView.$('.create-team.form-actions .action-cancel').click();
-            expect(Backbone.history.navigate.calls[0].args).toContain('topics/awesomeness');
+            expect(Backbone.history.navigate.calls[0].args).toContain(expectedUrl);
+        };
+
+        describe('NewTeam', function () {
+
+            beforeEach(function() {
+                teamAction = 'create';
+            });
+
+            it('can render itself correctly', function () {
+                assertFormRendersCorrectly();
+            });
+
+            it('can create a team', function () {
+                assertTeamCreateUpdateInfo(this, createTeamData, teamsUrl, 'teams/awesomeness/123');
+            });
+
+            it('shows validation error message when field is empty', function () {
+                assertValidationMessagesWhenFieldsEmpty(this);
+            });
+
+            it('shows validation error message when field value length exceeded the limit', function () {
+                assertValidationMessagesWhenInvalidData(this);
+            });
+
+            it("shows an error message for HTTP 500", function () {
+                assertShowMessageOnError(this, createTeamData, teamsUrl, 500);
+            });
+
+            it("shows correct error message when server returns an error", function () {
+                assertShowMessageOnError(this, createTeamData, teamsUrl, 400);
+            });
+
+            it("changes route on cancel click", function () {
+                assertRedirectsToCorrectUrlOnCancel('topics/awesomeness');
+            });
+        });
+
+        describe('EditTeam', function () {
+
+            beforeEach(function() {
+                teamAction = 'edit';
+            });
+
+            it('can render itself correctly', function () {
+                assertFormRendersCorrectly();
+            });
+
+            it('can edit a team', function () {
+                var copyTeamsData = _.clone(editTeamData);
+                copyTeamsData.country = 'CA';
+                copyTeamsData.language = 'fr';
+
+                assertTeamCreateUpdateInfo(this, copyTeamsData, teamsUrl + editTeamID + '?expand=user', 'teams/awesomeness/' + editTeamID);
+            });
+
+            it('shows validation error message when field is empty', function () {
+                assertValidationMessagesWhenFieldsEmpty(this);
+            });
+
+            it('shows validation error message when field value length exceeded the limit', function () {
+                assertValidationMessagesWhenInvalidData(this);
+            });
+
+            it("shows an error message for HTTP 500", function () {
+                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID + '?expand=user', 500);
+            });
+
+            it("shows correct error message when server returns an error", function () {
+                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID + '?expand=user', 400);
+            });
+
+            it("changes route on cancel click", function () {
+                assertRedirectsToCorrectUrlOnCancel('teams/awesomeness/' + editTeamID);
+            });
         });
     });
 });
