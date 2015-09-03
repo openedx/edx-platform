@@ -42,6 +42,8 @@ STATICFILES_FINDERS = [
     'staticfiles.finders.AppDirectoriesFinder',
 ]
 
+PIPELINE_ENABLED = False
+
 ############################# ADVANCED COMPONENTS #############################
 
 # Make it easier to test advanced components in local dev

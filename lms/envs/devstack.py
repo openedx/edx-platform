@@ -94,6 +94,8 @@ STATICFILES_FINDERS = [
     'staticfiles.finders.AppDirectoriesFinder',
 ]
 
+PIPELINE_ENABLED = False
+
 # Disable JavaScript compression in development
 PIPELINE_JS_COMPRESSOR = None
 
