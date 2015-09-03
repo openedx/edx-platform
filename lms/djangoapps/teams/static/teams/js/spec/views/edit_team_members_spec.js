@@ -77,7 +77,7 @@ define([
             spyOn(TeamUtils, 'showMessage');
         });
 
-        it('can renders a message when there are no members', function () {
+        it('can render a message when there are no members', function () {
             var view = createEditTeamMembersView([]);
             verifyNoMembersView(view);
         });
@@ -118,7 +118,7 @@ define([
                 'An error occurred while removing the member from the team. Try again.',
                 undefined
             );
-            expect(view.teamEvents.trigger).not.toHaveBeenCalledWith();
+            expect(view.teamEvents.trigger).not.toHaveBeenCalled();
             verifyTeamMembersView(view);
         });
 
@@ -131,7 +131,7 @@ define([
 
             deleteTeamMemember(view, false);
             expect(requests.length).toBe(0);
-            expect(view.teamEvents.trigger).not.toHaveBeenCalledWith();
+            expect(view.teamEvents.trigger).not.toHaveBeenCalled();
             verifyTeamMembersView(view);
         });
     });

@@ -39,7 +39,7 @@
                 editMembership: function (event) {
                     event.preventDefault();
                     Backbone.history.navigate(
-                        'topics/' + this.team.get('topic_id') + '/' + this.team.id +'/edit-team/manage-members',
+                        'teams/' + this.team.get('topic_id') + '/' + this.team.id +'/edit-team/manage-members',
                         {trigger: true}
                     );
                 },

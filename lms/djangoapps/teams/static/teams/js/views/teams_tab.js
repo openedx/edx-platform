@@ -74,14 +74,23 @@
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
                         ['topics/:topic_id/search(/)', _.bind(this.searchTeams, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
-                        ['topics/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
-                        ['topics/:topic_id/:team_id/edit-team/manage-members(/)', _.bind(this.editTeamMembers, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
                     ], function (route) {
                         router.route.apply(router, route);
                     });
+
+                    if (this.canEditTeam()) {
+                        _.each([
+                            ['teams/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
+                            ['teams/:topic_id/:team_id/edit-team/manage-members(/)',
+                                _.bind(this.editTeamMembers, this)
+                            ]
+                        ], function (route) {
+                            router.route.apply(router, route);
+                        });
+                    }
 
                     // Create an event queue to track team changes
                     this.teamEvents = _.clone(Backbone.Events);
@@ -401,7 +410,7 @@
                                 context: self.context,
                                 model: team,
                                 topic: topic,
-                                showEditButton: self.context.userInfo.privileged || self.context.userInfo.staff
+                                showEditButton: self.canEditTeam()
                             });
                             deferred.resolve(
                                 self.createViewWithHeader(
@@ -416,6 +425,10 @@
                         });
                     });
                     return deferred.promise();
+                },
+
+                canEditTeam: function () {
+                    return this.context.userInfo.privileged || this.context.userInfo.staff;
                 },
 
                 createBreadcrumbs: function(topic, team) {

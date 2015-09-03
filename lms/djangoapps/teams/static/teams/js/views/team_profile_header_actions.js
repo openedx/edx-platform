@@ -57,8 +57,10 @@
                     return view;
                 },
 
-                joinTeam: function () {
+                joinTeam: function (event) {
                     var view = this;
+
+                    event.preventDefault();
                     $.ajax({
                         type: 'POST',
                         url: view.context.teamMembershipsUrl,
@@ -118,7 +120,7 @@
                 editTeam: function (event) {
                     event.preventDefault();
                     Backbone.history.navigate(
-                        'topics/' + this.topic.id + '/' + this.model.get('id') +'/edit-team',
+                        'teams/' + this.topic.id + '/' + this.model.get('id') +'/edit-team',
                         {trigger: true}
                     );
                 }
