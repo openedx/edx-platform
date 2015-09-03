@@ -5,6 +5,7 @@ var edx = edx || {};
 
     edx.ccx = edx.ccx || {};
     edx.ccx.schedule = edx.ccx.schedule || {};
+    edx.ccx.dirty_unit_locations = [];
 
     var self;
 
@@ -44,12 +45,13 @@ var edx = edx || {};
             this.sequential_select = $('form#add-unit select[name="sequential"]');
             this.vertical_select = $('form#add-unit select[name="vertical"]');
             this.dirty = false;
-	    self = this;
+            self = this;
 	    $('#add-all').on('click', function(event) {
 	        event.preventDefault();
 	        self.schedule_apply(self.schedule, self.show);
+	        self.add_dirty_units(self.schedule);
 	        self.dirty = true;
-		self.schedule_collection.set(self.schedule);
+		    self.schedule_collection.set(self.schedule);
 	        self.render();
 	    });
 
@@ -111,13 +113,15 @@ var edx = edx || {};
 		    chapter,
 		    sequential === 'all' ? null : sequential,
 		    vertical === 'all' ? null: vertical),
-		  start = self.get_datetime('start'),
+		    start = self.get_datetime('start'),
 		  due = self.get_datetime('due');
-	      units.map(self.show);
+	      chapter = self.find_unit(self.schedule, chapter);
+		  units.map(self.show);
 	      var unit = units[units.length - 1];
 	      if (unit !== undefined && start) { unit.start = start; }
 	      if (unit !== undefined && due) { unit.due = due; }
 	      self.schedule_apply([unit], self.show);
+		  self.add_dirty_units([chapter]);
 	      self.schedule_collection.set(self.schedule);
 	      self.dirty = true;
 	      self.render();
@@ -162,7 +166,8 @@ var edx = edx || {};
 	    $('table.ccx-schedule button#remove-all').on('click', function(event) {
 	      event.preventDefault();
 	      self.schedule_apply(self.schedule, self.hide);
-	      self.dirty = true;
+	      self.add_dirty_units(self.schedule);
+          self.dirty = true;
 	      self.schedule_collection.set(self.schedule);
 	      self.render();
 	    });
@@ -170,8 +175,10 @@ var edx = edx || {};
 	    $('table.ccx-schedule button.remove-unit').on('click', function() {
 	      var row = $(this).closest('tr'),
 		  path = row.data('location').split(' '),
-		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]);
+		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]),
+		  chapter = self.find_unit(self.schedule, path[0]);
 	      self.schedule_apply([unit], self.hide);
+		  self.add_dirty_units([chapter]);
 	      self.schedule_collection.set(self.schedule);
 	      self.dirty = true;
 	      self.render();
@@ -214,14 +221,18 @@ var edx = edx || {};
 	    self.schedule_collection.set(self.schedule);
 	    var button = $('#dirty-schedule #save-changes');
 	    button.prop('disabled', true).text(gettext("Saving"));
-
+	    var data = {
+		"collection" : this.schedule,
+		"changed" : edx.ccx.dirty_unit_locations
+	    };
 	    $.ajax({
 		url: save_url,
 		type: 'POST',
 		contentType: 'application/json',
-		data: JSON.stringify(self.schedule),
+		data: JSON.stringify(data),
 		success: function(data) {
 		  self.dirty = false;
+		  self.reset_dirty_units();
 		  self.render();
 		  button.prop('disabled', false).text(gettext("Save changes"));
 
@@ -272,6 +283,19 @@ var edx = edx || {};
 	      return $('<option>')
 		.attr('value', node.location)
 		.text(node.display_name)[0];
+	    });
+	},
+
+	reset_dirty_units: function(){
+	    edx.ccx.dirty_unit_locations = [];
+	},
+
+	add_dirty_units: function(units){
+	    var ccx = edx.ccx;
+	    units.map(function(unit) {
+		if ($.inArray(unit.location, ccx.dirty_unit_locations) === -1) {
+		    ccx.dirty_unit_locations.push(unit.location)
+		}
 	    });
 	},
 
@@ -373,6 +397,7 @@ var edx = edx || {};
         });
 	      var path = row.data('location').split(' '),
 		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]),
+		  chapter = self.find_unit(self.schedule, path[0]),
 		  parts = unit[what] ? unit[what].split(' ') : ['', ''],
 		  date = parts[0],
 		  time = parts[1];
@@ -401,6 +426,7 @@ var edx = edx || {};
 		}
 		modal.find('.close-modal').click();
 		self.dirty = true;
+		self.add_dirty_units([chapter]);
 		self.schedule_collection.set(self.schedule);
 		self.render();
 	      });

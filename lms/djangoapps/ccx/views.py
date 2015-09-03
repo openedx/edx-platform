@@ -196,7 +196,13 @@ def save_ccx(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    def override_fields(parent, data, graded, earliest=None):
+    def unit_has_changed(unit, changed_units):
+        """
+        Check if a unit in ccx changed is modified and returns True/False
+        """
+        return unit['location'] in changed_units
+
+    def override_fields(parent, data, graded, changed_units, earliest=None):
         """
         Recursively apply CCX schedule data to CCX by overriding the
         `visible_to_staff_only`, `start` and `due` fields for units in the
@@ -206,6 +212,8 @@ def save_ccx(request, course, ccx=None):
             str(child.location): child
             for child in parent.get_children()}
         for unit in data:
+            if not unit_has_changed(unit, changed_units):
+                continue
             block = blocks[unit['location']]
             override_field_for_ccx(
                 ccx, block, 'visible_to_staff_only', unit['hidden'])
@@ -227,11 +235,12 @@ def save_ccx(request, course, ccx=None):
 
             children = unit.get('children', None)
             if children:
-                override_fields(block, children, graded, earliest)
+                override_fields(block, data=children, graded=graded, changed_units=changed_units, earliest=earliest)
         return earliest
 
     graded = {}
-    earliest = override_fields(course, json.loads(request.body), graded)
+    data = json.loads(request.body)
+    earliest = override_fields(course, data=data['collection'], graded=graded, changed_units=data['changed'])
     if earliest:
         override_field_for_ccx(ccx, course, 'start', earliest)
 
