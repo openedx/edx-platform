@@ -14,10 +14,9 @@
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_i18n.js'],
-function (VideoPlayer, i18n) {
-    var moment = window.moment;
-
+['video/03_video_player.js', 'video/00_i18n.js', 'moment'],
+function (VideoPlayer, i18n, moment) {
+    var moment = moment || window.moment;
     /**
      * @function
      *
