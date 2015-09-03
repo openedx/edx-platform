@@ -5,7 +5,7 @@
                 data-user-create-comment="<%= !readOnly %>"
                 data-user-create-subcomment="<%= !readOnly %>">
             <% if ( !readOnly) { %>
-                <button type="button" class="btn new-post-btn"><i class="icon fa fa-edit new-post-icon" aria-hidden="true"></i><%= gettext("New Post") %></button>
+                <button type="button" class="btn new-post-btn"><i class="icon fa fa-edit new-post-icon" aria-hidden="true"></i><%- gettext("New Post") %></button>
             <% } %>
         </div>
     </div>

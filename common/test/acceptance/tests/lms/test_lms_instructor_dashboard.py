@@ -168,32 +168,12 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Auto-auth register for the course.
         self._auto_auth(self.USERNAME, self.EMAIL, False)
 
-    def _auto_auth(self, username, email, staff):
+    def _auto_auth(self, username, email, staff, enrollment_mode="honor"):
         """
         Logout and login with given credentials.
         """
         AutoAuthPage(self.browser, username=username, email=email,
-                     course_id=self.course_id, staff=staff).visit()
-
-    def _login_as_a_verified_user(self):
-        """
-        login as a verififed user
-        """
-
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-
-        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
-        # Navigate to the track selection page
-        self.track_selection_page.visit()
-
-        # Enter the payment and verification flow by choosing to enroll as verified
-        self.track_selection_page.enroll('verified')
-
-        # Proceed to the fake payment page
-        self.payment_and_verification_flow.proceed_to_payment()
-
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+                     course_id=self.course_id, staff=staff, enrollment_mode=enrollment_mode).visit()
 
     def _create_a_proctored_exam_and_attempt(self):
         """
@@ -212,7 +192,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
-        self._login_as_a_verified_user()
+        self._auto_auth(self.USERNAME, self.EMAIL, False, enrollment_mode="verified")
         self.courseware_page.visit()
 
         # Start the proctored exam.
@@ -235,7 +215,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
-        self._login_as_a_verified_user()
+        self._auto_auth(self.USERNAME, self.EMAIL, False, enrollment_mode="verified")
         self.courseware_page.visit()
 
         # Start the proctored exam.

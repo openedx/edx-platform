@@ -381,12 +381,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def test_canceling_authentication_redirects_to_register_when_auth_entry_register(self):
         self.assert_exception_redirect_looks_correct('/register', auth_entry=pipeline.AUTH_ENTRY_REGISTER)
 
-    def test_canceling_authentication_redirects_to_login_when_auth_login_2(self):
-        self.assert_exception_redirect_looks_correct('/account/login/', auth_entry=pipeline.AUTH_ENTRY_LOGIN_2)
-
-    def test_canceling_authentication_redirects_to_login_when_auth_register_2(self):
-        self.assert_exception_redirect_looks_correct('/account/register/', auth_entry=pipeline.AUTH_ENTRY_REGISTER_2)
-
     def test_canceling_authentication_redirects_to_account_settings_when_auth_entry_account_settings(self):
         self.assert_exception_redirect_looks_correct(
             '/account/settings', auth_entry=pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS

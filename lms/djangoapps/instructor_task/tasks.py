@@ -34,6 +34,7 @@ from instructor_task.tasks_helper import (
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
+    upload_problem_responses_csv,
     upload_grades_csv,
     upload_problem_grade_report,
     upload_students_csv,
@@ -143,6 +144,18 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     action_name = ugettext_noop('emailed')
     visit_fcn = perform_delegate_email_batches
     return run_main_task(entry_id, visit_fcn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
+    """
+    Compute student answers to a given problem and upload the CSV to
+    an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_problem_responses_csv, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
 
 
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable

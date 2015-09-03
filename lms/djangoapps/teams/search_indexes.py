@@ -15,7 +15,7 @@ class CourseTeamIndexer(object):
     """
     INDEX_NAME = "course_team_index"
     DOCUMENT_TYPE_NAME = "course_team"
-    ENABLE_SEARCH_KEY = "ENABLE_TEAMS_SEARCH"
+    ENABLE_SEARCH_KEY = "ENABLE_TEAMS"
 
     def __init__(self, course_team):
         self.course_team = course_team

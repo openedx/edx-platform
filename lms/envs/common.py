@@ -401,9 +401,6 @@ FEATURES = {
     # Teams feature
     'ENABLE_TEAMS': True,
 
-    # Enable indexing teams for search
-    'ENABLE_TEAMS_SEARCH': False,
-
     # Show video bumper in LMS
     'ENABLE_VIDEO_BUMPER': False,
 
@@ -1518,6 +1515,7 @@ PIPELINE_JS = {
         'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
             'js/sticky_filter.js',
             'js/query-params.js',
+            'js/vendor/moment.min.js',
         ],
         'output_filename': 'js/lms-application.js',
     },
@@ -2634,6 +2632,18 @@ CREDIT_HELP_LINK_URL = "#"
 # not expected to be active; this setting simply allows administrators to
 # route any messages intended for LTI users to a common domain.
 LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
+
+# An aggregate score is one derived from multiple problems (such as the
+# cumulative score for a vertical element containing many problems). Sending
+# aggregate scores immediately introduces two issues: one is a race condition
+# between the view method and the Celery task where the updated score may not
+# yet be visible to the database if the view has not yet returned (and committed
+# its transaction). The other is that the student is likely to receive a stream
+# of notifications as the score is updated with every problem. Waiting a
+# reasonable period of time allows the view transaction to end, and allows us to
+# collapse multiple score updates into a single message.
+# The time value is in seconds.
+LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
 # Number of seconds before JWT tokens expire
 JWT_EXPIRATION = 30

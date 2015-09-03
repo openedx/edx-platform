@@ -10,7 +10,8 @@ define([
             return new TopicsView({
                 teamEvents: TeamSpecHelpers.teamEvents,
                 el: '.topics-container',
-                collection: topicCollection
+                collection: topicCollection,
+                context: TeamSpecHelpers.createMockContext()
             }).render();
         };
 
@@ -48,14 +49,15 @@ define([
                 topicsView = createTopicsView();
 
             triggerUpdateEvent(topicsView);
-            AjaxHelpers.expectJsonRequestURL(
+            AjaxHelpers.expectRequestURL(
                 requests,
-                'api/teams/topics',
+                TeamSpecHelpers.testContext.topicUrl,
                 {
-                    course_id : 'my/course/id',
-                    page : '1',
-                    page_size : '5',  // currently the page size is determined by the size of the collection
-                    order_by : 'name'
+                    course_id: TeamSpecHelpers.testCourseID,
+                    page: '1',
+                    page_size: '5',  // currently the page size is determined by the size of the collection
+                    order_by: 'name',
+                    text_search: ''
                 }
             );
         });
@@ -66,14 +68,15 @@ define([
 
             // Staff are not immediately added to the team, but may choose to join after the create event.
             triggerUpdateEvent(topicsView, true);
-            AjaxHelpers.expectJsonRequestURL(
+            AjaxHelpers.expectRequestURL(
                 requests,
-                'api/teams/topics',
+                TeamSpecHelpers.testContext.topicUrl,
                 {
-                    course_id : 'my/course/id',
-                    page : '1',
-                    page_size : '5',  // currently the page size is determined by the size of the collection
-                    order_by : 'name'
+                    course_id: TeamSpecHelpers.testCourseID,
+                    page: '1',
+                    page_size: '5',  // currently the page size is determined by the size of the collection
+                    order_by: 'name',
+                    text_search: ''
                 }
             );
         });

@@ -36,6 +36,7 @@
 
                 configuration: 'square_card',
                 cardClass: 'topic-card',
+                pennant: gettext('Topic'),
                 title: function () { return this.model.get('name'); },
                 description: function () { return this.model.get('description'); },
                 details: function () { return this.detailViews; },

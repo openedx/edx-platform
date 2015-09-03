@@ -552,7 +552,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                         var clickNewComponent;
 
                         clickNewComponent = function (index) {
-                            containerPage.$(".new-component .new-component-type a.single-template")[index].click();
+                            containerPage.$(".new-component .new-component-type button.single-template")[index].click();
                         };
 
                         it('Attaches a handler to new component button', function() {
@@ -598,7 +598,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                             var showTemplatePicker, verifyCreateHtmlComponent;
 
                             showTemplatePicker = function () {
-                                containerPage.$('.new-component .new-component-type a.multiple-templates')[0].click();
+                                containerPage.$('.new-component .new-component-type button.multiple-templates')[0].click();
                             };
 
                             verifyCreateHtmlComponent = function (test, templateIndex, expectedRequest) {
@@ -606,7 +606,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                                 renderContainerPage(test, mockContainerXBlockHtml);
                                 showTemplatePicker();
                                 xblockCount = containerPage.$('.studio-xblock-wrapper').length;
-                                containerPage.$('.new-component-html a')[templateIndex].click();
+                                containerPage.$('.new-component-html button')[templateIndex].click();
                                 EditHelpers.verifyXBlockRequest(requests, expectedRequest);
                                 AjaxHelpers.respondWithJson(requests, {"locator": "new_item"});
                                 respondWithHtml(mockXBlockHtml);

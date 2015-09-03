@@ -7,34 +7,43 @@
         'jquery.timeago',
         'js/components/card/views/card',
         'teams/js/views/team_utils',
+        'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
         'text!teams/templates/team-activity.underscore'
-    ], function (Backbone, _, gettext, timeago, CardView, TeamUtils, teamCountryLanguageTemplate, teamActivityTemplate) {
+    ], function (
+        Backbone,
+        _,
+        gettext,
+        timeago,
+        CardView,
+        TeamUtils,
+        teamMembershipDetailsTemplate,
+        teamCountryLanguageTemplate,
+        teamActivityTemplate
+    ) {
         var TeamMembershipView, TeamCountryLanguageView, TeamActivityView, TeamCardView;
 
         TeamMembershipView = Backbone.View.extend({
             tagName: 'div',
             className: 'team-members',
-            template: _.template(
-                '<span class="member-count"><%= membership_message %></span>' +
-                '<ul class="list-member-thumbs"></ul>'
-            ),
+            template: _.template(teamMembershipDetailsTemplate),
 
             initialize: function (options) {
                 this.maxTeamSize = options.maxTeamSize;
             },
 
             render: function () {
-                var memberships = this.model.get('membership'),
+                var allMemberships = _(this.model.get('membership'))
+                        .sortBy(function (member) {return new Date(member.last_activity_at);}).reverse(),
+                    displayableMemberships = allMemberships.slice(0, 5),
                     maxMemberCount = this.maxTeamSize;
                 this.$el.html(this.template({
-                    membership_message: TeamUtils.teamCapacityText(memberships.length, maxMemberCount)
+                    membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxMemberCount),
+                    memberships: displayableMemberships,
+                    has_additional_memberships: displayableMemberships.length < allMemberships.length,
+                    // Translators: "and others" refers to fact that additional members of a team exist that are not displayed.
+                    sr_message: gettext('and others')
                 }));
-                _.each(memberships, function (membership) {
-                    this.$('list-member-thumbs').append(
-                        '<li class="item-member-thumb"><img alt="' + membership.user.username + '" src=""></img></li>'
-                    );
-                }, this);
                 return this;
             }
         });

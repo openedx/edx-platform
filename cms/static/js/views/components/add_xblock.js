@@ -6,10 +6,10 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
     function ($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu) {
         var AddXBlockComponent = BaseView.extend({
             events: {
-                'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates',
-                'click .new-component .new-component-type a.single-template': 'createNewComponent',
+                'click .new-component .new-component-type button.multiple-templates': 'showComponentTemplates',
+                'click .new-component .new-component-type button.single-template': 'createNewComponent',
                 'click .new-component .cancel-button': 'closeNewComponent',
-                'click .new-component-templates .new-component-template a': 'createNewComponent',
+                'click .new-component-templates .new-component-template .button-component': 'createNewComponent',
                 'click .new-component-templates .cancel-button': 'closeNewComponent'
             },
 
@@ -43,13 +43,17 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                 type = $(event.currentTarget).data('type');
                 this.$('.new-component').slideUp(250);
                 this.$('.new-component-' + type).slideDown(250);
+                this.$('.new-component-' + type + ' div').focus();
             },
 
             closeNewComponent: function(event) {
                 event.preventDefault();
                 event.stopPropagation();
+                type = $(event.currentTarget).data('type');
                 this.$('.new-component').slideDown(250);
                 this.$('.new-component-templates').slideUp(250);
+                this.$('ul.new-component-type li button[data-type=' + type + ']').focus();
+
             },
 
             createNewComponent: function(event) {

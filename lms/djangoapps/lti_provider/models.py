@@ -112,6 +112,7 @@ class GradedAssignment(models.Model):
     usage_key = UsageKeyField(max_length=255, db_index=True)
     outcome_service = models.ForeignKey(OutcomeService)
     lis_result_sourcedid = models.CharField(max_length=255, db_index=True)
+    version_number = models.IntegerField(default=0)
 
     class Meta(object):
         """
