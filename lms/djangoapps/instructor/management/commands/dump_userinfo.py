@@ -81,12 +81,12 @@ CME_SPECIFIC_ORDER = (
     REGISTRATION_FIELDS[0:1] +
     ORDER_FIELDS[0:1] +
     REGISTRATION_FIELDS[1:2] +
-    ORDER_FIELDS[1:2] + 
+    ORDER_FIELDS[1:2] +
     REGISTRATION_FIELDS[2:3] +
     ORDER_FIELDS[2:3] +
     REGISTRATION_FIELDS[3:4] +
-    ORDER_FIELDS[3:4] + 
-    REGISTRATION_FIELDS[4:] + 
+    ORDER_FIELDS[3:4] +
+    REGISTRATION_FIELDS[4:] +
     CERTIFICATE_FIELDS
 )
 
@@ -180,7 +180,7 @@ class Command(BaseCommand):
         intervals = int(0.10 * total)
         if intervals > 100 and verbose:
             intervals = 101
-        
+
         sys.stdout.write("Processing users")
 
         for profile in profiles:
@@ -188,9 +188,9 @@ class Command(BaseCommand):
             self.print_progress(count, intervals, verbose)
 
             student_dict = {
-                'Credits Issued': 0.0, #XXX should be revisited when credit count functionality implemented
+                'Credits Issued': 0.0,  # XXX should be revisited when credit count functionality implemented
                 'Certif': False,
-            } 
+            }
 
             for field, label in PROFILE_FIELDS:
                 if 'untracked' not in field and len(label) > 0:
@@ -199,7 +199,7 @@ class Command(BaseCommand):
             registration = self.add_fields_to(student_dict, REGISTRATION_FIELDS, registration_table, user_id)
 
             if registration:
-                self.add_fields_to(student_dict, ORDER_FIELDS, {user_id : registration.order}, user_id)
+                self.add_fields_to(student_dict, ORDER_FIELDS, {user_id: registration.order}, user_id)
 
                 #Registration order special case values
                 if student_dict['Payment Type'] == 'Visa':
@@ -218,8 +218,11 @@ class Command(BaseCommand):
             student_dict['System ID'] = course_code
 
             try:
-                if (self.lies_between(student_dict['Date Registered'], start_date, end_date) or
-                    self.lies_between(student_dict['Credit Date'], start_date, end_date)):
+                if (
+                        self.lies_between(student_dict['Date Registered'], start_date, end_date)
+                        or
+                        self.lies_between(student_dict['Credit Date'], start_date, end_date)
+                ):
                     pass
                 else:
                     continue
@@ -240,10 +243,8 @@ class Command(BaseCommand):
         cme_profiles = CourseEnrollment.objects.select_related('user__profile__cmeuserprofile').filter(course_id=course_id).values(
             *[field for field, label in PROFILE_FIELDS if 'untracked' not in field]
         ).order_by('user__username')
-        
         registrations = PaidCourseRegistration.objects.filter(status='purchased', course_id=course_id)
         certificates = GeneratedCertificate.objects.filter(course_id=course_id)
-
         return certificates, cme_profiles, registrations
 
     def build_user_table(self, data_rows):
@@ -292,8 +293,14 @@ class Command(BaseCommand):
                 timeleft = diff * (total - count) / intervals
                 hours, remainder = divmod(timeleft.seconds, 3600)
                 minutes, seconds = divmod(remainder, 60)
-                sys.stdout.write("\n{count}/{total} completed ~{hours:02}:{minutes:02} remaining\n"
-                    .format(count=count, total=total, hours=hours, minutes=minutes))
+                sys.stdout.write(
+                    "\n{count}/{total} completed ~{hours:02}:{minutes:02} remaining\n".format(
+                        count=count,
+                        total=total,
+                        hours=hours,
+                        minutes=minutes,
+                    )
+                )
                 start = datetime.now(UTC)
             else:
                 sys.stdout.write('.')
