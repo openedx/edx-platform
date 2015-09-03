@@ -14,23 +14,8 @@ from student.tests.factories import UserFactory
 
 from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 import lti_provider.outcomes as outcomes
-<<<<<<< HEAD
-import lti_provider.tasks as tasks
-=======
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
-
-
-def create_score(earned, possible):
-    """
-    Create a new mock Score object with specified earned and possible values
-    """
-    score = MagicMock()
-    score.possible = possible
-    score.earned = earned
-    return score
->>>>>>> edx/master
 
 
 class StoreOutcomeParametersTest(TestCase):
@@ -310,7 +295,6 @@ class XmlHandlingTest(TestCase):
         self.assertFalse(outcomes.check_replace_result_response(response))
 
 
-<<<<<<< HEAD
 class TestBodyHashClient(unittest.TestCase):
     """
     Test our custom BodyHashClient
@@ -350,7 +334,8 @@ class TestBodyHashClient(unittest.TestCase):
         ]
         for oauth_header in expected_oauth_headers:
             self.assertIn(oauth_header, prepped_req.headers['Authorization'])
-=======
+
+
 class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
     Test cases for the assignments_for_problem method in outcomes.py
@@ -471,4 +456,3 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
         self.assertEqual(assignments[1].lis_result_sourcedid, 'graded_unit2')
         self.assertEqual(assignments[0].outcome_service, self.outcome_service)
         self.assertEqual(assignments[1].outcome_service, other_outcome_service)
->>>>>>> edx/master
