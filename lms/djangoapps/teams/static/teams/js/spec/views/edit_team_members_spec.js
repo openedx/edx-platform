@@ -39,7 +39,7 @@ define([
                 expect(view.$('.team-member').length).toEqual(1);
                 expect(view.$('.member-profile').attr('href')).toEqual('/u/frodo');
                 expect(view.$('img.image-url').attr('src')).toEqual('/frodo-image-url');
-                expect(view.$('#devstack-username-span').text()).toBe('frodo');
+                expect(view.$('.member-info-container .primary').text()).toBe('frodo');
                 // TODO: add test for last_activity_at and date_joined once they are styled (hopefully will have
                 // separate elements.
                 // expect(view.$el.find('.team-activity abbr').attr('title')).toEqual("2015-08-21T18:53:01.145Z");
