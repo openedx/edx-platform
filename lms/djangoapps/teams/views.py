@@ -34,8 +34,8 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from eventtracking import tracker
 from courseware.courses import get_course_with_access, has_access
+from eventtracking import tracker
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
@@ -319,16 +319,15 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if 'topic_id' in request.QUERY_PARAMS:
-            topic_id = request.QUERY_PARAMS['topic_id']
+        topic_id = request.QUERY_PARAMS.get('topic_id', None)
+        if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
                 error = build_api_error(
                     ugettext_noop('The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
-
+            result_filter.update({'topic_id': topic_id})
         if text_search and CourseTeamIndexer.search_is_enabled():
             search_engine = CourseTeamIndexer.engine()
             result_filter.update({'course_id': course_id_string})
@@ -346,6 +345,12 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 self.get_page()
             )
             serializer = self.get_pagination_serializer(paginated_results)
+            tracker.emit('edx.team.searched', {
+                "number_of_results": search_results['total'],
+                "search_text": text_search,
+                "topic_id": topic_id,
+                "course_id": course_id_string,
+            })
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')

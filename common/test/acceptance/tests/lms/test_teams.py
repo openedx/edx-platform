@@ -11,7 +11,7 @@ from flaky import flaky
 from nose.plugins.attrib import attr
 from uuid import uuid4
 
-from ..helpers import UniqueCourseTest, EventsTestMixin
+from ..helpers import EventsTestMixin, UniqueCourseTest
 from ...fixtures import LMS_BASE_URL
 from ...fixtures.course import CourseFixture
 from ...fixtures.discussion import (
@@ -717,10 +717,21 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         """
         # Note: all searches will return 0 results with the mock search server
         # used by Bok Choy.
+        search_text = 'banana'
         self.create_teams(self.topic, 5)
         self.browse_teams_page.visit()
-        search_results_page = self.browse_teams_page.search('banana')
-        self.verify_search_header(search_results_page, 'banana')
+        events = [{
+            'event_type': 'edx.team.searched',
+            'event': {
+                'course_id': self.course_id,
+                'search_text': search_text,
+                'topic_id': self.topic['id'],
+                'number_of_results': 0
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            search_results_page = self.browse_teams_page.search(search_text)
+        self.verify_search_header(search_results_page, search_text)
         self.assertTrue(search_results_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
 
