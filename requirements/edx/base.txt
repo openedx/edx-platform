@@ -82,7 +82,7 @@ stevedore==0.14.1
 sure==1.2.3
 sympy==0.7.1
 xmltodict==0.4.1
-django-ratelimit-backend==0.6
+django-ratelimit-backend==1.0
 unicodecsv==0.9.4
 django-require==1.0.6
 pyuca==1.1
