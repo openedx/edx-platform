@@ -8,7 +8,6 @@ from urlparse import urlparse
 import ddt
 import httpretty
 import mock
-import nose
 from pytz import UTC
 
 from django.core.urlresolvers import reverse
@@ -577,6 +576,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.content)
         self.assertEqual(response_data, expected_response_data)
+
 
 @httpretty.activate
 @disable_signal(api, 'thread_deleted')
