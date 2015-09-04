@@ -94,6 +94,10 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     data['id'] = obj.id
     commentable_id = data['commentable_id']
 
+    team = get_team(commentable_id)
+    if team is not None:
+        data.update(team_id=team.team_id)
+
     if id_map is None:
         id_map = get_cached_discussion_id_map(course, [commentable_id], user)
 
