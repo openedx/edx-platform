@@ -193,11 +193,14 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     }
 
                     #
-                    # Add in rendering context for proctored exams
+                    # Add in rendering context for proctored exams and timed exams
                     # if applicable
                     #
                     is_proctored_enabled = (
-                        getattr(section, 'is_proctored_enabled', False) and
+                        (
+                            getattr(section, 'is_proctored_enabled', False) or
+                            getattr(section, 'is_time_limited', False)
+                        ) and
                         settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
                     )
                     if is_proctored_enabled:
@@ -236,7 +239,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             # to log and continue (which is safe) than to have it be an
                             # unhandled exception
                             log.exception(ex)
-
                         if proctoring_attempt_context:
                             # yes, user has proctoring context about
                             # this level of the courseware
@@ -244,6 +246,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             section_context.update({
                                 'proctoring': proctoring_attempt_context,
                             })
+
 
                     sections.append(section_context)
             toc_chapters.append({
