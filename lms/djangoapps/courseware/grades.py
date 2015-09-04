@@ -306,7 +306,7 @@ def grade(student, request, course, keep_raw_scores=False, field_data_cache=None
         grade_summary = _grade(student, request, course, keep_raw_scores, field_data_cache, scores_client)
         responses = GRADES_UPDATED.send_robust(
             sender=None,
-            username=request.user.username,
+            username=student.username,
             grade_summary=grade_summary,
             course_key=course.id,
             deadline=course.end
