@@ -3,6 +3,7 @@
 import datetime
 import json
 import ddt
+import unittest
 
 from ..helpers import EventsTestMixin
 from .test_video_module import VideoBaseTest
@@ -10,8 +11,6 @@ from ...pages.lms.video.video import _parse_time_str
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches, assert_events_equal
 from opaque_keys.edx.keys import UsageKey, CourseKey
-
-from flaky import flaky
 
 
 class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
@@ -62,7 +61,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
-    @flaky  # TODO: AN-5867
+    @unittest.skip('AN-5867')
     def test_video_control_events(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode without HTML5 sources
