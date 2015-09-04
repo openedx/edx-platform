@@ -53,9 +53,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:17+0000\n"
-"PO-Revision-Date: 2015-08-21 13:15+0000\n"
-"Last-Translator: Hongseob Lee <shevious@gmail.com>\n"
+"POT-Creation-Date: 2015-09-04 14:06+0000\n"
+"PO-Revision-Date: 2015-09-04 14:08+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -100,8 +100,8 @@ msgstr "확인"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
-#: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/js/components/utils/view_utils.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -112,6 +112,11 @@ msgstr "확인"
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
+#: common/static/common/templates/discussion/thread-response-edit.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "취소"
@@ -2006,6 +2011,18 @@ msgstr "코멘트를 삭제하는데 오류가 발생했습니다. 다시 시도
 msgid "Are you sure you want to delete this response?"
 msgstr "이 답변을 삭제하시겠습니까?"
 
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Required field."
+msgstr ""
+
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Please do not use any spaces in this field."
+msgstr ""
+
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Please do not use any spaces or special characters in this field."
+msgstr ""
+
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr "총 %(num_items)s개 중 %(first_index)s 보기"
@@ -2163,6 +2180,7 @@ msgstr "게시된 날짜"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/forum-actions.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -2234,20 +2252,34 @@ msgid "An unexpected error occurred.  Please try again."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "last activity"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "open slots"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "name"
 msgstr "이름"
-
-#: lms/djangoapps/teams/static/teams/js/collections/team.js
-msgid "open_slots"
-msgstr "open_slots"
 
 #. Translators: This refers to the number of teams (a count of how many teams
 #. there are)
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "팀 인원 수"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Create"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Update"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team Name (Required) *"
@@ -2273,6 +2305,7 @@ msgid "Language"
 msgstr "언어"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid ""
 "The language that team members primarily use to communicate with each other."
 msgstr ""
@@ -2283,6 +2316,7 @@ msgid "Country"
 msgstr "국가"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "The country that team members primarily identify with."
 msgstr ""
 
@@ -2315,20 +2349,48 @@ msgstr ""
 msgid "You are not currently a member of any team."
 msgstr ""
 
+#. Translators: "and others" refers to fact that additional members of a team
+#. exist that are not displayed.
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "and others"
+msgstr ""
+
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "Last Activity %(date)s"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
 msgstr "%(span_start)s %(team_name)s %(span_end)s 보기"
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "An error occurred. Try again."
 msgstr ""
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "Leave this team?"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid ""
+"If you leave, you can no longer post in this team's discussions. Your place "
+"will be available to another learner."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+#: lms/static/js/verify_student/views/reverify_view.js
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr "확인"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team."
 msgstr ""
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr ""
 
@@ -2346,34 +2408,59 @@ msgid "teams"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr "팀"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
 " with other learners who are interested in the same topic as you are."
 msgstr "강좌에서 주제별로 조직된 모든 팀을 보세요. 관심사가 같은 다른 학습자들과 협력하기 위해 팀에 참여하세요."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Teams"
-msgstr "팀"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr ""
 
 #. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.  The whole string will be shown to users as "Browse teams" if they
-#. are using a screenreader, and "Browse" otherwise.
+#. readers.
+#. The whole string will be shown to users as "Browse teams" if they are using
+#. a
+#. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse %(sr_start)s teams %(sr_end)s"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"Create a new team if you can't find existing teams to join, or if you would "
-"like to learn with friends you know."
+msgid "Team Search"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"%(searchString)s\""
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Create a new team if you can't find an existing team to join, or if you "
+"would like to learn with friends you know."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
+msgid "Edit Team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"If you make significant changes, make sure you notify members of the team "
+"before making these changes."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Search teams"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2398,14 +2485,26 @@ msgid_plural "%(team_count)s Teams"
 msgstr[0] "%(team_count)s 팀"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the %(topic_name)s Topic"
 msgstr "%(topic_name)s 주제의 팀 보기"
 
+#. Translators: this string is shown at the bottom of the teams page
+#. to find a team to join or else to create a new one. There are three
+#. links that need to be included in the message:
+#. 1. Browse teams in other topics
+#. 2. search teams
+#. 3. create a new team
+#. Be careful to start each link with the appropriate start indicator
+#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
-"Try {browse_span_start}browsing all teams{span_end} or "
-"{search_span_start}searching team descriptions{span_end}. If you still can't"
-" find a team to join, {create_span_start}create a new team in this "
+"{browse_span_start}Browse teams in other topics{span_end} or "
+"{search_span_start}search teams{span_end} in this topic. If you still can't "
+"find a team to join, {create_span_start}create a new team in this "
 "topic{span_end}."
 msgstr ""
 
@@ -2605,7 +2704,7 @@ msgstr "다음 이용자들을 성공적으로 등록했습니다."
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
-msgstr "성공적으로 등록 이메일을 다음 이용자들에게  발송했습니다. 이용자들이 등록을 하면  .. 용어 확인이 필요합니다."
+msgstr "등록 이메일을 다음 이용자들에게  발송했습니다. "
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2987,7 +3086,7 @@ msgstr "본문: "
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "No tasks currently running."
-msgstr "실행중인 작업이 없습니다."
+msgstr "작업이 없습니다."
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "File Name"
@@ -3527,7 +3626,7 @@ msgstr "{platform_name}에서 귀하를 나타낼 이름입니다. 아이디는 
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Full Name"
-msgstr "이름"
+msgstr "실명"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -3762,11 +3861,6 @@ msgstr "신분증 사진을 찍어 주세요."
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Review your info"
 msgstr "입력 정보를 확인하세요."
-
-#: lms/static/js/verify_student/views/reverify_view.js
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr "확인"
 
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
@@ -4309,6 +4403,7 @@ msgid "Date Added"
 msgstr ""
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Type"
 msgstr ""
 
@@ -4338,7 +4433,7 @@ msgstr ""
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
-msgstr ""
+msgstr "파일 업로드"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
@@ -4862,18 +4957,6 @@ msgid ""
 "more than <%=limit%> characters."
 msgstr ""
 
-#: cms/static/js/views/utils/view_utils.js
-msgid "Required field."
-msgstr ""
-
-#: cms/static/js/views/utils/view_utils.js
-msgid "Please do not use any spaces in this field."
-msgstr ""
-
-#: cms/static/js/views/utils/view_utils.js
-msgid "Please do not use any spaces or special characters in this field."
-msgstr "영어 알파벳을 입력하고, 공백이나 특수문자를 사용하지 마세요."
-
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "component"
 msgstr ""
@@ -4963,10 +5046,525 @@ msgstr ""
 msgid "Due Date"
 msgstr ""
 
+#: cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/pagination.underscore
+msgid "Previous"
+msgstr ""
+
 #: cms/templates/js/previous-video-upload-list.underscore
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "상태"
+
+#: common/static/common/templates/image-modal.underscore
+msgid "Large"
+msgstr ""
+
+#: common/static/common/templates/image-modal.underscore
+msgid "Zoom In"
+msgstr ""
+
+#: common/static/common/templates/image-modal.underscore
+msgid "Zoom Out"
+msgstr ""
+
+#: common/static/common/templates/components/paging-footer.underscore
+msgid "Page number"
+msgstr ""
+
+#: common/static/common/templates/components/paging-footer.underscore
+msgid "Enter the page number you'd like to quickly navigate to."
+msgstr ""
+
+#: common/static/common/templates/components/paging-header.underscore
+msgid "Sorted by"
+msgstr ""
+
+#: common/static/common/templates/components/search-field.underscore
+msgid "Clear search"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "DISCUSSION HOME:"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/templates/commerce/provider.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/discovery/course_card.underscore
+msgid "gettext("
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Find discussions"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Focus in on specific topics"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Search for specific posts"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Sort by date, vote, or comments"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Engage with posts"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Upvote posts and good responses"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Report Forum Misuse"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Follow posts for updates"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Receive updates"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Toggle Notifications Setting"
+msgstr ""
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid ""
+"Check this box to receive an email digest once a day notifying you about "
+"new, unread activity from posts you are following."
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-answer.underscore
+msgid "Mark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-answer.underscore
+msgid "Unmark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-close.underscore
+msgid "Open"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-endorse.underscore
+msgid "Endorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-endorse.underscore
+msgid "Unendorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-follow.underscore
+msgid "Follow"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-follow.underscore
+msgid "Unfollow"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-pin.underscore
+msgid "Pin"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-pin.underscore
+msgid "Unpin"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+msgid "Report abuse"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+msgid "Report"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+msgid "Unreport"
+msgstr ""
+
+#: common/static/common/templates/discussion/forum-action-vote.underscore
+msgid "Vote for this post,"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Visible To:"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "All Groups"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single cohort."
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Title:"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Enter your question or comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "follow this post"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "post anonymously"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "post anonymously to classmates"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Add Post"
+msgstr ""
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "Community TA"
+msgstr ""
+
+#: common/static/common/templates/discussion/profile-thread.underscore
+#: common/static/common/templates/discussion/thread.underscore
+msgid "This thread is closed."
+msgstr ""
+
+#: common/static/common/templates/discussion/profile-thread.underscore
+msgid "View discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+msgid "Editing comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+msgid "Update comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/response-comment-show.underscore
+#, python-format
+msgid "posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/response-comment-show.underscore
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Editing post"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Edit post title"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Update post"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "answered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "unanswered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Following"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "By: Staff"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "By: Community TA"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: common/static/common/templates/discussion/thread-response-show.underscore
+msgid "fmt"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#, python-format
+msgid ""
+"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
+"unread comments)%(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#, python-format
+msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response-edit.underscore
+msgid "Editing response"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response-edit.underscore
+msgid "Update response"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "endorsed %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response.underscore
+msgid "fmts"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-response.underscore
+msgid "Add a comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "Related to: %(courseware_title_linked)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Post type:"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Question"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations."
+msgstr ""
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Add a Response"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Post a response:"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Expand discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Collapse discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Topic Area:"
+msgstr ""
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Discussion topics; current selection is:"
+msgstr ""
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Filter topics"
+msgstr ""
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Add your post to a relevant topic to help others find it."
+msgstr ""
+
+#: common/static/common/templates/discussion/user-profile.underscore
+msgid "Active Threads"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
+msgid "username or email"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "No results"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Course Key"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Download URL"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Grade"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Last Updated"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Download the user's certificate"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Not available"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Regenerate"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Regenerate the user's certificate"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Your team could not be created."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Your team could not be updated."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid ""
+"Enter information to describe your team. You cannot change these details "
+"after you create the team."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Optional Characteristics"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid ""
+"Help other learners decide whether to join your team by specifying some "
+"characteristics for your team. Choose carefully, because fewer people might "
+"be interested in joining your team if it seems too restrictive."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Create team."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Update team."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Cancel team creating."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Cancel team updating."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
+msgid "Are you having trouble finding a team to join?"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
+msgid "Join Team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "New Post"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team Details"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "You are a member of this team."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team member profiles"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team capacity"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "country"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "language"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Leave Team"
+msgstr ""
+
+#: lms/static/js/fixtures/donation.underscore
+#: lms/templates/dashboard/donation.underscore
+msgid "Donate"
+msgstr "기부"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
@@ -5006,12 +5604,6 @@ msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Subsection"
-msgstr ""
-
-#: lms/templates/commerce/provider.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/discovery/course_card.underscore
-msgid "gettext("
 msgstr ""
 
 #: lms/templates/commerce/provider.underscore
@@ -5102,10 +5694,6 @@ msgstr ""
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
 msgstr ""
-
-#: lms/templates/dashboard/donation.underscore
-msgid "Donate"
-msgstr "기부"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -5236,11 +5824,11 @@ msgstr "신규 학습 집단 추가"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Enter the name of the cohort"
-msgstr ""
+msgstr "학습집단명을 입력하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Name"
-msgstr "학습 집단명"
+msgstr "학습집단명"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Assignment Method"
@@ -5538,7 +6126,7 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
-msgstr "가입하기"
+msgstr "계정 연동하기"
 
 #: lms/templates/student_account/register.underscore
 #, python-format
@@ -6021,6 +6609,16 @@ msgstr ""
 msgid "status"
 msgstr ""
 
+#: cms/templates/js/add-xblock-component-button.underscore
+msgid "Add Component:"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+#: cms/templates/js/add-xblock-component-menu.underscore
+#, python-format
+msgid "%(type)s Component Template Menu"
+msgstr ""
+
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr ""
@@ -6097,6 +6695,11 @@ msgstr ""
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr ""
 
@@ -6139,17 +6742,11 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
-msgid "Add Signatory"
+msgid "Add Additional Signatory"
 msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "(Up to 4 signatories are allowed for a certificate)"
-msgstr ""
-
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Create"
 msgstr ""
 
 #: cms/templates/js/certificate-web-preview.underscore
@@ -6263,11 +6860,11 @@ msgstr ""
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Unscheduled"
-msgstr ""
+msgstr "지정되지 않음"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
-msgstr ""
+msgstr "과제 유형"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
@@ -6436,7 +7033,7 @@ msgstr ""
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grade as:"
-msgstr ""
+msgstr "과제 유형"
 
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-editor.underscore
@@ -6574,10 +7171,6 @@ msgstr ""
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "Add your first textbook"
-msgstr ""
-
-#: cms/templates/js/paging-header.underscore
-msgid "Previous"
 msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore

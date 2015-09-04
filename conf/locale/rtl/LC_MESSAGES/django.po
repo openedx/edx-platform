@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-24 22:03+0000\n"
-"PO-Revision-Date: 2015-08-24 22:03:48.240461\n"
+"POT-Creation-Date: 2015-09-04 14:15+0000\n"
+"PO-Revision-Date: 2015-09-04 14:15:47.324123\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1254,10 +1254,6 @@ msgid "incorrect"
 msgstr "هرذخققثذف"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "حشقفهشممغ ذخققثذف"
-
-#: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
 msgstr "هرذخوحمثفث"
 
@@ -1278,10 +1274,6 @@ msgstr "فاهس هس ذخققثذف."
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "فاهس هس هرذخققثذف."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
-msgstr "فاهس هس حشقفهشممغ ذخققثذف."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -5028,8 +5020,18 @@ msgid "{month} {day}, {year}"
 msgstr "{month} {day}, {year}"
 
 #: lms/djangoapps/certificates/views/webview.py
-msgid "a course of study offered by {partner_name}, through {platform_name}."
-msgstr "ش ذخعقسث خب سفعيغ خببثقثي زغ {partner_name}, فاقخعلا {platform_name}."
+msgid ""
+"a course of study offered by {partner_short_name}, an online learning "
+"initiative of {partner_long_name} through {platform_name}."
+msgstr ""
+"ش ذخعقسث خب سفعيغ خببثقثي زغ {partner_short_name}, شر خرمهرث مثشقرهرل "
+"هرهفهشفهدث خب {partner_long_name} فاقخعلا {platform_name}."
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"a course of study offered by {partner_short_name}, through {platform_name}."
+msgstr ""
+"ش ذخعقسث خب سفعيغ خببثقثي زغ {partner_short_name}, فاقخعلا {platform_name}."
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
@@ -5141,16 +5143,16 @@ msgstr "{platform_name} شذنرخصمثيلثس فاث بخممخصهرل سف�
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
-"participated in {partner_name} {course_number}"
+"participated in {partner_short_name} {course_number}"
 msgstr ""
 "فاهس هس ش دشمهي {platform_name} ذثقفهبهذشفث بخق {user_name}, صاخ "
-"حشقفهذهحشفثي هر {partner_name} {course_number}"
+"حشقفهذهحشفثي هر {partner_short_name} {course_number}"
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
-msgid "{partner_name} {course_number} Certificate | {platform_name}"
-msgstr "{partner_name} {course_number} ذثقفهبهذشفث | {platform_name}"
+msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
+msgstr "{partner_short_name} {course_number} ذثقفهبهذشفث | {platform_name}"
 
 #. Translators:  This text fragment appears after the student's name
 #. (displayed in a large font) on the certificate
@@ -5318,6 +5320,14 @@ msgid ""
 msgstr ""
 "هب غخعق ذخعقسث يخثس رخف شححثشق خر غخعق يشسازخشقي, ذخرفشذف "
 "{payment_support_link}."
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr "{course_id} هس رخف ش دشمهي ذخعقسث نثغ."
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr "ذخعقسث {course_id} يخثس رخف ثطهسف."
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
@@ -5865,6 +5875,28 @@ msgid "File is not attached."
 msgstr "بهمث هس رخف شففشذاثي."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Could not find problem with this location."
+msgstr "ذخعمي رخف بهري حقخزمثو صهفا فاهس مخذشفهخر."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The problem responses report is being created. To view the status of the "
+"report, see Pending Tasks below."
+msgstr ""
+"فاث حقخزمثو قثسحخرسثس قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
+"قثحخقف, سثث حثريهرل فشسنس زثمخص."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem responses report generation task is already in progress. Check the"
+" 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+"ش حقخزمثو قثسحخرسثس قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. ذاثذن فاث"
+" 'حثريهرل فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث "
+"قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{num}' does not exist."
 msgstr "هردخهذث رعوزثق '{num}' يخثس رخف ثطهسف."
 
@@ -6293,6 +6325,10 @@ msgid "CourseMode price updated successfully"
 msgstr "ذخعقسثوخيث حقهذث عحيشفثي سعذذثسسبعممغ"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr "رخ ثري يشفث سثف"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
 msgstr "ثرقخمموثرف يشفش هس رخص شدشهمشزمث هر {dashboard_link}."
 
@@ -6388,18 +6424,6 @@ msgstr "ثطفثقرشم ثوشهم"
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
 msgstr "لقشيثس بخق شسسهلروثرف \"{name}\""
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Found {num} records to dump."
-msgstr "بخعري {num} قثذخقيس فخ يعوح."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Couldn't find module with that urlname."
-msgstr "ذخعمير'ف بهري وخيعمث صهفا فاشف عقمرشوث."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Student state for problem {problem}"
-msgstr "سفعيثرف سفشفث بخق حقخزمثو {problem}"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
@@ -6572,6 +6596,12 @@ msgstr "ثوشهمثي"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+msgid "generated"
+msgstr "لثرثقشفثي"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "لقشيثي"
 
@@ -6580,12 +6610,6 @@ msgstr "لقشيثي"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "problem distribution graded"
 msgstr "حقخزمثو يهسفقهزعفهخر لقشيثي"
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
-msgid "generated"
-msgstr "لثرثقشفثي"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -9456,15 +9480,6 @@ msgstr "سشدث بشهمثي بخق عسثق حقثبثقثرذث '{key}' صه�
 #: openedx/core/djangoapps/user_api/preferences/views.py
 msgid "No data provided for user preference update"
 msgstr "رخ يشفش حقخدهيثي بخق عسثق حقثبثقثرذث عحيشفث"
-
-#: openedx/core/lib/api/paginators.py
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "حشلث هس رخف 'مشسف', رخق ذشر هف زث ذخردثقفثي فخ شر هرف."
-
-#: openedx/core/lib/api/paginators.py
-#, python-format
-msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr "هردشمهي حشلث (%(page_number)s): %(message)s"
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
@@ -12753,8 +12768,12 @@ msgid "Section:"
 msgstr "سثذفهخر:"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Problem urlname:"
-msgstr "حقخزمثو عقمرشوث:"
+msgid ""
+"To download a CSV listing student responses to a given problem, visit the "
+"Data Download section of the Instructor Dashboard."
+msgstr ""
+"فخ يخصرمخشي ش ذسد مهسفهرل سفعيثرف قثسحخرسثس فخ ش لهدثر حقخزمثو, دهسهف فاث "
+"يشفش يخصرمخشي سثذفهخر خب فاث هرسفقعذفخق يشسازخشقي."
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -14763,6 +14782,22 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Proctored Exam Results Report"
 msgstr "لثرثقشفث حقخذفخقثي ثطشو قثسعمفس قثحخقف"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"To generate a CSV file that lists all student answers to a given problem, "
+"enter the location of the problem (from its Staff Debug Info)."
+msgstr ""
+"فخ لثرثقشفث ش ذسد بهمث فاشف مهسفس شمم سفعيثرف شرسصثقس فخ ش لهدثر حقخزمثو, "
+"ثرفثق فاث مخذشفهخر خب فاث حقخزمثو (بقخو هفس سفشبب يثزعل هربخ)."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Problem location: "
+msgstr "حقخزمثو مخذشفهخر: "
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download a CSV of problem responses"
+msgstr "يخصرمخشي ش ذسد خب حقخزمثو قثسحخرسثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
