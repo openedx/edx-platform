@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 grade = grade_data['percent']
                 grading_policy = course.grading_policy
                 proforma_grade = grades.calculate_proforma_grade(grade_data, grading_policy)
-                progress_summary = grades.progress_summary(user, request, course)
+                progress_summary = grades.progress_summary(user, request, course, locators_as_strings=True)
                 try:
                     gradebook_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
                     if (gradebook_entry.grade != grade or
