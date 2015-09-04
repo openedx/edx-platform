@@ -84,7 +84,7 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
             if requester_cohort is not None and cc_thread["group_id"] != requester_cohort:
                 raise Http404
         return cc_thread, context
-    except CommentClientRequestError:
+    except CommentClientRequestError as e:
         # params are validated at a higher level, so the only possible request
         # error is if the thread doesn't exist
         raise Http404
