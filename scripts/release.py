@@ -22,7 +22,7 @@ try:
     import yaml
 except ImportError:
     print("Error: missing dependencies! Please run this command to install them:")
-    print("pip install path.py requests python-dateutil GitPython==0.3.2.RC1 PyYAML")
+    print("pip install path.py requests python-dateutil GitPython PyYAML")
     sys.exit(1)
 
 try:
@@ -32,7 +32,16 @@ except ImportError:
 
 JIRA_RE = re.compile(r"\b[A-Z]{2,}-\d+\b")
 PR_BRANCH_RE = re.compile(r"remotes/edx/pr/(\d+)")
-PROJECT_ROOT = path(__file__).abspath().dirname()
+
+
+def project_root():
+    directory = path(__file__).abspath().dirname()
+    while not (directory / ".git").exists():
+        directory = directory.parent
+    return directory
+
+
+PROJECT_ROOT = project_root()
 repo = Repo(PROJECT_ROOT)
 git = repo.git
 
