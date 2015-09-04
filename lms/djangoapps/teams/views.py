@@ -34,6 +34,7 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from eventtracking import tracker
 from courseware.courses import get_course_with_access, has_access
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
@@ -417,9 +418,22 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
+            tracker.emit('edx.team.created', {
+                'team_id': team.team_id,
+                'course_id': unicode(course_id)
+            })
             if not team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
+                tracker.emit(
+                    'edx.team.learner_added',
+                    {
+                        'team_id': team.team_id,
+                        'user_id': request.user.id,
+                        'course_id': unicode(team.course_id),
+                        'add_method': 'added_on_create'
+                    }
+                )
             return Response(CourseTeamSerializer(team).data)
 
     def get_page(self):
@@ -974,6 +988,15 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         try:
             membership = team.add_user(user)
+            tracker.emit(
+                'edx.team.learner_added',
+                {
+                    'team_id': team.team_id,
+                    'user_id': user.id,
+                    'course_id': unicode(team.course_id),
+                    'add_method': 'joined_from_team_view' if user == request.user else 'added_by_another_user'
+                }
+            )
         except AlreadyOnTeamInCourse:
             return Response(
                 build_api_error(
@@ -1100,6 +1123,15 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         if has_team_api_access(request.user, team.course_id, access_username=username):
             membership = self.get_membership(username, team)
             membership.delete()
+            tracker.emit(
+                'edx.team.learner_removed',
+                {
+                    'team_id': team.team_id,
+                    'course_id': unicode(team.course_id),
+                    'user_id': membership.user.id,
+                    'remove_method': 'self_removal' if membership.user == request.user else 'removed_by_admin'
+                }
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
