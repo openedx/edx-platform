@@ -4,8 +4,6 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory',
         'use strict';
 
         describe("Teams Tab Factory", function() {
-            var teamsTab;
-
             var initializeTeamsTabFactory = function() {
                 TeamsTabFactory(TeamSpecHelpers.createMockContext());
             };
@@ -19,6 +17,11 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory',
             });
 
             it('can render the "Teams" tab', function() {
+                // Hack to make sure the URL fragments from earlier
+                // tests don't interfere with Backbone routing by the
+                // teams tab view
+                document.location.hash = '';
+
                 initializeTeamsTabFactory();
                 expect($('.teams-content').text()).toContain('See all teams in your course, organized by topic');
             });

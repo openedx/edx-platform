@@ -19,11 +19,12 @@
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
             'teams/js/views/team_profile_header_actions',
+            'teams/js/views/team_utils',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamProfileHeaderActionsView, teamsTemplate) {
+                  TeamProfileHeaderActionsView, TeamUtils, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -143,6 +144,15 @@
                  */
                 start: function() {
                     Backbone.history.start();
+
+                    $(document).ajaxError(function (event, xhr) {
+                        if (xhr.status === 401) {
+                            TeamUtils.showMessage(gettext("Your request could not be completed. Reload the page and try again."));
+                        }
+                        else if (xhr.status === 500) {
+                            TeamUtils.showMessage(gettext("Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem."));
+                        }
+                    });
 
                     // Navigate to the default page if there is no history:
                     // 1. If the user belongs to at least one team, jump to the "My Teams" page

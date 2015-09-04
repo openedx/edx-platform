@@ -39,9 +39,7 @@ define([
             spyOn($.fn, 'focus');
         });
 
-        afterEach(function () {
-            Backbone.history.stop();
-        });
+        afterEach(Backbone.history.stop);
 
         describe('Navigation', function () {
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
@@ -74,6 +72,24 @@ define([
                 AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/teams/no_such_team?expand=user', null);
                 AjaxHelpers.respondWithError(requests, 404);
                 expectError(teamsTabView, 'The team "no_such_team" could not be found.');
+                expectFocus(teamsTabView.$('.warning'));
+            });
+
+            it('displays and focuses an error message when it receives a 401 AJAX response', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView().render();
+                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
+                AjaxHelpers.respondWithError(requests, 401);
+                expectError(teamsTabView, "Your request could not be completed. Reload the page and try again.");
+                expectFocus(teamsTabView.$('.warning'));
+            });
+
+            it('displays and focuses an error message when it receives a 500 AJAX response', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView().render();
+                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
+                AjaxHelpers.respondWithError(requests, 500);
+                expectError(teamsTabView, "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.");
                 expectFocus(teamsTabView.$('.warning'));
             });
         });
