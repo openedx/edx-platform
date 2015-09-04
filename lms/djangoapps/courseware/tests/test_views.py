@@ -299,7 +299,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         mock_course.id = self.course_key
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
-    # @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
     def test_get_cosmetic_display_price(self):
         """
         Check that get_cosmetic_display_price() returns the correct price given its inputs.

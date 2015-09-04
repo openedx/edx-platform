@@ -361,10 +361,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 22),
-        (ModuleStoreEnum.Type.mongo, 20, 4, 22),
-        (ModuleStoreEnum.Type.split, 3, 13, 22),
-        (ModuleStoreEnum.Type.split, 20, 13, 22),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 23),
+        (ModuleStoreEnum.Type.mongo, 20, 4, 23),
+        (ModuleStoreEnum.Type.split, 3, 13, 23),
+        (ModuleStoreEnum.Type.split, 20, 13, 23),
     )
     @ddt.unpack
     @count_queries
@@ -372,10 +372,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 16),
-        (ModuleStoreEnum.Type.mongo, 20, 3, 16),
-        (ModuleStoreEnum.Type.split, 3, 10, 16),
-        (ModuleStoreEnum.Type.split, 20, 10, 16),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 17),
+        (ModuleStoreEnum.Type.mongo, 20, 3, 17),
+        (ModuleStoreEnum.Type.split, 3, 10, 17),
+        (ModuleStoreEnum.Type.split, 20, 10, 17),
     )
     @ddt.unpack
     @count_queries
