@@ -590,6 +590,14 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }
 
+    # FAKE EMAIL DOMAIN setting is used to generate an email for an automatically provisioned account in case
+    # it is not provided by IdP (which should'nt normally be the case for providers with automatic provisioning)
+    FAKE_EMAIL_DOMAIN = ENV_TOKENS.get('FAKE_EMAIL_DOMAIN', 'fake-email-domain.foo')
+
+    # This setting is used as a user full name when automatically provisioning an account in case
+    # IdP provided name is empty, missing or does not pass minimal length check
+    THIRD_PARTY_AUTH_FALLBACK_FULL_NAME = ENV_TOKENS.get('THIRD_PARTY_AUTH_FALLBACK_FULL_NAME', "Unknown")
+
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']

@@ -28,6 +28,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         super(TestShibIntegrationTest, self).setUp()
         self.login_page_url = reverse('signin_user')
         self.register_page_url = reverse('register_user')
+        self.dashboard_page_url = reverse('dashboard')
         self.enable_saml(
             private_key=self._get_private_key(),
             public_key=self._get_public_key(),
@@ -142,7 +143,56 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         continue_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
         # And we should be redirected to the dashboard:
         self.assertEqual(continue_response.status_code, 302)
-        self.assertEqual(continue_response['Location'], self.url_prefix + reverse('dashboard'))
+        self.assertEqual(continue_response['Location'], self.url_prefix + self.dashboard_page_url)
+
+        # Now check that we can login again:
+        self.client.logout()
+        self._test_return_login()
+
+    def test_autoprovision_from_login(self):
+        self._configure_testshib_provider(autoprovision_account=True)
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+
+        # check that we don't have a user we're autoprovisioning account for
+        self._assert_user_does_not_exist('myself')
+
+        # The user goes to the register page, and sees a button to register with TestShib:
+        self._check_login_page()
+
+        self._test_autoprovision(TPA_TESTSHIB_LOGIN_URL)
+
+    def test_autoprovision_from_register(self):
+        self._configure_testshib_provider(autoprovision_account=True)
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+
+        # check that we don't have a user we're autoprovisioning account for
+        self._assert_user_does_not_exist('myself')
+
+        # The user goes to the register page, and sees a button to register with TestShib:
+        self._check_register_page()
+
+        self._test_autoprovision(TPA_TESTSHIB_REGISTER_URL)
+
+    def _test_autoprovision(self, entry_point):
+        """ Actual autoprovision code """
+        # The user clicks on the TestShib button:
+        try_entry_response = self.client.get(entry_point)
+        # The user should be redirected to TestShib:
+        self.assertEqual(try_entry_response.status_code, 302)
+        self.assertTrue(try_entry_response['Location'].startswith(TESTSHIB_SSO_URL))
+
+        # Now the user will authenticate with the SAML provider
+        self._fake_testshib_login_and_return()
+
+        # Then there's one more redirect to set logged_in cookie
+        continue_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
+
+        # We should be redirected to the dashboard screen since profile should be created and logged in
+        self.assertEqual(continue_response.status_code, 302)
+        self.assertEqual(continue_response['Location'], self.url_prefix + self.dashboard_page_url)
+
+        # assert account is created and activated
+        self._assert_account_created(username='myself', email='myself@testshib.org', full_name='Me Myself And I')
 
         # Now check that we can login again:
         self.client.logout()
@@ -168,7 +218,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         # And then we should be redirected to the dashboard:
         login_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
         self.assertEqual(login_response.status_code, 302)
-        self.assertEqual(login_response['Location'], self.url_prefix + reverse('dashboard'))
+        self.assertEqual(login_response['Location'], self.url_prefix + self.dashboard_page_url)
         # Now we are logged in:
         dashboard_response = self.client.get(reverse('dashboard'))
         self.assertEqual(dashboard_response.status_code, 200)
@@ -205,6 +255,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
+        kwargs.setdefault('autoprovision_account', False)
         self.configure_saml_provider(**kwargs)
 
         if fetch_metadata:
@@ -228,3 +279,16 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         user = User.objects.get(email=email)
         user.is_active = True
         user.save()
+
+    def _assert_user_does_not_exist(self, username):
+        """ Asserts that user with specified username does not exist """
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(username=username)
+
+    def _assert_account_created(self, username, email, full_name):
+        """ Asserts that user with specified username exists, activated and have specified full name and email """
+        user = User.objects.get(username=username)
+        self.assertIsNotNone(user.profile)
+        self.assertEqual(user.email, email)
+        self.assertEqual(user.profile.name, full_name)
+        self.assertTrue(user.is_active)
