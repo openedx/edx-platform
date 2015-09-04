@@ -219,4 +219,5 @@ class AdvancedSettingsPage(CoursePage):
             'video_bumper',
             'cert_html_view_enabled',
             'enable_proctored_exams',
+            'enable_timed_exams',
         ]

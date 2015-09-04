@@ -142,15 +142,18 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
         sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, is_white_label))
 
-    # Gate access to Proctoring tab
-    # only global staff (user.is_staff) is allowed to see this tab
-    can_see_proctoring = (
-        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and
-        course.enable_proctored_exams and
-        request.user.is_staff
+    # Gate access to Special Exam tab depending if either timed exams or proctored exams
+    # are enabled in the course
+
+    # NOTE: For now, if we only have procotred exams enabled, then only platform Staff
+    # (user.is_staff) will be able to view the special exams tab. This may
+    # change in the future
+    can_see_special_exams = (
+        ((course.enable_proctored_exams and request.user.is_staff) or course.enable_timed_exams) and
+        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
     )
-    if can_see_proctoring:
-        sections.append(_section_proctoring(course, access))
+    if can_see_special_exams:
+        sections.append(_section_special_exams(course, access))
 
     # Certificates panel
     # This is used to generate example certificates
@@ -233,13 +236,13 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
     return section_data
 
 
-def _section_proctoring(course, access):
+def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
 
     section_data = {
-        'section_key': 'proctoring',
-        'section_display_name': _('Proctoring'),
+        'section_key': 'special_exams',
+        'section_display_name': _('Special Exams'),
         'access': access,
         'course_id': unicode(course_key)
     }
@@ -492,7 +495,7 @@ def _section_data_download(course, access):
     course_key = course.id
 
     show_proctored_report_button = (
-        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and
+        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
         course.enable_proctored_exams
     )
 

@@ -699,7 +699,7 @@ class TestTOC(ModuleStoreTestCase):
 
 @attr('shard_1')
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
     def setUp(self):
@@ -963,7 +963,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         sequence = self.modulestore.get_item(usage_key)
 
         sequence.is_time_limited = True
-        sequence.is_proctored_enabled = True
+        sequence.is_proctored_exam = True
         sequence.is_practice_exam = is_practice_exam
 
         self.modulestore.update_item(sequence, self.user.id)
