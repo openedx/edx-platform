@@ -1,7 +1,7 @@
 """
     Test split modulestore w/o using any django stuff.
 """
-from mock import patch
+from mock import Mock, patch
 import datetime
 from importlib import import_module
 from path import Path as path
@@ -13,6 +13,7 @@ import uuid
 from contracts import contract
 from nose.plugins.attrib import attr
 from django.core.cache import get_cache, InvalidCacheBackendError
+from django.test.utils import override_settings
 
 from openedx.core.lib import tempdir
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
@@ -28,6 +29,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from xmodule.modulestore.split_mongo.mongo_connection import CourseStructureMemoryCache
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.modulestore.tests.factories import check_mongo_calls
@@ -902,6 +904,9 @@ class TestCourseStructureCache(SplitModuleTest):
         # ... and after
         self.addCleanup(self.cache.clear)
 
+        # Clear the memory cache
+        CourseStructureMemoryCache.clear()
+
         # make a new course:
         self.user = random.getrandbits(32)
         self.new_course = modulestore().create_course(
@@ -937,6 +942,25 @@ class TestCourseStructureCache(SplitModuleTest):
         # another mongo call here if we want the same course structure
         with check_mongo_calls(1):
             cached_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(cached_structure, not_cached_structure)
+
+    @override_settings(COURSE_STRUCTURE_MEMORY_CACHE_SIZE=10)
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache_memory_cache(self, mock_get_cache):
+        mock_get_cache.return_value = self.cache
+        self.cache.get = Mock(return_value=None)
+
+        with check_mongo_calls(1):
+            not_cached_structure = self._get_structure(self.new_course)
+        self.assertTrue(self.cache.get.called)
+
+        self.cache.get.reset_mock()
+
+        with check_mongo_calls(0):
+            cached_structure = self._get_structure(self.new_course)
+        self.assertFalse(self.cache.get.called)
 
         # now make sure that you get the same structure
         self.assertEqual(cached_structure, not_cached_structure)

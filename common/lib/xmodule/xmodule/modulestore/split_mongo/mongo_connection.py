@@ -6,6 +6,7 @@ import cPickle as pickle
 import math
 import zlib
 import pymongo
+import pylru
 import pytz
 import re
 from contextlib import contextmanager
@@ -13,6 +14,7 @@ from time import time
 
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+from django.conf import settings
 from django.core.cache import get_cache, InvalidCacheBackendError
 import dogstats_wrapper as dog_stats_api
 
@@ -207,6 +209,47 @@ def structure_to_mongo(structure, course_context=None):
         return new_structure
 
 
+class CourseStructureMemoryCache(object):
+    """
+    Wrapper arond pylru.lrucache used to cache course structure in memory.
+    Fetching and unpickling course structure from external caches can have
+    significant overhead for large courses.
+    """
+    cache = None
+
+    def __init__(self):
+        size = getattr(settings, 'COURSE_STRUCTURE_MEMORY_CACHE_SIZE', 0)
+        if size > 0:
+            if self.cache is None:
+                CourseStructureMemoryCache.cache = pylru.lrucache(size)
+            elif size != self.cache.size():
+                self.cache.size(size)
+        else:
+            CourseStructureMemoryCache.cache = None
+
+    def has(self, key):
+        """Check if the in-memory cache contains key."""
+        if self.cache is not None and key in self.cache:
+            return True
+        else:
+            return False
+
+    def get(self, key):
+        """Return cached value for the key."""
+        if self.cache is not None and key in self.cache:
+            return self.cache[key]
+
+    def set(self, key, structure):
+        """Store the structure under key."""
+        if self.cache is not None:
+            self.cache[key] = structure
+
+    @classmethod
+    def clear(cls):
+        """Clear the in-memory cache."""
+        cls.cache = None
+
+
 class CourseStructureCache(object):
     """
     Wrapper around django cache object to cache course structure objects.
@@ -215,7 +258,10 @@ class CourseStructureCache(object):
     If the 'course_structure_cache' doesn't exist, then don't do anything for
     for set and get.
     """
+
     def __init__(self):
+        self.memory_cache = CourseStructureMemoryCache()
+
         self.no_cache_found = False
         try:
             self.cache = get_cache('course_structure_cache')
@@ -224,6 +270,9 @@ class CourseStructureCache(object):
 
     def get(self, key, course_context=None):
         """Pull the compressed, pickled struct data from cache and deserialize."""
+        if self.memory_cache.has(key):
+            return self.memory_cache.get(key)
+
         if self.no_cache_found:
             return None
 
@@ -241,10 +290,15 @@ class CourseStructureCache(object):
             pickled_data = zlib.decompress(compressed_pickled_data)
             tagger.measure('uncompressed_size', len(pickled_data))
 
-            return pickle.loads(pickled_data)
+            structure = pickle.loads(pickled_data)
+            self.memory_cache.set(key, structure)
+
+            return structure
 
     def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
+        self.memory_cache.set(key, structure)
+
         if self.no_cache_found:
             return None
 

@@ -528,3 +528,6 @@ AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
+
+# Turn off course structure memory cache in tests
+COURSE_STRUCTURE_MEMORY_CACHE_SIZE = 0
