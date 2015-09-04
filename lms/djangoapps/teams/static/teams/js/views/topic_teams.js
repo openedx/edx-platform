@@ -57,13 +57,16 @@
                 },
 
                 searchTeams: function (event) {
-                    var searchField = $('.page-header-search .search-field');
+                    //var searchField = $('.page-header-search .search-field');
                     event.preventDefault();
-                    searchField.focus();
-                    searchField.select();
-                    $('html, body').animate({
-                        scrollTop: 0
-                    }, 500);
+                    //searchField.focus();
+                    //searchField.select();
+                    //$('html, body').animate({
+                    //    scrollTop: 0
+                    //}, 500);
+
+                    // TODO! Will navigate to correct place once required functionality is available
+                    Backbone.history.navigate('browse', {trigger: true});
                 },
 
                 showCreateTeamForm: function (event) {
