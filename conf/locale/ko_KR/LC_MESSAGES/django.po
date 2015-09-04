@@ -87,7 +87,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:18+0000\n"
+"POT-Creation-Date: 2015-09-04 14:07+0000\n"
 "PO-Revision-Date: 2015-08-14 05:59+0000\n"
 "Last-Translator: Hongseob Lee <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -248,7 +248,7 @@ msgstr "강좌"
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
-msgstr "표시 이름"
+msgstr "메뉴명"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
@@ -279,7 +279,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
-msgstr "명예 과정 수료증"
+msgstr "명예 과정 이수증"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -321,7 +321,7 @@ msgstr "명예 과정의 학습자로 등록되었습니다."
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
-msgstr "명예 규범"
+msgstr "학습자 서약"
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're auditing this course"
@@ -497,7 +497,7 @@ msgstr "국가를 입력하세요."
 
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
-msgstr "K-MOOC를 이용하려면, 명예규범을 준수해야 합니다."
+msgstr "K-MOOC를 이용하려면, 학습자 서약을 준수해야 합니다."
 
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
@@ -505,7 +505,7 @@ msgstr "한 개 이상의 필수 항목을 입력하지 않았습니다. "
 
 #: common/djangoapps/student/forms.py
 msgid "Username and password fields cannot match"
-msgstr "아이디와 패스워드가 일치하지 않습니다."
+msgstr "아이디와 패스워드가 일치합니다. 다르게 입력해주세요."
 
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
@@ -1257,10 +1257,6 @@ msgid "incorrect"
 msgstr "틀림"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr ""
-
-#: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
 msgstr "미완성"
 
@@ -1281,10 +1277,6 @@ msgstr "맞습니다."
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "틀립니다."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
-msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -2492,7 +2484,7 @@ msgstr "다른 이용 가능한 강좌 저작 도구를 찾아서, 필요할 때
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Draft a Rough Course Outline"
-msgstr "강좌 개요 초안"
+msgstr "강좌 개요 초안 만들기"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Your First Section and Subsection"
@@ -2607,7 +2599,7 @@ msgstr "도움말 다운로드"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Draft Your Course About Page"
-msgstr "강좌 안내 작성"
+msgstr "강좌 안내 작성하기"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Draft a Course Description"
@@ -4744,8 +4736,15 @@ msgid "{month} {day}, {year}"
 msgstr "{month} {day}, {year}"
 
 #: lms/djangoapps/certificates/views/webview.py
-msgid "a course of study offered by {partner_name}, through {platform_name}."
-msgstr " {platform_name}를 통해 {partner_name}에서 제공하는 강좌입니다. "
+msgid ""
+"a course of study offered by {partner_short_name}, an online learning "
+"initiative of {partner_long_name} through {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"a course of study offered by {partner_short_name}, through {platform_name}."
+msgstr ""
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
@@ -4854,16 +4853,14 @@ msgstr "{platform_name}은 다음 학습자의 성과를 인정합니다.  "
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
-"participated in {partner_name} {course_number}"
+"participated in {partner_short_name} {course_number}"
 msgstr ""
-"이것은 {partner_name} {course_number}에 참여한 {user_name}님의 유효한 {platform_name} "
-"수료증입니다. "
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
-msgid "{partner_name} {course_number} Certificate | {platform_name}"
-msgstr "{partner_name} {course_number} 수료증 | {platform_name}"
+msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
+msgstr ""
 
 #. Translators:  This text fragment appears after the student's name
 #. (displayed in a large font) on the certificate
@@ -5020,6 +5017,14 @@ msgid ""
 "If your course does not appear on your dashboard, contact "
 "{payment_support_link}."
 msgstr "신청 강좌가 학습자의 대시보드에 나타나지 않을 경우,  {payment_support_link} 로 연락바랍니다."
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr ""
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
@@ -5403,7 +5408,7 @@ msgstr "수강 등록한 학습자수 "
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "# staff"
-msgstr "관리자 인원수 "
+msgstr "운영팀 인원수 "
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "instructors"
@@ -5474,13 +5479,13 @@ msgstr "{platform_name} 관리자"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
-msgstr "강좌 관리자"
+msgstr "강좌 운영팀"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
-msgstr "관리자"
+msgstr "운영팀"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Used Registration Code"
@@ -5547,6 +5552,23 @@ msgstr " 아이디 {user} 가 이미 존재합니다. "
 #: lms/djangoapps/instructor/views/api.py
 msgid "File is not attached."
 msgstr "파일이 첨부되지 않았습니다 "
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Could not find problem with this location."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The problem responses report is being created. To view the status of the "
+"report, see Pending Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem responses report generation task is already in progress. Check the"
+" 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{num}' does not exist."
@@ -5953,6 +5975,10 @@ msgid "CourseMode price updated successfully"
 msgstr "CourseMode의 가격이 성공적으로 업데이트되었습니다. "
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
 msgstr "수강등록 데이터를 {dashboard_link}에서 볼 수 있습니다. "
 
@@ -5976,7 +6002,7 @@ msgstr "확장"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
-msgstr "자료 다운받기"
+msgstr "데이터"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "For analytics about your course, go to {analytics_dashboard_name}."
@@ -6048,18 +6074,6 @@ msgid "Grades for assignment \"{name}\""
 msgstr "\"{name}\" 과제의 성적"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Found {num} records to dump."
-msgstr "Found {num} records to dump. "
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Couldn't find module with that urlname."
-msgstr "해당 urlname을 가진 모듈을 찾을 수 없습니다. "
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Student state for problem {problem}"
-msgstr "{problem} 문제 학습자 상태"
-
-#: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
 msgstr " {course_id} 강좌 성적"
 
@@ -6092,7 +6106,7 @@ msgstr "{action}에 대한 원격 성적기록부 응답"
 #: lms/djangoapps/instructor/views/legacy.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
-msgstr "이름"
+msgstr "실명"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "{title} in course {course_key}"
@@ -6109,7 +6123,7 @@ msgstr "아이디"
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Full Name"
-msgstr "이름"
+msgstr "실명"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
@@ -6225,6 +6239,12 @@ msgstr "이메일이 전송되었습니다."
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+msgid "generated"
+msgstr "생성되었습니다."
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "채점되었습니다."
 
@@ -6233,12 +6253,6 @@ msgstr "채점되었습니다."
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "problem distribution graded"
 msgstr "채점된 문제 분포"
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
-msgid "generated"
-msgstr "생성되었습니다."
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -6643,7 +6657,7 @@ msgstr "제출이 검토를 위해 표시되었습니다."
 #: lms/djangoapps/open_ended_grading/views.py
 #: lms/templates/instructor/staff_grading.html
 msgid "Staff grading"
-msgstr "관리자 채점"
+msgstr "운영팀 채점"
 
 #. Translators: "Peer grading" appears on a tab that allows
 #. students to view open-ended problems that require grading
@@ -7786,12 +7800,12 @@ msgid "course_id must be provided"
 msgstr "course_id가 제공되어야 합니다."
 
 #: lms/djangoapps/teams/views.py
-msgid "The supplied topic id {topic_id} is not valid"
-msgstr "제공된 주제 ID {topic_id}가 유효하지 않습니다."
+msgid "text_search and order_by cannot be provided together"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported."
-msgstr "text_search는 제공되지 않습니다."
+msgid "The supplied topic id {topic_id} is not valid"
+msgstr "제공된 주제 ID {topic_id}가 유효하지 않습니다."
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
@@ -8686,7 +8700,7 @@ msgstr "이 글에는 첨부가 없습니다."
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
-msgstr "두 학습 집단을 같은 이름으로 만들 수 없습니다."
+msgstr "학습집단명은 같을 수 없습니다."
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid ""
@@ -8902,7 +8916,7 @@ msgstr "국가를 선택하십시오"
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
-msgstr "서비스 조항 및 명예 규범"
+msgstr "서비스 조항 및 학습자 서약"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
@@ -9089,7 +9103,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Unscheduled"
-msgstr ""
+msgstr "지정되지 않음"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -9504,7 +9518,7 @@ msgstr "계정이 이미 활성화되어 있습니다."
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr "강좌를 보기 위해서는  {link_start}대시보드{link_end}를 방문하세요."
+msgstr "강좌를 보기 위해  {link_start}대시보드{link_end}로 이동하세요. "
 
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course Navigation"
@@ -9524,6 +9538,10 @@ msgstr "도움말"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "로그아웃"
+
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "{programming_language} editor"
+msgstr ""
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -9567,7 +9585,7 @@ msgstr "축하합니다. {course_name}에 수강 신청이 되었습니다"
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
-msgstr "인증된 강좌 수료증으로 학점 받기"
+msgstr "인증된 이수증으로 학점 받기"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -9576,12 +9594,12 @@ msgid ""
 "qualify for academic credit from {org}, advance your career, or strengthen "
 "your school applications."
 msgstr ""
-"{org} 기관의 학점을 이수할 수 있을 만큼인 귀하의 새로운 기술과 지식을, 이 인증 수료증으로 보여주세요. 이 수료증을 귀하의 커리어"
-" 개발과 학교 지원에 활용하면 도움이 될 것입니다."
+"{org} 기관의 학점을 이수할 수 있을 만큼인 귀하의 새로운 기술과 지식을, 이수증으로 보여주세요. 이수증을 귀하의 커리어 개발과 학교"
+" 지원에 활용하면 도움이 될 것입니다."
 
 #: common/templates/course_modes/choose.html
 msgid "Benefits of a Verified Certificate"
-msgstr "인증된 강좌 수료증의 혜택"
+msgstr "인증된 이수증의 혜택"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -9593,7 +9611,7 @@ msgstr "{b_start} credit을 위한 자격:{b_end} 강좌를 성공적으로 완�
 msgid ""
 "{b_start}Official:{b_end} Receive an instructor-signed certificate with the "
 "institution's logo"
-msgstr "{b_start}공식:{b_end} 기관의 로고와 교수자의 서명이 담긴 강좌 수료증을 받으세오."
+msgstr "{b_start}공식:{b_end} 기관의 로고와 교수자의 서명이 담긴 이수증을 받으세요."
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -9692,7 +9710,7 @@ msgstr "수강중인 강좌 "
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
-msgstr "아직 등록한 강의가 없군요!"
+msgstr "아직 수강하는 강의가 없군요!"
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
@@ -10776,7 +10794,7 @@ msgstr "사용자"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Staffing and Enrollment"
-msgstr "운영진 설정 및 등록"
+msgstr "운영팀 설정 및 등록"
 
 #. Translators: refers to http://git-scm.com/docs/git-log
 #: lms/templates/sysadmin_dashboard.html
@@ -10820,7 +10838,7 @@ msgstr "강좌 운영팀과 교수자를 관리합니다."
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download staff and instructor list (csv file)"
-msgstr "운영진/교수자 목록 다운로드(CSV파일)"
+msgstr "운영팀/교수자 목록 다운로드(CSV파일)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -11215,7 +11233,7 @@ msgstr "학습자 일괄 추가를 위해 줄바꿈 혹은 쉼표로  이메일/
 msgid ""
 "You will not get notification for emails that bounce, so please double-check"
 " spelling."
-msgstr "이메일 주소가 정확한지 확인해야 합니다. 반송되는 이메일을 확인할 수 없기 때문입니다."
+msgstr "이메일 주소가 정확한지 확인해야 합니다. "
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11754,7 +11772,8 @@ msgstr "선수요건"
 msgid ""
 "You must successfully complete {link_start}{prc_display}{link_end} before "
 "you begin this course."
-msgstr "강좌를 시작하시 전에  {link_start}{prc_display}{link_end}을 성공적으로 완료해야 합니다. "
+msgstr ""
+"이 강좌를 수강하려면, 먼저 선수 강좌인 {link_start}{prc_display}{link_end} 수강을 하셔야 합니다."
 
 #: lms/templates/courseware/course_about.html
 msgid "Additional Resources"
@@ -11849,7 +11868,7 @@ msgstr "검색"
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
-msgstr "강좌 내용을 추가해 보세요. "
+msgstr "강좌 내용을 추가하세요. "
 
 #: lms/templates/courseware/courseware.html
 #, python-format
@@ -12068,8 +12087,10 @@ msgid "Section:"
 msgstr "주제:"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Problem urlname:"
-msgstr "문제 url 이름:"
+msgid ""
+"To download a CSV listing student responses to a given problem, visit the "
+"Data Download section of the Instructor Dashboard."
+msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -13850,7 +13871,7 @@ msgid ""
 "exams and problem sets), and can be changed on the 'Grading' page (under "
 "'Settings') in Studio."
 msgstr ""
-"강좌의 채점 정보를 표시하려면 클릭하세요. 스튜디오의 '과제 평가' ('설정' 메뉴 아래) 메뉴에서 설정(문제 세트, 평가 등)을 변경할"
+"강좌의 성적 정보를 표시하려면 클릭하세요. 스튜디오의 '과제 평가' ('설정' 메뉴 아래) 메뉴에서 설정(문제 세트, 평가 등)을 변경할"
 " 수 있습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -13863,7 +13884,7 @@ msgstr "익명 학습자 아이디를 CSV 파일로 다운로드하기"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
-msgstr "학습자 익명 아이디를 CSV 파일 만들기"
+msgstr "익명 학습자 아이디 CSV 파일"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -13885,7 +13906,7 @@ msgstr ""
 msgid ""
 "Please be patient and do not click these buttons multiple times. Clicking "
 "these buttons multiple times will significantly slow the generation process."
-msgstr "잠시만 기다려 주세요. 버튼을 여러번 클릭하지 마세요. 버튼을 여러번 클릭하게 되면 생성하는 과정이 느려집니다."
+msgstr "버튼을 여러번 클릭하지 마세요. 그럴 경우, 생성 과정이 느려집니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -13914,6 +13935,20 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Proctored Exam Results Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"To generate a CSV file that lists all student answers to a given problem, "
+"enter the location of the problem (from its Staff Debug Info)."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Problem location: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download a CSV of problem responses"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -13950,8 +13985,8 @@ msgid ""
 "generation. Reports are not deleted, so you will always be able to access "
 "previously generated reports from this page."
 msgstr ""
-"아래 보고서를 다운로드할 수 있습니다. 각 보고서는 UTC 날짜와 생성시간에 의해 구별됩니다. 생성된 보고서는 지워지지 않기 때문에, "
-"계속 다운로드 가능합니다."
+"아래 보고서를 다운로드할 수 있습니다. 각 보고서는 날짜와 생성시간으로 구별됩니다. 생성된 보고서는 지워지지 않기 때문에, 계속 다운로드"
+" 가능합니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -14664,8 +14699,8 @@ msgid ""
 " to manage course team membership. You can only give course team roles to "
 "enrolled users."
 msgstr ""
-"관리자 권한을 가진 강좌 팀원은 당신의 강좌 운영을 지원합니다. 운영팀이 할 수 있는 모든 작업을 할 수 있고, 강좌 팀원을 관리하기 "
-"위해 운영팀, 관리자, 토의 진행자, 베타테스터 권한을 추가하거나 없앨수 있습니다. "
+"교수자 권한을 가진 팀원은 강좌 운영팀이 할 수 있는 모든 작업을 할 수 있고, 팀 구성원을 관리하기 위해 운영팀, 교수자, 토의 "
+"조정자, 베타테스터 권한을 추가하거나 없앨 수 있습니다. "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Admin"
@@ -14848,7 +14883,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
-msgstr "이메일 발송"
+msgstr "이메일 발신"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
@@ -14882,7 +14917,7 @@ msgstr "본문: "
 msgid ""
 "Please try not to email students more than once per week. Before sending "
 "your email, consider:"
-msgstr "주 1회 이상 이메일 발송은 삼가해 주세요. 이메일 발송 전 점검 사항:"
+msgstr "주 1회 이상 이메일 발신은 삼가해 주세요. 이메일 발신 전 점검 사항:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -14895,7 +14930,7 @@ msgid ""
 "Have you sent the email to yourself first to make sure you're happy with how"
 " it's displayed, and that embedded links and images work properly?"
 msgstr ""
-"이메일이 잘 작성되었는지 확인하기 위해 우선 나에게만 발송하셨는지요? 이메일 내용 중 링크와 이미지는 잘 보이는지 확인하세요."
+"이메일이 잘 작성되었는지 확인하기 위해 우선 자신에게만 발신하셨는지요? 이메일 내용 중 링크와 이미지는 잘 보이는지 확인하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -14905,11 +14940,11 @@ msgstr "주의!"
 msgid ""
 "Once the 'Send Email' button is clicked, your email will be queued for "
 "sending."
-msgstr "일단 아래 '이메일 발송' 을 클릭하면, 발송대기 상태로 바뀝니다. "
+msgstr "일단 아래 '이메일 발신' 을 클릭하면, 발신 대기 상태로 바뀝니다. "
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "A queued email CANNOT be cancelled."
-msgstr "발송한 메일은 취소되지 않습니다."
+msgstr "발신은 취소할 수 없습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -14919,15 +14954,15 @@ msgstr "모든 작업은 백그라운드에서 이루어집니다. 이메일을 
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Email Task History"
-msgstr "이메일 기록"
+msgstr "이메일 발신 기록"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "To see the content of all previously sent emails, click this button:"
-msgstr "발송된 이메일 내용을 보기 위해 다음 버튼을 클릭하세요."
+msgstr "발신된 이메일 내용을 보기 위해 다음 버튼을 클릭하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Sent Email History"
-msgstr "이메일 기록 보기"
+msgstr "이메일 발신 기록 보기"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "To read an email, click its subject."
@@ -14971,7 +15006,7 @@ msgstr "성적 기록부 보기 "
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
-msgstr "학습자 별 성적 사정"
+msgstr "학습자별 성적 사정"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
@@ -15990,7 +16025,7 @@ msgstr ""
 
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
-msgstr "이름 편집"
+msgstr "실명 편집"
 
 #: lms/templates/verify_student/face_upload.html
 msgid "The following error occurred while editing your name:"
@@ -16212,7 +16247,7 @@ msgstr "페이지 액션"
 
 #: cms/templates/asset_index.html cms/templates/videos_index.html
 msgid "Upload New File"
-msgstr "새 파일 업로드"
+msgstr "파일 업로드"
 
 #: cms/templates/asset_index.html
 msgid "Adding Files for Your Course"
@@ -16223,7 +16258,7 @@ msgid ""
 "To add files to use in your course, click {em_start}Upload New File{em_end}."
 " Then follow the prompts to upload a file from your computer."
 msgstr ""
-"강좌에 사용할 파일을 추가하려면 {em_start}새 파일 업로드{em_end}를 클릭하세요. 그후 컴퓨터에서 파일을 업로드하세요."
+"강좌에 사용할 파일을 추가하려면 {em_start} 파일 업로드{em_end}를 클릭하세요. 그후 컴퓨터에서 파일을 업로드하세요."
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -16288,65 +16323,62 @@ msgstr "알림 닫기"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
-msgstr "강좌 수료증"
+msgstr "이수증"
 
 #: cms/templates/certificates.html
 msgid "This module is not enabled."
 msgstr "모듈이 활성화되지 않았습니다."
 
 #: cms/templates/certificates.html
-msgid ""
-"Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. If you are a course team member with the "
-"Admin role in Studio, you can configure your course certificate."
+msgid "Working with Certificates"
 msgstr ""
-"강좌 수료 직후,  학습자는 성과를 인정받을 수 있는 수료증을 받을 수 있습니다. 강좌 운영팀 중 교수자가 수료증을 설정할 수 있습니다."
-" "
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}Add your first certificate{em_end} to add a certificate "
-"configuration. Upload the organization logo to be used on the certificate, "
-"and specify at least one signatory. You can include up to four signatories "
-"for a certificate. You can also upload a signature image file for each "
-"signatory. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates. Optionally, specify a different course title to use "
-"on your course certificate. You might want to use a different title if, for "
-"example, the official course name is too long to display well on a "
-"certificate."
+"Specify a course title to use on the certificate if the course's official "
+"title is too long to be displayed well."
 msgstr ""
-"새로운 수료증 설정을 위해 {em_start}첫 수료증 추가하기{em_end}를 클릭합니다. 수료증에  넣을 기관 로고를 업로드하고,  "
-"최소 1개 이상의 서명인을 지정하세요. 최대 4개까지 지정 가능합니다. 서명인으로 사용할 이미지 파일을 각각 업로드할 수 있습니다.  "
-"{em_start} 알아두셔야 할 것은, {em_end} 서명 이미지가 인증 수료증에만 사용된다는 것입니다. 선택 사항입니다만, 각 "
-"수료증마다 강좌명을 다르게 할 수도 있습니다. 이는 예를 들어, 실제 강좌명이 수료증에 넣기에 너무 긴 경우 등을 위한 것입니다."
 
 #: cms/templates/certificates.html
 msgid ""
-"Select a course mode and click {em_start}Preview Certificate{em_end} to "
-"preview the certificate that a learner in the selected enrollment track "
-"would receive. When the certificate is ready for issuing, click "
-"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
-"{em_start}Deactivate{em_end}."
+"For verified certificates, specify between one and four signatories and "
+"upload the associated images."
 msgstr ""
-"강좌 모드를 선택하고, 선택한 수강 트랙의 학습자가 받을 수료증을 미리보기 위해, {em_start}수료증 미리보기{em_end}를 "
-"클릭합니다.  수료증 발급 준비가 되셨다면,  {em_start}활성화{em_end}를 클릭하세요. 수료증 발급 활성화를 중단하려면, "
-"{em_start}비활성화{em_end}를 클릭합니다."
 
 #: cms/templates/certificates.html
 msgid ""
-" To edit the certificate configuration, hover over the top right corner of "
-"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
-"over the top right corner of the form and click the delete icon. In general,"
-" do not delete certificates after a course has started, because some "
-"certificates might already have been issued to learners."
+"To edit or delete a certificate before it is activated, hover over the top "
+"right corner of the form and select {em_start}Edit{em_end} or the delete "
+"icon."
 msgstr ""
-"수료증 설정을 수정하려면, 양식 오른쪽 상단의 {em_start}수정{em_end}을 클릭하세요. 수료증을 삭제하려면, 삭제 아이콘을 "
-"클릭하면 됩니다. 이미 강좌가 시작된 경우라면, 수료증을 삭제하지 마십시오. 이미 일부 학습자에게 수료증이 발급되었을 수 있기 "
-"때문입니다.  "
+
+#: cms/templates/certificates.html
+msgid ""
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid "Issuing Certificates to Learners"
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"To begin issuing certificates, a course team member with the Admin role "
+"selects {em_start}Activate{em_end}. Course team members without the Admin "
+"role cannot edit or delete an activated certificate."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"{em_start}Do not{em_end} delete certificates after a course has started; "
+"learners who have already earned certificates will no longer be able to "
+"access them."
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"
-msgstr "강좌 수료증에 대해 더 알아보기"
+msgstr "이수증에 대해 더 알아보기"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -16648,7 +16680,7 @@ msgstr "강좌 공지사항"
 
 #: cms/templates/course_info.html
 msgid "New Update"
-msgstr "신규 업데이트"
+msgstr "새 공지사항"
 
 #: cms/templates/course_info.html
 msgid ""
@@ -16801,7 +16833,7 @@ msgid ""
 "To hide content from students, select the Configure icon for a section, "
 "subsection, or unit, then select {em_start}Hide from students{em_end}."
 msgstr ""
-"학습자에게 콘텐츠를 보이지 않게 하려면, 주제 및 소주제의 설정에서 {em_start}학습자에게 감추기기{em_end}를 선택하세요."
+"학습자에게 콘텐츠를 보이지 않게 하려면, 주제 및 소주제의 설정에서 {em_start}학습자에게 감추기{em_end}를 선택하세요."
 
 #: cms/templates/course_outline.html
 msgid "Learn more about the course outline"
@@ -17759,7 +17791,9 @@ msgstr "고급 설정에서 학습자가 볼 명칭을 새롭게 설정할 수 �
 #: cms/templates/index.html
 msgid ""
 "The unique number that identifies your course within your organization."
-msgstr "기관별 강좌 고유번호입니다."
+msgstr ""
+"이 강좌의 고유한 번호로 'KMOOC01'과 같이, 강좌 제공 기관의 영문 약자와 제공 기관의 몇 번째 강좌인지 번호의 조합으로 "
+"입력합니다. "
 
 #: cms/templates/index.html
 msgid ""
@@ -17770,7 +17804,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "The term in which your course will run."
-msgstr "강좌 운영 기간."
+msgstr "강좌 제공 기관별로 자유롭게 번호를 지정할 수 있습니다. "
 
 #: cms/templates/index.html
 msgid "Create"
@@ -17877,17 +17911,17 @@ msgstr "강의 다시 시작하기"
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
-msgstr "{studio_name} 관리자입니까?"
+msgstr "{studio_name} 강좌 운영팀인가요?"
 
 #: cms/templates/index.html
 msgid ""
 "The course creator must give you access to the course. Contact the course "
 "creator or administrator for the course you are helping to author."
-msgstr "강좌 개설자가 귀하에게 강좌 접근 권한을 줘야 합니다. 강좌 개설자 또는 관리자에게 문의하세요."
+msgstr "강좌 개설자가 귀하에게 강좌 접근 권한을 줘야 합니다. 강좌 개설자 또는 강좌 제공 기관의 관리자에게  문의하세요."
 
 #: cms/templates/index.html
 msgid "Create Your First Course"
-msgstr "처음 강좌를 만들어 보세요"
+msgstr "첫 강좌를 만듭니다."
 
 #: cms/templates/index.html
 msgid "Your new course is just a click away!"
@@ -17960,7 +17994,7 @@ msgstr ""
 msgid ""
 "Your request is currently being reviewed by {platform_name} staff and should"
 " be updated shortly."
-msgstr "요청은 현재 {platform_name} 직원에 의해 검토되고 있으며 곧 업데이트 될 것입니다."
+msgstr "요청은 현재 {platform_name} 관리자에 의해 검토되고 있으며 곧 업데이트 될 것입니다."
 
 #: cms/templates/index.html
 msgid "(Read-only)"
@@ -18055,7 +18089,7 @@ msgid ""
 "email address (%(email)s). An activation message and next steps should be "
 "waiting for you there."
 msgstr ""
-"등록 절차를 완료하려면 이메일 주소(%(email)s)를 인증받아야 합니다. 입력한 이메일 주소로 발송된 등록 이메일을 확인해주세요."
+"등록 절차를 완료하려면 이메일 주소(%(email)s)를 인증받아야 합니다. 입력한 이메일 주소로 발신된 등록 이메일을 확인해주세요."
 
 #: cms/templates/index.html
 msgid "Need help?"
@@ -18172,7 +18206,7 @@ msgstr "새로 추가할 구성원 이메일 주소"
 
 #: cms/templates/manage_users.html
 msgid "Provide the email address of the user you want to add as Staff"
-msgstr "관리자로 추가하고 싶은 이용자의 이메일 주소를 제공합니다."
+msgstr "운영팀으로 추가하고 싶은 이용자의 이메일 주소를 입력합니다."
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
@@ -18561,7 +18595,7 @@ msgstr "수강 대상 학습자를 위한 정보"
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
-msgstr "강좌 간단소개"
+msgstr "강좌에 대한 짧은 소개"
 
 #: cms/templates/settings.html
 msgid ""
@@ -18641,11 +18675,11 @@ msgstr "효과적인 학습을 위해 학습 시간 및 선수 강좌를 입력�
 
 #: cms/templates/settings.html
 msgid "Hours of Effort per Week"
-msgstr "주당 학습 권장 시간"
+msgstr "주별 학습 권장 시간"
 
 #: cms/templates/settings.html
 msgid "Time spent on all course work"
-msgstr "주당 학습에 투자하길 권장하는 시간"
+msgstr "주별 학습에 투자하길 권장하는 시간"
 
 #: cms/templates/settings.html
 msgid "Prerequisite Course"
@@ -19011,7 +19045,7 @@ msgstr "공개 대상:"
 
 #: cms/templates/visibility_editor.html
 msgid "All Students and Staff"
-msgstr "전체 학습자와 관리자"
+msgstr "전체 학습자와 운영팀"
 
 #: cms/templates/visibility_editor.html
 msgid "Specific Content Groups"
@@ -19047,8 +19081,7 @@ msgid ""
 "Thank you for signing up for {studio_name}! To activate your account, please"
 " copy and paste this address into your web browser's address bar:"
 msgstr ""
-"{studio_name}에 가입 해 주셔서 감사합니다! 계정을 활성화 하려면 웹 브라우저의 주소 표시 줄에 이 주소를 복사해서 붙여 "
-"넣으십시오"
+"{studio_name} 가입을 환영합니다! 계정을 활성화하려면 웹 브라우저의 주소 표시줄에 이 주소를 복사해서 붙여넣으시길 바랍니다."
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

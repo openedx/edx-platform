@@ -172,7 +172,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:18+0000\n"
+"POT-Creation-Date: 2015-09-04 14:07+0000\n"
 "PO-Revision-Date: 2015-06-29 17:10+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -1414,10 +1414,6 @@ msgid "incorrect"
 msgstr "incorrecto"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "parcialmente correcto"
-
-#: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
 msgstr "Incompleto"
 
@@ -1438,10 +1434,6 @@ msgstr "Esto es correcto."
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "Esto es incorrecto."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
-msgstr "Esto es parcialmente correcto."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -5325,8 +5317,15 @@ msgid "{month} {day}, {year}"
 msgstr "{day} de {month}, {year}"
 
 #: lms/djangoapps/certificates/views/webview.py
-msgid "a course of study offered by {partner_name}, through {platform_name}."
-msgstr "curso ofrecido por {partner_name}, a través de {platform_name}."
+msgid ""
+"a course of study offered by {partner_short_name}, an online learning "
+"initiative of {partner_long_name} through {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"a course of study offered by {partner_short_name}, through {platform_name}."
+msgstr ""
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
@@ -5440,16 +5439,14 @@ msgstr "{platform_name} reconoce el siguiente logro al estudiante"
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
-"participated in {partner_name} {course_number}"
+"participated in {partner_short_name} {course_number}"
 msgstr ""
-"Este es un certificado válido de {platform_name} para el usuario "
-"{user_name}, quién participó en el curso {partner_name} {course_number}"
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
-msgid "{partner_name} {course_number} Certificate | {platform_name}"
-msgstr "Certificado para {partner_name} {course_number} en {platform_name}"
+msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
+msgstr ""
 
 #. Translators:  This text fragment appears after the student's name
 #. (displayed in a large font) on the certificate
@@ -5615,6 +5612,14 @@ msgid ""
 msgstr ""
 "Si su curso no aparece en el panel de control, contacte a "
 "{payment_support_link}."
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr ""
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
@@ -6171,6 +6176,23 @@ msgid "File is not attached."
 msgstr "Archivo no adjuntado."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Could not find problem with this location."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The problem responses report is being created. To view the status of the "
+"report, see Pending Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem responses report generation task is already in progress. Check the"
+" 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{num}' does not exist."
 msgstr "La factura número '{num}' no existe."
 
@@ -6614,6 +6636,10 @@ msgid "CourseMode price updated successfully"
 msgstr "Se actualizó correctamente el precio para el modo de curso."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
 msgstr "Los datos de inscripciones ya están disponibles en {dashboard_link}."
 
@@ -6711,18 +6737,6 @@ msgstr "email externo"
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
 msgstr "Calificaciones para la tarea \"{name}\""
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Found {num} records to dump."
-msgstr "Se encontraron {num} registros para exportar."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Couldn't find module with that urlname."
-msgstr "No se ha encontrado ningún módulo con esa url."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Student state for problem {problem}"
-msgstr "Estado del estudiante para el problema {problem}"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
@@ -6906,6 +6920,12 @@ msgstr "enviado al correo electrónico"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+msgid "generated"
+msgstr "generado"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "calificado"
 
@@ -6914,12 +6934,6 @@ msgstr "calificado"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "problem distribution graded"
 msgstr "Distribución de calificaciones del problema"
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
-msgid "generated"
-msgstr "generado"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -8607,12 +8621,12 @@ msgid "course_id must be provided"
 msgstr "Debe suministrar un ID de curso"
 
 #: lms/djangoapps/teams/views.py
-msgid "The supplied topic id {topic_id} is not valid"
-msgstr "El ID de tema proporcionado {topic_id} no es válido"
+msgid "text_search and order_by cannot be provided together"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported."
-msgstr "text_search actualmente no está soportado"
+msgid "The supplied topic id {topic_id} is not valid"
+msgstr "El ID de tema proporcionado {topic_id} no es válido"
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
@@ -10465,6 +10479,10 @@ msgstr "Ayuda"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "Cerrar sesión"
+
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "{programming_language} editor"
+msgstr ""
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -13181,8 +13199,10 @@ msgid "Section:"
 msgstr "Sección:"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Problem urlname:"
-msgstr "urlname del problema:"
+msgid ""
+"To download a CSV listing student responses to a given problem, visit the "
+"Data Download section of the Instructor Dashboard."
+msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -15243,6 +15263,20 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Proctored Exam Results Report"
 msgstr "Generar reporte de resultados para examenes supervisados"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"To generate a CSV file that lists all student answers to a given problem, "
+"enter the location of the problem (from its Staff Debug Info)."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Problem location: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download a CSV of problem responses"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -17851,67 +17885,51 @@ msgid "This module is not enabled."
 msgstr "Este módulo no está habilitado."
 
 #: cms/templates/certificates.html
-msgid ""
-"Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. If you are a course team member with the "
-"Admin role in Studio, you can configure your course certificate."
+msgid "Working with Certificates"
 msgstr ""
-"Al completar con éxito el curso, los alumnos reciben un certificado para "
-"reconocer su logro. Si usted es un miembro del equipo de curso con el rol de"
-" administrador en Studio, puede configurar los certificados del curso."
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}Add your first certificate{em_end} to add a certificate "
-"configuration. Upload the organization logo to be used on the certificate, "
-"and specify at least one signatory. You can include up to four signatories "
-"for a certificate. You can also upload a signature image file for each "
-"signatory. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates. Optionally, specify a different course title to use "
-"on your course certificate. You might want to use a different title if, for "
-"example, the official course name is too long to display well on a "
-"certificate."
+"Specify a course title to use on the certificate if the course's official "
+"title is too long to be displayed well."
 msgstr ""
-"Haga clic en {em_start}Agregar su primer certificado{em_end} para agregar "
-"una configuración de certificados. Cargue el logotipo de la organización "
-"para ser utilizado en el certificado, y especifique al menos un signatario. "
-"Puede incluir hasta cuatro firmantes de un certificado. También puede cargar"
-" un archivo de imagen de la firma de cada signatario. "
-"{em_start}Nota:{em_end} Las imágenes de la firma sólo se utilizan para los "
-"certificados verificados. Opcionalmente, especifique un título de curso "
-"diferente a utilizar en su certificado. Es posible que desee utilizar un "
-"título diferente si, por ejemplo, el nombre oficial del curso es demasiado "
-"largo para que aparezca completo en el certificado."
 
 #: cms/templates/certificates.html
 msgid ""
-"Select a course mode and click {em_start}Preview Certificate{em_end} to "
-"preview the certificate that a learner in the selected enrollment track "
-"would receive. When the certificate is ready for issuing, click "
-"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
-"{em_start}Deactivate{em_end}."
+"For verified certificates, specify between one and four signatories and "
+"upload the associated images."
 msgstr ""
-"Seleccione un modo de curso y haga clic en {em_start}Vista previa de "
-"Certificado{em_end} para previsualizar el certificado que un estudiante en "
-"el modo de curso seleccionado recibiría. Cuando el certificado esté listo "
-"para la expedición, haga clic {em_start}Activar{em_end}. Para detener la "
-"emisión de un certificado activo, haga clic en {em_start}Desactivar{em_end}."
 
 #: cms/templates/certificates.html
 msgid ""
-" To edit the certificate configuration, hover over the top right corner of "
-"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
-"over the top right corner of the form and click the delete icon. In general,"
-" do not delete certificates after a course has started, because some "
-"certificates might already have been issued to learners."
+"To edit or delete a certificate before it is activated, hover over the top "
+"right corner of the form and select {em_start}Edit{em_end} or the delete "
+"icon."
 msgstr ""
-"Para editar la configuración del certificado, pase el puntero sobre la "
-"esquina superior derecha del formulario y haga clic en "
-"{em_start}Editar{em_end}. Para eliminar un certificado, pase el puntero "
-"sobre la esquina superior derecha del formulario y haga clic en el icono de "
-"eliminación. En general, no elimine los certificados después de que un curso"
-" haya iniciado, debido a que algunos certificados pueden ya haber sido "
-"emitidos a los alumnos."
+
+#: cms/templates/certificates.html
+msgid ""
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid "Issuing Certificates to Learners"
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"To begin issuing certificates, a course team member with the Admin role "
+"selects {em_start}Activate{em_end}. Course team members without the Admin "
+"role cannot edit or delete an activated certificate."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"{em_start}Do not{em_end} delete certificates after a course has started; "
+"learners who have already earned certificates will no longer be able to "
+"access them."
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"

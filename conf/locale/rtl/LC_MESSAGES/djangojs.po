@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-24 22:03+0000\n"
-"PO-Revision-Date: 2015-08-24 22:03:48.948707\n"
+"POT-Creation-Date: 2015-09-04 14:15+0000\n"
+"PO-Revision-Date: 2015-09-04 14:15:47.640544\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -73,8 +73,8 @@ msgstr "خن"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
-#: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/js/components/utils/view_utils.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -89,6 +89,7 @@ msgstr "خن"
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: common/static/common/templates/discussion/thread-response-edit.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "ذشرذثم"
@@ -2084,6 +2085,18 @@ msgstr "صث اشي سخوث فقخعزمث يثمثفهرل فاهس ذخووث
 msgid "Are you sure you want to delete this response?"
 msgstr "شقث غخع سعقث غخع صشرف فخ يثمثفث فاهس قثسحخرسث?"
 
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Required field."
+msgstr "قثضعهقثي بهثمي."
+
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Please do not use any spaces in this field."
+msgstr "حمثشسث يخ رخف عسث شرغ سحشذثس هر فاهس بهثمي."
+
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Please do not use any spaces or special characters in this field."
+msgstr "حمثشسث يخ رخف عسث شرغ سحشذثس خق سحثذهشم ذاشقشذفثقس هر فاهس بهثمي."
+
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr "ساخصهرل %(first_index)s خعف خب %(num_items)s فخفشم"
@@ -2268,6 +2281,7 @@ msgid "Public"
 msgstr "حعزمهذ"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/common/templates/components/search-field.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "Search"
 msgstr "سثشقذا"
@@ -2330,20 +2344,34 @@ msgid "An unexpected error occurred.  Please try again."
 msgstr "شر عرثطحثذفثي ثققخق خذذعققثي.  حمثشسث فقغ شلشهر."
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "last activity"
+msgstr "مشسف شذفهدهفغ"
+
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "open slots"
+msgstr "خحثر سمخفس"
+
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "name"
 msgstr "رشوث"
-
-#: lms/djangoapps/teams/static/teams/js/collections/team.js
-msgid "open_slots"
-msgstr "خحثر_سمخفس"
 
 #. Translators: This refers to the number of teams (a count of how many teams
 #. there are)
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "فثشو ذخعرف"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Create"
+msgstr "ذقثشفث"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Update"
+msgstr "عحيشفث"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team Name (Required) *"
@@ -2416,20 +2444,50 @@ msgstr "فثشو يثسذقهحفهخر ذشررخف اشدث وخقث فاشر 
 msgid "You are not currently a member of any team."
 msgstr "غخع شقث رخف ذعققثرفمغ ش وثوزثق خب شرغ فثشو."
 
+#. Translators: "and others" refers to fact that additional members of a team
+#. exist that are not displayed.
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "and others"
+msgstr "شري خفاثقس"
+
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "Last Activity %(date)s"
+msgstr "مشسف شذفهدهفغ %(date)s"
+
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
 msgstr "دهثص %(span_start)s %(team_name)s %(span_end)s"
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "An error occurred. Try again."
 msgstr "شر ثققخق خذذعققثي. فقغ شلشهر."
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "Leave this team?"
+msgstr "مثشدث فاهس فثشو?"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid ""
+"If you leave, you can no longer post in this team's discussions. Your place "
+"will be available to another learner."
+msgstr ""
+"هب غخع مثشدث, غخع ذشر رخ مخرلثق حخسف هر فاهس فثشو'س يهسذعسسهخرس. غخعق حمشذث "
+"صهمم زث شدشهمشزمث فخ شرخفاثق مثشقرثق."
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+#: lms/static/js/verify_student/views/reverify_view.js
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr "ذخربهقو"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team."
 msgstr "غخع شمقثشيغ زثمخرل فخ شرخفاثق فثشو."
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr "فاهس فثشو هس بعمم."
 
@@ -2448,6 +2506,10 @@ msgid "teams"
 msgstr "فثشوس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr "فثشوس"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
 " with other learners who are interested in the same topic as you are."
@@ -2456,31 +2518,54 @@ msgstr ""
 " صهفا خفاثق مثشقرثقس صاخ شقث هرفثقثسفثي هر فاث سشوث فخحهذ شس غخع شقث."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Teams"
-msgstr "فثشوس"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "وغ فثشو"
 
 #. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.  The whole string will be shown to users as "Browse teams" if they
-#. are using a screenreader, and "Browse" otherwise.
+#. readers.
+#. The whole string will be shown to users as "Browse teams" if they are using
+#. a
+#. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse %(sr_start)s teams %(sr_end)s"
 msgstr "زقخصسث %(sr_start)s فثشوس %(sr_end)s"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"Create a new team if you can't find existing teams to join, or if you would "
-"like to learn with friends you know."
-msgstr ""
-"ذقثشفث ش رثص فثشو هب غخع ذشر'ف بهري ثطهسفهرل فثشوس فخ تخهر, خق هب غخع صخعمي "
-"مهنث فخ مثشقر صهفا بقهثريس غخع نرخص."
+msgid "Team Search"
+msgstr "فثشو سثشقذا"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"%(searchString)s\""
+msgstr "ساخصهرل قثسعمفس بخق \"%(searchString)s\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
 msgstr "ذقثشفث ش رثص فثشو"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Create a new team if you can't find an existing team to join, or if you "
+"would like to learn with friends you know."
+msgstr ""
+"ذقثشفث ش رثص فثشو هب غخع ذشر'ف بهري شر ثطهسفهرل فثشو فخ تخهر, خق هب غخع "
+"صخعمي مهنث فخ مثشقر صهفا بقهثريس غخع نرخص."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
+msgid "Edit Team"
+msgstr "ثيهف فثشو"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"If you make significant changes, make sure you notify members of the team "
+"before making these changes."
+msgstr ""
+"هب غخع وشنث سهلرهبهذشرف ذاشرلثس, وشنث سعقث غخع رخفهبغ وثوزثقس خب فاث فثشو "
+"زثبخقث وشنهرل فاثسث ذاشرلثس."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Search teams"
+msgstr "سثشقذا فثشوس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "All Topics"
@@ -2505,19 +2590,31 @@ msgstr[0] "%(team_count)s فثشو"
 msgstr[1] "%(team_count)s فثشوس"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "فخحهذ"
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the %(topic_name)s Topic"
 msgstr "دهثص فثشوس هر فاث %(topic_name)s فخحهذ"
 
+#. Translators: this string is shown at the bottom of the teams page
+#. to find a team to join or else to create a new one. There are three
+#. links that need to be included in the message:
+#. 1. Browse teams in other topics
+#. 2. search teams
+#. 3. create a new team
+#. Be careful to start each link with the appropriate start indicator
+#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
-"Try {browse_span_start}browsing all teams{span_end} or "
-"{search_span_start}searching team descriptions{span_end}. If you still can't"
-" find a team to join, {create_span_start}create a new team in this "
+"{browse_span_start}Browse teams in other topics{span_end} or "
+"{search_span_start}search teams{span_end} in this topic. If you still can't "
+"find a team to join, {create_span_start}create a new team in this "
 "topic{span_end}."
 msgstr ""
-"فقغ {browse_span_start}زقخصسهرل شمم فثشوس{span_end} خق "
-"{search_span_start}سثشقذاهرل فثشو يثسذقهحفهخرس{span_end}. هب غخع سفهمم ذشر'ف"
-" بهري ش فثشو فخ تخهر, {create_span_start}ذقثشفث ش رثص فثشو هر فاهس "
+"{browse_span_start}زقخصسث فثشوس هر خفاثق فخحهذس{span_end} خق "
+"{search_span_start}سثشقذا فثشوس{span_end} هر فاهس فخحهذ. هب غخع سفهمم ذشر'ف "
+"بهري ش فثشو فخ تخهر, {create_span_start}ذقثشفث ش رثص فثشو هر فاهس "
 "فخحهذ{span_end}."
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
@@ -3955,11 +4052,6 @@ msgstr "فشنث ش حاخفخ خب غخعق هي"
 msgid "Review your info"
 msgstr "قثدهثص غخعق هربخ"
 
-#: lms/static/js/verify_student/views/reverify_view.js
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr "ذخربهقو"
-
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
 msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ قثمخشيهرل فاث حشلث."
@@ -5144,18 +5236,6 @@ msgstr ""
 "فاث ذخوزهرثي مثرلفا خب فاث خقلشرهظشفهخر شري مهزقشقغ ذخيث بهثميس ذشررخف زث "
 "وخقث فاشر <%=limit%> ذاشقشذفثقس."
 
-#: cms/static/js/views/utils/view_utils.js
-msgid "Required field."
-msgstr "قثضعهقثي بهثمي."
-
-#: cms/static/js/views/utils/view_utils.js
-msgid "Please do not use any spaces in this field."
-msgstr "حمثشسث يخ رخف عسث شرغ سحشذثس هر فاهس بهثمي."
-
-#: cms/static/js/views/utils/view_utils.js
-msgid "Please do not use any spaces or special characters in this field."
-msgstr "حمثشسث يخ رخف عسث شرغ سحشذثس خق سحثذهشم ذاشقشذفثقس هر فاهس بهثمي."
-
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "component"
 msgstr "ذخوحخرثرف"
@@ -5278,6 +5358,14 @@ msgstr "حشلث رعوزثق"
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
 msgstr "ثرفثق فاث حشلث رعوزثق غخع'ي مهنث فخ ضعهذنمغ رشدهلشفث فخ."
+
+#: common/static/common/templates/components/paging-header.underscore
+msgid "Sorted by"
+msgstr "سخقفثي زغ"
+
+#: common/static/common/templates/components/search-field.underscore
+msgid "Clear search"
+msgstr "ذمثشق سثشقذا"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "DISCUSSION HOME:"
@@ -5682,8 +5770,12 @@ msgid "Regenerate the user's certificate"
 msgstr "قثلثرثقشفث فاث عسثق'س ذثقفهبهذشفث"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Your team could not be created!"
-msgstr "غخعق فثشو ذخعمي رخف زث ذقثشفثي!"
+msgid "Your team could not be created."
+msgstr "غخعق فثشو ذخعمي رخف زث ذقثشفثي."
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Your team could not be updated."
+msgstr "غخعق فثشو ذخعمي رخف زث عحيشفثي."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid ""
@@ -5708,18 +5800,26 @@ msgstr ""
 "زث هرفثقثسفثي هر تخهرهرل غخعق فثشو هب هف سثثوس فخخ قثسفقهذفهدث."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "{primaryButtonTitle} {span_start}a new team{span_end}"
-msgstr "{primaryButtonTitle} {span_start}ش رثص فثشو{span_end}"
+msgid "Create team."
+msgstr "ذقثشفث فثشو."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Cancel {span_start}a new team{span_end}"
-msgstr "ذشرذثم {span_start}ش رثص فثشو{span_end}"
+msgid "Update team."
+msgstr "عحيشفث فثشو."
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Cancel team creating."
+msgstr "ذشرذثم فثشو ذقثشفهرل."
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Cancel team updating."
+msgstr "ذشرذثم فثشو عحيشفهرل."
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr "شقث غخع اشدهرل فقخعزمث بهريهرل ش فثشو فخ تخهر?"
 
-#: lms/djangoapps/teams/static/teams/templates/team-join.underscore
+#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
 msgstr "تخهر فثشو"
 
@@ -6893,6 +6993,16 @@ msgstr "يقشل شري يقخح خق ذمهذن اثقث فخ عحمخشي ده
 msgid "status"
 msgstr "سفشفعس"
 
+#: cms/templates/js/add-xblock-component-button.underscore
+msgid "Add Component:"
+msgstr "شيي ذخوحخرثرف:"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+#: cms/templates/js/add-xblock-component-menu.underscore
+#, python-format
+msgid "%(type)s Component Template Menu"
+msgstr "%(type)s ذخوحخرثرف فثوحمشفث وثرع"
+
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "ذخووخر حقخزمثو فغحثس"
@@ -6969,6 +7079,11 @@ msgstr "ذثقفهبهذشفث يثفشهمس"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "ذخعقسث فهفمث"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "ذخعقسث فهفمث خدثققهيث"
 
@@ -7013,18 +7128,12 @@ msgstr ""
 "ذثقفهبهذشفثس. مثشدث زمشرن فخ عسث فاث خببهذهشم ذخعقسث فهفمث."
 
 #: cms/templates/js/certificate-editor.underscore
-msgid "Add Signatory"
-msgstr "شيي سهلرشفخقغ"
+msgid "Add Additional Signatory"
+msgstr "شيي شييهفهخرشم سهلرشفخقغ"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "(Up to 4 signatories are allowed for a certificate)"
 msgstr "(عح فخ 4 سهلرشفخقهثس شقث شممخصثي بخق ش ذثقفهبهذشفث)"
-
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Create"
-msgstr "ذقثشفث"
 
 #: cms/templates/js/certificate-web-preview.underscore
 msgid "Choose mode"
