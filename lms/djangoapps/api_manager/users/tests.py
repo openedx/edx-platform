@@ -1475,6 +1475,163 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data[0]['proforma_grade'], 0.9375)
         self.assertEqual(response.data[0]['complete_status'], False)
 
+    def test_user_courses_grades_list_get_after_enrollment(self):
+        user_id = self.user.id
+
+        course = CourseFactory.create(org='TEST', run='TEST1', display_name="Test Gradebook after Enrollment")
+        test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+        chapter1 = ItemFactory.create(
+            category="chapter",
+            parent_location=course.location,
+            data=test_data,
+            display_name="Chapter 1"
+        )
+        chapter2 = ItemFactory.create(
+            category="chapter",
+            parent_location=course.location,
+            data=test_data,
+            display_name="Chapter 2"
+        )
+        ItemFactory.create(
+            category="sequential",
+            parent_location=chapter1.location,
+            data=test_data,
+            display_name="Sequence 1",
+        )
+        ItemFactory.create(
+            category="sequential",
+            parent_location=chapter2.location,
+            data=test_data,
+            display_name="Sequence 2",
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='foo'),
+            metadata={'rerandomize': 'always'},
+            display_name="test problem 1",
+            max_grade=45
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            metadata={'rerandomize': 'always'},
+            display_name="test problem 2"
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='foo'),
+            display_name=u"test mentoring midterm",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring final",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 2",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 3",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
+            due=self.course_end_date.replace(tzinfo=timezone.utc)
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring final",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 2",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 3",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
+            due=self.course_end_date.replace(tzinfo=timezone.utc)
+        )
+
+        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+        courseware_summary = response.data['courseware_summary']
+        self.assertEqual(len(courseware_summary), 2)
+        self.assertEqual(courseware_summary[0]['course'], 'Test Gradebook after Enrollment')
+        self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
+
+        sections = courseware_summary[0]['sections']
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0]['display_name'], 'Sequence 1')
+        self.assertEqual(sections[0]['graded'], False)
+
+        sections = courseware_summary[1]['sections']
+        self.assertEqual(len(sections), 12)
+        self.assertEqual(sections[0]['display_name'], 'Sequence 2')
+        self.assertEqual(sections[0]['graded'], False)
+
+        grade_summary = response.data['grade_summary']
+        self.assertGreater(len(grade_summary['section_breakdown']), 0)
+        grading_policy = response.data['grading_policy']
+        self.assertGreater(len(grading_policy['GRADER']), 0)
+        self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
+        self.assertAlmostEqual(response.data['current_grade'], 0, 0)
+        self.assertAlmostEqual(response.data['proforma_grade'], 0, 0)
+
+        test_uri = '{}/{}/courses/grades'.format(self.users_base_uri, user_id)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['course_id'], unicode(course.id))
+        self.assertAlmostEqual(response.data[0]['current_grade'], 0, 0)
+        self.assertAlmostEqual(response.data[0]['proforma_grade'], 0, 0)
+        self.assertEqual(response.data[0]['complete_status'], False)
+
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
 
