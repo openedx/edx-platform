@@ -45,7 +45,7 @@ from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
     validate_password_dictionary
 )
-from xmodule.modulestore import InvalidLocationError
+from xmodule.modulestore import InvalidLocationError, EdxJSONEncoder
 
 from progress.serializers import CourseModuleCompletionSerializer
 from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists
@@ -183,6 +183,24 @@ def _manage_role(course_descriptor, user, role, action):
                         update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
                     except Role.DoesNotExist:
                         pass
+
+
+def _recalculate_grade(request, student, course_descriptor):
+    """
+    Helper method for recalculating gradebook data
+    """
+    progress_summary = grades.progress_summary(student, request, course_descriptor, locators_as_strings=True)  # pylint: disable=unused-variable
+    grade_summary = grades.grade(student, request, course_descriptor)
+    grading_policy = course_descriptor.grading_policy
+    current_grade = grade_summary['percent']
+    proforma_grade = grades.calculate_proforma_grade(grade_summary, grading_policy)
+    return {
+        "progress_summary": progress_summary,
+        "grade_summary": grade_summary,
+        "grading_policy": grading_policy,
+        "current_grade": current_grade,
+        "proforma_grade": proforma_grade
+    }
 
 
 class UsersList(SecureListAPIView):
@@ -1003,17 +1021,51 @@ class UsersCoursesGradesDetail(SecureAPIView):
             user=student,
             course_id__exact=course_key,
         )
-        current_grade = 0
-        proforma_grade = 0
-        progress_summary = {}
-        grade_summary = {}
-        grading_policy = {}
+
         if len(queryset):
-            current_grade = queryset[0].grade
-            proforma_grade = queryset[0].proforma_grade
-            progress_summary = json.loads(queryset[0].progress_summary)
-            grade_summary = json.loads(queryset[0].grade_summary)
-            grading_policy = json.loads(queryset[0].grading_policy)
+            gradebook_entry = queryset[0]
+            if (gradebook_entry.grade and
+                    gradebook_entry.proforma_grade and
+                    gradebook_entry.progress_summary and
+                    gradebook_entry.grade_summary and
+                    gradebook_entry.grading_policy):
+                current_grade = queryset[0].grade
+                proforma_grade = queryset[0].proforma_grade
+                progress_summary = json.loads(queryset[0].progress_summary)
+                grade_summary = json.loads(queryset[0].grade_summary)
+                grading_policy = json.loads(queryset[0].grading_policy)
+            else:
+                gradebook_values = _recalculate_grade(request, student, course_descriptor)
+                gradebook_entry.grade = gradebook_values["current_grade"]
+                gradebook_entry.proforma_grade = gradebook_values["proforma_grade"]
+                gradebook_entry.progress_summary = json.dumps(gradebook_values["progress_summary"], cls=EdxJSONEncoder)
+                gradebook_entry.grade_summary = json.dumps(gradebook_values["grade_summary"], cls=EdxJSONEncoder)
+                gradebook_entry.grading_policy = json.dumps(gradebook_values["grading_policy"], cls=EdxJSONEncoder)
+                gradebook_entry.save()
+        else:
+            gradebook_values = _recalculate_grade(request, student, course_descriptor)
+            current_grade = gradebook_values["current_grade"]
+            proforma_grade = gradebook_values["proforma_grade"]
+            progress_summary = gradebook_values["progress_summary"]
+            grade_summary = gradebook_values["grade_summary"]
+            grading_policy = gradebook_values["grading_policy"]
+
+            # add to audit log
+            AUDIT_LOG.info(
+                u"API::New gradebook entry created for user-id - %s and course-id - '%s'",
+                user_id,
+                course_key
+            )
+
+            StudentGradebook.objects.create(
+                user=student,
+                course_id=course_key,
+                grade=current_grade,
+                proforma_grade=proforma_grade,
+                progress_summary=json.dumps(progress_summary, cls=EdxJSONEncoder),
+                grade_summary=json.dumps(grade_summary, cls=EdxJSONEncoder),
+                grading_policy=json.dumps(grading_policy, cls=EdxJSONEncoder)
+            )
 
         response_data = {
             'courseware_summary': progress_summary,
