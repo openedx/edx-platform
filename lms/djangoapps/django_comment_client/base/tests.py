@@ -1641,6 +1641,40 @@ class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         self.assertEqual(name, event_name)
         self.assertEqual(event['team_id'], team.team_id)
 
+    @ddt.data(
+        ('vote_for_thread', 'thread_id', 'thread'),
+        ('undo_vote_for_thread', 'thread_id', 'thread'),
+        ('vote_for_comment', 'comment_id', 'response'),
+        ('undo_vote_for_comment', 'comment_id', 'response'),
+    )
+    @ddt.unpack
+    @patch('eventtracking.tracker.emit')
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_thread_voted_event(self, view_name, obj_id_name, obj_type, mock_request, mock_emit):
+        undo = view_name.startswith('undo')
+
+        self._set_mock_request_data(mock_request, {
+            'closed': False,
+            'commentable_id': 'test_commentable_id',
+            'username': 'gumprecht',
+        })
+        request = RequestFactory().post('dummy_url', {})
+        request.user = self.student
+        request.view_name = view_name
+        view_function = getattr(views, view_name)
+        kwargs = dict(course_id=unicode(self.course.id))
+        kwargs[obj_id_name] = obj_id_name
+        if not undo:
+            kwargs.update(value='up')
+        view_function(request, **kwargs)
+
+        self.assertTrue(mock_emit.called)
+        event_name, event = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.forum.{}.voted'.format(obj_type))
+        self.assertEqual(event['target_username'], 'gumprecht')
+        self.assertEqual(event['undo_vote'], undo)
+        self.assertEqual(event['vote_value'], 'up')
+
 
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 

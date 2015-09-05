@@ -82,6 +82,9 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
 
 
 def track_created_event(request, event_name, course, obj, data):
+    """
+    Send analytics event for a newly created thread, response or comment.
+    """
     if len(obj.body) > TRACKING_MAX_FORUM_BODY:
         data['truncated'] = True
     else:
@@ -91,6 +94,9 @@ def track_created_event(request, event_name, course, obj, data):
 
 
 def track_thread_created_event(request, course, thread, followed):
+    """
+    Send analytics event for a newly created thread.
+    """
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='created')
     event_data = {
         'commentable_id': thread.commentable_id,
@@ -109,6 +115,9 @@ def track_thread_created_event(request, course, thread, followed):
 
 
 def track_comment_created_event(request, course, comment, commentable_id, followed):
+    """
+    Send analytics event for a newly created response or comment.
+    """
     obj_type = 'comment' if comment.get("parent_id") else 'response'
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='created')
     event_data = {
@@ -123,6 +132,9 @@ def track_comment_created_event(request, course, comment, commentable_id, follow
 
 
 def track_voted_event(request, course, obj, vote_value, undo_vote=False):
+    """
+    Send analytics event for a vote on a thread or response.
+    """
     if isinstance(obj, cc.Thread):
         obj_type = 'thread'
     else:
@@ -137,10 +149,19 @@ def track_voted_event(request, course, obj, vote_value, undo_vote=False):
     track_forum_event(request, event_name, course, obj, event_data)
 
 
-def permitted(fn):
-    @functools.wraps(fn)
+def permitted(func):
+    """
+    View decorator to verify the user is authorized to access this endpoint.
+    """
+    @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
+        """
+        Wrapper for the view that only calls the view if the user is authorized.
+        """
         def fetch_content():
+            """
+            Extract the forum object from the keyword arguments to the view.
+            """
             if "thread_id" in kwargs:
                 content = cc.Thread.find(kwargs["thread_id"]).to_dict()
             elif "comment_id" in kwargs:
@@ -152,13 +173,16 @@ def permitted(fn):
             return content
         course_key = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
         if check_permissions_by_view(request.user, course_key, fetch_content(), request.view_name):
-            return fn(request, *args, **kwargs)
+            return func(request, *args, **kwargs)
         else:
             return JsonError("unauthorized", status=401)
     return wrapper
 
 
 def ajax_content_response(request, course_key, content):
+    """
+    Standard AJAX response returning the content hierarchy of the current thread.
+    """
     user_info = cc.User.from_django_user(request.user).to_dict()
     annotated_content_info = get_annotated_content_info(course_key, content, request.user, user_info)
     return JsonResponse({
@@ -479,7 +503,7 @@ def _vote_or_unvote(request, course_id, obj, value='up', undo_vote=False):
 @permitted
 def vote_for_comment(request, course_id, comment_id, value):
     """
-    given a course_id and comment_id,
+    Given a course_id and comment_id, vote for this response.  AJAX only.
     """
     comment = cc.Comment.find(comment_id)
     result = _vote_or_unvote(request, course_id, comment, value)
