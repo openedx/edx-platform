@@ -238,6 +238,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             # to log and continue (which is safe) than to have it be an
                             # unhandled exception
                             log.exception(ex)
+
                         if proctoring_attempt_context:
                             # yes, user has proctoring context about
                             # this level of the courseware
@@ -245,7 +246,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             section_context.update({
                                 'proctoring': proctoring_attempt_context,
                             })
-
 
                     sections.append(section_context)
             toc_chapters.append({
