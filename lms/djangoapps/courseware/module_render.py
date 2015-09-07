@@ -201,8 +201,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                         (
                             getattr(section, 'is_proctored_enabled', False) or
                             getattr(section, 'is_time_limited', False)
-                        ) and
-                        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+                        ) and settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
                     )
                     if is_proctored_enabled:
                         # We need to import this here otherwise Lettuce test
