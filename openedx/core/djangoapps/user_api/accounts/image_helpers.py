@@ -6,7 +6,7 @@ import hashlib
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from microsite_configuration import microsite
 

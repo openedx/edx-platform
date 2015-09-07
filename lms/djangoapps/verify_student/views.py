@@ -57,7 +57,7 @@ from verify_student.image import decode_image_data, InvalidImageData
 from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 log = logging.getLogger(__name__)
