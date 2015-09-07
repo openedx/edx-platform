@@ -69,8 +69,8 @@ class IntegrationTestLTI(testutil.TestCase):
         self.assertTrue(login_response['Location'].endswith(reverse('signin_user')))
         register_response = self.client.get(login_response['Location'])
         self.assertEqual(register_response.status_code, 200)
-        self.assertIn('currentProvider&#34;: &#34;LTI Test Tool Consumer&#34;', register_response.content)
-        self.assertIn('&#34;errorMessage&#34;: null', register_response.content)
+        self.assertIn('"currentProvider": "LTI Test Tool Consumer"', register_response.content)
+        self.assertIn('"errorMessage": null', register_response.content)
 
         # Now complete the form:
         ajax_register_response = self.client.post(
@@ -153,7 +153,7 @@ class IntegrationTestLTI(testutil.TestCase):
             register_response = self.client.get(login_response['Location'])
             self.assertEqual(register_response.status_code, 200)
             self.assertIn(
-                'currentProvider&#34;: &#34;Tool Consumer with Secret in Settings&#34;',
+                '"currentProvider": "Tool Consumer with Secret in Settings"',
                 register_response.content
             )
-            self.assertIn('&#34;errorMessage&#34;: null', register_response.content)
+            self.assertIn('"errorMessage": null', register_response.content)
