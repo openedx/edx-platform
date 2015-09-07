@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-24 22:03+0000\n"
-"PO-Revision-Date: 2015-08-24 22:03:48.948707\n"
+"POT-Creation-Date: 2015-09-04 14:15+0000\n"
+"PO-Revision-Date: 2015-09-04 14:15:47.640544\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -73,8 +73,8 @@ msgstr "ÖK Ⱡ'σя#"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
-#: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/js/components/utils/view_utils.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -89,6 +89,7 @@ msgstr "ÖK Ⱡ'σя#"
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: common/static/common/templates/discussion/thread-response-edit.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
@@ -2160,6 +2161,22 @@ msgstr ""
 "Àré ýöü süré ýöü wänt tö délété thïs réspönsé? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Required field."
+msgstr "Réqüïréd fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Please do not use any spaces in this field."
+msgstr ""
+"Pléäsé dö nöt üsé äný späçés ïn thïs fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Please do not use any spaces or special characters in this field."
+msgstr ""
+"Pléäsé dö nöt üsé äný späçés ör spéçïäl çhäräçtérs ïn thïs fïéld. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr ""
@@ -2365,6 +2382,7 @@ msgid "Public"
 msgstr "Püßlïç Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/common/templates/components/search-field.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "Search"
 msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
@@ -2429,20 +2447,34 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "last activity"
+msgstr "läst äçtïvïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "open slots"
+msgstr "öpén slöts Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "name"
 msgstr "nämé Ⱡ'σяєм ι#"
-
-#: lms/djangoapps/teams/static/teams/js/collections/team.js
-msgid "open_slots"
-msgstr "öpén_slöts Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #. Translators: This refers to the number of teams (a count of how many teams
 #. there are)
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "téäm çöünt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Create"
+msgstr "Çréäté Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Update"
+msgstr "Ûpdäté Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team Name (Required) *"
@@ -2530,22 +2562,52 @@ msgstr ""
 "Ýöü äré nöt çürréntlý ä mémßér öf äný téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
+#. Translators: "and others" refers to fact that additional members of a team
+#. exist that are not displayed.
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "and others"
+msgstr "änd öthérs Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "Last Activity %(date)s"
+msgstr "Läst Àçtïvïtý %(date)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
 msgstr ""
 "Vïéw %(span_start)s %(team_name)s %(span_end)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "An error occurred. Try again."
 msgstr "Àn érrör öççürréd. Trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "Leave this team?"
+msgstr "Léävé thïs téäm? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid ""
+"If you leave, you can no longer post in this team's discussions. Your place "
+"will be available to another learner."
+msgstr ""
+"Ìf ýöü léävé, ýöü çän nö löngér pöst ïn thïs téäm's dïsçüssïöns. Ýöür pläçé "
+"wïll ßé äväïläßlé tö änöthér léärnér. Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+#: lms/static/js/verify_student/views/reverify_view.js
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr "Çönfïrm Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team."
 msgstr ""
 "Ýöü älréädý ßélöng tö änöthér téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr "Thïs téäm ïs füll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
@@ -2566,6 +2628,10 @@ msgid "teams"
 msgstr "téäms Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr "Téäms Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
 " with other learners who are interested in the same topic as you are."
@@ -2580,31 +2646,55 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Teams"
-msgstr "Téäms Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "Mý Téäm Ⱡ'σяєм ιρѕυм #"
 
 #. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.  The whole string will be shown to users as "Browse teams" if they
-#. are using a screenreader, and "Browse" otherwise.
+#. readers.
+#. The whole string will be shown to users as "Browse teams" if they are using
+#. a
+#. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse %(sr_start)s teams %(sr_end)s"
 msgstr "Bröwsé %(sr_start)s téäms %(sr_end)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"Create a new team if you can't find existing teams to join, or if you would "
-"like to learn with friends you know."
+msgid "Team Search"
+msgstr "Téäm Séärçh Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"%(searchString)s\""
 msgstr ""
-"Çréäté ä néw téäm ïf ýöü çän't fïnd éxïstïng téäms tö jöïn, ör ïf ýöü wöüld "
-"lïké tö léärn wïth frïénds ýöü knöw. Ⱡ'σяєм ιρѕυм ∂σłσя#"
+"Shöwïng résülts för \"%(searchString)s\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
 msgstr "Çréäté ä Néw Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Create a new team if you can't find an existing team to join, or if you "
+"would like to learn with friends you know."
+msgstr ""
+"Çréäté ä néw téäm ïf ýöü çän't fïnd än éxïstïng téäm tö jöïn, ör ïf ýöü "
+"wöüld lïké tö léärn wïth frïénds ýöü knöw. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
+msgid "Edit Team"
+msgstr "Édït Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"If you make significant changes, make sure you notify members of the team "
+"before making these changes."
+msgstr ""
+"Ìf ýöü mäké sïgnïfïçänt çhängés, mäké süré ýöü nötïfý mémßérs öf thé téäm "
+"ßéföré mäkïng thésé çhängés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Search teams"
+msgstr "Séärçh téäms Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "All Topics"
@@ -2635,26 +2725,38 @@ msgstr[0] "%(team_count)s Téäm Ⱡ'σяєм ιρѕυм ∂#"
 msgstr[1] "%(team_count)s Téäms Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "Töpïç Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the %(topic_name)s Topic"
 msgstr ""
 "Vïéw Téäms ïn thé %(topic_name)s Töpïç Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#. Translators: this string is shown at the bottom of the teams page
+#. to find a team to join or else to create a new one. There are three
+#. links that need to be included in the message:
+#. 1. Browse teams in other topics
+#. 2. search teams
+#. 3. create a new team
+#. Be careful to start each link with the appropriate start indicator
+#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
-"Try {browse_span_start}browsing all teams{span_end} or "
-"{search_span_start}searching team descriptions{span_end}. If you still can't"
-" find a team to join, {create_span_start}create a new team in this "
+"{browse_span_start}Browse teams in other topics{span_end} or "
+"{search_span_start}search teams{span_end} in this topic. If you still can't "
+"find a team to join, {create_span_start}create a new team in this "
 "topic{span_end}."
 msgstr ""
-"Trý {browse_span_start}ßröwsïng äll téäms{span_end} ör "
-"{search_span_start}séärçhïng téäm désçrïptïöns{span_end}. Ìf ýöü stïll çän't"
-" fïnd ä téäm tö jöïn, {create_span_start}çréäté ä néw téäm ïn thïs "
+"{browse_span_start}Bröwsé téäms ïn öthér töpïçs{span_end} ör "
+"{search_span_start}séärçh téäms{span_end} ïn thïs töpïç. Ìf ýöü stïll çän't "
+"fïnd ä téäm tö jöïn, {create_span_start}çréäté ä néw téäm ïn thïs "
 "töpïç{span_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
 "ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
 "α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"
@@ -4343,11 +4445,6 @@ msgstr "Täké ä phötö öf ýöür ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 msgid "Review your info"
 msgstr "Révïéw ýöür ïnfö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: lms/static/js/verify_student/views/reverify_view.js
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr "Çönfïrm Ⱡ'σяєм ιρѕυм #"
-
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
 msgstr ""
@@ -5730,22 +5827,6 @@ msgstr ""
 "Thé çömßïnéd léngth öf thé örgänïzätïön änd lïßrärý çödé fïélds çännöt ßé "
 "möré thän <%=limit%> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: cms/static/js/views/utils/view_utils.js
-msgid "Required field."
-msgstr "Réqüïréd fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/static/js/views/utils/view_utils.js
-msgid "Please do not use any spaces in this field."
-msgstr ""
-"Pléäsé dö nöt üsé äný späçés ïn thïs fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: cms/static/js/views/utils/view_utils.js
-msgid "Please do not use any spaces or special characters in this field."
-msgstr ""
-"Pléäsé dö nöt üsé äný späçés ör spéçïäl çhäräçtérs ïn thïs fïéld. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "component"
 msgstr "çömpönént Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -5876,6 +5957,14 @@ msgid "Enter the page number you'd like to quickly navigate to."
 msgstr ""
 "Éntér thé pägé nümßér ýöü'd lïké tö qüïçklý nävïgäté tö. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/static/common/templates/components/paging-header.underscore
+msgid "Sorted by"
+msgstr "Sörtéd ßý Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/common/templates/components/search-field.underscore
+msgid "Clear search"
+msgstr "Çléär séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "DISCUSSION HOME:"
@@ -6296,8 +6385,12 @@ msgstr ""
 "Régénéräté thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Your team could not be created!"
-msgstr "Ýöür téäm çöüld nöt ßé çréätéd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Your team could not be created."
+msgstr "Ýöür téäm çöüld nöt ßé çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Your team could not be updated."
+msgstr "Ýöür téäm çöüld nöt ßé üpdätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid ""
@@ -6327,15 +6420,20 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρт#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "{primaryButtonTitle} {span_start}a new team{span_end}"
-msgstr ""
-"{primaryButtonTitle} {span_start}ä néw téäm{span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, #"
+msgid "Create team."
+msgstr "Çréäté téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Cancel {span_start}a new team{span_end}"
-msgstr ""
-"Çänçél {span_start}ä néw téäm{span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+msgid "Update team."
+msgstr "Ûpdäté téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Cancel team creating."
+msgstr "Çänçél téäm çréätïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Cancel team updating."
+msgstr "Çänçél téäm üpdätïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
@@ -6343,7 +6441,7 @@ msgstr ""
 "Àré ýöü hävïng tröüßlé fïndïng ä téäm tö jöïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
-#: lms/djangoapps/teams/static/teams/templates/team-join.underscore
+#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
 msgstr "Jöïn Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -7683,6 +7781,16 @@ msgstr ""
 msgid "status"
 msgstr "stätüs Ⱡ'σяєм ιρѕυ#"
 
+#: cms/templates/js/add-xblock-component-button.underscore
+msgid "Add Component:"
+msgstr "Àdd Çömpönént: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+#: cms/templates/js/add-xblock-component-menu.underscore
+#, python-format
+msgid "%(type)s Component Template Menu"
+msgstr "%(type)s Çömpönént Témpläté Ménü Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "Çömmön Prößlém Týpés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -7763,6 +7871,11 @@ msgstr "Çértïfïçäté Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "Çöürsé Tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "Çöürsé Tïtlé Övérrïdé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -7807,20 +7920,14 @@ msgstr ""
 "çértïfïçätés. Léävé ßlänk tö üsé thé öffïçïäl çöürsé tïtlé. Ⱡ'σяєм #"
 
 #: cms/templates/js/certificate-editor.underscore
-msgid "Add Signatory"
-msgstr "Àdd Sïgnätörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+msgid "Add Additional Signatory"
+msgstr "Àdd Àddïtïönäl Sïgnätörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "(Up to 4 signatories are allowed for a certificate)"
 msgstr ""
 "(Ûp tö 4 sïgnätörïés äré ällöwéd för ä çértïfïçäté) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Create"
-msgstr "Çréäté Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/js/certificate-web-preview.underscore
 msgid "Choose mode"

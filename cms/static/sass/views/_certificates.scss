@@ -380,6 +380,12 @@
             color: $gray-l3;
           }
         }
+        &.custom-signatory-action {
+          position: relative;
+          top: 0;
+          left: 0;
+          opacity: 1.0;
+        }
       }
 
       .copy {
@@ -522,6 +528,10 @@
 
     .signatory-panel-body {
       padding: $baseline;
+
+      .signatory-image {
+        margin-top: 20px;
+      }
     }
 
     .signatory-panel-body label {

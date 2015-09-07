@@ -35,6 +35,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from courseware.courses import get_course_with_access, has_access
+from eventtracking import tracker
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
@@ -97,7 +98,7 @@ class TeamsDashboardView(View):
         team_memberships_page = Paginator(team_memberships, TEAM_MEMBERSHIPS_PER_PAGE).page(1)
         team_memberships_serializer = PaginatedMembershipSerializer(
             instance=team_memberships_page,
-            context={'expand': ('team',)},
+            context={'expand': ('team', 'user'), 'request': request},
         )
 
         context = {
@@ -175,7 +176,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             * text_search: Searches for full word matches on the name, description,
               country, and language fields. NOTES: Search is on full names for countries
               and languages, not the ISO codes. Text_search cannot be requested along with
-              with order_by. Searching relies on the ENABLE_TEAMS_SEARCH flag being set to True.
+              with order_by.
 
             * order_by: Cannot be called along with with text_search. Must be one of the following:
 
@@ -311,29 +312,28 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if 'text_search' in request.QUERY_PARAMS and 'order_by' in request.QUERY_PARAMS:
+        text_search = request.QUERY_PARAMS.get('text_search', None)
+        if text_search and request.QUERY_PARAMS.get('order_by', None):
             return Response(
                 build_api_error(ugettext_noop("text_search and order_by cannot be provided together")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if 'topic_id' in request.QUERY_PARAMS:
-            topic_id = request.QUERY_PARAMS['topic_id']
+        topic_id = request.QUERY_PARAMS.get('topic_id', None)
+        if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
                 error = build_api_error(
                     ugettext_noop('The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
-
-        if 'text_search' in request.QUERY_PARAMS and CourseTeamIndexer.search_is_enabled():
+            result_filter.update({'topic_id': topic_id})
+        if text_search and CourseTeamIndexer.search_is_enabled():
             search_engine = CourseTeamIndexer.engine()
-            text_search = request.QUERY_PARAMS['text_search'].encode('utf-8')
             result_filter.update({'course_id': course_id_string})
 
             search_results = search_engine.search(
-                query_string=text_search,
+                query_string=text_search.encode('utf-8'),
                 field_dictionary=result_filter,
                 size=MAXIMUM_SEARCH_SIZE,
             )
@@ -345,6 +345,12 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 self.get_page()
             )
             serializer = self.get_pagination_serializer(paginated_results)
+            tracker.emit('edx.team.searched', {
+                "number_of_results": search_results['total'],
+                "search_text": text_search,
+                "topic_id": topic_id,
+                "course_id": course_id_string,
+            })
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
@@ -417,9 +423,22 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
+            tracker.emit('edx.team.created', {
+                'team_id': team.team_id,
+                'course_id': unicode(course_id)
+            })
             if not team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
+                tracker.emit(
+                    'edx.team.learner_added',
+                    {
+                        'team_id': team.team_id,
+                        'user_id': request.user.id,
+                        'course_id': unicode(team.course_id),
+                        'add_method': 'added_on_create'
+                    }
+                )
             return Response(CourseTeamSerializer(team).data)
 
     def get_page(self):
@@ -974,6 +993,15 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         try:
             membership = team.add_user(user)
+            tracker.emit(
+                'edx.team.learner_added',
+                {
+                    'team_id': team.team_id,
+                    'user_id': user.id,
+                    'course_id': unicode(team.course_id),
+                    'add_method': 'joined_from_team_view' if user == request.user else 'added_by_another_user'
+                }
+            )
         except AlreadyOnTeamInCourse:
             return Response(
                 build_api_error(
@@ -1100,6 +1128,15 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         if has_team_api_access(request.user, team.course_id, access_username=username):
             membership = self.get_membership(username, team)
             membership.delete()
+            tracker.emit(
+                'edx.team.learner_removed',
+                {
+                    'team_id': team.team_id,
+                    'course_id': unicode(team.course_id),
+                    'user_id': membership.user.id,
+                    'remove_method': 'self_removal' if membership.user == request.user else 'removed_by_admin'
+                }
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)

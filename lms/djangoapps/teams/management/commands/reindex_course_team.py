@@ -53,8 +53,8 @@ class Command(BaseCommand):
 
         if len(args) == 0 and not options.get('all', False):
             raise CommandError(u"reindex_course_team requires one or more arguments: <course_team_id>")
-        elif not settings.FEATURES.get('ENABLE_TEAMS_SEARCH', False):
-            raise CommandError(u"ENABLE_TEAMS_SEARCH must be enabled")
+        elif not settings.FEATURES.get('ENABLE_TEAMS', False):
+            raise CommandError(u"ENABLE_TEAMS must be enabled to use course team indexing")
 
         if options.get('all', False):
             course_teams = CourseTeam.objects.all()

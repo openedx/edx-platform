@@ -17,12 +17,12 @@
            <span class="title"><%= gettext("Certificate Details") %></span>
          </header>
         <div class="actual-course-title">
-                <span class="certificate-label"><%= gettext('Course Title') %>: </span>
+                <span class="certificate-label"><b><%= gettext('Course Title') %>: </b> </span>
                 <span class="certificate-value"><%= course.get('name') %></span>
         </div>
         <% if (course_title) { %>
             <div class="course-title-override">
-                <span class="certificate-label"><%= gettext('Course Title Override') %>: </span>
+                <span class="certificate-label"><b><%= gettext('Course Title Override') %>: </b></span>
                 <span class="certificate-value"><%= course_title %></span>
             </div>
         <% } %>

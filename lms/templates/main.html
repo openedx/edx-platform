@@ -94,7 +94,7 @@ from branding import api as branding_api
     style_overrides_file = None
 
   else:
-    header_extra_file = None
+    header_extra_file = microsite.get_template_path('header_extra.html')
 
     if settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
         header_file = microsite.get_template_path('navigation-edx.html')

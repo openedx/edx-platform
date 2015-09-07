@@ -12,5 +12,5 @@
         <h2 class="page-title"><%- title %></h2>
         <p class="page-description"><%- description %></p>
     </div>
-    <div class="header-action-view"></div>
+    <div class="page-header-secondary"></div>
 </header>

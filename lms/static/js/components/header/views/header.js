@@ -17,7 +17,7 @@
                        var json = this.model.attributes;
                        this.$el.html(this.template(json));
                        if (this.headerActionsView) {
-                           this.headerActionsView.setElement(this.$('.header-action-view')).render();
+                           this.headerActionsView.setElement(this.$('.page-header-secondary')).render();
                        }
                        return this;
                    }

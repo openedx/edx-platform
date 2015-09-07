@@ -21,22 +21,19 @@
 
                 initialize: function(options) {
                     this.teamEvents = options.teamEvents;
-                    this.courseID = options.teamParams.courseID;
-                    this.topicID = options.teamParams.topicID;
+                    this.context = options.context;
+                    this.topic = options.topic;
                     this.collection = options.collection;
-                    this.teamsUrl = options.teamParams.teamsUrl;
-                    this.languages = options.teamParams.languages;
-                    this.countries = options.teamParams.countries;
-                    this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
                     this.action = options.action;
 
                     if (this.action === 'create') {
                         this.teamModel = new TeamModel({});
-                        this.teamModel.url = this.teamsUrl;
+                        this.teamModel.url = this.context.teamsUrl;
                         this.primaryButtonTitle = gettext("Create");
                     } else if(this.action === 'edit' ) {
                         this.teamModel = options.model;
-                        this.teamModel.url = this.teamsDetailUrl.replace('team_id', options.model.get('id')) + '?expand=user';
+                        this.teamModel.url = this.context.teamsDetailUrl.replace('team_id', options.model.get('id')) +
+                            '?expand=user';
                         this.primaryButtonTitle = gettext("Update");
                     }
 
@@ -63,7 +60,7 @@
                         required: false,
                         showMessages: false,
                         titleIconName: 'fa-comment-o',
-                        options: this.languages,
+                        options: this.context.languages,
                         helpMessage: gettext('The language that team members primarily use to communicate with each other.')
                     });
 
@@ -74,7 +71,7 @@
                         required: false,
                         showMessages: false,
                         titleIconName: 'fa-globe',
-                        options: this.countries,
+                        options: this.context.countries,
                         helpMessage: gettext('The country that team members primarily identify with.')
                     });
                 },
@@ -117,8 +114,8 @@
                         };
 
                     if (this.action === 'create') {
-                        data.course_id = this.courseID;
-                        data.topic_id = this.topicID;
+                        data.course_id = this.context.courseID;
+                        data.topic_id = this.topic.id;
                     } else if (this.action === 'edit' ) {
                         saveOptions.patch = true;
                         saveOptions.contentType = 'application/merge-patch+json';
@@ -137,7 +134,7 @@
                                 team: result
                             });
                             Backbone.history.navigate(
-                                'teams/' + view.topicID + '/' + view.teamModel.id,
+                                'teams/' + view.topic.id + '/' + view.teamModel.id,
                                 {trigger: true}
                             );
                         })
@@ -208,9 +205,9 @@
                     event.preventDefault();
                     var url;
                     if (this.action === 'create') {
-                        url = 'topics/' + this.topicID;
+                        url = 'topics/' + this.topic.id;
                     } else if (this.action === 'edit' ) {
-                        url = 'teams/' + this.topicID + '/' + this.teamModel.get('id');
+                        url = 'teams/' + this.topic.id + '/' + this.teamModel.get('id');
                     }
                     Backbone.history.navigate(url, {trigger: true});
                 }

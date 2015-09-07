@@ -24,6 +24,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
+from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -1226,7 +1227,7 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
         request = RequestFactory().post("dummy_url", {"body": text})
         request.user = self.student
         request.view_name = "create_sub_comment"
-        Thread.commentable_id = Mock()
+        Thread.commentable_id = "test_commentable"
         try:
             response = views.create_sub_comment(
                 request, course_id=unicode(self.course.id), comment_id="dummy_comment_id"
@@ -1496,7 +1497,11 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
             self.assertEqual(response.status_code, status_code)
 
 
+TEAM_COMMENTABLE_ID = 'test-team-discussion'
+
+
 @disable_signal(views, 'comment_created')
+@ddt.ddt
 class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
     """
     Forum actions are expected to launch analytics events. Test these here.
@@ -1591,6 +1596,51 @@ class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         self.assertEqual(event['user_forums_roles'], ['Student'])
         self.assertEqual(event['user_course_roles'], ['Wizard'])
         self.assertEqual(event['options']['followed'], False)
+
+    @patch('eventtracking.tracker.emit')
+    @patch('lms.lib.comment_client.utils.requests.request')
+    @ddt.data((
+        'create_thread',
+        'edx.forum.thread.created', {
+            'thread_type': 'discussion',
+            'body': 'Test text',
+            'title': 'Test',
+            'auto_subscribe': True
+        },
+        {'commentable_id': TEAM_COMMENTABLE_ID}
+    ), (
+        'create_comment',
+        'edx.forum.response.created',
+        {'body': 'Test comment', 'auto_subscribe': True},
+        {'thread_id': 'test_thread_id'}
+    ), (
+        'create_sub_comment',
+        'edx.forum.comment.created',
+        {'body': 'Another comment'},
+        {'comment_id': 'dummy_comment_id'}
+    ))
+    @ddt.unpack
+    def test_team_events(self, view_name, event_name, view_data, view_kwargs, mock_request, mock_emit):
+        user = self.student
+        team = CourseTeamFactory.create(discussion_topic_id=TEAM_COMMENTABLE_ID)
+        CourseTeamMembershipFactory.create(team=team, user=user)
+
+        mock_request.return_value.status_code = 200
+        self._set_mock_request_data(mock_request, {
+            'closed': False,
+            'commentable_id': TEAM_COMMENTABLE_ID,
+            'thread_id': 'test_thread_id',
+        })
+
+        request = RequestFactory().post('dummy_url', view_data)
+        request.user = user
+        request.view_name = view_name
+
+        getattr(views, view_name)(request, course_id=unicode(self.course.id), **view_kwargs)
+
+        name, event = mock_emit.call_args[0]
+        self.assertEqual(name, event_name)
+        self.assertEqual(event['team_id'], team.team_id)
 
 
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):

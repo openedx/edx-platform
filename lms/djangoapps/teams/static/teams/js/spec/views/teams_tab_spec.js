@@ -8,14 +8,6 @@ define([
     'use strict';
 
     describe('TeamsTab', function () {
-        var expectContent = function (teamsTabView, text) {
-            expect(teamsTabView.$('.page-content-main').text()).toContain(text);
-        };
-
-        var expectHeader = function (teamsTabView, text) {
-            expect(teamsTabView.$('.teams-header').text()).toContain(text);
-        };
-
         var expectError = function (teamsTabView, text) {
             expect(teamsTabView.$('.warning').text()).toContain(text);
         };
@@ -26,30 +18,17 @@ define([
 
         var createTeamsTabView = function(options) {
             var defaultTopics = {
-                    count: 1,
+                    count: 5,
                     num_pages: 1,
                     current_page: 1,
                     start: 0,
-                    results: [{
-                        description: 'test description',
-                        name: 'test topic',
-                        id: 'test_topic',
-                        team_count: 0
-                    }]
+                    results: TeamSpecHelpers.createMockTopicData(1, 5)
                 },
                 teamsTabView = new TeamsTabView(
-                    _.extend(
-                        {
-                            el: $('.teams-content'),
-                            topics: defaultTopics,
-                            userInfo: TeamSpecHelpers.createMockUserInfo(),
-                            topicsUrl: 'api/topics/',
-                            topicUrl: 'api/topics/topic_id,test/course/id',
-                            teamsUrl: 'api/teams/',
-                            courseID: 'test/course/id'
-                        },
-                        options || {}
-                    )
+                    {
+                        el: $('.teams-content'),
+                        context: TeamSpecHelpers.createMockContext(options)
+                    }
                 );
             teamsTabView.start();
             return teamsTabView;
@@ -82,7 +61,7 @@ define([
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('topics/no_such_topic', {trigger: true});
-                AjaxHelpers.expectRequest(requests, 'GET', 'api/topics/no_such_topic,test/course/id', null);
+                AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/topics/no_such_topic,course/1', null);
                 AjaxHelpers.respondWithError(requests, 404);
                 expectError(teamsTabView, 'The topic "no_such_topic" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
@@ -91,8 +70,8 @@ define([
             it('displays and focuses an error message when trying to navigate to a nonexistent team', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
-                teamsTabView.router.navigate('teams/test_topic/no_such_team', {trigger: true});
-                AjaxHelpers.expectRequest(requests, 'GET', 'api/teams/no_such_team?expand=user', null);
+                teamsTabView.router.navigate('teams/' + TeamSpecHelpers.testTopicID + '/no_such_team', {trigger: true});
+                AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/teams/no_such_team?expand=user', null);
                 AjaxHelpers.respondWithError(requests, 404);
                 expectError(teamsTabView, 'The team "no_such_team" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
@@ -113,7 +92,7 @@ define([
             it('allows access to a team which an unprivileged user is a member of', function () {
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({
-                        username: 'test-user',
+                        username: TeamSpecHelpers.testUser,
                         privileged: false
                     })
                 });
@@ -121,7 +100,7 @@ define([
                     attributes: {
                         membership: [{
                             user: {
-                                username: 'test-user'
+                                username: TeamSpecHelpers.testUser
                             }
                         }]
                     }
@@ -135,6 +114,104 @@ define([
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: { membership: [] }
                 })).toBe(true);
+            });
+        });
+
+        describe('Search', function () {
+            var verifyTeamsRequest = function(requests, options) {
+                AjaxHelpers.expectRequestURL(requests, TeamSpecHelpers.testContext.teamsUrl,
+                    _.extend(
+                        {
+                            topic_id: TeamSpecHelpers.testTopicID,
+                            expand: 'user',
+                            course_id: TeamSpecHelpers.testCourseID,
+                            order_by: '',
+                            page: '1',
+                            page_size: '10',
+                            text_search: ''
+                        },
+                        options
+                    ));
+            };
+
+            it('can search teams', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+                verifyTeamsRequest(requests, {
+                    order_by: 'last_activity_at',
+                    text_search: ''
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+                teamsTabView.$('.search-field').val('foo');
+                teamsTabView.$('.action-search').click();
+                verifyTeamsRequest(requests, {
+                    order_by: '',
+                    text_search: 'foo'
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
+                expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
+            });
+
+            it('can clear a search', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Perform a search
+                teamsTabView.$('.search-field').val('foo');
+                teamsTabView.$('.action-search').click();
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Clear the search and submit it again
+                teamsTabView.$('.search-field').val('');
+                teamsTabView.$('.action-search').click();
+                verifyTeamsRequest(requests, {
+                    order_by: 'last_activity_at',
+                    text_search: ''
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
+                expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
+            });
+
+            it('clears the search when navigating away and then back', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Perform a search
+                teamsTabView.$('.search-field').val('foo');
+                teamsTabView.$('.action-search').click();
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Navigate back to the teams list
+                teamsTabView.$('.breadcrumbs a').last().click();
+                verifyTeamsRequest(requests, {
+                    order_by: 'last_activity_at',
+                    text_search: ''
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
+                expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
+            });
+
+            it('does not switch to showing results when the search returns an error', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Perform a search
+                teamsTabView.$('.search-field').val('foo');
+                teamsTabView.$('.action-search').click();
+                AjaxHelpers.respondWithError(requests);
+                expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
+                expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
+                expect(teamsTabView.$('.search-field').val(), 'foo');
             });
         });
     });

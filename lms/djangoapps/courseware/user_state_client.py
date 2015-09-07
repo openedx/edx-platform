@@ -140,6 +140,8 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         block_count = state_length = 0
         evt_time = time()
 
+        self._ddog_histogram(evt_time, 'get_many.blks_requested', len(block_keys))
+
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:

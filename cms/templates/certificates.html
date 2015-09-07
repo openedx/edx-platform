@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 <%block name="bodyclass">is-signedin course view-certificates</%block>
 
 <%block name="header_extras">
-% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview"]:
+% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview", "signatory-actions"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>

@@ -1365,6 +1365,28 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             }
         )
 
+    def test_shopping_cart_navigation_link_not_in_microsite(self):
+        """
+        Tests shopping cart link is available in navigation header if request is not from a microsite.
+        """
+        CourseEnrollment.enroll(self.user, self.course_key)
+        self.add_course_to_user_cart(self.testing_course.id)
+        resp = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.course.id)}))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('<a class="shopping-cart"', resp.content)
+
+    def test_shopping_cart_navigation_link_in_microsite(self):
+        """
+        Tests shopping cart link is not available in navigation header if request is from a microsite.
+        """
+        CourseEnrollment.enroll(self.user, self.course_key)
+        self.add_course_to_user_cart(self.testing_course.id)
+        with patch('microsite_configuration.microsite.is_request_in_microsite',
+                   Mock(return_value=True)):
+            resp = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.course.id)}))
+            self.assertEqual(resp.status_code, 200)
+            self.assertNotIn('<a class="shopping-cart"', resp.content)
+
 
 class ReceiptRedirectTest(SharedModuleStoreTestCase):
     """Test special-case redirect from the receipt page. """

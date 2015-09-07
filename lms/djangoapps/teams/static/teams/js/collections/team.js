@@ -14,7 +14,7 @@
                             topic_id: this.topic_id = options.topic_id,
                             expand: 'user',
                             course_id: function () { return encodeURIComponent(self.course_id); },
-                            order_by: function () { return this.sortField; }
+                            order_by: function () { return self.searchString ? '' : this.sortField; }
                         },
                         BaseCollection.prototype.server_api
                     );

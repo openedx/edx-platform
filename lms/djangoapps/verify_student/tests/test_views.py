@@ -326,14 +326,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         response = self._get_page(page_name, course.id, expected_status_code=302)
         self._assert_redirects_to_upgrade(response, course.id)
 
-    def test_verify_later(self):
-        """ The deprecated verify-later page should redirect to the verification start page. """
-        course = self._create_course("verified")
-        course_key = course.id
-        self._enroll(course_key, "verified")
-        response = self._get_page("verify_student_verify_later", course_key, expected_status_code=301)
-        self._assert_redirects_to_verify_start(response, course_key, 301)
-
     def test_payment_confirmation(self):
         course = self._create_course("verified")
         self._enroll(course.id, "verified")

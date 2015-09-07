@@ -384,13 +384,36 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertTrue(self.video.is_video_rendered('html5'))
 
-    def test_video_with_youtube_blocked(self):
+    def test_video_with_youtube_blocked_with_default_response_time(self):
+        """
+        Scenario: Video is rendered in HTML5 mode when the YouTube API is blocked
+        Given the YouTube API is blocked
+        And the course has a Video component in "Youtube_HTML5" mode
+        Then the video has rendered in "HTML5" mode
+        And only one video has rendered
+        """
+        # configure youtube server
+        self.youtube_configuration.update({
+            'youtube_api_blocked': True,
+        })
+
+        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
+
+        # The video should only be loaded once
+        self.assertEqual(len(self.video.q(css='video')), 1)
+
+    def test_video_with_youtube_blocked_delayed_response_time(self):
         """
         Scenario: Video is rendered in HTML5 mode when the YouTube API is blocked
         Given the YouTube server response time is greater than 1.5 seconds
         And the YouTube API is blocked
         And the course has a Video component in "Youtube_HTML5" mode
         Then the video has rendered in "HTML5" mode
+        And only one video has rendered
         """
         # configure youtube server
         self.youtube_configuration.update({
@@ -403,6 +426,9 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         self.assertTrue(self.video.is_video_rendered('html5'))
+
+        # The video should only be loaded once
+        self.assertEqual(len(self.video.q(css='video')), 1)
 
     def test_html5_video_rendered_with_youtube_captions(self):
         """

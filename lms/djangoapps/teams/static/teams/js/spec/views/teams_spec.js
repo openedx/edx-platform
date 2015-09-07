@@ -17,11 +17,7 @@ define([
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
                 teamMemberships: options.teamMemberships || TeamSpecHelpers.createMockTeamMemberships(),
                 showActions: true,
-                teamParams: {
-                    topicID: 'test-topic',
-                    countries: TeamSpecHelpers.testCountries,
-                    languages: TeamSpecHelpers.testLanguages
-                }
+                context: TeamSpecHelpers.testContext
             }).render();
         };
 

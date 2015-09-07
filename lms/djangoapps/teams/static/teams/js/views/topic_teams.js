@@ -15,6 +15,7 @@
                 },
 
                 initialize: function(options) {
+                    this.showSortControls = options.showSortControls;
                     TeamsView.prototype.initialize.call(this, options);
                 },
 
@@ -24,21 +25,29 @@
                         this.collection.refresh(),
                         this.teamMemberships.refresh()
                     ).done(function() {
-                        TeamsView.prototype.render.call(self);
+                            TeamsView.prototype.render.call(self);
 
-                        if (self.teamMemberships.canUserCreateTeam()) {
-                            var message = interpolate_text(
-                                _.escape(gettext("Try {browse_span_start}browsing all teams{span_end} or {search_span_start}searching team descriptions{span_end}. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
-                                {
-                                    'browse_span_start': '<a class="browse-teams" href="">',
-                                    'search_span_start': '<a class="search-teams" href="">',
-                                    'create_span_start': '<a class="create-team" href="">',
-                                    'span_end': '</a>'
-                                }
-                            );
-                            self.$el.append(_.template(teamActionsTemplate, {message: message}));
-                        }
-                    });
+                            if (self.teamMemberships.canUserCreateTeam()) {
+                                var message = interpolate_text(
+                                    // Translators: this string is shown at the bottom of the teams page
+                                    // to find a team to join or else to create a new one. There are three
+                                    // links that need to be included in the message:
+                                    // 1. Browse teams in other topics
+                                    // 2. search teams
+                                    // 3. create a new team
+                                    // Be careful to start each link with the appropriate start indicator
+                                    // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
+                                    _.escape(gettext("{browse_span_start}Browse teams in other topics{span_end} or {search_span_start}search teams{span_end} in this topic. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
+                                    {
+                                        'browse_span_start': '<a class="browse-teams" href="">',
+                                        'search_span_start': '<a class="search-teams" href="">',
+                                        'create_span_start': '<a class="create-team" href="">',
+                                        'span_end': '</a>'
+                                    }
+                                );
+                                self.$el.append(_.template(teamActionsTemplate, {message: message}));
+                            }
+                        });
                     return this;
                 },
 
@@ -48,21 +57,25 @@
                 },
 
                 searchTeams: function (event) {
+                    var searchField = $('.page-header-search .search-field');
                     event.preventDefault();
-                    // TODO! Will navigate to correct place once required functionality is available
-                    Backbone.history.navigate('browse', {trigger: true});
+                    searchField.focus();
+                    searchField.select();
+                    $('html, body').animate({
+                        scrollTop: 0
+                    }, 500);
                 },
 
                 showCreateTeamForm: function (event) {
                     event.preventDefault();
-                    Backbone.history.navigate('topics/' + this.teamParams.topicID + '/create-team', {trigger: true});
+                    Backbone.history.navigate('topics/' + this.model.id + '/create-team', {trigger: true});
                 },
 
                 createHeaderView: function () {
                     return new PagingHeader({
                         collection: this.options.collection,
                         srInfo: this.srInfo,
-                        showSortControls: true
+                        showSortControls: this.showSortControls
                     });
                 }
             });

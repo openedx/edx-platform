@@ -16,6 +16,7 @@ from courseware.tests.factories import StaffFactory
 from common.test.utils import skip_signal
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
@@ -399,8 +400,11 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class TestListTeamsAPI(TeamAPITestCase):
+class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(TestListTeamsAPI, self).setUp('teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -471,6 +475,7 @@ class TestListTeamsAPI(TeamAPITestCase):
     def test_order_by_with_text_search(self):
         data = {'order_by': 'name', 'text_search': 'search'}
         self.verify_names(data, 400, [])
+        self.assert_no_events_were_emitted()
 
     @ddt.data((404, {'course_id': 'no/such/course'}), (400, {'topic_id': 'no_such_topic'}))
     @ddt.unpack
@@ -509,7 +514,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         ('queryable', ['Search']),
         ('Tonga', ['Search']),
         ('Island', ['Search']),
-        ('search queryable', []),
+        ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
     )
     @ddt.unpack
@@ -527,10 +532,21 @@ class TestListTeamsAPI(TeamAPITestCase):
             user='student_enrolled_public_profile'
         )
 
+        self.assert_event_emitted(
+            'edx.team.searched',
+            course_id=unicode(self.test_course_2.id),
+            search_text=text_search,
+            topic_id=None,
+            number_of_results=len(expected_team_names)
+        )
+
 
 @ddt.ddt
-class TestCreateTeamAPI(TeamAPITestCase):
+class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team creation endpoint."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(TestCreateTeamAPI, self).setUp('teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -549,11 +565,15 @@ class TestCreateTeamAPI(TeamAPITestCase):
             teams = self.get_teams_list(user=user)
             self.assertIn("New Team", [team['name'] for team in teams['results']])
 
+    def _expected_team_id(self, team, expected_prefix):
+        """ Return the team id that we'd expect given this team data and this prefix. """
+        return expected_prefix + '-' + team['discussion_topic_id']
+
     def verify_expected_team_id(self, team, expected_prefix):
         """ Verifies that the team id starts with the specified prefix and ends with the discussion_topic_id """
         self.assertIn('id', team)
         self.assertIn('discussion_topic_id', team)
-        self.assertEqual(team['id'], expected_prefix + '-' + team['discussion_topic_id'])
+        self.assertEqual(team['id'], self._expected_team_id(team, expected_prefix))
 
     def test_naming(self):
         new_teams = [
@@ -640,6 +660,19 @@ class TestCreateTeamAPI(TeamAPITestCase):
         self.verify_expected_team_id(team, 'fully-specified-team')
         del team['id']
 
+        self.assert_event_emitted(
+            'edx.team.created',
+            team_id=self._expected_team_id(team, 'fully-specified-team'),
+            course_id=unicode(self.test_course_1.id),
+        )
+
+        self.assert_event_emitted(
+            'edx.team.learner_added',
+            team_id=self._expected_team_id(team, 'fully-specified-team'),
+            course_id=unicode(self.test_course_1.id),
+            user_id=self.users[creator].id,
+            add_method='added_on_create'
+        )
         # Remove date_created and discussion_topic_id because they change between test runs
         del team['date_created']
         del team['discussion_topic_id']
@@ -1026,8 +1059,11 @@ class TestListMembershipAPI(TeamAPITestCase):
 
 
 @ddt.ddt
-class TestCreateMembershipAPI(TeamAPITestCase):
+class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(TestCreateMembershipAPI, self).setUp('teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1052,6 +1088,18 @@ class TestCreateMembershipAPI(TeamAPITestCase):
             self.assertEqual(membership['team']['team_id'], self.solar_team.team_id)
             memberships = self.get_membership_list(200, {'team_id': self.solar_team.team_id})
             self.assertEqual(memberships['count'], 2)
+
+            add_method = 'joined_from_team_view' if user == 'student_enrolled_not_on_team' else 'added_by_another_user'
+
+            self.assert_event_emitted(
+                'edx.team.learner_added',
+                team_id=self.solar_team.team_id,
+                user_id=self.users['student_enrolled_not_on_team'].id,
+                course_id=unicode(self.solar_team.course_id),
+                add_method=add_method
+            )
+        else:
+            self.assert_no_events_were_emitted()
 
     def test_no_username(self):
         response = self.post_create_membership(400, {'team_id': self.solar_team.team_id})
@@ -1176,8 +1224,11 @@ class TestDetailMembershipAPI(TeamAPITestCase):
 
 
 @ddt.ddt
-class TestDeleteMembershipAPI(TeamAPITestCase):
+class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership deletion endpoint."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(TestDeleteMembershipAPI, self).setUp('teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1197,6 +1248,18 @@ class TestDeleteMembershipAPI(TeamAPITestCase):
             status,
             user=user
         )
+
+        if status == 204:
+            remove_method = 'self_removal' if user == 'student_enrolled' else 'removed_by_admin'
+            self.assert_event_emitted(
+                'edx.team.learner_removed',
+                team_id=self.solar_team.team_id,
+                course_id=unicode(self.solar_team.course_id),
+                user_id=self.users['student_enrolled'].id,
+                remove_method=remove_method
+            )
+        else:
+            self.assert_no_events_were_emitted()
 
     def test_bad_team(self):
         self.delete_membership('no_such_team', self.users['student_enrolled'].username, 404)

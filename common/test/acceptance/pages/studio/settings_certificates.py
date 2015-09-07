@@ -27,6 +27,12 @@ class CertificatesPage(CoursePage):
     # Helpers
     ################
 
+    def refresh(self):
+        """
+        Refresh the certificate page
+        """
+        self.browser.refresh()
+
     def is_browser_on_page(self):
         """
         Verify that the browser is on the page and it is not still loading.
@@ -434,11 +440,8 @@ class Signatory(object):
         """
         Save signatory.
         """
-        # Move focus from input to save button and then click it
-        self.certificate.page.browser.execute_script(
-            "$('{} .signatory-panel-save').focus()".format(self.get_selector())
-        )
-        self.find_css('.signatory-panel-save').first.click()
+        # Click on the save button.
+        self.certificate.page.q(css='button.signatory-panel-save').click()
         self.mode = 'details'
         self.certificate.page.wait_for_ajax()
         self.wait_for_signatory_detail_view()
@@ -447,7 +450,7 @@ class Signatory(object):
         """
         Cancel signatory editing.
         """
-        self.find_css('.signatory-panel-close').first.click()
+        self.certificate.page.q(css='button.signatory-panel-close').click()
         self.mode = 'details'
         self.wait_for_signatory_detail_view()
 

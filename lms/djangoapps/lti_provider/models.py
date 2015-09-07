@@ -26,7 +26,7 @@ class LtiConsumer(models.Model):
     consumer_name = models.CharField(max_length=255, unique=True)
     consumer_key = models.CharField(max_length=32, unique=True, db_index=True)
     consumer_secret = models.CharField(max_length=32, unique=True)
-    instance_guid = models.CharField(max_length=255, null=True, unique=True)
+    instance_guid = models.CharField(max_length=255, blank=True, null=True, unique=True)
 
     @staticmethod
     def get_or_supplement(instance_guid, consumer_key):
@@ -112,6 +112,7 @@ class GradedAssignment(models.Model):
     usage_key = UsageKeyField(max_length=255, db_index=True)
     outcome_service = models.ForeignKey(OutcomeService)
     lis_result_sourcedid = models.CharField(max_length=255, db_index=True)
+    version_number = models.IntegerField(default=0)
 
     class Meta(object):
         """
