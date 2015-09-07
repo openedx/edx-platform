@@ -816,7 +816,7 @@ TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
 EVENT_TRACKING_ENABLED = True
 EVENT_TRACKING_BACKENDS = {
-    'tracking_logs': {
+    '0_tracking_logs': {
         'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
         'OPTIONS': {
             'backends': {
@@ -834,7 +834,7 @@ EVENT_TRACKING_BACKENDS = {
             ]
         }
     },
-    'segmentio': {
+    '1_segmentio': {
         'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
         'OPTIONS': {
             'backends': {
