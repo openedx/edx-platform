@@ -2806,12 +2806,11 @@ class RetrieveThreadTest(
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
-        self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.thread_author = UserFactory.create()
+        self.register_get_user_response(self.thread_author)
         self.request = RequestFactory().get("/test_path")
-        self.request.user = self.user
         self.thread_id = "test_thread"
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.thread_author, course_id=self.course.id)
 
     def register_thread(self, overrides=None):
         """
@@ -2823,8 +2822,8 @@ class RetrieveThreadTest(
             "id": self.thread_id,
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
-            "username": self.user.username,
-            "user_id": str(self.user.id),
+            "username": self.thread_author.username,
+            "user_id": str(self.thread_author.id),
             "title": "Test Title",
             "body": "Test body",
             "created_at": "2015-05-29T00:00:00Z",
@@ -2835,7 +2834,7 @@ class RetrieveThreadTest(
 
     def test_basic(self):
         expected_response_data = {
-            "author": self.user.username,
+            "author": self.thread_author.username,
             "author_label": None,
             "created_at": "2015-05-29T00:00:00Z",
             "updated_at": "2015-05-29T00:00:00Z",
@@ -2864,16 +2863,51 @@ class RetrieveThreadTest(
             "type": "discussion"
         }
         self.register_thread()
-        self.assertEqual(get_thread(self.request, self.thread_id),expected_response_data)
+        self.request.user = self.thread_author
+        self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
         self.assertEqual(httpretty.last_request().method, "GET")
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("missing_thread", 404)
+        self.request.user = self.thread_author
         with self.assertRaises(Http404):
             get_thread(self.request, "missing_thread")
 
-    def test_not_enrolled(self):
+    def test_nonauthor_enrolled_in_course(self):
+        expected_response_data = {
+            "author": self.thread_author.username,
+            "author_label": None,
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "editable_fields": ["abuse_flagged", "following", "voted"],
+            "course_id": unicode(self.course.id),
+            "topic_id": "test_topic",
+            "group_id": None,
+            "group_name": None,
+            "title": "Test Title",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "comment_count": 0,
+            "unread_comment_count": 0,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+            "read": False,
+            "has_endorsed": False,
+            "id": "test_thread",
+            "type": "discussion"
+        }
+        self.non_author_user = UserFactory.create()
+        self.register_get_user_response(self.non_author_user)
+        CourseEnrollmentFactory.create(user=self.non_author_user, course_id=self.course.id)
         self.register_thread()
-        self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
-            get_thread(self.request, self.thread_id)
+        self.request.user = self.non_author_user
+        self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
+        self.assertEqual(httpretty.last_request().method, "GET")
+

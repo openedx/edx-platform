@@ -1012,7 +1012,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase)
         self.assertEqual(json.loads(response.content), expected_response_data)
         self.assertEqual(httpretty.last_request().method, "GET")
 
-    def test_delete_nonexistent_thread(self):
+    def test_retrieve_nonexistent_thread(self):
         self.register_get_thread_error_response(self.thread_id, 404)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)

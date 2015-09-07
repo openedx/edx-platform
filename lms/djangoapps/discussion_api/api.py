@@ -707,17 +707,10 @@ def get_thread(request, thread_id):
 
         thread_id: The id for the thread to retrieve
 
-    Raises:
-
-        PermissionDenied: if user does not have permission to view thread
-
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    if has_permission(cc_thread, context):
-        serializer = ThreadSerializer(cc_thread, context=context)
-        return serializer.data
-    else:
-        raise PermissionDenied
+    serializer = ThreadSerializer(cc_thread, context=context)
+    return serializer.data
 
 
 def delete_thread(request, thread_id):
