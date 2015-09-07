@@ -1375,9 +1375,34 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('<a class="shopping-cart"', resp.content)
 
-    def test_shopping_cart_navigation_link_in_microsite(self):
+    def test_shopping_cart_navigation_link_not_in_microsite_and_not_on_courseware(self):
         """
-        Tests shopping cart link is not available in navigation header if request is from a microsite.
+        Tests shopping cart link is available in navigation header if request is not from a microsite
+        and requested page is not courseware too.
+        """
+        CourseEnrollment.enroll(self.user, self.course_key)
+        self.add_course_to_user_cart(self.testing_course.id)
+        resp = self.client.get(reverse('dashboard'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('<a class="shopping-cart"', resp.content)
+
+    def test_shopping_cart_navigation_link_in_microsite_not_on_courseware(self):
+        """
+        Tests shopping cart link is available in navigation header if request is from a microsite but requested
+        page is not from courseware.
+        """
+        CourseEnrollment.enroll(self.user, self.course_key)
+        self.add_course_to_user_cart(self.testing_course.id)
+        with patch('microsite_configuration.microsite.is_request_in_microsite',
+                   Mock(return_value=True)):
+            resp = self.client.get(reverse('dashboard'))
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<a class="shopping-cart"', resp.content)
+
+    def test_shopping_cart_navigation_link_in_microsite_courseware_page(self):
+        """
+        Tests shopping cart link is not available in navigation header if request is from a microsite
+        and requested page is from courseware.
         """
         CourseEnrollment.enroll(self.user, self.course_key)
         self.add_course_to_user_cart(self.testing_course.id)
