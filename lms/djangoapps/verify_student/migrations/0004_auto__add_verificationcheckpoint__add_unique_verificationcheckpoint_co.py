@@ -17,7 +17,7 @@ class Migration(SchemaMigration):
         db.send_create_signal('verify_student', ['VerificationCheckpoint'])
 
         # Adding M2M table for field photo_verification on 'VerificationCheckpoint'
-        m2m_table_name = db.shorten_name('verify_student_verificationcheckpoint_photo_verification')
+        m2m_table_name = 'verify_student_verificationcheckpoint_photo_verification'
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('verificationcheckpoint', models.ForeignKey(orm['verify_student.verificationcheckpoint'], null=False)),
