@@ -1303,26 +1303,6 @@ instructor_dash_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 )
 
-# JavaScript used by the student account and profile pages
-# These are not courseware, so they do not need many of the courseware-specific
-# JavaScript modules.
-student_account_js = [
-    'js/utils/edx.utils.validate.js',
-    'js/sticky_filter.js',
-    'js/query-params.js',
-    'js/student_account/models/LoginModel.js',
-    'js/student_account/models/RegisterModel.js',
-    'js/student_account/models/PasswordResetModel.js',
-    'js/student_account/views/FormView.js',
-    'js/student_account/views/LoginView.js',
-    'js/student_account/views/HintedLoginView.js',
-    'js/student_account/views/RegisterView.js',
-    'js/student_account/views/PasswordResetView.js',
-    'js/student_account/views/AccessView.js',
-    'js/student_account/views/InstitutionLoginView.js',
-    'js/student_account/accessApp.js',
-]
-
 verify_student_js = [
     'js/sticky_filter.js',
     'js/query-params.js',
@@ -1573,10 +1553,6 @@ PIPELINE_JS = {
     'dashboard': {
         'source_filenames': dashboard_js,
         'output_filename': 'js/dashboard.js'
-    },
-    'student_account': {
-        'source_filenames': student_account_js,
-        'output_filename': 'js/student_account.js'
     },
     'verify_student': {
         'source_filenames': verify_student_js,

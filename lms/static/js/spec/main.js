@@ -75,16 +75,6 @@
             'js/views/file_uploader': 'js/views/file_uploader',
             'js/views/notification': 'js/views/notification',
             'js/student_account/account': 'js/student_account/account',
-            'js/student_account/views/FormView': 'js/student_account/views/FormView',
-            'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
-            'js/student_account/views/LoginView': 'js/student_account/views/LoginView',
-            'js/student_account/views/InstitutionLoginView': 'js/student_account/views/InstitutionLoginView',
-            'js/student_account/models/PasswordResetModel': 'js/student_account/models/PasswordResetModel',
-            'js/student_account/views/PasswordResetView': 'js/student_account/views/PasswordResetView',
-            'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
-            'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
-            'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
-            'js/student_account/views/HintedLoginView': 'js/student_account/views/HintedLoginView',
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
@@ -94,7 +84,10 @@
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
 
             // edxnotes
-            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
+            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
+
+            // Common edx utils
+            'js/utils/edx.utils.validate': 'xmodule_js/common_static/js/utils/edx.utils.validate'
         },
         shim: {
             'gettext': {
@@ -335,91 +328,6 @@
                 deps: [
                     'backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
                     'js/models/notification', 'jquery.fileupload'
-                ]
-            },
-            // Student account registration/login
-            // Loaded explicitly until these are converted to RequireJS
-            'js/student_account/views/FormView': {
-                exports: 'edx.student.account.FormView',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext']
-            },
-            'js/student_account/models/LoginModel': {
-                exports: 'edx.student.account.LoginModel',
-                deps: ['jquery', 'jquery.cookie', 'backbone']
-            },
-            'js/student_account/views/LoginView': {
-                exports: 'edx.student.account.LoginView',
-                deps: [
-                    'jquery',
-                    'jquery.url',
-                    'underscore',
-                    'gettext',
-                    'js/student_account/models/LoginModel',
-                    'js/student_account/views/FormView'
-                ]
-            },
-            'js/student_account/views/InstitutionLoginView': {
-                exports: 'edx.student.account.InstitutionLoginView',
-                deps: [
-                    'jquery',
-                    'underscore',
-                    'backbone'
-                ]
-            },
-            'js/student_account/models/PasswordResetModel': {
-                exports: 'edx.student.account.PasswordResetModel',
-                deps: ['jquery', 'jquery.cookie', 'backbone']
-            },
-            'js/student_account/views/PasswordResetView': {
-                exports: 'edx.student.account.PasswordResetView',
-                deps: [
-                    'jquery',
-                    'underscore',
-                    'gettext',
-                    'js/student_account/models/PasswordResetModel',
-                    'js/student_account/views/FormView'
-                ]
-            },
-            'js/student_account/models/RegisterModel': {
-                exports: 'edx.student.account.RegisterModel',
-                deps: ['jquery', 'jquery.cookie', 'backbone']
-            },
-            'js/student_account/views/RegisterView': {
-                exports: 'edx.student.account.RegisterView',
-                deps: [
-                    'jquery',
-                    'jquery.url',
-                    'underscore',
-                    'gettext',
-                    'js/student_account/models/RegisterModel',
-                    'js/student_account/views/FormView'
-                ]
-            },
-            'js/student_account/views/HintedLoginView': {
-                exports: 'edx.student.account.HintedLoginView',
-                deps: [
-                    'jquery',
-                    'underscore',
-                    'backbone',
-                    'gettext'
-                ]
-            },
-            'js/student_account/views/AccessView': {
-                exports: 'edx.student.account.AccessView',
-                deps: [
-                    'jquery',
-                    'underscore',
-                    'backbone',
-                    'history',
-                    'utility',
-                    'js/student_account/views/LoginView',
-                    'js/student_account/views/PasswordResetView',
-                    'js/student_account/views/RegisterView',
-                    'js/student_account/views/InstitutionLoginView',
-                    'js/student_account/models/LoginModel',
-                    'js/student_account/models/PasswordResetModel',
-                    'js/student_account/models/RegisterModel',
-                    'js/student_account/views/FormView'
                 ]
             },
             'js/verify_student/models/verification_model': {
@@ -731,6 +639,7 @@
         'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
+        'lms/include/js/spec/student_account/logistration_factory_spec.js',
         'lms/include/js/spec/student_account/finish_auth_spec.js',
         'lms/include/js/spec/student_account/hinted_login_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
