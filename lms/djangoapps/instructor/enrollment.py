@@ -98,7 +98,9 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         representing state before and after the action.
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
-
+    #dirty hack to fix invite exists users and not enroll
+    if not auto_enroll:
+        previous_state.user = False
     if previous_state.user:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
