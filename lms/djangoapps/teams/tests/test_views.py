@@ -9,6 +9,7 @@ import ddt
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models.signals import post_save
+from django.utils import translation
 from nose.plugins.attrib import attr
 from rest_framework.test import APITestCase, APIClient
 
@@ -519,12 +520,13 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
-        # clear out the teams search index before reindexing
-        CourseTeamIndexer.engine().destroy()
+        def reset_search_index():
+            """Clear out the search index and reindex the teams."""
+            CourseTeamIndexer.engine().destroy()
+            for team in self.test_team_name_id_map.values():
+                CourseTeamIndexer.index(team)
 
-        for team in self.test_team_name_id_map.values():
-            CourseTeamIndexer.index(team)
-
+        reset_search_index()
         self.verify_names(
             {'course_id': self.test_course_2.id, 'text_search': text_search},
             200,
@@ -539,6 +541,16 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             topic_id=None,
             number_of_results=len(expected_team_names)
         )
+
+        # Verify that the searches still work for a user from a different locale
+        with translation.override('ar'):
+            reset_search_index()
+            self.verify_names(
+                {'course_id': self.test_course_2.id, 'text_search': text_search},
+                200,
+                expected_team_names,
+                user='student_enrolled_public_profile'
+            )
 
 
 @ddt.ddt
