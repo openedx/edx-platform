@@ -607,7 +607,7 @@ class ViewsTestCase(
 
         self.course.cohort_config = {
             'cohorted': True,
-            'inline_discussions_cohorting_default': True
+            'always_cohort_inline_discussions': True
         }
         self.store.update_item(self.course, self.student.id)
 
