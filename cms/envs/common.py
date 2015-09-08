@@ -170,6 +170,9 @@ FEATURES = {
     # Teams feature
     'ENABLE_TEAMS': True,
 
+    # Teams search feature
+    'ENABLE_TEAMS_SEARCH': False,
+
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
 
