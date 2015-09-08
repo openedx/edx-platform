@@ -18,6 +18,7 @@ class CourseMetadata(object):
     # Should not be used directly. Instead the filtered_list method should
     # be used if the field needs to be filtered depending on the feature flag.
     FILTERED_LIST = [
+        'cohort_config',
         'xml_attributes',
         'start',
         'end',
