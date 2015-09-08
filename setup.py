@@ -48,5 +48,12 @@ setup(
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
             "verification = openedx.core.djangoapps.credit.partition_schemes:VerificationPartitionScheme",
         ],
+        "openedx.block_structure_transformer": [
+            "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
+            "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
+            "split_test = lms.djangoapps.course_blocks.transformers.split_test:SplitTestTransformer",
+            "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
+        ],
     }
 )
