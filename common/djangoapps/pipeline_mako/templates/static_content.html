@@ -86,5 +86,5 @@ try:
 except TemplateLookupException:
     pass
 else:
-    content.write(tmpl.render_context(context))
+    tmpl.render_context(context)
 %></%def>
