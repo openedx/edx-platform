@@ -11,6 +11,7 @@ from certificates.models import (
     BadgeImageConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
+    PDFCertificateConfiguration,
 )
 
 
@@ -47,8 +48,16 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
     list_display = ('description', '__unicode__')
 
 
+class PDFCertificateConfigurationAdmin(admin.ModelAdmin):
+    """
+    Django admin customizations for PDFCertificateConfiguration model
+    """
+    list_display = ('course_key', 'long_org', 'long_course', 'version', 'is_active')
+
+
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(BadgeImageConfiguration)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)
+admin.site.register(PDFCertificateConfiguration, PDFCertificateConfigurationAdmin)

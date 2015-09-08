@@ -756,6 +756,72 @@ class CertificateTemplateAsset(TimeStampedModel):
         get_latest_by = 'created'
 
 
+class PDFCertificateConfiguration(TimeStampedModel):
+    """A set of PDF certificate configurations.
+
+    These PDF certificate configurations will replace configurations
+    stored in JSON files inside certificates repository and used at the time
+    of PDF certificate generation.
+
+    """
+    course_key = CourseKeyField(
+        max_length=255,
+        db_index=True,
+    )
+    long_org = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_(u'Long organization name.'),
+    )
+    long_course = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_(u'Long course name.'),
+    )
+    version = models.SmallIntegerField(
+        null=True,
+        blank=True,
+        default=1,
+        help_text=_(u'Version of certificate template.'),
+    )
+    render_course_name = models.BooleanField(
+        default=True,
+        help_text=_(u'Should course name rendered on certificate?'),
+    )
+    render_attr_phrase = models.BooleanField(
+        default=True,
+        help_text=_(u'Should course paragraph be rendered on certificate?'),
+    )
+    create_verification_page = models.BooleanField(
+        default=True,
+        help_text=_(u'Should verification url be rendered on certificate?'),
+    )
+    course_association_text = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_(u'Course text embedded in course paragraph. Default is "a course of study".'),
+    )
+    xseries_num_courses = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        help_text=_(u'A series of courses offered by org i.e. "two", "four".'),
+    )
+    is_active = models.BooleanField(
+        help_text=_(u'On/Off switch.'),
+        default=False,
+    )
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.course_key, self.long_org)
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = 'created'
+
+
 @receiver(post_save, sender=GeneratedCertificate)
 #pylint: disable=unused-argument
 def create_badge(sender, instance, **kwargs):
