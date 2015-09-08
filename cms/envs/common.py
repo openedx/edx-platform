@@ -815,6 +815,10 @@ TRACKING_BACKENDS = {
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
 EVENT_TRACKING_ENABLED = True
+
+# NOTE: the sort order of the backend names is important here, the events will be sent to the backends in sorted
+# order. In this case a processor modifies the event in a way that is only intended to be seen by segment.io, so
+# we want to make sure that backend and processor is run *after* the event has been sent to the tracking logs.
 EVENT_TRACKING_BACKENDS = {
     '0_tracking_logs': {
         'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
