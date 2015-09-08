@@ -13,6 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course
+from openedx.core.djangoapps.course_groups.cohorts import get_course_cohort_settings
 from student.models import CourseEnrollment
 
 from lms.lib.comment_client.user import User
@@ -186,7 +187,7 @@ class Command(BaseCommand):
 
         target_discussion_ids = None
         if options.get(self.COHORTED_ONLY_PARAMETER, False):
-            cohorted_discussions = course.cohort_config.get('cohorted_inline_discussions', None)
+            cohorted_discussions = get_course_cohort_settings(course_key).cohorted_discussions
             if not cohorted_discussions:
                 raise MissingCohortedConfigCommandError(
                     "Only cohorted discussions are marked for export, "
