@@ -10,6 +10,7 @@ The methods in these classes are organized into several conceptual buckets:
 """
 import os
 
+from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
 
@@ -134,12 +135,15 @@ class CertificatesPage(CoursePage):
         self.wait_for_add_certificate_button()
         self.q(css=self.certficate_css + " .action-add").first.click()
 
+    @js_defined("window.jQuery")
     def click_confirmation_prompt_primary_button(self):
         """
         Clicks the main action presented by the prompt (such as 'Delete')
+        We need to use Javascript here because the confirmation prompt is a CSS transition
         """
         self.wait_for_confirmation_prompt()
-        self.q(css='a.button.action-primary').first.click()
+        jquery_cmd = "$('a.button.action-primary').focus().click()"
+        self.browser.execute_script(jquery_cmd)
         self.wait_for_ajax()
 
 
