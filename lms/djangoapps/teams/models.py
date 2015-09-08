@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import uuid4
 import pytz
 from datetime import datetime
+from model_utils import FieldTracker
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
@@ -88,6 +89,11 @@ class CourseTeam(models.Model):
     last_activity_at = models.DateTimeField(db_index=True)  # indexed for ordering
     users = models.ManyToManyField(User, db_index=True, related_name='teams', through='CourseTeamMembership')
     team_size = models.IntegerField(default=0, db_index=True)  # indexed for ordering
+
+    field_tracker = FieldTracker()
+
+    # Don't emit changed events when these fields change.
+    FIELD_BLACKLIST = ['last_activity_at', 'team_size']
 
     @classmethod
     def create(cls, name, course_id, description, topic_id=None, country=None, language=None):

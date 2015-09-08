@@ -16,6 +16,8 @@ from rest_framework.authentication import (
 from rest_framework import status
 from rest_framework import permissions
 from django.db.models import Count
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django_countries import countries
 from django.utils.translation import ugettext as _
@@ -40,6 +42,7 @@ from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
 from teams import is_feature_enabled
+from util.model_utils import truncate_fields
 from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
@@ -57,6 +60,25 @@ from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
+
+
+@receiver(post_save, sender=CourseTeam)
+def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """ Emits signal after the team is saved. """
+    changed_fields = instance.field_tracker.changed()
+    # Don't emit events when we are first creating the team.
+    if not kwargs['created']:
+        for field in changed_fields:
+            if field not in instance.FIELD_BLACKLIST:
+                truncated_fields = truncate_fields(unicode(changed_fields[field]), unicode(getattr(instance, field)))
+                truncated_fields['team_id'] = instance.team_id
+                truncated_fields['course_id'] = unicode(instance.course_id)
+                truncated_fields['field'] = field
+
+                tracker.emit(
+                    'edx.team.changed',
+                    truncated_fields
+                )
 
 
 class TeamsDashboardView(View):

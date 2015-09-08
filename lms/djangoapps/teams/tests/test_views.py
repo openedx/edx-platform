@@ -755,8 +755,11 @@ class TestDetailTeamAPI(TeamAPITestCase):
 
 
 @ddt.ddt
-class TestUpdateTeamAPI(TeamAPITestCase):
+class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team update endpoint."""
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(TestUpdateTeamAPI, self).setUp('teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -769,9 +772,19 @@ class TestUpdateTeamAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_access(self, user, status):
+        prev_name = self.solar_team.name
         team = self.patch_team_detail(self.solar_team.team_id, status, {'name': 'foo'}, user=user)
         if status == 200:
             self.assertEquals(team['name'], 'foo')
+            self.assert_event_emitted(
+                'edx.team.changed',
+                team_id=self.solar_team.team_id,
+                course_id=unicode(self.solar_team.course_id),
+                truncated=[],
+                field='name',
+                old=prev_name,
+                new='foo'
+            )
 
     @ddt.data(
         (None, 401),
@@ -799,7 +812,21 @@ class TestUpdateTeamAPI(TeamAPITestCase):
     @ddt.data(('country', 'US'), ('language', 'en'), ('foo', 'bar'))
     @ddt.unpack
     def test_good_requests(self, key, value):
+        if hasattr(self.solar_team, key):
+            prev_value = getattr(self.solar_team, key)
+
         self.patch_team_detail(self.solar_team.team_id, 200, {key: value}, user='staff')
+
+        if hasattr(self.solar_team, key):
+            self.assert_event_emitted(
+                'edx.team.changed',
+                team_id=self.solar_team.team_id,
+                course_id=unicode(self.solar_team.course_id),
+                truncated=[],
+                field=key,
+                old=prev_value,
+                new=value
+            )
 
     def test_does_not_exist(self):
         self.patch_team_detail('no_such_team', 404, user='staff')

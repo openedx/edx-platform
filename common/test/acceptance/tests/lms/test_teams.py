@@ -1028,6 +1028,7 @@ class EditTeamTest(TeamFormActions):
         Then I should see the Edit Team button
         And When I click edit team button
         Then I should see the edit team page
+        And an analytics event should be fired
         When I edit all the fields with appropriate data
         And I click Update button
         Then I should see the page for my team with updated data
@@ -1041,7 +1042,55 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_or_edit_team_page.submit_form()
+
+        expected_events = [
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'course_id': self.course_id,
+                    'team_id': self.team['id'],
+                    'field': 'country',
+                    'old': 'AF',
+                    'new': 'PK',
+                    'truncated': [],
+                }
+            },
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'course_id': self.course_id,
+                    'team_id': self.team['id'],
+                    'field': 'name',
+                    'old': self.team['name'],
+                    'new': self.TEAMS_NAME,
+                    'truncated': [],
+                }
+            },
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'course_id': self.course_id,
+                    'team_id': self.team['id'],
+                    'field': 'language',
+                    'old': 'aa',
+                    'new': 'en',
+                    'truncated': [],
+                }
+            },
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'course_id': self.course_id,
+                    'team_id': self.team['id'],
+                    'field': 'description',
+                    'old': self.team['description'],
+                    'new': self.TEAM_DESCRIPTION,
+                    'truncated': [],
+                }
+            },
+        ]
+        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+            self.create_or_edit_team_page.submit_form()
 
         self.team_page.wait_for_page()
 
