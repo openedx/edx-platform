@@ -109,6 +109,30 @@ class XModuleSassWatcher(SassWatcher):
             traceback.print_exc()
 
 
+class XModuleAssetsWatcher(PatternMatchingEventHandler):
+    """
+    Watches for css and js file changes
+    """
+    ignore_directories = True
+    patterns = ['*.css', '*.js']
+
+    def register(self, observer):
+        """
+        Register files with observer
+        """
+        observer.schedule(self, 'common/lib/xmodule/', recursive=True)
+
+    def on_modified(self, event):
+        print('\tCHANGED:', event.src_path)
+        try:
+            process_xmodule_assets()
+        except Exception:  # pylint: disable=broad-except
+            traceback.print_exc()
+
+        # To refresh the hash values of static xmodule content
+        restart_django_servers()
+
+
 def coffeescript_files():
     """
     return find command for paths containing coffee files
@@ -181,6 +205,17 @@ def process_xmodule_assets():
     sh('xmodule_assets common/static/xmodule')
 
 
+def restart_django_servers():
+    """
+    Restart the django server.
+
+    `$ touch` makes the Django file watcher thinks that something has changed, therefore
+    it restarts the server.
+    """
+    sh(cmd(
+        "touch", 'lms/urls.py', 'cms/urls.py',
+    ))
+
 def collect_assets(systems, settings):
     """
     Collect static assets, including Django pipeline processing.
@@ -206,6 +241,7 @@ def watch_assets(options):
     CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer)
     XModuleSassWatcher().register(observer)
+    XModuleAssetsWatcher().register(observer)
 
     print("Starting asset watcher...")
     observer.start()
