@@ -16,6 +16,8 @@ from django_comment_client.management.commands.export_discussion_participation i
 from datetime import datetime
 
 # pylint: disable=invalid-name
+from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings
+
 _target_module = "django_comment_client.management.commands.export_discussion_participation"
 
 _std_parameters_list = (
@@ -31,6 +33,7 @@ _std_parameters_list = (
 
 
 @ddt.ddt
+@mock.patch(_target_module + ".get_course_cohort_settings")
 @mock.patch(_target_module + ".get_course")
 class CommandTest(TestCase):
     """
@@ -44,36 +47,38 @@ class CommandTest(TestCase):
         self.command.stdout = mock.Mock()
         self.command.stderr = mock.Mock()
 
-    def set_up_default_mocks(self, patched_get_course):
+    def set_up_default_mocks(self, patched_get_course, patched_get_settings, cohorted_thread_ids=None):
         """ Sets up default mocks passed via class decorator """
         patched_get_course.return_value = mock.Mock(spec=CourseLocator)
+        patched_get_settings.return_value = mock.Mock(spec=CourseCohortsSettings)
+        patched_get_settings.return_value.cohorted_discussions = cohorted_thread_ids or []
 
     # pylint:disable=unused-argument
-    def test_handle_given_no_arguments_raises_command_error(self, patched_get_course):
+    def test_handle_given_no_arguments_raises_command_error(self, patched_get_course, patched_get_settings):
         """ Tests that raises error if invoked with no arguments """
         with self.assertRaises(CommandError):
             self.command.handle()
 
     # pylint:disable=unused-argument
-    def test_handle_given_more_than_two_args_raises_command_error(self, patched_get_course):
+    def test_handle_given_more_than_two_args_raises_command_error(self, patched_get_course, patched_get_setting):
         """ Tests that raises error if invoked with too many arguments """
         with self.assertRaises(CommandError):
             self.command.handle(1, 2, 3)
 
-    def test_handle_given_invalid_course_key_raises_invalid_key_error(self, patched_get_course):
+    def test_handle_given_invalid_course_key_raises_invalid_key_error(self, patched_get_course, patched_get_settings):
         """ Tests that invalid key errors are propagated """
         patched_get_course.return_value = None
         with self.assertRaises(InvalidKeyError):
             self.command.handle("I'm invalid key")
 
-    def test_handle_given_missing_course_raises_command_error(self, patched_get_course):
+    def test_handle_given_missing_course_raises_command_error(self, patched_get_course, patched_get_settings):
         """ Tests that raises command error if missing course key was provided """
         patched_get_course.return_value = None
         with self.assertRaises(CommandError):
             self.command.handle("edX/demoX/now")
 
     # pylint: disable=unused-argument
-    def test_all_option(self, patched_get_course):
+    def test_all_option(self, patched_get_course, patched_get_settings):
         """ Tests that the 'all' option does run the dump command for all courses """
         self.command.dump_one = mock.Mock()
         self.command.get_all_courses = mock.Mock()
@@ -96,12 +101,9 @@ class CommandTest(TestCase):
         self.assertIn('test_dir/social_stats_course-v1SandboxSandboxSandbox', calls[1][0][1])
         self.assertIn('test_dir/social_stats_course-v1TestTestyTestify', calls[2][0][1])
 
-    def test_all_cohortedonly_options_together(self, patched_get_course):
+    def test_all_cohortedonly_options_together(self, patched_get_course, patched_get_settings):
         """ Ensure the 'all' option doesn't stop when one of the course doesn't have cohorted discussions """
-        self.set_up_default_mocks(patched_get_course)
-        type(patched_get_course.return_value).cohort_config = mock.PropertyMock(
-            return_value={'cohorted_inline_discussions': []}
-        )
+        self.set_up_default_mocks(patched_get_course, patched_get_settings)
         self.command.get_all_courses = mock.Mock()
         course_list = [mock.Mock() for __ in range(0, 3)]
         locator_list = [
@@ -120,9 +122,11 @@ class CommandTest(TestCase):
         self.assertEqual(calls[2][0][0], locator_list[2])
 
     @ddt.data("edX/demoX/now", "otherX/CourseX/later")
-    def test_handle_writes_to_correct_location_when_output_file_not_specified(self, course_key, patched_get_course):
+    def test_handle_writes_to_correct_location_when_output_file_not_specified(
+            self, course_key, patched_get_course, patched_get_settings
+    ):
         """ Tests that when no explicit filename is given data is exported to default location """
-        self.set_up_default_mocks(patched_get_course)
+        self.set_up_default_mocks(patched_get_course, patched_get_settings)
         expected_filename = utils.format_filename(
             "social_stats_{course}_{date:%Y_%m_%d_%H_%M_%S}.csv".format(course=course_key, date=datetime.utcnow())
         )
@@ -134,9 +138,11 @@ class CommandTest(TestCase):
             patched_open.assert_called_with(expected_filename, 'wb')
 
     @ddt.data("test.csv", "other_file.csv")
-    def test_handle_writes_to_correct_location_when_output_file_is_specified(self, location, patched_get_course):
+    def test_handle_writes_to_correct_location_when_output_file_is_specified(
+            self, location, patched_get_course, patched_get_settings
+    ):
         """ Tests that when explicit filename is given data is exported to chosen location """
-        self.set_up_default_mocks(patched_get_course)
+        self.set_up_default_mocks(patched_get_course, patched_get_settings)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor:
@@ -144,9 +150,9 @@ class CommandTest(TestCase):
             self.command.handle("irrelevant/course/key", location)
             patched_open.assert_called_with(location, 'wb')
 
-    def test_handle_creates_correct_exporter(self, patched_get_course):
+    def test_handle_creates_correct_exporter(self, patched_get_course, patched_get_settings):
         """ Tests that creates correct exporter """
-        self.set_up_default_mocks(patched_get_course)
+        self.set_up_default_mocks(patched_get_course, patched_get_settings)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor, \
@@ -161,9 +167,9 @@ class CommandTest(TestCase):
         {"1": {"num_threads": 12}},
         {"1": {"num_threads": 14, "num_comments": 7}}
     )
-    def test_handle_exports_correct_data(self, extracted, patched_get_course):
+    def test_handle_exports_correct_data(self, extracted, patched_get_course, patched_get_settings):
         """ Tests that invokes export with correct data """
-        self.set_up_default_mocks(patched_get_course)
+        self.set_up_default_mocks(patched_get_course, patched_get_settings)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor, \
@@ -175,14 +181,10 @@ class CommandTest(TestCase):
     @ddt.unpack
     @ddt.data(*_std_parameters_list)
     def test_handle_passes_correct_parameters_to_extractor(
-        self, course_key, end_date, thread_type, cohorted_thread_ids, patched_get_course
-    ):
+            self, course_key, end_date, thread_type, cohorted_thread_ids,
+            patched_get_course, patched_get_settings):
         """ Tests that when no explicit filename is given data is exported to default location """
-        self.set_up_default_mocks(patched_get_course)
-        if cohorted_thread_ids:
-            type(patched_get_course.return_value).cohort_config = mock.PropertyMock(
-                return_value={'cohorted_inline_discussions': cohorted_thread_ids}
-            )
+        self.set_up_default_mocks(patched_get_course, patched_get_settings, cohorted_thread_ids)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor:
