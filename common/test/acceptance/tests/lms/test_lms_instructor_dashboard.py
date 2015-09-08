@@ -5,6 +5,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 import time
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
@@ -221,6 +222,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Start the proctored exam.
         self.courseware_page.start_timed_exam()
 
+    @flaky  # TODO fix this, see SOL-1183
     def test_can_add_remove_allowance(self):
         """
         Make sure that allowances can be added and removed.
