@@ -10,13 +10,12 @@ from django.conf import settings
 from celery import task
 from celery.utils.log import get_task_logger
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from .api import set_credit_requirements
+from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.utils import get_course_blocks
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -75,8 +74,15 @@ def _get_course_credit_requirements(course_key):
     credit_xblock_requirements = _get_credit_course_requirement_xblocks(course_key)
     min_grade_requirement = _get_min_grade_requirement(course_key)
     proctored_exams_requirements = _get_proctoring_requirements(course_key)
+    block_requirements = credit_xblock_requirements + proctored_exams_requirements
+    # sort credit requirements list based on start date and put all the
+    # requirements with no start date at the end of requirement list.
+    sorted_block_requirements = sorted(
+        block_requirements, key=lambda x: (x['start_date'] is None, x['start_date'], x['display_name'])
+    )
+
     credit_requirements = (
-        min_grade_requirement + credit_xblock_requirements + proctored_exams_requirements
+        min_grade_requirement + sorted_block_requirements
     )
     return credit_requirements
 
@@ -131,6 +137,7 @@ def _get_credit_course_requirement_xblocks(course_key):  # pylint: disable=inval
                 "namespace": block.get_credit_requirement_namespace(),
                 "name": block.get_credit_requirement_name(),
                 "display_name": block.get_credit_requirement_display_name(),
+                'start_date': block.start,
                 "criteria": {},
             }
             for block in _get_xblocks(course_key, category)
@@ -147,15 +154,6 @@ def _get_xblocks(course_key, category):
     Returns only XBlocks that are published and haven't been deleted.
     """
     xblocks = get_course_blocks(course_key, category)
-
-    # Secondary sort on credit requirement name
-    xblocks = sorted(xblocks, key=lambda block: block.get_credit_requirement_display_name())
-
-    # Primary sort on start date
-    xblocks = sorted(xblocks, key=lambda block: (
-        block.start if block.start is not None
-        else datetime.datetime(datetime.MINYEAR, 1, 1).replace(tzinfo=UTC)
-    ))
 
     return xblocks
 
@@ -208,23 +206,32 @@ def _get_proctoring_requirements(course_key):
     # process
     from edx_proctoring.api import get_all_exams_for_course
 
-    requirements = [
-        {
-            'namespace': 'proctored_exam',
-            'name': exam['content_id'],
-            'display_name': exam['exam_name'],
-            'criteria': {},
-        }
-        for exam in get_all_exams_for_course(unicode(course_key))
-        # practice exams do not count towards eligibility
-        if exam['is_proctored'] and exam['is_active'] and not exam['is_practice_exam']
-    ]
+    requirements = []
+    for exam in get_all_exams_for_course(unicode(course_key)):
+        if exam['is_proctored'] and exam['is_active'] and not exam['is_practice_exam']:
+            try:
+                usage_key = UsageKey.from_string(exam['content_id'])
+                proctor_block = modulestore().get_item(usage_key)
+            except (InvalidKeyError, ItemNotFoundError):
+                LOGGER.info("Invalid content_id '%s' for proctored block '%s'", exam['content_id'], exam['exam_name'])
+                proctor_block = None
 
-    log_msg = (
-        'Registering the following as \'proctored_exam\' credit requirements: {log_msg}'.format(
-            log_msg=requirements
+            if proctor_block:
+                requirements.append(
+                    {
+                        'namespace': 'proctored_exam',
+                        'name': exam['content_id'],
+                        'display_name': exam['exam_name'],
+                        'start_date': proctor_block.start if proctor_block.start else None,
+                        'criteria': {},
+                    })
+
+    if requirements:
+        log_msg = (
+            'Registering the following as \'proctored_exam\' credit requirements: {log_msg}'.format(
+                log_msg=requirements
+            )
         )
-    )
-    LOGGER.info(log_msg)
+        LOGGER.info(log_msg)
 
     return requirements
