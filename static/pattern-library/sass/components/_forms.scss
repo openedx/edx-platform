@@ -1,0 +1,542 @@
+// ------------------------------
+// edX Pattern Library: Components - Forms
+
+// About: Contains base styling for forms
+
+// #GLOBAL
+// #INPUT TEXT
+// #INPUT RADIO/CHECKBOX
+// #SELECT
+// #TEXTAREA
+// #SLIDERS
+// #PROGRESS
+
+// ----------------------------
+// #GLOBAL
+// ----------------------------
+
+// sections of a form
+.form-group {
+    @include clearfix();
+    margin-bottom: spacing-vertical(mid-small);
+
+    // section title or legend
+    .form-group-hd {
+        margin-bottom: spacing-vertical(small);
+        font-size: font-size(large);
+    }
+
+    .field {
+        margin-bottom: spacing-vertical(base);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-hint {
+            font-size: font-size(small);
+            color: $field-tip-color;
+        }
+    }
+}
+
+// radio button and checkbox fieldsets
+.field-group {
+    margin-bottom: spacing-vertical(small);
+
+    // group title or legend
+    .field-group-hd {
+        margin-bottom: spacing-vertical(small);
+        font-size: font-size(large);
+    }
+
+    .field {
+        margin-bottom: spacing-vertical(x-small);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-hint {
+            @include margin-left(spacing-horizontal(mid-large));
+            margin-top: spacing-vertical(xx-small);
+            font-size: font-size(small);
+            color: $field-tip-color;
+        }
+    }
+}
+
+.field-label {
+    display: block;
+    width: auto;
+    margin-bottom: spacing-vertical(x-small);
+    font-size: font-size(base);
+    line-height: 100%;
+    color: $label-color;
+
+    // presents the label inline with the form control
+    &.label-inline {
+        display: inline-block;
+        margin-bottom: 0;
+    }
+
+    // STATE: is selected
+    .field-input:checked + .field-input-label,
+    .field-radio:checked + .field-input-label,
+    &.is-active,
+    &.is-selected {
+        @include transition(all timing(xx-fast) ease-in-out 0s);
+        color: $label-color-active;
+    }
+}
+
+.field-message {
+    font-size: font-size(small);
+    border-bottom-left-radius: $buttons-border-radius;
+    border-bottom-right-radius: $buttons-border-radius;
+
+    &.has-error {
+        padding: spacing-vertical(x-small);
+        background: palette(error, base);
+        color: palette(grayscale, white);
+    }
+}
+
+.field-hint {
+    margin-top: spacing-vertical(x-small);
+}
+
+.field-required {
+
+    @include ltr {
+
+        // for LTR displays we show the required indicator to the right of the label
+        &:after {
+            display: inline-block;
+            @include margin-left(spacing-horizontal(x-small));
+            content: "*";
+            font-size: font-size(small);
+            color: $field-required-indicator-color;
+        }
+    }
+
+    @include rtl {
+
+        // for RTL displays we show the required indicator to the left of the label
+        &:before {
+            display: inline-block;
+            @include margin-left(spacing-horizontal(x-small));
+            content: "*";
+            font-size: font-size(small);
+            color: $field-required-indicator-color;
+        }
+    }
+}
+
+.field-message,
+.field-hint,
+.input-text,
+.input-select,
+.wrapper-custom-select,
+.input-textarea,
+.input-slider,
+.input-progress {
+    width: input-width(base);
+}
+
+.field-input,
+.field-select,
+.field-textarea {
+    @include placeholder { color: $input-placeholder-text; }
+    @include transition(all timing(xx-fast) ease-in-out 0s);
+    display: inline-block;
+    padding: rem($baseline/2);
+    border: 1px solid $input-border-default;
+    background: $input-background-default;
+    font-family: $font-family-sans-serif;
+    font-size: font-size(base);
+    color: $input-text-default;
+
+    // STATE: is active or has focus
+    &:focus,
+    &.is-active {
+        border-color: $input-border-default-focus;
+        color: $input-text-default-hover;
+        outline: none;
+    }
+
+    // STATE: disabled
+    &:disabled,
+    &.is-disabled {
+        border-color: $input-border-disabled;
+        background: $input-background-disabled;
+        cursor: not-allowed;
+    }
+
+    // STATE: has an error
+    &.has-error {
+        border-color: palette(error, base);
+
+        & + .field-hint {
+            color: palette(error, dark);
+        }
+
+        .icon {
+            fill: palette(error, base);
+        }
+    }
+
+    // STATE: has a warning
+    &.has-warning {
+        border-color: palette(warning, base);
+
+        & + .field-hint {
+            color: palette(warning, dark);
+        }
+
+        .icon {
+            fill: palette(warning, base);
+        }
+    }
+
+    // STATE: is complete or valid
+    &.has-success {
+        border-color: palette(success, base);
+
+        // & + .field-hint {
+        //     color: palette(success, dark);
+        // }
+
+        .icon {
+            fill: palette(success, base);
+        }
+    }
+}
+
+.form-progress {
+    @include transition(all timing(xx-fast) ease-in-out 0s);
+}
+
+// ----------------------------
+// #INPUT TEXT
+// ----------------------------
+.input-text {
+
+    &.input-alt {
+        padding: spacing-verical(small) 0;
+        border-width: 0 0 2px 0;
+        background: $input-alt-background;
+
+        // STATE: is active or has focus
+        &:focus,
+        &.is-active {
+            border-color: $input-alt-border-focus;
+            background: $input-alt-background;
+        }
+
+        &.has-error {
+            border-width: 1px 1px 2px 1px;
+            border-color: palette(error, base);
+        }
+    }
+}
+
+// ----------------------------
+// #SELECT
+// ----------------------------
+.wrapper-replace-select {
+    position: relative;
+    // although this is on the wrapper, since we're positioning absolutley the replaced UI, we need to add a bottom margin here too
+    margin-bottom: 0;
+}
+
+.input-select {
+    height: rem($baseline*2);
+    line-height: spacing-vertical(small);
+
+    & + .field-message {
+        margin-top: -(spacing-vertical(xx-small));
+    }
+
+    // set via JavaScript when a select menu has been replaced
+    // not to be used manually
+    &.is-replaced {
+        position: relative;
+        top: 0;
+        @include left(0);
+        z-index: z-index(mid-front);
+        opacity: 0;
+    }
+}
+
+// custom select styling
+// this is the replacement select menu
+.wrapper-custom-select {
+    @extend .field-input;
+    display: inline;
+    position: absolute;
+    top: 0;
+    @include left(0);
+    height: rem($baseline*2);
+    line-height: 100%; // centers the text vertically while matching height of replacement menu
+    z-index: z-index(base);
+
+    // the color and position of the select menu icon
+    .icon {
+        @include size(rem($baseline));
+        position: absolute;
+        @include right(rem(($baseline/4)));
+        margin-top: rem(-($baseline/10)); // vertically centers the down caret icon
+        fill: $input-control-color;
+    }
+
+    &:disabled,
+    &.is-disabled {
+
+        .icon {
+            fill: $input-border-disabled;
+        }
+    }
+}
+
+// ----------------------------
+// #RADIO / CHECKBOX
+// ----------------------------
+.input-radio,
+.input-checkbox {
+    @include margin-right(spacing-horizontal(small));
+
+    // class used to use the enhanced version of checkboxes or radio buttons
+    &.replace-checkbox,
+    &.replace-radio {
+        @extend %a11y-hide;
+
+        & + .field-input-label:before {
+            @include size(rem($baseline/1.25));
+            display: inline-block;
+            @include margin-right(spacing-horizontal(x-small));
+            vertical-align: top;
+            content: "";
+        }
+    }
+
+    &.replace-checkbox {
+
+        & + .field-input-label:before {
+            @include input-checkbox();
+        }
+
+        // STATUS: a checked checkbox
+        &:checked + .field-input-label:before {
+            @include input-checkbox-checked();
+        }
+    }
+
+    &.replace-radio {
+
+        & + .field-input-label:before {
+            @include input-radio();
+        }
+
+        // STATUS: a selected radio button
+        &:checked + .field-input-label:before {
+            @include input-radio-checked();
+        }
+    }
+
+    // STATE: disabled
+    &:disabled,
+    &.is-disabled {
+        cursor: not-allowed;
+
+        & + .field-input-label {
+            // disabled state of normal checkboxes
+            color: palette(grayscale, base);
+        }
+
+        &.replace-checkbox {
+
+            & + .field-input-label {
+                color: palette(grayscale, base);
+
+                &:before {
+                    // disabled state of replaced checkboxes
+                    & + .field-input-label:before {
+                        @include input-radio-checkbox-disabled();
+                    }
+                }
+            }
+        }
+
+        &.replace-radio {
+
+            & + .field-input-label {
+                // disabled state of normal radio buttons
+                color: palette(grayscale, base);
+
+                &:before {
+                    // disabled state of replaced checkboxes
+                    & + .field-input-label:before {
+                        @include input-radio-checkbox-disabled();
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ----------------------------
+// #TEXTAREA
+// ----------------------------
+
+// base textareas can account for roughly six to seven lines of text
+.input-textarea {
+    height: input-height(base);
+
+    & + .field-message {
+        margin-top: -(spacing-vertical(xx-small));
+    }
+
+    // slimmer, shorter textareas, roughly two to three lines of text
+    &.textarea-short {
+        height: input-height(short);
+    }
+
+    // taller textareas, roughly ten lines of text
+    &.textarea-tall {
+        height: input-height(tall);
+    }
+
+    // textarea that spans the full width of its parent
+    &.textarea-block {
+        width: 100%;
+    }
+}
+
+.input-slider {
+    @include transition(all timing(xx-fast) ease-in-out 0s); // needed here for Firefox which doesn't use the pseudo element for the track
+    border: none;
+    border-radius: $input-progress-border-radius;
+    -webkit-appearance: none;
+    appearance: none;
+
+    // Chrome/Safari: slider track
+    &::-webkit-slider-runnable-track {
+        @include input-track();
+    }
+
+    // Chrome/Safari: thumb button
+    &::-webkit-slider-thumb {
+        @include input-thumb();
+    }
+
+    // Firefox: slider track
+    &::-moz-range-track {
+        @include input-track();
+    }
+
+    // Firefox: thumb button
+    &::-moz-range-thumb {
+        @include input-thumb();
+        // @extend %input-thumb;
+    }
+
+    // IE: track before the thumb button
+    &::-ms-fill-upper {
+        @include input-track();
+    }
+
+    // IE: track after the thumb button
+    &::-ms-fill-lower {
+        @include input-track();
+    }
+
+    // IE: notches along track
+    &::-ms-track {
+        border-width: rem($baseline/2); // the handle is clipped without this
+        border-color: transparent; // the handle is clipped without this
+        background: transparent; // the handle is clipped without this
+        color: transparent; // hides the notches along the track; remove if you want them
+    }
+
+    // IE: thumb button
+    &::-ms-thumb {
+        @include input-thumb();
+    }
+
+    // STATE: hovered over or focused on
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        &::-webkit-slider-runnable-track {
+            @include input-track-hover();
+        }
+
+        &::-webkit-slider-thumb {
+            @include input-thumb-hover();
+        }
+
+        &::-moz-range-track {
+            @include input-track-hover();
+        }
+
+        &::-moz-range-thumb {
+            @include input-thumb-hover();
+        }
+
+        &::-ms-track {
+            @include input-track-hover();
+            background: transparent;
+            border-color: transparent;
+        }
+
+        &::-ms-fill-upper {
+            @include input-track-hover();
+        }
+
+        &::-ms-fill-lower {
+            @include input-track-hover();
+        }
+
+        &::-ms-thumb {
+            @include input-thumb-hover();
+        }
+    }
+}
+
+// ----------------------------
+// #PROGRESS
+// ----------------------------
+.input-progress {
+    height: rem($baseline/2);
+    background: $input-progress-track; // Firefox doesn't use the psuedo
+    border: none;
+    border-radius: $input-progress-border-radius; // Firefox doesn't use the psudeo
+
+    &[value] {
+        -webkit-appearance: none;
+        appearance: none;
+
+        &::-webkit-progress-bar {
+            @include input-track();
+            // @extend input-track;
+        }
+
+        &::-webkit-progress-value {
+            @include input-progress-complete();
+        }
+
+        &::-moz-progress-bar {
+            @include input-progress-complete();
+        }
+
+        &::-ms-progress-bar {
+            @include input-track();
+        }
+
+        &::-ms-progress-value {
+            @include input-progress-complete();
+        }
+    }
+}

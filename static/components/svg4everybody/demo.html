@@ -1,0 +1,26 @@
+<!doctype html>
+<title>svg4everybody demo</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="svg4everybody.ie8.js"></script>
+<style>svg { display: inline-block; height: 150px; overflow: hidden; width: 100%; }</style>
+<style>svg { height: 256px; width: 256px; } img { max-width: 100%; max-height: 100%; } </style>
+<script>
+function addSVG(node, href) {
+	node.innerHTML ='<svg viewBox="0 0 512 512"><use xlink:href="' + href + '"></use></svg>';
+
+	node.parentNode.replaceChild(node.lastChild, node);
+}
+</script>
+
+<body>
+	<svg viewBox="0 0 512 512">
+		<use xlink:href="demo.svg#camera"></use>
+	</svg>
+
+	<button onclick="addSVG(this, 'demo.svg#pencil')">Add external SVG</button>
+
+	<button onclick="addSVG(this, '#eye')">Add internal SVG</button>
+
+	<svg style="display:none" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><!-- icomoon.io --><g id="eye"><path d="M256 96c-111.659 0-208.441 65.021-256 160 47.559 94.979 144.341 160 256 160 111.657 0 208.439-65.021 256-160-47.558-94.979-144.343-160-256-160zm126.225 84.852c30.081 19.187 55.571 44.887 74.718 75.148-19.146 30.261-44.638 55.961-74.719 75.148-37.797 24.109-81.445 36.852-126.224 36.852-44.78 0-88.428-12.743-126.225-36.852-30.08-19.187-55.57-44.887-74.717-75.148 19.146-30.262 44.637-55.962 74.717-75.148 1.959-1.25 3.938-2.461 5.929-3.65-4.979 13.664-7.704 28.411-7.704 43.798 0 70.691 57.308 128 128 128 70.692 0 128-57.309 128-128 0-15.387-2.725-30.134-7.704-43.799 1.99 1.189 3.969 2.401 5.929 3.651zm-126.225 24.148c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48z"/></g></svg>
+</body>

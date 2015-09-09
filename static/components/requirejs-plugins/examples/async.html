@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>RequireJS Async plugin</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .info{background-color:#cfc; border:2px solid #ada; padding:10px 20px;  margin:2em 0}
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <h1>RequireJS async plugin</h1>
+            <div class="info">
+                <p>
+                    Google Maps loads many JS files asynchronously, so listening just to the first script load
+                    isn't enough to check if it is ready to be used, another problem is that the regular gmaps script
+                    uses document.write, so we need to pass a `callback` parameter to make it not use `document.write`
+                    and wait for the callback call.
+                    <br>
+                    [<a href="http://code.google.com/apis/maps/documentation/javascript/basics.html#Async">More info</a>]
+                </p>
+            </div>
+            <div id="map-canvas" style="width:400px; height:300px; border:1px solid #ccc; background-color:#f5f5f5"></div>
+            <h2>JSONP</h2>
+            <div class="info">
+                <p>
+                    Note that the async! plugin isn't really required for JSONP calls if the response is an <strong>Object</strong>.
+                    If the response is an Array or String you will need the async! plugin. [<a href="http://requirejs.org/docs/api.html#jsonp">reference</a>]
+                </p>
+                <p>
+                    The default parameter used to set the callback name is <code>callback</code>, you can set a different name
+                    by passing it at the end of the dependency URL preceded by a exclamation mark (<code>!</code>), e.g.: <code>async!http://example.com/?foo=bar!jsoncallback</code>
+                </p>
+            </div>
+            <h3>Flickr feed</h3>
+            <div id="flickr-feed"></div>
+        </div>
+        <script src="../lib/require.js"></script>
+        <script>
+            require({
+                waitSeconds : 120, //make sure it is enough to load all gmaps scripts
+                paths : {
+                    async : '../src/async' //alias to plugin
+                }
+            });
+
+
+            // you can use a "!callbackName" at the end of the URL
+            // to specify name of parameter that expects callback function name
+            // the default value is "!callback" if not present.
+            // Notice that flickr uses "!jsoncallback".
+            require(
+                [
+                    'async!http://api.flickr.com/services/feeds/photos_public.gne?id=27041612@N06&format=json!jsoncallback',
+                    'async!http://maps.google.com/maps/api/js?sensor=false'
+                ],
+                function(photos){
+
+
+
+                    //flickr
+
+                    var flickrDiv = document.getElementById('flickr-feed'),
+                        idx = Math.round((photos.items.length - 1) * Math.random());
+
+                    flickrDiv.innerHTML += photos.items[idx].description;
+
+
+
+                    //Google maps is available and all components are ready to use.
+
+                    var mapDiv = document.getElementById('map-canvas');
+
+                    var map = new google.maps.Map(mapDiv, {
+                        center: new google.maps.LatLng(37.4419, -122.1419),
+                        zoom: 13,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+                        navigationControl: true,
+                        navigationControlOptions: {
+                            style: google.maps.NavigationControlStyle.SMALL
+                        }
+                    });
+
+                }
+            );
+
+        </script>
+    </body>
+</html>

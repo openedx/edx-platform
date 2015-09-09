@@ -1,0 +1,33 @@
+{
+  "name": "requirejs-plugins",
+  "version": "1.0.3",
+  "main": [
+    "src/async.js",
+    "src/depend.js",
+    "src/font.js",
+    "src/goog.js",
+    "src/image.js",
+    "src/json.js",
+    "src/mdown.js",
+    "src/noext.js",
+    "src/propertyParser.js",
+    "lib/Markdown.Converter.js",
+    "lib/text.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ],
+  "homepage": "https://github.com/millermedeiros/requirejs-plugins",
+  "_release": "1.0.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.3",
+    "commit": "ac9de4bfae70b0630754a9faf93c42db362cb9a2"
+  },
+  "_source": "git://github.com/millermedeiros/requirejs-plugins.git",
+  "_target": "~1.0.3",
+  "_originalSource": "requirejs-plugins",
+  "_direct": true
+}
