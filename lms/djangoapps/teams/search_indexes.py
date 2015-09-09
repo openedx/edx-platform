@@ -48,9 +48,9 @@ class CourseTeamIndexer(object):
         """
         # Always use the English version of any localizable strings (see TNL-3239)
         with translation.override('en'):
-            return "{name}\n{description}\n{country}\n{language}".format(
-                name=self.course_team.name.encode('utf-8'),
-                description=self.course_team.description.encode('utf-8'),
+            return u"{name}\n{description}\n{country}\n{language}".format(
+                name=self.course_team.name,
+                description=self.course_team.description,
                 country=self.course_team.country.name.format(),
                 language=self._language_name()
             )

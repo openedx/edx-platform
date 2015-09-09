@@ -333,7 +333,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             result_filter.update({'course_id': course_id_string})
 
             search_results = search_engine.search(
-                query_string=text_search.encode('utf-8'),
+                query_string=text_search,
                 field_dictionary=result_filter,
                 size=MAXIMUM_SEARCH_SIZE,
             )

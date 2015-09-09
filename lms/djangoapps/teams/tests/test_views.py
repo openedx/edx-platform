@@ -224,6 +224,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 course_id=self.test_course_2.id,
                 topic_id='topic_7'
             )
+            self.chinese_team = CourseTeamFactory.create(
+                name=u'著文企臺個',
+                description=u'共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
+                country='CN',
+                language='zh_HANS',
+                course_id=self.test_course_2.id,
+                topic_id='topic_7'
+            )
 
         self.test_team_name_id_map = {team.name: team for team in (
             self.solar_team,
@@ -232,6 +240,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             self.another_team,
             self.public_profile_team,
             self.search_team,
+            self.chinese_team,
         )}
 
         for user, course in [('staff', self.test_course_1), ('course_staff', self.test_course_1)]:
@@ -438,7 +447,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.verify_names(
             {'course_id': self.test_course_2.id},
             200,
-            ['Another Team', 'Public Profile Team', 'Search'],
+            ['Another Team', 'Public Profile Team', 'Search', u'著文企臺個'],
             user='staff'
         )
 
@@ -517,6 +526,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('Island', ['Search']),
         ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
+        (u'著文企臺個', [u'著文企臺個']),
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
