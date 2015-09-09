@@ -2465,6 +2465,96 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                     # Verify that the signal was emitted
                     self.assertEqual(receiver.call_count, 1)
 
+    def test_delete_published_item_creates_no_orphans(self):
+        """
+        Tests delete published item dont create any oprhans in course
+        """
+        self.initdb('split')
+        course_locator = self.course.id
+        course_locator_publish = course_locator.for_branch(ModuleStoreEnum.BranchName.published)
+
+        chapter = self.store.create_child(
+            self.user_id, self.course.location, 'chapter', block_id='section_one'
+        )
+
+        sequential = self.store.create_child(
+            self.user_id, chapter.location, 'sequential', block_id='subsection_one'
+        )
+
+        vertical = self.store.create_child(
+            self.user_id, sequential.location, 'vertical', block_id='moon_unit'
+        )
+
+        problem = self.store.create_child(
+            self.user_id, vertical.location, 'problem', block_id='problem'
+        )
+
+        self.store.publish(chapter.location, self.user_id)
+        # Verify that there are no changes
+        self.assertFalse(self._has_changes(chapter.location))
+        self.assertFalse(self._has_changes(sequential.location))
+        self.assertFalse(self._has_changes(vertical.location))
+        self.assertFalse(self._has_changes(problem.location))
+
+        # No oprhans in course
+        course_orphans = self.store.get_orphans(course_locator)
+        self.assertEqual(len(course_orphans), 0)
+        self.store.delete_item(vertical.location, self.user_id)
+        # No drafts oprhans in course after delete
+        course_orphans = self.store.get_orphans(course_locator)
+        self.assertEqual(len(course_orphans), 0)
+        # No published oprhans after delete
+        course_publish_orphans = self.store.get_orphans(course_locator_publish)
+        self.assertEqual(len(course_publish_orphans), 0)
+
+    def test_delete_draft_item_creates_no_orphans(self):
+        """
+        Tests delete draft item create no oprhans in course
+        """
+        self.initdb('split')
+        course_locator = self.course.id
+        course_locator_publish = course_locator.for_branch(ModuleStoreEnum.BranchName.published)
+
+        chapter = self.store.create_child(
+            self.user_id, self.course.location, 'chapter', block_id='section_one'
+        )
+
+        sequential = self.store.create_child(
+            self.user_id, chapter.location, 'sequential', block_id='subsection_one'
+        )
+
+        vertical = self.store.create_child(
+            self.user_id, sequential.location, 'vertical', block_id='moon_unit'
+        )
+
+        problem = self.store.create_child(
+            self.user_id, vertical.location, 'problem', block_id='problem'
+        )
+
+        self.store.publish(chapter.location, self.user_id)
+        # Verify that there are no changes
+        self.assertFalse(self._has_changes(chapter.location))
+        self.assertFalse(self._has_changes(sequential.location))
+        self.assertFalse(self._has_changes(vertical.location))
+        self.assertFalse(self._has_changes(problem.location))
+
+        # No oprhans in course
+        course_orphans = self.store.get_orphans(course_locator)
+        self.assertEqual(len(course_orphans), 0)
+
+        problem.display_name = 'changed'
+        problem = self.store.update_item(problem, self.user_id)
+        self.assertTrue(self._has_changes(vertical.location))
+        self.assertTrue(self._has_changes(problem.location))
+
+        self.store.delete_item(vertical.location, self.user_id)
+        # No drafts oprhans in course after delete
+        course_orphans = self.store.get_orphans(course_locator)
+        self.assertEqual(len(course_orphans), 0)
+        # No published oprhans after delete
+        course_publish_orphans = self.store.get_orphans(course_locator_publish)
+        self.assertEqual(len(course_publish_orphans), 0)
+
 
 @ddt.ddt
 @attr('mongo')
