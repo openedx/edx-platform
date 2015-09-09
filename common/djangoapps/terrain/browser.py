@@ -120,6 +120,7 @@ def initial_setup(server):
                 world.visit('/')
 
             except WebDriverException:
+                LOGGER.warn("Error acquiring %s browser, retrying", browser_driver, exc_info=True)
                 if hasattr(world, 'browser'):
                     world.browser.quit()
                 num_attempts += 1
