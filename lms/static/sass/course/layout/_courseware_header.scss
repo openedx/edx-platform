@@ -18,6 +18,12 @@
     @include margin-left(10px);
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
+    // setting sufficient contrast for sr elements
+    .sr {
+      color: $black;
+      background: $white;
+    }
+
     li {
       @include float(left);
       list-style: none;
