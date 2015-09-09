@@ -306,8 +306,10 @@
     }
 
     .action-remove-member {
-      margin-left: 20px;
       color: $blue;
+      background: transparent;
+      border: 1px solid transparent;
+      font: inherit;
     }
   }
 }

@@ -1,6 +1,6 @@
 <li class="team-member">
     <a class="member-profile" href="<%= memberProfileUrl %>">
-        <img class="image-url" src="<%= imageUrl %>" alt="profile page" />
+        <img class="image-url" src="<%= imageUrl %>" alt="<%= username %>'s profile page" />
     </a>
     <div class="member-info-container">
     	<span class="primary"><%= username %></span>
@@ -10,5 +10,7 @@
     		<span id="last-active"><%= lastActive %></span>
     	</div>
     </div>
-    <a class="action-remove-member" data-username="<%= username %>" href=""><%- gettext("Remove") %></a>
+    <button class="action-remove-member" data-username="<%= username %>">
+        <%- gettext("Remove") %><span class="sr">&nbsp;<%= username %></span>
+    </button>
 </li>

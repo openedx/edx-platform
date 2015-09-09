@@ -1,7 +1,7 @@
 <div class="wrapper-msg">
-    <span class="left-floater">
+    <h3 class="left-floater">
         <%- gettext("Instructor tools") %>
-    </span>
+    </h3>
     <span class="right-floater">
         <button class="action-delete">
             <%- gettext("Delete Team") %>
