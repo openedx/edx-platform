@@ -198,6 +198,42 @@ class TeamsTabTest(TeamsTabBase):
         self.verify_teams_present(True)
 
     @ddt.data(
+        'topics/{topic_id}',
+        'topics/{topic_id}/search',
+        'topics/{topic_id}/{team_id}/edit-team',
+        'teams/{topic_id}/{team_id}'
+    )
+    def test_unauthorized_error_message(self, route):
+        """Ensure that an error message is shown to the user if they attempt
+        to take an action which makes an AJAX request while not signed
+        in.
+        """
+        topics = self.create_topics(1)
+        topic = topics[0]
+        self.set_team_configuration({
+            u'max_team_size': 10,
+            u'topics': topics
+        })
+        team = self.create_teams(topic, 1)[0]
+        self.teams_page.visit()
+        self.browser.delete_cookie('sessionid')
+        url = self.browser.current_url.split('#')[0]
+        self.browser.get(
+            '{url}#{route}'.format(
+                url=url,
+                route=route.format(
+                    topic_id=topic['id'],
+                    team_id=team['id']
+                )
+            )
+        )
+        self.teams_page.wait_for_ajax()
+        self.assertEqual(
+            self.teams_page.warning_message,
+            u"Your request could not be completed. Reload the page and try again."
+        )
+
+    @ddt.data(
         ('browse', '.topics-list'),
         # TODO: find a reliable way to match the "My Teams" tab
         # ('my-teams', 'div.teams-list'),

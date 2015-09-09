@@ -102,6 +102,11 @@ class TeamsPage(CoursePage):
         """ Click on the breadcrumb for a specific topic """
         self.q(css='a.nav-item').filter(text=topic)[0].click()
 
+    @property
+    def warning_message(self):
+        """Return the text of the team warning message."""
+        return self.q(css='.warning').results[0].text
+
 
 class MyTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
     """
