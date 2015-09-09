@@ -15,6 +15,7 @@
                 </button>
             <% } %>
         </span>
+        <span class="sr timer-announce" aria-live="assertive"></span>
         <span id="time_remaining_id">
             <b>
             </b>
