@@ -722,27 +722,28 @@ class RegistrationView(APIView):
             if running_pipeline:
                 current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
 
-                # Override username / email / full name
-                field_overrides = current_provider.get_register_form_data(
-                    running_pipeline.get('kwargs')
-                )
+                if current_provider:
+                    # Override username / email / full name
+                    field_overrides = current_provider.get_register_form_data(
+                        running_pipeline.get('kwargs')
+                    )
 
-                for field_name in self.DEFAULT_FIELDS:
-                    if field_name in field_overrides:
-                        form_desc.override_field_properties(
-                            field_name, default=field_overrides[field_name]
-                        )
+                    for field_name in self.DEFAULT_FIELDS:
+                        if field_name in field_overrides:
+                            form_desc.override_field_properties(
+                                field_name, default=field_overrides[field_name]
+                            )
 
-                # Hide the password field
-                form_desc.override_field_properties(
-                    "password",
-                    default="",
-                    field_type="hidden",
-                    required=False,
-                    label="",
-                    instructions="",
-                    restrictions={}
-                )
+                    # Hide the password field
+                    form_desc.override_field_properties(
+                        "password",
+                        default="",
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
 
 
 class PasswordResetView(APIView):

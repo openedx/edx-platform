@@ -250,6 +250,7 @@ AUTHENTICATION_BACKENDS = (
     'social.backends.twitter.TwitterOAuth',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
+    'third_party_auth.lti.LTIAuthBackend',
 ) + AUTHENTICATION_BACKENDS
 
 ################################## OPENID #####################################
@@ -485,7 +486,7 @@ FEATURES['ENABLE_EDXNOTES'] = True
 # Enable teams feature for tests.
 FEATURES['ENABLE_TEAMS'] = True
 
-# Enable indexing teams for search
+# Enable teams search for tests.
 FEATURES['ENABLE_TEAMS_SEARCH'] = True
 
 # Add milestones to Installed apps for testing

@@ -14,7 +14,7 @@
 
                     this.server_api = _.extend(
                         {
-                            expand: 'team',
+                            expand: 'team,user',
                             username: this.username,
                             course_id: function () { return encodeURIComponent(self.course_id); }
                         },

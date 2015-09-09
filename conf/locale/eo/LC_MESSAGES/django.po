@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-24 22:03+0000\n"
-"PO-Revision-Date: 2015-08-24 22:03:48.240461\n"
+"POT-Creation-Date: 2015-09-04 14:15+0000\n"
+"PO-Revision-Date: 2015-09-04 14:15:47.324123\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1419,10 +1419,6 @@ msgid "incorrect"
 msgstr "ïnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "pärtïällý çörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
 msgstr "ïnçömplété Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -1443,10 +1439,6 @@ msgstr "Thïs ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "Thïs ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
-msgstr "Thïs ïs pärtïällý çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -5858,10 +5850,20 @@ msgid "{month} {day}, {year}"
 msgstr "{month} {day}, {year} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/certificates/views/webview.py
-msgid "a course of study offered by {partner_name}, through {platform_name}."
+msgid ""
+"a course of study offered by {partner_short_name}, an online learning "
+"initiative of {partner_long_name} through {platform_name}."
 msgstr ""
-"ä çöürsé öf stüdý öfféréd ßý {partner_name}, thröügh {platform_name}. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"ä çöürsé öf stüdý öfféréd ßý {partner_short_name}, än önlïné léärnïng "
+"ïnïtïätïvé öf {partner_long_name} thröügh {platform_name}. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"a course of study offered by {partner_short_name}, through {platform_name}."
+msgstr ""
+"ä çöürsé öf stüdý öfféréd ßý {partner_short_name}, thröügh {platform_name}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
@@ -5995,19 +5997,19 @@ msgstr ""
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
-"participated in {partner_name} {course_number}"
+"participated in {partner_short_name} {course_number}"
 msgstr ""
 "Thïs ïs ä välïd {platform_name} çértïfïçäté för {user_name}, whö "
-"pärtïçïpätéd ïn {partner_name} {course_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"pärtïçïpätéd ïn {partner_short_name} {course_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
-msgid "{partner_name} {course_number} Certificate | {platform_name}"
+msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
 msgstr ""
-"{partner_name} {course_number} Çértïfïçäté | {platform_name} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕ#"
+"{partner_short_name} {course_number} Çértïfïçäté | {platform_name} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #. Translators:  This text fragment appears after the student's name
 #. (displayed in a large font) on the certificate
@@ -6193,6 +6195,15 @@ msgid ""
 msgstr ""
 "Ìf ýöür çöürsé döés nöt äppéär ön ýöür däshßöärd, çöntäçt "
 "{payment_support_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+"{course_id} ïs nöt ä välïd çöürsé kéý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr "Çöürsé {course_id} döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
@@ -6805,6 +6816,35 @@ msgid "File is not attached."
 msgstr "Fïlé ïs nöt ättäçhéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Could not find problem with this location."
+msgstr ""
+"Çöüld nöt fïnd prößlém wïth thïs löçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The problem responses report is being created. To view the status of the "
+"report, see Pending Tasks below."
+msgstr ""
+"Thé prößlém réspönsés répört ïs ßéïng çréätéd. Tö vïéw thé stätüs öf thé "
+"répört, séé Péndïng Täsks ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem responses report generation task is already in progress. Check the"
+" 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+"À prößlém réspönsés répört générätïön täsk ïs älréädý ïn prögréss. Çhéçk thé"
+" 'Péndïng Täsks' täßlé för thé stätüs öf thé täsk. Whén çömplétéd, thé "
+"répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
+" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢#"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{num}' does not exist."
 msgstr ""
 "Ìnvöïçé nümßér '{num}' döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -7335,6 +7375,10 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr "Nö énd däté sét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
 msgstr ""
 "Énröllmént dätä ïs nöw äväïläßlé ïn {dashboard_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
@@ -7438,21 +7482,6 @@ msgstr "Éxtérnäl émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
 msgstr "Grädés för ässïgnmént \"{name}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Found {num} records to dump."
-msgstr "Föünd {num} réçörds tö dümp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Couldn't find module with that urlname."
-msgstr ""
-"Çöüldn't fïnd mödülé wïth thät ürlnämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Student state for problem {problem}"
-msgstr ""
-"Stüdént stäté för prößlém {problem} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
@@ -7659,6 +7688,12 @@ msgstr "émäïléd Ⱡ'σяєм ιρѕυм #"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+msgid "generated"
+msgstr "générätéd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "grädéd Ⱡ'σяєм ιρѕυ#"
 
@@ -7667,12 +7702,6 @@ msgstr "grädéd Ⱡ'σяєм ιρѕυ#"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "problem distribution graded"
 msgstr "prößlém dïstrïßütïön grädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
-msgid "generated"
-msgstr "générätéd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -10899,18 +10928,6 @@ msgid "No data provided for user preference update"
 msgstr ""
 "Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: openedx/core/lib/api/paginators.py
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr ""
-"Pägé ïs nöt 'läst', nör çän ït ßé çönvértéd tö än ïnt. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/lib/api/paginators.py
-#, python-format
-msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
-"Ìnvälïd pägé (%(page_number)s): %(message)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
@@ -14596,8 +14613,12 @@ msgid "Section:"
 msgstr "Séçtïön: Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Problem urlname:"
-msgstr "Prößlém ürlnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid ""
+"To download a CSV listing student responses to a given problem, visit the "
+"Data Download section of the Instructor Dashboard."
+msgstr ""
+"Tö döwnlöäd ä ÇSV lïstïng stüdént réspönsés tö ä gïvén prößlém, vïsït thé "
+"Dätä Döwnlöäd séçtïön öf thé Ìnstrüçtör Däshßöärd. Ⱡ'σяєм ι#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -16946,6 +16967,29 @@ msgid "Generate Proctored Exam Results Report"
 msgstr ""
 "Généräté Pröçtöréd Éxäm Résülts Répört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"To generate a CSV file that lists all student answers to a given problem, "
+"enter the location of the problem (from its Staff Debug Info)."
+msgstr ""
+"Tö généräté ä ÇSV fïlé thät lïsts äll stüdént änswérs tö ä gïvén prößlém, "
+"éntér thé löçätïön öf thé prößlém (fröm ïts Stäff Déßüg Ìnfö). Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Problem location: "
+msgstr "Prößlém löçätïön:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download a CSV of problem responses"
+msgstr ""
+"Döwnlöäd ä ÇSV öf prößlém réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""

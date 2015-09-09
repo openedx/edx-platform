@@ -11,31 +11,11 @@
 
                     this.teamEvents = options.teamEvents;
                     this.teamEvents.bind('teams:update', this.onUpdate, this);
-                    this.isStale = false;
                 },
 
                 onUpdate: function(event) {
+                    // Mark the collection as stale so that it knows to refresh when needed.
                     this.isStale = true;
-                },
-
-                /**
-                 * Refreshes the collection if it has been marked as stale.
-                 * @param force If true, it will always refresh.
-                 * @returns {promise} Returns a promise representing the refresh
-                 */
-                refresh: function(force) {
-                    var self = this,
-                        deferred = $.Deferred();
-                    if (force || this.isStale) {
-                        this.setPage(1)
-                            .done(function() {
-                                self.isStale = false;
-                                deferred.resolve();
-                            });
-                    } else {
-                        deferred.resolve();
-                    }
-                    return deferred.promise();
                 }
             });
             return BaseCollection;

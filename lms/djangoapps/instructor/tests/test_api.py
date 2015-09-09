@@ -4,6 +4,7 @@ Unit tests for instructor.api methods.
 """
 import datetime
 import ddt
+import functools
 import random
 import pytz
 import io
@@ -28,6 +29,7 @@ from mock import Mock, patch
 from nose.tools import raises
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import UsageKey
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
@@ -106,6 +108,12 @@ REPORTS_DATA = (
         'report_type': 'proctored exam results',
         'instructor_api_endpoint': 'get_proctored_exam_results',
         'task_api_endpoint': 'instructor_task.api.submit_proctored_exam_results_report',
+        'extra_instructor_api_kwargs': {},
+    },
+    {
+        'report_type': 'problem responses',
+        'instructor_api_endpoint': 'get_problem_responses',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_problem_responses_csv',
         'extra_instructor_api_kwargs': {},
     }
 )
@@ -234,6 +242,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_students_who_may_enroll', {}),
             ('get_exec_summary_report', {}),
             ('get_proctored_exam_results', {}),
+            ('get_problem_responses', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -286,6 +295,20 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
                 "Student should not be allowed to access endpoint " + endpoint
             )
 
+    def _access_problem_responses_endpoint(self, msg):
+        """
+        Access endpoint for problem responses report, ensuring that
+        UsageKey.from_string returns a problem key that the endpoint
+        can work with.
+
+        msg: message to display if assertion fails.
+        """
+        mock_problem_key = Mock(return_value=u'')
+        mock_problem_key.course_key = self.course.id
+        with patch.object(UsageKey, 'from_string') as patched_method:
+            patched_method.return_value = mock_problem_key
+            self._access_endpoint('get_problem_responses', {}, 200, msg)
+
     def test_staff_level(self):
         """
         Ensure that a staff member can't access instructor endpoints.
@@ -300,6 +323,11 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         for endpoint, args in self.staff_level_endpoints:
             # TODO: make these work
             if endpoint in ['update_forum_role_membership', 'list_forum_members']:
+                continue
+            elif endpoint == 'get_problem_responses':
+                self._access_problem_responses_endpoint(
+                    "Staff member should be allowed to access endpoint " + endpoint
+                )
                 continue
             self._access_endpoint(
                 endpoint,
@@ -329,6 +357,11 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         for endpoint, args in self.staff_level_endpoints:
             # TODO: make these work
             if endpoint in ['update_forum_role_membership']:
+                continue
+            elif endpoint == 'get_problem_responses':
+                self._access_problem_responses_endpoint(
+                    "Instructor should be allowed to access endpoint " + endpoint
+                )
                 continue
             self._access_endpoint(
                 endpoint,
@@ -2288,6 +2321,78 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertEqual(res['total_used_codes'], used_codes)
         self.assertEqual(res['total_codes'], 5)
 
+    def test_get_problem_responses_invalid_location(self):
+        """
+        Test whether get_problem_responses returns an appropriate status
+        message when users submit an invalid problem location.
+        """
+        url = reverse(
+            'get_problem_responses',
+            kwargs={'course_id': unicode(self.course.id)}
+        )
+        problem_location = ''
+
+        response = self.client.get(url, {'problem_location': problem_location})
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, 'Could not find problem with this location.')
+
+    def valid_problem_location(test):  # pylint: disable=no-self-argument
+        """
+        Decorator for tests that target get_problem_responses endpoint and
+        need to pretend user submitted a valid problem location.
+        """
+        @functools.wraps(test)
+        def wrapper(self, *args, **kwargs):
+            """
+            Run `test` method, ensuring that UsageKey.from_string returns a
+            problem key that the get_problem_responses endpoint can
+            work with.
+            """
+            mock_problem_key = Mock(return_value=u'')
+            mock_problem_key.course_key = self.course.id
+            with patch.object(UsageKey, 'from_string') as patched_method:
+                patched_method.return_value = mock_problem_key
+                test(self, *args, **kwargs)
+        return wrapper
+
+    @valid_problem_location
+    def test_get_problem_responses_successful(self):
+        """
+        Test whether get_problem_responses returns an appropriate status
+        message if CSV generation was started successfully.
+        """
+        url = reverse(
+            'get_problem_responses',
+            kwargs={'course_id': unicode(self.course.id)}
+        )
+        problem_location = ''
+
+        response = self.client.get(url, {'problem_location': problem_location})
+        res_json = json.loads(response.content)
+        self.assertIn('status', res_json)
+        status = res_json['status']
+        self.assertIn('is being created', status)
+        self.assertNotIn('already in progress', status)
+
+    @valid_problem_location
+    def test_get_problem_responses_already_running(self):
+        """
+        Test whether get_problem_responses returns an appropriate status
+        message if CSV generation is already in progress.
+        """
+        url = reverse(
+            'get_problem_responses',
+            kwargs={'course_id': unicode(self.course.id)}
+        )
+
+        with patch('instructor_task.api.submit_calculate_problem_responses_csv') as submit_task_function:
+            error = AlreadyRunningError()
+            submit_task_function.side_effect = error
+            response = self.client.get(url, {})
+            res_json = json.loads(response.content)
+            self.assertIn('status', res_json)
+            self.assertIn('already in progress', res_json['status'])
+
     def test_get_students_features(self):
         """
         Test that some minimum of information is formatted
@@ -2593,16 +2698,21 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     @ddt.data(*REPORTS_DATA)
     @ddt.unpack
+    @valid_problem_location
     def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
         kwargs = {'course_id': unicode(self.course.id)}
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
-
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        with patch(task_api_endpoint):
-            response = self.client.get(url, {})
         success_status = "The {report_type} report is being created.".format(report_type=report_type)
-        self.assertIn(success_status, response.content)
+        if report_type == 'problem responses':
+            with patch(task_api_endpoint):
+                response = self.client.get(url, {'problem_location': ''})
+            self.assertIn(success_status, response.content)
+        else:
+            CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+            with patch(task_api_endpoint):
+                response = self.client.get(url, {})
+            self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
     @ddt.unpack

@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:18+0000\n"
+"POT-Creation-Date: 2015-09-04 14:07+0000\n"
 "PO-Revision-Date: 2015-08-12 08:13+0000\n"
 "Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -1382,10 +1382,6 @@ msgid "incorrect"
 msgstr "غير صحيح"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr ""
-
-#: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
 msgstr "ناقص"
 
@@ -1406,10 +1402,6 @@ msgstr "هذا صحيح"
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "هذا خطأ"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
-msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -5190,8 +5182,15 @@ msgid "{month} {day}, {year}"
 msgstr "{month} {day}، {year}"
 
 #: lms/djangoapps/certificates/views/webview.py
-msgid "a course of study offered by {partner_name}, through {platform_name}."
-msgstr "مساق دروس يقدِّمه {partner_name}، عبر {platform_name}."
+msgid ""
+"a course of study offered by {partner_short_name}, an online learning "
+"initiative of {partner_long_name} through {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"a course of study offered by {partner_short_name}, through {platform_name}."
+msgstr ""
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
@@ -5302,16 +5301,14 @@ msgstr "تُقِرّ {platform_name} بإنجازات الطالب التالي�
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
-"participated in {partner_name} {course_number}"
+"participated in {partner_short_name} {course_number}"
 msgstr ""
-"هذه شهادة صالحة من {platform_name} للمستخدم {user_name} الذي شارك في "
-"{partner_name} {course_number}"
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
-msgid "{partner_name} {course_number} Certificate | {platform_name}"
-msgstr "شهادة {partner_name} {course_number} | {platform_name}"
+msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
+msgstr ""
 
 #. Translators:  This text fragment appears after the student's name
 #. (displayed in a large font) on the certificate
@@ -5477,6 +5474,14 @@ msgid ""
 msgstr ""
 "إذا لم يظهر مساقك على لوحة معلوماتك، يُرجى الاتصال بـ "
 "{payment_support_link}."
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr ""
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
@@ -6033,6 +6038,23 @@ msgid "File is not attached."
 msgstr "الملف غير مُرفَق. "
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Could not find problem with this location."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The problem responses report is being created. To view the status of the "
+"report, see Pending Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem responses report generation task is already in progress. Check the"
+" 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{num}' does not exist."
 msgstr " الفاتورة رقم '{num}' غير موجودة."
 
@@ -6452,6 +6474,10 @@ msgid "CourseMode price updated successfully"
 msgstr "تمّ عملية تحديث سعر CourseMode بنجاح"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
 msgstr "تتوافر بيانات التسجيل الآن على {dashboard_link}."
 
@@ -6556,18 +6582,6 @@ msgstr "بريد إلكتروني خارجي"
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
 msgstr "درجات الواجب \"{name}\""
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Found {num} records to dump."
-msgstr "وُجدت {num} سجلّات للتخلّص منها."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Couldn't find module with that urlname."
-msgstr "نأسف لتعذّر إيجاد وحدة بذلك الرابط."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Student state for problem {problem}"
-msgstr "حالة الطالب بالنسبة للمسألة {problem}"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
@@ -6739,6 +6753,12 @@ msgstr "الإرسال بالبريد الإلكتروني"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+msgid "generated"
+msgstr "الاستحداث"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "التقييم "
 
@@ -6747,12 +6767,6 @@ msgstr "التقييم "
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "problem distribution graded"
 msgstr "تقييم توزيع المسائل "
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
-msgid "generated"
-msgstr "الاستحداث"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -8382,12 +8396,12 @@ msgid "course_id must be provided"
 msgstr "يجب توفير الرقم التغريفي للمساق course_id."
 
 #: lms/djangoapps/teams/views.py
-msgid "The supplied topic id {topic_id} is not valid"
-msgstr "الرقم التعريفي الذي جرى توفيره حول الموضوع {topic_id} غير صالح."
+msgid "text_search and order_by cannot be provided together"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported."
-msgstr "إنّ خاصّية البحث في النصّ text_search غير مدعومة بعد."
+msgid "The supplied topic id {topic_id} is not valid"
+msgstr "الرقم التعريفي الذي جرى توفيره حول الموضوع {topic_id} غير صالح."
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
@@ -10194,6 +10208,10 @@ msgstr "المساعدة"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
+
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "{programming_language} editor"
+msgstr ""
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -12862,8 +12880,10 @@ msgid "Section:"
 msgstr "القسم:"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Problem urlname:"
-msgstr "اسم الرابط urlname الخاص بالمسألة: "
+msgid ""
+"To download a CSV listing student responses to a given problem, visit the "
+"Data Download section of the Instructor Dashboard."
+msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -14858,6 +14878,20 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Proctored Exam Results Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"To generate a CSV file that lists all student answers to a given problem, "
+"enter the location of the problem (from its Staff Debug Info)."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Problem location: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download a CSV of problem responses"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -17396,60 +17430,51 @@ msgid "This module is not enabled."
 msgstr "هذه الوحدة غير مفعَّلة."
 
 #: cms/templates/certificates.html
-msgid ""
-"Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. If you are a course team member with the "
-"Admin role in Studio, you can configure your course certificate."
+msgid "Working with Certificates"
 msgstr ""
-"عند استكمال الطلّاب لمساقك بنجاح، يحصلون على شهادة تُثبِت إنجازهم. وإذا كنت "
-"عضوًا في فريق المساق بدور مشرِف في الاستوديو، يمكنك إعداد شهادة مساقك."
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}Add your first certificate{em_end} to add a certificate "
-"configuration. Upload the organization logo to be used on the certificate, "
-"and specify at least one signatory. You can include up to four signatories "
-"for a certificate. You can also upload a signature image file for each "
-"signatory. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates. Optionally, specify a different course title to use "
-"on your course certificate. You might want to use a different title if, for "
-"example, the official course name is too long to display well on a "
-"certificate."
+"Specify a course title to use on the certificate if the course's official "
+"title is too long to be displayed well."
 msgstr ""
-"يُرجى النقر على {em_start}أَضِف شهادتك الأولى{em_end} لتُضيف إعدادات "
-"الشهادة. ثمّ حَمِّل شعار المؤسّسة لوضعه على الشهادة وحدِّد موقِّعًا واحدًا "
-"على الأقلّ وأربعة على الأكثر لكل شهادة. ويمكنك أيضًا تحميل صورة التوقيع لكل "
-"موقّع. {em_start}ملاحظة:{em_end} تُستخدَم صور التواقيع فقط للشهادات "
-"الموثَّقة. أو إذا أردت، يمكنك أن تحدِّد اسمًا مختلفًا للمساق لوضعه على "
-"شهادتك. وقد ترغب في استخدام اسم مختلف إذا كان، مثلًا، الاسم الرسمي للمساق "
-"طويلًا جدًّا إلى درجة أنّه لن يبدو واضحًا على الشهادة."
 
 #: cms/templates/certificates.html
 msgid ""
-"Select a course mode and click {em_start}Preview Certificate{em_end} to "
-"preview the certificate that a learner in the selected enrollment track "
-"would receive. When the certificate is ready for issuing, click "
-"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
-"{em_start}Deactivate{em_end}."
+"For verified certificates, specify between one and four signatories and "
+"upload the associated images."
 msgstr ""
-"يُرجى اختيار وضعية للمساق ثمّ النقر على {em_start}معاينة الشهادة{em_end} "
-"لمعاينة الشهادة التي سيحصل عليها المتعلّم في مسار التسجيل المُنتقى. وعندما "
-"تَجهَز الشهادة للإصدار، يُرجى النقر على {em_start}تفعيل.{em_end}. ولإيقاف "
-"إصدار شهادة مفعَّلة، يُرجى النقر على {em_start}إبطال التفعيل{em_end}."
 
 #: cms/templates/certificates.html
 msgid ""
-" To edit the certificate configuration, hover over the top right corner of "
-"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
-"over the top right corner of the form and click the delete icon. In general,"
-" do not delete certificates after a course has started, because some "
-"certificates might already have been issued to learners."
+"To edit or delete a certificate before it is activated, hover over the top "
+"right corner of the form and select {em_start}Edit{em_end} or the delete "
+"icon."
 msgstr ""
-"لتعديل إعدادات الشهادة، يُرجى تحريك الماوس إلى الزاوية العليا اليمنى من "
-"الاستمارة والنقر على {em_start}تعديل{em_end}. ولحذف  إحدى الشهادات، يُرجى "
-"تحريك الماوس إلى الزاوية العليا اليمنى من الاستمارة والنقر على رمز الحذف. "
-"وبشكل عام، لا تحذف الشهادات بعد بدء المساق، لأنّ بعض الشهادات قد تكون "
-"أُصدِرت مسبقًا للمتعلِّمين."
+
+#: cms/templates/certificates.html
+msgid ""
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid "Issuing Certificates to Learners"
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"To begin issuing certificates, a course team member with the Admin role "
+"selects {em_start}Activate{em_end}. Course team members without the Admin "
+"role cannot edit or delete an activated certificate."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"{em_start}Do not{em_end} delete certificates after a course has started; "
+"learners who have already earned certificates will no longer be able to "
+"access them."
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"

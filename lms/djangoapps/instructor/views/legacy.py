@@ -277,35 +277,6 @@ def instructor_dashboard(request, course_id):
                     msg += msg2
 
     #----------------------------------------
-    # DataDump
-
-    elif 'Download CSV of all responses to problem' in action:
-        problem_to_dump = request.POST.get('problem_to_dump', '')
-
-        if problem_to_dump[-4:] == ".xml":
-            problem_to_dump = problem_to_dump[:-4]
-        try:
-            module_state_key = course_key.make_usage_key_from_deprecated_string(problem_to_dump)
-            smdat = StudentModule.objects.filter(
-                course_id=course_key,
-                module_state_key=module_state_key
-            )
-            smdat = smdat.order_by('student')
-            msg += _("Found {num} records to dump.").format(num=smdat)
-        except Exception as err:  # pylint: disable=broad-except
-            msg += "<font color='red'>{text}</font><pre>{err}</pre>".format(
-                text=_("Couldn't find module with that urlname."),
-                err=escape(err)
-            )
-            smdat = []
-
-        if smdat:
-            datatable = {'header': ['username', 'state']}
-            datatable['data'] = [[x.student.username, x.state] for x in smdat]
-            datatable['title'] = _('Student state for problem {problem}').format(problem=problem_to_dump)
-            return return_csv('student_state_from_{problem}.csv'.format(problem=problem_to_dump), datatable)
-
-    #----------------------------------------
     # enrollment
 
     elif action == 'Enroll multiple students':

@@ -34,6 +34,7 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from eventtracking import tracker
 from courseware.courses import get_course_with_access, has_access
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
@@ -51,7 +52,7 @@ from .serializers import (
     add_team_count
 )
 from .search_indexes import CourseTeamIndexer
-from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
+from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ElasticSearchConnectionError
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
@@ -97,7 +98,7 @@ class TeamsDashboardView(View):
         team_memberships_page = Paginator(team_memberships, TEAM_MEMBERSHIPS_PER_PAGE).page(1)
         team_memberships_serializer = PaginatedMembershipSerializer(
             instance=team_memberships_page,
-            context={'expand': ('team',)},
+            context={'expand': ('team', 'user'), 'request': request},
         )
 
         context = {
@@ -120,7 +121,7 @@ class TeamsDashboardView(View):
             "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_memberships_url": reverse('team_membership_list', request=request),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
-            "languages": settings.ALL_LANGUAGES,
+            "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],  # pylint: disable=translation-of-non-string
             "countries": list(countries),
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
@@ -175,7 +176,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             * text_search: Searches for full word matches on the name, description,
               country, and language fields. NOTES: Search is on full names for countries
               and languages, not the ISO codes. Text_search cannot be requested along with
-              with order_by. Searching relies on the ENABLE_TEAMS_SEARCH flag being set to True.
+              with order_by.
 
             * order_by: Cannot be called along with with text_search. Must be one of the following:
 
@@ -190,9 +191,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             * page_size: Number of results to return per page.
 
             * page: Page number to retrieve.
-
-            * include_inactive: If true, inactive teams will be returned. The
-              default is to not include inactive teams.
 
             * expand: Comma separated list of types for which to return
               expanded representations. Supports "user" and "team".
@@ -219,10 +217,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                   discussion topic associated with this team.
 
                 * name: The name of the team.
-
-                * is_active: True if the team is currently active. If false, the
-                  team is considered "soft deleted" and will not be included by
-                  default in results.
 
                 * course_id: The identifier for the course this team belongs to.
 
@@ -266,8 +260,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             Any logged in user who has verified their email address can create
             a team. The format mirrors that of a GET for an individual team,
-            but does not include the id, is_active, date_created, or membership
-            fields. id is automatically computed based on name.
+            but does not include the id, date_created, or membership fields.
+            id is automatically computed based on name.
 
             If the user is not logged in, a 401 error is returned.
 
@@ -292,9 +286,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
     def get(self, request):
         """GET /api/team/v0/teams/"""
-        result_filter = {
-            'is_active': True
-        }
+        result_filter = {}
 
         if 'course_id' in request.QUERY_PARAMS:
             course_id_string = request.QUERY_PARAMS['course_id']
@@ -320,7 +312,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if 'text_search' in request.QUERY_PARAMS and 'order_by' in request.QUERY_PARAMS:
+        text_search = request.QUERY_PARAMS.get('text_search', None)
+        if text_search and request.QUERY_PARAMS.get('order_by', None):
             return Response(
                 build_api_error(ugettext_noop("text_search and order_by cannot be provided together")),
                 status=status.HTTP_400_BAD_REQUEST
@@ -335,16 +328,19 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
             result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
-        if 'include_inactive' in request.QUERY_PARAMS and request.QUERY_PARAMS['include_inactive'].lower() == 'true':
-            del result_filter['is_active']
 
-        if 'text_search' in request.QUERY_PARAMS and CourseTeamIndexer.search_is_enabled():
-            search_engine = CourseTeamIndexer.engine()
-            text_search = request.QUERY_PARAMS['text_search'].encode('utf-8')
+        if text_search and CourseTeamIndexer.search_is_enabled():
+            try:
+                search_engine = CourseTeamIndexer.engine()
+            except ElasticSearchConnectionError:
+                return Response(
+                    build_api_error(ugettext_noop('Error connecting to elasticsearch')),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             result_filter.update({'course_id': course_id_string})
 
             search_results = search_engine.search(
-                query_string=text_search,
+                query_string=text_search.encode('utf-8'),
                 field_dictionary=result_filter,
                 size=MAXIMUM_SEARCH_SIZE,
             )
@@ -355,19 +351,16 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 self.get_paginate_by(),
                 self.get_page()
             )
-
             serializer = self.get_pagination_serializer(paginated_results)
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
             if order_by_input == 'name':
-                queryset = queryset.extra(select={'lower_name': "lower(name)"})
-                queryset = queryset.order_by('lower_name')
+                # MySQL does case-insensitive order_by.
+                queryset = queryset.order_by('name')
             elif order_by_input == 'open_slots':
-                queryset = queryset.annotate(team_size=Count('users'))
                 queryset = queryset.order_by('team_size', '-last_activity_at')
             elif order_by_input == 'last_activity_at':
-                queryset = queryset.annotate(team_size=Count('users'))
                 queryset = queryset.order_by('-last_activity_at', 'team_size')
             else:
                 return Response({
@@ -431,9 +424,22 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
+            tracker.emit('edx.team.created', {
+                'team_id': team.team_id,
+                'course_id': unicode(course_id)
+            })
             if not team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
+                tracker.emit(
+                    'edx.team.learner_added',
+                    {
+                        'team_id': team.team_id,
+                        'user_id': request.user.id,
+                        'course_id': unicode(team.course_id),
+                        'add_method': 'added_on_create'
+                    }
+                )
             return Response(CourseTeamSerializer(team).data)
 
     def get_page(self):
@@ -495,10 +501,6 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                   discussion topic associated with this team.
 
                 * name: The name of the team.
-
-                * is_active: True if the team is currently active. If false, the team
-                  is considered "soft deleted" and will not be included by default in
-                  results.
 
                 * course_id: The identifier for the course this team belongs to.
 
@@ -992,6 +994,15 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         try:
             membership = team.add_user(user)
+            tracker.emit(
+                'edx.team.learner_added',
+                {
+                    'team_id': team.team_id,
+                    'user_id': user.id,
+                    'course_id': unicode(team.course_id),
+                    'add_method': 'joined_from_team_view' if user == request.user else 'added_by_another_user'
+                }
+            )
         except AlreadyOnTeamInCourse:
             return Response(
                 build_api_error(
@@ -1118,6 +1129,15 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         if has_team_api_access(request.user, team.course_id, access_username=username):
             membership = self.get_membership(username, team)
             membership.delete()
+            tracker.emit(
+                'edx.team.learner_removed',
+                {
+                    'team_id': team.team_id,
+                    'course_id': unicode(team.course_id),
+                    'user_id': membership.user.id,
+                    'remove_method': 'self_removal' if membership.user == request.user else 'removed_by_admin'
+                }
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)

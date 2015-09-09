@@ -5,6 +5,7 @@ Bok choy acceptance tests for problems in the LMS
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
+from flaky import flaky
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -191,6 +192,7 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
         """)
         return XBlockFixtureDesc('problem', 'PROBLEM HTML HINT TEST', data=xml)
 
+    @flaky  # TODO fix this, see TNL-3183
     def test_check_hint(self):
         """
         Test clicking Check shows the extended hint in the problem message.
