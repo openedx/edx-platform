@@ -134,7 +134,7 @@ define([
                     ));
             };
 
-            it('can search teams', function () {
+            xit('can search teams', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
@@ -154,7 +154,7 @@ define([
                 expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
             });
 
-            it('can clear a search', function () {
+            xit('can clear a search', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
@@ -177,7 +177,7 @@ define([
                 expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
             });
 
-            it('clears the search when navigating away and then back', function () {
+            xit('clears the search when navigating away and then back', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
@@ -199,7 +199,7 @@ define([
                 expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
             });
 
-            it('does not switch to showing results when the search returns an error', function () {
+            xit('does not switch to showing results when the search returns an error', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
