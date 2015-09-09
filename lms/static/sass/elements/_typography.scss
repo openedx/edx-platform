@@ -5,22 +5,22 @@
 
 // weights
 %t-ultrastrong {
- font-weight: 700;
+ font-weight: $font-bold;
 }
 %t-strong {
- font-weight: 600;
+ font-weight: $font-semibold;
 }
 %t-demi-strong {
- font-weight: 500;
+ font-weight: $font-demi;
 }
 %t-regular {
- font-weight: 400;
+ font-weight: $font-regular;
 }
 %t-light {
- font-weight: 300;
+ font-weight: $font-light;
 }
 %t-ultralight {
- font-weight: 200;
+ font-weight: $font-ultralight;
 }
 
 // headings/titles
@@ -195,41 +195,18 @@
 
 // ====================
 
-// typography weights
-%t-weight1 {
-  font-weight: $font-light;
-}
-
-%t-weight2 {
-  font-weight: $font-regular;
-}
-
-%t-weight3 {
-  font-weight: 500;
-}
-
-%t-weight4 {
-  font-weight: $font-semibold;
-}
-
-%t-weight5 {
-  font-weight: $font-bold;
-}
-
-// ====================
-
 // MISC: extends - type
 // application: canned headings
 %hd-lv1 {
   @extend %t-title1;
-  @extend %t-weight1;
+  @extend %t-light;
   color: $m-gray-d4;
   margin: 0 0 ($baseline*2) 0;
 }
 
 %hd-lv2 {
   @extend %t-title4;
-  @extend %t-weight1;
+  @extend %t-light;
   margin: 0 0 ($baseline*0.75) 0;
   border-bottom: 1px solid $m-gray-l3;
   padding-bottom: ($baseline/2);
@@ -238,21 +215,21 @@
 
 %hd-lv3 {
   @extend %t-title6;
-  @extend %t-weight4;
+  @extend %t-strong;
   margin: 0 0 ($baseline/4) 0;
   color: $m-gray-d4;
 }
 
 %hd-lv4 {
   @extend %t-title6;
-  @extend %t-weight2;
+  @extend %t-regular;
   margin: 0 0 $baseline 0;
   color: $m-gray-d4;
 }
 
 %hd-lv5 {
   @extend %t-title7;
-  @extend %t-weight4;
+  @extend %t-strong;
   margin: 0 0 ($baseline/4) 0;
   color: $m-gray-d4;
 }
@@ -270,7 +247,7 @@
 
 %copy-detail {
   @extend %t-copy-sub1;
-  @extend %t-weight3;
+  @extend %t-demi-strong;
   color: $m-gray-d1;
 }
 
@@ -280,11 +257,11 @@
 
 
   %copy-metadata-value {
-    @extend %t-weight2;
+    @extend %t-regular;
   }
 
   %copy-metadata-value {
-    @extend %t-weight4;
+    @extend %t-strong;
   }
 }
 
@@ -299,7 +276,7 @@
 
 %copy-badge {
   @extend %t-title9;
-  @extend %t-weight3;
+  @extend %t-demi-strong;
   border-radius: ($baseline/5);
   padding: ($baseline/2) $baseline;
   text-transform: uppercase;

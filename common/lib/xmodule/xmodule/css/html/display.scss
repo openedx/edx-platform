@@ -4,7 +4,7 @@
 }
 
 h1 {
-    color: $baseFontColor;
+    color: $base-font-color;
     font: normal 2em/1.4em $sans-serif;
     letter-spacing: 1px;
     margin: 0 0 1.416em 0;
@@ -44,7 +44,7 @@ p {
   margin-bottom: 1.416em;
   font-size: 1em;
   line-height: 1.6em !important;
-  color: $baseFontColor;
+  color: $base-font-color;
 }
 
 em, i {
@@ -74,7 +74,7 @@ blockquote {
 ol, ul {
   margin: 1em 0;
   padding: 0 0 0 1em;
-  color: $baseFontColor;
+  color: $base-font-color;
 
   li {
     margin-bottom: 0.708em;
@@ -101,7 +101,7 @@ img {
 
 pre {
   margin: 1em 0;
-  color: $baseFontColor;
+  color: $base-font-color;
   font-family: monospace, serif;
   font-size: 1em;
   white-space: pre-wrap;
@@ -109,7 +109,7 @@ pre {
 }
 
 code {
-  color: $baseFontColor;
+  color: $base-font-color;
   font-family: monospace, serif;
   background: none;
   padding: 0;

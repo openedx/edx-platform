@@ -29,7 +29,7 @@ body.discussion, .discussion-module {
 
     .username {
       @include font-size(14);
-      @extend %t-weight5;
+      @extend %t-ultrastrong;
     }
 
     .posted-details .username {

@@ -28,7 +28,7 @@
 
     .title {
       @extend %t-title5;
-      @extend %t-weight4;
+      @extend %t-strong;
       margin-bottom: ($baseline/4);
       color: inherit;
       text-transform: none;

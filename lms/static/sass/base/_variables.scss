@@ -24,8 +24,10 @@ $body-font-family: $sans-serif;
 $serif: $georgia;
 
 // FONT-WEIGHTS
+$font-ultralight: 200;
 $font-light: 300;
 $font-regular: 400;
+$font-demi: 500;
 $font-semibold: 600;
 $font-bold: 700;
 
@@ -34,8 +36,6 @@ $font-bold: 700;
 // MISC: base fonts/colors
 $body-font-size: em(14);
 $body-line-height: golden-ratio(.875em, 1);
-$base-font-color: rgb(60,60,60);
-$baseFontColor: rgb(60,60,60);
 $base-font-color: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
 $very-light-text: rgb(255,255,255); // #ffffff
@@ -228,13 +228,11 @@ $light-gray: rgb(221,221,221); // #dddddd
 $lightGrey: rgb(237,241,245); // #edf1f5
 $darkGrey: rgb(136,145,161); // #8891a1
 $lightGrey1: $gray-l3;
-$blue-d1: shade($blue,20%);
-$blue-d2: shade($blue,40%);
-$blue-d4: shade($blue,80%);
 
 // ====================
 
 // edx.org marketing site variables
+// Why are these different from the above colors?
 $m-gray: rgb(138,140,143); // #8A8C8F
 $m-gray-l1: rgb(151,153,155); // #97999B
 $m-gray-l2: rgb(164,166,168); // #A4A6A8
@@ -305,10 +303,6 @@ $shadow-d2: rgba($black, 0.6);
 // ====================
 
 $m-base-font-size: em(15);
-
-$base-font-color: rgb(60,60,60);
-$baseFontColor: rgb(60,60,60);
-$lighter-base-font-color: rgb(100,100,100);
 $text-color: $dark-gray;
 
 $dark-trans-bg: rgba(0, 0, 0, .75);
@@ -469,7 +463,7 @@ $button-color: $blue;
 $button-archive-color: rgb(238,238,238); // #eeeeee
 
 // MISC: shadow, form, modal
-$shadow-color: $blue;
+$shadow-color: $blue; // A blue shadow?
 $form-bg-color: $white;
 $modal-bg-color: rgb(245,245,245);
 
@@ -480,7 +474,7 @@ $sidebar-chapter-bg: rgb(246,246,246); // #f6f6f6
 $sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214));
 
 // TOP HEADER IMAGE MARGIN
-$header_image_margin: -69px;
+$header_image_margin: -69px; // What the heck?
 
 //FOOTER MARGIN
 $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
@@ -525,7 +519,7 @@ $header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 
 $msg-bg: $action-primary-bg;
 
-
+// Why not use our lovely variables at the top?
 $dark-gray1: rgb(74,74,74); // #
 $light-gray1: rgb(242,242,242); // #f2f2f2
 $light-gray2: rgb(171,171,171); // #ababab

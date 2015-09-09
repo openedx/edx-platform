@@ -169,7 +169,7 @@
   }
 
   .intro {
-    @extend %t-weight4;
+    @extend %t-strong;
   }
 
   .listing-tools {
@@ -440,7 +440,7 @@
 
     legend {
         @extend %t-title6;
-        @extend %t-weight4;
+        @extend %t-strong;
         margin-bottom: ($baseline/4);
     }
 
@@ -459,7 +459,7 @@
         }
 
         &.is-required {
-            @extend %t-weight4;
+            @extend %t-strong;
 
             .label:after {
               @include margin-left($baseline/4);

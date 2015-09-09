@@ -98,7 +98,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
 // CASE: annotator error in toggling notes (vendor customization)
 .annotator-notice {
-  @extend %t-weight4;
+  @extend %t-strong;
   @extend %t-copy-sub1;
   padding: ($baseline/4) $baseline;
   background: $black-t3;
@@ -107,7 +107,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 // CASE: annotator error in toggling notes
 // vendor customization
 .annotator-notice {
-  @extend %t-weight4;
+  @extend %t-strong;
   @extend %t-copy-sub1;
   padding: ($baseline/2) $baseline;
   background: $gray-d4;

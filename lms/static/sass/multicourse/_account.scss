@@ -134,7 +134,7 @@
         @include left($baseline*1.5);
 
         .title-super, .title-sub {
-          @extend %t-weight1;
+          @extend %t-light;
           display: block;
           letter-spacing: 0;
         }
@@ -495,7 +495,7 @@
 
     .copy {
       @extend %t-copy-lead1;
-      @extend %t-weight4;
+      @extend %t-strong;
       position: absolute;
       top: -($baseline);
       left: 43%;

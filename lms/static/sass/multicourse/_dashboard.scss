@@ -177,7 +177,7 @@
         }
 
         .nav__item {
-          @extend %t-weight4;
+          @extend %t-strong;
           @include font-size(13);
           margin-left: 26px;
         }
@@ -604,7 +604,7 @@
         .message-title,
         .message-copy .title {
           @extend %t-title6;
-          @extend %t-weight4;
+          @extend %t-strong;
           line-height: 1em;
           margin-bottom: ($baseline/4);
         }
@@ -722,7 +722,7 @@
 
             .copy {
               @extend %t-action3;
-              @extend %t-weight4;
+              @extend %t-strong;
               margin-right: $baseline;
             }
 
@@ -1071,7 +1071,7 @@
 
   .status-data-message {
     @extend %t-copy-sub1;
-    @extend %t-weight4;
+    @extend %t-strong;
     margin-bottom: ($baseline/2);
   }
 
@@ -1079,7 +1079,7 @@
     @extend %ui-no-list;
 
     .action {
-      @extend %t-weight4;
+      @extend %t-strong;
       display: block;
       @include font-size(14);
     }
@@ -1119,7 +1119,7 @@
 
     .action-reverify {
       @extend %btn-primary-error;
-      @extend %t-weight4;
+      @extend %t-strong;
       display: block;
       @include font-size(14);
     }
@@ -1266,7 +1266,7 @@ a.fade-cover{
 
       &.title {
         @extend %t-title5;
-        @extend %t-weight4;
+        @extend %t-strong;
         font-family: $f-sans-serif;
 
         // Overriding Platform h2 styles

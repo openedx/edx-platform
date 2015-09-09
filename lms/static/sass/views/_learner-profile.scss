@@ -229,7 +229,7 @@
 
         .u-field-title {
             font-size: 1.1em;
-            @extend %t-weight4;
+            @extend %t-strong;
             margin-bottom: ($baseline/4);
         }
 
