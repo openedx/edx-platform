@@ -29,7 +29,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
@@ -894,16 +894,32 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        enrollment, created = CourseEnrollment.objects.get_or_create(
-            user=user,
-            course_id=course_key,
-        )
+        try:
+            enrollment, created = CourseEnrollment.objects.get_or_create(
+                user=user,
+                course_id=course_key,
+            )
 
-        # If we *did* just create a new enrollment, set some defaults
-        if created:
-            enrollment.mode = "honor"
-            enrollment.is_active = False
-            enrollment.save()
+            # If we *did* just create a new enrollment, set some defaults
+            if created:
+                enrollment.mode = "honor"
+                enrollment.is_active = False
+                enrollment.save()
+        except IntegrityError:
+            log.info(
+                (
+                    "An integrity error occurred while getting-or-creating the enrollment"
+                    "for course key %s and student %s. This can occur if two processes try to get-or-create "
+                    "the enrollment at the same time and the database is set to REPEATABLE READ. We will try "
+                    "committing the transaction and retrying."
+                ),
+                course_key, user
+            )
+            transaction.commit()
+            enrollment = CourseEnrollment.objects.get(
+                user=user,
+                course_id=course_key,
+            )
 
         return enrollment
 
