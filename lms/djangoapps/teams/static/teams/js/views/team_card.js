@@ -32,11 +32,13 @@
 
             initialize: function (options) {
                 this.maxTeamSize = options.maxTeamSize;
+                this.memberships = options.memberships;
             },
 
             render: function () {
-                var allMemberships = _(this.model.get('membership'))
-                        .sortBy(function (member) {return new Date(member.last_activity_at);}).reverse(),
+                var allMemberships = _(this.memberships).sortBy(function (member) {
+                    return new Date(member.last_activity_at);
+                }).reverse(),
                     displayableMemberships = allMemberships.slice(0, 5),
                     maxMemberCount = this.maxTeamSize;
                 this.$el.html(this.template({
@@ -97,7 +99,7 @@
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
-                    new TeamMembershipView({model: this.teamModel(), maxTeamSize: this.maxTeamSize}),
+                    new TeamMembershipView({memberships: this.getMemberships(), maxTeamSize: this.maxTeamSize}),
                     new TeamCountryLanguageView({
                         model: this.teamModel(),
                         countries: this.countries,
@@ -105,11 +107,23 @@
                     }),
                     new TeamActivityView({date: this.teamModel().get('last_activity_at')})
                 ];
+                this.model.on('change:membership', function () {
+                    this.detailViews[0].memberships = this.getMemberships();
+                }, this);
             },
 
             teamModel: function () {
                 if (this.model.has('team')) { return this.model.get('team'); }
                 return this.model;
+            },
+
+            getMemberships: function () {
+                if (this.model.has('team')) {
+                    return [this.model.attributes];
+                }
+                else {
+                    return this.model.get('membership');
+                }
             },
 
             configuration: 'list_card',

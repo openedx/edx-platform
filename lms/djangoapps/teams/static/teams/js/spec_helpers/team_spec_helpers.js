@@ -68,8 +68,11 @@ define([
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
             return {
                 user: {
-                    'username': testUser,
-                    'url': 'https://openedx.example.com/api/user/v1/accounts/' + testUser
+                    username: testUser,
+                    url: 'https://openedx.example.com/api/user/v1/accounts/' + testUser,
+                    profile_image: {
+                        image_url_small: 'test_profile_image'
+                    }
                 },
                 team: teams[i-1]
             };
