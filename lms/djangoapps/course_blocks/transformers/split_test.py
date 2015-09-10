@@ -45,10 +45,10 @@ class SplitTestTransformer(BlockStructureTransformer):
         user_partitions = getattr(xblock, 'user_partitions', [])
         split_test_partitions = getattr(xblock, 'split_test_partition', []) or []
 
-        # For each block, check if there is an split_test block.
-        # If split_test is found, check it's user_partition value and get children.
-        # Set split_test_group on each of the children for fast retrival in transform phase.
-        # Add same group to childrens children, because due to structure restrictions first level
+        # For each block, check if it is a split_test block.
+        # If split_test is found, check its user_partition value and get children.
+        # Set split_test_group on each of the children for fast retrieval in transform phase.
+        # Add same group to children's children, because due to structure restrictions first level
         # children are verticals.
         for block_key in block_structure.topological_traversal():
             xblock = block_structure.get_xblock(block_key)
@@ -96,11 +96,11 @@ class SplitTestTransformer(BlockStructureTransformer):
         if not user_partitions:
             return
 
-        user_groups = get_user_partition_groups(
-            user_info.course_key, user_partitions, user_info.user
-        )
-
         if not user_info.has_staff_access:
+            user_groups = get_user_partition_groups(
+                user_info.course_key, user_partitions, user_info.user
+            )
+
             block_structure.remove_block_if(
                 lambda block_key: not SplitTestTransformer.check_split_access(
                     block_structure.get_transformer_block_data(

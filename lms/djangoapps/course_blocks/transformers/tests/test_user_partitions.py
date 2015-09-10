@@ -40,7 +40,6 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
-        clear_course_from_cache(self.course.id)
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
@@ -109,18 +108,10 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
             group.id,
         )
 
-    def test_course_structure_with_user_partition(self):
+    def test_user_assigned(self):
         """
-        Test course structure integrity if course has user partition section
-        and user is assigned to group in user partition.
+        Test when user is assigned to group in user partition.
         """
-        raw_block_structure = get_course_blocks(
-            self.user,
-            self.course.location,
-            transformers={}
-        )
-        self.assertEqual(len(list(raw_block_structure.get_block_keys())), len(self.blocks))
-
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
