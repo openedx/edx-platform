@@ -329,6 +329,7 @@ mark {
 // UI - semantically hide text
 .sr {
   @extend %text-sr;
+  @extend %a11y-ensure-contrast;
 }
 
 // UI - skipnav
