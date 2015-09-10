@@ -13,8 +13,8 @@ from .fields import FieldsMixin
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
 CARD_TITLE_CSS = 'h3.card-title'
-MY_TEAMS_BUTTON_CSS = 'a.nav-item[data-index="0"]'
-BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
+MY_TEAMS_BUTTON_CSS = '.nav-item[data-index="0"]'
+BROWSE_BUTTON_CSS = '.nav-item[data-index="1"]'
 TEAMS_LINK_CSS = '.action-view'
 TEAMS_HEADER_CSS = '.teams-header'
 CREATE_TEAM_LINK_CSS = '.create-team'
@@ -23,24 +23,28 @@ CREATE_TEAM_LINK_CSS = '.create-team'
 class TeamCardsMixin(object):
     """Provides common operations on the team card component."""
 
+    def _bounded_selector(self, css):
+        """Bind the CSS to a particular tabpanel (e.g. My Teams or Browse)."""
+        return '{tabpanel_id} {css}'.format(tabpanel_id=getattr(self, 'tabpanel_id', ''), css=css)
+
     def view_first_team(self):
         """Click the 'view' button of the first team card on the page."""
-        self.q(css='a.action-view').first.click()
+        self.q(css=self._bounded_selector('a.action-view')).first.click()
 
     @property
     def team_cards(self):
         """Get all the team cards on the page."""
-        return self.q(css='.team-card')
+        return self.q(css=self._bounded_selector('.team-card'))
 
     @property
     def team_names(self):
         """Return the names of each team on the page."""
-        return self.q(css='h3.card-title').map(lambda e: e.text).results
+        return self.q(css=self._bounded_selector('h3.card-title')).map(lambda e: e.text).results
 
     @property
     def team_descriptions(self):
         """Return the names of each team on the page."""
-        return self.q(css='p.card-description').map(lambda e: e.text).results
+        return self.q(css=self._bounded_selector('p.card-description')).map(lambda e: e.text).results
 
 
 class BreadcrumbsMixin(object):
@@ -135,6 +139,7 @@ class MyTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
     """
 
     url_path = "teams/#my-teams"
+    tabpanel_id = '#tabpanel-my-teams'
 
     def is_browser_on_page(self):
         """Check if the "My Teams" tab is being viewed."""
@@ -166,7 +171,7 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
     @property
     def topic_names(self):
         """Return a list of the topic names present on the page."""
-        return self.q(css=CARD_TITLE_CSS).map(lambda e: e.text).results
+        return self.q(css='#tabpanel-browse ' + CARD_TITLE_CSS).map(lambda e: e.text).results
 
     @property
     def topic_descriptions(self):
