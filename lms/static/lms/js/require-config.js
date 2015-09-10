@@ -35,6 +35,8 @@
             "gettext": "/i18n",
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
+            "moment": "js/vendor/moment.min",
+            "moment-with-locales": "js/vendor/moment-with-locales.min",
             "text": "js/vendor/requirejs/text",
             "logger": "js/src/logger",
             "backbone": "js/vendor/backbone-min",
@@ -52,7 +54,6 @@
             "URI": "js/vendor/URI.min",
             "string_utils": "js/src/string_utils",
             "utility": "js/src/utility",
-            "moment": "js/vendor/moment.min",
 
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
@@ -188,6 +189,9 @@
             },
             // End of needed by OVA
             "moment": {
+                exports: "moment"
+            },
+            "moment-with-locales": {
                 exports: "moment"
             }
         }

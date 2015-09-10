@@ -1,20 +1,22 @@
 ;(function (define) {
     'use strict';
     define([
+        'jquery',
         'backbone',
         'underscore',
         'gettext',
-        'jquery.timeago',
+        'moment-with-locales',
         'js/components/card/views/card',
         'teams/js/views/team_utils',
         'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
         'text!teams/templates/team-activity.underscore'
     ], function (
+        $,
         Backbone,
         _,
         gettext,
-        timeago,
+        moment,
         CardView,
         TeamUtils,
         teamMembershipDetailsTemplate,
@@ -75,15 +77,18 @@
             },
 
             render: function () {
+                var lastActivity = moment(this.date),
+                    currentLanguage = $('html').attr('lang');
+                lastActivity.locale(currentLanguage);
                 this.$el.html(
                     interpolate(
-                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
-                        gettext("Last Activity %(date)s"),
-                        {date: this.template({date: this.date})},
+                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: http://momentjs.com/)
+                        gettext("Last activity %(date)s"),
+                        {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})},
                         true
                     )
                 );
-                this.$('abbr').timeago();
+                this.$('abbr').text(lastActivity.fromNow());
             }
         });
 
@@ -103,7 +108,7 @@
             },
 
             teamModel: function () {
-                if (this.model.has('team')) { return this.model.get('team'); };
+                if (this.model.has('team')) { return this.model.get('team'); }
                 return this.model;
             },
 
