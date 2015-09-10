@@ -136,6 +136,7 @@ div.course-wrapper {
         border-bottom: none;
         box-shadow: none;
         text-align: left;
+        width: 100%;
         &:hover {
           background-color: transparent;
         }
@@ -181,8 +182,16 @@ div.course-wrapper {
         border-top: 4px solid #22B557 !important;
         margin: 0 auto;
       }
+      &.success-left-bar {
+        border-left: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
       &.message-top-bar {
         border-top: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
+      &.message-left-bar {
+        border-left: 4px solid #FAB95C !important;
         margin: 0 auto;
       }
       &.failure {
@@ -245,6 +254,12 @@ div.course-wrapper {
         &:last-child {
           > .fa {
             color: rgb(206, 216, 220);
+          }
+          border-bottom: none;
+        }
+        &:last-child {
+          > .practice-exam {
+            color: #147ABA;
           }
           border-bottom: none;
         }
