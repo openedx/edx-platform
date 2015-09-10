@@ -365,7 +365,7 @@
                         viewWithHeader = this.createViewWithHeader({
                             subject: topic,
                             mainView: teamsView,
-                            headerActionsView: null, // TODO: add back SearchFieldView when search is enabled
+                            headerActionsView: SearchFieldView,
                             title: options.title,
                             description: options.description,
                             breadcrumbs: this.createBreadcrumbs()

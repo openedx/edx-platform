@@ -1,8 +1,5 @@
 """ Search index used to load data into elasticsearch"""
 
-import logging
-from requests import ConnectionError
-
 from django.conf import settings
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
@@ -11,7 +8,6 @@ from functools import wraps
 
 from search.search_engine_base import SearchEngine
 
-from .errors import ElasticSearchConnectionError
 from .serializers import CourseTeamSerializer, CourseTeam
 
 
@@ -34,7 +30,7 @@ class CourseTeamIndexer(object):
     """
     INDEX_NAME = "course_team_index"
     DOCUMENT_TYPE_NAME = "course_team"
-    ENABLE_SEARCH_KEY = "ENABLE_TEAMS_SEARCH"
+    ENABLE_SEARCH_KEY = "ENABLE_TEAMS"
 
     def __init__(self, course_team):
         self.course_team = course_team
@@ -108,11 +104,7 @@ class CourseTeamIndexer(object):
         Return course team search engine (if feature is enabled).
         """
         if cls.search_is_enabled():
-            try:
-                return SearchEngine.get_search_engine(index=cls.INDEX_NAME)
-            except ConnectionError as err:
-                logging.error("Error connecting to elasticsearch: %s", err)
-                raise ElasticSearchConnectionError
+            return SearchEngine.get_search_engine(index=cls.INDEX_NAME)
 
     @classmethod
     def search_is_enabled(cls):
@@ -127,10 +119,7 @@ def course_team_post_save_callback(**kwargs):
     """
     Reindex object after save.
     """
-    try:
-        CourseTeamIndexer.index(kwargs['instance'])
-    except ElasticSearchConnectionError:
-        pass
+    CourseTeamIndexer.index(kwargs['instance'])
 
 
 @receiver(post_delete, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_delete_callback')

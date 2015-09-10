@@ -58,7 +58,7 @@ from .serializers import (
     add_team_count
 )
 from .search_indexes import CourseTeamIndexer
-from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ElasticSearchConnectionError
+from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
@@ -366,13 +366,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
             result_filter.update({'topic_id': topic_id})
         if text_search and CourseTeamIndexer.search_is_enabled():
-            try:
-                search_engine = CourseTeamIndexer.engine()
-            except ElasticSearchConnectionError:
-                return Response(
-                    build_api_error(ugettext_noop('Error connecting to elasticsearch')),
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            search_engine = CourseTeamIndexer.engine()
             result_filter.update({'course_id': course_id_string})
 
             search_results = search_engine.search(

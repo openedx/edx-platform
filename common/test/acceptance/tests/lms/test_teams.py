@@ -9,7 +9,6 @@ from dateutil.parser import parse
 import ddt
 from nose.plugins.attrib import attr
 from uuid import uuid4
-from unittest import skip
 
 from ..helpers import EventsTestMixin, UniqueCourseTest
 from ...fixtures import LMS_BASE_URL
@@ -783,7 +782,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
-    @skip('Disabled until search connectivity issues are resolved, see  TNL-3206')
     def test_search(self):
         """
         Scenario: User should be able to search for a team
