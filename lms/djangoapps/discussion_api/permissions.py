@@ -82,9 +82,8 @@ def get_editable_fields(cc_content, context):
 
     return ret
 
-
-def can_delete(cc_content, context):
+def has_permission(cc_content, context):
     """
-    Return True if the requester can delete the given content, False otherwise
+    Return True if the requester has access to the given content, False otherwise
     """
     return _is_author_or_privileged(cc_content, context)

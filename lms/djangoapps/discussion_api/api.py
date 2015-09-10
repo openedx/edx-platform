@@ -18,11 +18,10 @@ from courseware.courses import get_course_with_access
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
-    can_delete,
+    has_permission,
     get_editable_fields,
     get_initializable_comment_fields,
-    get_initializable_thread_fields,
-)
+    get_initializable_thread_fields)
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
     THREAD_CREATED_EVENT_NAME,
@@ -697,6 +696,23 @@ def update_comment(request, comment_id, update_data):
     return api_comment
 
 
+def get_thread(request, thread_id):
+    """
+    Retrieve a thread.
+
+    Arguments:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        thread_id: The id for the thread to retrieve
+
+    """
+    cc_thread, context = _get_thread_and_context(request, thread_id)
+    serializer = ThreadSerializer(cc_thread, context=context)
+    return serializer.data
+
+
 def delete_thread(request, thread_id):
     """
     Delete a thread.
@@ -714,7 +730,7 @@ def delete_thread(request, thread_id):
 
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    if can_delete(cc_thread, context):
+    if has_permission(cc_thread, context):
         cc_thread.delete()
         thread_deleted.send(sender=None, user=request.user, post=cc_thread)
     else:
@@ -738,7 +754,7 @@ def delete_comment(request, comment_id):
 
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
-    if can_delete(cc_comment, context):
+    if has_permission(cc_comment, context):
         cc_comment.delete()
         comment_deleted.send(sender=None, user=request.user, post=cc_comment)
     else:

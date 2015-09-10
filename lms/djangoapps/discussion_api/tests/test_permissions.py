@@ -6,7 +6,7 @@ import itertools
 import ddt
 
 from discussion_api.permissions import (
-    can_delete,
+    has_permission,
     get_editable_fields,
     get_initializable_comment_fields,
     get_initializable_thread_fields,
@@ -110,7 +110,7 @@ class CanDeleteTest(ModuleStoreTestCase):
     def test_thread(self, is_author, is_privileged):
         thread = Thread(user_id="5" if is_author else "6")
         context = _get_context(requester_id="5", is_requester_privileged=is_privileged)
-        self.assertEqual(can_delete(thread, context), is_author or is_privileged)
+        self.assertEqual(has_permission(thread, context), is_author or is_privileged)
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
@@ -121,4 +121,4 @@ class CanDeleteTest(ModuleStoreTestCase):
             is_requester_privileged=is_privileged,
             thread=Thread(user_id="5" if is_thread_author else "6")
         )
-        self.assertEqual(can_delete(comment, context), is_author or is_privileged)
+        self.assertEqual(has_permission(comment, context), is_author or is_privileged)
