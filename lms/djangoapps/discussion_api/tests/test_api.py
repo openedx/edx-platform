@@ -1890,8 +1890,6 @@ class UpdateThreadTest(
         self.request2.user = self.user2
         CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
 
-
-
     def register_thread(self, overrides=None):
         """
         Make a thread with appropriate data overridden by the overrides
@@ -2211,8 +2209,6 @@ class UpdateThreadTest(
         else:
             vote_count -= 1
             self.assertEqual(result["vote_count"], vote_count)
-
-
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
