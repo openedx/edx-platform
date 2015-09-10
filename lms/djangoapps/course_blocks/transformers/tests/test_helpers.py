@@ -17,6 +17,16 @@ class CourseStructureTestCase(ModuleStoreTestCase):
     """
     blocks = []
 
+    def setUp(self):
+        """
+        Create users.
+        """
+        super(CourseStructureTestCase, self).setUp()
+        # Set up users.
+        self.password = 'test'
+        self.user = UserFactory.create(password=self.password)
+        self.staff = UserFactory.create(password=self.password, is_staff=True)
+
     def build_course(self, course_hierarchy):
         """
         Build a hierarchy of XBlocks.
@@ -86,6 +96,28 @@ class CourseStructureTestCase(ModuleStoreTestCase):
         """
         xblocks = (self.blocks[ref] for ref in refs)
         return set([xblock.location for xblock in xblocks])
+
+    def assert_course_structure_staff_user(self, staff, course, blocks, transformer):
+        """
+        Assert course structure integrity if block structure has transformer applied
+        and is viewed by staff user.
+        """
+        raw_block_structure = get_course_blocks(
+            staff,
+            course.location,
+            transformers={}
+        )
+        self.assertEqual(len(list(raw_block_structure.get_block_keys())), len(blocks))
+
+        trans_block_structure = get_course_blocks(
+            staff,
+            course.location,
+            transformers={transformer}
+        )
+        self.assertEqual(
+            len(list(raw_block_structure.get_block_keys())), 
+            len(list(trans_block_structure.get_block_keys()))
+        )
 
 
 class BlockParentsMapTestCase(ModuleStoreTestCase):

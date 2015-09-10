@@ -3,8 +3,7 @@ Transformers helpers functions.
 """
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
-# TODO 8874: Make it so we support all schemes instead of manually declaring them here.
-INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
+
 SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]
 
 
@@ -25,8 +24,6 @@ def get_user_partition_groups(course_key, user_partitions, user):
     """
     partition_groups = {}
     for partition in user_partitions:
-        if partition.scheme not in INCLUDE_SCHEMES:
-            continue
         group = partition.scheme.get_group_for_user(
             course_key,
             user,
