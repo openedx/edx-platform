@@ -61,7 +61,7 @@ define([
             it('does not interfere with anchor links to #content', function () {
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('#content', {trigger: true});
-                expect(teamsTabView.$('.warning')).toHaveClass('is-hidden');
+                expect(teamsTabView.$('.wrapper-msg')).toHaveClass('is-hidden');
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
@@ -156,7 +156,7 @@ define([
                     }
                 ],
                 'fires a page view event for the edit team page': [
-                    'topics/' + TeamSpecHelpers.testTopicID + '/' + 'test_team_id/edit-team',
+                    'teams/' + TeamSpecHelpers.testTopicID + '/' + 'test_team_id/edit-team',
                     {
                         page_name: 'edit-team',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -165,7 +165,9 @@ define([
                 ]
             }, function (url, expectedEvent) {
                 var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
+                    teamsTabView = createTeamsTabView({
+                        userInfo: TeamSpecHelpers.createMockUserInfo({ staff: true })
+                    });
                 teamsTabView.router.navigate(url, {trigger: true});
                 if (requests.length) {
                     AjaxHelpers.respondWithJson(requests, {});

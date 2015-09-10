@@ -22,7 +22,16 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateOrEditTeamPage, TeamPage
+from ...pages.lms.teams import (
+    TeamsPage,
+    MyTeamsPage,
+    BrowseTopicsPage,
+    BrowseTeamsPage,
+    TeamManagementPage,
+    EditMembershipPage,
+    TeamPage
+)
+from ...pages.common.utils import confirm_prompt
 
 
 TOPICS_PER_PAGE = 12
@@ -199,7 +208,7 @@ class TeamsTabTest(TeamsTabBase):
     @ddt.data(
         'topics/{topic_id}',
         'topics/{topic_id}/search',
-        'topics/{topic_id}/{team_id}/edit-team',
+        'teams/{topic_id}/{team_id}/edit-team',
         'teams/{topic_id}/{team_id}'
     )
     def test_unauthorized_error_message(self, route):
@@ -209,10 +218,10 @@ class TeamsTabTest(TeamsTabBase):
         """
         topics = self.create_topics(1)
         topic = topics[0]
-        self.set_team_configuration({
-            u'max_team_size': 10,
-            u'topics': topics
-        })
+        self.set_team_configuration(
+            {u'max_team_size': 10, u'topics': topics},
+            global_staff=True
+        )
         team = self.create_teams(topic, 1)[0]
         self.teams_page.visit()
         self.browser.delete_cookie('sessionid')
@@ -384,7 +393,7 @@ class BrowseTopicsTest(TeamsTabBase):
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
         self.assertTrue(browse_teams_page.is_browser_on_page())
         browse_teams_page.click_create_team_link()
-        create_team_page = CreateOrEditTeamPage(self.browser, self.course_id, topic)
+        create_team_page = TeamManagementPage(self.browser, self.course_id, topic)
         create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
         create_team_page.value_for_textarea_field(
             field_id='description',
@@ -393,8 +402,9 @@ class BrowseTopicsTest(TeamsTabBase):
         create_team_page.submit_form()
         team_page = TeamPage(self.browser, self.course_id)
         self.assertTrue(team_page.is_browser_on_page)
-        team_page.click_all_topics_breadcrumb()
+        team_page.click_all_topics()
         self.assertTrue(self.topics_page.is_browser_on_page())
+        self.topics_page.wait_for_ajax()
         self.assertEqual(topic_name, self.topics_page.topic_names[0])
 
     def test_list_topics(self):
@@ -834,21 +844,25 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
 @attr('shard_5')
 class TeamFormActions(TeamsTabBase):
     """
-    Base class for create & edit team.
+    Base class for create, edit, and delete team.
     """
     TEAM_DESCRIPTION = 'The Avengers are a fictional team of superheroes.'
 
     topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
     TEAMS_NAME = 'Avengers'
 
+    def setUp(self):
+        super(TeamFormActions, self).setUp()
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
+
     def verify_page_header(self, title, description, breadcrumbs):
         """
         Verify that the page header correctly reflects the
         create team header, description and breadcrumb.
         """
-        self.assertEqual(self.create_or_edit_team_page.header_page_name, title)
-        self.assertEqual(self.create_or_edit_team_page.header_page_description, description)
-        self.assertEqual(self.create_or_edit_team_page.header_page_breadcrumbs, breadcrumbs)
+        self.assertEqual(self.team_management_page.header_page_name, title)
+        self.assertEqual(self.team_management_page.header_page_description, description)
+        self.assertEqual(self.team_management_page.header_page_breadcrumbs, breadcrumbs)
 
     def verify_and_navigate_to_create_team_page(self):
         """Navigates to the create team page and verifies."""
@@ -868,7 +882,7 @@ class TeamFormActions(TeamsTabBase):
 
         self.team_page.click_edit_team_button()
 
-        self.create_or_edit_team_page.wait_for_page()
+        self.team_management_page.wait_for_page()
 
         # Edit page header.
         self.verify_page_header(
@@ -891,33 +905,37 @@ class TeamFormActions(TeamsTabBase):
 
     def fill_create_or_edit_form(self):
         """Fill the create/edit team form fields with appropriate values."""
-        self.create_or_edit_team_page.value_for_text_field(field_id='name', value=self.TEAMS_NAME, press_enter=False)
-        self.create_or_edit_team_page.value_for_textarea_field(
+        self.team_management_page.value_for_text_field(
+            field_id='name',
+            value=self.TEAMS_NAME,
+            press_enter=False
+        )
+        self.team_management_page.value_for_textarea_field(
             field_id='description',
             value=self.TEAM_DESCRIPTION
         )
-        self.create_or_edit_team_page.value_for_dropdown_field(field_id='language', value='English')
-        self.create_or_edit_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+        self.team_management_page.value_for_dropdown_field(field_id='language', value='English')
+        self.team_management_page.value_for_dropdown_field(field_id='country', value='Pakistan')
 
     def verify_all_fields_exist(self):
         """
         Verify the fields for create/edit page.
         """
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_field('name'),
+            self.team_management_page.message_for_field('name'),
             'A name that identifies your team (maximum 255 characters).'
         )
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_textarea_field('description'),
+            self.team_management_page.message_for_textarea_field('description'),
             'A short description of the team to help other learners understand '
             'the goals or direction of the team (maximum 300 characters).'
         )
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_field('country'),
+            self.team_management_page.message_for_field('country'),
             'The country that team members primarily identify with.'
         )
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_field('language'),
+            self.team_management_page.message_for_field('language'),
             'The language that team members primarily use to communicate with each other.'
         )
 
@@ -932,7 +950,6 @@ class CreateTeamTest(TeamFormActions):
         super(CreateTeamTest, self).setUp()
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
 
-        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page.visit()
 
@@ -960,14 +977,14 @@ class CreateTeamTest(TeamFormActions):
         Then I should see the error message and highlighted fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.create_or_edit_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.assertEqual(
-            self.create_or_edit_team_page.validation_message_text,
+            self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
-        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='description'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='description'))
 
     def test_user_can_see_error_message_for_incorrect_data(self):
         """
@@ -982,7 +999,7 @@ class CreateTeamTest(TeamFormActions):
         self.verify_and_navigate_to_create_team_page()
 
         # Fill the name field with >255 characters to see validation message.
-        self.create_or_edit_team_page.value_for_text_field(
+        self.team_management_page.value_for_text_field(
             field_id='name',
             value='EdX is a massive open online course (MOOC) provider and online learning platform. '
                   'It hosts online university-level courses in a wide range of disciplines to a worldwide '
@@ -994,13 +1011,13 @@ class CreateTeamTest(TeamFormActions):
                   'edX has more than 4 million users taking more than 500 courses online.',
             press_enter=False
         )
-        self.create_or_edit_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.assertEqual(
-            self.create_or_edit_team_page.validation_message_text,
+            self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
 
     def test_user_can_create_new_team_successfully(self):
         """
@@ -1040,7 +1057,7 @@ class CreateTeamTest(TeamFormActions):
             }
         ]
         with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
-            self.create_or_edit_team_page.submit_form()
+            self.team_management_page.submit_form()
 
         # Verify that the page is shown for the new team
         team_page = TeamPage(self.browser, self.course_id)
@@ -1072,7 +1089,7 @@ class CreateTeamTest(TeamFormActions):
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.verify_and_navigate_to_create_team_page()
-        self.create_or_edit_team_page.cancel_team()
+        self.team_management_page.cancel_team()
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
@@ -1102,6 +1119,131 @@ class CreateTeamTest(TeamFormActions):
 
 
 @ddt.ddt
+class DeleteTeamTest(TeamFormActions):
+    """
+    Tests for deleting teams.
+    """
+
+    def setUp(self):
+        super(DeleteTeamTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+
+        #need to have a membership to confirm it gets deleted as well
+        self.create_membership(self.user_info['username'], self.team['id'])
+
+        self.team_page.visit()
+
+    def test_cancel_delete(self):
+        """
+        Scenario: The user should be able to cancel the Delete Team dialog
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Delete Team button
+        When I click the delete team button
+        And I cancel the prompt
+        And I refresh the page
+        Then I should still see the team
+        """
+        self.delete_team(cancel=True)
+        self.assertTrue(self.team_management_page.is_browser_on_page())
+        self.browser.refresh()
+        self.team_management_page.wait_for_page()
+        self.assertEqual(
+            ' '.join(('All Topics', self.topic['name'], self.team['name'])),
+            self.team_management_page.header_page_breadcrumbs
+        )
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_delete_team(self, role):
+        """
+        Scenario: The user should be able to see and navigate to the delete team page.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Delete Team button
+        When I click the delete team button
+        And I confirm the prompt
+        Then I should see the browse teams page
+        And the team should not be present
+        """
+        # If role is None, remain logged in as global staff
+        if role is not None:
+            AutoAuthPage(
+                self.browser,
+                course_id=self.course_id,
+                staff=False,
+                roles=role
+            ).visit()
+        self.team_page.visit()
+        self.delete_team(require_notification=False)
+        browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
+        self.assertTrue(browse_teams_page.is_browser_on_page())
+        self.assertNotIn(self.team['name'], browse_teams_page.team_names)
+
+    def delete_team(self, **kwargs):
+        """
+        Delete a team. Passes `kwargs` to `confirm_prompt`.
+        Expects edx.team.deleted event to be emitted, with correct course_id.
+        Also expects edx.team.learner_removed event to be emitted for the
+        membership that is removed as a part of the delete operation.
+        """
+
+        self.team_page.click_edit_team_button()
+        self.team_management_page.wait_for_page()
+        self.team_management_page.delete_team_button.click()
+
+        if 'cancel' in kwargs and kwargs['cancel'] is True:
+            confirm_prompt(self.team_management_page, **kwargs)
+        else:
+            expected_events = [
+                {
+                    'event_type': 'edx.team.deleted',
+                    'event': {
+                        'course_id': self.course_id,
+                        'team_id': self.team['id']
+                    }
+                },
+                {
+                    'event_type': 'edx.team.learner_removed',
+                    'event': {
+                        'course_id': self.course_id,
+                        'team_id': self.team['id'],
+                        'remove_method': 'team_deleted',
+                        'user_id': self.user_info['user_id']
+                    }
+                }
+            ]
+            with self.assert_events_match_during(
+                event_filter=self.only_team_events, expected_events=expected_events
+            ):
+                confirm_prompt(self.team_management_page, **kwargs)
+
+    def test_delete_team_updates_topics(self):
+        """
+        Scenario: Deleting a team should update the team count on the topics page
+        Given I am staff user for a course with a team
+        And I delete a team
+        When I navigate to the browse topics page
+        Then the team count for the deletd team's topic should be updated
+        """
+        self.delete_team(require_notification=False)
+        BrowseTeamsPage(self.browser, self.course_id, self.topic).click_all_topics()
+        topics_page = BrowseTopicsPage(self.browser, self.course_id)
+        self.assertTrue(topics_page.is_browser_on_page())
+        self.teams_page.verify_topic_team_count(0)
+
+
+@ddt.ddt
 class EditTeamTest(TeamFormActions):
     """
     Tests for editing the team.
@@ -1114,7 +1256,6 @@ class EditTeamTest(TeamFormActions):
             {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
             global_staff=True
         )
-        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
 
         self.team = self.create_teams(self.topic, num_teams=1)[0]
         self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
@@ -1204,7 +1345,7 @@ class EditTeamTest(TeamFormActions):
             },
         ]
         with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
-            self.create_or_edit_team_page.submit_form()
+            self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()
 
@@ -1237,7 +1378,7 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_or_edit_team_page.cancel_team()
+        self.team_management_page.cancel_team()
 
         self.team_page.wait_for_page()
 
@@ -1289,7 +1430,7 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_or_edit_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()
 
@@ -1317,6 +1458,108 @@ class EditTeamTest(TeamFormActions):
         }]
         with self.assert_events_match_during(self.only_team_events, expected_events=events):
             self.verify_and_navigate_to_edit_team_page()
+
+
+@ddt.ddt
+class EditMembershipTest(TeamFormActions):
+    """
+    Tests for administrating from the team membership page
+    """
+
+    def setUp(self):
+        super(EditMembershipTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+
+        #make sure a user exists on this team so we can edit the membership
+        self.create_membership(self.user_info['username'], self.team['id'])
+
+        self.edit_membership_page = EditMembershipPage(self.browser, self.course_id, self.team)
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+
+    def edit_membership_helper(self, role, cancel=False):
+        """
+        Helper for common functionality in edit membership tests.
+        Checks for all relevant assertions about membership being removed,
+        including verify edx.team.learner_removed events are emitted.
+        """
+        if role is not None:
+            AutoAuthPage(
+                self.browser,
+                course_id=self.course_id,
+                staff=False,
+                roles=role
+            ).visit()
+
+        self.team_page.visit()
+        self.team_page.click_edit_team_button()
+        self.team_management_page.wait_for_page()
+
+        self.assertTrue(
+            self.team_management_page.membership_button_present
+        )
+
+        self.team_management_page.click_membership_button()
+        self.edit_membership_page.wait_for_page()
+        self.edit_membership_page.click_first_remove()
+        if cancel:
+            self.edit_membership_page.cancel_delete_membership_dialog()
+            self.assertEqual(self.edit_membership_page.team_members, 1)
+        else:
+            expected_events = [
+                {
+                    'event_type': 'edx.team.learner_removed',
+                    'event': {
+                        'course_id': self.course_id,
+                        'team_id': self.team['id'],
+                        'remove_method': 'removed_by_admin',
+                        'user_id': self.user_info['user_id']
+                    }
+                }
+            ]
+            with self.assert_events_match_during(
+                event_filter=self.only_team_events, expected_events=expected_events
+            ):
+                self.edit_membership_page.confirm_delete_membership_dialog()
+            self.assertEqual(self.edit_membership_page.team_members, 0)
+        self.assertTrue(self.edit_membership_page.is_browser_on_page)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and confirm the dialog
+        Then my membership should be removed, and I should remain on the page
+        """
+        self.edit_membership_helper(role, cancel=False)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_cancel_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and cancel the dialog
+        Then my membership should not be removed, and I should remain on the page
+        """
+        self.edit_membership_helper(role, cancel=True)
 
 
 @attr('shard_5')

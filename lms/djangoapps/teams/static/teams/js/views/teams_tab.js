@@ -2,6 +2,7 @@
     'use strict';
 
     define(['backbone',
+            'jquery',
             'underscore',
             'gettext',
             'common/js/components/views/search_field',
@@ -19,13 +20,15 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
+            'teams/js/views/edit_team_members',
             'teams/js/views/team_profile_header_actions',
             'teams/js/views/team_utils',
+            'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel,
+        function (Backbone, $, _, gettext, SearchFieldView, HeaderView, HeaderModel,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection, TeamAnalytics,
                   TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamProfileHeaderActionsView, TeamUtils, teamsTemplate) {
+                  TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -37,12 +40,16 @@
                 initialize: function (options) {
                     this.header = options.header;
                     this.main = options.main;
+                    this.instructorTools = options.instructorTools;
                 },
 
                 render: function () {
                     this.$el.html(_.template(teamsTemplate));
                     this.$('p.error').hide();
                     this.header.setElement(this.$('.teams-header')).render();
+                    if (this.instructorTools) {
+                        this.instructorTools.setElement(this.$('.teams-instructor-tools-bar')).render();
+                    }
                     this.main.setElement(this.$('.page-content')).render();
                     return this;
                 }
@@ -68,13 +75,23 @@
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
                         ['topics/:topic_id/search(/)', _.bind(this.searchTeams, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
-                        ['topics/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
                     ], function (route) {
                         router.route.apply(router, route);
                     });
+
+                    if (this.canEditTeam()) {
+                        _.each([
+                            ['teams/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
+                            ['teams/:topic_id/:team_id/edit-team/manage-members(/)',
+                                _.bind(this.editTeamMembers, this)
+                            ]
+                        ], function (route) {
+                            router.route.apply(router, route);
+                        });
+                    }
 
                     // Create an event queue to track team changes
                     this.teamEvents = _.clone(Backbone.Events);
@@ -169,7 +186,7 @@
 
                 render: function() {
                     this.mainView.setElement(this.$el).render();
-                    this.hideWarning();
+                    TeamUtils.hideMessage();
                     return this;
                 },
 
@@ -240,26 +257,54 @@
                 editTeam: function (topicID, teamID) {
                     var self = this,
                         editViewWithHeader;
-                    this.getTopic(topicID).done(function (topic) {
-                        self.getTeam(teamID, false).done(function(team) {
-                            var view = new TeamEditView({
-                                action: 'edit',
-                                teamEvents: self.teamEvents,
-                                context: self.context,
-                                topic: topic,
-                                model: team
-                            });
-                            editViewWithHeader = self.createViewWithHeader({
-                                title: gettext("Edit Team"),
-                                description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                    $.when(this.getTopic(topicID), this.getTeam(teamID, false)).done(function(topic, team) {
+                        var view = new TeamEditView({
+                            action: 'edit',
+                            teamEvents: self.teamEvents,
+                            context: self.context,
+                            topic: topic,
+                            model: team
+                        });
+                        var instructorToolsView = new InstructorToolsView({
+                            team: team,
+                            teamEvents: self.teamEvents
+                        });
+                        editViewWithHeader = self.createViewWithHeader({
+                            title: gettext("Edit Team"),
+                            description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                            mainView: view,
+                            topic: topic,
+                            team: team,
+                            instructorTools: instructorToolsView
+                        });
+                        self.mainView = editViewWithHeader;
+                        self.render();
+                        TeamAnalytics.emitPageViewed('edit-team', topicID, teamID);
+                    });
+                },
+
+                /**
+                 *
+                 * The backbone router entry for editing team members, using topic and team IDs.
+                 */
+                editTeamMembers: function (topicID, teamID) {
+                    var self = this;
+                    $.when(this.getTopic(topicID), this.getTeam(teamID, true)).done(function(topic, team) {
+                        var view = new TeamMembersEditView({
+                            teamEvents: self.teamEvents,
+                            context: self.context,
+                            model: team
+                        });
+                        self.mainView = self.createViewWithHeader({
                                 mainView: view,
+                                title: gettext("Membership"),
+                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
                                 topic: topic,
                                 team: team
-                            });
-                            self.mainView = editViewWithHeader;
-                            self.render();
-                            TeamAnalytics.emitPageViewed('edit-team', topicID, teamID);
-                        });
+                            }
+                        );
+                        self.render();
+                        TeamAnalytics.emitPageViewed('edit-team-members', topicID, teamID);
                     });
                 },
 
@@ -365,36 +410,39 @@
                 getBrowseTeamView: function (topicID, teamID) {
                     var self = this,
                         deferred = $.Deferred();
-                    self.getTopic(topicID).done(function(topic) {
-                        self.getTeam(teamID, true).done(function(team) {
-                            var view = new TeamProfileView({
-                                teamEvents: self.teamEvents,
-                                router: self.router,
-                                context: self.context,
-                                model: team,
-                                setFocusToHeaderFunc: self.setFocusToHeader
-                            });
 
-                            var TeamProfileActionsView = new TeamProfileHeaderActionsView({
-                                teamEvents: self.teamEvents,
-                                context: self.context,
-                                model: team,
-                                topic: topic,
-                                showEditButton: self.context.userInfo.privileged || self.context.userInfo.staff
-                            });
-                            deferred.resolve(
-                                self.createViewWithHeader(
-                                    {
-                                        mainView: view,
-                                        subject: team,
-                                        topic: topic,
-                                        headerActionsView: TeamProfileActionsView
-                                    }
-                                )
-                            );
+                    $.when(this.getTopic(topicID), this.getTeam(teamID, true)).done(function(topic, team) {
+                        var view = new TeamProfileView({
+                            teamEvents: self.teamEvents,
+                            router: self.router,
+                            context: self.context,
+                            model: team,
+                            setFocusToHeaderFunc: self.setFocusToHeader
                         });
+
+                        var TeamProfileActionsView = new TeamProfileHeaderActionsView({
+                            teamEvents: self.teamEvents,
+                            context: self.context,
+                            model: team,
+                            topic: topic,
+                            showEditButton: self.canEditTeam()
+                        });
+                        deferred.resolve(
+                            self.createViewWithHeader(
+                                {
+                                    mainView: view,
+                                    subject: team,
+                                    topic: topic,
+                                    headerActionsView: TeamProfileActionsView
+                                }
+                            )
+                        );
                     });
                     return deferred.promise();
+                },
+
+                canEditTeam: function () {
+                    return this.context.userInfo.privileged || this.context.userInfo.staff;
                 },
 
                 createBreadcrumbs: function(topic, team) {
@@ -446,7 +494,8 @@
                                 }
                             }
                         }),
-                        main: options.mainView
+                        main: options.mainView,
+                        instructorTools: options.instructorTools
                     });
                 },
 
@@ -566,18 +615,7 @@
                  */
                 notFoundError: function (message) {
                     this.router.navigate('my-teams', {trigger: true});
-                    this.showWarning(message);
-                },
-
-                showWarning: function (message) {
-                    var warningEl = this.$('.warning');
-                    warningEl.find('.copy').html('<p>' + message + '</p');
-                    warningEl.toggleClass('is-hidden', false);
-                    warningEl.focus();
-                },
-
-                hideWarning: function () {
-                    this.$('.warning').toggleClass('is-hidden', true);
+                    TeamUtils.showMessage(message);
                 },
 
                 /**

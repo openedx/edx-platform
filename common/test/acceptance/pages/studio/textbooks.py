@@ -4,8 +4,8 @@ Course Textbooks page.
 
 import requests
 from path import Path as path
+from ..common.utils import click_css
 from .course_page import CoursePage
-from .utils import click_css
 
 
 class TextbooksPage(CoursePage):

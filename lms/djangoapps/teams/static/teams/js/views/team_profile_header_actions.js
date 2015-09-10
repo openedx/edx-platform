@@ -2,11 +2,12 @@
     'use strict';
 
     define(['backbone',
+            'jquery',
             'underscore',
             'gettext',
             'teams/js/views/team_utils',
             'text!teams/templates/team-profile-header-actions.underscore'],
-        function (Backbone, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
+        function (Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
             return Backbone.View.extend({
 
                 errorMessage: gettext("An error occurred. Try again."),
@@ -56,8 +57,10 @@
                     return view;
                 },
 
-                joinTeam: function () {
+                joinTeam: function (event) {
                     var view = this;
+
+                    event.preventDefault();
                     $.ajax({
                         type: 'POST',
                         url: view.context.teamMembershipsUrl,
@@ -117,7 +120,7 @@
                 editTeam: function (event) {
                     event.preventDefault();
                     Backbone.history.navigate(
-                        'topics/' + this.topic.id + '/' + this.model.get('id') +'/edit-team',
+                        'teams/' + this.topic.id + '/' + this.model.get('id') +'/edit-team',
                         {trigger: true}
                     );
                 }
