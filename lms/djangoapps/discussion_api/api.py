@@ -391,7 +391,6 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read
     # existing comments service interface
     if cc_thread["thread_type"] == "question":
         if endorsed is None:
-            #raise ValidationError({"endorsed": ["This field is required for question threads."]})
             endorsed_responses = cc_thread["endorsed_responses"][response_skip:(response_skip + page_size)]
             non_endorsed_responses = cc_thread["non_endorsed_responses"]
             responses = endorsed_responses + non_endorsed_responses

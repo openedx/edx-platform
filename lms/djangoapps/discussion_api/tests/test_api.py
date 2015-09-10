@@ -1036,17 +1036,6 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             {"endorsed": ["This field may not be specified for discussion threads."]}
         )
 
-    # def test_question_without_endorsed(self):
-    #     with self.assertRaises(ValidationError) as assertion:
-    #         self.get_comment_list(
-    #             self.make_minimal_cs_thread({"thread_type": "question"}),
-    #             endorsed=None
-    #         )
-    #     self.assertEqual(
-    #         assertion.exception.message_dict,
-    #         {"endorsed": ["This field is required for question threads."]}
-    #     )
-
     def test_empty(self):
         discussion_thread = self.make_minimal_cs_thread(
             {"thread_type": "discussion", "children": [], "resp_total": 0}
