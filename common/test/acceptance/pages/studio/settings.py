@@ -4,11 +4,13 @@ Course Schedule and Details Settings page.
 """
 from __future__ import unicode_literals
 from bok_choy.promise import EmptyPromise
+from bok_choy.javascript import requirejs
 
 from .course_page import CoursePage
 from .utils import press_the_notification_button
 
 
+@requirejs('js/factories/settings')
 class SettingsPage(CoursePage):
     """
     Course Schedule and Details Settings page.
@@ -21,6 +23,13 @@ class SettingsPage(CoursePage):
     ################
     def is_browser_on_page(self):
         return self.q(css='body.view-settings').present
+
+    def wait_for_require_js(self):
+        """
+        Wait for require-js to load javascript files.
+        """
+        if hasattr(self, 'wait_for_js'):
+            self.wait_for_js()  # pylint: disable=no-member
 
     def refresh_and_wait_for_load(self):
         """
@@ -182,4 +191,5 @@ class SettingsPage(CoursePage):
                 lambda: self.q(css='body.view-settings').present,
                 'Page is refreshed'
             ).fulfill()
+        self.wait_for_require_js()
         self.wait_for_ajax()
