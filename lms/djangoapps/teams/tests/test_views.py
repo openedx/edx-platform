@@ -9,6 +9,7 @@ import ddt
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models.signals import post_save
+from django.utils import translation
 from nose.plugins.attrib import attr
 from rest_framework.test import APITestCase, APIClient
 
@@ -223,6 +224,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 course_id=self.test_course_2.id,
                 topic_id='topic_7'
             )
+            self.chinese_team = CourseTeamFactory.create(
+                name=u'著文企臺個',
+                description=u'共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
+                country='CN',
+                language='zh_HANS',
+                course_id=self.test_course_2.id,
+                topic_id='topic_7'
+            )
 
         self.test_team_name_id_map = {team.name: team for team in (
             self.solar_team,
@@ -231,6 +240,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             self.another_team,
             self.public_profile_team,
             self.search_team,
+            self.chinese_team,
         )}
 
         for user, course in [('staff', self.test_course_1), ('course_staff', self.test_course_1)]:
@@ -437,7 +447,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.verify_names(
             {'course_id': self.test_course_2.id},
             200,
-            ['Another Team', 'Public Profile Team', 'Search'],
+            ['Another Team', 'Public Profile Team', 'Search', u'著文企臺個'],
             user='staff'
         )
 
@@ -516,15 +526,17 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('Island', ['Search']),
         ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
+        (u'著文企臺個', [u'著文企臺個']),
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
-        # clear out the teams search index before reindexing
-        CourseTeamIndexer.engine().destroy()
+        def reset_search_index():
+            """Clear out the search index and reindex the teams."""
+            CourseTeamIndexer.engine().destroy()
+            for team in self.test_team_name_id_map.values():
+                CourseTeamIndexer.index(team)
 
-        for team in self.test_team_name_id_map.values():
-            CourseTeamIndexer.index(team)
-
+        reset_search_index()
         self.verify_names(
             {'course_id': self.test_course_2.id, 'text_search': text_search},
             200,
@@ -539,6 +551,16 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             topic_id=None,
             number_of_results=len(expected_team_names)
         )
+
+        # Verify that the searches still work for a user from a different locale
+        with translation.override('ar'):
+            reset_search_index()
+            self.verify_names(
+                {'course_id': self.test_course_2.id, 'text_search': text_search},
+                200,
+                expected_team_names,
+                user='student_enrolled_public_profile'
+            )
 
 
 @ddt.ddt

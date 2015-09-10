@@ -6,6 +6,7 @@ from requests import ConnectionError
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import translation
 
 from search.search_engine_base import SearchEngine
 
@@ -49,12 +50,14 @@ class CourseTeamIndexer(object):
         """
         Generate the text field used for general search.
         """
-        return "{name}\n{description}\n{country}\n{language}".format(
-            name=self.course_team.name.encode('utf-8'),
-            description=self.course_team.description.encode('utf-8'),
-            country=self.course_team.country.name.format(),
-            language=self._language_name()
-        )
+        # Always use the English version of any localizable strings (see TNL-3239)
+        with translation.override('en'):
+            return u"{name}\n{description}\n{country}\n{language}".format(
+                name=self.course_team.name,
+                description=self.course_team.description,
+                country=self.course_team.country.name.format(),
+                language=self._language_name()
+            )
 
     def _language_name(self):
         """
