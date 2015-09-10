@@ -187,10 +187,13 @@ class ThreadSerializer(_ContentSerializer):
     non_endorsed_comment_list_url = serializers.SerializerMethodField("get_non_endorsed_comment_list_url")
     read = serializers.BooleanField(read_only=True)
     has_endorsed = serializers.BooleanField(read_only=True, source="endorsed")
+    response_count = serializers.IntegerField(source="resp_total", read_only=True)
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
+    # TODO: https://openedx.atlassian.net/browse/MA-1359
     def __init__(self, *args, **kwargs):
+        remove_fields = kwargs.pop('remove_fields', None)
         super(ThreadSerializer, self).__init__(*args, **kwargs)
         # type is an invalid class attribute name, so we must declare a
         # different name above and modify it here
@@ -199,6 +202,11 @@ class ThreadSerializer(_ContentSerializer):
         # not have the pinned field set
         if self.object and self.object.get("pinned") is None:
             self.object["pinned"] = False
+
+        if remove_fields:
+            # for multiple fields in a list
+            for field_name in remove_fields:
+                self.fields.pop(field_name)
 
     def get_group_name(self, obj):
         """Returns the name of the group identified by the thread's group_id."""
