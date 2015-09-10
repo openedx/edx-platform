@@ -118,38 +118,14 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             ]
         }
 
-    def test_user_not_assigned(self):
-        """
-        Test when user is not assigned to any group in user partition.
-        """
+    def test_user(self):
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
-            transformers={self.transformer}
+            transformers={self.transformer},
         )
 
-        self.assertEqual(
-            set(trans_block_structure.get_block_keys()),
-            self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'split_test1')
-        )
-
-    def test_user_assigned(self):
-        """
-        Test when user is assigned to any group in user partition.
-        """
-        # Add user to split test.
-        self.split_test_user_partition.scheme.get_group_for_user(
-            CourseKey.from_string(unicode(self.course.id)),
-            self.user,
-            self.split_test_user_partition,
-        )
-
-        trans_block_structure = get_course_blocks(
-            self.user,
-            self.course.location,
-            transformers={self.transformer}
-        )
-
+        # user was randomly assigned to one of the groups
         user_groups = get_user_partition_groups(
             self.course.id, [self.split_test_user_partition], self.user
         )
@@ -164,9 +140,14 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
         self.assertEqual(set(trans_block_structure.get_block_keys()), set(self.get_block_key_set(*expected_blocks)))
 
-    def test_course_structure_with_staff_user(self):
-        """
-        Test course structure integrity if block structure has transformer applied
-        and is viewed by staff user.
-        """
-        self.assert_course_structure_staff_user(self.staff, self.course, self.blocks, self.transformer)
+        # calling again should result in the same block set
+        reloaded_structure = get_course_blocks(
+            self.user,
+            self.course.location,
+            transformers={self.transformer}
+        )
+        self.assertEqual(set(reloaded_structure.get_block_keys()), set(self.get_block_key_set(*expected_blocks)))
+
+
+    def test_staff_user(self):
+        self.assert_staff_access_to_all_blocks(self.staff, self.course, self.blocks, self.transformer)

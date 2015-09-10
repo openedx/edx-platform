@@ -97,10 +97,9 @@ class CourseStructureTestCase(ModuleStoreTestCase):
         xblocks = (self.blocks[ref] for ref in refs)
         return set([xblock.location for xblock in xblocks])
 
-    def assert_course_structure_staff_user(self, staff, course, blocks, transformer):
+    def assert_staff_access_to_all_blocks(self, staff, course, blocks, transformer):
         """
-        Assert course structure integrity if block structure has transformer applied
-        and is viewed by staff user.
+        Assert staff users have access to all blocks
         """
         raw_block_structure = get_course_blocks(
             staff,
