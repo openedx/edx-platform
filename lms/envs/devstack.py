@@ -85,8 +85,9 @@ def should_show_debug_toolbar(_):
 
 ########################### PIPELINE #################################
 
-# # Skip RequireJS optimizer in development
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+PIPELINE_ENABLED = False
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG

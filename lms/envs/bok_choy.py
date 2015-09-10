@@ -74,6 +74,8 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
 
+PIPELINE_ENABLED = True
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True

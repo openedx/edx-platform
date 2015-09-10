@@ -68,6 +68,8 @@ STATICFILES_DIRS = (
     (TEST_ROOT / "staticfiles" / "cms").abspath(),
 )
 
+PIPELINE_ENABLED = True
+
 # Silence noisy logs
 import logging
 LOG_OVERRIDES = [
