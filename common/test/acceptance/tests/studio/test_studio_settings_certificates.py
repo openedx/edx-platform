@@ -80,6 +80,41 @@ class CertificatesTest(StudioCourseTest):
             self.certificates_page.no_certificates_message_text
         )
 
+    def test_uploading_signatory_image_messages(self):
+        """
+        Scenario: Ensure that message telling me to valid signatory image.
+        Given I have a course without certificates
+        When I click button 'Add your first Certificate'
+        And I set new the course title override and signatory with valid images and click the button 'Create'
+        Then I see the new certificate is added and has one signatory inside it
+        When I click 'Edit' button of signatory panel
+        And I set the signatory image that is beyond its dimension limit via clicking on 'Upload Signature Image'
+        Then I see the upload error message related to image dimension
+        Then I try set the signatory image with .jpg extension
+        Then I see the upload error related to image extension
+        """
+        self.certificates_page.visit()
+        certificate = self.create_and_verify_certificate(
+            "Course Title Override",
+            0,
+            [self.make_signatory_data('first')]
+        )
+        self.assertEqual(len(self.certificates_page.certificates), 1)
+        # Edit the signatory in certificate
+        signatory = certificate.signatories[0]
+        signatory.edit()
+        signatory.upload_signature_image('Invalid-Signature.png', is_valid_image=False)
+        self.assertEqual(
+            self.certificates_page.get_text('#upload_error'),
+            u"Image must be a transparent PNG with dimensions of 450 X 60 px at max.")
+
+        # Only .png files are acceptable
+        signatory.upload_signature_image('image.jpg', is_valid_image=False)
+
+        self.assertEqual(
+            self.certificates_page.get_text('#upload_error'),
+            u"Only PNG files can be uploaded. Please select a file ending in .png to upload.")
+
     def test_can_create_and_edit_certficate(self):
         """
         Scenario: Ensure that the certificates can be created and edited correctly.

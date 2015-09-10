@@ -167,8 +167,9 @@ function ($, _, Backbone, gettext,
             event.preventDefault();
             var upload = new FileUploadModel({
                 title: gettext("Upload signature image."),
-                message: gettext("Image must be 450px X 150px transparent PNG."),
-                mimeTypes: ['image/png']
+                message: gettext("Image must be a transparent PNG with dimensions of 450px X 60px at max."),
+                mimeTypes: ['image/png'],
+                imageDimensions: { maxWidth: 450, maxHeight: 60 }
             });
             var self = this;
             var modal = new FileUploadDialog({
