@@ -74,6 +74,7 @@
   .nav-dd {
 
     .title {
+      @extend %t-demi-strong;
       @extend %t-action2;
       @extend %ui-btn-dd-nav-primary;
       @include transition(all $tmg-f2 ease-in-out 0s);
