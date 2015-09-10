@@ -1036,11 +1036,16 @@ class UsersCoursesGradesDetail(SecureAPIView):
                 grading_policy = json.loads(queryset[0].grading_policy)
             else:
                 gradebook_values = _recalculate_grade(request, student, course_descriptor)
-                gradebook_entry.grade = gradebook_values["current_grade"]
-                gradebook_entry.proforma_grade = gradebook_values["proforma_grade"]
-                gradebook_entry.progress_summary = json.dumps(gradebook_values["progress_summary"], cls=EdxJSONEncoder)
-                gradebook_entry.grade_summary = json.dumps(gradebook_values["grade_summary"], cls=EdxJSONEncoder)
-                gradebook_entry.grading_policy = json.dumps(gradebook_values["grading_policy"], cls=EdxJSONEncoder)
+                current_grade = gradebook_values["current_grade"]
+                proforma_grade = gradebook_values["proforma_grade"]
+                progress_summary = gradebook_values["progress_summary"]
+                grade_summary = gradebook_values["grade_summary"]
+                grading_policy = gradebook_values["grading_policy"]
+                gradebook_entry.grade = current_grade
+                gradebook_entry.proforma_grade = proforma_grade
+                gradebook_entry.progress_summary = json.dumps(progress_summary, cls=EdxJSONEncoder)
+                gradebook_entry.grade_summary = json.dumps(grade_summary, cls=EdxJSONEncoder)
+                gradebook_entry.grading_policy = json.dumps(grading_policy, cls=EdxJSONEncoder)
                 gradebook_entry.save()
         else:
             gradebook_values = _recalculate_grade(request, student, course_descriptor)
