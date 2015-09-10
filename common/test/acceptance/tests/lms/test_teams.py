@@ -7,7 +7,6 @@ import time
 
 from dateutil.parser import parse
 import ddt
-from flaky import flaky
 from nose.plugins.attrib import attr
 from uuid import uuid4
 from unittest import skip
@@ -286,6 +285,14 @@ class MyTeamsTest(TeamsTabBase):
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.my_teams_page = MyTeamsPage(self.browser, self.course_id)
+        self.page_viewed_event = {
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'my-teams',
+                'topic_id': None,
+                'team_id': None
+            }
+        }
 
     def test_not_member_of_any_teams(self):
         """
@@ -295,7 +302,8 @@ class MyTeamsTest(TeamsTabBase):
         And I should see no teams
         And I should see a message that I belong to no teams.
         """
-        self.my_teams_page.visit()
+        with self.assert_events_match_during(self.only_team_events, expected_events=[self.page_viewed_event]):
+            self.my_teams_page.visit()
         self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertEqual(
             self.my_teams_page.q(css='.page-content-main').text,
@@ -313,7 +321,8 @@ class MyTeamsTest(TeamsTabBase):
         """
         teams = self.create_teams(self.topic, 1)
         self.create_membership(self.user_info['username'], teams[0]['id'])
-        self.my_teams_page.visit()
+        with self.assert_events_match_during(self.only_team_events, expected_events=[self.page_viewed_event]):
+            self.my_teams_page.visit()
         self.verify_teams(self.my_teams_page, teams)
 
 
@@ -510,6 +519,28 @@ class BrowseTopicsTest(TeamsTabBase):
         self.assertTrue(browse_teams_page.is_browser_on_page())
         self.assertEqual(browse_teams_page.header_name, 'Example Topic')
         self.assertEqual(browse_teams_page.header_description, 'Description')
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the browse topics page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the browse topics page
+        Then my browser should post a page viewed event
+        """
+        topic = {u"name": u"Example Topic", u"id": u"example_topic", u"description": "Description"}
+        self.set_team_configuration(
+            {u"max_team_size": 1, u"topics": [topic]}
+        )
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'browse',
+                'topic_id': None,
+                'team_id': None
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.topics_page.visit()
 
 
 @attr('shard_5')
@@ -752,6 +783,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         Then I should see the search result page
         And the search header should be shown
         And 0 results should be shown
+        And my browser should fire a page viewed event for the search page
         """
         # Note: all searches will return 0 results with the mock search server
         # used by Bok Choy.
@@ -766,11 +798,37 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
                 'topic_id': self.topic['id'],
                 'number_of_results': 0
             }
+        }, {
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'search-teams',
+                'topic_id': self.topic['id'],
+                'team_id': None
+            }
         }]
         with self.assert_events_match_during(self.only_team_events, expected_events=events):
             search_results_page = self.browse_teams_page.search(search_text)
         self.verify_search_header(search_results_page, search_text)
         self.assertTrue(search_results_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the browse page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Teams page
+        Then my browser should post a page viewed event for the teams page
+        """
+        self.create_teams(self.topic, 5)
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'single-topic',
+                'topic_id': self.topic['id'],
+                'team_id': None
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.browse_teams_page.visit()
 
 
 @attr('shard_5')
@@ -1024,6 +1082,24 @@ class CreateTeamTest(TeamFormActions):
 
         self.verify_my_team_count(0)
 
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the create team page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the create team page
+        Then my browser should post a page viewed event
+        """
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'new-team',
+                'topic_id': self.topic['id'],
+                'team_id': None
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.verify_and_navigate_to_create_team_page()
+
 
 @ddt.ddt
 class EditTeamTest(TeamFormActions):
@@ -1223,6 +1299,24 @@ class EditTeamTest(TeamFormActions):
             location='Pakistan',
             language='English'
         )
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the edit team page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the edit team page
+        Then my browser should post a page viewed event
+        """
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'edit-team',
+                'topic_id': self.topic['id'],
+                'team_id': self.team['id']
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.verify_and_navigate_to_edit_team_page()
 
 
 @attr('shard_5')
@@ -1554,3 +1648,22 @@ class TeamPageTest(TeamsTabBase):
         # Verify that if one switches to "My Team" without reloading the page, the old team no longer shows.
         self.teams_page.click_all_topics()
         self.verify_my_team_count(0)
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the team profile page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the team profile page
+        Then my browser should post a page viewed event
+        """
+        self._set_team_configuration_and_membership()
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'single-team',
+                'topic_id': self.topic['id'],
+                'team_id': self.teams[0]['id']
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.team_page.visit()
