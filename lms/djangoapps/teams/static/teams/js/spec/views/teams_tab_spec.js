@@ -153,11 +153,6 @@ define([
                     }
                 ]
             }, function (url, expectedEvent) {
-                if (url.indexOf('search') !== -1
-                        || url.indexOf('create-team') !== -1
-                        || url.indexOf('edit-team') !== -1) {
-                    debugger;
-                }
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate(url, {trigger: true});
