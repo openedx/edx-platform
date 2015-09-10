@@ -186,7 +186,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 None - deletes the item and its subtree, and updates the parents per description above
                 ModuleStoreEnum.RevisionOption.published_only - removes only Published versions
                 ModuleStoreEnum.RevisionOption.all - removes both Draft and Published parents
-                    currently only provided by contentstore.views.item.orphan_handler
                 Otherwise, raises a ValueError.
         """
         with self.bulk_operations(location.course_key):
@@ -297,7 +296,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         return super(DraftVersioningModuleStore, self).get_block_original_usage(usage_key)
 
     def get_orphans(self, course_key, **kwargs):
-        course_key = self._map_revision_to_branch(course_key)
+        if course_key.branch is None:
+            raise ValueError("Branch not specified.")
         return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
 
     def fix_not_found(self, course_key, user_id):
