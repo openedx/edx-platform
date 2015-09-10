@@ -6,7 +6,6 @@ from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartiti
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
-from student.tests.factories import UserFactory
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -36,31 +35,30 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
             scheme=CohortPartitionScheme
         )
         self.user_partition.scheme.name = "cohort"
-
+        
         # Build course.
-        self.course_hierarchy = self.get_test_course_hierarchy()
+        self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
         clear_course_from_cache(self.course.id)
 
-        # Set up user and enroll in course.
-        self.password = 'test'
-        self.user = UserFactory.create(password=self.password)
+        # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
 
         # Set up cohorts.
         config_course_cohorts(self.course, is_cohorted=True)
         self.cohorts = [CohortFactory(course_id=self.course.id) for __ in enumerate(self.groups)]
         self.add_user_to_cohort_group(self.cohorts[0], self.groups[0])
+        self.transformer = UserPartitionTransformer()
 
-    def get_test_course_hierarchy(self):
+    def get_course_hierarchy(self):
         """
         Get a course hierarchy to test with.
 
         Assumes self.user_partition has already been initialized.
         """
         return {
-            'org': 'UserPartitionTransformation',
+            'org': 'UserPartitionTransformer',
             'course': 'UP101F',
             'run': 'test_run',
             'user_partitions': [self.user_partition],
@@ -116,8 +114,6 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         Test course structure integrity if course has user partition section
         and user is assigned to group in user partition.
         """
-        self.transformation = UserPartitionTransformer()
-
         raw_block_structure = get_course_blocks(
             self.user,
             self.course.location,
@@ -125,13 +121,19 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         )
         self.assertEqual(len(list(raw_block_structure.get_block_keys())), len(self.blocks))
 
-        clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
-            transformers={self.transformation}
+            transformers={self.transformer}
         )
         self.assertSetEqual(
             set(trans_block_structure.get_block_keys()),
             self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'html2')
         )
+
+    def test_course_structure_with_staff_user(self):
+        """
+        Test course structure integrity if block structure has transformer applied
+        and is viewed by staff user.
+        """
+        self.assert_course_structure_staff_user(self.staff, self.course, self.blocks, self.transformer)
