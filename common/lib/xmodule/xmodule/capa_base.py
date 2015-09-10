@@ -1424,8 +1424,8 @@ class CapaMixin(CapaFields):
         msg = _("Your answers have been saved.")
         if not self.max_attempts == 0:
             msg = _(
-                    "Your answers have been saved but not graded. Click {check} to grade them."
-                ).format(check=self.check_button_name())
+                    "Your answers have been saved but not graded. Click '{button_name}' to grade them."
+                ).format(button_name=self.check_button_name())
         return {
             'success': True,
             'msg': msg,
