@@ -189,17 +189,34 @@ MOCK_MODULES = [
     'ecommerce_api_client',
     'client',
     'ecommerce_api_client.client',
-    'ecommerce_api_client.exceptions'
-
-
+    'ecommerce_api_client.exceptions',
+    'student.auth',
+    'ccx_keys',
+    'ccx_keys.locator',
+    'user_api.preferences.api'
 ]
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock(class_that_is_extended=object)
 
+if "DJANGO_SETTINGS_MODULE" not in os.environ:
+    docs_path = os.getcwd()
+    mezzanine_path_parts = (docs_path, "..")
+    sys.path.insert(0, docs_path)
+    sys.path.insert(0, os.path.realpath(os.path.join(*mezzanine_path_parts)))
+    os.environ["DJANGO_SETTINGS_MODULE"] = "docs_settings"
+    # Django 1.7's setup is required before touching translated strings.
+    import django
+    try:
+        django.setup()
+    except AttributeError:  # < 1.7
+        pass
+
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 sys.path.append('../../../../')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.dev'
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.dev")
 
 from docs.shared.conf import *
 
@@ -227,6 +244,7 @@ sys.path.insert(0, root)
 sys.path.append(root / "common/lib/xmodule")
 sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "lms/djangoapps")
+sys.path.append(root / "lms/envs")
 sys.path.append(root / "openedx/core/djangoapps")
 
 sys.path.insert(
