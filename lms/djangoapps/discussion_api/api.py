@@ -39,7 +39,7 @@ from django_comment_common.signals import (
     comment_created,
     comment_edited,
     comment_voted,
-    comment_deleted
+    comment_deleted,
 )
 from django_comment_client.utils import get_accessible_discussion_modules, is_commentable_cohorted
 from lms.lib.comment_client.comment import Comment
@@ -695,6 +695,23 @@ def update_comment(request, comment_id, update_data):
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context)
     return api_comment
+
+
+def get_thread(request, thread_id):
+    """
+    Retrieve a thread.
+
+    Arguments:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        thread_id: The id for the thread to retrieve
+
+    """
+    cc_thread, context = _get_thread_and_context(request, thread_id)
+    serializer = ThreadSerializer(cc_thread, context=context)
+    return serializer.data
 
 
 def delete_thread(request, thread_id):

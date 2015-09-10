@@ -27,7 +27,7 @@ from django_comment_common.signals import (
     comment_edited,
     comment_voted,
     comment_deleted,
-    comment_endorsed
+    comment_endorsed,
 )
 from django_comment_common.utils import ThreadContext
 from django_comment_client.utils import (
