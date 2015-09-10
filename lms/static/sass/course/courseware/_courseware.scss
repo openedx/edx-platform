@@ -136,6 +136,7 @@ div.course-wrapper {
         border-bottom: none;
         box-shadow: none;
         text-align: left;
+        width: 100%;
         &:hover {
           background-color: transparent;
         }
@@ -181,8 +182,16 @@ div.course-wrapper {
         border-top: 4px solid #22B557 !important;
         margin: 0 auto;
       }
+      &.success-left-bar {
+        border-left: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
       &.message-top-bar {
         border-top: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
+      &.message-left-bar {
+        border-left: 4px solid #FAB95C !important;
         margin: 0 auto;
       }
       &.failure {
@@ -190,11 +199,18 @@ div.course-wrapper {
         margin: 0 auto;
       }
     }
+
     div.proctored-exam {
       @extend .timed-exam;
       .proctored-exam-message {
         border-top: ($baseline/10) solid rgb(207, 216, 220);
         padding-top: 25px;
+      }
+      // specialized padding override just for the entrance page
+      &.entrance {
+        button.gated-sequence {
+          padding: 0 ($baseline*5) 0 ($baseline*2.5);
+        }
       }
       button {
         background: #126F9A;
@@ -221,8 +237,7 @@ div.course-wrapper {
             font-size: 22px;
             left: 0;
             top: $baseline;
-            color: rgb(206, 216, 220)
-
+            color: rgb(206, 216, 220);
           }
         }
         .start-timed-exam {
@@ -241,10 +256,19 @@ div.course-wrapper {
           top: 50%;
           font-size: 30px;
           margin-top: -15px;
+          &.fa-arrow-circle-right {
+            top: 30%;
+          }
         }
         &:last-child {
           > .fa {
             color: rgb(206, 216, 220);
+          }
+          border-bottom: none;
+        }
+        &:last-child {
+          > .practice-exam {
+            color: #147ABA;
           }
           border-bottom: none;
         }
