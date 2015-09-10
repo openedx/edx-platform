@@ -1,10 +1,6 @@
 """
 Transformers helpers functions.
 """
-from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
-
-SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]
 
 
 def get_user_partition_groups(course_key, user_partitions, user):
@@ -28,7 +24,6 @@ def get_user_partition_groups(course_key, user_partitions, user):
             course_key,
             user,
             partition,
-            **({'assign': False} if partition.scheme in SCHEME_SUPPORTS_ASSIGNMENT else {})
         )
         if group is not None:
             partition_groups[partition.id] = group
