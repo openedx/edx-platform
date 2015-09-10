@@ -3,7 +3,6 @@ Tests for SplitTestTransformer.
 """
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import UserFactory
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition
@@ -38,18 +37,17 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         self.split_test_user_partition.scheme.name = "random"
 
         # Build course.
-        self.course_hierarchy = self.get_test_course_hierarchy()
+        self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
         clear_course_from_cache(self.course.id)
 
-        # Set up user and enroll in course.
-        self.password = 'test'
-        self.user = UserFactory.create(password=self.password)
+        # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
-        self.transformation = []
+        
+        self.transformer = SplitTestTransformer()
 
-    def get_test_course_hierarchy(self):
+    def get_course_hierarchy(self):
         """
         Get a course hierarchy to test with.
 
@@ -141,8 +139,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         Test course structure integrity if course has split test section
         and user is not assigned to any group in user partition.
         """
-        self.transformation = SplitTestTransformer()
-
         # Add user to split test.
         self.add_user_to_splittest_group(assign=False)
 
@@ -157,7 +153,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
-            transformers={self.transformation}
+            transformers={self.transformer}
         )
 
         self.assertEqual(
@@ -170,8 +166,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         Test course structure integrity if course has split test section
         and user is assigned to any group in user partition.
         """
-        self.transformation = SplitTestTransformer()
-
         # Add user to split test.
         self.add_user_to_splittest_group()
 
@@ -186,7 +180,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
-            transformers={self.transformation}
+            transformers={self.transformer}
         )
 
         user_groups = get_user_partition_groups(
@@ -219,3 +213,10 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                         'html2'
                     )
                 )
+
+    def test_course_structure_with_staff_user(self):
+        """
+        Test course structure integrity if block structure has transformer applied
+        and is viewed by staff user.
+        """
+        self.assert_course_structure_staff_user(self.staff, self.course, self.blocks, self.transformer)

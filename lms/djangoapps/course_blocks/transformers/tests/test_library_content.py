@@ -2,7 +2,6 @@
 Tests for ContentLibraryTransformer.
 """
 import mock
-from student.tests.factories import UserFactory
 from student.tests.factories import CourseEnrollmentFactory
 
 from course_blocks.transformers.library_content import ContentLibraryTransformer
@@ -33,20 +32,18 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         super(ContentLibraryTransformerTestCase, self).setUp()
 
         # Build course.
-        self.course_hierarchy = self.get_test_course_hierarchy()
+        self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
         clear_course_from_cache(self.course.id)
 
-        # Set up user and enroll in course.
-        self.password = 'test'
-        self.user = UserFactory.create(password=self.password)
+        # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
 
         self.selected_modules = [MockedModules('{"selected": [["vertical", "vertical_vertical2"]]}')]
-        self.transformer = []
+        self.transformer = ContentLibraryTransformer()
 
-    def get_test_course_hierarchy(self):
+    def get_course_hierarchy(self):
         """
         Get a course hierarchy to test with.
         """
@@ -115,8 +112,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         and after that mock response from MySQL db.
         Check user can see mocked sections in content library.
         """
-        self.transformer = ContentLibraryTransformer()
-
         raw_block_structure = get_course_blocks(
             self.user,
             self.course.location,
@@ -159,3 +154,10 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                     'html1'
                 )
             )
+
+    def test_course_structure_with_staff_user(self):
+        """
+        Test course structure integrity if block structure has transformer applied
+        and is viewed by staff user.
+        """
+        self.assert_course_structure_staff_user(self.staff, self.course, self.blocks, self.transformer)
