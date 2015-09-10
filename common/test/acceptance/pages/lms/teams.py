@@ -23,6 +23,10 @@ CREATE_TEAM_LINK_CSS = '.create-team'
 class TeamCardsMixin(object):
     """Provides common operations on the team card component."""
 
+    def view_first_team(self):
+        """Click the 'view' button of the first team card on the page."""
+        self.q(css='a.action-view').first.click()
+
     @property
     def team_cards(self):
         """Get all the team cards on the page."""
