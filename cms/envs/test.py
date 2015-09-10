@@ -281,8 +281,5 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # teams feature
 FEATURES['ENABLE_TEAMS'] = True
 
-# teams search
-FEATURES['ENABLE_TEAMS_SEARCH'] = True
-
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
