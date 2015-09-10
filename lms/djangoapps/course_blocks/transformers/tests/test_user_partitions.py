@@ -122,9 +122,5 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
             self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'html2')
         )
 
-    def test_course_structure_with_staff_user(self):
-        """
-        Test course structure integrity if block structure has transformer applied
-        and is viewed by staff user.
-        """
-        self.assert_course_structure_staff_user(self.staff, self.course, self.blocks, self.transformer)
+    def test_staff_user(self):
+        self.assert_staff_access_to_all_blocks(self.staff, self.course, self.blocks, self.transformer)
