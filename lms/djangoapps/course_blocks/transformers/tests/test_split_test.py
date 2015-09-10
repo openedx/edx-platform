@@ -4,7 +4,6 @@ Tests for SplitTestTransformer.
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import CourseEnrollmentFactory
-from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition
 
 from course_blocks.transformers.split_test import SplitTestTransformer
@@ -27,8 +26,9 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         # Set up user partitions and groups.
         self.groups = [Group(3, 'Group A'), Group(4, 'Group B')]
         self.content_groups = [3, 4]
+        self.split_test_user_partition_id = 0
         self.split_test_user_partition = UserPartition(
-            id=0,
+            id=self.split_test_user_partition_id,
             name='Partition 2',
             description='This is partition 2',
             groups=self.groups,
@@ -40,7 +40,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
-        clear_course_from_cache(self.course.id)
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
@@ -119,37 +118,10 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             ]
         }
 
-    def add_user_to_splittest_group(self, assign=True):
+    def test_user_not_assigned(self):
         """
-        Add user to split test, get group for him and update blocks.
+        Test when user is not assigned to any group in user partition.
         """
-        self.split_test_user_partition.scheme.get_group_for_user(
-            CourseKey.from_string(unicode(self.course.id)),
-            self.user,
-            self.split_test_user_partition,
-            assign=assign,
-        )
-        store = modulestore()
-        for __, block in self.blocks.iteritems():
-            block.save()
-            store.update_item(block, self.user.id)
-
-    def test_course_structure_with_user_split_test(self):
-        """
-        Test course structure integrity if course has split test section
-        and user is not assigned to any group in user partition.
-        """
-        # Add user to split test.
-        self.add_user_to_splittest_group(assign=False)
-
-        raw_block_structure = get_course_blocks(
-            self.user,
-            self.course.location,
-            transformers={}
-        )
-        self.assertEqual(len(list(raw_block_structure.get_block_keys())), len(self.blocks))
-
-        clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
@@ -161,22 +133,17 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'split_test1')
         )
 
-    def test_course_structure_with_user_split_test_group_assigned(self):
+    def test_user_assigned(self):
         """
-        Test course structure integrity if course has split test section
-        and user is assigned to any group in user partition.
+        Test when user is assigned to any group in user partition.
         """
         # Add user to split test.
-        self.add_user_to_splittest_group()
-
-        raw_block_structure = get_course_blocks(
+        self.split_test_user_partition.scheme.get_group_for_user(
+            CourseKey.from_string(unicode(self.course.id)),
             self.user,
-            self.course.location,
-            transformers={}
+            self.split_test_user_partition,
         )
-        self.assertEqual(len(list(raw_block_structure.get_block_keys())), len(self.blocks))
 
-        clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
@@ -186,33 +153,16 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         user_groups = get_user_partition_groups(
             self.course.id, [self.split_test_user_partition], self.user
         )
-        for group in user_groups.itervalues():
-            if group.id == 3:
-                self.assertEqual(
-                    set(trans_block_structure.get_block_keys()),
-                    self.get_block_key_set(
-                        'course',
-                        'chapter1',
-                        'lesson1',
-                        'vertical1',
-                        'split_test1',
-                        'vertical2',
-                        'html1'
-                    )
-                )
-            else:
-                self.assertEqual(
-                    set(trans_block_structure.get_block_keys()),
-                    self.get_block_key_set(
-                        'course',
-                        'chapter1',
-                        'lesson1',
-                        'vertical1',
-                        'split_test1',
-                        'vertical3',
-                        'html2'
-                    )
-                )
+        self.assertEquals(len(user_groups), 1)
+        group = user_groups[self.split_test_user_partition_id]
+
+        expected_blocks = ['course', 'chapter1', 'lesson1', 'vertical1', 'split_test1']
+        if group.id == 3:
+            expected_blocks += ['vertical2', 'html1']
+        else:
+            expected_blocks += ['vertical3', 'html2']
+
+        self.assertEqual(set(trans_block_structure.get_block_keys()), set(self.get_block_key_set(*expected_blocks)))
 
     def test_course_structure_with_staff_user(self):
         """
