@@ -382,21 +382,13 @@ def prs_by_email(start_ref, end_ref):
     }
     # `emails` maps from other_emails to primary email, based on people.yaml.
     emails = {}
-    try:
-        people_resp = requests.get(PEOPLE_YAML, headers=headers)
-        people_resp.raise_for_status()
-        people = yaml.safe_load(people_resp.text)
-    except requests.exceptions.RequestException as e:
-        # Hmm, muddle through without canonicalized emails...
-        message = (
-            "Warning: could not fetch people.yaml: {message}".format(message=e.message)
-        )
-        print(colorize("red", message), file=sys.stderr)
-    else:
-        for person in people.itervalues():
-            if 'other_emails' in person:
-                for other_email in person['other_emails']:
-                    emails[other_email] = person['email']
+    people_resp = requests.get(PEOPLE_YAML, headers=headers)
+    people_resp.raise_for_status()
+    people = yaml.safe_load(people_resp.text)
+    for person in people.itervalues():
+        if 'other_emails' in person:
+            for other_email in person['other_emails']:
+                emails[other_email] = person['email']
 
     unordered_data = collections.defaultdict(set)
     for pr_num in get_merged_prs(start_ref, end_ref):
