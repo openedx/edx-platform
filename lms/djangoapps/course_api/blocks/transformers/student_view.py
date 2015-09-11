@@ -17,25 +17,45 @@ class StudentViewTransformer(BlockStructureTransformer):
         """
         Collect student_view_multi_device and student_view_data values for each block
         """
-        # TODO
-        # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 1125, in _xmodule
-        #     raise UndefinedContext()
+        for block_key in block_structure.topological_traversal():
+            block = block_structure.get_xblock(block_key)
 
-        # for block_key in block_structure.topological_traversal():
-        #     block = block_structure.get_xblock(block_key)
-        #     block_structure.set_transformer_block_data(
-        #         block_key,
-        #         cls,
-        #         cls.STUDENT_VIEW_MULTI_DEVICE,
-        #         block.has_support(getattr(block, 'student_view', None), 'multi_device'),
-        #     )
-        #     if getattr(block, 'student_view_data', None):
-        #         block_structure.set_transformer_block_data(
-        #             block_key,
-        #             cls,
-        #             cls.STUDENT_VIEW_DATA,
-        #             block.student_view_data(),
-        #         )
+            # We're iterating through descriptors (not bound to a user) that are
+            # given to us by the modulestore. The reason we look at 
+            # block.__class__ is to avoid the XModuleDescriptor -> XModule
+            # proxying that would happen if we just examined block directly,
+            # since it's likely that student_view() is going to be defined on
+            # the XModule side.
+            #
+            # If that proxying happens, this method will throw an
+            # UndefinedContext exception, because we haven't initialized any of
+            # the user-specific context.
+            #
+            # This isn't a problem for pure XBlocks, because it's all in one
+            # class, and there's no proxying. So basically, if you encounter a
+            # problem where your particular XModule explodes here (and don't
+            # have the time to convert it to an XBlock), please try refactoring
+            # so that you declare your student_view() method in a common
+            # ancestor class of both your Descriptor and Module classes. As an
+            # example, I changed the name of HtmlFields to HtmlBlock and moved
+            # student_view() from HtmlModuleMixin to HtmlBlock.
+            student_view = getattr(block.__class__, 'student_view', None)
+            supports_multi_device = block.has_support(student_view, 'multi_device')
+
+            block_structure.set_transformer_block_data(
+                block_key,
+                cls,
+                cls.STUDENT_VIEW_MULTI_DEVICE,
+                supports_multi_device,
+            )
+            if getattr(block, 'student_view_data', None):
+                student_view_data = block.student_view_data()
+                block_structure.set_transformer_block_data(
+                    block_key,
+                    cls,
+                    cls.STUDENT_VIEW_DATA,
+                    student_view_data,
+                )
 
     def transform(self, user_info, block_structure):
         """

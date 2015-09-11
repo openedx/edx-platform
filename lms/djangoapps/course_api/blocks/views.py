@@ -128,7 +128,7 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
         blocks = get_course_blocks(
             params.cleaned_data['user'],
             params.cleaned_data['usage_key'],
-            transformers=LMS_COURSE_TRANSFORMERS | {blocks_api_transformer},
+            transformers=LMS_COURSE_TRANSFORMERS + [blocks_api_transformer],
         )
 
         return Response(
