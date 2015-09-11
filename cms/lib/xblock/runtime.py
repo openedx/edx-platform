@@ -9,7 +9,6 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
     Handler URL function for Studio
     """
-
     if thirdparty:
         raise NotImplementedError("edX Studio doesn't support third-party xblock handler urls")
 
