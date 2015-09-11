@@ -300,6 +300,52 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         course_key = self._map_revision_to_branch(course_key)
         return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
 
+    def delete_orphans(self, course_key, user_id, **kwargs):
+        draft_preferred_course_key = self._map_revision_to_branch(course_key)
+        published_course_key = self._map_revision_to_branch(
+            course_key, ModuleStoreEnum.RevisionOption.published_only
+        )
+
+        draft_orphans = super(DraftVersioningModuleStore, self).get_orphans(
+            draft_preferred_course_key, **kwargs
+        )
+
+        published_orphans = super(DraftVersioningModuleStore, self).get_orphans(
+            published_course_key, **kwargs
+        )
+
+        orphans = [(orphan, 'draft') for orphan in draft_orphans] + [(orphan, 'published') for orphan in published_orphans]
+        # orphans = defaultdict(list)
+        # for orphan_list, branch in [(draft_orphans, 'draft'), (published_orphans, 'published')]:
+        #     for orphan in orphan_list:
+        #         orphans[orphan].append('branch')
+
+        while orphans:
+            orphan, branch = orphans.pop()
+            if orphan in draft_orphans and orphan in published_orphans:
+                # great, delete from both groups
+                self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.all)
+
+            elif branch == 'draft':
+                if orphan not in published_branch:
+                    # not passing a revision means you delete just from the draft branch
+                    self.delete_item(orphan, user_id)
+                elif orphan in published_branch:
+                    self._revert_block_to_published(orphan)
+
+            elif branch == 'published':
+                if orphan not in draft_blocks:
+                    self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
+                else:
+                    draft_block = ...
+                    draft_parent = draft_block.get_parent()
+                    if parent.category in DIRECT_ONLY_CATEGORIES:
+                        _revert_block_to_published(parent)
+                        self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.all)
+                    else:
+                        self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
+
+
     def fix_not_found(self, course_key, user_id):
         """
         Fix any children which point to non-existent blocks in the course's published and draft branches
