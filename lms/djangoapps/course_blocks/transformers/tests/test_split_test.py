@@ -2,12 +2,12 @@
 Tests for SplitTestTransformer.
 """
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from course_blocks.transformers.split_test import SplitTestTransformer
-from course_blocks.api import get_course_blocks, clear_course_from_cache
+from course_blocks.transformers.user_partitions import UserPartitionTransformer
+from course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.test_helpers import CourseStructureTestCase
 
 from course_blocks.transformers.helpers import get_user_partition_groups
@@ -43,9 +43,9 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
-        
-        self.transformer = SplitTestTransformer()
 
+        self.transformer = UserPartitionTransformer()
+        
     def get_course_hierarchy(self):
         """
         Get a course hierarchy to test with.
@@ -148,6 +148,3 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         )
         self.assertEqual(set(reloaded_structure.get_block_keys()), set(self.get_block_key_set(*expected_blocks)))
 
-
-    def test_staff_user(self):
-        self.assert_staff_access_to_all_blocks(self.staff, self.course, self.blocks, self.transformer)
