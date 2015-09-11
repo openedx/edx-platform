@@ -3,7 +3,8 @@
 Course Schedule and Details Settings page.
 """
 from __future__ import unicode_literals
-from bok_choy.promise import EmptyPromise
+from bok_choy.promise import BrokenPromise, EmptyPromise
+from selenium.webdriver.support.select import Select
 
 from .course_page import CoursePage
 from .utils import press_the_notification_button
@@ -122,6 +123,26 @@ class SettingsPage(CoursePage):
             raise Exception("Invalid license name: {name}".format(name=license_name))
         button.click()
 
+    @property
+    def selected_prerequisite_course(self):
+        """
+        Return the selected course from the prerequisite course dropdown list
+        """
+        def _get_selected_prerequisite_course(self):
+            """
+            Internal helper to retrieve the selected option value
+            """
+            select = Select(self.pre_requisite_course_options.first.results[0])
+            selected_option_value = select.first_selected_option.get_attribute('value')
+            return selected_option_value
+
+        self.wait_for(
+            lambda: Select(self.pre_requisite_course_options.first.results[0]),
+            description='Prerequisite course options available'
+        )
+        return _get_selected_prerequisite_course(self)
+
+
     ################
     # Waits
     ################
@@ -171,15 +192,3 @@ class SettingsPage(CoursePage):
                 '#alert-confirmation-title',
                 'Save confirmation message is visible'
             )
-
-    def refresh_page(self, wait_for_confirmation=True):
-        """
-        Reload the page.
-        """
-        self.browser.refresh()
-        if wait_for_confirmation:
-            EmptyPromise(
-                lambda: self.q(css='body.view-settings').present,
-                'Page is refreshed'
-            ).fulfill()
-        self.wait_for_ajax()

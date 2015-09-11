@@ -1,6 +1,7 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
+from flaky import flaky
 from unittest import skip
 
 from .base_studio_test import StudioCourseTest
@@ -11,7 +12,6 @@ from ...tests.studio.base_studio_test import StudioCourseTest
 from ..helpers import (
     generate_course_key,
     select_option_by_value,
-    is_option_value_selected,
     element_has_text,
 )
 
@@ -40,7 +40,7 @@ class SettingsMilestonesTest(StudioCourseTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
-    @skip  # TODO: fix this. SOL-449
+    @flaky(max_runs=20, min_passes=20)  # TODO: fix this. SOL-449
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
@@ -65,9 +65,9 @@ class SettingsMilestonesTest(StudioCourseTest):
         )
         pre_requisite_course_id = unicode(pre_requisite_course_key)
 
-        # Refresh the page to load the new course fixture and populate the prrequisite course dropdown
+        # Visit the page again to reload the new course fixture and populate the prerequisite course dropdown
         # Then select the prerequisite course and save the changes
-        self.settings_detail.refresh_page()
+        self.settings_detail.visit()
         self.settings_detail.wait_for_prerequisite_course_options()
         select_option_by_value(
             browser_query=self.settings_detail.pre_requisite_course_options,
@@ -79,13 +79,10 @@ class SettingsMilestonesTest(StudioCourseTest):
             self.settings_detail.alert_confirmation_title.text
         )
 
-        # Refresh the page again and confirm the prerequisite course selection is properly reflected
-        self.settings_detail.refresh_page()
+        # Visit the page again to confirm the prerequisite course selection is properly reflected
+        self.settings_detail.visit()
         self.settings_detail.wait_for_prerequisite_course_options()
-        self.assertTrue(is_option_value_selected(
-            browser_query=self.settings_detail.pre_requisite_course_options,
-            value=pre_requisite_course_id
-        ))
+        self.assertEqual(pre_requisite_course_id, self.settings_detail.selected_prerequisite_course)
 
         # Set the prerequisite course back to None and save the changes
         select_option_by_value(
@@ -98,13 +95,10 @@ class SettingsMilestonesTest(StudioCourseTest):
             self.settings_detail.alert_confirmation_title.text
         )
 
-        # Refresh the page again to confirm the None selection is properly reflected
-        self.settings_detail.refresh_page()
+        # Visit the page again to confirm the None selection is properly reflected
+        self.settings_detail.visit()
         self.settings_detail.wait_for_prerequisite_course_options()
-        self.assertTrue(is_option_value_selected(
-            browser_query=self.settings_detail.pre_requisite_course_options,
-            value=''
-        ))
+        self.assertEqual('', self.settings_detail.selected_prerequisite_course)
 
         # Re-pick the prerequisite course and confirm no errors are thrown (covers a discovered bug)
         select_option_by_value(
@@ -117,14 +111,10 @@ class SettingsMilestonesTest(StudioCourseTest):
             self.settings_detail.alert_confirmation_title.text
         )
 
-        # Refresh the page again to confirm the prerequisite course selection is properly reflected
-        self.settings_detail.refresh_page()
+        # Visit the page again to confirm the prerequisite course selection is properly reflected
+        self.settings_detail.visit()
         self.settings_detail.wait_for_prerequisite_course_options()
-        dropdown_status = is_option_value_selected(
-            browser_query=self.settings_detail.pre_requisite_course_options,
-            value=pre_requisite_course_id
-        )
-        self.assertTrue(dropdown_status)
+        self.assertEqual(pre_requisite_course_id, self.settings_detail.selected_prerequisite_course)
 
     def test_page_has_enable_entrance_exam_field(self):
         """
