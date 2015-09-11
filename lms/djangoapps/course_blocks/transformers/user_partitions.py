@@ -1,9 +1,10 @@
 """
-User Partitions Transformer, used to filter course structure per user.
+User Partitions Transformer
 """
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 
 from .helpers import get_user_partition_groups
+from .split_test import SplitTestTransformer
 
 
 class MergedGroupAccess(object):
@@ -122,6 +123,9 @@ class UserPartitionTransformer(BlockStructureTransformer):
         Arguments:
             block_structure (BlockStructureCollectedData)
         """
+        # First have the split test transformer setup its group access data for each block.
+        SplitTestTransformer.collect(block_structure)
+
         # Because user partitions are course-wide, only store data for them on the root block.
         root_block = block_structure.get_xblock(block_structure.root_block_key)
         user_partitions = getattr(root_block, 'user_partitions', []) or []
@@ -153,6 +157,8 @@ class UserPartitionTransformer(BlockStructureTransformer):
             user_info (object)
             block_structure (BlockStructureCollectedData)
         """
+        SplitTestTransformer().transform(user_info, block_structure)
+
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
 
         if not user_partitions or user_info.has_staff_access:
