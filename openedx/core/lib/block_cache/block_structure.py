@@ -45,35 +45,25 @@ class BlockStructure(object):
     def get_block_keys(self):
         return self._block_relations.iterkeys()
 
-    def topological_traversal(self, get_result=None, predicate=None):
+    def topological_traversal(self, **kwargs):
         return traverse_topologically(
             start_node=self.root_block_key,
             get_parents=self.get_parents,
             get_children=self.get_children,
-            get_result=get_result,
-            predicate=predicate,
+            **kwargs
         )
 
-    def post_order_traversal(self, get_result=None, predicate=None):
+    def post_order_traversal(self, **kwargs):
         return traverse_post_order(
             start_node=self.root_block_key,
             get_children=self.get_children,
-            get_result=get_result,
-            predicate=predicate,
+            **kwargs
         )
 
     def prune(self):
         # create a new block relations map with only those blocks that are still linked
         pruned_block_relations = defaultdict(self.BlockRelations)
         old_block_relations = self._block_relations
-
-        # def do_for_each_block(block_key):
-        #     if block_key in old_block_relations:
-        #         self._add_block(pruned_block_relations, block_key)
-        #
-        #         for parent in old_block_relations[block_key].parents:
-        #             if parent in pruned_block_relations:
-        #                 self._add_relation(pruned_block_relations, parent, block_key)
 
         def do_for_each_block(block_key):
             if block_key in old_block_relations:
@@ -157,13 +147,13 @@ class BlockStructureBlockData(BlockStructure):
         self._block_relations.pop(usage_key, None)
         self._block_data_map.pop(usage_key, None)
 
-    def remove_block_if(self, removal_condition):
+    def remove_block_if(self, removal_condition, **kwargs):
         def predicate(block_key):
             if removal_condition(block_key):
                 self.remove_block(block_key)
                 return False
             return True
-        list(self.topological_traversal(predicate=predicate))
+        list(self.topological_traversal(predicate=predicate, **kwargs))
 
 
 class BlockStructureCollectedData(BlockStructureBlockData):
