@@ -135,6 +135,18 @@ div.course-wrapper {
           font-weight: 600;
         }
       }
+      button {
+        @extend %t-ultralight;
+        background: #126F9A;
+        color: $white;
+        font-size: 16px;
+        padding: 16px ($baseline*1.5);
+        margin-bottom: ($baseline/2);
+        border: none;
+        &:hover {
+          background-color: #035E88;
+        }
+      }
       button.gated-sequence {
         background-color: transparent;
         border-bottom: none;
@@ -155,6 +167,7 @@ div.course-wrapper {
       .gated-sequence {
         color: #147ABA;
         font-weight: 600;
+        padding: 16px 7px;
         a.start-timed-exam {
           cursor: pointer;
           color: #147ABA;
@@ -210,6 +223,7 @@ div.course-wrapper {
         border-top: ($baseline/10) solid rgb(207, 216, 220);
         padding-top: 25px;
       }
+
       // specialized padding override just for the entrance page
       &.entrance {
         button.gated-sequence {
