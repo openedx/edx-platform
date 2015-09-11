@@ -2399,7 +2399,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 parent_block.edit_info.source_version = None
                 self.decache_block(usage_locator.course_key, new_id, parent_block_key)
 
-            self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_structure)
+            self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_blocks)
 
             # update index if appropriate and structures
             self.update_structure(usage_locator.course_key, new_structure)
@@ -2416,30 +2416,36 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             return result
 
-    @contract(block_key=BlockKey, structure='dict')
-    def _remove_subtree(self, block_key, structure):
+    @contract(root_block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
+    def _remove_subtree(self, root_block_key, blocks):
         """
-        Remove the subtree rooted at block_key
+        Remove the subtree rooted at root_block_key
         We do this breadth-first to make sure that we don't remove
         any children that may have parents that we don't want to delete.
         """
-        to_delete = {block_key}
-        tier = {block_key}
+        # create mapping from each child's key to its parents' keys
+        child_parent_map = defaultdict(set)
+        for block_key, block_data in blocks.iteritems():
+            for child in block_data.fields.get('children', []):
+                child_parent_map[BlockKey(*child)].add(block_key)
+
+        to_delete = {root_block_key}
+        tier = {root_block_key}
         while tier:
-            new_tier = set()
+            next_tier = set()
             for block_key in tier:
-                for child in structure['blocks'][block_key].fields.get('children', []):
+                for child in blocks[block_key].fields.get('children', []):
                     child_block_key = BlockKey(*child)
-                    parents = self._get_parents_from_structure(child_block_key, structure)
+                    parents = child_parent_map[child_block_key]
                     # Make sure we want to delete all of the child's parents
                     # before slating it for deletion
-                    if all(parent in to_delete for parent in parents):
-                        new_tier.add(child_block_key)
-            tier = new_tier
+                    if parents.issubset(to_delete):
+                        next_tier.add(child_block_key)
+            tier = next_tier
             to_delete.update(tier)
 
         for block_key in to_delete:
-            del structure['blocks'][block_key]
+            del blocks[block_key]
 
     def delete_course(self, course_key, user_id):
         """
