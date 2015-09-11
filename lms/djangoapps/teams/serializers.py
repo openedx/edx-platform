@@ -112,7 +112,8 @@ class MembershipSerializer(serializers.ModelSerializer):
             view_name='teams_detail',
             read_only=True,
         ),
-        expanded_serializer=CourseTeamSerializer(read_only=True)
+        expanded_serializer=CourseTeamSerializer(read_only=True),
+        exclude_expand_fields={'user'},
     )
 
     class Meta(object):
