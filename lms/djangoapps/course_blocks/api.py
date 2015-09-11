@@ -20,7 +20,6 @@ LMS_COURSE_TRANSFORMERS = [
     visibility.VisibilityTransformer(),
     start_date.StartDateTransformer(),
     user_partitions.UserPartitionTransformer(),
-    split_test.SplitTestTransformer(),
     library_content.ContentLibraryTransformer(),
 ]
 
