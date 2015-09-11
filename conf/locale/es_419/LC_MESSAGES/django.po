@@ -172,7 +172,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:07+0000\n"
+"POT-Creation-Date: 2015-09-11 12:16+0000\n"
 "PO-Revision-Date: 2015-06-29 17:10+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -434,7 +434,7 @@ msgstr "Profesional en educación"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
-msgstr "Las inscripciones están cerradas"
+msgstr "Inscripciones cerradas"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
@@ -8627,6 +8627,10 @@ msgstr ""
 #: lms/djangoapps/teams/views.py
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "El ID de tema proporcionado {topic_id} no es válido"
+
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
+msgstr ""
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be

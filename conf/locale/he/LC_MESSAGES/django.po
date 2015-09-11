@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:07+0000\n"
+"POT-Creation-Date: 2015-09-11 12:16+0000\n"
 "PO-Revision-Date: 2015-05-28 20:00+0000\n"
 "Last-Translator: Nadav Stark <nadav@yeda.org.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -7426,6 +7426,10 @@ msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "The supplied topic id {topic_id} is not valid"
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
 msgstr ""
 
 #. Translators: 'ordering' is a string describing a way
