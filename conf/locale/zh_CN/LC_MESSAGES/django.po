@@ -142,6 +142,7 @@
 # Junjie, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Lucas H. Xu <xuh@bu.edu>, 2015
+# Wheathana <mr_wheat@sina.cn>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -211,6 +212,7 @@
 # 匡冲 <kuangchong07@gmail.com>, 2013
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# Wheathana <mr_wheat@sina.cn>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Scott Huang <sc.h@aol.com>, 2014
@@ -263,7 +265,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:07+0000\n"
+"POT-Creation-Date: 2015-09-11 12:16+0000\n"
 "PO-Revision-Date: 2015-06-18 03:04+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -7645,6 +7647,10 @@ msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "The supplied topic id {topic_id} is not valid"
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
 msgstr ""
 
 #. Translators: 'ordering' is a string describing a way
