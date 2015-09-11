@@ -9,7 +9,7 @@ define([
 ], function ($, Backbone, Logger, AjaxHelpers, SpecHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
-    describe('TeamsTab', function () {
+    describe('TeamsTab', function() {
         var expectError = function (teamsTabView, text) {
             expect(teamsTabView.$('.warning').text()).toContain(text);
         };
@@ -19,19 +19,12 @@ define([
         };
 
         var createTeamsTabView = function(options) {
-            var defaultTopics = {
-                    count: 5,
-                    num_pages: 1,
-                    current_page: 1,
-                    start: 0,
-                    results: TeamSpecHelpers.createMockTopicData(1, 5)
-                },
-                teamsTabView = new TeamsTabView(
-                    {
-                        el: $('.teams-content'),
-                        context: TeamSpecHelpers.createMockContext(options)
-                    }
-                );
+            var teamsTabView = new TeamsTabView(
+                {
+                    el: $('.teams-content'),
+                    context: TeamSpecHelpers.createMockContext(options)
+                }
+            );
             teamsTabView.start();
             return teamsTabView;
         };
@@ -115,6 +108,7 @@ define([
                 AjaxHelpers.respondWithError(requests, 500);
                 expectError(teamsTabView, "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.");
                 expectFocus(teamsTabView.$('.warning'));
+            });
 
             it('does not navigate to the topics page when syncing its collection if not on the search page', function () {
                 var teamsTabView = createTeamsTabView(),
@@ -174,7 +168,7 @@ define([
             }, function (url, expectedEvent) {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView({
-                        userInfo: TeamSpecHelpers.createMockUserInfo({ staff: true })
+                        userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})
                     });
                 teamsTabView.router.navigate(url, {trigger: true});
                 if (requests.length) {
@@ -187,7 +181,7 @@ define([
         describe('Discussion privileges', function () {
             it('allows privileged access to any team', function () {
                 var teamsTabView = createTeamsTabView({
-                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: true })
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true})
                 });
                 // Note: using `undefined` here to ensure that we
                 // don't even look at the team when the user is
@@ -215,10 +209,10 @@ define([
 
             it('does not allow access if the user is neither privileged nor a team member', function () {
                 var teamsTabView = createTeamsTabView({
-                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: false, staff: true })
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false, staff: true})
                 });
                 expect(teamsTabView.readOnlyDiscussion({
-                    attributes: { membership: [] }
+                    attributes: {membership: []}
                 })).toBe(true);
             });
         });
@@ -281,28 +275,6 @@ define([
                 teamsTabView.$('.search-field').val('');
                 teamsTabView.$('.action-search').click();
                 verifyTeamsRequest(requests, {
-                    order_by: 'last_activity_at',
-                    text_search: ''
-                });
-                AjaxHelpers.respondWithJson(requests, {});
-                expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
-                expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
-            });
-
-            it('clears the search when navigating away and then back', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
-                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
-                AjaxHelpers.respondWithJson(requests, {});
-
-                // Perform a search
-                teamsTabView.$('.search-field').val('foo');
-                teamsTabView.$('.action-search').click();
-                AjaxHelpers.respondWithJson(requests, {});
-
-                // Navigate back to the teams list
-                teamsTabView.$('.breadcrumbs a').last().click();
-                verifyTeamsRequest(removeTeamEvents(requests), {
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
