@@ -1970,7 +1970,6 @@ class UpdateThreadTest(
                 "pinned": ["False"],
             }
         )
-        self.assertEqual(1,2)
 
     def test_nonexistent_thread(self):
         self.register_get_thread_error_response("test_thread", 404)
@@ -2179,9 +2178,9 @@ class UpdateThreadTest(
             self.register_get_user_response(self.user2, upvoted_ids=["test_thread"])
             vote_count += 1
 
-        for (current_vote, user_vote, request) in [
-            (current_user1_vote, user1_vote, self.request) ,
-            (current_user2_vote, user2_vote, self.request2)]:
+        for (current_vote, user_vote, request) in \
+                [(current_user1_vote, user1_vote, self.request),
+                 (current_user2_vote, user2_vote, self.request2)]:
 
             self.register_thread_votes_response("test_thread")
             self.register_thread(overrides={"votes": {"up_count": vote_count}})
@@ -2574,9 +2573,9 @@ class UpdateCommentTest(
             self.register_get_user_response(self.user2, upvoted_ids=["test_comment"])
             vote_count += 1
 
-        for (current_vote, user_vote, request) in [
-            (current_user1_vote, user1_vote, self.request) ,
-            (current_user2_vote, user2_vote, self.request2)]:
+        for (current_vote, user_vote, request) in \
+                [(current_user1_vote, user1_vote, self.request),
+                 (current_user2_vote, user2_vote, self.request2)]:
 
             self.register_comment_votes_response("test_comment")
             self.register_comment(overrides={"votes": {"up_count": vote_count}})
