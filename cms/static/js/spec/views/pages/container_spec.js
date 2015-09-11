@@ -574,6 +574,25 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                             });
                         });
 
+                        it('also works for older-style add component links', function () {
+                            // Some third party xblocks (problem-builder in particular) expect add
+                            // event handlers on custom <a> add buttons which is what the platform
+                            // used to use instead of <button>s.
+                            // This can be removed once there is a proper API that XBlocks can use
+                            // to add children or allow authors to add children.
+                            renderContainerPage(this, mockContainerXBlockHtml);
+                            $(".add-xblock-component-button").each(function() {
+                                var htmlAsLink = $($(this).prop('outerHTML').replace(/(<\/?)button/g, "$1a"));
+                                $(this).replaceWith(htmlAsLink);
+                            });
+                            $(".add-xblock-component-button").first().click();
+                            EditHelpers.verifyXBlockRequest(requests, {
+                                "category": "discussion",
+                                "type": "discussion",
+                                "parent_locator": "locator-group-A"
+                            });
+                        });
+
                         it('shows a notification while creating', function () {
                             var notificationSpy = EditHelpers.createNotificationSpy();
                             renderContainerPage(this, mockContainerXBlockHtml);

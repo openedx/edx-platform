@@ -6,8 +6,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
     function ($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu) {
         var AddXBlockComponent = BaseView.extend({
             events: {
-                'click .new-component .new-component-type button.multiple-templates': 'showComponentTemplates',
-                'click .new-component .new-component-type button.single-template': 'createNewComponent',
+                'click .new-component .new-component-type .multiple-templates': 'showComponentTemplates',
+                'click .new-component .new-component-type .single-template': 'createNewComponent',
                 'click .new-component .cancel-button': 'closeNewComponent',
                 'click .new-component-templates .new-component-template .button-component': 'createNewComponent',
                 'click .new-component-templates .cancel-button': 'closeNewComponent'
