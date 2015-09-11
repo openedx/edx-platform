@@ -2276,15 +2276,21 @@ class UpdateCommentTest(
     def setUp(self):
         super(UpdateCommentTest, self).setUp()
 
-        self.user = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
+
+        self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+        self.user2 = UserFactory.create()
+        self.register_get_user_response(self.user2)
+        self.request2 = RequestFactory().get("/test_path")
+        self.request2.user = self.user2
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
 
     def register_comment(self, overrides=None, thread_overrides=None, course=None):
         """
@@ -2533,6 +2539,84 @@ class UpdateCommentTest(
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count(self, current_vote_status, first_vote, second_vote):
+        """
+        Tests vote_count increases and decreases correctly from the same user
+        """
+        #setup
+        starting_vote_count = 0
+        if current_vote_status:
+            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            starting_vote_count = 1
+        self.register_comment_votes_response("test_comment")
+        self.register_comment(overrides={"votes": {"up_count": starting_vote_count}})
+
+        #first vote
+        data = {"voted": first_vote}
+        result = update_comment(self.request, "test_comment", data)
+        self.register_comment(overrides={"voted": first_vote})
+        self.assertEqual(result["vote_count"], 1 if first_vote else 0)
+
+        #second vote
+        data = {"voted": second_vote}
+        result = update_comment(self.request, "test_comment", data)
+        self.assertEqual(result["vote_count"], 1 if second_vote else 0)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count_two_users(
+            self,
+            current_user1_vote,
+            current_user2_vote,
+            user1_vote,
+            user2_vote
+    ):
+        """
+        Tests vote_count increases and decreases correctly from different users
+        """
+        #setup
+        vote_count = 0
+        if current_user1_vote:
+            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            vote_count += 1
+        if current_user2_vote:
+            self.register_get_user_response(self.user2, upvoted_ids=["test_comment"])
+            vote_count += 1
+
+        self.register_comment_votes_response("test_comment")
+        self.register_comment(overrides={"votes": {"up_count": vote_count}})
+
+        # first user vote
+        data = {"voted": user1_vote}
+        result = update_comment(self.request, "test_comment", data)
+        if current_user1_vote == user1_vote:
+            self.assertEqual(result["vote_count"], vote_count)
+        elif user1_vote:
+            vote_count += 1
+            self.assertEqual(result["vote_count"], vote_count)
+            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+        else:
+            vote_count -= 1
+            self.assertEqual(result["vote_count"], vote_count)
+            self.register_get_user_response(self.user, upvoted_ids=[])
+
+        self.register_comment_votes_response("test_thread")
+        self.register_comment(overrides={"votes": {"up_count": vote_count}})
+
+        # second user vote
+        data = {"voted": user2_vote}
+        result = update_comment(self.request2, "test_comment", data)
+        if current_user2_vote == user2_vote:
+            self.assertEqual(result["vote_count"], vote_count)
+        elif user2_vote:
+            vote_count += 1
+            self.assertEqual(result["vote_count"], vote_count)
+        else:
+            vote_count -= 1
+            self.assertEqual(result["vote_count"], vote_count)
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
