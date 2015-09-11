@@ -783,7 +783,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
-    @skip('Disabled until search connectivity issues are resolved, see  TNL-3206')
+    @skip("Skip until TNL-3198 (searching teams makes two AJAX requests) is resolved")
     def test_search(self):
         """
         Scenario: User should be able to search for a team
