@@ -18,7 +18,6 @@ django-openid-auth==0.4
 django-sekizai==0.8.2
 django-ses==0.7.0
 django-storages==1.1.5
-django-threaded-multihost==1.4-1
 django-method-override==0.1.0
 djangorestframework==2.3.5
 django==1.4.5
