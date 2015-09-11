@@ -53,6 +53,8 @@ from .overrides import (
     clear_override_for_ccx,
     get_override_for_ccx,
     override_field_for_ccx,
+    clear_ccx_field_info_from_ccx_map,
+    bulk_delete_ccx_override_fields,
 )
 
 
@@ -196,42 +198,50 @@ def save_ccx(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    def override_fields(parent, data, graded, earliest=None):
+    def override_fields(parent, data, graded, earliest=None, ccx_ids_to_delete=None):
         """
         Recursively apply CCX schedule data to CCX by overriding the
         `visible_to_staff_only`, `start` and `due` fields for units in the
         course.
         """
+        if ccx_ids_to_delete is None:
+            ccx_ids_to_delete = []
         blocks = {
             str(child.location): child
             for child in parent.get_children()}
+
         for unit in data:
             block = blocks[unit['location']]
             override_field_for_ccx(
                 ccx, block, 'visible_to_staff_only', unit['hidden'])
+
             start = parse_date(unit['start'])
             if start:
                 if not earliest or start < earliest:
                     earliest = start
                 override_field_for_ccx(ccx, block, 'start', start)
             else:
-                clear_override_for_ccx(ccx, block, 'start')
+                ccx_ids_to_delete.append(get_override_for_ccx(ccx, block, 'start_id'))
+                clear_ccx_field_info_from_ccx_map(ccx, block, 'start')
+
             due = parse_date(unit['due'])
             if due:
                 override_field_for_ccx(ccx, block, 'due', due)
             else:
-                clear_override_for_ccx(ccx, block, 'due')
+                ccx_ids_to_delete.append(get_override_for_ccx(ccx, block, 'due_id'))
+                clear_ccx_field_info_from_ccx_map(ccx, block, 'due')
 
             if not unit['hidden'] and block.graded:
                 graded[block.format] = graded.get(block.format, 0) + 1
 
             children = unit.get('children', None)
             if children:
-                override_fields(block, children, graded, earliest)
-        return earliest
+                override_fields(block, children, graded, earliest, ccx_ids_to_delete)
+        return earliest, ccx_ids_to_delete
 
     graded = {}
-    earliest = override_fields(course, json.loads(request.body), graded)
+    earliest, ccx_ids_to_delete = override_fields(course, json.loads(request.body), graded, [])
+    bulk_delete_ccx_override_fields(ccx, ccx_ids_to_delete)
     if earliest:
         override_field_for_ccx(ccx, course, 'start', earliest)
 
