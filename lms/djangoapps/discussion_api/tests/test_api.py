@@ -1970,6 +1970,7 @@ class UpdateThreadTest(
                 "pinned": ["False"],
             }
         )
+        self.assertEqual(1,2)
 
     def test_nonexistent_thread(self):
         self.register_get_thread_error_response("test_thread", 404)
@@ -2178,37 +2179,25 @@ class UpdateThreadTest(
             self.register_get_user_response(self.user2, upvoted_ids=["test_thread"])
             vote_count += 1
 
-        self.register_thread_votes_response("test_thread")
-        self.register_thread(overrides={"votes": {"up_count": vote_count}})
+        for (current_vote, user_vote, request) in [
+            (current_user1_vote, user1_vote, self.request) ,
+            (current_user2_vote, user2_vote, self.request2)]:
 
-        # first user vote
-        data = {"voted": user1_vote}
-        result = update_thread(self.request, "test_thread", data)
-        if current_user1_vote == user1_vote:
-            self.assertEqual(result["vote_count"], vote_count)
-        elif user1_vote:
-            vote_count += 1
-            self.assertEqual(result["vote_count"], vote_count)
-            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-        else:
-            vote_count -= 1
-            self.assertEqual(result["vote_count"], vote_count)
-            self.register_get_user_response(self.user, upvoted_ids=[])
+            self.register_thread_votes_response("test_thread")
+            self.register_thread(overrides={"votes": {"up_count": vote_count}})
 
-        self.register_thread_votes_response("test_thread")
-        self.register_thread(overrides={"votes": {"up_count": vote_count}})
-
-        # second user vote
-        data = {"voted": user2_vote}
-        result = update_thread(self.request2, "test_thread", data)
-        if current_user2_vote == user2_vote:
-            self.assertEqual(result["vote_count"], vote_count)
-        elif user2_vote:
-            vote_count += 1
-            self.assertEqual(result["vote_count"], vote_count)
-        else:
-            vote_count -= 1
-            self.assertEqual(result["vote_count"], vote_count)
+            data = {"voted": user_vote}
+            result = update_thread(request, "test_thread", data)
+            if current_vote == user_vote:
+                self.assertEqual(result["vote_count"], vote_count)
+            elif user_vote:
+                vote_count += 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            else:
+                vote_count -= 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=[])
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
@@ -2577,7 +2566,6 @@ class UpdateCommentTest(
         """
         Tests vote_count increases and decreases correctly from different users
         """
-        #setup
         vote_count = 0
         if current_user1_vote:
             self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
@@ -2586,37 +2574,25 @@ class UpdateCommentTest(
             self.register_get_user_response(self.user2, upvoted_ids=["test_comment"])
             vote_count += 1
 
-        self.register_comment_votes_response("test_comment")
-        self.register_comment(overrides={"votes": {"up_count": vote_count}})
+        for (current_vote, user_vote, request) in [
+            (current_user1_vote, user1_vote, self.request) ,
+            (current_user2_vote, user2_vote, self.request2)]:
 
-        # first user vote
-        data = {"voted": user1_vote}
-        result = update_comment(self.request, "test_comment", data)
-        if current_user1_vote == user1_vote:
-            self.assertEqual(result["vote_count"], vote_count)
-        elif user1_vote:
-            vote_count += 1
-            self.assertEqual(result["vote_count"], vote_count)
-            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
-        else:
-            vote_count -= 1
-            self.assertEqual(result["vote_count"], vote_count)
-            self.register_get_user_response(self.user, upvoted_ids=[])
+            self.register_comment_votes_response("test_comment")
+            self.register_comment(overrides={"votes": {"up_count": vote_count}})
 
-        self.register_comment_votes_response("test_thread")
-        self.register_comment(overrides={"votes": {"up_count": vote_count}})
-
-        # second user vote
-        data = {"voted": user2_vote}
-        result = update_comment(self.request2, "test_comment", data)
-        if current_user2_vote == user2_vote:
-            self.assertEqual(result["vote_count"], vote_count)
-        elif user2_vote:
-            vote_count += 1
-            self.assertEqual(result["vote_count"], vote_count)
-        else:
-            vote_count -= 1
-            self.assertEqual(result["vote_count"], vote_count)
+            data = {"voted": user_vote}
+            result = update_comment(request, "test_comment", data)
+            if current_vote == user_vote:
+                self.assertEqual(result["vote_count"], vote_count)
+            elif user_vote:
+                vote_count += 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            else:
+                vote_count -= 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=[])
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
