@@ -175,7 +175,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
 
-    def delete_item(self, location, user_id, revision=None, **kwargs):
+    def delete_item(self, location, user_id, revision=None, skip_auto_publish=False, **kwargs):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
 
@@ -217,7 +217,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 if (
                         branch == ModuleStoreEnum.BranchName.draft and
                         branched_location.block_type in (DIRECT_ONLY_CATEGORIES + ['vertical']) and
-                        parent_loc
+                        parent_loc and
+                        not skip_auto_publish
                 ):
                     # will publish if its not an orphan
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)

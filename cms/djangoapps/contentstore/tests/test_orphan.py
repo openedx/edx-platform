@@ -60,6 +60,8 @@ class TestOrphanBase(CourseTestCase):
 
         return course
 
+    def assertOrphanCount(self, course_key, number):
+        self.assertEqual(len(self.store.get_orphans(course_key)), number)
 
 @ddt.ddt
 class TestOrphan(TestOrphanBase):
