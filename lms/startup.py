@@ -19,6 +19,9 @@ import analytics
 import xmodule.x_module
 import lms_xblock.runtime
 
+import xmodule.x_module
+import lms_xblock.runtime
+
 log = logging.getLogger(__name__)
 
 
