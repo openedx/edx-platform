@@ -548,7 +548,6 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
         self.assert_event_emitted(
             'edx.team.searched',
-            course_id=unicode(self.test_course_2.id),
             search_text=text_search,
             topic_id=None,
             number_of_results=len(expected_team_names)
@@ -707,13 +706,11 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         self.assert_event_emitted(
             'edx.team.created',
             team_id=self._expected_team_id(team, 'fully-specified-team'),
-            course_id=unicode(self.test_course_1.id),
         )
 
         self.assert_event_emitted(
             'edx.team.learner_added',
             team_id=self._expected_team_id(team, 'fully-specified-team'),
-            course_id=unicode(self.test_course_1.id),
             user_id=self.users[creator].id,
             add_method='added_on_create'
         )
@@ -821,12 +818,10 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
             self.assert_event_emitted(
                 'edx.team.deleted',
                 team_id=self.solar_team.team_id,
-                course_id=unicode(self.test_course_1.id)
             )
             self.assert_event_emitted(
                 'edx.team.learner_removed',
                 team_id=self.solar_team.team_id,
-                course_id=unicode(self.test_course_1.id),
                 remove_method='team_deleted',
                 user_id=self.users['student_enrolled'].id
             )
@@ -840,12 +835,10 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         self.assert_event_emitted(
             'edx.team.deleted',
             team_id=self.solar_team.team_id,
-            course_id=unicode(self.test_course_1.id)
         )
         self.assert_event_emitted(
             'edx.team.learner_removed',
             team_id=self.solar_team.team_id,
-            course_id=unicode(self.test_course_1.id),
             remove_method='team_deleted',
             user_id=self.users['student_enrolled'].id
         )
@@ -877,7 +870,6 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             self.assert_event_emitted(
                 'edx.team.changed',
                 team_id=self.solar_team.team_id,
-                course_id=unicode(self.solar_team.course_id),
                 truncated=[],
                 field='name',
                 old=prev_name,
@@ -919,7 +911,6 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             self.assert_event_emitted(
                 'edx.team.changed',
                 team_id=self.solar_team.team_id,
-                course_id=unicode(self.solar_team.course_id),
                 truncated=[],
                 field=key,
                 old=prev_value,
@@ -1220,7 +1211,6 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
                 'edx.team.learner_added',
                 team_id=self.solar_team.team_id,
                 user_id=self.users['student_enrolled_not_on_team'].id,
-                course_id=unicode(self.solar_team.course_id),
                 add_method=add_method
             )
         else:
@@ -1378,7 +1368,6 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.assert_event_emitted(
                 'edx.team.learner_removed',
                 team_id=self.solar_team.team_id,
-                course_id=unicode(self.solar_team.course_id),
                 user_id=self.users['student_enrolled'].id,
                 remove_method='removed_by_admin'
             )
@@ -1396,7 +1385,6 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
         self.assert_event_emitted(
             'edx.team.learner_removed',
             team_id=self.solar_team.team_id,
-            course_id=unicode(self.solar_team.course_id),
             user_id=self.users['student_enrolled'].id,
             remove_method='self_removal'
         )
