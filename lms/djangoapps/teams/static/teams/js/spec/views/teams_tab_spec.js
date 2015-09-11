@@ -115,6 +115,7 @@ define([
                 AjaxHelpers.respondWithError(requests, 500);
                 expectError(teamsTabView, "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.");
                 expectFocus(teamsTabView.$('.warning'));
+            });
 
             it('does not navigate to the topics page when syncing its collection if not on the search page', function () {
                 var teamsTabView = createTeamsTabView(),
