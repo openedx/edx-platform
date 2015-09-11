@@ -18,7 +18,7 @@ class BlockSerializer(serializers.Serializer):
             return self.context['block_structure'].get_xblock_field(block_key, field_name)
 
     def to_native(self, block_key):
-
+        # create response data dict for basic fields
         data = {
             'id': unicode(block_key),
             'lms_web_url': reverse(
@@ -33,6 +33,7 @@ class BlockSerializer(serializers.Serializer):
             ),
         }
 
+        # add additional requested fields that are supported by the various transformers
         for supported_field in SUPPORTED_FIELDS:
             if supported_field.requested_field_name in self.context['requested_fields']:
                 data[supported_field.requested_field_name] = self._get_field(
@@ -40,5 +41,8 @@ class BlockSerializer(serializers.Serializer):
                     supported_field.transformer,
                     supported_field.block_field_name,
                 )
+
+        if 'children' in self.context['requested_fields']:
+            data['children'] = self.context['block_structure'].get_children(block_key)
 
         return data

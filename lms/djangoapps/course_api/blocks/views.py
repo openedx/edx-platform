@@ -12,12 +12,6 @@ from .forms import BlockListGetForm
 from .serializers import BlockSerializer
 
 
-# TODO
-# user not specified (-> staff)
-# children field
-# navigation to return descendants
-# support hide_from_toc
-
 @view_auth_classes()
 class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
     """
@@ -46,9 +40,9 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
           Example: block_counts=video,problem
 
         * fields: (list) Indicates which additional fields to return for each block.
-          Default is children,graded,format,student_view_multi_device
+          The following fields are always returned: type, display_name
 
-          Example: fields=graded,format,student_view_multi_device
+          Example: fields=graded,format,student_view_multi_device,children
 
         * depth (integer or all) Indicates how deep to traverse into the blocks hierarchy.
           A value of all means the entire hierarchy.
@@ -73,7 +67,7 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
           * display_name: (string) The display name of the block.
 
           * children: (list) If the block has child blocks, a list of IDs of the child blocks.
-            Returned only if the "children" input parameter is True.
+            Returned only if "children" is included in the "fields" parameter.
 
           * block_counts: (dict) For each block type specified in the block_counts parameter to the endpoint, the
             aggregate number of blocks of that type for this block and all of its descendants.
@@ -128,7 +122,7 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
         blocks = get_course_blocks(
             params.cleaned_data['user'],
             params.cleaned_data['usage_key'],
-            transformers=LMS_COURSE_TRANSFORMERS | {blocks_api_transformer},
+            transformers=LMS_COURSE_TRANSFORMERS + [blocks_api_transformer],
         )
 
         return Response(
