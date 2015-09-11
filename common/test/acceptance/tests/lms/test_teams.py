@@ -806,6 +806,13 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
                 'number_of_results': 0
             }
         }, {
+            'event_type': 'edx.team.searched',
+            'event': {
+                'search_text': search_text,
+                'topic_id': self.topic['id'],
+                'number_of_results': 0
+            }
+        }, {
             'event_type': 'edx.team.page_viewed',
             'event': {
                 'page_name': 'search-teams',
