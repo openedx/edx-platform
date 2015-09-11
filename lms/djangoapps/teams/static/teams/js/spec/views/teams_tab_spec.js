@@ -58,6 +58,14 @@ define([
         afterEach(Backbone.history.stop);
 
         describe('Navigation', function () {
+            it('does not render breadcrumbs for the top level tabs', function() {
+                var teamsTabView = createTeamsTabView();
+                teamsTabView.router.navigate('#my-teams', {trigger: true});
+                expect(teamsTabView.$('.breadcrumbs').length).toBe(0);
+                teamsTabView.router.navigate('#browse', {trigger: true});
+                expect(teamsTabView.$('.breadcrumbs').length).toBe(0);
+            });
+
             it('does not interfere with anchor links to #content', function () {
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('#content', {trigger: true});

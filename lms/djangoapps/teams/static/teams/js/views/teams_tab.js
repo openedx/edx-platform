@@ -220,7 +220,6 @@
                                     { searchString: view.teamsCollection.searchString },
                                     true
                                 ),
-                                breadcrumbs: view.createBreadcrumbs(topic),
                                 showSortControls: false
                             });
                             view.render();
@@ -239,6 +238,7 @@
                             topic: topic,
                             title: gettext("Create a New Team"),
                             description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
+                            breadcrumbs: view.createBreadcrumbs(topic),
                             mainView: new TeamEditView({
                                 action: 'create',
                                 teamEvents: view.teamEvents,
@@ -272,6 +272,7 @@
                         editViewWithHeader = self.createViewWithHeader({
                             title: gettext("Edit Team"),
                             description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                            breadcrumbs: self.createBreadcrumbs(topic, team),
                             mainView: view,
                             topic: topic,
                             team: team,
@@ -297,6 +298,7 @@
                         });
                         self.mainView = self.createViewWithHeader({
                                 mainView: view,
+                                breadcrumbs: self.createBreadcrumbs(topic, team),
                                 title: gettext("Membership"),
                                 description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
                                 topic: topic,
@@ -366,7 +368,7 @@
                             headerActionsView: null, // TODO: add back SearchFieldView when search is enabled
                             title: options.title,
                             description: options.description,
-                            breadcrumbs: options.breadcrumbs
+                            breadcrumbs: this.createBreadcrumbs()
                         }),
                         searchUrl = 'topics/' + topic.get('id') + '/search';
                     // Listen to requests to sync the collection and redirect it as follows:
@@ -433,7 +435,8 @@
                                     mainView: view,
                                     subject: team,
                                     topic: topic,
-                                    headerActionsView: TeamProfileActionsView
+                                    headerActionsView: TeamProfileActionsView,
+                                    breadcrumbs: self.createBreadcrumbs(topic)
                                 }
                             )
                         );
@@ -470,9 +473,6 @@
                         breadcrumbs = options.breadcrumbs,
                         title = options.title || subject.get('name'),
                         description = options.description || subject.get('description');
-                    if (!breadcrumbs) {
-                        breadcrumbs = this.createBreadcrumbs(options.topic, options.team);
-                    }
                     return new TeamsHeaderModel({
                         breadcrumbs: breadcrumbs,
                         title: title,
