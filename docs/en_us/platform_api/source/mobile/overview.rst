@@ -7,6 +7,10 @@ Mobile API Overview
 Use the Mobile API to build mobile applications for students to view course
 information and videos for courses on your instance of Open edX.
 
+.. contents::
+   :local:
+   :depth: 1
+
 ******************************************
 Mobile API Version and Status
 ******************************************
