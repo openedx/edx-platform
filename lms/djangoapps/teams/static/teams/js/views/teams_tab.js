@@ -31,7 +31,7 @@
                   TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
-                    _.extend(this.defaults, {nav_aria_label: gettext('teams')});
+                    _.extend(this.defaults, {nav_aria_label: gettext('Topics')});
                     HeaderModel.prototype.initialize.call(this);
                 }
             });

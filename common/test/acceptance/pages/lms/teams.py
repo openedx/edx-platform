@@ -508,7 +508,7 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
 
     def click_first_profile_image(self):
         """Clicks on first team member's profile image"""
-        self.q(css='.page-content-secondary .members-info > .team-member').first.click()
+        self.q(css='.page-content-secondary .members-info .team-member').first.click()
 
     @property
     def first_member_username(self):
