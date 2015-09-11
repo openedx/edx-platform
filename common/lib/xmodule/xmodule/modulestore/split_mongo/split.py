@@ -2357,9 +2357,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         return new_blocks
 
-    def delete_item(self, usage_locator, user_id, force=False):
+    def delete_item(self, usage_locator, user_id, force=False, delete_children=True):
         """
-        Delete the block or tree rooted at block (if delete_children) and any references w/in the course to the block
+        Delete the block or tree rooted at block (if delete_children) and any
+        references w/in the course to the block
         from a new version of the course structure.
 
         returns CourseLocator for new version
@@ -2399,7 +2400,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 parent_block.edit_info.source_version = None
                 self.decache_block(usage_locator.course_key, new_id, parent_block_key)
 
-            self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_blocks)
+            if delete_children:
+                self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_blocks)
+            else:
+                # just remove this node
+                del new_blocks[BlockKey.from_usage_key(usage_locator)]
 
             # update index if appropriate and structures
             self.update_structure(usage_locator.course_key, new_structure)

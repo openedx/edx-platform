@@ -175,7 +175,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
 
-    def delete_item(self, location, user_id, revision=None, **kwargs):
+    def delete_item(self, location, user_id, revision=None, skip_auto_publish=False, force=False, delete_children=True, **kwargs):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
 
@@ -211,13 +211,14 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
-                SplitMongoModuleStore.delete_item(self, branched_location, user_id)
+                SplitMongoModuleStore.delete_item(self, branched_location, user_id, force, delete_children)
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
                 # publish vertical to behave more like the old mongo/draft modulestore - TNL-2593
                 if (
                         branch == ModuleStoreEnum.BranchName.draft and
                         branched_location.block_type in (DIRECT_ONLY_CATEGORIES + ['vertical']) and
-                        parent_loc
+                        parent_loc and
+                        not skip_auto_publish
                 ):
                     # will publish if its not an orphan
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
@@ -314,36 +315,43 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             published_course_key, **kwargs
         )
 
-        orphans = [(orphan, 'draft') for orphan in draft_orphans] + [(orphan, 'published') for orphan in published_orphans]
-        # orphans = defaultdict(list)
-        # for orphan_list, branch in [(draft_orphans, 'draft'), (published_orphans, 'published')]:
-        #     for orphan in orphan_list:
-        #         orphans[orphan].append('branch')
+        published_block_ids = [
+            block.id for block in self._lookup_course(published_course_key).structure['blocks']
+        ]
 
-        while orphans:
+        draft_block_ids = [
+            block.id for block in self._lookup_course(draft_preferred_course_key).structure['blocks']
+        ]
+
+        orphans = [(orphan, 'draft') for orphan in draft_orphans] + [(orphan, 'published') for orphan in published_orphans]
+        # import ipdb; ipdb.set_trace()
+        if orphans:
             orphan, branch = orphans.pop()
             if orphan in draft_orphans and orphan in published_orphans:
                 # great, delete from both groups
                 self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.all)
 
             elif branch == 'draft':
-                if orphan not in published_branch:
+                if orphan.block_id not in published_block_ids:
                     # not passing a revision means you delete just from the draft branch
-                    self.delete_item(orphan, user_id)
-                elif orphan in published_branch:
-                    self._revert_block_to_published(orphan)
+                    self.delete_item(orphan, user_id, skip_auto_publish=True)
+                else:
+                    self.revert_single_block_to_published(orphan, user_id, force=True)
 
             elif branch == 'published':
-                if orphan not in draft_blocks:
+                if orphan.block_id not in draft_block_ids:
                     self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
                 else:
-                    draft_block = ...
-                    draft_parent = draft_block.get_parent()
-                    if parent.category in DIRECT_ONLY_CATEGORIES:
-                        _revert_block_to_published(parent)
+                    draft_location = orphan.for_branch('draft-branch')
+                    draft_block = self.get_item(draft_location)
+                    draft_parent = draft_block.parent
+                    if draft_parent.category in DIRECT_ONLY_CATEGORIES:
+                        self.revert_single_block_to_published(draft_parent, user_id, force=True)
                         self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.all)
                     else:
                         self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
+
+            self.delete_orphans(course_key, user_id, **kwargs)
 
 
     def fix_not_found(self, course_key, user_id):
@@ -424,7 +432,13 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             self.delete_item(location, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
             return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft), **kwargs)
 
-    def revert_to_published(self, location, user_id):
+    def revert_to_published(self, location, user_id=None):
+        return self._revert_to_published(location, user_id)
+
+    def revert_single_block_to_published(self, location, user_id, force=False):
+        self._revert_to_published(locals, user_id, recursive=False, force=True)
+
+    def _revert_to_published(self, location, user_id, recursive=True, force=False):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
         If no published version exists, a VersionConflictError is thrown.
@@ -434,7 +448,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
         :raises InvalidVersionError: if no published version exists for the location specified
         """
-        if location.category in DIRECT_ONLY_CATEGORIES:
+        if location.category in DIRECT_ONLY_CATEGORIES and not force:
             return
 
         draft_course_key = location.course_key.for_branch(ModuleStoreEnum.BranchName.draft)
@@ -456,12 +470,16 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             new_structure = self.version_structure(draft_course_key, draft_course_structure, user_id)
 
             # remove the block and its descendants from the new structure
-            self._remove_subtree(BlockKey.from_usage_key(location), new_structure['blocks'])
+            if recursive:
+                self._remove_subtree(BlockKey.from_usage_key(location), new_structure['blocks'])
+            else:
+                del new_structure['blocks'][BlockKey.from_usage_key(location)]
 
             # copy over the block and its descendants from the published branch
             def copy_from_published(root_block_id):
                 """
-                copies root_block_id and its descendants from published_course_structure to new_structure
+                copies root_block_id and its descendants (if `recursive`) from
+                published_course_structure to new_structure
                 """
                 self._update_block_in_structure(
                     new_structure,
@@ -469,6 +487,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     self._get_block_from_structure(published_course_structure, root_block_id)
                 )
                 block = self._get_block_from_structure(new_structure, root_block_id)
+                if not recursive:
+                    return
                 for child_block_id in block.fields.get('children', []):
                     copy_from_published(child_block_id)
 
@@ -508,6 +528,18 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         Returns whether this xblock has a published version (whether it's up to date or not).
         """
         return self._get_head(xblock, ModuleStoreEnum.BranchName.published) is not None
+
+    def _get_published_version(self, xblock):
+        """
+        Returns the xblock's published version if it's there
+        """
+        return self._get_head(xblock, ModuleStoreEnum.BranchName.published)
+
+    def _get_draft_version(self, xblock):
+        """
+        Returns the xblock's draft version if it's there
+        """
+        return self._get_head(xblock, ModuleStoreEnum.BranchName.draft)
 
     def convert_to_draft(self, location, user_id):
         """

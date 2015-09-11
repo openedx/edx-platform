@@ -760,7 +760,13 @@ class DraftModuleStore(MongoModuleStore):
         course_key = location.course_key
         self._flag_publish_event(course_key)
 
-    def revert_to_published(self, location, user_id=None):
+    def revert_to_published(self, location, user_id):
+        return self._revert_to_published(location, user_id)
+
+    def revert_single_block_to_published(self, location, user_id, force=False):
+        return self._revert_to_published(location, user_id, recusive=False, force=force)
+
+    def _revert_to_published(self, location, user_id=None, recusive=True, force=False):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
         If no published version exists, an InvalidVersionError is thrown.
@@ -773,7 +779,7 @@ class DraftModuleStore(MongoModuleStore):
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         _verify_revision_is_published(location)
 
-        if location.category in DIRECT_ONLY_CATEGORIES:
+        if location.category in DIRECT_ONLY_CATEGORIES or not force:
             return
 
         if not self.has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only):
@@ -799,9 +805,10 @@ class DraftModuleStore(MongoModuleStore):
                 # it must be published (since adding a child to a published item creates a draft of the parent).
                 item = versions_found[0]
                 assert item.get('_id').get('revision') != MongoRevisionKey.draft
-                for child in item.get('definition', {}).get('children', []):
-                    child_loc = Location.from_deprecated_string(child)
-                    delete_draft_only(child_loc)
+                if recusive:
+                    for child in item.get('definition', {}).get('children', []):
+                        child_loc = Location.from_deprecated_string(child)
+                        delete_draft_only(child_loc)
 
         delete_draft_only(location)
 
