@@ -3,6 +3,9 @@
 """
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 from courseware.access_utils import check_start_date
+from xmodule.course_metadata_utils import DEFAULT_START_DATE
+
+from .utils import get_field_on_block
 
 
 class StartDateTransformer(BlockStructureTransformer):
@@ -36,13 +39,21 @@ class StartDateTransformer(BlockStructureTransformer):
             ) if parents else None
 
             # set the merged value for this block
-            block_start = block_structure.get_xblock(block_key).start
+            block_start = get_field_on_block(block_structure.get_xblock(block_key), 'start')
+            if min_all_parents_start_date is None:
+                # no parents so just use value on block or default
+                merged_start_value = block_start or DEFAULT_START_DATE
+            elif not block_start:
+                # no value on this block so take value from parents
+                merged_start_value = min_all_parents_start_date
+            else:
+                # max of merged-start-from-all-parents and this block
+                merged_start_value = max(min_all_parents_start_date, block_start)
             block_structure.set_transformer_block_data(
                 block_key,
                 cls,
                 cls.MERGED_START_DATE,
-                # max of merged-start-from-all-parents and this block
-                max(min_all_parents_start_date or block_start, block_start)
+                merged_start_value
             )
 
     def transform(self, user_info, block_structure):
