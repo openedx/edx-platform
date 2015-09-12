@@ -56,8 +56,8 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 
 ############################ FEATURE CONFIGURATION #############################
-STUDIO_NAME = "Studio"
-STUDIO_SHORT_NAME = "Studio"
+STUDIO_NAME = "SureID Online Training Course Studio"
+STUDIO_SHORT_NAME = "Online Training Course Studio"
 FEATURES = {
     'USE_DJANGO_PIPELINE': True,
 
