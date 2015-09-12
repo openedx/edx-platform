@@ -4,7 +4,7 @@ Tests for VisibilityTransformer.
 import ddt
 
 from course_blocks.transformers.visibility import VisibilityTransformer
-from .test_helpers import BlockParentsMapTestCase
+from .test_helpers import BlockParentsMapTestCase, update_block
 
 
 @ddt.ddt
@@ -33,7 +33,7 @@ class VisibilityTransformerTestCase(BlockParentsMapTestCase):
         for i, _ in enumerate(self.parents_map):
             block = self.get_block(i)
             block.visible_to_staff_only = (i in staff_only_blocks)
-            self.update_block(block)
+            update_block(block)
 
         self.check_transformer_results(
             expected_student_visible_blocks, blocks_with_differing_student_access, [VisibilityTransformer()]

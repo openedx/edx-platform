@@ -18,6 +18,8 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
     """
     UserPartitionTransformer Test
     """
+    TEST_PARTITION_ID = 0
+
     def setUp(self):
         """
         Setup course structure and create user for user partition transformer test.
@@ -25,10 +27,9 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         super(UserPartitionTransformerTestCase, self).setUp()
 
         # Set up user partitions and groups.
-        self.groups = [Group(1, 'Group 1'), Group(2, 'Group 2')]
-        self.content_groups = [1, 2]
+        self.groups = [Group(1, 'Group 1'), Group(2, 'Group 2'), Group(3, 'Group 3'), Group(4, 'Group 4')]
         self.user_partition = UserPartition(
-            id=0,
+            id=self.TEST_PARTITION_ID,
             name='Partition 1',
             description='This is partition 1',
             groups=self.groups,
@@ -46,8 +47,18 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
 
         # Set up cohorts.
         config_course_cohorts(self.course, is_cohorted=True)
-        self.cohorts = [CohortFactory(course_id=self.course.id) for __ in enumerate(self.groups)]
-        self.add_user_to_cohort_group(self.cohorts[0], self.groups[0])
+        self.cohorts = []
+        for group in self.groups:
+            cohort = CohortFactory(course_id=self.course.id)
+            self.cohorts.append(cohort)
+            link_cohort_to_partition_group(
+                cohort,
+                self.user_partition.id,
+                group.id,
+            )
+
+        add_user_to_cohort(self.cohorts[0], self.user.username)
+
         self.transformer = UserPartitionTransformer()
 
     def get_course_hierarchy(self):
@@ -56,62 +67,104 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
 
         Assumes self.user_partition has already been initialized.
         """
-        return {
-            'org': 'UserPartitionTransformer',
-            'course': 'UP101F',
-            'run': 'test_run',
-            'user_partitions': [self.user_partition],
-            '#ref': 'course',
-            '#children': [
-                {
-                    '#type': 'chapter',
-                    '#ref': 'chapter1',
-                    '#children': [
-                        {
-                            'metadata': {
-                                'group_access': {0: [0, 1, 2]},
-                            },
-                            '#type': 'sequential',
-                            '#ref': 'lesson1',
-                            '#children': [
-                                {
-                                    '#type': 'vertical',
-                                    '#ref': 'vertical1',
-                                    '#children': [
-                                        {
-                                            'metadata': {'group_access': {0: [0]}},
-                                            '#type': 'html',
-                                            '#ref': 'html1',
-                                        },
-                                        {
-                                            'metadata': {'group_access': {0: [1]}},
-                                            '#type': 'html',
-                                            '#ref': 'html2',
-                                        }
-                                    ],
-                                }
-                            ],
-                        }
-                    ],
-                }
-            ]
-        }
-
-    def add_user_to_cohort_group(self, cohort, group):
-        """
-        Add user to cohort, link cohort to content group, and update blocks.
-        """
-        add_user_to_cohort(cohort, self.user.username)
-        link_cohort_to_partition_group(
-            cohort,
-            self.user_partition.id,
-            group.id,
-        )
+        #                                     course
+        #                                  /          \
+        #                                 /            \
+        #                      A[1, 2, 3]                B
+        #                     /  |      \                |
+        #                   /    |       \               |
+        #                 /      |        \              |
+        #           C[1, 2]    D[2, 3]     E            /
+        #         / |     \      |        / \          /
+        #        /  |     \      |       /   \        /
+        #       /   |     \      |      /     \      /
+        #     F   G[1]   H[2]    I     J     K[4]   /
+        #        /   \    /                  /  \  /
+        #       /    \   /                  /   \ /
+        #      /     \  /                  /    \/
+        #  L[1, 2]  M[1, 2, 3]            N     O
+        #
+        return [
+            {
+                'org': 'UserPartitionTransformer',
+                'course': 'UP101F',
+                'run': 'test_run',
+                'user_partitions': [self.user_partition],
+                '#type': 'course',
+                '#ref': 'course',
+                '#children': [
+                    {
+                        '#type': 'vertical',
+                        '#ref': 'A',
+                        'metadata': {'group_access': {self.TEST_PARTITION_ID: [0, 1, 2, 3]}},
+                    },
+                    {'#type': 'vertical', '#ref': 'B'},
+                ],
+            },
+            {
+                '#type': 'vertical',
+                '#ref': 'C',
+                '#parents': ['A'],
+                'metadata': {'group_access': {self.TEST_PARTITION_ID: [1, 2]}},
+                '#children': [
+                    {'#type': 'vertical', '#ref': 'F'},
+                    {
+                        '#type': 'vertical',
+                        '#ref': 'G',
+                        'metadata': {'group_access': {self.TEST_PARTITION_ID: [1]}},
+                    },
+                    {
+                        '#type': 'vertical',
+                        '#ref': 'H',
+                        'metadata': {'group_access': {self.TEST_PARTITION_ID: [2]}},
+                    },
+                ],
+            },
+            {
+                '#type': 'vertical',
+                '#ref': 'D',
+                '#parents': ['A'],
+                'metadata': {'group_access': {self.TEST_PARTITION_ID: [2, 3]}},
+                '#children': [{'#type': 'vertical', '#ref': 'I'}],
+            },
+            {
+                '#type': 'vertical',
+                '#ref': 'E',
+                '#parents': ['A'],
+                '#children': [{'#type': 'vertical', '#ref': 'J'}],
+            },
+            {
+                '#type': 'vertical',
+                '#ref': 'K',
+                '#parents': ['E'],
+                'metadata': {'group_access': {self.TEST_PARTITION_ID: [4]}},
+                '#children': [{'#type': 'vertical', '#ref': 'N'}],
+            },
+            {
+                '#type': 'vertical',
+                '#ref': 'L',
+                '#parents': ['G'],
+                'metadata': {'group_access': {self.TEST_PARTITION_ID: [1, 2]}},
+            },
+            {
+                '#type': 'vertical',
+                '#ref': 'M',
+                '#parents': ['G', 'H'],
+                'metadata': {'group_access': {self.TEST_PARTITION_ID: [1, 2, 3]}},
+            },
+            {
+                '#type': 'vertical',
+                '#ref': 'O',
+                '#parents': ['K', 'B'],
+            },
+        ]
 
     def test_user_assigned(self):
         """
         Test when user is assigned to group in user partition.
         """
+        # TODO ddt with testing user in different groups
+
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
@@ -119,8 +172,8 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         )
         self.assertSetEqual(
             set(trans_block_structure.get_block_keys()),
-            self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'html2')
+            self.get_block_key_set(self.blocks, 'course', 'A', 'B', 'C', 'E', 'F', 'G', 'J', 'L', 'M', 'O')
         )
 
     def test_staff_user(self):
-        self.assert_staff_access_to_all_blocks(self.staff, self.course, self.blocks, self.transformer)
+        self.assert_staff_access_to_all_blocks(self.course, self.blocks, self.transformer)
