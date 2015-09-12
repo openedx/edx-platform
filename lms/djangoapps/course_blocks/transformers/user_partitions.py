@@ -4,7 +4,7 @@ User Partitions Transformer
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 
 from .split_test import SplitTestTransformer
-
+from .utils import get_field_on_block
 
 class MergedGroupAccess(object):
     """
@@ -36,19 +36,26 @@ class MergedGroupAccess(object):
         # Note that a user must have access to all partitions in group_access
         # or _access in order to access a block.
 
-        block_group_access = getattr(xblock, 'group_access', {})
         self._access = {}  # { partition.id: set(IDs of groups that can access partition }
+
+        # Get the group_access value that is directly set on the xblock.
+        # Do not get the inherited value since field inheritance doesn't
+        # take a union of them for DAGs.
+        block_group_access = get_field_on_block(xblock, 'group_access', default_value={})
 
         for partition in user_partitions:
 
             # Within this loop, None <=> Universe set <=> "No access restriction"
 
             block_group_ids = set(block_group_access.get(partition.id, [])) or None
-            parents_group_ids = [
-                merged_parent_access._access[partition.id]
-                for merged_parent_access in merged_parent_access_list
-                if partition.id in merged_parent_access._access
-            ]
+            parents_group_ids = []
+            for merged_parent_access in merged_parent_access_list:
+                if partition.id in merged_parent_access._access:
+                    parents_group_ids.append(merged_parent_access._access[partition.id])
+                else:
+                    parents_group_ids = []
+                    break
+
             merged_parent_group_ids = (
                 set().union(*parents_group_ids)
                 if parents_group_ids != []
@@ -193,6 +200,7 @@ class UserPartitionTransformer(BlockStructureTransformer):
         user_groups = get_user_partition_groups(
             user_info.course_key, user_partitions, user_info.user
         )
+        # TODO test this when deserializing across processes
         block_structure.remove_block_if(
             lambda block_key: not block_structure.get_transformer_block_data(
                 block_key, self, 'merged_group_access'
