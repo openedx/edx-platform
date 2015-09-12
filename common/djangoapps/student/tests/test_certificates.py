@@ -13,6 +13,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from certificates.api import get_certificate_url  # pylint: disable=import-error
+from course_modes.models import CourseMode
 
 # pylint: disable=no-member
 
@@ -41,6 +42,15 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     def test_display_verified_certificate(self, enrollment_mode):
         self._create_certificate(enrollment_mode)
         self._check_can_download_certificate()
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    def test_display_verified_certificate_no_id(self):
+        """
+        Confirm that if we get a certificate with a no-id-professional mode
+        we still can download our certificate
+        """
+        self._create_certificate(CourseMode.NO_ID_PROFESSIONAL_MODE)
+        self._check_can_download_certificate_no_id()
 
     @ddt.data('verified', 'honor')
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
@@ -103,6 +113,16 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     def _check_can_download_certificate(self):
         response = self.client.get(reverse('dashboard'))
         self.assertContains(response, u'Download Your ID Verified')
+        self.assertContains(response, self.DOWNLOAD_URL)
+
+    def _check_can_download_certificate_no_id(self):
+        """
+        Inspects the dashboard to see if a certificate for a non verified course enrollment
+        is present
+        """
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, u'Download')
+        self.assertContains(response, u'(PDF)')
         self.assertContains(response, self.DOWNLOAD_URL)
 
     def _check_can_not_download_certificate(self):
