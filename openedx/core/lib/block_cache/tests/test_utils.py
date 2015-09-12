@@ -74,21 +74,68 @@ class MockTransformer(BlockStructureTransformer):
         pass
 
 
-#     0
-#    / \
-#   1  2
-#  / \
-# 3   4
-SIMPLE_CHILDREN_MAP = [[1, 2], [3, 4], [], [], []]
+class ChildrenMapTestMixin(object):
+    #     0
+    #    / \
+    #   1  2
+    #  / \
+    # 3   4
+    SIMPLE_CHILDREN_MAP = [[1, 2], [3, 4], [], [], []]
 
+    #       0
+    #      /
+    #     1
+    #    /
+    #   2
+    #  /
+    # 3
+    LINEAR_CHILDREN_MAP = [[1], [2], [3], []]
 
-class BlockStructureTestMixin(object):
-    def verify_block_structure(self, block_structure, children_map):
+    #     0
+    #    / \
+    #   1  2
+    #   \ / \
+    #    3  4
+    #   / \
+    #  5  6
+    DAG_CHILDREN_MAP = [[1, 2], [3], [3, 4], [5, 6], [], [], []]
+
+    def create_block_structure(self, block_structure_cls, children_map):
+        # create block structure
+        block_structure = block_structure_cls(root_block_key=0)
+
+        # add_relation
+        for parent, children in enumerate(children_map):
+            for child in children:
+               block_structure.add_relation(parent, child)
+        return block_structure
+
+    def get_parents_map(self, children_map):
+        parent_map = [[] for _ in children_map]
+        for parent, children in enumerate(children_map):
+            for child in children:
+                parent_map[child].append(parent)
+        return parent_map
+
+    def assert_block_structure(self, block_structure, children_map, missing_blocks=None):
+        if not missing_blocks:
+            missing_blocks = []
+
         for block_key, children in enumerate(children_map):
-            self.assertTrue(
-                block_structure.has_block(block_key)
-            )
             self.assertEquals(
-                set(block_structure.get_children(block_key)),
-                set(children),
+                block_structure.has_block(block_key),
+                block_key not in missing_blocks,
             )
+            if block_key not in missing_blocks:
+                self.assertEquals(
+                    set(block_structure.get_children(block_key)),
+                    set(children),
+                )
+
+        parents_map = self.get_parents_map(children_map)
+        for block_key, parents in enumerate(parents_map):
+            if block_key not in missing_blocks:
+                self.assertEquals(
+                    set(block_structure.get_parents(block_key)),
+                    set(parents),
+                )

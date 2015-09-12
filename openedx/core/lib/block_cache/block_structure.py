@@ -34,7 +34,7 @@ class BlockStructure(object):
         self._add_relation(self._block_relations, parent_key, child_key)
 
     def get_parents(self, usage_key):
-        return self._block_relations.get(usage_key).parents if self.has_block(usage_key) else []
+        return self._block_relations[usage_key].parents if self.has_block(usage_key) else []
 
     def get_children(self, usage_key):
         return self._block_relations[usage_key].children if self.has_block(usage_key) else []
@@ -134,23 +134,30 @@ class BlockStructureBlockData(BlockStructure):
     def remove_transformer_block_data(self, usage_key, transformer, key):
         self._block_data_map[usage_key]._transformer_data.get(transformer.name(), {}).pop(key, None)
 
-    def remove_block(self, usage_key):
+    def remove_block(self, usage_key, keep_descendants):
+        children = self._block_relations[usage_key].children
+        parents = self._block_relations[usage_key].parents
+
         # Remove block from its children.
-        for child in self._block_relations[usage_key].children:
+        for child in children:
             self._block_relations[child].parents.remove(usage_key)
 
         # Remove block from its parents.
-        for parent_key in self._block_relations[usage_key].parents:
-            self._block_relations[parent_key].children.remove(usage_key)
+        for parent in parents:
+            self._block_relations[parent].children.remove(usage_key)
 
         # Remove block.
         self._block_relations.pop(usage_key, None)
         self._block_data_map.pop(usage_key, None)
 
-    def remove_block_if(self, removal_condition, **kwargs):
+        # Recreate the graph connections if descendants are to be kept.
+        if keep_descendants:
+            [self.add_relation(parent, child) for child in children for parent in parents]
+
+    def remove_block_if(self, removal_condition, keep_descendants=False, **kwargs):
         def predicate(block_key):
             if removal_condition(block_key):
-                self.remove_block(block_key)
+                self.remove_block(block_key, keep_descendants)
                 return False
             return True
         list(self.topological_traversal(predicate=predicate, **kwargs))

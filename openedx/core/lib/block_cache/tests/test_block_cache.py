@@ -5,11 +5,11 @@ Tests for block_cache.py
 from mock import patch
 from unittest import TestCase
 from .test_utils import (
-    MockModulestoreFactory, MockCache, MockUserInfo, MockTransformer, SIMPLE_CHILDREN_MAP, BlockStructureTestMixin
+    MockModulestoreFactory, MockCache, MockUserInfo, MockTransformer, ChildrenMapTestMixin
 )
 from ..block_cache import get_blocks
 
-class TestBlockCache(TestCase, BlockStructureTestMixin):
+class TestBlockCache(TestCase, ChildrenMapTestMixin):
 
     class TestTransformer1(MockTransformer):
         @classmethod
@@ -45,7 +45,7 @@ class TestBlockCache(TestCase, BlockStructureTestMixin):
 
     @patch('openedx.core.lib.block_cache.transformer.BlockStructureTransformers.get_available_plugins')
     def test_get_blocks(self, mock_available_transforms):
-        children_map = SIMPLE_CHILDREN_MAP
+        children_map = self.SIMPLE_CHILDREN_MAP
         cache = MockCache()
         user_info = MockUserInfo()
         modulestore = MockModulestoreFactory.create(children_map)
@@ -57,4 +57,4 @@ class TestBlockCache(TestCase, BlockStructureTestMixin):
 
         mock_available_transforms.return_value = {transformer.name(): transformer for transformer in transformers}
         block_structure = get_blocks(cache, modulestore, user_info, root_block_key=0, transformers=transformers)
-        self.verify_block_structure(block_structure, children_map)
+        self.assert_block_structure(block_structure, children_map)

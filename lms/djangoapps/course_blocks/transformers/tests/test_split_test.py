@@ -5,12 +5,9 @@ from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartiti
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
-from course_blocks.transformers.split_test import SplitTestTransformer
-from course_blocks.transformers.user_partitions import UserPartitionTransformer
-from course_blocks.api import get_course_blocks
-from lms.djangoapps.course_blocks.transformers.tests.test_helpers import CourseStructureTestCase
-
-from course_blocks.transformers.helpers import get_user_partition_groups
+from ...api import get_course_blocks
+from ..user_partitions import UserPartitionTransformer, get_user_partition_groups
+from .test_helpers import CourseStructureTestCase
 
 
 class SplitTestTransformerTestCase(CourseStructureTestCase):
@@ -132,7 +129,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         self.assertEquals(len(user_groups), 1)
         group = user_groups[self.split_test_user_partition_id]
 
-        expected_blocks = ['course', 'chapter1', 'lesson1', 'vertical1', 'split_test1']
+        expected_blocks = ['course', 'chapter1', 'lesson1', 'vertical1']
         if group.id == 3:
             expected_blocks += ['vertical2', 'html1']
         else:
