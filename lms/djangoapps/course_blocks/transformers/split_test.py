@@ -56,4 +56,7 @@ class SplitTestTransformer(BlockStructureTransformer):
             user_info (object)
             block_structure (BlockStructureCollectedData)
         """
-        pass
+        block_structure.remove_block_if(
+            lambda block_key: block_key.block_type == 'split_test',
+            keep_descendants=True,
+        )

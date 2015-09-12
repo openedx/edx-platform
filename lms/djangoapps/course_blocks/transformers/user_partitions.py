@@ -3,7 +3,6 @@ User Partitions Transformer
 """
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 
-from .helpers import get_user_partition_groups
 from .split_test import SplitTestTransformer
 
 
@@ -106,6 +105,33 @@ class MergedGroupAccess(object):
         # If the user has access for every partition, grant access.
         else:
             return True
+
+
+def get_user_partition_groups(course_key, user_partitions, user):
+    """
+    Collect group ID for each partition in this course for this user.
+
+    Arguments:
+        course_key (CourseKey)
+        user_partitions (list[UserPartition])
+        user (User)
+
+    Returns:
+        dict[int: Group]: Mapping from user partitions to the group to which
+            the user belongs in each partition. If the user isn't in a group
+            for a particular partition, then that partition's ID will not be
+            in the dict.
+    """
+    partition_groups = {}
+    for partition in user_partitions:
+        group = partition.scheme.get_group_for_user(
+            course_key,
+            user,
+            partition,
+        )
+        if group is not None:
+            partition_groups[partition.id] = group
+    return partition_groups
 
 
 class UserPartitionTransformer(BlockStructureTransformer):
