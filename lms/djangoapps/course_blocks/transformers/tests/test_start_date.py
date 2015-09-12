@@ -7,10 +7,8 @@ from datetime import timedelta
 from django.utils.timezone import now
 from mock import patch
 
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
-
-from ..start_date import StartDateTransformer
-from .test_helpers import BlockParentsMapTestCase
+from ..start_date import StartDateTransformer, DEFAULT_START_DATE
+from .test_helpers import BlockParentsMapTestCase, update_block
 
 
 @ddt.ddt
@@ -43,10 +41,19 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     @ddt.data(
         ({}, {}, {}),
+        ({0: StartDateType.default}, {}, {}),
+        ({0: StartDateType.future}, {}, {}),
         ({0: StartDateType.released}, {0, 1, 2, 3, 4, 5, 6}, {}),
+
+        # has_access checks on block directly and doesn't follow negative access set on parent/ancestor (i.e., 0)
         ({1: StartDateType.released}, {}, {1, 3, 4, 6}),
+        ({2: StartDateType.released}, {}, {2, 5, 6}),
         ({1: StartDateType.released, 2: StartDateType.released}, {}, {1, 2, 3, 4, 5, 6}),
-        ({0: StartDateType.released, 4: StartDateType.future}, {0, 1, 2, 3, 5}, {}),
+
+        # DAG conflicts: has_access relies on field inheritance so it takes only the value from the first parent-chain
+        ({0: StartDateType.released, 4: StartDateType.future}, {0, 1, 2, 3, 5, 6}, {6}),
+        ({0: StartDateType.released, 2: StartDateType.released, 4: StartDateType.future}, {0, 1, 2, 3, 5, 6}, {6}),
+        ({0: StartDateType.released, 2: StartDateType.future, 4: StartDateType.released}, {0, 1, 3, 4, 6}, {}),
     )
     @ddt.unpack
     def test_block_start_date(
@@ -55,7 +62,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
         for i, start_date_type in start_date_type_values.iteritems():
             block = self.get_block(i)
             block.start = self.StartDateType.start(start_date_type)
-            self.update_block(block)
+            update_block(block)
 
         self.check_transformer_results(
             expected_student_visible_blocks, blocks_with_differing_student_access, [StartDateTransformer()]

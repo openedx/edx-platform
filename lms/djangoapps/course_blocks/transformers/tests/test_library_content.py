@@ -47,10 +47,11 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         """
         Get a course hierarchy to test with.
         """
-        return {
+        return [{
             'org': 'ContentLibraryTransformer',
             'course': 'CL101F',
             'run': 'test_run',
+            '#type': 'course',
             '#ref': 'course',
             '#children': [
                 {
@@ -103,7 +104,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                     ],
                 }
             ]
-        }
+        }]
 
     def test_course_structure_with_user_course_library(self):
         """
@@ -128,7 +129,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
 
         self.assertEqual(
             set(trans_block_structure.get_block_keys()),
-            self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'library_content1')
+            self.get_block_key_set(self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1')
         )
 
         # Check course structure again, with mocked selected modules for a user.
@@ -145,6 +146,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             self.assertEqual(
                 set(trans_block_structure.get_block_keys()),
                 self.get_block_key_set(
+                    self.blocks,
                     'course',
                     'chapter1',
                     'lesson1',
@@ -156,4 +158,4 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             )
 
     def test_staff_user(self):
-        self.assert_staff_access_to_all_blocks(self.staff, self.course, self.blocks, self.transformer)
+        self.assert_staff_access_to_all_blocks(self.course, self.blocks, self.transformer)
