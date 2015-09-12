@@ -51,11 +51,12 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
         Returns: dict[course_structure]
         """
-        return {
+        return [{
             'org': 'SplitTestTransformer',
             'course': 'ST101F',
             'run': 'test_run',
             'user_partitions': [self.split_test_user_partition],
+            '#type': 'course',
             '#ref': 'course',
             '#children': [
                 {
@@ -113,15 +114,9 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                     ],
                 }
             ]
-        }
+        }]
 
     def test_user(self):
-        trans_block_structure = get_course_blocks(
-            self.user,
-            self.course.location,
-            transformers={self.transformer},
-        )
-
         # user was randomly assigned to one of the groups
         user_groups = get_user_partition_groups(
             self.course.id, [self.split_test_user_partition], self.user
@@ -129,19 +124,18 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         self.assertEquals(len(user_groups), 1)
         group = user_groups[self.split_test_user_partition_id]
 
+        # determine expected blocks
         expected_blocks = ['course', 'chapter1', 'lesson1', 'vertical1']
-        if group.id == 3:
-            expected_blocks += ['vertical2', 'html1']
-        else:
-            expected_blocks += ['vertical3', 'html2']
+        expected_blocks += (['vertical2', 'html1'] if group.id == 3 else ['vertical3', 'html2'])
 
-        self.assertEqual(set(trans_block_structure.get_block_keys()), set(self.get_block_key_set(*expected_blocks)))
-
-        # calling again should result in the same block set
-        reloaded_structure = get_course_blocks(
-            self.user,
-            self.course.location,
-            transformers={self.transformer}
-        )
-        self.assertEqual(set(reloaded_structure.get_block_keys()), set(self.get_block_key_set(*expected_blocks)))
-
+        # calling twice should result in the same block set
+        for _ in range(2):
+            trans_block_structure = get_course_blocks(
+                self.user,
+                self.course.location,
+                transformers={self.transformer},
+            )
+            self.assertEqual(
+                set(trans_block_structure.get_block_keys()),
+                set(self.get_block_key_set(self.blocks, *expected_blocks))
+            )
