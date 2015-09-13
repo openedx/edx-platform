@@ -10,7 +10,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-unicode_username_re = re.compile(settings.USERNAME_PATTERN, re.UNICODE)
+unicode_username_re = re.compile(settings.USERNAME_REGEX, re.UNICODE)
 
 unicode_username_field = forms.RegexField(label=_("Username"),
                                           max_length=30,

@@ -61,7 +61,10 @@ from lms.envs.common import (
     # Django REST framework configuration
     REST_FRAMEWORK,
 
-    STATICI18N_OUTPUT_DIR
+    STATICI18N_OUTPUT_DIR,
+
+    # Unicode usernames
+    USERNAME_PATTERN, USERNAME_REGEX,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -1186,9 +1189,6 @@ OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
 
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
-
-# This pattern allow space in username
-USERNAME_PATTERN = r'(?P<username>[\w .@_+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''

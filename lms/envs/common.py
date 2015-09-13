@@ -589,7 +589,10 @@ ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
 # This pattern allow space in username
-USERNAME_PATTERN = r'(?P<username>[\w .@_+-]+)'
+_USERNAME_REGEX_PART = '[\w .@_+-]+'
+USERNAME_REGEX = r'^{}$'.format(_USERNAME_REGEX_PART)
+USERNAME_PATTERN = r'(?P<username>{})'.format(_USERNAME_REGEX_PART)
+
 
 
 ############################## EVENT TRACKING #################################
