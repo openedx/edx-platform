@@ -21,7 +21,9 @@ class GraphTraversalsTestCase(TestCase):
         """
         ...
         """
-        #       b1
+        #       a1         a2
+        #       |          |
+        #       b1         b2
         #      /  \
         #     c1  c2
         #    /  \   \
@@ -126,3 +128,50 @@ class GraphTraversalsTestCase(TestCase):
             )),
             ['c2']
         )
+
+    def test_topological_complex(self):
+        """
+        Test a more complex DAG
+        """
+        #                 root
+        #              /    |           \
+        #             /     |            \
+        #           A       B              C
+        #          / \   /  |   \         |   \
+        #         /   \ /   |    \        |    \
+        #        D     E    F    G        H    I
+        #                  / \    \      |
+        #                 /   \    \     |
+        #                J    K     \    L
+        #                   /  |    \   / \
+        #                  /   |    \  /   \
+        #                 M    N     O     P
+        graph = {
+            'root': ['A', 'B', 'C', 'E', 'F', 'K', 'O'], # has additional links than what is drawn above
+            'A': ['D', 'E'],
+            'B': ['E', 'F', 'G'],
+            'C': ['H', 'I'],
+            'D': [],
+            'E': [],
+            'F': ['J', 'K'],
+            'G': ['O'],
+            'H': ['L'],
+            'I': [],
+            'J': [],
+            'K': ['M', 'N'],
+            'L': ['O', 'P'],
+            'M': [],
+            'N': [],
+            'O': [],
+            'P': [],
+        }
+        graph_parents = self.get_parent_map(graph)
+        for _ in range(2): # should get the same result twice
+            self.assertEqual(
+                list(traverse_topologically(
+                    start_node='root',
+                    get_children=(lambda node: graph[node]),
+                    get_parents=(lambda node: graph_parents[node]),
+                )),
+                ['root', 'A', 'D', 'B', 'E', 'F', 'J', 'K', 'M', 'N', 'G', 'C', 'H', 'L', 'O', 'P', 'I'],
+            )

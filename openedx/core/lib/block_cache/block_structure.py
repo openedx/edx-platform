@@ -204,11 +204,15 @@ class BlockStructureFactory(object):
     @classmethod
     def create_from_modulestore(cls, root_block_key, modulestore):
         block_structure = BlockStructureCollectedData(root_block_key)
+        blocks_visited = set()
 
         def build_block_structure(xblock):
             """
             Helper function to recursively walk block structure
             """
+            if xblock.location in blocks_visited:
+                return
+            blocks_visited.add(xblock.location)
             block_structure.add_xblock(xblock)
             for child in xblock.get_children():
                 block_structure.add_relation(xblock.location, child.location)
