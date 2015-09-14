@@ -44,7 +44,9 @@ define([
         it('can render itself', function () {
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
                 teamsView = createTopicTeamsView({
-                    teams: TeamSpecHelpers.createMockTeams(testTeamData),
+                    teams: TeamSpecHelpers.createMockTeams({
+                        results: testTeamData
+                    }),
                     teamMemberships: TeamSpecHelpers.createMockTeamMemberships([])
                 });
 

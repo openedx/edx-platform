@@ -43,18 +43,22 @@ define([
         });
     };
 
-    var createMockTeams = function(teamData) {
-        if (!teamData) {
-            teamData = createMockTeamData(1, 5);
-        }
-        return new TeamCollection(
+    var createMockTeamsResponse = function(options) {
+        return _.extend(
             {
                 count: 6,
                 num_pages: 2,
                 current_page: 1,
                 start: 0,
-                results: teamData
+                results: createMockTeamData(1, 5)
             },
+            options
+        );
+    };
+
+    var createMockTeams = function(options) {
+        return new TeamCollection(
+            createMockTeamsResponse(options),
             {
                 teamEvents: teamEvents,
                 course_id: testCourseID,
@@ -325,6 +329,7 @@ define([
         testTeamDiscussionID: testTeamDiscussionID,
         testContext: testContext,
         createMockTeamData: createMockTeamData,
+        createMockTeamsResponse: createMockTeamsResponse,
         createMockTeams: createMockTeams,
         createMockTeamMembershipsData: createMockTeamMembershipsData,
         createMockTeamMemberships: createMockTeamMemberships,
