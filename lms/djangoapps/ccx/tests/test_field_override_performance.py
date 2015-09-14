@@ -151,7 +151,10 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         """
         return check_sum_of_calls(XBlock, ['__init__'], instantiations, instantiations, include_arguments=False)
 
-    def instrument_course_progress_render(self, course_width, enable_ccx, view_as_ccx, queries, reads, xblocks):
+    def instrument_course_progress_render(
+            self, course_width, enable_ccx, view_as_ccx,
+            default_queries, history_queries, reads, xblocks
+    ):
         """
         Renders the progress page, instrumenting Mongo reads and SQL queries.
         """
@@ -173,10 +176,11 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             # can actually take affect.
             OverrideFieldData.provider_classes = None
 
-            with self.assertNumQueries(queries):
-                with self.assertMongoCallCount(reads):
-                    with self.assertXBlockInstantiations(xblocks):
-                        self.grade_course(self.course, view_as_ccx)
+            with self.assertNumQueries(default_queries, using='default'):
+                with self.assertNumQueries(history_queries, using='student_module_history'):
+                    with self.assertMongoCallCount(reads):
+                        with self.assertXBlockInstantiations(xblocks):
+                            self.grade_course(self.course, view_as_ccx)
 
     @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(1, 4), (True, False), (True, False)))
     @ddt.unpack
@@ -201,8 +205,12 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             raise SkipTest("Can't use a MongoModulestore test as a CCX course")
 
         with self.settings(FIELD_OVERRIDE_PROVIDERS=providers[overrides]):
-            queries, reads, xblocks = self.TEST_DATA[(overrides, course_width, enable_ccx, view_as_ccx)]
-            self.instrument_course_progress_render(course_width, enable_ccx, view_as_ccx, queries, reads, xblocks)
+            default_queries, history_queries, reads, xblocks = self.TEST_DATA[
+                (overrides, course_width, enable_ccx, view_as_ccx)
+            ]
+            self.instrument_course_progress_render(
+                course_width, enable_ccx, view_as_ccx, default_queries, history_queries, reads, xblocks
+            )
 
 
 class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
@@ -213,25 +221,30 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        # (providers, course_width, enable_ccx, view_as_ccx): # of sql queries, # of mongo queries, # of xblocks
-        ('no_overrides', 1, True, False): (48, 6, 13),
-        ('no_overrides', 2, True, False): (135, 6, 84),
-        ('no_overrides', 3, True, False): (480, 6, 335),
-        ('ccx', 1, True, False): (48, 6, 13),
-        ('ccx', 2, True, False): (135, 6, 84),
-        ('ccx', 3, True, False): (480, 6, 335),
-        ('ccx', 1, True, True): (48, 6, 13),
-        ('ccx', 2, True, True): (135, 6, 84),
-        ('ccx', 3, True, True): (480, 6, 335),
-        ('no_overrides', 1, False, False): (48, 6, 13),
-        ('no_overrides', 2, False, False): (135, 6, 84),
-        ('no_overrides', 3, False, False): (480, 6, 335),
-        ('ccx', 1, False, False): (48, 6, 13),
-        ('ccx', 2, False, False): (135, 6, 84),
-        ('ccx', 3, False, False): (480, 6, 335),
-        ('ccx', 1, False, True): (48, 6, 13),
-        ('ccx', 2, False, True): (135, 6, 84),
-        ('ccx', 3, False, True): (480, 6, 335),
+        # (providers, course_width, enable_ccx, view_as_ccx): (
+        #     # of sql queries to default,
+        #     # sql queries to student_module_history,
+        #     # of mongo queries,
+        #     # of xblocks
+        # )
+        ('no_overrides', 1, True, False): (23, 1, 6, 13),
+        ('no_overrides', 2, True, False): (53, 16, 6, 84),
+        ('no_overrides', 3, True, False): (183, 81, 6, 335),
+        ('ccx', 1, True, False): (23, 1, 6, 13),
+        ('ccx', 2, True, False): (53, 16, 6, 84),
+        ('ccx', 3, True, False): (183, 81, 6, 335),
+        ('ccx', 1, True, True): (23, 1, 6, 13),
+        ('ccx', 2, True, True): (53, 16, 6, 84),
+        ('ccx', 3, True, True): (183, 81, 6, 335),
+        ('no_overrides', 1, False, False): (23, 1, 6, 13),
+        ('no_overrides', 2, False, False): (53, 16, 6, 84),
+        ('no_overrides', 3, False, False): (183, 81, 6, 335),
+        ('ccx', 1, False, False): (23, 1, 6, 13),
+        ('ccx', 2, False, False): (53, 16, 6, 84),
+        ('ccx', 3, False, False): (183, 81, 6, 335),
+        ('ccx', 1, False, True): (23, 1, 6, 13),
+        ('ccx', 2, False, True): (53, 16, 6, 84),
+        ('ccx', 3, False, True): (183, 81, 6, 335),
     }
 
 
@@ -243,22 +256,22 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (48, 4, 9),
-        ('no_overrides', 2, True, False): (135, 19, 54),
-        ('no_overrides', 3, True, False): (480, 84, 215),
-        ('ccx', 1, True, False): (48, 4, 9),
-        ('ccx', 2, True, False): (135, 19, 54),
-        ('ccx', 3, True, False): (480, 84, 215),
-        ('ccx', 1, True, True): (50, 4, 13),
-        ('ccx', 2, True, True): (137, 19, 84),
-        ('ccx', 3, True, True): (482, 84, 335),
-        ('no_overrides', 1, False, False): (48, 4, 9),
-        ('no_overrides', 2, False, False): (135, 19, 54),
-        ('no_overrides', 3, False, False): (480, 84, 215),
-        ('ccx', 1, False, False): (48, 4, 9),
-        ('ccx', 2, False, False): (135, 19, 54),
-        ('ccx', 3, False, False): (480, 84, 215),
-        ('ccx', 1, False, True): (48, 4, 9),
-        ('ccx', 2, False, True): (135, 19, 54),
-        ('ccx', 3, False, True): (480, 84, 215),
+        ('no_overrides', 1, True, False): (23, 1, 4, 9),
+        ('no_overrides', 2, True, False): (53, 16, 19, 54),
+        ('no_overrides', 3, True, False): (183, 81, 84, 215),
+        ('ccx', 1, True, False): (23, 1, 4, 9),
+        ('ccx', 2, True, False): (53, 16, 19, 54),
+        ('ccx', 3, True, False): (183, 81, 84, 215),
+        ('ccx', 1, True, True): (25, 1, 4, 13),
+        ('ccx', 2, True, True): (55, 16, 19, 84),
+        ('ccx', 3, True, True): (185, 81, 84, 335),
+        ('no_overrides', 1, False, False): (23, 1, 4, 9),
+        ('no_overrides', 2, False, False): (53, 16, 19, 54),
+        ('no_overrides', 3, False, False): (183, 81, 84, 215),
+        ('ccx', 1, False, False): (23, 1, 4, 9),
+        ('ccx', 2, False, False): (53, 16, 19, 54),
+        ('ccx', 3, False, False): (183, 81, 84, 215),
+        ('ccx', 1, False, True): (23, 1, 4, 9),
+        ('ccx', 2, False, True): (53, 16, 19, 54),
+        ('ccx', 3, False, True): (183, 81, 84, 215),
     }

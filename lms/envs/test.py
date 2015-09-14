@@ -185,7 +185,10 @@ DATABASES = {
         'NAME': TEST_ROOT / 'db' / 'edx.db',
         'ATOMIC_REQUESTS': True,
     },
-
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': TEST_ROOT / 'db' / 'student_module_history.db'
+    },
 }
 
 # This hack disables migrations during tests. We want to create tables directly from the models for speed.

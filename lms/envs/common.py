@@ -417,6 +417,12 @@ GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
+############################ Global Database Configuration #####################
+
+DATABASE_ROUTERS = [
+    'courseware.routers.StudentModuleHistoryRouter',
+]
+
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
