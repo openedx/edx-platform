@@ -159,7 +159,6 @@ class StudentModule(CallStackMixin, models.Model):
         return unicode(repr(self))
 
 
-
 class StudentModuleHistoryArchive(CallStackMixin, models.Model):
     """
     An archive of StudentModuleHistory from before the primary key space extended.
