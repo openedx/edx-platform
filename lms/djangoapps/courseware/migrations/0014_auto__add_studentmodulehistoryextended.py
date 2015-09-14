@@ -4,15 +4,17 @@ from south.db import dbs
 from south.v2 import SchemaMigration
 from django.db import models
 
+default_db = dbs['default']
+csmh_db = dbs['student_module_history']
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Archive 'StudentModuleHistory'
-        dbs['default'].rename_table('courseware_studentmodulehistory', 'courseware_studentmodulehistoryarchive')
+        default_db.rename_table('courseware_studentmodulehistory', 'courseware_studentmodulehistoryarchive')
 
         # Create a new 'StudentModuleHistory' with an extended key space
-        dbs['student_module_history'].create_table('courseware_studentmodulehistory', (
+        csmh_db.create_table('courseware_studentmodulehistory', (
             ('id', self.gf('courseware.fields.UnsignedBigIntAutoField')(primary_key=True)),
             ('course_key', self.gf('xmodule_django.models.CourseKeyField')(max_length=255)),
             ('usage_key', self.gf('xmodule_django.models.UsageKeyField')(max_length=255)),
@@ -23,15 +25,15 @@ class Migration(SchemaMigration):
             ('grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
             ('max_grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
         ))
-        dbs['student_module_history'].send_create_signal('courseware', ['StudentModuleHistory'])
+        csmh_db.send_create_signal('courseware', ['StudentModuleHistory'])
 
 
     def backwards(self, orm):
         # Revert to the old StudentModuleHistory table, but leave the data that was recorded in the interim.
         # This data will have to be manually cleaned up before the migration can be moved forward again.
 
-        dbs['student_module_history'].rename_table('courseware_studentmodulehistory', 'courseware_studentmodulehistory_extended_archive')
-        dbs['history'].rename_table('courseware_studentmodulehistoryarchive', 'courseware_studentmodulehistory')
+        csmh_db.rename_table('courseware_studentmodulehistory', 'courseware_studentmodulehistory_extended_archive')
+        default_db.rename_table('courseware_studentmodulehistoryarchive', 'courseware_studentmodulehistory')
 
 
     models = {
