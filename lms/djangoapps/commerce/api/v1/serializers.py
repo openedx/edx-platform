@@ -105,7 +105,8 @@ class CourseSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-    def _new_course_mode_models(self, modes_data):
+    @staticmethod
+    def _new_course_mode_models(modes_data):
         """Convert validated course mode data to CourseMode objects. """
         return [
             CourseMode(**modes_dict)

@@ -8,13 +8,13 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
-from rest_framework.mixins import CreateModelMixin
 from rest_framework.permissions import IsAuthenticated
 
 from commerce.api.v1.models import Course
 from commerce.api.v1.permissions import ApiKeyOrModelPermission
 from commerce.api.v1.serializers import CourseSerializer
 from course_modes.models import CourseMode
+from openedx.core.lib.api.mixins import PutAsCreateMixin
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class CourseListView(ListAPIView):
         return list(Course.iterator())
 
 
-class CourseRetrieveUpdateView(RetrieveUpdateAPIView, CreateModelMixin):
+class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     """ Retrieve, update, or create courses/modes. """
     lookup_field = 'id'
     lookup_url_kwarg = 'course_id'
@@ -52,28 +52,6 @@ class CourseRetrieveUpdateView(RetrieveUpdateAPIView, CreateModelMixin):
             return course
 
         raise Http404
-
-    def update(self, request, *args, **kwargs):
-        """
-        Create/update course modes for a course.
-
-        NOTE: we override the generic view's update() method to preserve
-        backwards compatibility with Django Rest Framework v2, which allowed
-        creation of new resources using PUT.
-        """
-        # First, try to update the existing instance
-        try:
-            try:
-                return super(CourseRetrieveUpdateView, self).update(request, *args, **kwargs)
-            except Http404:
-                # If no instance exists yet, create it.
-                # This is backwards-compatible with the behavior of DRF v2.
-                return super(CourseRetrieveUpdateView, self).create(request, *args, **kwargs)
-
-        # Backwards compatibility with DRF v2 behavior, which would catch model-level
-        # validation errors and return a 400
-        except ValidationError as err:
-            return Response(err.messages, status=status.HTTP_400_BAD_REQUEST)
 
     def pre_save(self, obj):
         # There is nothing to pre-save. The default behavior changes the Course.id attribute from

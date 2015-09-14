@@ -117,7 +117,7 @@ class OAuth2Tests(TestCase):
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_get_form_with_wrong_authorization_header_token_type_failing(self):
         """Ensure that a wrong token type lead to the correct HTTP error status code"""
-        auth = "Wrong token-type-obsviously"
+        auth = "Wrong token-type-obviously"
         response = self.csrf_client.get('/oauth2-test/', {}, HTTP_AUTHORIZATION=auth)
         self.assertEqual(response.status_code, 401)
         response = self.csrf_client.get('/oauth2-test/', HTTP_AUTHORIZATION=auth)
