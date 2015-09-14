@@ -2912,6 +2912,12 @@ class RetrieveThreadTest(
         self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
         self.assertEqual(httpretty.last_request().method, "GET")
 
+    def test_not_enrolled_in_course(self):
+        self.register_thread()
+        self.request.user = UserFactory.create()
+        with self.assertRaises(Http404):
+            get_thread(self.request, self.thread_id)
+
     @ddt.data(
         *itertools.product(
             [
