@@ -42,7 +42,6 @@ import json
 
     <script type="text/javascript">
       window.baseUrl = ${json.dumps(settings.STATIC_URL)};
-      window.TENDER_SUBDOMAIN = ${json.dumps(settings.TENDER_SUBDOMAIN)};
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
@@ -65,7 +64,6 @@ import json
         <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
       % endif
       <%include file="widgets/footer.html" />
-      <%include file="widgets/tender.html" />
 
       <div id="page-notification"></div>
     </div>

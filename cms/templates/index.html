@@ -479,13 +479,6 @@
 
             <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Getting Started with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</a>
           </li>
-          % if settings.TENDER_DOMAIN:
-            <li class="action-item">
-              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary" title="${_("Use our feedback tool, Tender, to request help")}">
-                ${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}
-              </a>
-            </li>
-          % endif
         </ol>
       </div>
 
@@ -513,14 +506,8 @@
 <%!
 from django.conf import settings
 
-if settings.TENDER_DOMAIN:
-  help_link_start = '<a href="http://{domain}/discussion/new" class="show-tender">'.format(
-    domain=settings.TENDER_DOMAIN,
-  )
-  help_link_end = '</a>'
-else:
-  help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
-  help_link_end = '</a>'
+help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
+help_link_end = '</a>'
 %>
         <p>${_("Your request to author courses in {studio_name} has been denied. Please {link_start}contact {platform_name} Staff with further questions{link_end}.").format(
             studio_name=settings.STUDIO_NAME,
@@ -556,16 +543,6 @@ else:
       <div class="bit">
         <h3 class="title title-3">${_('Need help?')}</h3>
         <p>${_('Please check your Junk or Spam folders in case our email isn\'t in your INBOX. Still can\'t find the verification email? Request help via the link below.')}</p>
-
-        <ol class='list-actions'>
-          % if settings.TENDER_DOMAIN:
-            <li class="action-item">
-              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
-                ${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}
-              </a>
-            </li>
-          % endif
-        </ol>
       </div>
     </aside>
   </section>

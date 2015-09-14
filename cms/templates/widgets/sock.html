@@ -20,46 +20,56 @@ from django.core.urlresolvers import reverse
       </header>
 
       <div class="support">
-        <h3 class="title">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h3>
+        <%!
+        from django.conf import settings
 
-        <div class="copy">
-           <p>${_("You can click Help in the upper right corner of any page to get more information about the page you're on. You can also use the links below to download the Building and Running an {platform_name} Course PDF file, to go to the {platform_name} Author Support site, or to enroll in edX101.").format(platform_name=settings.PLATFORM_NAME)}</p>
-        </div>
+        is_edx_domain = settings.FEATURES.get('IS_EDX_DOMAIN', False)
+        partner_email = settings.FEATURES.get('PARTNER_SUPPORT_EMAIL', '')
 
-      <ul class="list-actions">
-          <li class="action-item js-help-pdf">
-            <a href="${get_online_help_info(online_help_token)['pdf_url']}" target="_blank" rel="external" class="action action-primary">${_("Building and Running an {platform_name} Course PDF").format(platform_name=settings.PLATFORM_NAME)}</a>
-          </li>
-
-        % if settings.TENDER_DOMAIN:
-          <li class="action-item">
-            <a href="http://${settings.TENDER_DOMAIN}" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
-            <span class="tip">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</span>
-          </li>
-        % endif
-
-        <li class="action-item">
-          <a href="https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1" rel="external" class="action action-primary">${_("Enroll in edX101")}</a>
-          <span class="tip">${_("How to use {studio_name} to build your course").format(studio_name=settings.STUDIO_NAME)}</span>
-        </li>
-      </ul>
-      </div>
-
-    % if settings.TENDER_DOMAIN:
-      <div class="feedback">
-        <h3 class="title">${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h3>
-
-        <div class="copy">
-           <p>${_("Have problems, questions, or suggestions about {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</p>
-        </div>
+        links = [{
+            'href': 'http://docs.edx.org',
+            'sr_mouseover_text': _('Access documentation on http://docs.edx.org'),
+            'text': _('edX Documentation'),
+            'condition': True
+        }, {
+            'href': 'https://partners.edx.org',
+            'sr_mouseover_text': _('Access Course Staff Support on the Partner Portal to submit or review support tickets'),
+            'text': _('edX Partner Portal'),
+            'condition': is_edx_domain
+        }, {
+            'href': 'https://open.edx.org',
+            'sr_mouseover_text': _('Access the Open edX Portal'),
+            'text': _('Open edX Portal'),
+            'condition': not is_edx_domain
+        }, {
+            'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
+            'sr_mouseover_text': _('Enroll in edX101: Overview of Creating an edX Course'),
+            'text': _('Enroll in edX101'),
+            'condition': True
+        }, {
+            'href': 'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
+            'sr_mouseover_text': _('Enroll in StudioX: Creating a Course with edX Studio'),
+            'text': _('Enroll in StudioX'),
+            'condition': True
+        }, {
+            'href': 'mailto:{email}'.format(email=partner_email),
+            'sr_mouseover_text': _('Send an email to {email}').format(email=partner_email),
+            'text': _('Contact Us'),
+            'condition': 'PARTNER_SUPPORT_EMAIL' in settings.FEATURES
+        }]
+        %>
 
         <ul class="list-actions">
-          <li class="action-item">
-            <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary" title="${_("Use our feedback tool, Tender, to share your feedback")}"><i class="icon fa fa-comments"></i>${_("Contact Us")}</a>
-          </li>
+          % for link in links:
+            % if link['condition']:
+              <li class="action-item">
+                <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${link['text']}</a>
+                <span class="tip">${link['sr_mouseover_text']}</span>
+              </li>
+            %endif
+          % endfor
         </ul>
       </div>
-    % endif
     </section>
   </div>
 </div>

@@ -50,7 +50,6 @@
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured',
             'youtube': '//www.youtube.com/player_api?noext',
-            'tender': '//api.tenderapp.com/tender_widget',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
