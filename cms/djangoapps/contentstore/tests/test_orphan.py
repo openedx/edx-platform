@@ -9,24 +9,33 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.split_mongo import BlockKey
 import ddt
+import itertools
+
+from opaque_keys.edx.locator import CourseLocator
+
+ORPHAN_TYPES = itertools.product(
+    [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft],
+    [True, False],
+    [True, False],
+)
 
 
 class TestOrphanBase(CourseTestCase):
     """
     Base class for Studio tests that require orphaned modules
     """
-    def setUp(self):
-        super(TestOrphanBase, self).setUp()
+    def create_course_with_orphans(self, default_store):
+        course = CourseFactory(default_store=default_store)
 
         # create chapters and add them to course tree
-        chapter1 = self.store.create_child(self.user.id, self.course.location, 'chapter', "Chapter1")
+        chapter1 = self.store.create_child(self.user.id, course.location, 'chapter', "Chapter1")
         self.store.publish(chapter1.location, self.user.id)
 
-        chapter2 = self.store.create_child(self.user.id, self.course.location, 'chapter', "Chapter2")
+        chapter2 = self.store.create_child(self.user.id, course.location, 'chapter', "Chapter2")
         self.store.publish(chapter2.location, self.user.id)
 
         # orphan chapter
-        orphan_chapter = self.store.create_item(self.user.id, self.course.id, 'chapter', "OrphanChapter")
+        orphan_chapter = self.store.create_item(self.user.id, course.id, 'chapter', "OrphanChapter")
         self.store.publish(orphan_chapter.location, self.user.id)
 
         # create vertical and add it as child to chapter1
@@ -34,7 +43,7 @@ class TestOrphanBase(CourseTestCase):
         self.store.publish(vertical1.location, self.user.id)
 
         # create orphan vertical
-        orphan_vertical = self.store.create_item(self.user.id, self.course.id, 'vertical', "OrphanVert")
+        orphan_vertical = self.store.create_item(self.user.id, course.id, 'vertical', "OrphanVert")
         self.store.publish(orphan_vertical.location, self.user.id)
 
         # create component and add it to vertical1
@@ -49,24 +58,51 @@ class TestOrphanBase(CourseTestCase):
         self.store.update_item(orphan_vertical, self.user.id)
 
         # create an orphaned html module
-        orphan_html = self.store.create_item(self.user.id, self.course.id, 'html', "OrphanHtml")
+        orphan_html = self.store.create_item(self.user.id, course.id, 'html', "OrphanHtml")
         self.store.publish(orphan_html.location, self.user.id)
 
-        self.store.create_child(self.user.id, self.course.location, 'static_tab', "staticuno")
-        self.store.create_child(self.user.id, self.course.location, 'about', "overview")
-        self.store.create_child(self.user.id, self.course.location, 'course_info', "updates")
+        self.store.create_child(self.user.id, course.location, 'static_tab', "staticuno")
+        self.store.create_child(self.user.id, course.location, 'course_info', "updates")
 
+        return course
 
-    def course_orphans_one_branch(self, branch=None, DOC=None):
+    def create_course_with_orphan_on_branch(self, branch, DOC):
+        """
+        branch is the branch to create the orphan on
+        DOC is whether or not its parent is in a direct only category
+        """
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         chapter = ItemFactory.create(category='chapter', parent=course)
         sequential = ItemFactory.create(category='sequential', parent=chapter)
         vertical = ItemFactory.create(category='vertical', parent=sequential)
         html = ItemFactory.create(category='html', parent=vertical)
 
+        branch_explicit_course_key = course.id.for_branch(branch)
+        store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
+
+        # Now, we're going to remove the children from one of the blocks on the branch
+        # we want to make the orphans on
+        block = chapter if DOC else vertical
+
+        original_structure = store._lookup_course(branch_explicit_course_key).structure
+        new_structure = store.version_structure(
+            branch_explicit_course_key, original_structure, self.user.id
+        )
+
+        # remove children
+        block_key = BlockKey.from_usage_key(block.location)
+        new_structure['blocks'][block_key].fields['children'] = []
+
+        new_id = new_structure['_id']
+
+        index_entry = store._get_index_if_valid(branch_explicit_course_key)
+        store._update_head(course.id, index_entry, branch_explicit_course_key.branch, new_structure['_id'])
+
+        store.update_structure(branch_explicit_course_key, new_structure)
+
         return course
 
-    def course_with_orphans_in_branch(self, branch, DOC):
+    def create_course_with_orphan_on_branch_DNE_other_branch(self, branch, DOC):
         """
         Tests that if there are orphans only on the published branch,
         running delete orphans with a course key that specifies
@@ -115,12 +151,14 @@ class TestOrphan(TestOrphanBase):
     """
     def setUp(self):
         super(TestOrphan, self).setUp()
-        self.orphan_url = reverse_course_url('orphan_handler', self.course.id)
 
-    def test_mongo_orphan(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_mongo_orphan(self, default_store):
         """
         Test that old mongo finds the orphans
         """
+        self.course = self.create_course_with_orphans(default_store)
+        self.orphan_url = reverse_course_url('orphan_handler', self.course.id)
         orphans = json.loads(
             self.client.get(
                 self.orphan_url,
@@ -135,10 +173,13 @@ class TestOrphan(TestOrphanBase):
         location = self.course.location.replace(category='html', name='OrphanHtml')
         self.assertIn(location.to_deprecated_string(), orphans)
 
-    def test_mongo_orphan_delete(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_mongo_orphan_delete(self, default_store):
         """
         Test that old mongo deletes the orphans
         """
+        self.course = self.create_course_with_orphans(default_store)
+        self.orphan_url = reverse_course_url('orphan_handler', self.course.id)
         self.client.delete(self.orphan_url)
         orphans = json.loads(
             self.client.get(self.orphan_url, HTTP_ACCEPT='application/json').content
@@ -150,16 +191,38 @@ class TestOrphan(TestOrphanBase):
         self.assertTrue(self.store.has_item(self.course.id.make_usage_key('html', "multi_parent_html")))
 
 
-    @ddt.data(
-        ('published-branch', 0, 1, True),
-        ('published-branch', 0, 1, False),
-        ('draft-branch', 1, 0, True),
-        ('draft-branch', 1, 0, False)
-    )
+    def test_split_mongo_orphan_delete(self):
+        self.course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
+        store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
+        self.assertOrphanCount(self.course.id, 3)
+        self.assertOrphanCount(self.course.id.for_branch('published-branch'), 3)
+        store.delete_orphans(self.course.id, self.user.id)
+        self.assertOrphanCount(self.course.id, 0)
+        self.assertOrphanCount(self.course.id.for_branch('published-branch'), 0)
+
+    @ddt.data(*ORPHAN_TYPES)
     @ddt.unpack
-    def test_split_mongo_orphan_delete(self, branch, draft_orphans, published_orphans, DOC):
-        course = self.course_with_orphans_in_branch(branch, DOC)
-        store = self.store._get_modulestore_by_type('split')
+    def test_split_mongo_orphan_delete_special_cases(
+        self,
+        branch,
+        DOC,
+        exists_on_other_branch,
+    ):
+        """
+        branch: which branch the orphan is on
+        DOC: whether or not the orphan's parent is a "direct only category)
+        exists_on_other_branch: if the orphan has a corresponding xblock
+          that exists on the other branch
+        """
+        draft_orphans, published_orphans = 1, 0
+        if branch == ModuleStoreEnum.BranchName.published:
+            draft_orphans, published_orphans = 0, 1
+
+        course = self.create_course_with_orphan_on_branch_DNE_other_branch(branch, DOC)
+        if exists_on_other_branch:
+            course = self.create_course_with_orphan_on_branch(branch, DOC)
+
+        store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 
         self.assertOrphanCount(course.id, draft_orphans)
         self.assertOrphanCount(course.id.for_branch('published-branch'), published_orphans)
@@ -169,53 +232,13 @@ class TestOrphan(TestOrphanBase):
         self.assertOrphanCount(course.id, 0)
         self.assertOrphanCount(course.id.for_branch('published-branch'), 0)
 
-
-    def test_split_mongo_orphan_delete_2(self):
-        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        chapter = ItemFactory.create(category='chapter', parent=course)
-        sequential = ItemFactory.create(category='sequential', parent=chapter)
-        vertical = ItemFactory.create(category='vertical', parent=sequential)
-        html = ItemFactory.create(category='html', parent=vertical)
-
-        pub = course.id.for_branch('published-branch')
-        course_id = course.id
-        store = self.store._get_modulestore_by_type('split')
-
-        chapter_key = BlockKey.from_usage_key(chapter.location)
-
-        original_structure = store._lookup_course(pub).structure
-
-        new_structure = store.version_structure(pub, original_structure, self.user.id)
-
-        new_structure['blocks'][chapter_key].fields['children'] = []
-        parent_block_keys = store._get_parents_from_structure(chapter.location, original_structure)
-        parent_block_key = parent_block_key
-        store.decache_block(chapter.location.course_key, new_id, parent_block_key)
-
-        index_entry = store._get_index_if_valid(course.id)
-        new_id = new_structure['_id']
-
-        # update index if appropriate and structures
-        store.update_structure(usage_locator.course_key, new_structure)
-
-        if index_entry is not None:
-            # update the index entry if appropriate
-            store._update_head(course.id, index_entry, 'published-branch', new_id)
-            result = usage_locator.course_key.for_version(new_id)
-        else:
-            result = CourseLocator(version_guid=new_id)
-
-
-
-
-        # import ipdb; ipdb.set_trace()
-
-
-
-    def test_not_permitted(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_not_permitted(self, default_store):
         """
         Test that auth restricts get and delete appropriately
         """
+        self.course = self.create_course_with_orphans(default_store)
+        self.orphan_url = reverse_course_url('orphan_handler', self.course.id)
         test_user_client, test_user = self.create_non_staff_authed_user_client()
         CourseEnrollment.enroll(test_user, self.course.id)
         response = test_user_client.get(self.orphan_url)

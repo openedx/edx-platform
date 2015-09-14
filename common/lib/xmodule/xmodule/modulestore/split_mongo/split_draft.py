@@ -315,6 +315,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             published_course_key, **kwargs
         )
 
+        draft_orphan_ids = [orphan.block_id for orphan in draft_orphans]
+        published_orphan_ids = [orphan.block_id for orphan in published_orphans]
+
         published_block_ids = [
             block.id for block in self._lookup_course(published_course_key).structure['blocks']
         ]
@@ -323,22 +326,29 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             block.id for block in self._lookup_course(draft_preferred_course_key).structure['blocks']
         ]
 
-        orphans = [(orphan, 'draft') for orphan in draft_orphans] + [(orphan, 'published') for orphan in published_orphans]
+        orphans = draft_orphans + published_orphans
         # import ipdb; ipdb.set_trace()
         if orphans:
-            orphan, branch = orphans.pop()
-            if orphan in draft_orphans and orphan in published_orphans:
+            orphan = orphans.pop()
+            if orphan.block_id in (set(draft_orphan_ids) & set(published_orphan_ids)):
                 # great, delete from both groups
                 self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.all)
 
-            elif branch == 'draft':
+            elif orphan.branch == ModuleStoreEnum.BranchName.draft:
                 if orphan.block_id not in published_block_ids:
                     # not passing a revision means you delete just from the draft branch
                     self.delete_item(orphan, user_id, skip_auto_publish=True)
                 else:
-                    self.revert_single_block_to_published(orphan, user_id, force=True)
+                    # revert parent to published
+                    published_location = orphan.for_branch(ModuleStoreEnum.BranchName.published)
+                    published_block = self.get_item(published_location)
+                    published_parent = published_block.parent
+                    draft_would_be_parent = published_parent.for_branch(ModuleStoreEnum.BranchName.draft)
+                    # TODO: what do you do if draft_would_be_parent isn't in
+                    # the draft branch of the course?
+                    self.revert_single_block_to_published(draft_would_be_parent, user_id, force=True)
 
-            elif branch == 'published':
+            elif orphan.branch == ModuleStoreEnum.BranchName.published:
                 if orphan.block_id not in draft_block_ids:
                     self.delete_item(orphan, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
                 else:
@@ -436,7 +446,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         return self._revert_to_published(location, user_id)
 
     def revert_single_block_to_published(self, location, user_id, force=False):
-        self._revert_to_published(locals, user_id, recursive=False, force=True)
+        self._revert_to_published(location, user_id, recursive=False, force=True)
 
     def _revert_to_published(self, location, user_id, recursive=True, force=False):
         """
