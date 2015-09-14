@@ -138,7 +138,10 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
 
     #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
-    is_cohorted = is_commentable_cohorted(course.id, discussion_id)
+    if discussion_id:
+        is_cohorted = is_commentable_cohorted(course.id, discussion_id)
+    else:
+        is_cohorted = is_course_cohorted(course.id)
 
     if has_permission(request.user, "see_all_cohorts", course.id):
         group_id = request.GET.get('group_id')
