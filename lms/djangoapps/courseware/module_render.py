@@ -191,11 +191,11 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     }
 
                     #
-                    # Add in rendering context for proctored exams
+                    # Add in rendering context for proctored exams and timed exams
                     # if applicable
                     #
                     is_proctored_enabled = (
-                        getattr(section, 'is_proctored_enabled', False) and
+                        getattr(section, 'is_time_limited', False) and
                         settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
                     )
                     if is_proctored_enabled:
