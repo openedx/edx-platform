@@ -10,8 +10,6 @@ from django.test.utils import override_settings
 from django.utils import translation
 
 from django_comment_client.forum.views import get_threads
-from django_comment_common.utils import ThreadContext
-from django_comment_common.models import ForumsConfig
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
