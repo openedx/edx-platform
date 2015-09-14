@@ -1877,11 +1877,18 @@ class UpdateThreadTest(
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
+
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+        self.user2 = UserFactory.create()
+        self.register_get_user_response(self.user2)
+        self.request2 = RequestFactory().get("/test_path")
+        self.request2.user = self.user2
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
 
     def register_thread(self, overrides=None):
         """
@@ -2088,47 +2095,108 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, old_voted, new_voted):
+    def test_voted(self, current_vote_status, new_vote_status):
         """
         Test attempts to edit the "voted" field.
 
-        old_voted indicates whether the thread should be upvoted at the start of
-        the test. new_voted indicates the value for the "voted" field in the
-        update. If old_voted and new_voted are the same, no update should be
-        made. Otherwise, a vote should be PUT or DELETEd according to the
-        new_voted value.
+        current_vote_status indicates whether the thread should be upvoted at
+        the start of the test. new_vote_status indicates the value for the
+        "voted" field in the update. If current_vote_status and new_vote_status
+        are the same, no update should be made. Otherwise, a vote should be PUT
+        or DELETEd according to the new_vote_status value.
         """
-        if old_voted:
+        if current_vote_status:
             self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
         self.register_thread_votes_response("test_thread")
         self.register_thread()
-        data = {"voted": new_voted}
-        if old_voted == new_voted:
-            result = update_thread(self.request, "test_thread", data)
-        else:
-            # Vote signals should only be sent if the number of votes has changed
-            with self.assert_signal_sent(api, 'thread_voted', sender=None, user=self.user, exclude_args=('post',)):
-                result = update_thread(self.request, "test_thread", data)
-        self.assertEqual(result["voted"], new_voted)
+        data = {"voted": new_vote_status}
+        result = update_thread(self.request, "test_thread", data)
+        self.assertEqual(result["voted"], new_vote_status)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/threads/test_thread/votes"
-        if old_voted == new_voted:
+        if current_vote_status == new_vote_status:
             self.assertNotEqual(last_request_path, votes_url)
         else:
             self.assertEqual(last_request_path, votes_url)
             self.assertEqual(
                 httpretty.last_request().method,
-                "PUT" if new_voted else "DELETE"
+                "PUT" if new_vote_status else "DELETE"
             )
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_voted else
+                httpretty.last_request().parsed_body if new_vote_status else
                 parse_qs(urlparse(httpretty.last_request().path).query)
             )
             actual_request_data.pop("request_id", None)
             expected_request_data = {"user_id": [str(self.user.id)]}
-            if new_voted:
+            if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count(self, current_vote_status, first_vote, second_vote):
+        """
+        Tests vote_count increases and decreases correctly from the same user
+        """
+        #setup
+        starting_vote_count = 0
+        if current_vote_status:
+            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            starting_vote_count = 1
+        self.register_thread_votes_response("test_thread")
+        self.register_thread(overrides={"votes": {"up_count": starting_vote_count}})
+
+        #first vote
+        data = {"voted": first_vote}
+        result = update_thread(self.request, "test_thread", data)
+        self.register_thread(overrides={"voted": first_vote})
+        self.assertEqual(result["vote_count"], 1 if first_vote else 0)
+
+        #second vote
+        data = {"voted": second_vote}
+        result = update_thread(self.request, "test_thread", data)
+        self.assertEqual(result["vote_count"], 1 if second_vote else 0)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count_two_users(
+            self,
+            current_user1_vote,
+            current_user2_vote,
+            user1_vote,
+            user2_vote
+    ):
+        """
+        Tests vote_count increases and decreases correctly from different users
+        """
+        #setup
+        vote_count = 0
+        if current_user1_vote:
+            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            vote_count += 1
+        if current_user2_vote:
+            self.register_get_user_response(self.user2, upvoted_ids=["test_thread"])
+            vote_count += 1
+
+        for (current_vote, user_vote, request) in \
+                [(current_user1_vote, user1_vote, self.request),
+                 (current_user2_vote, user2_vote, self.request2)]:
+
+            self.register_thread_votes_response("test_thread")
+            self.register_thread(overrides={"votes": {"up_count": vote_count}})
+
+            data = {"voted": user_vote}
+            result = update_thread(request, "test_thread", data)
+            if current_vote == user_vote:
+                self.assertEqual(result["vote_count"], vote_count)
+            elif user_vote:
+                vote_count += 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            else:
+                vote_count -= 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=[])
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
@@ -2196,15 +2264,21 @@ class UpdateCommentTest(
     def setUp(self):
         super(UpdateCommentTest, self).setUp()
 
-        self.user = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
+
+        self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+        self.user2 = UserFactory.create()
+        self.register_get_user_response(self.user2)
+        self.request2 = RequestFactory().get("/test_path")
+        self.request2.user = self.user2
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
 
     def register_comment(self, overrides=None, thread_overrides=None, course=None):
         """
@@ -2414,47 +2488,110 @@ class UpdateCommentTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, old_voted, new_voted):
+    def test_voted(self, current_vote_status, new_vote_status):
         """
         Test attempts to edit the "voted" field.
 
-        old_voted indicates whether the comment should be upvoted at the start of
-        the test. new_voted indicates the value for the "voted" field in the
-        update. If old_voted and new_voted are the same, no update should be
-        made. Otherwise, a vote should be PUT or DELETEd according to the
-        new_voted value.
+        current_vote_status indicates whether the comment should be upvoted at
+        the start of the test. new_vote_status indicates the value for the
+        "voted" field in the update. If current_vote_status and new_vote_status
+        are the same, no update should be made. Otherwise, a vote should be PUT
+        or DELETEd according to the new_vote_status value.
         """
-        if old_voted:
+        vote_count = 0
+        if current_vote_status:
             self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            vote_count = 1
         self.register_comment_votes_response("test_comment")
-        self.register_comment()
-        data = {"voted": new_voted}
-        if old_voted == new_voted:
-            result = update_comment(self.request, "test_comment", data)
-        else:
-            # Vote signals should only be sent if the number of votes has changed
-            with self.assert_signal_sent(api, 'comment_voted', sender=None, user=self.user, exclude_args=('post',)):
-                result = update_comment(self.request, "test_comment", data)
-        self.assertEqual(result["voted"], new_voted)
+        self.register_comment(overrides={"votes": {"up_count": vote_count}})
+        data = {"voted": new_vote_status}
+        result = update_comment(self.request, "test_comment", data)
+        self.assertEqual(result["vote_count"], 1 if new_vote_status else 0)
+        self.assertEqual(result["voted"], new_vote_status)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/comments/test_comment/votes"
-        if old_voted == new_voted:
+        if current_vote_status == new_vote_status:
             self.assertNotEqual(last_request_path, votes_url)
         else:
             self.assertEqual(last_request_path, votes_url)
             self.assertEqual(
                 httpretty.last_request().method,
-                "PUT" if new_voted else "DELETE"
+                "PUT" if new_vote_status else "DELETE"
             )
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_voted else
+                httpretty.last_request().parsed_body if new_vote_status else
                 parse_qs(urlparse(httpretty.last_request().path).query)
             )
             actual_request_data.pop("request_id", None)
             expected_request_data = {"user_id": [str(self.user.id)]}
-            if new_voted:
+            if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count(self, current_vote_status, first_vote, second_vote):
+        """
+        Tests vote_count increases and decreases correctly from the same user
+        """
+        #setup
+        starting_vote_count = 0
+        if current_vote_status:
+            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            starting_vote_count = 1
+        self.register_comment_votes_response("test_comment")
+        self.register_comment(overrides={"votes": {"up_count": starting_vote_count}})
+
+        #first vote
+        data = {"voted": first_vote}
+        result = update_comment(self.request, "test_comment", data)
+        self.register_comment(overrides={"voted": first_vote})
+        self.assertEqual(result["vote_count"], 1 if first_vote else 0)
+
+        #second vote
+        data = {"voted": second_vote}
+        result = update_comment(self.request, "test_comment", data)
+        self.assertEqual(result["vote_count"], 1 if second_vote else 0)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count_two_users(
+            self,
+            current_user1_vote,
+            current_user2_vote,
+            user1_vote,
+            user2_vote
+    ):
+        """
+        Tests vote_count increases and decreases correctly from different users
+        """
+        vote_count = 0
+        if current_user1_vote:
+            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            vote_count += 1
+        if current_user2_vote:
+            self.register_get_user_response(self.user2, upvoted_ids=["test_comment"])
+            vote_count += 1
+
+        for (current_vote, user_vote, request) in \
+                [(current_user1_vote, user1_vote, self.request),
+                 (current_user2_vote, user2_vote, self.request2)]:
+
+            self.register_comment_votes_response("test_comment")
+            self.register_comment(overrides={"votes": {"up_count": vote_count}})
+
+            data = {"voted": user_vote}
+            result = update_comment(request, "test_comment", data)
+            if current_vote == user_vote:
+                self.assertEqual(result["vote_count"], vote_count)
+            elif user_vote:
+                vote_count += 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            else:
+                vote_count -= 1
+                self.assertEqual(result["vote_count"], vote_count)
+                self.register_get_user_response(self.user, upvoted_ids=[])
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
