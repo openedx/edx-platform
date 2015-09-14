@@ -2,9 +2,6 @@
 import logging
 
 from django.http import Http404
-from django.core.exceptions import ValidationError
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
