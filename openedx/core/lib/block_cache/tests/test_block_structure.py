@@ -225,37 +225,60 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureFactory
     """
-    def test_factory_methods(self):
-        children_map = self.SIMPLE_CHILDREN_MAP
-        modulestore = MockModulestoreFactory.create(children_map)
+    def setUp(self):
+        super(TestBlockStructureFactory, self).setUp()
+        self.children_map = self.SIMPLE_CHILDREN_MAP
+        self.modulestore = MockModulestoreFactory.create(self.children_map)
+
+        self.block_structure = BlockStructureFactory.create_from_modulestore(
+            root_block_key=0, modulestore=self.modulestore
+        )
+
+    def add_transformers(self):
+        """
+        Add each registered transformer to the block structure.
+        """
+        for transformer in BlockStructureTransformers.get_registered_transformers():
+            self.block_structure.add_transformer(transformer)
+            self.block_structure.set_transformer_block_data(
+                usage_key=0, transformer=transformer, key='test', value='{} val'.format(transformer.name())
+            )
+
+    def test_create_from_modulestore(self):
+        self.assert_block_structure(self.block_structure, self.children_map)
+
+    def test_uncollected_transformers(self):
         cache = MockCache()
 
-        # test create from modulestore
-        block_structure = BlockStructureFactory.create_from_modulestore(root_block_key=0, modulestore=modulestore)
-        self.assert_block_structure(block_structure, children_map)
-
-        # test not in cache
-        self.assertIsNone(BlockStructureFactory.create_from_cache(root_block_key=0, cache=cache))
-
-        # test transformers outdated
-        BlockStructureFactory.serialize_to_cache(block_structure, cache)
+        BlockStructureFactory.serialize_to_cache(self.block_structure, cache)
         with patch('openedx.core.lib.block_cache.block_structure.logger.info') as mock_logger:
+            # cached data does not have collected information for all registered transformers
             self.assertIsNone(BlockStructureFactory.create_from_cache(root_block_key=0, cache=cache))
             self.assertTrue(mock_logger.called)
 
-        # update transformers
-        for transformer in BlockStructureTransformers.get_registered_transformers():
-            block_structure.add_transformer(transformer)
-            block_structure.set_transformer_block_data(
-                usage_key=0, transformer=transformer, key='test', value='test.val'
-            )
-        BlockStructureFactory.serialize_to_cache(block_structure, cache)
+    def test_not_in_cache(self):
+        cache = MockCache()
+
+        self.assertIsNone(BlockStructureFactory.create_from_cache(root_block_key=0, cache=cache))
+
+    def test_cache(self):
+        cache = MockCache()
+        self.add_transformers()
+
+        # serialize to cache
+        BlockStructureFactory.serialize_to_cache(self.block_structure, cache)
 
         # test re-create from cache
+        self.modulestore.get_items_call_count = 0
         from_cache_block_structure = BlockStructureFactory.create_from_cache(root_block_key=0, cache=cache)
         self.assertIsNotNone(from_cache_block_structure)
-        self.assert_block_structure(from_cache_block_structure, children_map)
+        self.assert_block_structure(from_cache_block_structure, self.children_map)
+        self.assertEquals(self.modulestore.get_items_call_count, 0)
 
-        # test remove from cache
+    def test_remove_from_cache(self):
+        cache = MockCache()
+        self.add_transformers()
+
+        BlockStructureFactory.serialize_to_cache(self.block_structure, cache)
         BlockStructureFactory.remove_from_cache(root_block_key=0, cache=cache)
         self.assertIsNone(BlockStructureFactory.create_from_cache(root_block_key=0, cache=cache))
