@@ -246,7 +246,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory Test Title longer than 40 characters in length'
+                    inputSignatoryTitle: 'New Signatory Test Title longer than 106 characters in lengthNew Signatory Test Title longer than 106 characters in length'
                 });
 
                 setValuesToInputs(this.view, {
