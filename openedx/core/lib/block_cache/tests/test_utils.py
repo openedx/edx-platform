@@ -24,11 +24,15 @@ class MockXBlock(object):
 
 
 class MockModulestore(object):
+    def __init__(self):
+        self.get_items_call_count = 0
+
     def set_blocks(self, blocks):
         self.blocks = blocks
 
     def get_item(self, block_key, depth=None):
-         return self.blocks.get(block_key)
+        self.get_items_call_count += 1
+        return self.blocks.get(block_key)
 
 
 class MockCache(object):

@@ -52,28 +52,29 @@ def _traverse_generic(
             if not all_parents_visited or (not yield_descendants_of_unyielded and not any_parent_yielded):
                 continue
 
-        # Add its unvisited children to the stack in reverse order so that
-        # they are popped off in their original order.
-        # It's important that we visit the children even if the parent isn't yielded
-        # in case a child has multiple parents and this is its last parent.
-        unvisited_children = get_children(curr_node)
+        if curr_node not in yield_results:
+            # Add its unvisited children to the stack in reverse order so that
+            # they are popped off in their original order.
+            # It's important that we visit the children even if the parent isn't yielded
+            # in case a child has multiple parents and this is its last parent.
+            unvisited_children = list(get_children(curr_node))
 
-        # If we're not doing a topological traversal, check whether the child has been visited.
-        if not get_parents:
-            unvisited_children = list(
-                child
-                for child in unvisited_children
-                if child not in yield_results
-            )
-        unvisited_children.reverse()
-        stack.extend(unvisited_children)
+            # If we're not doing a topological traversal, check whether the child has been visited.
+            if not get_parents:
+                unvisited_children = list(
+                    child
+                    for child in unvisited_children
+                    if child not in yield_results
+                )
+            unvisited_children.reverse()
+            stack.extend(unvisited_children)
 
-        # Return the result if it satisfies the predicate.
-        # Keep track of the result so we know whether to yield its children.
-        should_yield_node = predicate(curr_node)
-        yield_results[curr_node] = should_yield_node
-        if should_yield_node:
-            yield get_result(curr_node)
+            # Return the result if it satisfies the predicate.
+            # Keep track of the result so we know whether to yield its children.
+            should_yield_node = predicate(curr_node)
+            yield_results[curr_node] = should_yield_node
+            if should_yield_node:
+                yield get_result(curr_node)
 
 
 def traverse_topologically(start_node, get_parents, get_children, **kwargs):
