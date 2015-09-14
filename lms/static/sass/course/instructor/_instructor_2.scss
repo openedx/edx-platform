@@ -1956,16 +1956,20 @@ input[name="subject"] {
           width: 140px;
         }
         &.email {
-          width: 250px;
+          @include text-align(center);
+          width: ($baseline*8);
           word-wrap: break-word;
         }
         &.allowance-name {
-          width: 140px;
+          width: ($baseline*5);
+          text-align: center;
         }
         &.allowance-value {
-          width: 150px;
+          @include text-align(center);
+          width: ($baseline*5);
         }
         &.c_action {
+          @include text-align(center);
           width: 60px;
         }
       }
@@ -1991,6 +1995,7 @@ input[name="subject"] {
         text-align: center;
       }
       td:nth-child(3){
+        word-wrap: break-word;
         text-align: center;
       }
       td:nth-child(6){
@@ -1998,17 +2003,12 @@ input[name="subject"] {
         text-align: center;
       }
 
-      td{
-        a.remove_allowance{
-          @include margin-left(15px);
-        }
-      }
       td:last-child {
         padding-left: 17px;
       }
     }
   }
-  .exam-attempts-content {
+  .exam-attempts-content, .exam-allowances-content {
     padding-left: 0;
     padding-right: 0;
   }
@@ -2033,7 +2033,7 @@ input[name="subject"] {
       span {
         background-color: #ccc;
         display: inline-block;
-        padding: 6px 12px;
+        padding: 7px 12px;
         cursor: pointer;
       }
     }
