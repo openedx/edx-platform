@@ -46,7 +46,8 @@ class SplitTestTransformer(BlockStructureTransformer):
             # set group access for each child
             for child_location in xblock.children:
                 child = block_structure.get_xblock(child_location)
-                child.group_access[partition_for_this_block.id] = [child_to_group[child_location]]
+                group = child_to_group.get(child_location, None)
+                child.group_access[partition_for_this_block.id] = [group] if group else []
 
     def transform(self, user_info, block_structure):
         """

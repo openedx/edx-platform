@@ -25,6 +25,13 @@ class CourseStructureTestCase(ModuleStoreTestCase):
         self.user = UserFactory.create(password=self.password)
         self.staff = UserFactory.create(password=self.password, is_staff=True)
 
+    def create_block_id(self, block_type, block_ref):
+        """
+        Returns the block id (display name) that is used in the test
+        course structures for the given block type and block reference string.
+        """
+        return '{}_{}'.format(block_type, block_ref)
+
     def build_xblock(self, block_hierarchy, block_map, parent):
         """
         Build an XBlock, add it to block_map, and call build_xblock on the
@@ -47,7 +54,7 @@ class CourseStructureTestCase(ModuleStoreTestCase):
             kwargs['parent'] = parent
 
         xblock = factory.create(
-            display_name='{} {}'.format(block_type, block_ref),
+            display_name=self.create_block_id(block_type, block_ref),
             publish_item=True,
             **kwargs
         )
@@ -63,15 +70,35 @@ class CourseStructureTestCase(ModuleStoreTestCase):
 
         The additional parents are obtained from the '#parents' field
         and is expected to be a list of '#ref' values of the parents.
+
+        Note: if a '#parents' field is found, the block is removed from
+        the course block since it is expected to not belong to the root.
+        If the block is meant to be a direct child of the course as well,
+        the course should be explicitly listed in '#parents'.
+
+        Arguments:
+            block_hierarchy (BlockStructureDict): Definition of block hierarchy.
+            block_map (dict[str: XBlock]): Mapping from '#ref' values to their XBlocks.
+
         """
         parents = block_hierarchy.get('#parents', [])
-        for parent_ref in parents:
-            parent_block = block_map[parent_ref]
-            parent_block.children.append(
-                block_map[block_hierarchy['#ref']].location
-            )
-            update_block(parent_block)
+        if parents:
+            block_key = block_map[block_hierarchy['#ref']].location
 
+            # First remove the block from the course.
+            # It would be re-added to the course if the course was
+            # explicitly listed in parents.
+            course = modulestore().get_item(block_map['course'].location)
+            course.children.remove(block_key)
+            block_map['course'] = update_block(course)
+
+            # Add this to block to each listed parent.
+            for parent_ref in parents:
+                parent_block = modulestore().get_item(block_map[parent_ref].location)
+                parent_block.children.append(block_key)
+                block_map[parent_ref] = update_block(parent_block)
+
+        # recursively call the children
         for child_hierarchy in block_hierarchy.get('#children', []):
             self.add_parents(child_hierarchy, block_map)
 
@@ -278,3 +305,11 @@ def update_block(block):
     Helper method to update the block in the modulestore
     """
     return modulestore().update_item(block, 'test_user')
+
+
+def create_location(org, course, run, block_type, block_id):
+    """
+    Returns the usage key for the given key parameters using the
+    default modulestore
+    """
+    return modulestore().make_course_key(org, course, run).make_usage_key(block_type, block_id)

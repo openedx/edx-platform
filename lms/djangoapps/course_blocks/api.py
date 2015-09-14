@@ -10,7 +10,6 @@ from .transformers import (
     start_date,
     user_partitions,
     visibility,
-    split_test,
     library_content,
 )
 from .user_info import CourseUserInfo
