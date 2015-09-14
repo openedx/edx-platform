@@ -22,9 +22,12 @@
   %button-reset {
     box-shadow: none;
     border: none;
+    border-radius: 0;
     background-image: none;
     background-color: transparent;
-    font-weight: normal;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
   }
 
 // layout
@@ -148,6 +151,7 @@
     border-bottom: 3px solid $gray-l5;
 
     .nav-item {
+        @extend %button-reset;
         display: inline-block;
         margin-bottom: -3px; // to match the border
         border-bottom: 3px solid $gray-l5;
