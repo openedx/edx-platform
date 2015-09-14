@@ -10,6 +10,7 @@ csmh_db = dbs['student_module_history']
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+
         # Archive 'StudentModuleHistory'
         default_db.rename_table('courseware_studentmodulehistory', 'courseware_studentmodulehistoryarchive')
 
@@ -25,6 +26,27 @@ class Migration(SchemaMigration):
             ('grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
             ('max_grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
         ))
+
+        if not default_db.dry_run:
+            try:
+                initial_id = 1000000 + orm.StudentModuleHistoryArchive.objects.all().latest('id').id
+            except orm.StudentModuleHistoryArchive.DoesNotExist:
+                initial_id = 0
+
+            if csmh_db.backend_name == 'mysql':
+                csmh_db.execute('ALTER TABLE courseware_studentmodulehistory AUTO_INCREMENT=%s', [initial_id])
+            elif csmh_db.backend_name == 'sqlite3':
+                # This is a hack to force sqlite to add new rows after the earlier rows we
+                # want to migrate.
+                orm.StudentModuleHistory(
+                    id=initial_id,
+                    course_key=None,
+                    usage_key=None,
+                    username="",
+                    version="",
+                    created=datetime.datetime.now(),
+                ).save()
+
         csmh_db.send_create_signal('courseware', ['StudentModuleHistory'])
 
 
