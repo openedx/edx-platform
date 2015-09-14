@@ -3,8 +3,9 @@ Tests for block_cache.py
 """
 
 from django.core.cache import get_cache
-from mock import patch, DEFAULT
+from mock import patch
 from unittest import TestCase
+
 from .test_utils import (
     MockModulestoreFactory, MockCache, MockUserInfo, MockTransformer, ChildrenMapTestMixin
 )
@@ -81,5 +82,5 @@ class TestBlockCache(TestCase, ChildrenMapTestMixin):
             self.assert_block_structure(block_structure, self.children_map)
             if iteration == 0:
                 self.assertTrue(self.modulestore.get_items_call_count > 0)
-            # else:  TODO - debug issue with pickling
-            #     self.assertEquals(self.modulestore.get_items_call_count, 0)
+            else:
+                self.assertEquals(self.modulestore.get_items_call_count, 0)
