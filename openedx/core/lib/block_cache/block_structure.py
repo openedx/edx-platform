@@ -13,18 +13,19 @@ logger = getLogger(__name__)  # pylint: disable=C0103
 TRANSFORMER_VERSION_KEY = '_version'
 
 
+class BlockRelations(object):
+    def __init__(self):
+        self.parents = []
+        self.children = []
+
+
 class BlockStructure(object):
     """
     A class to encapsulate a structure of blocks, a directed acyclic graph of blocks.
     """
-    class BlockRelations(object):
-        def __init__(self):
-            self.parents = []
-            self.children = []
-
     def __init__(self, root_block_key):
         self.root_block_key = root_block_key
-        self._block_relations = defaultdict(self.BlockRelations)
+        self._block_relations = defaultdict(BlockRelations)
         self._add_block(self._block_relations, root_block_key)
 
     def __iter__(self):
@@ -62,7 +63,7 @@ class BlockStructure(object):
 
     def prune(self):
         # create a new block relations map with only those blocks that are still linked
-        pruned_block_relations = defaultdict(self.BlockRelations)
+        pruned_block_relations = defaultdict(BlockRelations)
         old_block_relations = self._block_relations
 
         def do_for_each_block(block_key):
@@ -86,23 +87,24 @@ class BlockStructure(object):
         _ = block_relations[block_key]
 
 
+class BlockData(object):
+    def __init__(self):
+        # dictionary mapping xblock field names to their values.
+        self._xblock_fields = {}
+
+        # dictionary mapping transformers' IDs to their collected data.
+        self._transformer_data = defaultdict(dict)
+
+
 class BlockStructureBlockData(BlockStructure):
     """
     A sub-class of BlockStructure that encapsulates data captured about the blocks.
     """
-    class BlockData(object):
-        def __init__(self):
-            # dictionary mapping xblock field names to their values.
-            self._xblock_fields = {}
-
-            # dictionary mapping transformers' IDs to their collected data.
-            self._transformer_data = defaultdict(dict)
-
     def __init__(self, root_block_key):
         super(BlockStructureBlockData, self).__init__(root_block_key)
 
         # dictionary mapping usage keys to BlockData
-        self._block_data_map = defaultdict(self.BlockData)
+        self._block_data_map = defaultdict(BlockData)
 
         # dictionary mapping transformer IDs to block-structure-wide transformer data
         self._transformer_data = defaultdict(dict)
@@ -204,11 +206,15 @@ class BlockStructureFactory(object):
     @classmethod
     def create_from_modulestore(cls, root_block_key, modulestore):
         block_structure = BlockStructureCollectedData(root_block_key)
+        blocks_visited = set()
 
         def build_block_structure(xblock):
             """
             Helper function to recursively walk block structure
             """
+            if xblock.location in blocks_visited:
+                return
+            blocks_visited.add(xblock.location)
             block_structure.add_xblock(xblock)
             for child in xblock.get_children():
                 block_structure.add_relation(xblock.location, child.location)
@@ -243,14 +249,22 @@ class BlockStructureFactory(object):
             block_structure._block_relations = block_relations
             block_structure._transformer_data = transformer_data
 
-            if all(
-                transformer.VERSION == block_structure.get_transformer_data_version(transformer)
-                for transformer in BlockStructureTransformers.get_registered_transformers()
-            ):
+            transformer_issues = {}
+            for transformer in BlockStructureTransformers.get_registered_transformers():
+                cached_transformer_version = block_structure.get_transformer_data_version(transformer)
+                if transformer.VERSION != cached_transformer_version:
+                    transformer_issues[transformer.name()] = "version: {}, cached: {}".format(
+                        transformer.VERSION,
+                        cached_transformer_version,
+                    )
+
+            if not transformer_issues:
                 block_structure._block_data_map = cache.get_many(block_relations.iterkeys())
                 return block_structure
             else:
-                logger.info("Collected data for transformer is outdated.")
+                logger.info(
+                    "Collected data for the following transformers have issues:\n{}."
+                ).format('\n'.join([t_name + ": " + t_value for t_name, t_value in transformer_issues.iteritems()]))
 
         return None
 
