@@ -481,7 +481,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
             # remove the block and its descendants from the new structure
             if recursive:
-                self._remove_subtree(BlockKey.from_usage_key(location), new_structure['blocks'])
+                self._remove_subtree(BlockKey.from_usage_key(location), new_structure)
             else:
                 del new_structure['blocks'][BlockKey.from_usage_key(location)]
 
