@@ -2,6 +2,8 @@
 Tests for UserPartitionTransformer.
 """
 
+import ddt
+
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
@@ -10,10 +12,11 @@ from student.tests.factories import CourseEnrollmentFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from course_blocks.transformers.user_partitions import UserPartitionTransformer
-from course_blocks.api import get_course_blocks, clear_course_from_cache
+from course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.test_helpers import CourseStructureTestCase
 
 
+@ddt.ddt
 class UserPartitionTransformerTestCase(CourseStructureTestCase):
     """
     UserPartitionTransformer Test
@@ -56,8 +59,6 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
                 self.user_partition.id,
                 group.id,
             )
-
-        add_user_to_cohort(self.cohorts[0], self.user.username)
 
         self.transformer = UserPartitionTransformer()
 
@@ -159,11 +160,20 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
             },
         ]
 
-    def test_user_assigned(self):
+    @ddt.data(
+        (None, ('course', 'B', 'O')),
+        (1, ('course', 'A', 'B', 'C', 'E', 'F', 'G', 'J', 'L', 'M', 'O')),
+        (2, ('course', 'A', 'B', 'C', 'D', 'E', 'F', 'H', 'I', 'J', 'M', 'O')),
+        (3, ('course', 'A', 'B', 'D', 'E', 'I', 'J', 'O')),
+        (4, ('course', 'B', 'O')),
+    )
+    @ddt.unpack
+    def test_user_assigned(self, group_id, expected_blocks):
         """
         Test when user is assigned to group in user partition.
         """
-        # TODO ddt with testing user in different groups
+        if group_id:
+            add_user_to_cohort(self.cohorts[group_id-1], self.user.username)
 
         trans_block_structure = get_course_blocks(
             self.user,
@@ -172,7 +182,7 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         )
         self.assertSetEqual(
             set(trans_block_structure.get_block_keys()),
-            self.get_block_key_set(self.blocks, 'course', 'A', 'B', 'C', 'E', 'F', 'G', 'J', 'L', 'M', 'O')
+            self.get_block_key_set(self.blocks, *expected_blocks)
         )
 
     def test_staff_user(self):
