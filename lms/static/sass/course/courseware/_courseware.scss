@@ -98,7 +98,6 @@ div.course-wrapper {
     @extend .content;
     padding: ($baseline*2);
     line-height: 1.6;
-
     h1 {
       margin: 0 0 lh();
     }
@@ -137,6 +136,7 @@ div.course-wrapper {
         border-bottom: none;
         box-shadow: none;
         text-align: left;
+        width: 100%;
         &:hover {
           background-color: transparent;
         }
@@ -182,8 +182,16 @@ div.course-wrapper {
         border-top: 4px solid #22B557 !important;
         margin: 0 auto;
       }
+      &.success-left-bar {
+        border-left: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
       &.message-top-bar {
         border-top: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
+      &.message-left-bar {
+        border-left: 4px solid #FAB95C !important;
         margin: 0 auto;
       }
       &.failure {
@@ -191,11 +199,18 @@ div.course-wrapper {
         margin: 0 auto;
       }
     }
+
     div.proctored-exam {
       @extend .timed-exam;
       .proctored-exam-message {
         border-top: ($baseline/10) solid rgb(207, 216, 220);
         padding-top: 25px;
+      }
+      // specialized padding override just for the entrance page
+      &.entrance {
+        button.gated-sequence {
+          padding: 0 ($baseline*5) 0 ($baseline*2.5);
+        }
       }
       button {
         background: #126F9A;
@@ -222,8 +237,7 @@ div.course-wrapper {
             font-size: 22px;
             left: 0;
             top: $baseline;
-            color: rgb(206, 216, 220)
-
+            color: rgb(206, 216, 220);
           }
         }
         .start-timed-exam {
@@ -242,12 +256,153 @@ div.course-wrapper {
           top: 50%;
           font-size: 30px;
           margin-top: -15px;
+          &.fa-arrow-circle-right {
+            top: 30%;
+          }
         }
         &:last-child {
           > .fa {
             color: rgb(206, 216, 220);
           }
           border-bottom: none;
+        }
+        &:last-child {
+          > .practice-exam {
+            color: #147ABA;
+          }
+          border-bottom: none;
+        }
+      }
+    }
+    .proctored-exam-skip-confirm-wrapper {
+      border-left: ($baseline/4) solid $red;
+      padding: $baseline ($baseline*1.5);;
+      background-color: rgb(242, 244, 245);
+
+      .msg-title {
+        @extend %t-title5;
+        @extend %t-strong;
+      }
+
+      .msg-content {
+        color: $gray-l1;
+
+        strong {
+          @extend %t-strong;
+        }
+      }
+
+      .proctored-exam-skip-actions {
+        @include float(right);
+        margin-top: $baseline;
+      }
+
+      .btn {
+        @extend %t-strong;
+        transition: color $tmg-f3 ease-in-out 0s,border-color
+        $tmg-f3 ease-in-out 0s,background
+        $tmg-f3 ease-in-out 0s,box-shadow
+        $tmg-f3 ease-in-out 0s;;
+
+        // Display: inline, side-by-side
+        display: inline-block;
+        border-style: solid;
+        border-radius: 3px;
+        border-width: 1px;
+
+        // Display: block, one button per line, full width
+        &.block {
+            display: block;
+            width: 100%;
+        }
+
+        // STATE: is disabled
+        &:disabled,
+        &.is-disabled {
+          pointer-events: none;
+          outline: none;
+          cursor: default;
+        }
+      }
+
+      .btn-base {
+        @extend %t-copy-base;
+        padding: $baseline/2 $baseline;
+      }
+      // ----------------------------
+      // #DEFAULT
+      // ----------------------------
+      .btn-default {
+        border-color: rgb(0, 121, 188);
+        background: $white-t1;
+        color: rgb(0, 121, 188);;
+
+        // STATE: hover and focus
+        &:hover,
+        &.is-hovered,
+        &:focus,
+        &.is-focused {
+          background: rgb(0, 121, 188);
+          color: $white;
+          box-shadow: none;
+          text-shadow: none;
+        }
+
+        // STATE: is pressed or active
+        &:active,
+        &.is-pressed,
+        &.is-active {
+          border-color: $m-blue-d5;
+          background: $m-blue-d5;
+          box-shadow: none;
+          text-shadow: none;
+        }
+
+        // STATE: is disabled
+        &:disabled,
+        &.is-disabled {
+          border-color: $m-gray-d1;
+          background: $white-t1;
+          color: $m-gray-d3;
+        }
+      }
+      // ----------------------------
+      // #PRIMARY
+      // ----------------------------
+      .btn-primary {
+        border-color: rgb(0, 121, 188);
+        background: rgb(0, 121, 188);
+        color: $white;
+        box-shadow: none;
+        text-shadow: none;
+
+        // STATE: hover and focus
+        &:hover,
+        &.is-hovered,
+        &:focus,
+        &.is-focused {
+          border-color: $m-blue-d5;
+          background: $m-blue-d5;
+          box-shadow: none;
+          text-shadow: none;
+        }
+
+        // STATE: is pressed or active
+        &:active,
+        &.is-pressed,
+        &.is-active {
+          border-color: rgb(0, 121, 188);
+          background: rgb(0, 121, 188);
+          box-shadow: none;
+          text-shadow: none;
+        }
+
+        // STATE: is disabled
+        &:disabled,
+        &.is-disabled {
+          border-color: $m-gray-d1;
+          background: $white-t1;
+          color: $m-gray-d3;
         }
       }
     }

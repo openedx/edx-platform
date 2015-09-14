@@ -9,7 +9,6 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminF
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.django import modulestore
 
 
 USER_COUNT = 11
@@ -80,7 +79,6 @@ class TestGradebook(SharedModuleStoreTestCase):
             args=(self.course.id.to_deprecated_string(),)
         ))
 
-    def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)
 
 

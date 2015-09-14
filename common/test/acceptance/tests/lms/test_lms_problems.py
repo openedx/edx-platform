@@ -5,7 +5,6 @@ Bok choy acceptance tests for problems in the LMS
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
-from flaky import flaky
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -180,7 +179,6 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
             <problem>
             <p>question text</p>
             <stringresponse answer="A">
-                <stringequalhint answer="B">aa <a href="#">bb</a> cc</stringequalhint>
                 <stringequalhint answer="C"><a href="#">aa bb</a> cc</stringequalhint>
                 <textline size="20"/>
             </stringresponse>
@@ -192,7 +190,6 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
         """)
         return XBlockFixtureDesc('problem', 'PROBLEM HTML HINT TEST', data=xml)
 
-    @flaky  # TODO fix this, see TNL-3183
     def test_check_hint(self):
         """
         Test clicking Check shows the extended hint in the problem message.
@@ -200,25 +197,16 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_text[0], u'question text')
-        problem_page.fill_answer('B')
-        problem_page.click_check()
-        self.assertEqual(problem_page.message_text, u'Incorrect: aa bb cc')
         problem_page.fill_answer('C')
         problem_page.click_check()
         self.assertEqual(problem_page.message_text, u'Incorrect: aa bb cc')
         # Check for corresponding tracking event
         actual_events = self.wait_for_events(
             event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
-            number_of_matches=2
+            number_of_matches=1
         )
         self.assert_events_match(
             [{'event': {'hint_label': u'Incorrect',
-                        'trigger_type': 'single',
-                        'student_answer': [u'B'],
-                        'correctness': False,
-                        'question_type': 'stringresponse',
-                        'hints': [{'text': 'aa <a href="#">bb</a> cc'}]}},
-             {'event': {'hint_label': u'Incorrect',
                         'trigger_type': 'single',
                         'student_answer': [u'C'],
                         'correctness': False,

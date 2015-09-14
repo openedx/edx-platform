@@ -63,6 +63,8 @@ lib_paths:
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/date.js
     - xmodule_js/common_static/js/vendor/moment.min.js
+    - xmodule_js/common_static/js/vendor/moment-with-locales.min.js
+    - xmodule_js/common_static/js/utils/edx.utils.validate.js
 
 # Paths to source JavaScript files
 src_paths:

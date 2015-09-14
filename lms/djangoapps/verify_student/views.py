@@ -1473,11 +1473,3 @@ class InCourseReverifyView(View):
         params = urllib.urlencode({"checkpoint": checkpoint})
         full_url = u"{base}?{params}".format(base=base_url, params=params)
         return redirect(full_url)
-
-
-class VerifyLaterView(RedirectView):
-    """ This view has been deprecated and should redirect to the unified verification flow. """
-    permanent = True
-
-    def get_redirect_url(self, course_id, **kwargs):    # pylint: disable=unused-argument
-        return reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_id)})

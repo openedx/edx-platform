@@ -139,7 +139,7 @@ class CertificatesPage(CoursePage):
         Clicks the main action presented by the prompt (such as 'Delete')
         """
         self.wait_for_confirmation_prompt()
-        self.q(css='a.button.action-primary').first.click()
+        self.q(css='button.action-primary').first.click()
         self.wait_for_ajax()
 
 

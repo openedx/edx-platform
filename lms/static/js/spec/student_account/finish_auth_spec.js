@@ -1,13 +1,18 @@
-define([
-    'jquery',
-    'utility',
-    'common/js/spec_helpers/ajax_helpers',
-    'js/student_account/views/FinishAuthView',
-    'js/student_account/enrollment',
-    'js/student_account/shoppingcart',
-    'js/student_account/emailoptin'
-], function($, utility, AjaxHelpers, FinishAuthView, EnrollmentInterface, ShoppingCartInterface, EmailOptInInterface) {
-        'use strict';
+;(function (define) {
+    'use strict';
+    define([
+            'jquery',
+            'jquery.url',
+            'utility',
+            'common/js/spec_helpers/ajax_helpers',
+            'js/student_account/views/FinishAuthView',
+            'js/student_account/enrollment',
+            'js/student_account/shoppingcart',
+            'js/student_account/emailoptin'
+        ],
+        function($, url, utility, AjaxHelpers, FinishAuthView, EnrollmentInterface, ShoppingCartInterface,
+                 EmailOptInInterface) {
+
         describe('FinishAuthView', function() {
             var requests = null,
                 view = null,
@@ -167,5 +172,5 @@ define([
                 expect( view.redirect ).toHaveBeenCalledWith( "/dashboard" );
             });
         });
-    }
-);
+    });
+}).call(this, define || RequireJS.define);

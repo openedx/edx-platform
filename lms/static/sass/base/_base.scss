@@ -84,7 +84,7 @@ p {
     @include transition(all 0.1s linear 0s);
 
     &:hover, &:focus {
-      color: $link-color;
+      color: $link-hover;
       text-decoration: underline;
     }
   }
@@ -96,7 +96,9 @@ a, a:visited {
   text-decoration: none;
   @include transition(all 0.1s linear 0s);
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
+    color: $link-hover;
     text-decoration: underline;
   }
 
@@ -327,6 +329,7 @@ mark {
 // UI - semantically hide text
 .sr {
   @extend %text-sr;
+  @extend %a11y-ensure-contrast;
 }
 
 // UI - skipnav

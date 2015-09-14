@@ -951,3 +951,65 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.content)
         self.assertEqual(response_data, expected_response_data)
+
+
+@httpretty.activate
+class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ThreadViewSet Retrieve"""
+    def setUp(self):
+        super(ThreadViewSetRetrieveTest, self).setUp()
+        self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
+        self.thread_id = "test_thread"
+
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "commentable_id": "test_topic",
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+            "title": "Test Title",
+            "body": "Test body",
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z"
+        })
+        expected_response_data = {
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "course_id": unicode(self.course.id),
+            "topic_id": "test_topic",
+            "group_id": None,
+            "group_name": None,
+            "title": "Test Title",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "comment_count": 0,
+            "unread_comment_count": 0,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+            "read": False,
+            "has_endorsed": False,
+            "id": "test_thread",
+            "type": "discussion"
+        }
+        self.register_get_thread_response(cs_thread)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), expected_response_data)
+        self.assertEqual(httpretty.last_request().method, "GET")
+
+    def test_retrieve_nonexistent_thread(self):
+        self.register_get_thread_error_response(self.thread_id, 404)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)

@@ -9,6 +9,7 @@
 # Amol Bhave <ammubhave@gmail.com>, 2013
 # anant agarwal <agarwal@cag.csail.mit.edu>, 2013
 # Anant Vima <anant.vima@anu.edu.au>, 2014
+# CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2015
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # Goutam Kumar Dey <de_kumargoutam@yahoo.co.in>, 2014
 # gvidushiin <gvidushiin@gmail.com>, 2014
@@ -48,6 +49,7 @@
 # 
 # Translators:
 # Amol Bhave <ammubhave@gmail.com>, 2013
+# CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2015
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # Goutam Kumar Dey <de_kumargoutam@yahoo.co.in>, 2014
 # gvidushiin <gvidushiin@gmail.com>, 2014
@@ -72,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:07+0000\n"
+"POT-Creation-Date: 2015-09-11 12:16+0000\n"
 "PO-Revision-Date: 2015-06-28 20:21+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -94,12 +96,12 @@ msgstr "चर्चा"
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Problem"
-msgstr ""
+msgstr "समस्या"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
-msgstr ""
+msgstr "उन्‍नत"
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
@@ -108,17 +110,13 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: cms/templates/course_outline.html lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
-msgstr ""
+msgstr "खंड"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/ccx/schedule.html
 msgid "Subsection"
-msgstr ""
+msgstr "उपखंड"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py
@@ -7553,6 +7551,10 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr ""
 
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
+msgstr ""
+
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -8829,7 +8831,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
-msgstr ""
+msgstr "एच टी एम एल"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Video"
@@ -9133,7 +9135,7 @@ msgstr "यह पेज मौजूद नहीं है"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/student_profile/learner_profile.html
 msgid "Loading"
-msgstr ""
+msgstr "लोड हो रहा है"
 
 #: cms/templates/asset_index.html lms/templates/courseware/courseware.html
 msgid "close"
@@ -15896,7 +15898,7 @@ msgstr ""
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
-msgstr ""
+msgstr "यदि समस्या बनी रहती है तो कृपया {email} इस ईमेल पर संपर्क करें."
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
@@ -15905,7 +15907,7 @@ msgstr ""
 
 #: cms/templates/activation_active.html
 msgid "Your account is already active"
-msgstr ""
+msgstr "आपका खाता वर्तमान में सक्रीय है"
 
 #: cms/templates/activation_active.html
 msgid ""
@@ -15969,11 +15971,11 @@ msgstr "विषय-वस्तु"
 #: cms/templates/ux/reference/course-create-rerun.html
 #: cms/templates/ux/reference/outline.html
 msgid "Page Actions"
-msgstr ""
+msgstr "पृष्‍ठ के कार्यकलाप"
 
 #: cms/templates/asset_index.html cms/templates/videos_index.html
 msgid "Upload New File"
-msgstr ""
+msgstr "नई फाइल अपलोड करें"
 
 #: cms/templates/asset_index.html
 msgid "Adding Files for Your Course"

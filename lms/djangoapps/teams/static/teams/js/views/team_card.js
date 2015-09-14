@@ -1,25 +1,27 @@
 ;(function (define) {
     'use strict';
     define([
+        'jquery',
         'backbone',
         'underscore',
         'gettext',
-        'jquery.timeago',
+        'moment-with-locales',
         'js/components/card/views/card',
         'teams/js/views/team_utils',
         'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
-        'text!teams/templates/team-activity.underscore'
+        'text!teams/templates/date.underscore'
     ], function (
+        $,
         Backbone,
         _,
         gettext,
-        timeago,
+        moment,
         CardView,
         TeamUtils,
         teamMembershipDetailsTemplate,
         teamCountryLanguageTemplate,
-        teamActivityTemplate
+        dateTemplate
     ) {
         var TeamMembershipView, TeamCountryLanguageView, TeamActivityView, TeamCardView;
 
@@ -30,11 +32,13 @@
 
             initialize: function (options) {
                 this.maxTeamSize = options.maxTeamSize;
+                this.memberships = options.memberships;
             },
 
             render: function () {
-                var allMemberships = _(this.model.get('membership'))
-                        .sortBy(function (member) {return new Date(member.last_activity_at);}).reverse(),
+                var allMemberships = _(this.memberships).sortBy(function (member) {
+                    return new Date(member.last_activity_at);
+                }).reverse(),
                     displayableMemberships = allMemberships.slice(0, 5),
                     maxMemberCount = this.maxTeamSize;
                 this.$el.html(this.template({
@@ -68,22 +72,25 @@
         TeamActivityView = Backbone.View.extend({
             tagName: 'div',
             className: 'team-activity',
-            template: _.template(teamActivityTemplate),
+            template: _.template(dateTemplate),
 
             initialize: function (options) {
                 this.date = options.date;
             },
 
             render: function () {
+                var lastActivity = moment(this.date),
+                    currentLanguage = $('html').attr('lang');
+                lastActivity.locale(currentLanguage);
                 this.$el.html(
                     interpolate(
-                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
-                        gettext("Last Activity %(date)s"),
-                        {date: this.template({date: this.date})},
+                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: http://momentjs.com/)
+                        gettext("Last activity %(date)s"),
+                        {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})},
                         true
                     )
                 );
-                this.$('abbr').timeago();
+                this.$('abbr').text(lastActivity.fromNow());
             }
         });
 
@@ -92,7 +99,7 @@
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
-                    new TeamMembershipView({model: this.teamModel(), maxTeamSize: this.maxTeamSize}),
+                    new TeamMembershipView({memberships: this.getMemberships(), maxTeamSize: this.maxTeamSize}),
                     new TeamCountryLanguageView({
                         model: this.teamModel(),
                         countries: this.countries,
@@ -100,11 +107,23 @@
                     }),
                     new TeamActivityView({date: this.teamModel().get('last_activity_at')})
                 ];
+                this.model.on('change:membership', function () {
+                    this.detailViews[0].memberships = this.getMemberships();
+                }, this);
             },
 
             teamModel: function () {
-                if (this.model.has('team')) { return this.model.get('team'); };
+                if (this.model.has('team')) { return this.model.get('team'); }
                 return this.model;
+            },
+
+            getMemberships: function () {
+                if (this.model.has('team')) {
+                    return [this.model.attributes];
+                }
+                else {
+                    return this.model.get('membership');
+                }
             },
 
             configuration: 'list_card',

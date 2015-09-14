@@ -224,13 +224,10 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
 
 
 @attr('shard_1')
-class TestRecommenderWithResources(TestRecommender):
-    """
-    Check whether we can add/edit/flag/export resources correctly
-    """
+class TestRecommenderResourceBase(TestRecommender):
+    """Base helper class for tests with resources."""
     def setUp(self):
-        # call the setUp function from the superclass
-        super(TestRecommenderWithResources, self).setUp()
+        super(TestRecommenderResourceBase, self).setUp()
         self.resource_id = self.resource_urls[0]
         self.resource_id_second = self.resource_urls[1]
         self.non_existing_resource_id = 'An non-existing id'
@@ -258,6 +255,12 @@ class TestRecommenderWithResources(TestRecommender):
         resource.update(edited_recommendations)
         return resource
 
+
+@attr('shard_1')
+class TestRecommenderWithResources(TestRecommenderResourceBase):
+    """
+    Check whether we can add/edit/flag/export resources correctly
+    """
     def test_add_redundant_resource(self):
         """
         Verify the addition of a redundant resource (url) is rejected
@@ -420,14 +423,10 @@ class TestRecommenderWithResources(TestRecommender):
 
 @attr('shard_1')
 @ddt
-class TestRecommenderVoteWithResources(TestRecommenderWithResources):
+class TestRecommenderVoteWithResources(TestRecommenderResourceBase):
     """
     Check whether we can vote resources correctly
     """
-    def setUp(self):
-        # call the setUp function from the superclass
-        super(TestRecommenderVoteWithResources, self).setUp()
-
     @data(
         {'event': 'recommender_upvote'},
         {'event': 'recommender_downvote'}
@@ -538,14 +537,10 @@ class TestRecommenderVoteWithResources(TestRecommenderWithResources):
 
 @attr('shard_1')
 @ddt
-class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
+class TestRecommenderStaffFeedbackWithResources(TestRecommenderResourceBase):
     """
     Check whether we can remove/endorse resources correctly
     """
-    def setUp(self):
-        # call the setUp function from the superclass
-        super(TestRecommenderStaffFeedbackWithResources, self).setUp()
-
     @data('remove_resource', 'endorse_resource')
     def test_remove_or_endorse_resource_non_existing(self, test_case):
         """
@@ -642,7 +637,6 @@ class TestRecommenderFileUploading(TestRecommender):
     Check whether we can handle file uploading correctly
     """
     def setUp(self):
-        # call the setUp function from the superclass
         super(TestRecommenderFileUploading, self).setUp()
         self.initial_configuration = {
             'flagged_accum_resources': {},

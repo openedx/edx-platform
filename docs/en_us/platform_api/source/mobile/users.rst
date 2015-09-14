@@ -4,10 +4,9 @@ Mobile API User Resource
 
 With the Mobile API **User** resource, you can complete the following tasks.
 
-* :ref:`Get details about a user<Get User Details>`.
-* :ref:`Get course enrollments for a user<Get a User's Course Enrollments>`.
-* :ref:`Get a user's status in a course<Get or Change User Status in a Course>`.
-* :ref:`Change a user's status in a course<Get or Change User Status in a Course>`.
+.. contents::
+   :local:
+   :depth: 1
 
 .. _Get User Details:
 

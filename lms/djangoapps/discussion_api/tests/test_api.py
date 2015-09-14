@@ -33,6 +33,7 @@ from discussion_api.api import (
     get_thread_list,
     update_comment,
     update_thread,
+    get_thread,
 )
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -2783,6 +2784,182 @@ class DeleteCommentTest(
         )
         try:
             delete_comment(self.request, self.comment_id)
+            self.assertFalse(expected_error)
+        except Http404:
+            self.assertTrue(expected_error)
+
+
+@ddt.ddt
+class RetrieveThreadTest(
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase
+):
+    """Tests for get_thread"""
+    @classmethod
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUpClass(cls):
+        super(RetrieveThreadTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(RetrieveThreadTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.thread_author = UserFactory.create()
+        self.register_get_user_response(self.thread_author)
+        self.request = RequestFactory().get("/test_path")
+        self.request.user = self.thread_author
+        self.thread_id = "test_thread"
+        CourseEnrollmentFactory.create(user=self.thread_author, course_id=self.course.id)
+
+    def register_thread(self, overrides=None):
+        """
+        Make a thread with appropriate data overridden by the overrides
+        parameter and register mock responses for GET on its
+        endpoint.
+        """
+        cs_data = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "commentable_id": "test_topic",
+            "username": self.thread_author.username,
+            "user_id": str(self.thread_author.id),
+            "title": "Test Title",
+            "body": "Test body",
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z"
+        })
+        cs_data.update(overrides or {})
+        self.register_get_thread_response(cs_data)
+
+    def test_basic(self):
+        expected_response_data = {
+            "author": self.thread_author.username,
+            "author_label": None,
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "course_id": unicode(self.course.id),
+            "topic_id": "test_topic",
+            "group_id": None,
+            "group_name": None,
+            "title": "Test Title",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "comment_count": 0,
+            "unread_comment_count": 0,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+            "read": False,
+            "has_endorsed": False,
+            "id": "test_thread",
+            "type": "discussion"
+        }
+        self.register_thread()
+        self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
+        self.assertEqual(httpretty.last_request().method, "GET")
+
+    def test_thread_id_not_found(self):
+        self.register_get_thread_error_response("missing_thread", 404)
+        with self.assertRaises(Http404):
+            get_thread(self.request, "missing_thread")
+
+    def test_nonauthor_enrolled_in_course(self):
+        expected_response_data = {
+            "author": self.thread_author.username,
+            "author_label": None,
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "editable_fields": ["abuse_flagged", "following", "voted"],
+            "course_id": unicode(self.course.id),
+            "topic_id": "test_topic",
+            "group_id": None,
+            "group_name": None,
+            "title": "Test Title",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "comment_count": 0,
+            "unread_comment_count": 0,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+            "read": False,
+            "has_endorsed": False,
+            "id": "test_thread",
+            "type": "discussion"
+        }
+        non_author_user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.register_get_user_response(non_author_user)
+        CourseEnrollmentFactory.create(user=non_author_user, course_id=self.course.id)
+        self.register_thread()
+        self.request.user = non_author_user
+        self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
+        self.assertEqual(httpretty.last_request().method, "GET")
+
+    def test_not_enrolled_in_course(self):
+        self.register_thread()
+        self.request.user = UserFactory.create()
+        with self.assertRaises(Http404):
+            get_thread(self.request, self.thread_id)
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        """
+        Tests group access for retrieving a thread
+
+        All privileged roles are able to retrieve a thread. A student role can
+        only retrieve a thread if,
+        the student role is the author and the thread is not in a cohort,
+        the student role is the author and the thread is in the author's cohort.
+        """
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.thread_author, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.thread_author])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.thread_author]
+        self.register_thread({
+            "course_id": unicode(cohort_course.id),
+            "group_id": (
+                None if thread_group_state == "no_group" else
+                cohort.id if thread_group_state == "match_group" else
+                cohort.id + 1
+            ),
+        })
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            get_thread(self.request, self.thread_id)
             self.assertFalse(expected_error)
         except Http404:
             self.assertTrue(expected_error)

@@ -180,7 +180,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:07+0000\n"
+"POT-Creation-Date: 2015-09-11 12:16+0000\n"
 "PO-Revision-Date: 2015-08-05 08:47+0000\n"
 "Last-Translator: Weyedide <weyedide@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -7562,6 +7562,10 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr ""
 
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
+msgstr ""
+
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -8609,7 +8613,10 @@ msgstr ""
 msgid "Highest level of education completed"
 msgstr ""
 
-#: lms/templates/signup_modal.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
 msgid "Year of birth"
 msgstr "Год рождения"
 
@@ -13439,7 +13446,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
-msgstr ""
+msgstr "Дата окончания курса:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -13459,7 +13466,7 @@ msgstr "Курс уже закончился?"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of sections:"
-msgstr ""
+msgstr "Количество разделов:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"

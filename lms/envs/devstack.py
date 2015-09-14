@@ -85,8 +85,17 @@ def should_show_debug_toolbar(_):
 
 ########################### PIPELINE #################################
 
-# # Skip RequireJS optimizer in development
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+# Skip packaging and optimization in development
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+
+# Revert to the default set of finders as we don't want the production pipeline
+STATICFILES_FINDERS = [
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
+]
+
+# Disable JavaScript compression in development
+PIPELINE_JS_COMPRESSOR = None
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
