@@ -454,13 +454,10 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p1', {'2_1': u'Correct'})
 
         # Now fetch the state entry for that problem.
-        student_module = StudentModule.objects.get(
-            course_id=self.course.id,
-            student=self.student_user
-        )
         # count how many state history entries there are
         baseline = StudentModuleHistory.objects.filter(
-            student_module=student_module
+            username=self.student_user.username,
+            course_key=self.course.id,
         )
         baseline_count = baseline.count()
         self.assertEqual(baseline_count, 3)
@@ -470,7 +467,8 @@ class TestCourseGrader(TestSubmittingProblems):
 
         # check that we don't have more state history entries
         csmh = StudentModuleHistory.objects.filter(
-            student_module=student_module
+            username=self.student_user.username,
+            course_key=self.course.id,
         )
         current_count = csmh.count()
         self.assertEqual(current_count, 3)

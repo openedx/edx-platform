@@ -14,7 +14,9 @@ class Migration(SchemaMigration):
         # Create a new 'StudentModuleHistory' with an extended key space
         db.create_table('courseware_studentmodulehistory', (
             ('id', self.gf('courseware.fields.UnsignedBigIntAutoField')(primary_key=True)),
-            ('student_module', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['courseware.StudentModule'])),
+            ('course_key', self.gf('xmodule_django.models.CourseKeyField')(max_length=255)),
+            ('usage_key', self.gf('xmodule_django.models.UsageKeyField')(max_length=255)),
+            ('username', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('version', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(db_index=True)),
             ('state', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
@@ -123,12 +125,14 @@ class Migration(SchemaMigration):
         },
         'courseware.studentmodulehistory': {
             'Meta': {'object_name': 'StudentModuleHistory'},
+            'course_key': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'}),
             'grade': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('courseware.fields.UnsignedBigIntAutoField', [], {'primary_key': 'True'}),
             'max_grade': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'state': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'student_module': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['courseware.StudentModule']"}),
+            'usage_key': ('xmodule_django.models.UsageKeyField', [], {'max_length': '255'}),
+            'username': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'version': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'courseware.xmodulestudentinfofield': {

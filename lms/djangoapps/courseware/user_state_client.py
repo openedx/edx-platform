@@ -303,16 +303,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
-        student_modules = list(
-            student_module
-            for student_module, usage_id
-            in self._get_student_modules(username, [block_key])
-        )
-        if len(student_modules) == 0:
-            raise self.DoesNotExist()
 
-        history_entries = StudentModuleHistory.objects.prefetch_related('student_module').filter(
-            student_module__in=student_modules
+        history_entries = StudentModuleHistory.objects.filter(
+            username=username,
+            usage_key=block_key,
         ).order_by('-id')
 
         # If no history records exist, raise an error
@@ -331,9 +325,9 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             if state == {}:
                 state = None
 
-            block_key = history_entry.student_module.module_state_key
+            block_key = history_entry.usage_key
             block_key = block_key.map_into_course(
-                history_entry.student_module.course_id
+                history_entry.course_key
             )
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
