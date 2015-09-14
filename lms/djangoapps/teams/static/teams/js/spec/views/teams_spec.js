@@ -24,7 +24,9 @@ define([
         it('can render itself', function () {
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
                 teamsView = createTeamsView({
-                    teams: TeamSpecHelpers.createMockTeams(testTeamData)
+                    teams: TeamSpecHelpers.createMockTeams({
+                        results: testTeamData
+                    })
                 });
 
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
