@@ -15,7 +15,10 @@ class TestOrphanBase(CourseTestCase):
     Base class for Studio tests that require orphaned modules
     """
     def create_course_with_orphans(self, default_store):
-
+        """
+        Creates a course with 3 orphan modules, one of which
+        has a child that's also in the course tree.
+        """
         course = CourseFactory.create(default_store=default_store)
 
         # create chapters and add them to course tree
@@ -56,6 +59,7 @@ class TestOrphanBase(CourseTestCase):
         self.store.create_child(self.user.id, course.location, 'course_info', "updates")
 
         return course
+
 
 @ddt.ddt
 class TestOrphan(TestOrphanBase):
