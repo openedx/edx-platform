@@ -70,6 +70,7 @@ class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         )
 
 
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
@@ -103,6 +104,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseTopicsView"""
     def setUp(self):
@@ -139,6 +141,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @ddt.ddt
 @httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet list"""
     def setUp(self):
@@ -388,6 +391,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @httpretty.activate
 @disable_signal(api, 'thread_created')
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet create"""
     def setUp(self):
@@ -480,6 +484,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @httpretty.activate
 @disable_signal(api, 'thread_edited')
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet partial_update"""
     def setUp(self):
@@ -580,6 +585,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
 @httpretty.activate
 @disable_signal(api, 'thread_deleted')
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
     def setUp(self):
@@ -613,6 +619,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet list"""
     def setUp(self):
@@ -744,6 +751,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @httpretty.activate
 @disable_signal(api, 'comment_deleted')
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
 
@@ -785,6 +793,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @httpretty.activate
 @disable_signal(api, 'comment_created')
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet create"""
     def setUp(self):
@@ -869,6 +878,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @disable_signal(api, 'comment_edited')
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet partial_update"""
     def setUp(self):
@@ -954,6 +964,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
 
 
 @httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet Retrieve"""
     def setUp(self):

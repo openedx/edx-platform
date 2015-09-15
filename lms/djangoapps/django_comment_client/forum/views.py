@@ -27,7 +27,6 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 from courseware.tabs import EnrolledTab
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
-from ccx.overrides import get_current_ccx
 
 from django_comment_common.utils import ThreadContext
 from django_comment_client.permissions import has_permission, get_team
@@ -66,11 +65,7 @@ class DiscussionTab(EnrolledTab):
     def is_enabled(cls, course, user=None):
         if not super(DiscussionTab, cls).is_enabled(course, user):
             return False
-
-        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-            if get_current_ccx(course.id):
-                return False
-        return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
+        return utils.is_discussion_enabled(course.id)
 
 
 def _attr_safe_json(obj):
