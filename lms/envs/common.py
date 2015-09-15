@@ -1817,9 +1817,6 @@ TEMPLATE_VISIBLE_SETTINGS = [
     'FEATURES',
 ]
 
-############################### CHAT ################################
-JABBER = {}
-DATABASE_ROUTERS = []
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media
 # links in the footer.
