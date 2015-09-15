@@ -50,6 +50,7 @@ from verify_student.models import (
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.utils import XssTestMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import check_mongo_calls
@@ -80,7 +81,7 @@ class StartView(TestCase):
 
 
 @ddt.ddt
-class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
+class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     """
     Tests for the payment and verification flow views.
     """
@@ -246,6 +247,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         response = self._get_page('verify_student_verify_now', course.id)
 
         self._assert_messaging(response, PayAndVerifyView.VERIFY_NOW_MSG)
+        self.assert_xss(response, '<script>alert("XSS")</script>')
 
         # Expect that *all* steps are displayed,
         # but we start after the payment step (because it's already completed).
@@ -327,6 +329,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
         self._assert_messaging(response, PayAndVerifyView.PAYMENT_CONFIRMATION_MSG)
 
+        self.assert_xss(response, '<script>alert("XSS")</script>')
+
         # Expect that *all* steps are displayed,
         # but we start at the payment confirmation step
         self._assert_steps_displayed(
@@ -358,6 +362,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         )
 
         self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
+
+        self.assert_xss(response, '<script>alert("XSS")</script>')
 
         # Expect that *all* steps are displayed,
         # but we start on the first verify step
@@ -444,6 +450,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.WEBCAM_REQ,
         ])
         self._assert_upgrade_session_flag(True)
+        self.assert_xss(response, '<script>alert("XSS")</script>')
 
     def test_upgrade_already_verified(self):
         course = self._create_course("verified")
@@ -653,7 +660,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
     def _create_course(self, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """
-        course = CourseFactory.create()
+        course = CourseFactory.create(display_name='<script>alert("XSS")</script>')
 
         if kwargs.get('course_start'):
             course.start = kwargs.get('course_start')

@@ -10,13 +10,13 @@ from verify_student.views import PayAndVerifyView
 
 <%block name="pagetitle">
   % if message_key == PayAndVerifyView.UPGRADE_MSG:
-    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name)}
+    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name) | h}
   % elif message_key == PayAndVerifyView.PAYMENT_CONFIRMATION_MSG:
-    ${_("Receipt For {course_name}").format(course_name=course.display_name)}
+    ${_("Receipt For {course_name}").format(course_name=course.display_name) | h}
   % elif message_key in [PayAndVerifyView.VERIFY_NOW_MSG, PayAndVerifyView.VERIFY_LATER_MSG]:
-    ${_("Verify For {course_name}").format(course_name=course.display_name)}
+    ${_("Verify For {course_name}").format(course_name=course.display_name) | h}
   % else:
-    ${_("Enroll In {course_name}").format(course_name=course.display_name)}
+    ${_("Enroll In {course_name}").format(course_name=course.display_name) | h}
   % endif
 </%block>
 
