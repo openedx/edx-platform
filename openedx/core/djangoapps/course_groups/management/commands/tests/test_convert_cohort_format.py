@@ -16,10 +16,47 @@ class TestConvertCohortFormat(ModuleStoreTestCase):
 
     @unpack
     @data(
-        ({'unrelated_setting': False, 'inline_discussions_cohorting_default': True}, {
-            'unrelated_setting': False, 'inline_discussions_cohorting_default': True,
-            'always_cohort_inline_discussions': True,
-        }),
+        (
+            {
+                'unrelated_setting': False, 'inline_discussions_cohorting_default': True,
+                'cohorted_inline_discussions': ['test1', 'test2'],
+                'cohorted_course_wide_discussions': ['test3', 'test4']
+            },
+            {
+                'unrelated_setting': False, 'inline_discussions_cohorting_default': True,
+                'cohorted_inline_discussions': ['test1', 'test2'],
+                'cohorted_course_wide_discussions': ['test3', 'test4'],
+                'cohorted_discussions': ['test1', 'test2', 'test3', 'test4'],
+                'always_cohort_inline_discussions': True,
+            }
+        ),
+        (
+            {
+                'cohorted_inline_discussions': ['test1', 'test2'],
+            },
+            {
+                'cohorted_inline_discussions': ['test1', 'test2'],
+                'cohorted_discussions': ['test1', 'test2'],
+            }
+        ),
+        (
+            {
+                'cohorted_course_wide_discussions': ['test3', 'test4'],
+            },
+            {
+                'cohorted_course_wide_discussions': ['test3', 'test4'],
+                'cohorted_discussions': ['test3', 'test4']
+            }
+        ),
+        (
+            {
+                'inline_discussions_cohorting_default': True
+            },
+            {
+                'inline_discussions_cohorting_default': True,
+                'always_cohort_inline_discussions': True
+            }
+        ),
         ({'unrelated_setting': False}, {'unrelated_setting': False}),
         (None, {})
     )
