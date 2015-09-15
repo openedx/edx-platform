@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:15+0000\n"
-"PO-Revision-Date: 2015-09-04 14:15:47.640544\n"
+"POT-Creation-Date: 2015-09-11 12:46+0000\n"
+"PO-Revision-Date: 2015-09-11 12:47:23.562016\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -84,6 +84,7 @@ msgstr "خن"
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
+#: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
@@ -99,6 +100,7 @@ msgstr "ذشرذثم"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-details.underscore
@@ -177,7 +179,7 @@ msgstr "ثققخق"
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
-#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
@@ -190,7 +192,6 @@ msgstr "سشدث"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/signatory-editor.underscore
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
 msgid "Close"
@@ -2440,6 +2441,61 @@ msgstr "ثرفثق فثشو يثسذقهحفهخر."
 msgid "Team description cannot have more than 300 characters."
 msgstr "فثشو يثسذقهحفهخر ذشررخف اشدث وخقث فاشر 300 ذاشقشذفثقس."
 
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "An error occurred while removing the member from the team. Try again."
+msgstr "شر ثققخق خذذعققثي صاهمث قثوخدهرل فاث وثوزثق بقخو فاث فثشو. فقغ شلشهر."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "This team does not have any members."
+msgstr "فاهس فثشو يخثس رخف اشدث شرغ وثوزثقس."
+
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "Joined %(date)s"
+msgstr "تخهرثي %(date)s"
+
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "Last Activity %(date)s"
+msgstr "مشسف شذفهدهفغ %(date)s"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "Remove this team member?"
+msgstr "قثوخدث فاهس فثشو وثوزثق?"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid ""
+"This learner will be removed from the team, allowing another learner to take"
+" the available spot."
+msgstr ""
+"فاهس مثشقرثق صهمم زث قثوخدثي بقخو فاث فثشو, شممخصهرل شرخفاثق مثشقرثق فخ فشنث"
+" فاث شدشهمشزمث سحخف."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+#: lms/static/js/views/image_field.js
+#: cms/templates/js/video/metadata-translations-item.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
+msgid "Remove"
+msgstr "قثوخدث"
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid "Delete this team?"
+msgstr "يثمثفث فاهس فثشو?"
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid ""
+"Deleting a team is permanent and cannot be undone. All members are removed "
+"from the team, and team discussions can no longer be accessed."
+msgstr ""
+"يثمثفهرل ش فثشو هس حثقوشرثرف شري ذشررخف زث عريخرث. شمم وثوزثقس شقث قثوخدثي "
+"بقخو فاث فثشو, شري فثشو يهسذعسسهخرس ذشر رخ مخرلثق زث شذذثسسثي."
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid "Team \"%(team)s\" successfully deleted."
+msgstr "فثشو \"%(team)s\" سعذذثسسبعممغ يثمثفثي."
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "غخع شقث رخف ذعققثرفمغ ش وثوزثق خب شرغ فثشو."
@@ -2451,9 +2507,9 @@ msgid "and others"
 msgstr "شري خفاثقس"
 
 #. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last Activity %(date)s"
+msgid "Last activity %(date)s"
 msgstr "مشسف شذفهدهفغ %(date)s"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
@@ -2531,6 +2587,20 @@ msgid "Browse %(sr_start)s teams %(sr_end)s"
 msgstr "زقخصسث %(sr_start)s فثشوس %(sr_end)s"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Your request could not be completed. Reload the page and try again."
+msgstr "غخعق قثضعثسف ذخعمي رخف زث ذخوحمثفثي. قثمخشي فاث حشلث شري فقغ شلشهر."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
+"problem."
+msgstr ""
+"غخعق قثضعثسف ذخعمي رخف زث ذخوحمثفثي يعث فخ ش سثقدثق حقخزمثو. قثمخشي فاث حشلث"
+" شري فقغ شلشهر. هب فاث هسسعث حثقسهسفس, ذمهذن فاث اثمح فشز فخ قثحخقف فاث "
+"حقخزمثو."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
 msgstr "فثشو سثشقذا"
 
@@ -2562,6 +2632,18 @@ msgid ""
 msgstr ""
 "هب غخع وشنث سهلرهبهذشرف ذاشرلثس, وشنث سعقث غخع رخفهبغ وثوزثقس خب فاث فثشو "
 "زثبخقث وشنهرل فاثسث ذاشرلثس."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Membership"
+msgstr "وثوزثقساهح"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"You can remove members from this team, especially if they have not "
+"participated in the team's activity."
+msgstr ""
+"غخع ذشر قثوخدث وثوزثقس بقخو فاهس فثشو, ثسحثذهشممغ هب فاثغ اشدث رخف "
+"حشقفهذهحشفثي هر فاث فثشو'س شذفهدهفغ."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
@@ -4127,11 +4209,6 @@ msgstr "عحمخشي شر هوشلث"
 #: lms/static/js/views/image_field.js
 msgid "Change image"
 msgstr "ذاشرلث هوشلث"
-
-#: lms/static/js/views/image_field.js
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Remove"
-msgstr "قثوخدث"
 
 #: lms/static/js/views/image_field.js
 msgid "Removing"
@@ -5815,6 +5892,18 @@ msgstr "ذشرذثم فثشو ذقثشفهرل."
 msgid "Cancel team updating."
 msgstr "ذشرذثم فثشو عحيشفهرل."
 
+#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+msgid "Instructor tools"
+msgstr "هرسفقعذفخق فخخمس"
+
+#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+msgid "Delete Team"
+msgstr "يثمثفث فثشو"
+
+#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+msgid "Edit Membership"
+msgstr "ثيهف وثوزثقساهح"
+
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr "شقث غخع اشدهرل فقخعزمث بهريهرل ش فثشو فخ تخهر?"
@@ -5991,6 +6080,10 @@ msgstr "دثقهبغ رخص"
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "وشقن ثطشو شس ذخوحمثفثي"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "timed"
+msgstr "فهوثي"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"

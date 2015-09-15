@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:15+0000\n"
-"PO-Revision-Date: 2015-09-04 14:15:47.324123\n"
+"POT-Creation-Date: 2015-09-11 12:47+0000\n"
+"PO-Revision-Date: 2015-09-11 12:47:23.251524\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -9565,6 +9565,11 @@ msgid "The supplied topic id {topic_id} is not valid"
 msgstr ""
 "Thé süpplïéd töpïç ïd {topic_id} ïs nöt välïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
+msgstr ""
+"Érrör çönnéçtïng tö élästïçséärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be

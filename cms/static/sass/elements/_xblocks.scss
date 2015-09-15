@@ -4,7 +4,7 @@
 // Table of Contents
 // * +Layout - Xblocks
 // * +Licensing - Xblocks
-// * +Pagination - Xblocks 
+// * +Pagination - Xblocks
 // * +Messaging - Xblocks
 // * +Case: Page Level
 // * +Case: Nesting Level
@@ -14,7 +14,7 @@
 // * +Case - Special Xblock Type Overrides
 
 
-// +Layout - Xblocks 
+// +Layout - Xblocks
 // ====================
 // styling for xblocks at various levels of nesting: page level,
 .wrapper-xblock {
@@ -116,7 +116,7 @@
     }
   }
 
-  // +Licensing - Xblocks 
+  // +Licensing - Xblocks
   // ====================
   .xblock-license,
   .xmodule_display.xmodule_HtmlModule .xblock-license,
@@ -157,7 +157,7 @@
   }
 
 
-  // +Pagination - Xblocks 
+  // +Pagination - Xblocks
   .container-paging-header {
     .meta-wrap {
       margin: $baseline ($baseline/2);
@@ -910,7 +910,7 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
       @extend %t-copy-sub2;
     }
   }
-  
+
   .wrapper-license-options {
     margin-bottom: ($baseline/2);
 

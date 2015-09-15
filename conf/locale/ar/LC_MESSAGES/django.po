@@ -51,6 +51,7 @@
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
+# soliman osman <solimanosman@windowslive.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
@@ -101,6 +102,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # omarithawi <oithawi@qrf.org>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
+# soliman osman <solimanosman@windowslive.com>, 2015
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -129,7 +131,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:07+0000\n"
+"POT-Creation-Date: 2015-09-11 12:16+0000\n"
 "PO-Revision-Date: 2015-08-12 08:13+0000\n"
 "Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -8402,6 +8404,10 @@ msgstr ""
 #: lms/djangoapps/teams/views.py
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "الرقم التعريفي الذي جرى توفيره حول الموضوع {topic_id} غير صالح."
+
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
+msgstr ""
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be

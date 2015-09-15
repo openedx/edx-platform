@@ -7,7 +7,8 @@ import json
 from bok_choy.web_app_test import WebAppTest
 from ..helpers import generate_course_key
 from ...pages.common.logout import LogoutPage
-from ...pages.studio.utils import add_html_component, click_css, type_in_codemirror
+from ...pages.common.utils import click_css
+from ...pages.studio.utils import add_html_component, type_in_codemirror
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.container import ContainerPage

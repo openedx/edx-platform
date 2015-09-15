@@ -6,7 +6,7 @@
                 .replace(/>/g, '&gt;')
         }
     %>
-    <%= interpolate_text('You are taking "{exam_link}" as a proctored exam. The timer on the right shows the time remaining in the exam.', {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>"}) %>
+    <%= interpolate_text('You are taking "{exam_link}" as a {exam_type} exam. The timer on the right shows the time remaining in the exam.', {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('timed')}) %>
     <span id="turn_in_exam_id" class="pull-right">
         <span id="turn_in_exam_id">
             <% if(attempt_status !== 'ready_to_submit') {%>
@@ -15,6 +15,7 @@
                 </button>
             <% } %>
         </span>
+        <span class="sr timer-announce" aria-live="assertive"></span>
         <span id="time_remaining_id">
             <b>
             </b>

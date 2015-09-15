@@ -490,11 +490,17 @@ def _section_extensions(course):
 def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
+
+    show_proctored_report_button = (
+        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and
+        course.enable_proctored_exams
+    )
+
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
-        'show_generate_proctored_exam_report_button': settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False),
+        'show_generate_proctored_exam_report_button': show_proctored_report_button,
         'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),

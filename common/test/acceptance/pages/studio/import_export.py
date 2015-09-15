@@ -9,7 +9,8 @@ import os
 import re
 import requests
 
-from .utils import click_css
+from ..common.utils import click_css
+
 from .library import LibraryPage
 from .course_page import CoursePage
 from . import BASE_URL

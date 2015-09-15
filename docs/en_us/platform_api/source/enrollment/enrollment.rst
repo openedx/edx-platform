@@ -5,14 +5,9 @@ Enrollment API Enrollment Resource
 With the Enrollment API **Enrollment** resource, you can complete the
 following tasks.
 
-* :ref:`Get the user's enrollment status in a course <Get the Users Enrollment
-  Status in a Course>`.
-* :ref:`Get the user's enrollment information for a course<Get Enrollment Details for a
-  Course>`.
-* :ref:`View a user's enrollments <View and add to a Users Course
-  Enrollments>`.
-* :ref:`Enroll a user in a course <View and add to a Users Course
-  Enrollments>`.
+.. contents::
+   :local:
+   :depth: 1
   
 
 .. _Get the Users Enrollment Status in a Course:
@@ -62,7 +57,7 @@ Get the User's Enrollment Status in a Course
 Get the User's Enrollment Information for a Course
 **************************************************
 
-.. autoclass:: enrollment.views.EnrollmentCourseDetailView
+.. .. autoclass:: enrollment.views.EnrollmentCourseDetailView
 
 **Example response showing a user's course enrollment information**
 

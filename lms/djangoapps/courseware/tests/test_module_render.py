@@ -850,7 +850,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             'honor',
             True,
             None,
-            'Would you like to take "Toy Videos" as a practice proctored exam?',
+            'Try a proctored exam',
             True
         ),
         (
@@ -871,7 +871,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             'verified',
             False,
             None,
-            'Would you like to take "Toy Videos" as a proctored exam?',
+            'This exam is proctored',
             False
         ),
         (

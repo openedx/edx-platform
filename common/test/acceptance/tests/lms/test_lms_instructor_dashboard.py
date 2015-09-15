@@ -5,6 +5,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 import time
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
@@ -208,7 +209,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        #open the exam settings to make it a proctored exam.
+        # open the exam settings to make it a proctored exam.
         self.course_outline.open_exam_settings_dialog()
         self.course_outline.make_exam_timed()
         time.sleep(2)  # Wait for 2 seconds to save the settings.
@@ -225,9 +226,8 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
         Make sure that allowances can be added and removed.
         """
-
-        # Given that an exam has been configured to be a proctored exam.
-        self._create_a_proctored_exam_and_attempt()
+        # Given that an exam has been configured to be a timed exam.
+        self._create_a_timed_exam_and_attempt()
 
         # When I log in as an instructor,
         self.log_in_as_instructor()

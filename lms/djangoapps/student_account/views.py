@@ -95,22 +95,25 @@ def login_and_registration_form(request, initial_mode="login"):
 
     # Otherwise, render the combined login/registration page
     context = {
-        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
-        'disable_courseware_js': True,
-        'initial_mode': initial_mode,
-        'third_party_auth': json.dumps(_third_party_auth_context(request, redirect_to)),
-        'third_party_auth_hint': third_party_auth_hint or '',
-        'platform_name': settings.PLATFORM_NAME,
+        'data': {
+            'login_redirect_url': redirect_to,
+            'initial_mode': initial_mode,
+            'third_party_auth': _third_party_auth_context(request, redirect_to),
+            'third_party_auth_hint': third_party_auth_hint or '',
+            'platform_name': settings.PLATFORM_NAME,
+
+            # Include form descriptions retrieved from the user API.
+            # We could have the JS client make these requests directly,
+            # but we include them in the initial page load to avoid
+            # the additional round-trip to the server.
+            'login_form_desc': json.loads(form_descriptions['login']),
+            'registration_form_desc': json.loads(form_descriptions['registration']),
+            'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
+        },
+        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
         'allow_iframing': True,
-
-        # Include form descriptions retrieved from the user API.
-        # We could have the JS client make these requests directly,
-        # but we include them in the initial page load to avoid
-        # the additional round-trip to the server.
-        'login_form_desc': form_descriptions['login'],
-        'registration_form_desc': form_descriptions['registration'],
-        'password_reset_form_desc': form_descriptions['password_reset'],
+        'disable_courseware_js': True,
     }
 
     return render_to_response('student_account/login_and_register.html', context)

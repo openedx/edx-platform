@@ -460,10 +460,11 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_certificate_custom_template_with_org_mode_course(self):
         """
         Tests custom template search and rendering.
+        This test should check template matching when org={org}, course={course}, mode={mode}.
         """
         self._add_course_certificates(count=1, signatory_count=2)
-        self._create_custom_template(1, mode='honor', course_key=unicode(self.course.id))
-        self._create_custom_template(2, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor', course_key=unicode(self.course.id))
+        self._create_custom_template(org_id=2, mode='honor')
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
@@ -487,11 +488,17 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     def test_certificate_custom_template_with_org(self):
         """
-        Tests custom template search if if have a single template for all courses of organization.
+        Tests custom template search if we have a single template for organization and mode
+        with course set to Null.
+        This test should check template matching when org={org}, course=Null, mode={mode}.
         """
+        course = CourseFactory.create(
+            org='cstX', number='cst_22', display_name='custom template course'
+        )
+
         self._add_course_certificates(count=1, signatory_count=2)
-        self._create_custom_template(1)
-        self._create_custom_template(1, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor', course_key=course.id)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
@@ -506,9 +513,32 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             self.assertContains(response, 'course name: {}'.format(self.course.display_name))
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    def test_certificate_custom_template_with_organization(self):
+        """
+        Tests custom template search when we have a single template for a organization.
+        This test should check template matching when org={org}, course=Null, mode=null.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(org_id=1, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor', course_key=self.course.id)
+        self._create_custom_template(org_id=2)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.side_effect = [
+                [{"id": 2, "name": "organization name 2"}],
+            ]
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     def test_certificate_custom_template_with_course_mode(self):
         """
-        Tests custom template search if if have a single template for a course mode.
+        Tests custom template search if we have a single template for a course mode.
+        This test should check template matching when org=null, course=Null, mode={mode}.
         """
         mode = 'honor'
         self._add_course_certificates(count=1, signatory_count=2)

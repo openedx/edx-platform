@@ -3,9 +3,10 @@
     define([
         'gettext',
         'teams/js/views/topic_card',
+        'teams/js/views/team_utils',
         'common/js/components/views/paging_header',
         'common/js/components/views/paginated_view'
-    ], function (gettext, TopicCardView, PagingHeader, PaginatedView) {
+    ], function (gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView) {
         var TopicsView = PaginatedView.extend({
             type: 'topics',
 
@@ -35,6 +36,7 @@
                 this.collection.refresh()
                     .done(function() {
                         PaginatedView.prototype.render.call(self);
+                        TeamUtils.hideMessage();
                     });
                 return this;
             }

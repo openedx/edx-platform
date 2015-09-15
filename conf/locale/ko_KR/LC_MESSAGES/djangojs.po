@@ -53,8 +53,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-04 14:06+0000\n"
-"PO-Revision-Date: 2015-09-04 14:08+0000\n"
+"POT-Creation-Date: 2015-09-11 12:15+0000\n"
+"PO-Revision-Date: 2015-09-11 12:17+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
@@ -111,6 +111,7 @@ msgstr "확인"
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
+#: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
@@ -126,6 +127,7 @@ msgstr "취소"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete"
 msgstr "삭제"
 
@@ -187,7 +189,7 @@ msgstr "오류"
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
-#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
@@ -679,7 +681,7 @@ msgstr "설명"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Dimensions"
-msgstr " 차원"
+msgstr " 이미지 크기"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1029,7 +1031,7 @@ msgstr "링크 편집/삽입"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit video"
-msgstr "비디오 편집/삽입"
+msgstr "동영상 편집/삽입"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1608,7 +1610,7 @@ msgid ""
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"고급 편집기를 사용한다면, 이 문제는 XML로 전환되며, 단순 편집기 인터페이스로 다시 돌아올 수 없습니다. \n"
+"고급 편집기를 사용한다면, 이 문제는 XML로 전환되며, 간편 편집기 인터페이스로 다시 돌아올 수 없습니다. \n"
 "고급 편집기에서 이 문제를 XML로 전환하시겠습니까?"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
@@ -2228,7 +2230,7 @@ msgstr "지우기"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Text"
-msgstr "텍스트"
+msgstr "Text"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Video"
@@ -2345,6 +2347,55 @@ msgstr ""
 msgid "Team description cannot have more than 300 characters."
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "An error occurred while removing the member from the team. Try again."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "This team does not have any members."
+msgstr ""
+
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "Joined %(date)s"
+msgstr ""
+
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "Last Activity %(date)s"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid "Remove this team member?"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+msgid ""
+"This learner will be removed from the team, allowing another learner to take"
+" the available spot."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+#: lms/static/js/views/image_field.js
+msgid "Remove"
+msgstr "제거"
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid "Delete this team?"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid ""
+"Deleting a team is permanent and cannot be undone. All members are removed "
+"from the team, and team discussions can no longer be accessed."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid "Team \"%(team)s\" successfully deleted."
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr ""
@@ -2356,9 +2407,9 @@ msgid "and others"
 msgstr ""
 
 #. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last Activity %(date)s"
+msgid "Last activity %(date)s"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
@@ -2431,6 +2482,17 @@ msgid "Browse %(sr_start)s teams %(sr_end)s"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Your request could not be completed. Reload the page and try again."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
+"problem."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
 msgstr ""
 
@@ -2457,6 +2519,16 @@ msgstr ""
 msgid ""
 "If you make significant changes, make sure you notify members of the team "
 "before making these changes."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Membership"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"You can remove members from this team, especially if they have not "
+"participated in the team's activity."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -3530,19 +3602,19 @@ msgstr "학습집단이 비활성화되었습니다."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
-msgstr "학습자의 수료증 생성을 허용하시겠습니까?"
+msgstr "학습자의 이수증 생성을 허용하시겠습니까?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Prevent students from generating certificates in this course?"
-msgstr "학습자의 수료증 생성을 제한하시겠습니까?"
+msgstr "학습자의 이수증 생성을 제한하시겠습니까?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Start generating certificates for all students in this course?"
-msgstr "본 강좌의 모든 학습자를 위한 강좌 수료증 생성을 시작하시겠습니까?"
+msgstr "본 강좌의 모든 학습자를 위한 강좌 이수증 생성을 시작하시겠습니까?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while generating certificates. Please try again."
-msgstr "강좌 수료증을 발급하는 동안 오류가 발생했습니다. 다시 시도하세요."
+msgstr "강좌 이수증을 발급하는 동안 오류가 발생했습니다. 다시 시도하세요."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
@@ -3632,7 +3704,7 @@ msgstr "실명"
 msgid ""
 "The name that appears on your certificates. Other learners never see your "
 "full name."
-msgstr "수료증에 나타나는 이름입니다. 다른 학습자들은 당신의 이름을 볼 수 없습니다. "
+msgstr "이수증에 나타나는 이름입니다. 다른 학습자들은 당신의 이름을 볼 수 없습니다. "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -3814,7 +3886,7 @@ msgstr "사진을 제출 할 수 없습니다."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education Verified Certificate"
-msgstr "전문 과정 수료증 "
+msgstr "전문 과정 이수증"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education"
@@ -3822,11 +3894,11 @@ msgstr "전문 교육 과정"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate upgrade"
-msgstr "인증 수료증 업그레이드하기"
+msgstr "인증 이수증 업그레이드하기"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate"
-msgstr "인증 수료증"
+msgstr "인증 이수증"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Checkout"
@@ -3933,10 +4005,6 @@ msgstr "이미지 업로드"
 #: lms/static/js/views/image_field.js
 msgid "Change image"
 msgstr "이미지 변경"
-
-#: lms/static/js/views/image_field.js
-msgid "Remove"
-msgstr "제거"
 
 #: lms/static/js/views/image_field.js
 msgid "Removing"
@@ -4494,7 +4562,7 @@ msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
-msgstr "업로드 할 PDF 파일을 선택하세요."
+msgstr "업로드할 PDF 파일을 선택하세요."
 
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
@@ -5521,6 +5589,18 @@ msgstr ""
 msgid "Cancel team updating."
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+msgid "Instructor tools"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+msgid "Delete Team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+msgid "Edit Membership"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr ""
@@ -5689,6 +5769,10 @@ msgstr ""
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "timed"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore

@@ -7,11 +7,11 @@ import time
 
 from dateutil.parser import parse
 import ddt
-from flaky import flaky
 from nose.plugins.attrib import attr
 from uuid import uuid4
+from unittest import skip
 
-from ..helpers import UniqueCourseTest, EventsTestMixin
+from ..helpers import EventsTestMixin, UniqueCourseTest
 from ...fixtures import LMS_BASE_URL
 from ...fixtures.course import CourseFixture
 from ...fixtures.discussion import (
@@ -22,7 +22,16 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateOrEditTeamPage, TeamPage
+from ...pages.lms.teams import (
+    TeamsPage,
+    MyTeamsPage,
+    BrowseTopicsPage,
+    BrowseTeamsPage,
+    TeamManagementPage,
+    EditMembershipPage,
+    TeamPage
+)
+from ...pages.common.utils import confirm_prompt
 
 
 TOPICS_PER_PAGE = 12
@@ -197,6 +206,42 @@ class TeamsTabTest(TeamsTabBase):
         self.verify_teams_present(True)
 
     @ddt.data(
+        'topics/{topic_id}',
+        'topics/{topic_id}/search',
+        'teams/{topic_id}/{team_id}/edit-team',
+        'teams/{topic_id}/{team_id}'
+    )
+    def test_unauthorized_error_message(self, route):
+        """Ensure that an error message is shown to the user if they attempt
+        to take an action which makes an AJAX request while not signed
+        in.
+        """
+        topics = self.create_topics(1)
+        topic = topics[0]
+        self.set_team_configuration(
+            {u'max_team_size': 10, u'topics': topics},
+            global_staff=True
+        )
+        team = self.create_teams(topic, 1)[0]
+        self.teams_page.visit()
+        self.browser.delete_cookie('sessionid')
+        url = self.browser.current_url.split('#')[0]
+        self.browser.get(
+            '{url}#{route}'.format(
+                url=url,
+                route=route.format(
+                    topic_id=topic['id'],
+                    team_id=team['id']
+                )
+            )
+        )
+        self.teams_page.wait_for_ajax()
+        self.assertEqual(
+            self.teams_page.warning_message,
+            u"Your request could not be completed. Reload the page and try again."
+        )
+
+    @ddt.data(
         ('browse', '.topics-list'),
         # TODO: find a reliable way to match the "My Teams" tab
         # ('my-teams', 'div.teams-list'),
@@ -249,6 +294,14 @@ class MyTeamsTest(TeamsTabBase):
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.my_teams_page = MyTeamsPage(self.browser, self.course_id)
+        self.page_viewed_event = {
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'my-teams',
+                'topic_id': None,
+                'team_id': None
+            }
+        }
 
     def test_not_member_of_any_teams(self):
         """
@@ -258,7 +311,8 @@ class MyTeamsTest(TeamsTabBase):
         And I should see no teams
         And I should see a message that I belong to no teams.
         """
-        self.my_teams_page.visit()
+        with self.assert_events_match_during(self.only_team_events, expected_events=[self.page_viewed_event]):
+            self.my_teams_page.visit()
         self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertEqual(
             self.my_teams_page.q(css='.page-content-main').text,
@@ -276,7 +330,8 @@ class MyTeamsTest(TeamsTabBase):
         """
         teams = self.create_teams(self.topic, 1)
         self.create_membership(self.user_info['username'], teams[0]['id'])
-        self.my_teams_page.visit()
+        with self.assert_events_match_during(self.only_team_events, expected_events=[self.page_viewed_event]):
+            self.my_teams_page.visit()
         self.verify_teams(self.my_teams_page, teams)
 
 
@@ -338,7 +393,7 @@ class BrowseTopicsTest(TeamsTabBase):
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
         self.assertTrue(browse_teams_page.is_browser_on_page())
         browse_teams_page.click_create_team_link()
-        create_team_page = CreateOrEditTeamPage(self.browser, self.course_id, topic)
+        create_team_page = TeamManagementPage(self.browser, self.course_id, topic)
         create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
         create_team_page.value_for_textarea_field(
             field_id='description',
@@ -347,8 +402,9 @@ class BrowseTopicsTest(TeamsTabBase):
         create_team_page.submit_form()
         team_page = TeamPage(self.browser, self.course_id)
         self.assertTrue(team_page.is_browser_on_page)
-        team_page.click_all_topics_breadcrumb()
+        team_page.click_all_topics()
         self.assertTrue(self.topics_page.is_browser_on_page())
+        self.topics_page.wait_for_ajax()
         self.assertEqual(topic_name, self.topics_page.topic_names[0])
 
     def test_list_topics(self):
@@ -473,6 +529,28 @@ class BrowseTopicsTest(TeamsTabBase):
         self.assertTrue(browse_teams_page.is_browser_on_page())
         self.assertEqual(browse_teams_page.header_name, 'Example Topic')
         self.assertEqual(browse_teams_page.header_description, 'Description')
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the browse topics page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the browse topics page
+        Then my browser should post a page viewed event
+        """
+        topic = {u"name": u"Example Topic", u"id": u"example_topic", u"description": "Description"}
+        self.set_team_configuration(
+            {u"max_team_size": 1, u"topics": [topic]}
+        )
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'browse',
+                'topic_id': None,
+                'team_id': None
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.topics_page.visit()
 
 
 @attr('shard_5')
@@ -705,6 +783,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
+    @skip("Skip until TNL-3198 (searching teams makes two AJAX requests) is resolved")
     def test_search(self):
         """
         Scenario: User should be able to search for a team
@@ -714,34 +793,75 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         Then I should see the search result page
         And the search header should be shown
         And 0 results should be shown
+        And my browser should fire a page viewed event for the search page
         """
         # Note: all searches will return 0 results with the mock search server
         # used by Bok Choy.
+        search_text = 'banana'
         self.create_teams(self.topic, 5)
         self.browse_teams_page.visit()
-        search_results_page = self.browse_teams_page.search('banana')
-        self.verify_search_header(search_results_page, 'banana')
+        events = [{
+            'event_type': 'edx.team.searched',
+            'event': {
+                'search_text': search_text,
+                'topic_id': self.topic['id'],
+                'number_of_results': 0
+            }
+        }, {
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'search-teams',
+                'topic_id': self.topic['id'],
+                'team_id': None
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            search_results_page = self.browse_teams_page.search(search_text)
+        self.verify_search_header(search_results_page, search_text)
         self.assertTrue(search_results_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the browse page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Teams page
+        Then my browser should post a page viewed event for the teams page
+        """
+        self.create_teams(self.topic, 5)
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'single-topic',
+                'topic_id': self.topic['id'],
+                'team_id': None
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.browse_teams_page.visit()
 
 
 @attr('shard_5')
 class TeamFormActions(TeamsTabBase):
     """
-    Base class for create & edit team.
+    Base class for create, edit, and delete team.
     """
     TEAM_DESCRIPTION = 'The Avengers are a fictional team of superheroes.'
 
     topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
     TEAMS_NAME = 'Avengers'
 
+    def setUp(self):
+        super(TeamFormActions, self).setUp()
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
+
     def verify_page_header(self, title, description, breadcrumbs):
         """
         Verify that the page header correctly reflects the
         create team header, description and breadcrumb.
         """
-        self.assertEqual(self.create_or_edit_team_page.header_page_name, title)
-        self.assertEqual(self.create_or_edit_team_page.header_page_description, description)
-        self.assertEqual(self.create_or_edit_team_page.header_page_breadcrumbs, breadcrumbs)
+        self.assertEqual(self.team_management_page.header_page_name, title)
+        self.assertEqual(self.team_management_page.header_page_description, description)
+        self.assertEqual(self.team_management_page.header_page_breadcrumbs, breadcrumbs)
 
     def verify_and_navigate_to_create_team_page(self):
         """Navigates to the create team page and verifies."""
@@ -761,7 +881,7 @@ class TeamFormActions(TeamsTabBase):
 
         self.team_page.click_edit_team_button()
 
-        self.create_or_edit_team_page.wait_for_page()
+        self.team_management_page.wait_for_page()
 
         # Edit page header.
         self.verify_page_header(
@@ -784,33 +904,37 @@ class TeamFormActions(TeamsTabBase):
 
     def fill_create_or_edit_form(self):
         """Fill the create/edit team form fields with appropriate values."""
-        self.create_or_edit_team_page.value_for_text_field(field_id='name', value=self.TEAMS_NAME, press_enter=False)
-        self.create_or_edit_team_page.value_for_textarea_field(
+        self.team_management_page.value_for_text_field(
+            field_id='name',
+            value=self.TEAMS_NAME,
+            press_enter=False
+        )
+        self.team_management_page.value_for_textarea_field(
             field_id='description',
             value=self.TEAM_DESCRIPTION
         )
-        self.create_or_edit_team_page.value_for_dropdown_field(field_id='language', value='English')
-        self.create_or_edit_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+        self.team_management_page.value_for_dropdown_field(field_id='language', value='English')
+        self.team_management_page.value_for_dropdown_field(field_id='country', value='Pakistan')
 
     def verify_all_fields_exist(self):
         """
         Verify the fields for create/edit page.
         """
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_field('name'),
+            self.team_management_page.message_for_field('name'),
             'A name that identifies your team (maximum 255 characters).'
         )
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_textarea_field('description'),
+            self.team_management_page.message_for_textarea_field('description'),
             'A short description of the team to help other learners understand '
             'the goals or direction of the team (maximum 300 characters).'
         )
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_field('country'),
+            self.team_management_page.message_for_field('country'),
             'The country that team members primarily identify with.'
         )
         self.assertEqual(
-            self.create_or_edit_team_page.message_for_field('language'),
+            self.team_management_page.message_for_field('language'),
             'The language that team members primarily use to communicate with each other.'
         )
 
@@ -825,7 +949,6 @@ class CreateTeamTest(TeamFormActions):
         super(CreateTeamTest, self).setUp()
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
 
-        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page.visit()
 
@@ -853,14 +976,14 @@ class CreateTeamTest(TeamFormActions):
         Then I should see the error message and highlighted fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.create_or_edit_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.assertEqual(
-            self.create_or_edit_team_page.validation_message_text,
+            self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
-        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='description'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='description'))
 
     def test_user_can_see_error_message_for_incorrect_data(self):
         """
@@ -875,7 +998,7 @@ class CreateTeamTest(TeamFormActions):
         self.verify_and_navigate_to_create_team_page()
 
         # Fill the name field with >255 characters to see validation message.
-        self.create_or_edit_team_page.value_for_text_field(
+        self.team_management_page.value_for_text_field(
             field_id='name',
             value='EdX is a massive open online course (MOOC) provider and online learning platform. '
                   'It hosts online university-level courses in a wide range of disciplines to a worldwide '
@@ -887,13 +1010,13 @@ class CreateTeamTest(TeamFormActions):
                   'edX has more than 4 million users taking more than 500 courses online.',
             press_enter=False
         )
-        self.create_or_edit_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.assertEqual(
-            self.create_or_edit_team_page.validation_message_text,
+            self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
 
     def test_user_can_create_new_team_successfully(self):
         """
@@ -919,21 +1042,17 @@ class CreateTeamTest(TeamFormActions):
 
         expected_events = [
             {
-                'event_type': 'edx.team.created',
-                'event': {
-                    'course_id': self.course_id,
-                }
+                'event_type': 'edx.team.created'
             },
             {
                 'event_type': 'edx.team.learner_added',
                 'event': {
-                    'course_id': self.course_id,
                     'add_method': 'added_on_create',
                 }
             }
         ]
         with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
-            self.create_or_edit_team_page.submit_form()
+            self.team_management_page.submit_form()
 
         # Verify that the page is shown for the new team
         team_page = TeamPage(self.browser, self.course_id)
@@ -965,7 +1084,7 @@ class CreateTeamTest(TeamFormActions):
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.verify_and_navigate_to_create_team_page()
-        self.create_or_edit_team_page.cancel_team()
+        self.team_management_page.cancel_team()
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
@@ -974,6 +1093,147 @@ class CreateTeamTest(TeamFormActions):
         self.teams_page.verify_team_count_in_first_topic(0)
 
         self.verify_my_team_count(0)
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the create team page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the create team page
+        Then my browser should post a page viewed event
+        """
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'new-team',
+                'topic_id': self.topic['id'],
+                'team_id': None
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.verify_and_navigate_to_create_team_page()
+
+
+@ddt.ddt
+class DeleteTeamTest(TeamFormActions):
+    """
+    Tests for deleting teams.
+    """
+
+    def setUp(self):
+        super(DeleteTeamTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+
+        #need to have a membership to confirm it gets deleted as well
+        self.create_membership(self.user_info['username'], self.team['id'])
+
+        self.team_page.visit()
+
+    def test_cancel_delete(self):
+        """
+        Scenario: The user should be able to cancel the Delete Team dialog
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Delete Team button
+        When I click the delete team button
+        And I cancel the prompt
+        And I refresh the page
+        Then I should still see the team
+        """
+        self.delete_team(cancel=True)
+        self.assertTrue(self.team_management_page.is_browser_on_page())
+        self.browser.refresh()
+        self.team_management_page.wait_for_page()
+        self.assertEqual(
+            ' '.join(('All Topics', self.topic['name'], self.team['name'])),
+            self.team_management_page.header_page_breadcrumbs
+        )
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_delete_team(self, role):
+        """
+        Scenario: The user should be able to see and navigate to the delete team page.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Delete Team button
+        When I click the delete team button
+        And I confirm the prompt
+        Then I should see the browse teams page
+        And the team should not be present
+        """
+        # If role is None, remain logged in as global staff
+        if role is not None:
+            AutoAuthPage(
+                self.browser,
+                course_id=self.course_id,
+                staff=False,
+                roles=role
+            ).visit()
+        self.team_page.visit()
+        self.delete_team(require_notification=False)
+        browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
+        self.assertTrue(browse_teams_page.is_browser_on_page())
+        self.assertNotIn(self.team['name'], browse_teams_page.team_names)
+
+    def delete_team(self, **kwargs):
+        """
+        Delete a team. Passes `kwargs` to `confirm_prompt`.
+        Expects edx.team.deleted event to be emitted, with correct course_id.
+        Also expects edx.team.learner_removed event to be emitted for the
+        membership that is removed as a part of the delete operation.
+        """
+
+        self.team_page.click_edit_team_button()
+        self.team_management_page.wait_for_page()
+        self.team_management_page.delete_team_button.click()
+
+        if 'cancel' in kwargs and kwargs['cancel'] is True:
+            confirm_prompt(self.team_management_page, **kwargs)
+        else:
+            expected_events = [
+                {
+                    'event_type': 'edx.team.deleted',
+                    'event': {
+                        'team_id': self.team['id']
+                    }
+                },
+                {
+                    'event_type': 'edx.team.learner_removed',
+                    'event': {
+                        'team_id': self.team['id'],
+                        'remove_method': 'team_deleted',
+                        'user_id': self.user_info['user_id']
+                    }
+                }
+            ]
+            with self.assert_events_match_during(
+                event_filter=self.only_team_events, expected_events=expected_events
+            ):
+                confirm_prompt(self.team_management_page, **kwargs)
+
+    def test_delete_team_updates_topics(self):
+        """
+        Scenario: Deleting a team should update the team count on the topics page
+        Given I am staff user for a course with a team
+        And I delete a team
+        When I navigate to the browse topics page
+        Then the team count for the deletd team's topic should be updated
+        """
+        self.delete_team(require_notification=False)
+        BrowseTeamsPage(self.browser, self.course_id, self.topic).click_all_topics()
+        topics_page = BrowseTopicsPage(self.browser, self.course_id)
+        self.assertTrue(topics_page.is_browser_on_page())
+        self.teams_page.verify_topic_team_count(0)
 
 
 @ddt.ddt
@@ -989,7 +1249,6 @@ class EditTeamTest(TeamFormActions):
             {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
             global_staff=True
         )
-        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
 
         self.team = self.create_teams(self.topic, num_teams=1)[0]
         self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
@@ -1017,6 +1276,7 @@ class EditTeamTest(TeamFormActions):
         Then I should see the Edit Team button
         And When I click edit team button
         Then I should see the edit team page
+        And an analytics event should be fired
         When I edit all the fields with appropriate data
         And I click Update button
         Then I should see the page for my team with updated data
@@ -1030,7 +1290,51 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_or_edit_team_page.submit_form()
+
+        expected_events = [
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'team_id': self.team['id'],
+                    'field': 'country',
+                    'old': 'AF',
+                    'new': 'PK',
+                    'truncated': [],
+                }
+            },
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'team_id': self.team['id'],
+                    'field': 'name',
+                    'old': self.team['name'],
+                    'new': self.TEAMS_NAME,
+                    'truncated': [],
+                }
+            },
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'team_id': self.team['id'],
+                    'field': 'language',
+                    'old': 'aa',
+                    'new': 'en',
+                    'truncated': [],
+                }
+            },
+            {
+                'event_type': 'edx.team.changed',
+                'event': {
+                    'team_id': self.team['id'],
+                    'field': 'description',
+                    'old': self.team['description'],
+                    'new': self.TEAM_DESCRIPTION,
+                    'truncated': [],
+                }
+            },
+        ]
+        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+            self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()
 
@@ -1063,7 +1367,7 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_or_edit_team_page.cancel_team()
+        self.team_management_page.cancel_team()
 
         self.team_page.wait_for_page()
 
@@ -1115,7 +1419,7 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_or_edit_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()
 
@@ -1125,6 +1429,125 @@ class EditTeamTest(TeamFormActions):
             location='Pakistan',
             language='English'
         )
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the edit team page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the edit team page
+        Then my browser should post a page viewed event
+        """
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'edit-team',
+                'topic_id': self.topic['id'],
+                'team_id': self.team['id']
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.verify_and_navigate_to_edit_team_page()
+
+
+@ddt.ddt
+class EditMembershipTest(TeamFormActions):
+    """
+    Tests for administrating from the team membership page
+    """
+
+    def setUp(self):
+        super(EditMembershipTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+
+        #make sure a user exists on this team so we can edit the membership
+        self.create_membership(self.user_info['username'], self.team['id'])
+
+        self.edit_membership_page = EditMembershipPage(self.browser, self.course_id, self.team)
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+
+    def edit_membership_helper(self, role, cancel=False):
+        """
+        Helper for common functionality in edit membership tests.
+        Checks for all relevant assertions about membership being removed,
+        including verify edx.team.learner_removed events are emitted.
+        """
+        if role is not None:
+            AutoAuthPage(
+                self.browser,
+                course_id=self.course_id,
+                staff=False,
+                roles=role
+            ).visit()
+
+        self.team_page.visit()
+        self.team_page.click_edit_team_button()
+        self.team_management_page.wait_for_page()
+
+        self.assertTrue(
+            self.team_management_page.membership_button_present
+        )
+
+        self.team_management_page.click_membership_button()
+        self.edit_membership_page.wait_for_page()
+        self.edit_membership_page.click_first_remove()
+        if cancel:
+            self.edit_membership_page.cancel_delete_membership_dialog()
+            self.assertEqual(self.edit_membership_page.team_members, 1)
+        else:
+            expected_events = [
+                {
+                    'event_type': 'edx.team.learner_removed',
+                    'event': {
+                        'team_id': self.team['id'],
+                        'remove_method': 'removed_by_admin',
+                        'user_id': self.user_info['user_id']
+                    }
+                }
+            ]
+            with self.assert_events_match_during(
+                event_filter=self.only_team_events, expected_events=expected_events
+            ):
+                self.edit_membership_page.confirm_delete_membership_dialog()
+            self.assertEqual(self.edit_membership_page.team_members, 0)
+        self.assertTrue(self.edit_membership_page.is_browser_on_page)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and confirm the dialog
+        Then my membership should be removed, and I should remain on the page
+        """
+        self.edit_membership_helper(role, cancel=False)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_cancel_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and cancel the dialog
+        Then my membership should not be removed, and I should remain on the page
+        """
+        self.edit_membership_helper(role, cancel=True)
 
 
 @attr('shard_5')
@@ -1358,13 +1781,14 @@ class TeamPageTest(TeamsTabBase):
         And if I switch to "My Team", the team I have joined is displayed
         """
         self._set_team_configuration_and_membership(create_membership=False)
-        self.team_page.visit()
+        teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
+        teams_page.visit()
+        teams_page.view_first_team()
         self.assertTrue(self.team_page.join_team_button_present)
         expected_events = [
             {
                 'event_type': 'edx.team.learner_added',
                 'event': {
-                    'course_id': self.course_id,
                     'add_method': 'joined_from_team_view'
                 }
             }
@@ -1375,7 +1799,7 @@ class TeamPageTest(TeamsTabBase):
         self.assertFalse(self.team_page.join_team_message_present)
         self.assert_team_details(num_members=1, is_member=True)
 
-        # Verify that if one switches to "My Team" without reloading the page, the newly created team is shown.
+        # Verify that if one switches to "My Team" without reloading the page, the newly joined team is shown.
         self.teams_page.click_all_topics()
         self.verify_my_team_count(1)
 
@@ -1443,7 +1867,6 @@ class TeamPageTest(TeamsTabBase):
             {
                 'event_type': 'edx.team.learner_removed',
                 'event': {
-                    'course_id': self.course_id,
                     'remove_method': 'self_removal'
                 }
             }
@@ -1456,3 +1879,22 @@ class TeamPageTest(TeamsTabBase):
         # Verify that if one switches to "My Team" without reloading the page, the old team no longer shows.
         self.teams_page.click_all_topics()
         self.verify_my_team_count(0)
+
+    def test_page_viewed_event(self):
+        """
+        Scenario: Visiting the team profile page should fire a page viewed event.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the team profile page
+        Then my browser should post a page viewed event
+        """
+        self._set_team_configuration_and_membership()
+        events = [{
+            'event_type': 'edx.team.page_viewed',
+            'event': {
+                'page_name': 'single-team',
+                'topic_id': self.topic['id'],
+                'team_id': self.teams[0]['id']
+            }
+        }]
+        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+            self.team_page.visit()

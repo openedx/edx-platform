@@ -19,6 +19,7 @@ from discussion_api.api import (
     get_comment_list,
     get_course,
     get_course_topics,
+    get_thread,
     get_thread_list,
     update_comment,
     update_thread,
@@ -256,6 +257,12 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["order_direction"],
             )
         )
+
+    def retrieve(self, request, thread_id=None):
+        """
+        Implements the GET method for thread ID
+        """
+        return Response(get_thread(request, thread_id))
 
     def create(self, request):
         """

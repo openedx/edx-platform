@@ -29,13 +29,16 @@ define([
 
     var createMockTeamData = function (startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+            var id = "id" + i;
             return {
                 name: "team " + i,
-                id: "id " + i,
+                id: id,
                 language: testLanguages[i%4][0],
                 country: testCountries[i%4][0],
                 membership: [],
-                last_activity_at: ''
+                last_activity_at: '',
+                topic_id: 'topic_id' + i,
+                url: 'api/team/v0/teams/' + id
             };
         });
     };
@@ -65,8 +68,11 @@ define([
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
             return {
                 user: {
-                    'username': testUser,
-                    'url': 'https://openedx.example.com/api/user/v1/accounts/' + testUser
+                    username: testUser,
+                    url: 'https://openedx.example.com/api/user/v1/accounts/' + testUser,
+                    profile_image: {
+                        image_url_small: 'test_profile_image'
+                    }
                 },
                 team: teams[i-1]
             };
@@ -122,6 +128,10 @@ define([
             expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
             expect(currentCard.text()).toMatch(_.object(testCountries)[team.country]);
         });
+    };
+
+    var triggerTeamEvent = function (action) {
+        teamEvents.trigger('teams:update', {action: action});
     };
 
     createMockPostResponse = function(options) {
@@ -327,6 +337,7 @@ define([
         createMockThreadResponse: createMockThreadResponse,
         createMockTopicData: createMockTopicData,
         createMockTopicCollection: createMockTopicCollection,
+        triggerTeamEvent: triggerTeamEvent,
         verifyCards: verifyCards
     };
 });

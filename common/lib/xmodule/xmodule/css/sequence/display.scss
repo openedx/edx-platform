@@ -39,6 +39,7 @@ $sequence--border-color: #C8C8C8;
   margin: -4px 0 ($baseline*1.5);
   position: relative;
   border-bottom: none;
+  z-index: 0;
 
   @media print {
     display: none;

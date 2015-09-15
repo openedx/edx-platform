@@ -25,7 +25,7 @@
                 },
 
                 onUpdate: function(event) {
-                    if (event.action === 'create') {
+                    if (_.contains(['create', 'delete'], event.action)) {
                         this.isStale = true;
                     }
                 },

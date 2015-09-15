@@ -772,6 +772,122 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(result.children[0].children), 1)
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
 
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_persist_dag(self, _from_json):
+        """
+        try saving temporary xblocks
+        """
+        test_course = modulestore().create_course(
+            course='course', run='2014', org='testx',
+            display_name='fun test course', user_id='testbot',
+            master_branch=ModuleStoreEnum.BranchName.draft
+        )
+        test_chapter = modulestore().create_xblock(
+            test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
+            parent_xblock=test_course
+        )
+        self.assertEqual(test_chapter.display_name, 'chapter n')
+        test_def_content = '<problem>boo</problem>'
+        # create child
+        new_block = modulestore().create_xblock(
+            test_course.system, test_course.id,
+            'problem',
+            fields={
+                'data': test_def_content,
+                'display_name': 'problem'
+            },
+            parent_xblock=test_chapter
+        )
+        self.assertIsNotNone(new_block.definition_locator)
+        self.assertTrue(isinstance(new_block.definition_locator.definition_id, LocalId))
+        # better to pass in persisted parent over the subdag so
+        # subdag gets the parent pointer (otherwise 2 ops, persist dag, update parent children,
+        # persist parent
+        persisted_course = modulestore().persist_xblock_dag(test_course, 'testbot')
+        self.assertEqual(len(persisted_course.children), 1)
+        persisted_chapter = persisted_course.get_children()[0]
+        self.assertEqual(persisted_chapter.category, 'chapter')
+        self.assertEqual(persisted_chapter.display_name, 'chapter n')
+        self.assertEqual(len(persisted_chapter.children), 1)
+        persisted_problem = persisted_chapter.get_children()[0]
+        self.assertEqual(persisted_problem.category, 'problem')
+        self.assertEqual(persisted_problem.data, test_def_content)
+        # update it
+        persisted_problem.display_name = 'altered problem'
+        persisted_problem = modulestore().update_item(persisted_problem, 'testbot')
+        self.assertEqual(persisted_problem.display_name, 'altered problem')
+
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_block_generations(self, _from_json):
+        """
+        Test get_block_generations
+        """
+        test_course = modulestore().create_course(
+            org='edu.harvard',
+            course='history',
+            run='hist101',
+            display_name='history test course',
+            user_id='testbot',
+            master_branch=ModuleStoreEnum.BranchName.draft
+        )
+        chapter = modulestore().create_child(
+            None, test_course.location,
+            block_type='chapter',
+            block_id='chapter1',
+            fields={'display_name': 'chapter 1'}
+        )
+        sub = modulestore().create_child(
+            None, chapter.location,
+            block_type='vertical',
+            block_id='subsection1',
+            fields={'display_name': 'subsection 1'}
+        )
+        first_problem = modulestore().create_child(
+            None, sub.location,
+            block_type='problem',
+            block_id='problem1',
+            fields={'display_name': 'problem 1', 'data': '<problem></problem>'}
+        )
+        first_problem.max_attempts = 3
+        first_problem.save()  # decache the above into the kvs
+        updated_problem = modulestore().update_item(first_problem, 'testbot')
+        self.assertIsNotNone(updated_problem.previous_version)
+        self.assertEqual(updated_problem.previous_version, first_problem.update_version)
+        self.assertNotEqual(updated_problem.update_version, first_problem.update_version)
+        modulestore().delete_item(updated_problem.location, 'testbot')
+
+        second_problem = modulestore().create_child(
+            None, sub.location.version_agnostic(),
+            block_type='problem',
+            block_id='problem2',
+            fields={'display_name': 'problem 2', 'data': '<problem></problem>'}
+        )
+
+        # The draft course root has 2 revisions: the published revision, and then the subsequent
+        # changes to the draft revision
+        version_history = modulestore().get_block_generations(test_course.location)
+        self.assertIsNotNone(version_history)
+        self.assertEqual(version_history.locator.version_guid, test_course.location.version_guid)
+        self.assertEqual(len(version_history.children), 1)
+        self.assertEqual(version_history.children[0].children, [])
+        self.assertEqual(version_history.children[0].locator.version_guid, chapter.location.version_guid)
+
+        # sub changed on add, add problem, delete problem, add problem in strict linear seq
+        version_history = modulestore().get_block_generations(sub.location)
+        self.assertEqual(len(version_history.children), 1)
+        self.assertEqual(len(version_history.children[0].children), 1)
+        self.assertEqual(len(version_history.children[0].children[0].children), 1)
+        self.assertEqual(len(version_history.children[0].children[0].children[0].children), 0)
+
+        # first and second problem may show as same usage_id; so, need to ensure their histories are right
+        version_history = modulestore().get_block_generations(updated_problem.location)
+        self.assertEqual(version_history.locator.version_guid, first_problem.location.version_guid)
+        self.assertEqual(len(version_history.children), 1)  # updated max_attempts
+        self.assertEqual(len(version_history.children[0].children), 0)
+
+        version_history = modulestore().get_block_generations(second_problem.location)
+        self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
+
 
 class TestCourseStructureCache(SplitModuleTest):
     """Tests for the CourseStructureCache"""

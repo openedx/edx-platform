@@ -43,8 +43,8 @@ define(['jquery',
                 expect(view.$el).toHaveClass('list-card');
                 expect(view.$el.find('.card-title').text()).toContain('Test Team');
                 expect(view.$el.find('.card-description').text()).toContain('A team for testing');
-                expect(view.$el.find('.team-activity abbr').attr('title')).toEqual("2015-08-21T18:53:01.145Z");
-                expect(view.$el.find('.team-activity').text()).toContain('Last Activity');
+                expect(view.$el.find('.team-activity abbr').attr('title')).toContain('August 21st 2015');
+                expect(view.$el.find('.team-activity').text()).toContain('Last activity');
                 expect(view.$el.find('.card-meta').text()).toContain('0 / 100 Members');
                 expect(view.$el.find('.team-location').text()).toContain('United States of America');
                 expect(view.$el.find('.team-language').text()).toContain('English');
@@ -143,7 +143,7 @@ define(['jquery',
                         {username: 'user_5', image_url: 'user_5_image'},
                         {username: 'user_6', image_url: 'user_6_image'},
                         {username: 'user_3', image_url: 'user_3_image'},
-                        {username: 'user_4', image_url: 'user_4_image'},
+                        {username: 'user_4', image_url: 'user_4_image'}
                     ]);
                     expect(view.$('.item-member-thumb').eq(-1)).toHaveText('and others…');
                 });
