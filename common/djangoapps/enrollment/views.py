@@ -459,6 +459,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         Returns a list for the currently logged in user, or for the user named by the 'user' GET
         parameter.  If the username does not match the currently logged in user, only courses the
         requesting user has staff permissions for are listed.
+
+        Only staff or instructor permissions on individual courses are taken into account when
+        deciding whether the requesting user is permitted to see a particular enrollment, i.e.
+        organizational staff access doesn't grant permission to see the enrollments in all courses
+        of the organization.  This may change in the future.
+
+        However, users with global staff access can see all enrollments of all students.
         """
         username = request.GET.get('user', request.user.username)
         try:
