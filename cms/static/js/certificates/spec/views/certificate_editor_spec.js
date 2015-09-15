@@ -228,7 +228,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 }
             );
 
-            it('signatories should not save when title has more than 40 characters per line', function() {
+            it('signatories should not save when fields have too many characters per line', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 setValuesToInputs(this.view, {
                     inputCertificateName: 'New Certificate Name'
@@ -239,7 +239,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory title longer than 40 characters on one line'
+                    inputSignatoryTitle: 'This is a certificate signatory title that has waaaaaaay more than 106 characters, in order to cause an exception.'
                 });
 
                 setValuesToInputs(this.view, {
