@@ -187,6 +187,8 @@ def compile_sass(options):
 
     sh(cmd(*parts))
 
+    print("\t\tFinished compiling sass.")
+
 
 def compile_templated_sass(systems, settings):
     """
@@ -196,6 +198,7 @@ def compile_templated_sass(systems, settings):
     """
     for sys in systems:
         sh(django_cmd(sys, settings, 'preprocess_assets'))
+        print("\t\tFinished preprocessing {} assets.".format(sys))
 
 
 def process_xmodule_assets():
@@ -203,6 +206,7 @@ def process_xmodule_assets():
     Process XModule static assets.
     """
     sh('xmodule_assets common/static/xmodule')
+    print("\t\tFinished processing xmodule assets.")
 
 
 def restart_django_servers():
@@ -216,6 +220,7 @@ def restart_django_servers():
         "touch", 'lms/urls.py', 'cms/urls.py',
     ))
 
+
 def collect_assets(systems, settings):
     """
     Collect static assets, including Django pipeline processing.
@@ -224,6 +229,7 @@ def collect_assets(systems, settings):
     """
     for sys in systems:
         sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
+        print("\t\tFinished collecting {} assets.".format(sys))
 
 
 @task
