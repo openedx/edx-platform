@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django_comment_client.forum.views import get_threads
 from edxmako.tests import mako_middleware_process_request
 
 from django_comment_client.forum import views
@@ -1337,3 +1338,29 @@ class EnrollmentTestCase(ModuleStoreTestCase):
         request.user = self.student
         with self.assertRaises(UserNotEnrolled):
             views.forum_form_discussion(request, course_id=self.course.id.to_deprecated_string())
+
+
+class ThreadListingTestCase(CohortedTestCase):
+    """
+    Test to make sure that queries for threads are only for those a user is allowed to view.
+    """
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_index_send_id(self, _mock_request):
+        request = RequestFactory().get('dummy_url')
+        request.user = self.student
+        _threads, params = get_threads(request, self.course)
+        self.assertEqual(params['group_id'], self.student_cohort.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_cohorted_commentable_send_id(self, _mock_request):
+        request = RequestFactory().get('dummy_url')
+        request.user = self.student
+        _threads, params = get_threads(request, self.course, 'cohorted_topic')
+        self.assertEqual(params['group_id'], self.student_cohort.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_non_cohorted_commentable_does_not_send_id(self, _mock_request):
+        request = RequestFactory().get('dummy_url')
+        request.user = self.student
+        _threads, params = get_threads(request, self.course, 'non_cohorted_topic')
+        self.assertNotIn('group_id', params)
