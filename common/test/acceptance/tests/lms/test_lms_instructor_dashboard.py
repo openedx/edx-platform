@@ -44,7 +44,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         return instructor_dashboard_page
 
 
-@attr('shard_5')
+@attr('shard_1')
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -265,7 +265,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
-@attr('shard_5')
+@attr('shard_1')
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
     Tests for Entrance exam specific student grading tasks.
@@ -557,7 +557,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.verify_report_download(report_name)
 
 
-@attr('shard_5')
+@attr('shard_1')
 class CertificatesTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.

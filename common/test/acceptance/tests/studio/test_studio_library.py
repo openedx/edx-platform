@@ -186,7 +186,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
-@attr('shard_5')
+@attr('shard_2')
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """
