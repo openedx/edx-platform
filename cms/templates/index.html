@@ -61,7 +61,8 @@
               <ol class="list-input">
                 <li class="field text required" id="field-course-name">
                   <label for="new-course-name">${_("Course Name")}</label>
-                  ## Translators: This is an example name for a new course, seen when filling out the form to create a new course.
+                  ## Translators: This is an example name for a new course, seen when
+                  ## filling out the form to create a new course.
                   <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" required placeholder="${_('e.g. Introduction to Computer Science')}" aria-describedby="tip-new-course-name tip-error-new-course-name" />
                   <span class="tip" id="tip-new-course-name">${_("The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-course-name"></span>
@@ -77,7 +78,9 @@
 
                 <li class="field text required" id="field-course-number">
                   <label for="new-course-number">${_("Course Number")}</label>
-                  ## Translators: This is an example for the number used to identify a course, seen when filling out the form to create a new course. The number here is short for "Computer Science 101". It can contain letters but cannot contain spaces.
+                  ## Translators: This is an example for the number used to identify a course,
+                  ## seen when filling out the form to create a new course. The number here is
+                  ## short for "Computer Science 101". It can contain letters but cannot contain spaces.
                   <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" required placeholder="${_('e.g. CS101')}" aria-describedby="tip-new-course-number tip-error-new-course-number" />
                   <span class="tip" id="tip-new-course-number">${_("The unique number that identifies your course within your organization.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-course-number"></span>
@@ -85,7 +88,8 @@
 
                 <li class="field text required" id="field-course-run">
                   <label for="new-course-run">${_("Course Run")}</label>
-                  ## Translators: This is an example for the "run" used to identify different instances of a course, seen when filling out the form to create a new course.
+                  ## Translators: This is an example for the "run" used to identify different
+                  ## instances of a course, seen when filling out the form to create a new course.
                   <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" required placeholder="${_('e.g. 2014_T1')}" aria-describedby="tip-new-course-run tip-error-new-course-run" />
                   <span class="tip" id="tip-new-course-run">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-course-run"></span>
@@ -123,7 +127,9 @@
               <ol class="list-input">
                 <li class="field text required" id="field-library-name">
                   <label for="new-library-name">${_("Library Name")}</label>
-                  ## Translators: This is an example name for a new content library, seen when filling out the form to create a new library. (A library is a collection of content or problems.)
+                  ## Translators: This is an example name for a new content library, seen when
+                  ## filling out the form to create a new library.
+                  ## (A library is a collection of content or problems.)
                   <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" required placeholder="${_('e.g. Computer Science Problems')}" aria-describedby="tip-new-library-name tip-error-new-library-name" />
                   <span class="tip" id="tip-new-library-name">${_("The public display name for your library.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-library-name"></span>
@@ -137,7 +143,10 @@
 
                 <li class="field text required" id="field-library-number">
                   <label for="new-library-number">${_("Library Code")}</label>
-                  ## Translators: This is an example for the "code" used to identify a library, seen when filling out the form to create a new library. This example is short for "Computer Science Problems". The example number may contain letters but must not contain spaces.
+                  ## Translators: This is an example for the "code" used to identify a library,
+                  ## seen when filling out the form to create a new library. This example is short
+                  ## for "Computer Science Problems". The example number may contain letters
+                  ## but must not contain spaces.
                   <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required placeholder="${_('e.g. CSPROB')}" aria-describedby="tip-new-library-number tip-error-new-library-number" />
                   <span class="tip" id="tip-new-library-number">${_("The unique code that identifies this library.")} <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-library-number"></span>
@@ -188,7 +197,11 @@
                   <dt class="label sr">${_("This course run is currently being created.")}</dt>
                   <dd class="value">
                     <i class="icon fa fa-refresh fa-spin"></i>
-                    ## Translators: This is a status message, used to inform the user of what the system is doing. This status means that the user has requested to re-run an existing course, and the system is currently in the process of duplicating and configuring the existing course so that it can be re-run.
+                    ## Translators: This is a status message, used to inform the user of
+                    ## what the system is doing. This status means that the user has
+                    ## requested to re-run an existing course, and the system is currently
+                    ## in the process of duplicating and configuring the existing course
+                    ## so that it can be re-run.
                     <span class="copy">${_("Configuring as re-run")}</span>
                   </dd>
                 </dl>
@@ -227,10 +240,14 @@
                 </div>
 
                 <dl class="course-status">
-                  <dt class="label sr">This re-run processing status:</dt>
+                  ## Translators: This is a status message for the course re-runs feature.
+                  ## When a course admin indicates that a course should be re-run, the system
+                  ## needs to process the request and prepare the new course. The status of
+                  ## the process will follow this text.
+                  <dt class="label sr">${_("This re-run processing status:")}</dt>
                   <dd class="value">
                     <i class="icon fa fa-warning"></i>
-                    <span class="copy">Configuration Error</span>
+                    <span class="copy">${_("Configuration Error")}</span>
                   </dd>
                 </dl>
               </div>
