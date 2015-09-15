@@ -17,7 +17,7 @@ class AssetIndexTest(StudioCourseTest):
     """
 
     def setUp(self, is_staff=False):
-        super(AssetIndexTest, self).setUp()
+        super(AssetIndexTest, self).setUp(is_staff=is_staff)
         self.asset_page = AssetIndexPage(
             self.browser,
             self.course_info['org'],
@@ -31,18 +31,20 @@ class AssetIndexTest(StudioCourseTest):
         """
         self.course_fixture.add_asset(['image.jpg', 'textbook.pdf'])
 
+    @flaky(max_runs=60, min_passes=60)
     def test_page_existence(self):
         """
         Make sure that the page is accessible.
         """
         self.asset_page.visit()
 
-    @flaky  # TODO fix this, see SOL-1160
+    @flaky(max_runs=20, min_passes=20)  # TODO fix this, see SOL-1160
     def test_type_filter_exists(self):
         """
         Make sure type filter is on the page.
         """
         self.asset_page.visit()
+        self.asset_page.wait_for_element_presence('#asset-paging-header', 'Assets loaded', timeout=600)
         assert self.asset_page.type_filter_on_page() is True
 
     def test_filter_results(self):
