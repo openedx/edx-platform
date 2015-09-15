@@ -150,7 +150,7 @@ def instructor_dashboard_2(request, course_id):
         request.user.is_staff
     )
     if can_see_proctoring:
-        sections.append(_section_proctoring(course, access))
+        sections.append(_section_timed_exam(course, access))
 
     # Certificates panel
     # This is used to generate example certificates
@@ -233,13 +233,13 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
     return section_data
 
 
-def _section_proctoring(course, access):
+def _section_timed_exam(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
 
     section_data = {
-        'section_key': 'proctoring',
-        'section_display_name': _('Proctoring'),
+        'section_key': 'timed_exam',
+        'section_display_name': _('Timed Exam'),
         'access': access,
         'course_id': unicode(course_key)
     }
