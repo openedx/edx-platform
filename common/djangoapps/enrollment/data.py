@@ -11,7 +11,7 @@ from enrollment.errors import (
     CourseNotFoundError, CourseEnrollmentClosedError, CourseEnrollmentFullError,
     CourseEnrollmentExistsError, UserNotFoundError, InvalidEnrollmentAttribute
 )
-from enrollment.serializers import CourseEnrollmentSerializer, CourseField
+from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import (
     CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
@@ -35,9 +35,30 @@ def get_course_enrollments(user_id):
 
     """
     qset = CourseEnrollment.objects.filter(
-        user__username=user_id, is_active=True
+        user__username=user_id,
+        is_active=True
     ).order_by('created')
-    return CourseEnrollmentSerializer(qset).data
+
+    enrollments = CourseEnrollmentSerializer(qset, many=True).data
+
+    # Find deleted courses and filter them out of the results
+    deleted = []
+    valid = []
+    for enrollment in enrollments:
+        if enrollment.get("course_details") is not None:
+            valid.append(enrollment)
+        else:
+            deleted.append(enrollment)
+
+    if deleted:
+        log.warning(
+            (
+                u"Course enrollments for user %s reference "
+                u"courses that do not exist (this can occur if a course is deleted)."
+            ), user_id,
+        )
+
+    return valid
 
 
 def get_course_enrollment(username, course_id):
@@ -271,4 +292,4 @@ def get_course_enrollment_info(course_id, include_expired=False):
         log.warning(msg)
         raise CourseNotFoundError(msg)
     else:
-        return CourseField().to_native(course, include_expired=include_expired)
+        return CourseSerializer(course, include_expired=include_expired).data

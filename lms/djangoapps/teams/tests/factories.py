@@ -32,3 +32,10 @@ class CourseTeamMembershipFactory(DjangoModelFactory):
     """Factory for CourseTeamMemberships."""
     FACTORY_FOR = CourseTeamMembership
     last_activity_at = LAST_ACTIVITY_AT
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """Create the team membership. """
+        obj = model_class(*args, **kwargs)
+        obj.save()
+        return obj
