@@ -312,7 +312,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
         else:
-            self.db_connection.update_course_index(updated_index_entry, course_key)
+            self.db_connection.update_course_index(updated_index_entry, course_context=course_key)
 
     def get_structure(self, course_key, version_guid):
         bulk_write_record = self._get_bulk_ops_record(course_key)
