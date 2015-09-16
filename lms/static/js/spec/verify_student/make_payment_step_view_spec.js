@@ -66,7 +66,8 @@ define([
                 var params = {
                     contribution: kwargs.amount || "",
                     course_id: kwargs.courseId || "",
-                    processor: kwargs.processor || ""
+                    processor: kwargs.processor || "",
+                    sku: kwargs.sku || ""
                 };
 
                 // Click the "go to payment" button

@@ -766,13 +766,22 @@ def create_order(request):
         return HttpResponseBadRequest(_("Selected price is not valid number."))
 
     current_mode = None
-    paid_modes = CourseMode.paid_modes_for_course(course_id)
-    # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
-    # for course exist then choose the first one
-    if paid_modes:
-        if len(paid_modes) > 1:
-            log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
-        current_mode = paid_modes[0]
+    sku = request.POST.get('sku', None)
+
+    if sku:
+        try:
+            current_mode = CourseMode.objects.get(sku=sku)
+        except CourseMode.DoesNotExist:
+            log.exception(u'Failed to find CourseMode with SKU [%s].', sku)
+
+    if not current_mode:
+        # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
+        # for course exist then choose the first one
+        paid_modes = CourseMode.paid_modes_for_course(course_id)
+        if paid_modes:
+            if len(paid_modes) > 1:
+                log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
+            current_mode = paid_modes[0]
 
     # Make sure this course has a paid mode
     if not current_mode:
