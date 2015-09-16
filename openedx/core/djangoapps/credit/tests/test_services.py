@@ -1,6 +1,9 @@
 """
 Tests for the Credit xBlock service
 """
+import unittest
+
+from django.conf import settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -65,6 +68,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
 
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False), 'This is contrived and does not work for CME')
     def test_no_profile_name(self):
         """
         Makes sure that get_credit_state returns None if the user does not
