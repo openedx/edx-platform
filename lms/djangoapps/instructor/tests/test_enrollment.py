@@ -756,6 +756,15 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
             self.assertIn("You have been", subject)
             self.assertIn("You have been", message)
 
+    def test_platform_language_is_used_for_new_user(self):
+        # simulate a new user
+        subject, message = self.get_subject_and_message(None)
+        language_after_rendering = get_language()
+
+        self.assertIn("You have been invited in platform language", subject)
+        self.assertIn("You have been invited in platform language", message)
+        self.assertEqual(settings.LANGUAGE_CODE, language_after_rendering)
+
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def test_render_enrollment_message_ccx_members(self):
         """
