@@ -123,6 +123,10 @@ class CourseMode(models.Model):
         self.currency = self.currency.lower()
         super(CourseMode, self).save(force_insert, force_update, using)
 
+    @property
+    def slug(self):
+        return self.mode_slug
+
     @classmethod
     def all_modes_for_courses(cls, course_id_list):
         """Find all modes for a list of course IDs, including expired modes.

@@ -17,6 +17,7 @@ var edx = edx || {};
                 isActive: true,
                 suggestedPrices: [],
                 minPrice: 0,
+                sku: '',
                 currency: 'usd',
                 upgrade: false,
                 verificationDeadline: '',
@@ -133,7 +134,8 @@ var edx = edx || {};
                 postData = {
                     'processor': event.target.id,
                     'contribution': paymentAmount,
-                    'course_id': this.stepData.courseKey
+                    'course_id': this.stepData.courseKey,
+                    'sku': this.templateContext().sku
                 };
 
             // Disable the payment button to prevent multiple submissions
