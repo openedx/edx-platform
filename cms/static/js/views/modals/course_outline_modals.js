@@ -267,9 +267,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         events : {
             'change #id_timed_examination': 'timedExamination',
             'focusout #id_time_limit': 'timeLimitFocusout',
-            'change #id_exam_proctoring': 'isExamProctored'
+            'change #id_exam_proctoring': 'toggleProctoredExam'
         },
-        isExamProctored: function (event) {
+        toggleProctoredExam: function (event) {
             event.preventDefault();
             if (!$(event.currentTarget).is(':checked')) {
                 this.$('#id_practice_exam').prop('checked', false);
