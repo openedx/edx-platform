@@ -30,16 +30,6 @@ def register_proctored_exams(course_key):
     subsystem. Likewise, if formerly registered exams are unmarked, then those
     registered exams are marked as inactive
     """
-
-    if not settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
-        # if feature is not enabled then do a quick exit
-        return
-
-    course = modulestore().get_course(course_key)
-    if not course.enable_proctored_exams:
-        # likewise if course does not have this feature turned on
-        return
-
     # get all sequences, since they can be marked as timed/proctored exams
     _timed_exams = modulestore().get_items(
         course_key,
