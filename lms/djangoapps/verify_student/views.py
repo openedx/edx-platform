@@ -273,7 +273,7 @@ class PayAndVerifyView(View):
         # separate out the payment flow and use the product SKU to figure out what
         # the user is trying to purchase.
         #
-        # Nonethless, for the time being we continue to make the really ugly assumption
+        # Nonetheless, for the time being we continue to make the really ugly assumption
         # that at some point there was a paid course mode we can query for the price.
         relevant_course_mode = self._get_paid_mode(course_key)
 
@@ -509,9 +509,12 @@ class PayAndVerifyView(View):
         # Retrieve all the modes at once to reduce the number of database queries
         all_modes, unexpired_modes = CourseMode.all_and_unexpired_modes_for_courses([course_key])
 
-        # Retrieve the first unexpired, paid mode, if there is one
+        # Retrieve the first mode that matches the following criteria:
+        #  * Unexpired
+        #  * Price > 0
+        #  * Not credit
         for mode in unexpired_modes[course_key]:
-            if mode.min_price > 0:
+            if mode.min_price > 0 and not CourseMode.is_credit_mode(mode):
                 return mode
 
         # Otherwise, find the first expired mode
