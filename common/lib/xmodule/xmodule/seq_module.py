@@ -228,7 +228,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         feature_enabled = (
             proctoring_service and
             credit_service and
-            proctoring_service.is_feature_enabled()
+            (proctoring_service.is_feature_enabled() or (self.is_time_limited and not self.is_proctored_enabled))
         )
         if feature_enabled:
             user_id = self.runtime.user_id
