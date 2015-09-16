@@ -249,8 +249,9 @@ class TestMissingStudentModule(TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(5):
-            self.kvs.set(user_state_key('a_field'), 'a_value')
+        with self.assertNumQueries(2, using='default'):
+            with self.assertNumQueries(1, using='student_module_history'):
+                self.kvs.set(user_state_key('a_field'), 'a_value')
 
         self.assertEquals(1, sum(len(cache) for cache in self.field_data_cache.cache.values()))
         self.assertEquals(1, StudentModule.objects.all().count())
