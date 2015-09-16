@@ -47,7 +47,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return new Editor({
                     parentElement: this.$('.modal-section'),
                     model: this.model,
-                    xblockType: this.options.xblockType
+                    xblockType: this.options.xblockType,
+                    enable_proctored_exams: this.options.enable_proctored_exams
                 });
             }, this);
         },
@@ -161,7 +162,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         render: function () {
             var html = this.template($.extend({}, {
                 xblockInfo: this.model,
-                xblockType: this.options.xblockType
+                xblockType: this.options.xblockType,
+                enable_proctored_exam: this.options.enable_proctored_exams
             }, this.getContext()));
 
             this.$el.html(html);
@@ -264,7 +266,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         events : {
             'change #id_timed_examination': 'timedExamination',
-            'focusout #id_time_limit': 'timeLimitFocusout'
+            'focusout #id_time_limit': 'timeLimitFocusout',
+            'change #id_exam_proctoring': 'isExamProctored'
+        },
+        isExamProctored: function (event) {
+            event.preventDefault();
+            if (!$(event.currentTarget).is(':checked')) {
+                this.$('#id_practice_exam').prop('checked', false);
+                this.$('#id_practice_exam').attr('disabled', 'disabled');
+            }
+            else {
+                this.$('#id_practice_exam').removeAttr('disabled');
+            }
+            return true;
         },
         timeLimitFocusout: function(event) {
             var selectedTimeLimit = $(event.currentTarget).val();
@@ -275,20 +289,24 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         timedExamination: function (event) {
             event.preventDefault();
             if (!$(event.currentTarget).is(':checked')) {
-                this.$('#id_exam_proctoring').attr('checked', false);
                 this.$('#id_time_limit').val('00:00');
-                this.$('#id_exam_proctoring').attr('disabled','disabled');
                 this.$('#id_time_limit').attr('disabled', 'disabled');
-                this.$('#id_practice_exam').attr('checked', false);
-                this.$('#id_practice_exam').attr('disabled','disabled');
+                if (this.options.enable_proctored_exams) {
+                    this.$('#id_exam_proctoring').attr('checked', false);
+                    this.$('#id_exam_proctoring').attr('disabled', 'disabled');
+                    this.$('#id_practice_exam').attr('checked', false);
+                    this.$('#id_practice_exam').attr('disabled', 'disabled');
+                }
             }
             else {
                 if (!this.isValidTimeLimit(this.$('#id_time_limit').val())) {
                     this.$('#id_time_limit').val('00:30');
                 }
-                this.$('#id_practice_exam').removeAttr('disabled');
-                this.$('#id_exam_proctoring').removeAttr('disabled');
                 this.$('#id_time_limit').removeAttr('disabled');
+                if (this.options.enable_proctored_exams) {
+                    this.$('#id_practice_exam').removeAttr('disabled');
+                    this.$('#id_exam_proctoring').removeAttr('disabled');
+                }
             }
             return true;
         },
@@ -302,8 +320,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             });
             this.setExamTime(this.model.get('default_time_limit_minutes'));
             this.setExamTmePreference(this.model.get('is_time_limited'));
-            this.setExamProctoring(this.model.get('is_proctored_enabled'));
-            this.setPracticeExam(this.model.get('is_practice_exam'));
+            if (this.options.enable_proctored_exams) {
+                this.setExamProctoring(this.model.get('is_proctored_enabled'));
+                this.setPracticeExam(this.model.get('is_practice_exam'));
+            }
         },
         setPracticeExam: function(value) {
             this.$('#id_practice_exam').prop('checked', value);
@@ -318,16 +338,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         setExamTmePreference: function (value) {
             this.$('#id_timed_examination').prop('checked', value);
             if (!this.$('#id_timed_examination').is(':checked')) {
-                this.$('#id_exam_proctoring').attr('disabled','disabled');
                 this.$('#id_time_limit').attr('disabled', 'disabled');
-                this.$('#id_practice_exam').attr('disabled', 'disabled');
+                if (this.options.enable_proctored_exams) {
+                    this.$('#id_exam_proctoring').attr('disabled','disabled');
+                    this.$('#id_practice_exam').attr('disabled', 'disabled');
+                }
             }
         },
         isExamTimeEnabled: function () {
             return this.$('#id_timed_examination').is(':checked');
         },
         isPracticeExam: function () {
-            return this.$('#id_practice_exam').is(':checked');
+            if (this.options.enable_proctored_exams) {
+                return this.$('#id_practice_exam').is(':checked');
+            } else {
+                return false;
+            }
         },
         isValidTimeLimit: function(time_limit) {
             var pattern = new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
@@ -349,7 +375,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return total_time;
         },
         isExamProctoringEnabled: function () {
-            return this.$('#id_exam_proctoring').is(':checked');
+            if (this.options.enable_proctored_exams) {
+                return this.$('#id_exam_proctoring').is(':checked');
+            } else {
+                return false;
+            }
         },
         getRequestData: function () {
             var time_limit = this.getExamTimeLimit();
@@ -566,14 +596,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (xblockInfo.isChapter()) {
                 editors = [ReleaseDateEditor, StaffLockEditor];
             } else if (xblockInfo.isSequential()) {
-                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
-
-                // since timed/proctored exams are optional
-                // we want it before the StaffLockEditor
-                // to keep it closer to the GradingEditor
-                if (options.enable_proctored_exams) {
-                    editors.push(TimedExaminationPreferenceEditor);
-                }
+                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, TimedExaminationPreferenceEditor];
 
                 editors.push(StaffLockEditor);
 
