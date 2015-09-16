@@ -6,18 +6,23 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum, Q
+from django.utils.translation import ugettext_lazy as _
+from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
 
 
-class StudentProgress(TimeStampedModel):
+class StudentProgress(models.Model):
     """
     StudentProgress is essentially a container used to store calculated progress of user
     """
     user = models.ForeignKey(User, db_index=True)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
-    completions = models.IntegerField(default=0)
+    completions = models.IntegerField(default=0, db_index=True)
+    # We can't use TimeStampedModel here because those fields are not indexed.
+    created = AutoCreatedField(_('created'))
+    modified = AutoLastModifiedField(_('modified'), db_index=True)
 
     class Meta:
         """
