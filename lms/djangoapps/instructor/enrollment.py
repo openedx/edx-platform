@@ -417,9 +417,11 @@ def render_message_to_string(subject_template, message_template, param_dict, lan
     Returns two strings that correspond to the rendered, translated email
     subject and message.
     """
+    # Override the email language with the user's preference, if it is set
     if language is not None:
         with override_language(language):
             return get_subject_and_message(subject_template, message_template, param_dict)
+    # If language is None, this is a new user so we want to deliver the email in the platform language
     else:
         return get_subject_and_message(subject_template, message_template, param_dict)
 
