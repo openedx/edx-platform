@@ -93,10 +93,22 @@ class CapaModule(CapaMixin, XModule):
             result = handlers[dispatch](data)
 
         except NotFoundError as err:
+            log.exception(
+                "Unable to find data when dispatching %s to %s for user %s",
+                dispatch,
+                self.scope_ids.usage_id,
+                self.scope_ids.user_id
+            )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(not_found_error_message), None, traceback_obj
 
         except Exception as err:
+            log.exception(
+                "Unknown error when dispatching %s to %s for user %s",
+                dispatch,
+                self.scope_ids.usage_id,
+                self.scope_ids.user_id
+            )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(generic_error_message), None, traceback_obj
 
