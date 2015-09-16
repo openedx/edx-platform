@@ -867,6 +867,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "user_partitions": get_user_partition_info(xblock, course=course),
     }
 
+    # update xblock_info with timed_exam information if the xblock category is sequential
+    if xblock.category == 'sequential':
+        xblock_info.update({
+            "is_time_limited": xblock.is_time_limited,
+            "default_time_limit_minutes": xblock.default_time_limit_minutes
+        })
+
     # update xblock_info with proctored_exam information if the feature flag is enabled
     if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
         if xblock.category == 'course':
@@ -876,8 +883,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         elif xblock.category == 'sequential':
             xblock_info.update({
                 "is_proctored_enabled": xblock.is_proctored_enabled,
-                "is_time_limited": xblock.is_time_limited,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes,
                 "is_practice_exam": xblock.is_practice_exam
             })
 

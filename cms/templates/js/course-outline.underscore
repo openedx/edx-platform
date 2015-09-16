@@ -34,6 +34,22 @@ var gradingType = gettext('Not Graded');
 if (xblockInfo.get('graded')) {
     gradingType = xblockInfo.get('format')
 }
+
+var is_proctored_exam = xblockInfo.get('is_proctored_enabled');
+var is_practice_exam = xblockInfo.get('is_practice_exam');
+if (is_proctored_exam) {
+    if (is_practice_exam) {
+        var exam_label = gettext('Practice Exam');
+        var exam_value = gettext('Timed and Practice Proctored Exam');
+    } else {
+        var exam_label = gettext('Proctored Exam');
+        var exam_value = gettext('Timed and Proctored Exam');
+    }
+
+} else {
+    var exam_label = gettext('Timed Exam');
+    var exam_value = gettext('Timed Exam');
+}
 %>
 <% if (parentInfo) { %>
 <li class="outline-item outline-<%= xblockType %> <%= visibilityClass %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : '' %>"
@@ -145,9 +161,9 @@ if (xblockInfo.get('graded')) {
             <% if (xblockInfo.get('is_time_limited')) { %>
                 <div class="status-timed-proctored-exam">
                     <p>
-                        <span class="sr status-proctored-exam-label"> <%= gettext('Proctored Exam') %> </span>
+                        <span class="sr status-proctored-exam-label"> <%= exam_label %> </span>
                         <i class="icon fa fa-check"></i>
-                        <span class="status-proctored-exam-value"> <%= gettext('Timed and Proctored Exam') %> </span>
+                        <span class="status-proctored-exam-value"> <%= exam_value %> </span>
                         <% if (xblockInfo.get('due_date')) { %>
                             <span class="status-due-date"> <%= gettext('Due Date') %> <%= xblockInfo.get('due_date') %> </span>
                         <% } %>
