@@ -5,6 +5,9 @@ import pytz
 from datetime import datetime
 from dateutil import parser
 import ddt
+from elasticsearch.exceptions import ConnectionError
+from mock import patch
+from search.search_engine_base import SearchEngine
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -1397,3 +1400,49 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
 
     def test_missing_membership(self):
         self.delete_membership(self.wind_team.team_id, self.users['student_enrolled'].username, 404)
+
+
+class TestElasticSearchErrors(TeamAPITestCase):
+    """Test that the Team API is robust to Elasticsearch connection errors."""
+
+    ES_ERROR = ConnectionError('N/A', 'connection error', {})
+
+    @patch.object(SearchEngine, 'get_search_engine', side_effect=ES_ERROR)
+    def test_list_teams(self, __):
+        """Test that text searches return a 503 when Elasticsearch is down.
+
+        The endpoint should still return 200 when a search is not supplied."""
+        self.get_teams_list(
+            expected_status=503,
+            data={'course_id': self.test_course_1.id, 'text_search': 'zoinks'},
+            user='staff'
+        )
+        self.get_teams_list(
+            expected_status=200,
+            data={'course_id': self.test_course_1.id},
+            user='staff'
+        )
+
+    @patch.object(SearchEngine, 'get_search_engine', side_effect=ES_ERROR)
+    def test_create_team(self, __):
+        """Test that team creation is robust to Elasticsearch errors."""
+        self.post_create_team(
+            expected_status=200,
+            data=self.build_team_data(name='zoinks'),
+            user='staff'
+        )
+
+    @patch.object(SearchEngine, 'get_search_engine', side_effect=ES_ERROR)
+    def test_delete_team(self, __):
+        """Test that team deletion is robust to Elasticsearch errors."""
+        self.delete_team(self.wind_team.team_id, 204, user='staff')
+
+    @patch.object(SearchEngine, 'get_search_engine', side_effect=ES_ERROR)
+    def test_patch_team(self, __):
+        """Test that team updates are robust to Elasticsearch errors."""
+        self.patch_team_detail(
+            self.wind_team.team_id,
+            200,
+            data={'description': 'new description'},
+            user='staff'
+        )

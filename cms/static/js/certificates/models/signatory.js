@@ -46,18 +46,13 @@ function(_, str, Backbone, BackboneRelational, gettext) {
                         'title': gettext('Signatory title should span over maximum of 2 lines.')
                     }, errors);
                 }
-                else if ((lines.length > 1 && (lines[0].length > 40 || lines[1].length > 40)) ||
-                    (lines.length === 1 && title.length > 40)) {
+                else if ((lines.length > 1 && (lines[0].length > 53 && lines[1].length > 53)) ||
+                    (lines.length === 1 && title.length > 106)) {
                     errors = _.extend({
                         'title': gettext('Signatory title should have maximum of 40 characters per line.')
                     }, errors);
                 }
 
-            }
-            if(_.has(attrs, 'organization') && attrs.organization.length > 40) {
-                errors = _.extend({
-                    'organization': gettext('Signatory organization should not be more than 40 characters long.')
-                }, errors);
             }
             if (errors !== null){
                 return errors;

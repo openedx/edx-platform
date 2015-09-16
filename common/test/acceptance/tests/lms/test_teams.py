@@ -9,7 +9,6 @@ from dateutil.parser import parse
 import ddt
 from nose.plugins.attrib import attr
 from uuid import uuid4
-from unittest import skip
 
 from ..helpers import EventsTestMixin, UniqueCourseTest
 from ...fixtures import LMS_BASE_URL
@@ -783,7 +782,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
-    @skip("Skip until TNL-3198 (searching teams makes two AJAX requests) is resolved")
     def test_search(self):
         """
         Scenario: User should be able to search for a team
@@ -794,6 +792,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And the search header should be shown
         And 0 results should be shown
         And my browser should fire a page viewed event for the search page
+        And a searched event should have been fired
         """
         # Note: all searches will return 0 results with the mock search server
         # used by Bok Choy.
@@ -801,21 +800,21 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.create_teams(self.topic, 5)
         self.browse_teams_page.visit()
         events = [{
-            'event_type': 'edx.team.searched',
-            'event': {
-                'search_text': search_text,
-                'topic_id': self.topic['id'],
-                'number_of_results': 0
-            }
-        }, {
             'event_type': 'edx.team.page_viewed',
             'event': {
                 'page_name': 'search-teams',
                 'topic_id': self.topic['id'],
                 'team_id': None
             }
+        }, {
+            'event_type': 'edx.team.searched',
+            'event': {
+                'search_text': search_text,
+                'topic_id': self.topic['id'],
+                'number_of_results': 0
+            }
         }]
-        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+        with self.assert_events_match_during(self.only_team_events, expected_events=events, in_order=False):
             search_results_page = self.browse_teams_page.search(search_text)
         self.verify_search_header(search_results_page, search_text)
         self.assertTrue(search_results_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))

@@ -275,6 +275,14 @@
     }
   }
 
+  .members-info {
+    margin: 0;
+    padding: 0;
+    li {
+      display: inline;
+    }
+  }
+
   .edit-members {
     @extend %ui-no-list;
 
@@ -318,6 +326,26 @@
   .search-field::-ms-clear {
     width: 0px;
     height: 0px;
+  }
+}
+
+//efischer - TNL-3189
+//copied from cms/static/sass/elements/_system-feedback.scss#L106
+//along with some "hide the inherited value, we want none" action
+.prompt.warning button {
+  @extend %btn-no-style;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    color: $orange-s2;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: 0px;
   }
 }
 
