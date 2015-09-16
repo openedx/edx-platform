@@ -76,9 +76,9 @@ from verify_student.views import PayAndVerifyView
       data-verification-good-until='${verification_good_until}'
       data-capture-sound='${capture_sound}'
 
-      # If we reached the verification flow from an in-course checkpoint,
-      # then pass the checkpoint location in so that we can associate
-      # the attempt with the checkpoint on submission.
+      ## If we reached the verification flow from an in-course checkpoint,
+      ## then pass the checkpoint location in so that we can associate
+      ## the attempt with the checkpoint on submission.
       % if checkpoint_location is not None:
         data-checkpoint-location='${checkpoint_location}'
       % endif
