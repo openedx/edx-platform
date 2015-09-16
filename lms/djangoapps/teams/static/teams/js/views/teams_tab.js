@@ -31,7 +31,7 @@
                   TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
-                    _.extend(this.defaults, {nav_aria_label: gettext('teams')});
+                    _.extend(this.defaults, {nav_aria_label: gettext('Topics')});
                     HeaderModel.prototype.initialize.call(this);
                 }
             });
@@ -214,6 +214,7 @@
                             view.mainView = view.createTeamsListView({
                                 topic: topic,
                                 collection: view.teamsCollection,
+                                breadcrumbs: view.createBreadcrumbs(topic),
                                 title: gettext('Team Search'),
                                 description: interpolate(
                                     gettext('Showing results for "%(searchString)s"'),
@@ -337,6 +338,7 @@
                                         var teamsView = view.createTeamsListView({
                                             topic: topic,
                                             collection: collection,
+                                            breadcrumbs: view.createBreadcrumbs(),
                                             showSortControls: true
                                         });
                                         deferred.resolve(teamsView);
@@ -368,7 +370,7 @@
                             headerActionsView: searchFieldView,
                             title: options.title,
                             description: options.description,
-                            breadcrumbs: this.createBreadcrumbs()
+                            breadcrumbs: options.breadcrumbs
                         }),
                         searchUrl = 'topics/' + topic.get('id') + '/search';
                     // Listen to requests to sync the collection and redirect it as follows:
@@ -378,6 +380,11 @@
                     // 3. Otherwise, do nothing and remain on the current page.
                     // Note: Backbone makes this a no-op if redirecting to the current page.
                     this.listenTo(collection, 'sync', function() {
+                        // Clear the stale flag here as by definition the collection is up-to-date,
+                        // and the flag itself isn't guaranteed to be cleared yet. This is to ensure
+                        // that the collection doesn't unnecessarily get refreshed again.
+                        collection.isStale = false;
+
                         if (collection.searchString) {
                             Backbone.history.navigate(searchUrl, {trigger: true});
                         } else if (Backbone.history.getFragment() === searchUrl) {

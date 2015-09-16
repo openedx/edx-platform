@@ -29,19 +29,6 @@ define([
             return teamsTabView;
         };
 
-        /**
-         * Filters out all team events from a list of requests.
-         */
-        var removeTeamEvents = function (requests) {
-            return requests.filter(function (request) {
-                if (request.requestBody && request.requestBody.startsWith('event_type=edx.team')) {
-                    return false;
-                } else {
-                    return true;
-                }
-            });
-        };
-
         beforeEach(function () {
             setFixtures('<div class="teams-content"></div>');
             spyOn($.fn, 'focus');
@@ -233,25 +220,33 @@ define([
                         options
                     ));
             };
-
-            it('can search teams', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
-                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
-                verifyTeamsRequest(requests, {
-                    order_by: 'last_activity_at',
-                    text_search: ''
-                });
-                AjaxHelpers.respondWithJson(requests, {});
+            var performSearch = function(requests, teamsTabView) {
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
                 verifyTeamsRequest(requests, {
                     order_by: '',
                     text_search: 'foo'
                 });
+                AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamsResponse({results: []}));
+            };
+
+            it('can search teams', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView(),
+                    requestCountBeforeSearch;
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+                verifyTeamsRequest(requests, {
+                    order_by: 'last_activity_at',
+                    text_search: ''
+                });
                 AjaxHelpers.respondWithJson(requests, {});
+                requestCountBeforeSearch = requests.length;
+                performSearch(requests, teamsTabView);
                 expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
                 expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
+
+                // Expect exactly one search request to be fired
+                expect(requests.length).toBe(requestCountBeforeSearch + 1);
             });
 
             it('can clear a search', function () {
@@ -259,21 +254,35 @@ define([
                     teamsTabView = createTeamsTabView();
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 AjaxHelpers.respondWithJson(requests, {});
+                performSearch(requests, teamsTabView);
 
                 // Perform a search
-                teamsTabView.$('.search-field').val('foo');
-                teamsTabView.$('.action-search').click();
-                // Note: this is a bit of a hack -- without it the URL
-                // fragment won't be what it would be in the real
-                // app. This line sets the fragment without triggering
-                // callbacks, allowing teams_tab.js to detect the
-                // fragment correctly.
-                Backbone.history.navigate('topics/' + TeamSpecHelpers.testTopicID + '/search', {trigger: false});
-                AjaxHelpers.respondWithJson(requests, {});
+                performSearch(requests, teamsTabView);
 
                 // Clear the search and submit it again
                 teamsTabView.$('.search-field').val('');
                 teamsTabView.$('.action-search').click();
+                verifyTeamsRequest(requests, {
+                    order_by: 'last_activity_at',
+                    text_search: ''
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
+                expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
+            });
+
+            it('can navigate back to all teams from a search', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Perform a search
+                performSearch(requests, teamsTabView);
+
+                // Verify the breadcrumbs have a link back to the teams list, and click on it
+                expect(teamsTabView.$('.breadcrumbs a').length).toBe(2);
+                teamsTabView.$('.breadcrumbs a').last().click();
                 verifyTeamsRequest(requests, {
                     order_by: 'last_activity_at',
                     text_search: ''
@@ -289,10 +298,12 @@ define([
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 AjaxHelpers.respondWithJson(requests, {});
 
-                // Perform a search
+                // Perform a search but respond with a 500
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
                 AjaxHelpers.respondWithError(requests);
+
+                // Verify that the team list is still shown
                 expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
                 expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
                 expect(teamsTabView.$('.search-field').val(), 'foo');
