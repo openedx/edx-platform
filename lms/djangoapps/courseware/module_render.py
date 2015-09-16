@@ -194,13 +194,18 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                     #
                     # Add in rendering context for proctored exams and timed exams
-                    # if applicable
-                    #
-                    is_proctored_enabled = (
-                        getattr(section, 'is_time_limited', False) and
-                        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+                    # if:
+                    # 1. the section is time_limited but not proctored_enabled.
+                    # OR
+                    # 2. the section is proctored_enabled and ENABLE_PROCTORED_EXAMS is set
+                    section_is_proctored_enabled = getattr(section, 'is_proctored_enabled', False)
+                    section_is_time_limited = getattr(section, 'is_time_limited', False)
+                    proctoring_feature_is_enabled = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+
+                    show_rendering_context = (section_is_time_limited and not section_is_proctored_enabled) or (
+                        section_is_proctored_enabled and proctoring_feature_is_enabled
                     )
-                    if is_proctored_enabled:
+                    if show_rendering_context:
                         # We need to import this here otherwise Lettuce test
                         # harness fails. When running in 'harvest' mode, the
                         # test service appears to get into trouble with
