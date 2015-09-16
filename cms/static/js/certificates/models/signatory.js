@@ -54,11 +54,6 @@ function(_, str, Backbone, BackboneRelational, gettext) {
                 }
 
             }
-            if(_.has(attrs, 'organization') && attrs.organization.length > 40) {
-                errors = _.extend({
-                    'organization': gettext('Signatory organization should not be more than 40 characters long.')
-                }, errors);
-            }
             if (errors !== null){
                 return errors;
             }
