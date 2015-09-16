@@ -135,6 +135,12 @@
   width: 1px;
 }
 
+// extends - ensures proper contrast for automated checkers
+%a11y-ensure-contrast {
+  background: $white;
+  color: $black;
+}
+
 // extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 %ui-no-list {
   list-style: none;

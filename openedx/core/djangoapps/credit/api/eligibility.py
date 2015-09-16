@@ -320,7 +320,7 @@ def remove_credit_requirement_status(username, course_key, req_namespace, req_na
     # but that could cause serious performance issues if many users attempt to
     # lock the row at the same time.
     # Instead, we skip removing the requirement and log an error.
-    if req_to_remove is None:
+    if not req_to_remove:
         log.error(
             (
                 u'Could not remove credit requirement in course "%s" '

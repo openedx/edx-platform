@@ -21,7 +21,6 @@ git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
 git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
-git+https://github.com/mfogel/django-settings-context-processor.git@b758c3930862761216267715a70bbefd206ac03a#egg=django-settings-context-processor==0.2
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
 # fs==0.4.0
@@ -31,6 +30,8 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 # custom opaque-key implementations for ccx
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
+# Used for testing
+-e git+https://github.com/gabrielfalcao/lettuce.git@b18b8fb711eb7a178c58574716032ad8de525912#egg=lettuce=1.8-support
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@32fca2a954745315be97b91ef0d5ad4eb38cf365#egg=XBlock
@@ -47,17 +48,17 @@ git+https://github.com/edx/i18n-tools.git@v0.1.3#egg=i18n-tools==v0.1.3
 git+https://github.com/edx/edx-oauth2-provider.git@0.5.6#egg=oauth2-provider==0.5.6
 -e git+https://github.com/edx/edx-val.git@v0.0.5#egg=edx-val
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
--e git+https://github.com/edx/edx-search.git@release-2015-07-22#egg=edx-search
+-e git+https://github.com/edx/edx-search.git@release-2015-09-11a#egg=edx-search
 -e git+https://github.com/edx/edx-milestones.git@9b44a37edc3d63a23823c21a63cdd53ef47a7aa4#egg=edx-milestones
-git+https://github.com/edx/edx-lint.git@178819aae155f8f14db4ebb6866c867fb17d5000#egg=edx_lint==0.2.6
+git+https://github.com/edx/edx-lint.git@c5745631d2eee4e2efe8c31fa7b42fe2c12a0755#egg=edx_lint==0.2.7
 -e git+https://github.com/edx/xblock-utils.git@213a97a50276d6a2504d8133650b2930ead357a0#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
--e git+https://github.com/edx/edx-reverification-block.git@5e77525cab256a20a0cf182fcf5471369b284ff1#egg=edx-reverification-block
+-e git+https://github.com/edx/edx-reverification-block.git@5162ca169ca1486479e02f6ad2f538e6b8ae6f00#egg=edx-reverification-block
 git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-client==1.1.0
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
 -e git+https://github.com/edx/edx-organizations.git@release-2015-08-31#egg=edx-organizations
 
-git+https://github.com/edx/edx-proctoring.git@0.8.3#egg=edx-proctoring==0.8.3
+git+https://github.com/edx/edx-proctoring.git@0.9.6#egg=edx-proctoring==0.9.6
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga

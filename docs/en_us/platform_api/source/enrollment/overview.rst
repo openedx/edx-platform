@@ -7,8 +7,9 @@ Enrollment API Overview
 Use the Enrollment API to view user and course enrollment
 information and to enroll a user in a course.
 
-You can use the Enrollment API for web, desktop, and mobile
-applications.
+.. contents::
+   :local:
+   :depth: 1
 
 ****************************************
 Enrollment API Version and Status

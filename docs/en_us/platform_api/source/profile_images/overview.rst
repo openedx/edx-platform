@@ -8,6 +8,10 @@ The requesting user can upload or remove his or her own profile image.
 
 Users with staff access can remove profile images from any user account.
 
+.. contents::
+   :local:
+   :depth: 1
+
 *************************************
 Profile Images API Version and Status
 *************************************

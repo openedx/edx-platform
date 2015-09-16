@@ -8,7 +8,6 @@ import json
 
 import mock
 import ddt
-import markupsafe
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
@@ -20,6 +19,7 @@ from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
+from openedx.core.lib.json_utils import EscapedEdxJSONEncoder
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
@@ -223,7 +223,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     @ddt.unpack
     def test_login_and_registration_form(self, url_name, initial_mode):
         response = self.client.get(reverse(url_name))
-        expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
+        expected_data = '"initial_mode": "{mode}"'.format(mode=initial_mode)
         self.assertContains(response, expected_data)
 
     @ddt.data("signin_user", "register_user")
@@ -255,6 +255,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         # that preserves the querystring params
         with mock.patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': is_edx_domain}):
             response = self.client.get(reverse(url_name), params)
+
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
         self.assertContains(response, expected_url)
 
@@ -330,7 +331,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     def test_hinted_login(self):
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
         response = self.client.get(reverse('signin_user'), params)
-        self.assertContains(response, "data-third-party-auth-hint='oa2-google-oauth2'")
+        self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
@@ -358,17 +359,17 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         finish_auth_url = None
         if current_backend:
             finish_auth_url = reverse("social:complete", kwargs={"backend": current_backend}) + "?"
-        auth_info = markupsafe.escape(
-            json.dumps({
-                "currentProvider": current_provider,
-                "providers": providers,
-                "secondaryProviders": [],
-                "finishAuthUrl": finish_auth_url,
-                "errorMessage": None,
-            })
-        )
 
-        expected_data = u"data-third-party-auth='{auth_info}'".format(
+        auth_info = {
+            "currentProvider": current_provider,
+            "providers": providers,
+            "secondaryProviders": [],
+            "finishAuthUrl": finish_auth_url,
+            "errorMessage": None,
+        }
+        auth_info = json.dumps(auth_info, cls=EscapedEdxJSONEncoder)
+
+        expected_data = '"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
 

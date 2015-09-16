@@ -246,7 +246,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory Test Title longer than 40 characters in length'
+                    inputSignatoryTitle: 'This is a certificate signatory title that has waaaaaaay more than 106 characters, in order to cause an exception.'
                 });
 
                 setValuesToInputs(this.view, {

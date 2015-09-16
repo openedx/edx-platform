@@ -14,6 +14,8 @@ import logging
 
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
+from provider.utils import short_token, long_token
+
 log = logging.getLogger("edx.lti_provider")
 
 
@@ -24,8 +26,8 @@ class LtiConsumer(models.Model):
     that must be persisted.
     """
     consumer_name = models.CharField(max_length=255, unique=True)
-    consumer_key = models.CharField(max_length=32, unique=True, db_index=True)
-    consumer_secret = models.CharField(max_length=32, unique=True)
+    consumer_key = models.CharField(max_length=32, unique=True, db_index=True, default=short_token)
+    consumer_secret = models.CharField(max_length=32, unique=True, default=long_token)
     instance_guid = models.CharField(max_length=255, blank=True, null=True, unique=True)
 
     @staticmethod

@@ -161,10 +161,10 @@ ${fragment.foot_html()}
 % endif
 
 <div class="container">
-  <div class="course-wrapper">
+  <div class="course-wrapper" role="presentation">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
-    <div class="course-index" role="navigation">
+    <div class="course-index">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
       </header>
@@ -198,7 +198,7 @@ ${fragment.foot_html()}
 
     </div>
 % endif
-    <section class="course-content" id="course-content" role="main" aria-label=“Content”>
+    <section class="course-content" id="course-content" role="main" aria-label="Content">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:

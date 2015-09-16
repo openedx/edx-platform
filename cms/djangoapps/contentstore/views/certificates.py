@@ -218,7 +218,7 @@ class CertificateManager(object):
         # including the actual 'certificates' list that we're working with in this context
         certificates = course.certificates.get('certificates', [])
         if only_active:
-            certificates = [certificate for certificate in certificates if certificate['is_active']]
+            certificates = [certificate for certificate in certificates if certificate.get('is_active', False)]
         return certificates
 
     @staticmethod

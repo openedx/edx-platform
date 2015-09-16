@@ -406,7 +406,6 @@ div.problem {
       margin-top: 3px;
 
       .MathJax_Display {
-        display: inline-block;
         width: auto;
       }
 
@@ -427,6 +426,11 @@ div.problem {
           background: #f1f1f1;
         }
       }
+    }
+
+    // Fix for formulaequationinput, overriding MathJax_Display default style to allow "loading" image to sit next to it
+    section.formulaequationinput div.equation .MathJax_Display {
+      display: inline-block !important;
     }
 
     // Hides equation previews in symbolic response problems when printing
@@ -713,13 +717,10 @@ div.problem {
       height: 46px;
     }
 
-    > .incorrect, .correct, .unanswered {
-
-      .status {
-        display: inline-block;
-        margin-top: ($baseline/2);
-        background: none;
-      }
+    .status {
+      display: inline-block;
+      margin-top: ($baseline/2);
+      background: none;
     }
 
     // CASE: incorrect answer
@@ -746,8 +747,8 @@ div.problem {
       }
     }
 
-    // CASE: unanswered
-    > .unanswered {
+    // CASE: unanswered and unsubmitted
+    > .unanswered, > .unsubmitted {
 
       input {
         border: 2px solid $gray-l4;

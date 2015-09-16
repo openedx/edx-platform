@@ -97,13 +97,10 @@ class DiscussionModule(DiscussionFields, XModule):
 
     def get_course(self):
         """
-        Return the CourseDescriptor at the root of the tree we're in.
+        Return CourseDescriptor by course id.
         """
-        block = self
-        while block.parent:
-            block = block.get_parent()
-
-        return block
+        course = self.runtime.modulestore.get_course(self.course_id)
+        return course
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):

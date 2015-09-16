@@ -39,9 +39,9 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
     def test_teams_search_flag_disabled_raises_command_error(self):
         """ Test that raises CommandError for disabled feature flag. """
         with mock.patch('django.conf.settings.FEATURES') as features:
-            features.return_value = {"ENABLE_TEAMS_SEARCH": False}
+            features.return_value = {"ENABLE_TEAMS": False}
             with self.assertRaises(SystemExit), nostderr():
-                with self.assertRaisesRegexp(CommandError, ".* ENABLE_TEAMS_SEARCH must be enabled .*"):
+                with self.assertRaisesRegexp(CommandError, ".* ENABLE_TEAMS must be enabled .*"):
                     call_command('reindex_course_team')
 
     def test_given_invalid_team_id_raises_command_error(self):

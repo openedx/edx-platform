@@ -7,6 +7,10 @@ Course Structure API Overview
 Use the edX Platform Course Structure API to view course details, including the
 blocks in the course and the course grading policy.
 
+.. contents::
+   :local:
+   :depth: 1
+
 ********************************************
 Course Structure API Version 0
 ********************************************

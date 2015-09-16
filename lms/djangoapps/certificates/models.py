@@ -49,6 +49,7 @@ from datetime import datetime
 import json
 import logging
 import uuid
+import os
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -730,6 +731,21 @@ class CertificateTemplate(TimeStampedModel):
         unique_together = (('organization_id', 'course_key', 'mode'),)
 
 
+def template_assets_path(instance, filename):
+    """
+    Delete the file if it already exist and returns the certificate template asset file path.
+
+    :param instance: CertificateTemplateAsset object
+    :param filename: file to upload
+    :return path: path of asset file e.g. certificate_template_assets/1/filename
+    """
+    name = os.path.join('certificate_template_assets', str(instance.id), filename)
+    fullname = os.path.join(settings.MEDIA_ROOT, name)
+    if os.path.exists(fullname):
+        os.remove(fullname)
+    return name
+
+
 class CertificateTemplateAsset(TimeStampedModel):
     """A set of assets to be used in custom web certificate templates.
 
@@ -745,9 +761,19 @@ class CertificateTemplateAsset(TimeStampedModel):
     )
     asset = models.FileField(
         max_length=255,
-        upload_to='certificate_template_assets',
+        upload_to=template_assets_path,
         help_text=_(u'Asset file. It could be an image or css file.'),
     )
+
+    def save(self, *args, **kwargs):
+        """save the certificate template asset """
+        if self.pk is None:
+            asset_image = self.asset
+            self.asset = None
+            super(CertificateTemplateAsset, self).save(*args, **kwargs)
+            self.asset = asset_image
+
+        super(CertificateTemplateAsset, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'%s' % (self.asset.url, )  # pylint: disable=no-member

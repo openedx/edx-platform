@@ -1,6 +1,8 @@
 """HTTP endpoints for the Teams API."""
 
-from django.shortcuts import render_to_response
+import logging
+
+from django.shortcuts import get_object_or_404, render_to_response
 from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -16,6 +18,8 @@ from rest_framework.authentication import (
 from rest_framework import status
 from rest_framework import permissions
 from django.db.models import Count
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django_countries import countries
 from django.utils.translation import ugettext as _
@@ -34,12 +38,14 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from eventtracking import tracker
 from courseware.courses import get_course_with_access, has_access
+from eventtracking import tracker
+from track import contexts
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
 from teams import is_feature_enabled
+from util.model_utils import truncate_fields
 from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
@@ -52,11 +58,42 @@ from .serializers import (
     add_team_count
 )
 from .search_indexes import CourseTeamIndexer
-from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ElasticSearchConnectionError
+from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
+
+log = logging.getLogger(__name__)
+
+
+def emit_team_event(event_name, course_key, event_data):
+    """
+    Emit team events with the correct course id context.
+    """
+    context = contexts.course_context_from_course_id(course_key)
+
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, event_data)
+
+
+@receiver(post_save, sender=CourseTeam)
+def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """ Emits signal after the team is saved. """
+    changed_fields = instance.field_tracker.changed()
+    # Don't emit events when we are first creating the team.
+    if not kwargs['created']:
+        for field in changed_fields:
+            if field not in instance.FIELD_BLACKLIST:
+                truncated_fields = truncate_fields(unicode(changed_fields[field]), unicode(getattr(instance, field)))
+                truncated_fields['team_id'] = instance.team_id
+                truncated_fields['field'] = field
+
+                emit_team_event(
+                    'edx.team.changed',
+                    instance.course_id,
+                    truncated_fields
+                )
 
 
 class TeamsDashboardView(View):
@@ -256,6 +293,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             example, the course_id may not reference a real course or the page
             number may be beyond the last page.
 
+            If the server is unable to connect to Elasticsearch, and
+            the text_search parameter is supplied, a 503 error is returned.
+
         **Response Values for POST**
 
             Any logged in user who has verified their email address can create
@@ -319,28 +359,28 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if 'topic_id' in request.QUERY_PARAMS:
-            topic_id = request.QUERY_PARAMS['topic_id']
+        topic_id = request.QUERY_PARAMS.get('topic_id', None)
+        if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
                 error = build_api_error(
                     ugettext_noop('The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
-
+            result_filter.update({'topic_id': topic_id})
         if text_search and CourseTeamIndexer.search_is_enabled():
             try:
                 search_engine = CourseTeamIndexer.engine()
             except ElasticSearchConnectionError:
                 return Response(
                     build_api_error(ugettext_noop('Error connecting to elasticsearch')),
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE
                 )
+
             result_filter.update({'course_id': course_id_string})
 
             search_results = search_engine.search(
-                query_string=text_search.encode('utf-8'),
+                query_string=text_search,
                 field_dictionary=result_filter,
                 size=MAXIMUM_SEARCH_SIZE,
             )
@@ -352,6 +392,11 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 self.get_page()
             )
             serializer = self.get_pagination_serializer(paginated_results)
+            emit_team_event('edx.team.searched', course_key, {
+                "number_of_results": search_results['total'],
+                "search_text": text_search,
+                "topic_id": topic_id,
+            })
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
@@ -424,19 +469,18 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
-            tracker.emit('edx.team.created', {
-                'team_id': team.team_id,
-                'course_id': unicode(course_id)
+            emit_team_event('edx.team.created', course_key, {
+                'team_id': team.team_id
             })
             if not team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
-                tracker.emit(
+                emit_team_event(
                     'edx.team.learner_added',
+                    course_key,
                     {
                         'team_id': team.team_id,
                         'user_id': request.user.id,
-                        'course_id': unicode(team.course_id),
                         'add_method': 'added_on_create'
                     }
                 )
@@ -477,7 +521,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     """
         **Use Cases**
 
-            Get or update a course team's information. Updates are supported
+            Get, update, or delete a course team's information. Updates are supported
             only through merge patch.
 
         **Example Requests**:
@@ -485,6 +529,8 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             GET /api/team/v0/teams/{team_id}}
 
             PATCH /api/team/v0/teams/{team_id} "application/merge-patch+json"
+
+            DELETE /api/team/v0/teams/{team_id}
 
         **Query Parameters for GET**
 
@@ -550,6 +596,20 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the update could not be completed due to validation errors, this
             method returns a 400 error with all error messages in the
             "field_errors" field of the returned JSON.
+
+        **Response Values for DELETE**
+
+            Only staff can delete teams. When a team is deleted, all
+            team memberships associated with that team are also
+            deleted. Returns 204 on successful deletion.
+
+            If the user is anonymous or inactive, a 401 is returned.
+
+            If the user is not course or global staff and does not
+            have discussion privileges, a 403 is returned.
+
+            If the user is logged in and the team does not exist, a 404 is returned.
+
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
@@ -560,6 +620,27 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     def get_queryset(self):
         """Returns the queryset used to access the given team."""
         return CourseTeam.objects.all()
+
+    def delete(self, request, team_id):
+        """DELETE /api/team/v0/teams/{team_id}"""
+        team = get_object_or_404(CourseTeam, team_id=team_id)
+        self.check_object_permissions(request, team)
+        # Note: list() forces the queryset to be evualuated before delete()
+        memberships = list(CourseTeamMembership.get_memberships(team_id=team_id))
+
+        # Note: also deletes all team memberships associated with this team
+        team.delete()
+        log.info('user %d deleted team %s', request.user.id, team_id)
+        emit_team_event('edx.team.deleted', team.course_id, {
+            'team_id': team_id,
+        })
+        for member in memberships:
+            emit_team_event('edx.team.learner_removed', team.course_id, {
+                'team_id': team_id,
+                'remove_method': 'team_deleted',
+                'user_id': member.user_id
+            })
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TopicListView(GenericAPIView):
@@ -994,12 +1075,12 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         try:
             membership = team.add_user(user)
-            tracker.emit(
+            emit_team_event(
                 'edx.team.learner_added',
+                team.course_id,
                 {
                     'team_id': team.team_id,
                     'user_id': user.id,
-                    'course_id': unicode(team.course_id),
                     'add_method': 'joined_from_team_view' if user == request.user else 'added_by_another_user'
                 }
             )
@@ -1128,14 +1209,17 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         team = self.get_team(team_id)
         if has_team_api_access(request.user, team.course_id, access_username=username):
             membership = self.get_membership(username, team)
+            removal_method = 'self_removal'
+            if 'admin' in request.QUERY_PARAMS:
+                removal_method = 'removed_by_admin'
             membership.delete()
-            tracker.emit(
+            emit_team_event(
                 'edx.team.learner_removed',
+                team.course_id,
                 {
                     'team_id': team.team_id,
-                    'course_id': unicode(team.course_id),
                     'user_id': membership.user.id,
-                    'remove_method': 'self_removal' if membership.user == request.user else 'removed_by_admin'
+                    'remove_method': removal_method
                 }
             )
             return Response(status=status.HTTP_204_NO_CONTENT)

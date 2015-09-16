@@ -482,7 +482,13 @@ class CreditRequirementStatus(TimeStampedModel):
             requirement_status = cls.objects.get(username=username, requirement=requirement)
             requirement_status.delete()
         except cls.DoesNotExist:
-            log.exception(u'The requirement status does not exist against the username %s.', username)
+            log_msg = (
+                u'The requirement status {requirement} does not exist for username {username}.'.format(
+                    requirement=requirement,
+                    username=username
+                )
+            )
+            log.error(log_msg)
             return
 
 

@@ -23,6 +23,8 @@ requirejs.config({
         "jquery.simulate": "xmodule_js/common_static/js/vendor/jquery.simulate",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
+        "moment": "xmodule_js/common_static/js/vendor/moment.min",
+        "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
         "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
         "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",

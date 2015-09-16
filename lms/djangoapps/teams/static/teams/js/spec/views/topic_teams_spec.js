@@ -44,7 +44,9 @@ define([
         it('can render itself', function () {
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
                 teamsView = createTopicTeamsView({
-                    teams: TeamSpecHelpers.createMockTeams(testTeamData),
+                    teams: TeamSpecHelpers.createMockTeams({
+                        results: testTeamData
+                    }),
                     teamMemberships: TeamSpecHelpers.createMockTeamMemberships([])
                 });
 
@@ -66,7 +68,7 @@ define([
             expect(Backbone.history.navigate.calls[0].args).toContain('browse');
         });
 
-        xit('gives the search field focus when clicking on the search teams link', function () {
+        it('gives the search field focus when clicking on the search teams link', function () {
             var emptyMembership = TeamSpecHelpers.createMockTeamMemberships([]),
                 teamsView = createTopicTeamsView({ teamMemberships: emptyMembership });
             spyOn($.fn, 'focus').andCallThrough();
