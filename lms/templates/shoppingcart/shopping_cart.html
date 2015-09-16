@@ -15,7 +15,7 @@ from django.utils.translation import ungettext
 
   % if is_course_enrollment_closed:
     <%
-      # Translators: course_names is a comma-separated list of one or more course names
+      ## Translators: course_names is a comma-separated list of one or more course names
       expiry_message = ungettext(
           "{course_names} has been removed because the enrollment period has closed.",
           "{course_names} have been removed because the enrollment period has closed.",
