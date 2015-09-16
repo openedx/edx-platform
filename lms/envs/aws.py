@@ -131,6 +131,8 @@ if STATIC_URL_BASE:
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
 
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
+
 # DEFAULT_COURSE_ABOUT_IMAGE_URL specifies the default image to show for courses that don't provide one
 DEFAULT_COURSE_ABOUT_IMAGE_URL = ENV_TOKENS.get('DEFAULT_COURSE_ABOUT_IMAGE_URL', DEFAULT_COURSE_ABOUT_IMAGE_URL)
 
