@@ -75,6 +75,18 @@ class CertificatesPage(CoursePage):
         """
         return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content').text[0]
 
+    def find_css(self, css_selector):
+        """
+        Find elements as defined by css locator.
+        """
+        return self.q(css=css_selector)
+
+    def get_text(self, css):
+        """
+        Return text for the defined by css locator.
+        """
+        return self.find_css(css).first.text[0]
+
     ################
     # Wait Actions
     ################
@@ -454,7 +466,7 @@ class Signatory(object):
         self.mode = 'details'
         self.wait_for_signatory_detail_view()
 
-    def upload_signature_image(self, image_filename):
+    def upload_signature_image(self, image_filename, is_valid_image=True):
         """
         Opens upload image dialog and upload given image file.
         """
@@ -468,18 +480,31 @@ class Signatory(object):
             css='.assetupload-modal .upload-dialog input[type="file"]'
         )[0].send_keys(asset_file_path)
 
-        EmptyPromise(
-            lambda: not self.certificate.page.q(
-                css='.assetupload-modal a.action-upload.disabled'
-            ).present,
-            'Upload button is not disabled anymore'
-        ).fulfill()
+        if is_valid_image:
+            EmptyPromise(
+                lambda: not self.certificate.page.q(
+                    css='.assetupload-modal a.action-upload.disabled'
+                ).present,
+                'Upload button is not disabled anymore'
+            ).fulfill()
 
-        self.certificate.page.q(css='.assetupload-modal a.action-upload').first.click()
-        EmptyPromise(
-            lambda: not self.certificate.page.q(css='.assetupload-modal .upload-dialog').visible,
-            'Upload dialog is removed after uploading image'
-        ).fulfill()
+            self.certificate.page.q(css='.assetupload-modal a.action-upload').first.click()
+            EmptyPromise(
+                lambda: not self.certificate.page.q(css='.assetupload-modal .upload-dialog').visible,
+                'Upload dialog is removed after uploading image'
+            ).fulfill()
+        else:
+            EmptyPromise(
+                lambda: self.certificate.page.q(
+                    css='.assetupload-modal a.action-upload.disabled'
+                ).present,
+                'Upload button is disabled'
+            ).fulfill()
+
+            EmptyPromise(
+                lambda: self.certificate.page.q(css='.assetupload-modal .upload-dialog').visible,
+                'Upload dialog is visible after uploading an invalid image'
+            ).fulfill()
 
     ################
     # Wait Actions

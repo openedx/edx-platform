@@ -9,6 +9,7 @@ var FileUpload = Backbone.Model.extend({
         "uploadedBytes": 0,
         "totalBytes": 0,
         "finished": false,
+        "imageDimensions": {},
         "mimeTypes": [],
         "fileFormats": []
     },
@@ -21,6 +22,23 @@ var FileUpload = Backbone.Model.extend({
                 ),
                 attributes: {selectedFile: true}
             };
+        }
+        // if the uploaded file is an image,
+        if (options.uploadedImage && !$.isEmptyObject(attrs.imageDimensions))  {
+            var maxWidth = attrs.imageDimensions.maxWidth;
+            var maxHeight = attrs.imageDimensions.maxHeight;
+
+            //An uploaded image dimensions should be less than or equal to configure one.
+            if (options.uploadedImage.width > maxWidth || options.uploadedImage.height > maxHeight) {
+             return {
+                 message: _.template(
+                     gettext('Image must be a transparent <%= fileTypes %> with dimensions ' +
+                         'of ' + maxWidth + ' X '+ maxHeight + ' px at max.'),
+                     this.formatValidTypes()
+                 ),
+                 attributes: {selectedFile: true}
+             };
+            }
         }
     },
     // Return a list of this uploader's valid file types

@@ -14,6 +14,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             }),
 
             initialize: function() {
+                this.uploadedImageFile = null;
                 BaseModal.prototype.initialize.call(this);
                 this.events = _.extend({}, BaseModal.prototype.events, this.events);
                 this.template = this.loadTemplate("upload-dialog");
@@ -26,8 +27,24 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
                 BaseModal.prototype.addActionButtons.call(this);
             },
 
+            isSelectedFileAnImage: function(selectedFile) {
+                //Check: Is selected file an image object.
+                return (selectedFile && $.inArray(selectedFile.type, ["image/gif", "image/jpeg", "image/png"]) > -1);
+            },
+
+            loadImageFile: function (file) {
+                // Load an image file.
+                var deferred = $.Deferred();
+                var image = new Image();
+                image.onload = function() {
+                    deferred.resolve(image);
+                };
+                image.src = URL.createObjectURL(file);
+                return deferred.promise();
+            },
+
             renderContents: function() {
-                var isValid = this.model.isValid(),
+                var isValid = this.model.isValid({uploadedImage: this.uploadedImageFile}),
                     selectedFile = this.model.get('selectedFile'),
                     oldInput = this.$("input[type=file]").get(0);
                 BaseModal.prototype.renderContents.call(this);
@@ -63,13 +80,30 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
 
             selectFile: function(e) {
                 var selectedFile = e.target.files[0] || null;
-                this.model.set({
-                    selectedFile: selectedFile
-                });
-                // This change event triggering necessary for FireFox, because the browser don't
-                // consider change of File object (file input field) as a change in model.
-                if (selectedFile && $.isEmptyObject(this.model.changed)){
-                    this.model.trigger('change');
+                var self = this;
+                // If the selected file is an image and model has any restriction on image dimension, Then load the
+                // image object to get its attributes e.g. width & height.
+                if(this.isSelectedFileAnImage(selectedFile) && !$.isEmptyObject(this.model.get('imageDimensions'))) {
+                    $.when(this.loadImageFile(selectedFile))
+                        .done(function (uploadedImage) {
+                            self.uploadedImageFile = uploadedImage;
+                            setFileToModel();
+                        });
+                }
+                else {
+                    setFileToModel();
+                }
+
+                function setFileToModel() {
+                    //Update the model with selected file.
+                    self.model.set({
+                        selectedFile: selectedFile
+                    });
+                    // This change event triggering necessary for FireFox, because the browser don't
+                    // consider change of File object (file input field) as a change in model.
+                    if (selectedFile && $.isEmptyObject(self.model.changed)) {
+                        self.model.trigger('change');
+                    }
                 }
             },
 
