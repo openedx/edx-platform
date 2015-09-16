@@ -246,42 +246,33 @@
   }
   .report-receipt-provider {
     @extend %ui-window;
-    border-top: 3px solid $credit-color-base;
+    padding: ($baseline*0.75) $baseline;
 
     .provider-wrapper {
       width: 70%;
       @include float(left);
-      padding-left: $baseline;
 
       .provider-info {
-        padding: $baseline $baseline $baseline 0;
+        margin-bottom: $baseline;
         font-weight: 600;
-      }
-      .provider-more-info {
-      }
-      .provider-instructions {
       }
     }
 
     .provider-buttons-logos {
-      width: 30%;
       @include float(right);
       @include text-align(center);
 
-      .provider-logo {
-        padding: $baseline;
-      }
-      .provider-logo image {
-        width: 100px;
+      .provider-logo img {
+          width: 100px;
       }
 
       .complete-order {
         @include text-align(center);
-        padding: $baseline;
-      }
-      .complete-order button {
-        @extend %btn-pl-primary-base;
-        white-space: nowrap;
+
+        button {
+          @extend %btn-pl-primary-base;
+          white-space: nowrap;
+        }
       }
     }
   }
