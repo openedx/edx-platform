@@ -13,9 +13,6 @@
 // MISC: expandable UI
 .is-expandable {
 
-  .title-expand {
-  }
-
   .expandable-icon {
     @include transition(all $tmg-f2 ease-in-out 0s);
     display: inline-block;
@@ -102,7 +99,7 @@
   }
 
   label {
-    @extend %t-weight4;
+    @extend %t-strong;
     font-family: $sans-serif;
     font-style: normal;
     color: $m-gray-d4;
@@ -121,7 +118,7 @@
   // HACK: nasty override due to our bad input/button styling
   button, input[type="submit"], input[type="button"], button[type="submit"] {
     @include font-size(16);
-    @extend %t-weight4;
+    @extend %t-strong;
     text-transform: none;
     text-shadow: none;
     letter-spacing: 0;
@@ -158,11 +155,11 @@
   // elements: common copy
   .title {
     @extend %t-title5;
-    @extend %t-weight1;
+    @extend %t-light;
   }
 
   .copy {
-    @extend %t-weight1;
+    @extend %t-light;
   }
 
   // ====================
@@ -202,14 +199,14 @@
       }
 
       td {
-        @extend %t-weight3;
+        @extend %t-demi-strong;
         vertical-align: middle;
         padding: ($baseline*0.75) $baseline;
         color: $m-gray-d3;
       }
 
       th {
-        @extend %t-weight2;
+        @extend %t-regular;
         padding: ($baseline/2) $baseline;
       }
 
@@ -221,7 +218,7 @@
 
         th[scope="col"] {
           @extend %t-title7;
-          @extend %t-weight2;
+          @extend %t-regular;
           vertical-align: middle;
           color: $m-gray-d3;
           background: $m-gray-l4;
@@ -331,7 +328,7 @@
 
       .title {
         @extend %t-title6;
-        @extend %t-weight4;
+        @extend %t-strong;
       }
 
       .copy {
@@ -441,7 +438,7 @@
 
       .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
         @extend %t-title5;
-        @extend %t-weight4;
+        @extend %t-strong;
         @include font-size(14);
         @include line-height(14);
         display: inline-block;
@@ -547,7 +544,7 @@
 
         .step-number {
           @extend %t-title7;
-          @extend %t-weight4;
+          @extend %t-strong;
           @include line-height(0);
           @include margin(16px, auto, 0, auto);
           color: $m-gray-l1;
@@ -556,7 +553,7 @@
 
       .step-name {
         @extend %t-title7;
-        @extend %t-weight4;
+        @extend %t-strong;
         color: $m-gray-l1;
       }
 
@@ -704,7 +701,7 @@
             }
 
             .help-item-emphasis {
-              @extend %t-weight4;
+              @extend %t-strong;
             }
           }
 
@@ -848,7 +845,7 @@
           @extend %copy-base;
 
           strong {
-            @extend %t-weight5;
+            @extend %t-ultrastrong;
             color: $m-gray-d4;
           }
         }
@@ -1033,7 +1030,7 @@
 
     .copy {
       @extend %t-copy-lead1;
-      @extend %t-weight4;
+      @extend %t-strong;
       position: absolute;
       top: -($baseline*1.25);
       @include left(calc( 50% - 46px ));
@@ -1112,7 +1109,7 @@
       }
 
       .label-value {
-        @extend %t-weight4;
+        @extend %t-strong;
       }
 
       .denomination-name {
@@ -1255,7 +1252,7 @@
 
       .title {
         @extend %t-title5;
-        @extend %t-weight5;
+        @extend %t-ultrastrong;
         margin-bottom: ($baseline/2);
         width: calc( 100% - 30px );
       }
@@ -1279,7 +1276,7 @@
         @include fill-parent;
 
         input {
-          @extend %t-weight4;
+          @extend %t-strong;
           padding: ($baseline/2) ($baseline*0.75);
           width: 100%;
           white-space: normal;
@@ -1360,7 +1357,7 @@
 
       .title {
         @extend %hd-lv4;
-        @extend %t-weight4;
+        @extend %t-strong;
         margin-top: $baseline;
         margin-bottom: ($baseline/2);
       }
@@ -1381,7 +1378,7 @@
 
       .label {
         @extend %hd-lv4;
-        @extend %t-weight4;
+        @extend %t-strong;
         margin-bottom: ($baseline/2);
       }
     }
@@ -1548,7 +1545,7 @@
 
         .title {
           @extend %t-title5;
-          @extend %t-weight4;
+          @extend %t-strong;
           padding: $baseline;
           border-bottom: 1px solid $verified-color-lvl4;
           background: $verified-color-lvl5;
@@ -1638,7 +1635,7 @@
 
         .title {
           @extend %t-title5;
-          @extend %t-weight4;
+          @extend %t-strong;
           border-bottom-color: $m-pink-l3;
           background: tint($m-pink, 95%);
           color: $m-pink;
@@ -1796,7 +1793,7 @@
 
         .copy {
           @extend %t-copy-sub1;
-          @extend %t-weight3;
+          @extend %t-demi-strong;
         }
 
         .list-actions {
@@ -2061,7 +2058,7 @@
 .register.is-verified {
 
   .nav-wizard .price-value {
-    @extend %t-weight4;
+    @extend %t-strong;
     @include font-size(16);
     margin-top: 18px;
     color: $m-blue-d1;

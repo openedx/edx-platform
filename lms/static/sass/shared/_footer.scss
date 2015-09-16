@@ -246,7 +246,7 @@ $edx-footer-bg-color: rgb(252,252,252);
 %edx-footer-title {
   // TODO: refactor _typography.scss to extend this set of styling
   @extend %t-title;
-  @extend %t-weight4;
+  @extend %t-strong;
   @include font-size(15);
   @include line-height(15);
   text-transform: none;
@@ -292,10 +292,10 @@ $edx-footer-bg-color: rgb(252,252,252);
 
   // CASE: has visual emphasis
   &.has-emphasis {
-    @extend %t-weight4;
+    @extend %t-strong;
 
     .copy {
-      @extend %t-weight4;
+      @extend %t-strong;
     }
   }
 }

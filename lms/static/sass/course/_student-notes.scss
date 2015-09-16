@@ -59,12 +59,12 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
       .page-title {
         @extend %t-title4;
-        @extend %t-weight1;
+        @extend %t-light;
         margin-bottom: 0;
 
         .page-subtitle {
           @extend %t-title7;
-          @extend %t-weight2;
+          @extend %t-regular;
           display: block;
           margin-top: ($baseline/4);
           color: $gray-l1;
@@ -110,14 +110,14 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     // course structure labels
     .course-title, .tags-title {
       @extend %t-title6;
-      @extend %t-weight4;
+      @extend %t-strong;
       margin: 0 0 ($baseline/2) 0;
       color: $gray-d3;
     }
 
     .course-subtitle {
       @extend %t-title7;
-      @extend %t-weight4;
+      @extend %t-strong;
       margin: 0 0 ($baseline/4) 0;
       border-bottom: $divider-visual-tertiary;
       padding-bottom: ($baseline/2);
@@ -156,7 +156,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
         .note-excerpt-more-link {
           @extend %t-copy-sub1;
-          @extend %t-weight2;
+          @extend %t-regular;
           @extend %shame-link-text;
           display: inline;
           @include margin-left($baseline/4);
@@ -183,7 +183,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
             .note-comment-ul,
             .note-comment-ol {
               @extend %t-copy-sub1;
-              @extend %t-weight2;
+              @extend %t-regular;
               padding: 0;
               margin: 0;
               background: transparent;
@@ -216,7 +216,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
           .reference-title {
             @extend %t-title8;
-            @extend %t-weight3;
+            @extend %t-demi-strong;
             margin-top: ($baseline/2);
             text-transform: uppercase;
             letter-spacing: ($baseline/20);
@@ -229,7 +229,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           }
 
           .reference-meta {
-            @extend %t-weight2;
+            @extend %t-regular;
             color: $m-gray-d2;
           }
 

@@ -70,23 +70,12 @@
 
 // primary button
 %btn-primary {
-  @extend %t-weight3;
+  @extend %t-regular;
   @extend %btn;
   @extend %btn-edged;
   border: none;
   padding: ($baseline*0.75) $baseline;
   text-align: center;
-
-  &:hover, &:active, &:focus {
-
-  }
-
-  &.current, &.active {
-
-    &:hover, &:active, &:focus {
-
-    }
-  }
 
   &.disabled, &.is-disabled, &[disabled] {
     background: $m-gray-l2;
@@ -374,14 +363,14 @@
 
   .btn-large {
     @extend %t-action1;
-    @extend %t-weight3;
+    @extend %t-regular;
     display: block;
     padding:($baseline*0.75) ($baseline*1.5);
   }
 
   .btn-avg {
     @extend %t-action2;
-    @extend %t-weight3;
+    @extend %t-regular;
   }
 
   .btn-blue {

@@ -9,7 +9,7 @@
   }
 
   .search-field {
-    @extend %t-weight2;
+    @extend %t-regular;
     @include box-sizing(border-box);
     top: 5px;
     width: 100%;

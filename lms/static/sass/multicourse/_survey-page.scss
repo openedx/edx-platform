@@ -22,7 +22,7 @@
 
     .title {
       @extend %t-title4;
-      @extend %t-weight4;
+      @extend %t-strong;
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l4;
       padding-bottom: ($baseline/2);
@@ -76,7 +76,7 @@
 
     .message-title {
       @extend %t-title5;
-      @extend %t-weight4;
+      @extend %t-strong;
       margin-bottom: ($baseline/2);
       color: $error-color;
     }
@@ -136,7 +136,7 @@
   // override basic label styles
   label {
     @extend %t-copy-base;
-    @extend %t-weight4;
+    @extend %t-strong;
     display: block;
     font-style: normal;
   }
@@ -151,7 +151,7 @@
 
     .title {
       @extend %t-title7;
-      @extend %t-weight4;
+      @extend %t-strong;
     }
 
     p {
