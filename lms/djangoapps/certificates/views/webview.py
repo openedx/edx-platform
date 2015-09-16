@@ -110,7 +110,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     course_title_from_cert = context['certificate_data'].get('course_title', '')
     accomplishment_copy_course_name = course_title_from_cert if course_title_from_cert else course.display_name
     context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
-    share_settings = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
+    share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
     context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
     context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
     context['facebook_share_text'] = share_settings.get(

@@ -379,19 +379,6 @@ FEATURES = {
     # Batch-Generated Certificates from Instructor Dashboard
     'CERTIFICATES_INSTRUCTOR_GENERATION': False,
 
-    # Social Media Sharing on Student Dashboard
-    'SOCIAL_SHARING_SETTINGS': {
-        # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
-        'CUSTOM_COURSE_URLS': False,
-        'DASHBOARD_FACEBOOK': False,
-        'CERTIFICATE_FACEBOOK': False,
-        'CERTIFICATE_FACEBOOK_TEXT': None,
-        'CERTIFICATE_TWITTER': False,
-        'CERTIFICATE_TWITTER_TEXT': None,
-        'DASHBOARD_TWITTER': False,
-        'DASHBOARD_TWITTER_TEXT': None
-    },
-
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
 
@@ -1997,6 +1984,20 @@ MKTG_URL_LINK_MAP = {
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
+}
+
+############################# SOCIAL MEDIA SHARING #############################
+# Social Media Sharing on Student Dashboard
+SOCIAL_SHARING_SETTINGS = {
+    # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
+    'CUSTOM_COURSE_URLS': False,
+    'DASHBOARD_FACEBOOK': False,
+    'CERTIFICATE_FACEBOOK': False,
+    'CERTIFICATE_FACEBOOK_TEXT': None,
+    'CERTIFICATE_TWITTER': False,
+    'CERTIFICATE_TWITTER_TEXT': None,
+    'DASHBOARD_TWITTER': False,
+    'DASHBOARD_TWITTER_TEXT': None
 }
 
 ################# Social Media Footer Links #######################
