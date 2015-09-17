@@ -410,7 +410,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             new_structure = self.version_structure(draft_course_key, draft_course_structure, user_id)
 
             # remove the block and its descendants from the new structure
-            self._remove_subtree(BlockKey.from_usage_key(location), new_structure['blocks'])
+            self._remove_subtree(BlockKey.from_usage_key(location), new_structure)
 
             # copy over the block and its descendants from the published branch
             def copy_from_published(root_block_id):
