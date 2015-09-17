@@ -2,7 +2,9 @@
 import unittest
 import ddt
 import mock
-from unittest import TestCase
+
+from django.test import TestCase
+
 from third_party_auth.strategy import ConfigurationModelStrategy
 from third_party_auth.tests import testutil
 
@@ -97,30 +99,40 @@ class TestStrategy(TestCase):
         self.assertEqual(user_data['email'], expected_email)
 
     @ddt.data(
-        (None, 'host', 'host'),
-        ("", 'other_host', 'other_host'),
-        ('x_forwarded_host', 'irrelevant', 'x_forwarded_host'),
-        ('other_x_forwarded_host', 'still_irrelevant', 'other_x_forwarded_host'),
+        (True, None, 'host', 'host'),
+        (True, "", 'other_host', 'other_host'),
+        (True, 'x_forwarded_host', 'irrelevant', 'x_forwarded_host'),
+        (True, 'other_x_forwarded_host', 'still_irrelevant', 'other_x_forwarded_host'),
+        (False, None, 'host', 'host'),
+        (False, "", 'other_host', 'other_host'),
+        (False, 'x_forwarded_host', 'normal_host', 'normal_host'),
+        (False, 'other_x_forwarded_host', 'other_normal_host', 'other_normal_host'),
     )
     @ddt.unpack
-    def test_request_host(self, x_forwarded_value, get_host_value, expected_value, unused_patch):
+    def test_request_host(self, respect_x_headers, x_forwarded_value, get_host_value, expected_value, unused_patch):
         self.request_mock.META = {}
         self.request_mock.get_host.return_value = get_host_value
         if x_forwarded_value is not None:
             self.request_mock.META['HTTP_X_FORWARDED_HOST'] = x_forwarded_value
 
-        self.assertEqual(self.strategy.request_host(), expected_value)
+        with self.settings(RESPECT_X_FORWARDED_HEADERS=respect_x_headers):
+            self.assertEqual(self.strategy.request_host(), expected_value)
 
     @ddt.data(
-        (None, 'host', 'host'),
-        ("", 'other_host', 'other_host'),
-        ('x_forwarded_host', 'irrelevant', 'x_forwarded_host'),
-        ('other_x_forwarded_host', 'still_irrelevant', 'other_x_forwarded_host'),
+        (True, None, 'port', 'port'),
+        (True, "", 'other_port', 'other_port'),
+        (True, 'x_forwarded_port', 'irrelevant', 'x_forwarded_port'),
+        (True, 'other_x_forwarded_port', 'still_irrelevant', 'other_x_forwarded_port'),
+        (False, None, 'port', 'port'),
+        (False, "", 'other_port', 'other_port'),
+        (False, 'x_forwarded_port', 'normal_port', 'normal_port'),
+        (False, 'other_x_forwarded_port', 'other_normal_port', 'other_normal_port'),
     )
     @ddt.unpack
-    def test_request_port(self, x_forwarded_value, server_port_value, expected_value, unused_patch):
+    def test_request_port(self, respect_x_headers, x_forwarded_value, server_port_value, expected_value, unused_patch):
         self.request_mock.META = {'SERVER_PORT': server_port_value}
         if x_forwarded_value is not None:
             self.request_mock.META['HTTP_X_FORWARDED_PORT'] = x_forwarded_value
 
-        self.assertEqual(self.strategy.request_port(), expected_value)
+        with self.settings(RESPECT_X_FORWARDED_HEADERS=respect_x_headers):
+            self.assertEqual(self.strategy.request_port(), expected_value)
