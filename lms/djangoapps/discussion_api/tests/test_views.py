@@ -83,7 +83,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Course not found."}
         )
 
     def test_get_success(self):
@@ -116,7 +116,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Course not found."}
         )
 
     def test_get_success(self):
@@ -159,7 +159,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Course not found."}
         )
 
     def test_basic(self):
