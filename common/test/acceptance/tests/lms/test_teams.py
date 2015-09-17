@@ -8,9 +8,10 @@ import time
 from dateutil.parser import parse
 import ddt
 from nose.plugins.attrib import attr
+from selenium.common.exceptions import TimeoutException
 from uuid import uuid4
 
-from ..helpers import EventsTestMixin, UniqueCourseTest
+from ..helpers import get_modal_alert, EventsTestMixin, UniqueCourseTest
 from ...fixtures import LMS_BASE_URL
 from ...fixtures.course import CourseFixture
 from ...fixtures.discussion import (
@@ -60,17 +61,22 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
                 'language': 'aa',
                 'country': 'AF'
             }
-            response = self.course_fixture.session.post(
-                LMS_BASE_URL + '/api/team/v0/teams/',
-                data=json.dumps(team),
-                headers=self.course_fixture.headers
-            )
+            teams.append(self.post_team_data(team))
             # Sadly, this sleep is necessary in order to ensure that
             # sorting by last_activity_at works correctly when running
             # in Jenkins.
             time.sleep(time_between_creation)
-            teams.append(json.loads(response.text))
         return teams
+
+    def post_team_data(self, team_data):
+        """Given a JSON representation of a team, post it to the server."""
+        response = self.course_fixture.session.post(
+            LMS_BASE_URL + '/api/team/v0/teams/',
+            data=json.dumps(team_data),
+            headers=self.course_fixture.headers
+        )
+        self.assertEqual(response.status_code, 200)
+        return json.loads(response.text)
 
     def create_membership(self, username, team_id):
         """Assign `username` to `team_id`."""
@@ -837,6 +843,26 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         }]
         with self.assert_events_match_during(self.only_team_events, expected_events=events):
             self.browse_teams_page.visit()
+
+    def test_team_name_xss(self):
+        """
+        Scenario: Team names should be HTML-escaped on the teams page
+        Given I am enrolled in a course with teams enabled
+        When I visit the Teams page for a topic, with a team name containing JS code
+        Then I should not see any alerts
+        """
+        team = self.post_team_data({
+            'course_id': self.course_id,
+            'topic_id': self.topic['id'],
+            'name': '<script>alert("XSS")</script>',
+            'description': 'Description',
+            'language': 'aa',
+            'country': 'AF'
+        })
+        with self.assertRaises(TimeoutException):
+            self.browser.get(self.browse_teams_page.url)
+            alert = get_modal_alert(self.browser)
+            alert.accept()
 
 
 @attr('shard_5')
