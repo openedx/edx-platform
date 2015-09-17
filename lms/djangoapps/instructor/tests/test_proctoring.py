@@ -27,7 +27,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
-        cls.proctoring_link = '<a href="" data-section="proctoring">Proctoring</a>'
+        cls.proctoring_link = '<a href="" data-section="timed_exam">Timed Exam</a>'
 
     def setUp(self):
         super(TestProctoringDashboardViews, self).setUp()
