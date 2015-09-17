@@ -6,6 +6,7 @@ from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
 
+
 class MergedGroupAccess(object):
     """
     ...

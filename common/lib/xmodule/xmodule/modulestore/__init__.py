@@ -905,7 +905,6 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         """
         pass
 
-
     @abstractmethod
     def make_course_usage_key(self, course_key):
         """

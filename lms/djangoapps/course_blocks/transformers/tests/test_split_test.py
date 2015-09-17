@@ -48,7 +48,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
 
         self.transformer = UserPartitionTransformer()
-        
+
     def get_course_hierarchy(self):
         """
         Get a course hierarchy to test with.
@@ -156,7 +156,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                             {
                                 '#type': 'vertical',
                                 '#ref': 'L',
-                                '#children': [{'#type': 'vertical', '#ref': 'P',},],
+                                '#children': [{'#type': 'vertical', '#ref': 'P'}],
                             },
                         ],
                     },
