@@ -13,6 +13,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
+from django.utils import translation
 
 from bulk_email.models import Optout
 from courseware.tests.factories import StaffFactory, InstructorFactory
@@ -22,6 +23,9 @@ from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -307,6 +311,101 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
                                 [s.email for s in self.students] +
                                 [s.email for s in added_users if s not in optouts])
         self.assertItemsEqual(outbox_contents, should_send_contents)
+
+
+@attr('shard_1')
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
+class TestLocalizedEmailSubjectFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
+
+    _real_ugettext = {}
+
+    def setUp(self):
+        super(TestLocalizedEmailSubjectFromDashboardMockedHtmlToText, self).setUp()
+
+        translations = translation.trans_real._translations  # pylint: disable=protected-access
+
+        for lang in ('ar', 'fr', 'it'):
+            with translation.override(lang):
+                # In order to undo it later
+                self._real_ugettext[lang] = translations[lang].ugettext
+                translations[lang].ugettext = self.get_mocked_ugettext(lang)
+
+    def get_mocked_ugettext(self, lang_code):
+        """
+        Mocks ugettext to return the lang code along with the original string.
+
+        e.g.
+        mock_ugettext('ar')('Hello') == '@AR Hello@'
+        """
+        def mocked_ugettext(msg):
+            """
+            A mock of ugettext to isolate it from the real `.mo` files.
+            """
+            return u'@{} {}@'.format(lang_code.upper(), msg)
+
+        return mocked_ugettext
+
+    def test_email_from_address_localization(self):
+        """
+        Test if the email `from` is localized to the student's preference.
+        """
+        arabic_user = UserFactory(email=u'omar@example.com')
+        self.students.append(arabic_user)
+        set_user_preference(arabic_user, LANGUAGE_KEY, 'ar')
+        CourseEnrollmentFactory.create(user=arabic_user, course_id=self.course.id)
+
+        french_user = UserFactory(email=u'antonin@example.com')
+        self.students.append(french_user)
+        set_user_preference(french_user, LANGUAGE_KEY, 'fr')
+        CourseEnrollmentFactory.create(user=french_user, course_id=self.course.id)
+
+        # This should default to `en` because it is the default lang in test
+        default_user = UserFactory(email=u'default@example.com')
+        self.students.append(default_user)
+        CourseEnrollmentFactory.create(user=default_user, course_id=self.course.id)
+
+        test_email = {
+            'action': 'Send email',
+            'send_to': 'all',
+            'subject': 'test subject for all',
+            'message': 'test message for all'
+        }
+
+        # Post the email to the instructor dashboard API
+        self.client.post(self.send_mail_url, test_email)
+
+        arabic_msg = mail.outbox[2]
+        french_msg = mail.outbox[1]
+        default_msg = mail.outbox[0]
+
+        # Just to make sure the order is correct
+        self.assertEquals(arabic_msg.to[0], arabic_user.email)
+        self.assertEquals(french_msg.to[0], french_user.email)
+        self.assertEquals(default_msg.to[0], default_user.email)
+
+        self.assertRegexpMatches(
+            arabic_msg.from_email,
+            '@AR .* Course Staff@'
+        )
+
+        self.assertRegexpMatches(
+            french_msg.from_email,
+            '@FR .* Course Staff@'
+        )
+
+        self.assertNotRegexpMatches(
+            default_msg.from_email,
+            '@.* Course Staff@'
+        )
+
+    def tearDown(self):
+        super(TestLocalizedEmailSubjectFromDashboardMockedHtmlToText, self).tearDown()
+
+        translations = translation.trans_real._translations  # pylint: disable=protected-access
+
+        for lang, ugettext in self._real_ugettext.iteritems():
+            translations[lang].ugettext = ugettext
 
 
 @attr('shard_1')
