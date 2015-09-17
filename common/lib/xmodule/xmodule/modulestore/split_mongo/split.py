@@ -2357,9 +2357,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         return new_blocks
 
-    def delete_item(self, usage_locator, user_id, force=False):
+    def delete_item(self, usage_locator, user_id, force=False, delete_children=True):
         """
-        Delete the block or tree rooted at block (if delete_children) and any references w/in the course to the block
+        Delete the block or tree rooted at block (if delete_children) and any
+        references w/in the course to the block
         from a new version of the course structure.
 
         returns CourseLocator for new version
@@ -2399,7 +2400,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 parent_block.edit_info.source_version = None
                 self.decache_block(usage_locator.course_key, new_id, parent_block_key)
 
-            self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_blocks)
+            if delete_children:
+                self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_structure)
+            else:
+                # just remove this node
+                del new_blocks[BlockKey.from_usage_key(usage_locator)]
 
             # update index if appropriate and structures
             self.update_structure(usage_locator.course_key, new_structure)
@@ -2416,14 +2421,30 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             return result
 
-    @contract(block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
-    def _remove_subtree(self, block_key, blocks):
+    @contract(block_key=BlockKey, structure='dict')
+    def _remove_subtree(self, block_key, structure):
         """
         Remove the subtree rooted at block_key
+        We do this breadth-first to make sure that we don't remove
+        any children that may have parents that we don't want to delete.
         """
-        for child in blocks[block_key].fields.get('children', []):
-            self._remove_subtree(BlockKey(*child), blocks)
-        del blocks[block_key]
+        to_delete = {block_key}
+        tier = {block_key}
+        while tier:
+            new_tier = set()
+            for block_key in tier:
+                for child in structure['blocks'][block_key].fields.get('children', []):
+                    child_block_key = BlockKey(*child)
+                    parents = self._get_parents_from_structure(child_block_key, structure)
+                    # Make sure we want to delete all of the child's parents
+                    # before slating it for deletion
+                    if all(parent in to_delete for parent in parents):
+                        new_tier.add(child_block_key)
+            tier = new_tier
+            to_delete.update(tier)
+
+        for block_key in set(to_delete):
+            del structure['blocks'][block_key]
 
     def delete_course(self, course_key, user_id):
         """

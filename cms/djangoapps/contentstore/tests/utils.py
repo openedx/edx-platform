@@ -72,7 +72,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     Base class for Studio tests that require a logged in user and a course.
     Also provides helper methods for manipulating and verifying the course.
     """
-    def setUp(self):
+    def setUp(self, **kwargs):
         """
         These tests need a user in the DB so that the django Test Client can log them in.
         The test user is created in the ModuleStoreTestCase setUp method.
@@ -86,7 +86,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
 
-        self.course = CourseFactory.create()
+        default_store = kwargs.get('default_store')
+        self.course = CourseFactory.create(default_store=default_store)
 
     def create_non_staff_authed_user_client(self, authenticate=True):
         """
