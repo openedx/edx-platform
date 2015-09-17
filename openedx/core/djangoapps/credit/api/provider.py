@@ -162,7 +162,7 @@ def create_credit_request(course_key, provider_id, username):
                 "course_org": "HogwartsX",
                 "course_num": "Potions101",
                 "course_run": "1T2015",
-                "final_grade": 0.95,
+                "final_grade": "0.95",
                 "user_username": "ron",
                 "user_email": "ron@example.com",
                 "user_full_name": "Ron Weasley",
@@ -242,13 +242,13 @@ def create_credit_request(course_key, provider_id, username):
 
     # Retrieve the final grade from the eligibility table
     try:
-        final_grade = CreditRequirementStatus.objects.get(
+        final_grade = unicode(CreditRequirementStatus.objects.get(
             username=username,
             requirement__namespace="grade",
             requirement__name="grade",
             requirement__course__course_key=course_key,
             status="satisfied"
-        ).reason["final_grade"]
+        ).reason["final_grade"])
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
         log.exception(
             "Could not retrieve final grade from the credit eligibility table "
