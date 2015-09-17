@@ -8,24 +8,29 @@ from django.db import models
 from django.db.models import Avg, Max, Min, Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
+from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from model_utils.models import TimeStampedModel
 from student.models import CourseEnrollment
 from xmodule_django.models import CourseKeyField
 
 
-class StudentGradebook(TimeStampedModel):
+class StudentGradebook(models.Model):
     """
     StudentGradebook is essentially a container used to cache calculated
     grades (see courseware.grades.grade), which can be an expensive operation.
     """
     user = models.ForeignKey(User, db_index=True)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
-    grade = models.FloatField()
+    grade = models.FloatField(db_index=True)
     proforma_grade = models.FloatField()
     progress_summary = models.TextField(blank=True)
     grade_summary = models.TextField(blank=True)
     grading_policy = models.TextField(blank=True)
+    # We can't use TimeStampedModel here because those fields are not indexed.
+    created = AutoCreatedField(_('created'), db_index=True)
+    modified = AutoLastModifiedField(_('modified'), db_index=True)
 
     class Meta:
         """
