@@ -55,6 +55,12 @@ class SessionsList(SecureAPIView):
     """
 
     def post(self, request):
+        return self.login_user(request)
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def login_user(request, session_id=None):
+        """ Create a new session and login the user, or upgrade an existing session """
         response_data = {}
         # Add some rate limiting here by re-using the RateLimitMixin as a helper class
         limiter = BadRequestRateLimiter()
@@ -105,21 +111,29 @@ class SessionsList(SecureAPIView):
                     # violate our RESTfulness
                     #
                     engine = import_module(settings.SESSION_ENGINE)
-                    new_session = engine.SessionStore()
-                    new_session.create()
+                    if session_id is None:
+                        session = engine.SessionStore()
+                        session.create()
+                        success_status = status.HTTP_201_CREATED
+                    else:
+                        session = engine.SessionStore(session_id)
+                        success_status = status.HTTP_200_OK
+                        if SESSION_KEY in session:
+                            # Cannot re-login a user who is already logged in:
+                            return Response({}, status=status.HTTP_403_FORBIDDEN)
 
                     # These values are expected to be set in any new session
-                    new_session[SESSION_KEY] = user.id
-                    new_session[BACKEND_SESSION_KEY] = user.backend
+                    session[SESSION_KEY] = user.id
+                    session[BACKEND_SESSION_KEY] = user.backend
 
-                    new_session.save()
+                    session.save()
 
-                    response_data['token'] = new_session.session_key
-                    response_data['expires'] = new_session.get_expiry_age()
+                    response_data['token'] = session.session_key
+                    response_data['expires'] = session.get_expiry_age()
                     user_dto = UserSerializer(user)
                     response_data['user'] = user_dto.data
-                    response_data['uri'] = '{}/{}'.format(base_uri, new_session.session_key)
-                    response_status = status.HTTP_201_CREATED
+                    response_data['uri'] = '{}/{}'.format(base_uri, session.session_key)
+                    response_status = success_status
 
                     # generate a CSRF tokens for any web clients that may need to
                     # call into the LMS via Ajax (for example Notifications)
@@ -152,12 +166,15 @@ class SessionsDetail(SecureAPIView):
     **Use Case**
 
         SessionsDetail gets a details about a specific API session, as well as
-        enables you to delete an API session.
+        enables you to delete an API session or "upgrade" a session by logging
+        in the user.
 
 
     **Example Requests**
 
         GET /api/session/{session_id}
+
+        POST /api/session/{session_id}
 
         DELETE /api/session/{session_id}/delete
 
@@ -189,6 +206,10 @@ class SessionsDetail(SecureAPIView):
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, session_id):
+        """ Login and upgrade an existing session from anonymous to authenticated. """
+        return SessionsList.login_user(request, session_id)
 
     def delete(self, request, session_id):
         engine = import_module(settings.SESSION_ENGINE)
