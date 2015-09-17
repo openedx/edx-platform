@@ -95,3 +95,32 @@ class TestStrategy(TestCase):
 
         _, user_data = self._get_last_call_args(patched_create_account)
         self.assertEqual(user_data['email'], expected_email)
+
+    @ddt.data(
+        (None, 'host', 'host'),
+        ("", 'other_host', 'other_host'),
+        ('x_forwarded_host', 'irrelevant', 'x_forwarded_host'),
+        ('other_x_forwarded_host', 'still_irrelevant', 'other_x_forwarded_host'),
+    )
+    @ddt.unpack
+    def test_request_host(self, x_forwarded_value, get_host_value, expected_value, unused_patch):
+        self.request_mock.META = {}
+        self.request_mock.get_host.return_value = get_host_value
+        if x_forwarded_value is not None:
+            self.request_mock.META['HTTP_X_FORWARDED_HOST'] = x_forwarded_value
+
+        self.assertEqual(self.strategy.request_host(), expected_value)
+
+    @ddt.data(
+        (None, 'host', 'host'),
+        ("", 'other_host', 'other_host'),
+        ('x_forwarded_host', 'irrelevant', 'x_forwarded_host'),
+        ('other_x_forwarded_host', 'still_irrelevant', 'other_x_forwarded_host'),
+    )
+    @ddt.unpack
+    def test_request_port(self, x_forwarded_value, server_port_value, expected_value, unused_patch):
+        self.request_mock.META = {'SERVER_PORT': server_port_value}
+        if x_forwarded_value is not None:
+            self.request_mock.META['HTTP_X_FORWARDED_PORT'] = x_forwarded_value
+
+        self.assertEqual(self.strategy.request_port(), expected_value)
