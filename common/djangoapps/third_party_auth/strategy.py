@@ -91,15 +91,27 @@ class ConfigurationModelStrategy(DjangoStrategy):
         return create_account_with_params(self.request, user_fields, skip_email=True)
 
     def request_host(self):
-        forwarded_host = self.request.META.get('HTTP_X_FORWARDED_HOST')
-        if forwarded_host:
-            return forwarded_host
+        """
+        Host in use for this request
+        """
+        # TODO: this override is a temporary measure until upstream python-social-auth patch is merged:
+        # https://github.com/omab/python-social-auth/pull/741
+        if self.setting('RESPECT_X_FORWARDED_HEADERS', False):
+            forwarded_host = self.request.META.get('HTTP_X_FORWARDED_HOST')
+            if forwarded_host:
+                return forwarded_host
 
         return super(ConfigurationModelStrategy, self).request_host()
 
     def request_port(self):
-        forwarded_port = self.request.META.get('HTTP_X_FORWARDED_PORT')
-        if forwarded_port:
-            return forwarded_port
+        """
+        Port in use for this request
+        """
+        # TODO: this override is a temporary measure until upstream python-social-auth patch is merged:
+        # https://github.com/omab/python-social-auth/pull/741
+        if self.setting('RESPECT_X_FORWARDED_HEADERS', False):
+            forwarded_port = self.request.META.get('HTTP_X_FORWARDED_PORT')
+            if forwarded_port:
+                return forwarded_port
 
         return super(ConfigurationModelStrategy, self).request_port()
