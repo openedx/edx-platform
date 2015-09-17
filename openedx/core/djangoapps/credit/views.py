@@ -111,7 +111,7 @@ def create_credit_request(request, provider_id):
                 course_org: "ASUx"
                 course_num: "DemoX"
                 course_run: "1T2015"
-                final_grade: 0.95,
+                final_grade: "0.95",
                 user_username: "john",
                 user_email: "john@example.com"
                 user_full_name: "John Smith"
