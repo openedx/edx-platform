@@ -851,7 +851,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         When I visit the Teams page for a topic, with a team name containing JS code
         Then I should not see any alerts
         """
-        team = self.post_team_data({
+        self.post_team_data({
             'course_id': self.course_id,
             'topic_id': self.topic['id'],
             'name': '<script>alert("XSS")</script>',
