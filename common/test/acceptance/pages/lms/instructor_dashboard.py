@@ -66,14 +66,14 @@ class InstructorDashboardPage(CoursePage):
         certificates_section.wait_for_page()
         return certificates_section
 
-    def select_proctoring(self):
+    def select_timed_exam(self):
         """
-        Selects the proctoring tab and returns the ProctoringSection
+        Selects the timed exam tab and returns the Timed Exam Section
         """
-        self.q(css='a[data-section=proctoring]').first.click()
-        proctoring_section = ProctoringPage(self.browser)
-        proctoring_section.wait_for_page()
-        return proctoring_section
+        self.q(css='a[data-section=timed_exam]').first.click()
+        timed_exam_section = TimedExamPage(self.browser)
+        timed_exam_section.wait_for_page()
+        return timed_exam_section
 
     @staticmethod
     def get_asset_path(file_name):
@@ -114,20 +114,20 @@ class MembershipPage(PageObject):
         return MembershipPageAutoEnrollSection(self.browser)
 
 
-class ProctoringPage(PageObject):
+class TimedExamPage(PageObject):
     """
-    Proctoring section of the Instructor dashboard.
+    Timed exam section of the Instructor dashboard.
     """
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=proctoring].active-section').present
+        return self.q(css='a[data-section=timed_exam].active-section').present
 
     def select_allowance_section(self):
         """
         Expand the allowance section
         """
-        allowance_section = ProctoringPageAllowanceSection(self.browser)
+        allowance_section = TimedExamPageAllowanceSection(self.browser)
         if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]").present:
             self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0").click()
             self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]",
@@ -139,7 +139,7 @@ class ProctoringPage(PageObject):
         """
         Expand the Student Attempts Section
         """
-        exam_attempts_section = ProctoringPageAttemptsSection(self.browser)
+        exam_attempts_section = TimedExamPageAttemptsSection(self.browser)
         if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present:
             self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1").click()
             self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]",
@@ -751,9 +751,9 @@ class MembershipPageAutoEnrollSection(PageObject):
         self.click_upload_file_button()
 
 
-class ProctoringPageAllowanceSection(PageObject):
+class TimedExamPageAllowanceSection(PageObject):
     """
-    Allowance section of the Instructor dashboard's Proctoring tab.
+    Allowance section of the Instructor dashboard's Timed Exam tab.
     """
     url = None
 
@@ -768,9 +768,9 @@ class ProctoringPageAllowanceSection(PageObject):
         return self.q(css="a#add-allowance").present
 
 
-class ProctoringPageAttemptsSection(PageObject):
+class TimedExamPageAttemptsSection(PageObject):
     """
-    Exam Attempts section of the Instructor dashboard's Proctoring tab.
+    Exam Attempts section of the Instructor dashboard's Timed Exam tab.
     """
     url = None
 
