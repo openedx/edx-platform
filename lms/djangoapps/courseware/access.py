@@ -607,6 +607,10 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+        if user.is_authenticated():
+            if not UserProfile.has_registered(user):
+                if _can_load_descriptor_nonregistered(descriptor):
+                    return ACCESS_GRANTED
         response = (
             _visible_to_nonstaff_users(descriptor)
             and _has_group_access(descriptor, user, course_key)
@@ -614,12 +618,6 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             (
                 _has_detached_class_tag(descriptor)
                 or _can_access_descriptor_with_start_date(user, descriptor, course_key)
-            )
-            and
-            (
-                UserProfile.has_registered(user)
-                or
-                _can_load_descriptor_nonregistered(descriptor)
             )
         )
 
