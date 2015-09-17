@@ -18,7 +18,12 @@ class CourseModeSerializer(serializers.ModelSerializer):
     """ CourseMode serializer. """
     name = serializers.CharField(source='mode_slug')
     price = serializers.IntegerField(source='min_price')
-    expires = serializers.DateTimeField(source='expiration_datetime', required=False, blank=True)
+    expires = serializers.DateTimeField(
+        source='expiration_datetime',
+        required=False,
+        allow_null=True,
+        format=None
+    )
 
     def get_identity(self, data):
         try:
@@ -56,8 +61,8 @@ class CourseSerializer(serializers.Serializer):
     """ Course serializer. """
     id = serializers.CharField(validators=[validate_course_id])  # pylint: disable=invalid-name
     name = serializers.CharField(read_only=True)
-    verification_deadline = serializers.DateTimeField(blank=True)
-    modes = CourseModeSerializer(many=True, allow_add_remove=True)
+    verification_deadline = serializers.DateTimeField(format=None, allow_null=True, required=False)
+    modes = CourseModeSerializer(many=True)
 
     def validate(self, attrs):
         """ Ensure the verification deadline occurs AFTER the course mode enrollment deadlines. """
@@ -68,7 +73,7 @@ class CourseSerializer(serializers.Serializer):
 
             # Find the earliest upgrade deadline
             for mode in attrs['modes']:
-                expires = mode.expiration_datetime
+                expires = mode.get("expiration_datetime")
                 if expires:
                     # If we don't already have an upgrade_deadline value, use datetime.max so that we can actually
                     # complete the comparison.
@@ -82,9 +87,28 @@ class CourseSerializer(serializers.Serializer):
 
         return attrs
 
-    def restore_object(self, attrs, instance=None):
-        if instance is None:
-            return Course(attrs['id'], attrs['modes'], attrs['verification_deadline'])
+    def create(self, validated_data):
+        """Create course modes for a course. """
+        course = Course(
+            validated_data["id"],
+            self._new_course_mode_models(validated_data["modes"]),
+            verification_deadline=validated_data["verification_deadline"]
+        )
+        course.save()
+        return course
 
-        instance.update(attrs)
+    def update(self, instance, validated_data):
+        """Update course modes for an existing course. """
+        validated_data["modes"] = self._new_course_mode_models(validated_data["modes"])
+
+        instance.update(validated_data)
+        instance.save()
         return instance
+
+    @staticmethod
+    def _new_course_mode_models(modes_data):
+        """Convert validated course mode data to CourseMode objects. """
+        return [
+            CourseMode(**modes_dict)
+            for modes_dict in modes_data
+        ]
