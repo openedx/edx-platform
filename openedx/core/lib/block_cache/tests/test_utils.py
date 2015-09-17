@@ -74,6 +74,7 @@ class MockUserInfo(object):
 
 class MockTransformer(BlockStructureTransformer):
     VERSION = 1
+
     def transform(self, user_info, block_structure):
         pass
 
@@ -111,7 +112,7 @@ class ChildrenMapTestMixin(object):
         # add_relation
         for parent, children in enumerate(children_map):
             for child in children:
-               block_structure.add_relation(parent, child)
+                block_structure.add_relation(parent, child)
         return block_structure
 
     def get_parents_map(self, children_map):

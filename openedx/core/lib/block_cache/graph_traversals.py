@@ -129,7 +129,7 @@ def traverse_post_order(start_node, get_children, get_result=None, predicate=Non
 
     while stack:
         # peek at the next item in the stack
-        current_stack_item = stack[len(stack)-1]
+        current_stack_item = stack[len(stack) - 1]
 
         # verify the block wasn't already visited and the block satisfies the predicate
         if current_stack_item.block in visited or not predicate(current_stack_item.block):

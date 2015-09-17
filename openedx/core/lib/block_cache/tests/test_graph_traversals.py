@@ -147,7 +147,7 @@ class GraphTraversalsTestCase(TestCase):
         #                  /   |    \  /   \
         #                 M    N     O     P
         graph = {
-            'root': ['A', 'B', 'C', 'E', 'F', 'K', 'O'], # has additional links than what is drawn above
+            'root': ['A', 'B', 'C', 'E', 'F', 'K', 'O'],  # has additional links than what is drawn above
             'A': ['D', 'E'],
             'B': ['E', 'F', 'G'],
             'C': ['H', 'I'],
@@ -166,7 +166,7 @@ class GraphTraversalsTestCase(TestCase):
             'P': [],
         }
         graph_parents = self.get_parent_map(graph)
-        for _ in range(2): # should get the same result twice
+        for _ in range(2):  # should get the same result twice
             self.assertEqual(
                 list(traverse_topologically(
                     start_node='root',
