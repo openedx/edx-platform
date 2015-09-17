@@ -16,7 +16,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         """
         The management command doesn't work on non split courses
         """
-        course = CourseFactory(default_store=ModuleStoreEnum.Type.mongo)
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         with self.assertRaises(SystemExit):
             call_command("fix_not_found", unicode(course.id))
 
