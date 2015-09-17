@@ -207,7 +207,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     @ddt.data(None, YESTERDAY, TOMORROW)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch('courseware.access.get_current_request_hostname', Mock(return_value='preview.localhost'))
+    @patch('courseware.access_utils.get_current_request_hostname', Mock(return_value='preview.localhost'))
     def test__has_access_descriptor_in_preview_mode(self, start):
         """
         Tests that descriptor has access in preview mode.
@@ -225,7 +225,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     )  # ddt throws an error if I don't put the None argument there
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch('courseware.access.get_current_request_hostname', Mock(return_value='localhost'))
+    @patch('courseware.access_utils.get_current_request_hostname', Mock(return_value='localhost'))
     def test__has_access_descriptor_when_not_in_preview_mode(self, start, expected_error_type):
         """
         Tests that descriptor has no access when start date in future & without preview.
