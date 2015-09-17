@@ -3,6 +3,7 @@
 """
 from abc import abstractproperty
 
+
 class UserInfo(object):
     """
     ...

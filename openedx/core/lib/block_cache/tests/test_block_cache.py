@@ -30,7 +30,7 @@ class TestBlockCache(TestCase, ChildrenMapTestMixin):
                 block_structure.topological_traversal(
                     get_result=lambda block_key: block_structure.set_transformer_block_data(
                         block_key, self, self.block_key(), self.block_val(block_key)
-            )))
+                )))
 
         def transform(self, user_info, block_structure):
             def assert_collected_value(block_key):
@@ -45,7 +45,7 @@ class TestBlockCache(TestCase, ChildrenMapTestMixin):
             list(
                 block_structure.topological_traversal(
                     get_result=lambda block_key: assert_collected_value(block_key)
-            ))
+                ))
 
     def setUp(self):
         super(TestBlockCache, self).setUp()
