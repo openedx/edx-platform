@@ -15,6 +15,7 @@ from opaque_keys.edx.keys import UsageKey
 from transformers.student_view import StudentViewTransformer
 from transformers.block_counts import BlockCountsTransformer
 
+
 class ListField(Field):
     """
     Field for a list of strings
@@ -26,7 +27,7 @@ class BlockListGetForm(Form):
     """
     A form to validate query parameters in the block list retrieval endpoint
     """
-    user = CharField(required=True) # TODO return all blocks if user is not specified by requesting staff user
+    user = CharField(required=True)  # TODO return all blocks if user is not specified by requesting staff user
     usage_key = CharField(required=True)
     requested_fields = ListField(required=False)
     student_view_data = ListField(required=False)
@@ -58,7 +59,6 @@ class BlockListGetForm(Form):
             raise ValidationError("'{}' is not a valid usage key".format(unicode(usage_key)))
 
         return usage_key
-
 
     def clean(self):
         cleaned_data = super(BlockListGetForm, self).clean()

@@ -35,11 +35,11 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
 
         # get_children
         for parent, children in enumerate(children_map):
-           self.assertSetEqual(set(block_structure.get_children(parent)), set(children))
+            self.assertSetEqual(set(block_structure.get_children(parent)), set(children))
 
         # get_parents
         for child, parents in enumerate(self.get_parents_map(children_map)):
-           self.assertSetEqual(set(block_structure.get_parents(child)), set(parents))
+            self.assertSetEqual(set(block_structure.get_parents(child)), set(parents))
 
         # has_block
         for node in range(len(children_map)):
@@ -68,7 +68,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         transformers_info = [
             TransformerInfo(
                 transformer=MockTransformer(),
-                structure_wide_data=[("t1.global1", "t1.g.val1"), ("t1.global2", "t1.g.val2"),],
+                structure_wide_data=[("t1.global1", "t1.g.val1"), ("t1.global2", "t1.g.val2")],
                 block_specific_data={
                     "B1": [("t1.key1", "t1.b1.val1"), ("t1.key2", "t1.b1.val2")],
                     "B2": [("t1.key1", "t1.b2.val1"), ("t1.key2", "t1.b2.val2")],
@@ -78,7 +78,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
             ),
             TransformerInfo(
                 transformer=MockTransformer(),
-                structure_wide_data=[("t2.global1", "t2.g.val1"), ("t2.global2", "t2.g.val2"),],
+                structure_wide_data=[("t2.global1", "t2.g.val1"), ("t2.global2", "t2.g.val2")],
                 block_specific_data={
                     "B1": [("t2.key1", "t2.b1.val1"), ("t2.key2", "t2.b1.val2")],
                     "B2": [("t2.key1", "t2.b2.val1"), ("t2.key2", "t2.b2.val2")],

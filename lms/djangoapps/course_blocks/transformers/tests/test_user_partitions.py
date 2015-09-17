@@ -39,7 +39,7 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
             scheme=CohortPartitionScheme
         )
         self.user_partition.scheme.name = "cohort"
-        
+
         # Build course.
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
@@ -173,7 +173,7 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         Test when user is assigned to group in user partition.
         """
         if group_id:
-            add_user_to_cohort(self.cohorts[group_id-1], self.user.username)
+            add_user_to_cohort(self.cohorts[group_id - 1], self.user.username)
 
         trans_block_structure = get_course_blocks(
             self.user,
