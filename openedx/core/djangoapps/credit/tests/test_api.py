@@ -633,14 +633,10 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertTrue(parsed_date < datetime.datetime.now(pytz.UTC))
 
         # Validate course information
-        self.assertIn('course_org', parameters)
         self.assertEqual(parameters['course_org'], self.course_key.org)
-        self.assertIn('course_num', parameters)
         self.assertEqual(parameters['course_num'], self.course_key.course)
-        self.assertIn('course_run', parameters)
         self.assertEqual(parameters['course_run'], self.course_key.run)
-        self.assertIn('final_grade', parameters)
-        self.assertEqual(parameters['final_grade'], self.FINAL_GRADE)
+        self.assertEqual(parameters['final_grade'], unicode(self.FINAL_GRADE))
 
         # Validate user information
         for key in self.USER_INFO.keys():
