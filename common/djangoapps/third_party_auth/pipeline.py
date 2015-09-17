@@ -56,6 +56,10 @@ rather than spreading them across two functions in the pipeline.
 
 See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
+import base64
+import hashlib
+import hmac
+import json
 import random
 import string  # pylint: disable-msg=deprecated-module
 from collections import OrderedDict
@@ -111,6 +115,9 @@ AUTH_ENTRY_REGISTER_2 = 'account_register'
 AUTH_ENTRY_LOGIN_API = 'login_api'
 AUTH_ENTRY_REGISTER_API = 'register_api'
 
+# Custom auth entry point used by external software
+AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
+
 
 def is_api(auth_entry):
     """Returns whether the auth entry point is via an API call."""
@@ -151,7 +158,7 @@ _AUTH_ENTRY_CHOICES = frozenset([
 
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
-])
+] + AUTH_ENTRY_CUSTOM.keys())
 
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
@@ -494,6 +501,31 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
         # choice of the user.
 
 
+def redirect_to_custom_form(auth_entry, user_details):
+    """
+    If auth_entry is found in AUTH_ENTRY_CUSTOM, this is used to send provider
+    data to an external server's registration/login page.
+
+    The data is sent as a base64-encoded GET parameter and includes a
+    cryptographic checksum in case the integrity of the data is important.
+    """
+    form_info = AUTH_ENTRY_CUSTOM[auth_entry]
+    secret_key = form_info['secret_key']
+    if isinstance(secret_key, unicode):
+        secret_key = secret_key.encode('utf-8')
+    custom_form_url = form_info['url']
+    data_str = json.dumps({
+        "user_details": user_details
+    })
+    digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
+    query_data = urllib.urlencode({
+        'data': base64.b64encode(data_str),
+        'hmac': base64.b64encode(digest),
+    })
+    sep = '?' if '?' not in custom_form_url else '&'
+    return redirect(custom_form_url + sep + query_data)
+
+
 @partial.partial
 def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None,
                             allow_inactive_user=False, *args, **kwargs):
@@ -557,6 +589,9 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             return dispatch_to_register()
         elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
+        elif auth_entry in AUTH_ENTRY_CUSTOM:
+            # Pass the username, email, etc. via query params to the custom entry page:
+            return redirect_to_custom_form(auth_entry, kwargs['details'])
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
 
