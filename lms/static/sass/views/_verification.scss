@@ -263,7 +263,8 @@
       @include text-align(center);
 
       .provider-logo img {
-          width: 100px;
+          max-width: 160px;
+          margin-bottom: $baseline * 0.5;
       }
 
       .complete-order {
