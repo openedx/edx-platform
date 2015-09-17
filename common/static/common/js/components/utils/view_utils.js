@@ -7,8 +7,8 @@
         "common/js/components/views/feedback_prompt"],
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
-            runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
-            setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler,
+            runOperationShowingMessage, withDisabledElement, disableElementWhileRunning,
+            getScrollOffset, setScrollOffset, setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler,
             validateRequiredField, validateURLItemEncoding, validateTotalKeyLength, checkTotalKeyLengthViolations;
 
         // see https://openedx.atlassian.net/browse/TNL-889 for what is it and why it's 65
@@ -87,6 +87,25 @@
             });
         };
 
+        /**
+         * Wraps a Backbone event callback to disable the event's target element.
+         *
+         * This paradigm is designed to be used in Backbone event maps where
+         * multiple events firing simultaneously is not desired.
+         *
+         * @param functionName the function to execute, as a string.
+         * The function must return a jQuery promise and be able to take an event
+         */
+        withDisabledElement = function(functionName) {
+            return function(event) {
+                var view = this;
+                disableElementWhileRunning($(event.currentTarget), function() {
+                    //call view.functionName(event), with view as the current this
+                    return view[functionName].apply(view, [event]);
+                });
+            };
+        };
+ 
         /**
          * Disables a given element when a given operation is running.
          * @param {jQuery} element the element to be disabled.
@@ -235,6 +254,7 @@
             'hideLoadingIndicator': hideLoadingIndicator,
             'confirmThenRunOperation': confirmThenRunOperation,
             'runOperationShowingMessage': runOperationShowingMessage,
+            'withDisabledElement': withDisabledElement,
             'disableElementWhileRunning': disableElementWhileRunning,
             'deleteNotificationHandler': deleteNotificationHandler,
             'setScrollTop': setScrollTop,
