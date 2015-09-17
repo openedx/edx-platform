@@ -92,3 +92,6 @@ def apply_settings(django_settings):
         django_settings.SOCIAL_AUTH_USER_FIELDS = getattr(
             django_settings, 'USER_FIELDS', ['username', 'email', 'first_name', 'last_name', 'fullname']
         )
+
+    if not hasattr(django_settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS'):
+        django_settings.THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {}
