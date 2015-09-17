@@ -89,3 +89,17 @@ class ConfigurationModelStrategy(DjangoStrategy):
 
         # when autoprovisioning we need to skip email activation, hence skip_email is True
         return create_account_with_params(self.request, user_fields, skip_email=True)
+
+    def request_host(self):
+        forwarded_host = self.request.META.get('HTTP_X_FORWARDED_HOST')
+        if forwarded_host:
+            return forwarded_host
+
+        return super(ConfigurationModelStrategy, self).request_host()
+
+    def request_port(self):
+        forwarded_port = self.request.META.get('HTTP_X_FORWARDED_PORT')
+        if forwarded_port:
+            return forwarded_port
+
+        return super(ConfigurationModelStrategy, self).request_port()
