@@ -4,6 +4,7 @@ Utility methods useful for Studio page tests.
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from bok_choy.javascript import js_defined
+from bok_choy.promise import EmptyPromise
 
 from ..common.utils import click_css, wait_for_notification
 
@@ -199,3 +200,17 @@ def verify_ordering(test_class, page, expected_orderings):
                     blocks_checked.add(expected)
                 break
     test_class.assertEqual(len(blocks_checked), len(xblocks))
+
+
+def click_studio_help(page):
+    """Click the Studio help link in the page footer."""
+    page.q(css='.cta-show-sock').click()
+    EmptyPromise(
+        lambda: page.q(css='.support .list-actions a').results[0].text != '',
+        'Support section opened'
+    ).fulfill()
+
+
+def studio_help_links(page):
+    """Return the list of Studio help links in the page footer."""
+    return page.q(css='.support .list-actions a').results
