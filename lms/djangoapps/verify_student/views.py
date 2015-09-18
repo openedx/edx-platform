@@ -46,18 +46,18 @@ from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors import (
     get_signed_purchase_params, get_purchase_endpoint
 )
-from verify_student.ssencrypt import has_valid_signature
-from verify_student.models import (
+from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
+from lms.djangoapps.verify_student.models import (
     VerificationDeadline,
     SoftwareSecurePhotoVerification,
     VerificationCheckpoint,
     VerificationStatus,
 )
-from verify_student.image import decode_image_data, InvalidImageData
+from lms.djangoapps.verify_student.image import decode_image_data, InvalidImageData
 from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 log = logging.getLogger(__name__)

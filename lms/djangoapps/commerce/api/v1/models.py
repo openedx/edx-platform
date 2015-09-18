@@ -7,7 +7,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from course_modes.models import CourseMode
-from verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.models import VerificationDeadline
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +54,7 @@ class Course(object):
 
         return mode.mode_slug
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Save the CourseMode objects to the database. """
 
@@ -88,6 +88,7 @@ class Course(object):
             merged_mode.currency = posted_mode.currency
             merged_mode.sku = posted_mode.sku
             merged_mode.expiration_datetime = posted_mode.expiration_datetime
+            merged_mode.save()
 
             merged_modes.add(merged_mode)
             merged_mode_keys.add(merged_mode.mode_slug)

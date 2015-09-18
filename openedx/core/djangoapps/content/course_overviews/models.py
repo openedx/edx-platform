@@ -55,9 +55,9 @@ class CourseOverview(TimeStampedModel):
 
     # Certification data
     certificates_display_behavior = TextField(null=True)
-    certificates_show_before_end = BooleanField()
-    cert_html_view_enabled = BooleanField()
-    has_any_active_web_certificate = BooleanField()
+    certificates_show_before_end = BooleanField(default=False)
+    cert_html_view_enabled = BooleanField(default=False)
+    has_any_active_web_certificate = BooleanField(default=False)
     cert_name_short = TextField()
     cert_name_long = TextField()
 
@@ -66,8 +66,8 @@ class CourseOverview(TimeStampedModel):
 
     # Access parameters
     days_early_for_beta = FloatField(null=True)
-    mobile_available = BooleanField()
-    visible_to_staff_only = BooleanField()
+    mobile_available = BooleanField(default=False)
+    visible_to_staff_only = BooleanField(default=False)
     _pre_requisite_courses_json = TextField()  # JSON representation of list of CourseKey strings
 
     # Enrollment details
@@ -108,7 +108,7 @@ class CourseOverview(TimeStampedModel):
         start = course.start
         end = course.end
         if isinstance(course.id, CCXLocator):
-            from ccx.utils import get_ccx_from_ccx_locator  # pylint: disable=import-error
+            from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
             ccx = get_ccx_from_ccx_locator(course.id)
             display_name = ccx.display_name
             start = ccx.start

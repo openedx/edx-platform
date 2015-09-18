@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
+from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
@@ -150,10 +151,9 @@ urlpatterns += (
 
 # Favicon
 favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
-urlpatterns += ((
+urlpatterns += (url(
     r'^favicon\.ico$',
-    'django.views.generic.simple.redirect_to',
-    {'url': settings.STATIC_URL + favicon_path}
+    RedirectView.as_view(url=settings.STATIC_URL + favicon_path)
 ),)
 
 # Semi-static views only used by edX, not by themes
@@ -474,8 +474,8 @@ if settings.COURSEWARE_ENABLED:
     if settings.FEATURES["ENABLE_TEAMS"]:
         # Teams endpoints
         urlpatterns += (
-            url(r'^api/team/', include('teams.api_urls')),
-            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
+            url(r'^api/team/', include('lms.djangoapps.teams.api_urls')),
+            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('lms.djangoapps.teams.urls'), name="teams_endpoints"),
         )
 
     # allow course staff to change to student view of courseware

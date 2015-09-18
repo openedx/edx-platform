@@ -17,7 +17,7 @@ import urlparse
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from microsite_configuration import microsite
 from edxmako.shortcuts import marketing_link

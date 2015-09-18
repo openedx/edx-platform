@@ -42,7 +42,6 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from simple_history.models import HistoricalRecords
-from south.modelsinspector import add_introspection_rules
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
@@ -796,7 +795,7 @@ class CourseEnrollmentManager(models.Manager):
         'course_id' is the course_id to return enrollments
         """
 
-        enrollment_number = super(CourseEnrollmentManager, self).get_query_set().filter(
+        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
             course_id=course_id,
             is_active=1
         ).count()
@@ -827,7 +826,7 @@ class CourseEnrollmentManager(models.Manager):
         """
         # Unfortunately, Django's "group by"-style queries look super-awkward
         query = use_read_replica_if_available(
-            super(CourseEnrollmentManager, self).get_query_set().filter(course_id=course_id, is_active=True).values(
+            super(CourseEnrollmentManager, self).get_queryset().filter(course_id=course_id, is_active=True).values(
                 'mode').order_by().annotate(Count('mode')))
         total = 0
         enroll_dict = defaultdict(int)
@@ -1903,9 +1902,6 @@ class LanguageField(models.CharField):
             *args,
             **kwargs
         )
-
-
-add_introspection_rules([], [r"^student\.models\.LanguageField"])
 
 
 class LanguageProficiency(models.Model):

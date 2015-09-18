@@ -253,8 +253,8 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (True, 2),
-        (False, 6),
+        (True, 8), # 6 Django savepoints & 2 cohort SELECTs
+        (False, 12), # 6 Django savepoints & 6 cohort SELECTs
     )
     @ddt.unpack
     def test_get_cohort_sql_queries(self, use_cached, num_sql_queries):

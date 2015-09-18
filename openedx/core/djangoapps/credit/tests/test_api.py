@@ -401,7 +401,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         user = UserFactory.create(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
 
         # Satisfy one of the requirements, but not the other
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(11):
             api.set_credit_requirement_status(
                 user.username,
                 self.course_key,
@@ -413,7 +413,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit("bob", self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(15):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -700,15 +700,16 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # - 2 queries: Get-or-create the credit request.
         # - 1 query: Retrieve user account and profile information from the user API.
         # - 1 query: Look up the user's final grade from the credit requirements table.
-        # - 2 queries: Update the request.
+        # - 1 query: Update the request.
         # - 2 queries: Update the history table for the request.
-        with self.assertNumQueries(10):
+        # - 4 Django savepoints
+        with self.assertNumQueries(13):
             request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
-        # - 3 queries: Retrieve and update the request
+        # - 2 queries: Retrieve and update the request
         # - 1 query: Update the history table for the request.
         uuid = request["parameters"]["request_uuid"]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             api.update_credit_request_status(uuid, self.PROVIDER_ID, "approved")
 
         with self.assertNumQueries(1):

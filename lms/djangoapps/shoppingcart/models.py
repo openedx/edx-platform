@@ -7,7 +7,7 @@ from decimal import Decimal
 import json
 import analytics
 from io import BytesIO
-from django.db.models import Q
+from django.db.models import Q, F
 import pytz
 import logging
 import smtplib
@@ -230,7 +230,7 @@ class Order(models.Model):
         """
         self.orderitem_set.all().delete()  # pylint: disable=no-member
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def start_purchase(self):
         """
         Start the purchase process.  This will set the order status to "paying",
@@ -668,7 +668,7 @@ class OrderItem(TimeStampedModel):
         if order.currency != currency and order.orderitem_set.exists():
             raise InvalidCartItem(_("Trying to add a different currency into the cart"))
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def purchase_item(self):
         """
         This is basically a wrapper around purchased_callback that handles
@@ -1276,17 +1276,17 @@ class RegistrationCodeRedemption(models.Model):
 class SoftDeleteCouponManager(models.Manager):
     """ Use this manager to get objects that have a is_active=True """
 
-    def get_active_coupons_query_set(self):
+    def get_active_coupons_queryset(self):
         """
         filter the is_active = True Coupons only
         """
-        return super(SoftDeleteCouponManager, self).get_query_set().filter(is_active=True)
+        return super(SoftDeleteCouponManager, self).get_queryset().filter(is_active=True)
 
-    def get_query_set(self):
+    def get_queryset(self):
         """
         get all the coupon objects
         """
-        return super(SoftDeleteCouponManager, self).get_query_set()
+        return super(SoftDeleteCouponManager, self).get_queryset()
 
 
 class Coupon(models.Model):
@@ -1474,7 +1474,7 @@ class PaidCourseRegistration(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum('unit_cost', field='qty * unit_cost')
+            total=Sum(F('qty') * F('unit_cost'))
         )
 
         if result['total'] is not None:
@@ -1483,7 +1483,7 @@ class PaidCourseRegistration(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -1648,7 +1648,7 @@ class CourseRegCodeItem(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum('unit_cost', field='qty * unit_cost')
+            total=Sum(F('qty') * F('unit_cost'))
         )
 
         if result['total'] is not None:
@@ -1657,7 +1657,7 @@ class CourseRegCodeItem(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=arguments-differ
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -1859,7 +1859,7 @@ class CertificateItem(OrderItem):
         return target_cert
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
         """
         Add a CertificateItem to an order
@@ -2034,7 +2034,7 @@ class Donation(OrderItem):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, donation_amount, course_id=None, currency='usd'):
         """Add a donation to an order.
 

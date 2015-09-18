@@ -923,7 +923,7 @@ def provider_identity(request):
 
     response = render_to_response('identity.xml',
                                   {'url': get_xrds_url('login', request)},
-                                  mimetype='text/xml')
+                                  content_type='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('identity', request)
@@ -937,7 +937,7 @@ def provider_xrds(request):
 
     response = render_to_response('xrds.xml',
                                   {'url': get_xrds_url('login', request)},
-                                  mimetype='text/xml')
+                                  content_type='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)

@@ -498,9 +498,8 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
     'oauth2_handler.UserInfoHandler'
 )
 
-################################## EDX WEB #####################################
-# This is where we stick our compiled template files. Most of the app uses Mako
-# templates
+################################## TEMPLATE CONFIGURATION #####################################
+# Mako templating
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATES = {}
@@ -509,8 +508,7 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
                           COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
 
-# This is where Django Template lookup is defined. There are a few of these
-# still left lying around.
+# Django templating
 TEMPLATE_DIRS = [
     PROJECT_ROOT / "templates",
     COMMON_ROOT / 'templates',
@@ -545,6 +543,33 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.microsite_footer_context_processor',
 )
+
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'edxmako.makoloader.MakoFilesystemLoader',
+    'edxmako.makoloader.MakoAppDirectoriesLoader',
+
+    # 'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+
+)
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Don't look for template source files inside installed applications.
+        'APP_DIRS': False,
+        # Instead, look for template source files in these dirs.
+        'DIRS': TEMPLATE_DIRS,
+        # Options specific to this backend.
+        'OPTIONS': {
+            'loaders': TEMPLATE_LOADERS,
+            'context_processors': TEMPLATE_CONTEXT_PROCESSORS
+        }
+    }
+]
+
+###############################################################################################
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = (
@@ -802,6 +827,7 @@ TEMPLATE_DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # CMS base
 CMS_BASE = 'localhost:8001'
@@ -1120,16 +1146,6 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'edxmako.makoloader.MakoFilesystemLoader',
-    'edxmako.makoloader.MakoAppDirectoriesLoader',
-
-    # 'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-
-)
-
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'microsite_configuration.middleware.MicrositeMiddleware',
@@ -1177,7 +1193,6 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.locale.LocaleMiddleware',
     'django_locale.middleware.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
@@ -1214,8 +1229,8 @@ STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCa
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 ]
 
@@ -1807,8 +1822,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'djcelery',
-    'south',
 
     # History tables
     'simple_history',
@@ -1825,7 +1840,6 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'staticfiles',
     'static_replace',
 
     # Theming
@@ -1863,6 +1877,8 @@ INSTALLED_APPS = (
     'provider',
     'provider.oauth2',
     'oauth2_provider',
+
+    'third_party_auth',
 
     # We don't use this directly (since we use OAuth2), but we need to install it anyway.
     # When a user is deleted, Django queries all tables with a FK to the auth_user table,
@@ -1924,7 +1940,7 @@ INSTALLED_APPS = (
     'enrollment',
 
     # Student Identity Verification
-    'verify_student',
+    'lms.djangoapps.verify_student',
 
     # Dark-launching languages
     'dark_lang',
@@ -1951,6 +1967,7 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
+    'social.apps.django_app.default',
 
     # Surveys
     'survey',
@@ -1974,10 +1991,17 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     # Course teams
-    'teams',
+    'lms.djangoapps.teams',
 
     'xblock_django',
+
+    'sorl.thumbnail',
 )
+
+# Migrations which are not in the standard module "migrations"
+MIGRATION_MODULES = {
+    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
+}
 
 ######################### CSRF #########################################
 
@@ -2200,10 +2224,6 @@ PASSWORD_MAX_LENGTH = None
 PASSWORD_COMPLEXITY = {"UPPER": 1, "LOWER": 1, "DIGITS": 1}
 PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
 PASSWORD_DICTIONARY = []
-
-##################### LinkedIn #####################
-INSTALLED_APPS += ('django_openid_auth',)
-
 
 ############################ ORA 2 ############################################
 

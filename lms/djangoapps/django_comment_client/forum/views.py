@@ -27,7 +27,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 from courseware.tabs import EnrolledTab
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
-from ccx.overrides import get_current_ccx
+from lms.djangoapps.ccx.overrides import get_current_ccx
 
 from django_comment_common.utils import ThreadContext
 from django_comment_client.permissions import has_permission, get_team
