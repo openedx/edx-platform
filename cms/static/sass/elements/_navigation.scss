@@ -50,6 +50,10 @@ nav {
 
   .title {
 
+    &:active {
+      outline: 0;
+    }
+
     .label, .fa-caret-down {
       display: inline-block;
       vertical-align: middle;
