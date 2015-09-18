@@ -130,8 +130,6 @@ class AcceptanceTestSuite(TestSuite):
             sh("./manage.py cms --settings acceptance migrate --traceback --noinput")
         else:
             # If no cached database exists, syncdb before migrating, then create the cache
-            sh("./manage.py lms --settings acceptance syncdb --traceback --noinput")
-            sh("./manage.py cms --settings acceptance syncdb --traceback --noinput")
             sh("./manage.py lms --settings acceptance migrate --traceback --noinput")
             sh("./manage.py cms --settings acceptance migrate --traceback --noinput")
 

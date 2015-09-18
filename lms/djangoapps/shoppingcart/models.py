@@ -7,7 +7,7 @@ from decimal import Decimal
 import json
 import analytics
 from io import BytesIO
-from django.db.models import Q
+from django.db.models import Q, F
 import pytz
 import logging
 import smtplib
@@ -109,6 +109,9 @@ class Order(models.Model):
     as the shopping cart.
     FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     user = models.ForeignKey(User, db_index=True)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
@@ -230,7 +233,7 @@ class Order(models.Model):
         """
         self.orderitem_set.all().delete()  # pylint: disable=no-member
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def start_purchase(self):
         """
         Start the purchase process.  This will set the order status to "paying",
@@ -632,6 +635,9 @@ class OrderItem(TimeStampedModel):
     Each implementation of OrderItem should provide its own purchased_callback as
     a method.
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     objects = InheritanceManager()
     order = models.ForeignKey(Order, db_index=True)
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
@@ -669,7 +675,7 @@ class OrderItem(TimeStampedModel):
         if order.currency != currency and order.orderitem_set.exists():
             raise InvalidCartItem(_("Trying to add a different currency into the cart"))
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def purchase_item(self):
         """
         This is basically a wrapper around purchased_callback that handles
@@ -803,6 +809,9 @@ class Invoice(TimeStampedModel):
     which is when a user wants to purchase Registration Codes,
     but will not do so via a Credit Card transaction.
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     company_name = models.CharField(max_length=255, db_index=True)
     company_contact_name = models.CharField(max_length=255)
     company_contact_email = models.CharField(max_length=255)
@@ -972,6 +981,9 @@ class InvoiceTransaction(TimeStampedModel):
        the refund.
 
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     invoice = models.ForeignKey(Invoice)
     amount = models.DecimalField(
         default=0.0, decimal_places=2, max_digits=30,
@@ -1021,7 +1033,10 @@ class InvoiceTransaction(TimeStampedModel):
         returns the total amount of the paid invoices.
         """
         result = cls.objects.filter(amount__gt=0, invoice__course_id=course_key, status='completed').aggregate(
-            total=Sum('amount')
+            total=Sum(
+                'amount',
+                output_field=models.DecimalField(decimal_places=2, max_digits=30)
+            )
         )
 
         total = result.get('total', 0)
@@ -1056,6 +1071,9 @@ class InvoiceItem(TimeStampedModel):
     codes for the DemoX course.
 
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     objects = InheritanceManager()
     invoice = models.ForeignKey(Invoice, db_index=True)
     qty = models.IntegerField(
@@ -1096,6 +1114,9 @@ class CourseRegistrationCodeInvoiceItem(InvoiceItem):
     a course registration.
 
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     course_id = CourseKeyField(max_length=128, db_index=True)
 
     def snapshot(self):
@@ -1166,6 +1187,7 @@ class InvoiceHistory(models.Model):
 
     class Meta(object):
         get_latest_by = "timestamp"
+        app_label = "shoppingcart"
 
 
 # Hook up Django signals to record changes in the history table.
@@ -1187,6 +1209,9 @@ class CourseRegistrationCode(models.Model):
     This table contains registration codes
     With registration code, a user can register for a course for free
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     code = models.CharField(max_length=32, db_index=True, unique=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     created_by = models.ForeignKey(User, related_name='created_by_user')
@@ -1222,6 +1247,9 @@ class RegistrationCodeRedemption(models.Model):
     """
     This model contains the registration-code redemption info
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     order = models.ForeignKey(Order, db_index=True, null=True)
     registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
     redeemed_by = models.ForeignKey(User, db_index=True)
@@ -1276,18 +1304,18 @@ class RegistrationCodeRedemption(models.Model):
 
 class SoftDeleteCouponManager(models.Manager):
     """ Use this manager to get objects that have a is_active=True """
-
-    def get_active_coupons_query_set(self):
+    # pylint: disable=super-on-old-class
+    def get_active_coupons_queryset(self):
         """
         filter the is_active = True Coupons only
         """
-        return super(SoftDeleteCouponManager, self).get_query_set().filter(is_active=True)
+        return super(SoftDeleteCouponManager, self).get_queryset().filter(is_active=True)
 
-    def get_query_set(self):
+    def get_queryset(self):
         """
         get all the coupon objects
         """
-        return super(SoftDeleteCouponManager, self).get_query_set()
+        return super(SoftDeleteCouponManager, self).get_queryset()
 
 
 class Coupon(models.Model):
@@ -1295,6 +1323,9 @@ class Coupon(models.Model):
     This table contains coupon codes
     A user can get a discount offer on course if provide coupon code
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     code = models.CharField(max_length=32, db_index=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     course_id = CourseKeyField(max_length=255)
@@ -1321,6 +1352,9 @@ class CouponRedemption(models.Model):
     """
     This table contain coupon redemption info
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     order = models.ForeignKey(Order, db_index=True)
     user = models.ForeignKey(User, db_index=True)
     coupon = models.ForeignKey(Coupon, db_index=True)
@@ -1434,6 +1468,9 @@ class PaidCourseRegistration(OrderItem):
     """
     This is an inventory item for paying for a course registration
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
     course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
@@ -1475,7 +1512,10 @@ class PaidCourseRegistration(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum('unit_cost', field='qty * unit_cost')
+            total=Sum(
+                F('qty') * F('unit_cost'),
+                output_field=models.DecimalField(decimal_places=2, max_digits=30)
+            )
         )
 
         if result['total'] is not None:
@@ -1484,7 +1524,7 @@ class PaidCourseRegistration(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -1615,6 +1655,9 @@ class CourseRegCodeItem(OrderItem):
     This is an inventory item for paying for
     generating course registration codes
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
 
@@ -1649,7 +1692,10 @@ class CourseRegCodeItem(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum('unit_cost', field='qty * unit_cost')
+            total=Sum(
+                F('qty') * F('unit_cost'),
+                output_field=models.DecimalField(decimal_places=2, max_digits=30)
+            )
         )
 
         if result['total'] is not None:
@@ -1658,7 +1704,7 @@ class CourseRegCodeItem(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=arguments-differ
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -1775,6 +1821,9 @@ class CourseRegCodeItemAnnotation(models.Model):
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
@@ -1790,6 +1839,9 @@ class PaidCourseRegistrationAnnotation(models.Model):
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
@@ -1802,6 +1854,9 @@ class CertificateItem(OrderItem):
     """
     This is an inventory item for purchasing certificates
     """
+    class Meta(object):
+        app_label = "shoppingcart"
+
     course_id = CourseKeyField(max_length=128, db_index=True)
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
@@ -1860,7 +1915,7 @@ class CertificateItem(OrderItem):
         return target_cert
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
         """
         Add a CertificateItem to an order
@@ -2010,7 +2065,8 @@ class CertificateItem(OrderItem):
 
 class DonationConfiguration(ConfigurationModel):
     """Configure whether donations are enabled on the site."""
-    pass
+    class Meta(ConfigurationModel.Meta):
+        app_label = "shoppingcart"
 
 
 class Donation(OrderItem):
@@ -2019,6 +2075,9 @@ class Donation(OrderItem):
     Donations can be made for a specific course or to the organization as a whole.
     Users can choose the donation amount.
     """
+
+    class Meta(object):
+        app_label = "shoppingcart"
 
     # Types of donations
     DONATION_TYPES = (
@@ -2035,7 +2094,7 @@ class Donation(OrderItem):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, donation_amount, course_id=None, currency='usd'):
         """Add a donation to an order.
 

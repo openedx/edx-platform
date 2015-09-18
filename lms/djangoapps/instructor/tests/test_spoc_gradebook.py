@@ -140,7 +140,6 @@ class TestLetterCutoffPolicy(TestGradebook):
         self.assertIn("grade_D {color:DarkSlateGray;}", self.response.content)
 
     def test_assigned_grades(self):
-        print self.response.content
         # Users 9-10 have >= 90% on Homeworks [2]
         # Users 9-10 have >= 90% on the class [2]
         # One use at the top of the page [1]

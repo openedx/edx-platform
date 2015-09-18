@@ -1,26 +1,24 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import models
-from south.db import db
-from south.utils import datetime_utils as datetime
-from south.v2 import DataMigration
+from django.db import models, migrations
 
 
-class Migration(DataMigration):
-    username = settings.ECOMMERCE_SERVICE_WORKER_USERNAME
-    email = username + '@fake.email'
+USERNAME = settings.ECOMMERCE_SERVICE_WORKER_USERNAME
+EMAIL = USERNAME + '@fake.email'
 
-    def forwards(self, orm):
-        """Add the service user."""
-        user = User.objects.create(username=self.username, email=self.email)
-        user.set_unusable_password()
-        user.save()
+def forwards(apps, schema_editor):
+    """Add the service user."""
+    user = User.objects.create(username=USERNAME, email=EMAIL)
+    user.set_unusable_password()
+    user.save()
 
-    def backwards(self, orm):
-        """Remove the service user."""
-        User.objects.get(username=self.username, email=self.email).delete()
+def backwards(apps, schema_editor):
+    """Remove the service user."""
+    User.objects.get(username=USERNAME, email=EMAIL).delete()
 
-    models = {}
-    complete_apps = ['commerce']
-    symmetrical = True
+class Migration(migrations.Migration):
+
+    operations = [
+        migrations.RunPython(forwards, backwards),
+    ]

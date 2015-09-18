@@ -5,7 +5,7 @@ Utility functions related to urls.
 import sys
 from django.conf import settings
 from django.core.urlresolvers import set_urlconf
-from django.utils.importlib import import_module
+from importlib import import_module
 
 
 def reload_django_url_config():

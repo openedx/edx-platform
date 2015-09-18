@@ -84,7 +84,7 @@ import json
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
-                      display_course_number: "${_(context_course.display_coursenumber)}",
+                      display_course_number: "${_(context_course.display_number_with_default)}",
                       revision: "${context_course.location.revision | h}",
                       self_paced: ${json.dumps(context_course.self_paced)}
                   });
