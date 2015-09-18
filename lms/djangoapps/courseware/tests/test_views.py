@@ -1128,14 +1128,15 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_RENDER_XBLOCK_API': True})
     def setUp(self):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
 
-    def get_response(self):
+    def get_response(self, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
         url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        if url_encoded_params:
+            url += '?' + url_encoded_params
         return self.client.get(url)
