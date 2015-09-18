@@ -119,7 +119,6 @@ django_debug_toolbar==1.3.2
 
 # Used for testing
 astroid==1.3.8
-bok-choy==0.4.3
 chrono==1.0.2
 coverage==4.0b3
 ddt==0.8.0
