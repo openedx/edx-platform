@@ -59,7 +59,7 @@ class StoreOutcomeParametersTest(TestCase):
 
     def test_graded_assignment_created(self):
         params = self.get_valid_request_params()
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
         assignment = GradedAssignment.objects.get(
             lis_result_sourcedid=params['lis_result_sourcedid']
@@ -70,7 +70,7 @@ class StoreOutcomeParametersTest(TestCase):
 
     def test_outcome_service_created(self):
         params = self.get_valid_request_params()
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
         outcome = OutcomeService.objects.get(
             lti_consumer=self.consumer
@@ -79,7 +79,7 @@ class StoreOutcomeParametersTest(TestCase):
 
     def test_graded_assignment_references_outcome_service(self):
         params = self.get_valid_request_params()
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
         outcome = OutcomeService.objects.get(
             lti_consumer=self.consumer
@@ -91,7 +91,7 @@ class StoreOutcomeParametersTest(TestCase):
 
     def test_no_duplicate_graded_assignments(self):
         params = self.get_valid_request_params()
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
         with self.assertNumQueries(2):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
@@ -102,7 +102,7 @@ class StoreOutcomeParametersTest(TestCase):
 
     def test_no_duplicate_outcome_services(self):
         params = self.get_valid_request_params()
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
         with self.assertNumQueries(2):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
@@ -126,7 +126,7 @@ class StoreOutcomeParametersTest(TestCase):
     def test_db_record_created_without_consumer_id(self):
         params = self.get_valid_request_params()
         del params['tool_consumer_instance_guid']
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
         self.assertEqual(GradedAssignment.objects.count(), 1)
         self.assertEqual(OutcomeService.objects.count(), 1)

@@ -10,7 +10,7 @@ class DetailResponse(JsonResponse):
 
     def __init__(self, message, status=HTTP_200_OK):
         data = {'detail': message}
-        super(DetailResponse, self).__init__(object=data, status=status)
+        super(DetailResponse, self).__init__(resp_obj=data, status=status)
 
 
 class InternalRequestErrorResponse(DetailResponse):

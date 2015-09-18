@@ -19663,8 +19663,8 @@ msgstr ""
 
 #: wiki/views/article.py
 #, python-format
-msgid "The article %s is now set to display revision #%d"
-msgstr "Отображается версия #%d статьи %s  "
+msgid "The article %(title)s is now set to display revision #%(revision_number)d"
+msgstr "Отображается версия #%(revision_number)d статьи %(title)s  "
 
 #: wiki/views/article.py
 msgid "New title"

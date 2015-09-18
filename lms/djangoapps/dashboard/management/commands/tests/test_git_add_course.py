@@ -52,22 +52,22 @@ class TestGitAddCourse(ModuleStoreTestCase):
         """
         Convenience function for testing command failures
         """
-        with self.assertRaises(SystemExit):
-            with self.assertRaisesRegexp(CommandError, regex):
-                call_command('git_add_course', *args,
-                             stderr=StringIO.StringIO())
+        with self.assertRaisesRegexp(CommandError, regex):
+            call_command('git_add_course', *args, stderr=StringIO.StringIO())
 
     def test_command_args(self):
         """
         Validate argument checking
         """
+        # No argument given.
+        self.assertCommandFailureRegexp('Error: too few arguments')
+        # Extra/Un-named arguments given.
         self.assertCommandFailureRegexp(
-            'This script requires at least one argument, the git URL')
-        self.assertCommandFailureRegexp(
-            'Expected no more than three arguments; recieved 4',
+            'Error: unrecognized arguments: blah blah blah',
             'blah', 'blah', 'blah', 'blah')
+        # Not a valid path.
         self.assertCommandFailureRegexp(
-            'Repo was not added, check log output for details',
+            'Path {0} doesn\'t exist, please create it,'.format(self.GIT_REPO_DIR),
             'blah')
         # Test successful import from command
         if not os.path.isdir(self.GIT_REPO_DIR):
@@ -80,12 +80,12 @@ class TestGitAddCourse(ModuleStoreTestCase):
             os.mkdir(self.GIT_REPO_DIR / 'edx4edx')
 
         call_command('git_add_course', self.TEST_REPO,
-                     self.GIT_REPO_DIR / 'edx4edx_lite')
+                     directory_path=self.GIT_REPO_DIR / 'edx4edx_lite')
 
         # Test with all three args (branch)
         call_command('git_add_course', self.TEST_REPO,
-                     self.GIT_REPO_DIR / 'edx4edx_lite',
-                     self.TEST_BRANCH)
+                     directory_path=self.GIT_REPO_DIR / 'edx4edx_lite',
+                     repository_branch=self.TEST_BRANCH)
 
     def test_add_repo(self):
         """

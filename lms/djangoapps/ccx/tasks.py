@@ -11,7 +11,7 @@ from ccx_keys.locator import CCXLocator
 from xmodule.modulestore.django import SignalHandler
 from lms import CELERY_APP
 
-from .models import CustomCourseForEdX
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 log = logging.getLogger("edx.ccx")
 

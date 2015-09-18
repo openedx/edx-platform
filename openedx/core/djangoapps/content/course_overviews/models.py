@@ -2,7 +2,7 @@
 Declaration of CourseOverview model
 """
 import json
-from django.db import models
+from django.db import models, transaction
 
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
@@ -31,6 +31,9 @@ class CourseOverview(TimeStampedModel):
     a course as part of a user dashboard or enrollment API.
     """
 
+    class Meta(object):
+        app_label = 'course_overviews'
+
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
     VERSION = 2
 
@@ -57,9 +60,9 @@ class CourseOverview(TimeStampedModel):
 
     # Certification data
     certificates_display_behavior = TextField(null=True)
-    certificates_show_before_end = BooleanField()
-    cert_html_view_enabled = BooleanField()
-    has_any_active_web_certificate = BooleanField()
+    certificates_show_before_end = BooleanField(default=False)
+    cert_html_view_enabled = BooleanField(default=False)
+    has_any_active_web_certificate = BooleanField(default=False)
     cert_name_short = TextField()
     cert_name_long = TextField()
 
@@ -68,8 +71,8 @@ class CourseOverview(TimeStampedModel):
 
     # Access parameters
     days_early_for_beta = FloatField(null=True)
-    mobile_available = BooleanField()
-    visible_to_staff_only = BooleanField()
+    mobile_available = BooleanField(default=False)
+    visible_to_staff_only = BooleanField(default=False)
     _pre_requisite_courses_json = TextField()  # JSON representation of list of CourseKey strings
 
     # Enrollment details
@@ -110,7 +113,7 @@ class CourseOverview(TimeStampedModel):
         start = course.start
         end = course.end
         if isinstance(course.id, CCXLocator):
-            from ccx.utils import get_ccx_from_ccx_locator  # pylint: disable=import-error
+            from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
             ccx = get_ccx_from_ccx_locator(course.id)
             display_name = ccx.display_name
             start = ccx.start
@@ -177,11 +180,12 @@ class CourseOverview(TimeStampedModel):
             if isinstance(course, CourseDescriptor):
                 course_overview = cls._create_from_course(course)
                 try:
-                    course_overview.save()
-                    CourseOverviewTab.objects.bulk_create([
-                        CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
-                        for tab in course.tabs
-                    ])
+                    with transaction.atomic():
+                        course_overview.save()
+                        CourseOverviewTab.objects.bulk_create([
+                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            for tab in course.tabs
+                        ])
                 except IntegrityError:
                     # There is a rare race condition that will occur if
                     # CourseOverview.get_from_id is called while a

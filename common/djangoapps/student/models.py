@@ -42,7 +42,6 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from simple_history.models import HistoricalRecords
-from south.modelsinspector import add_introspection_rules
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
@@ -189,7 +188,7 @@ class UserStanding(models.Model):
         (ACCOUNT_ENABLED, u"Account Enabled"),
     )
 
-    user = models.ForeignKey(User, db_index=True, related_name='standing', unique=True)
+    user = models.OneToOneField(User, db_index=True, related_name='standing')
     account_status = models.CharField(
         blank=True, max_length=31, choices=USER_STANDING_CHOICES
     )
@@ -493,7 +492,7 @@ class Registration(models.Model):
     class Meta(object):
         db_table = "auth_registration"
 
-    user = models.ForeignKey(User, unique=True)
+    user = models.OneToOneField(User)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
     def register(self, user):
@@ -824,7 +823,7 @@ class CourseEnrollmentManager(models.Manager):
         'course_id' is the course_id to return enrollments
         """
 
-        enrollment_number = super(CourseEnrollmentManager, self).get_query_set().filter(
+        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
             course_id=course_id,
             is_active=1
         ).count()
@@ -855,7 +854,7 @@ class CourseEnrollmentManager(models.Manager):
         """
         # Unfortunately, Django's "group by"-style queries look super-awkward
         query = use_read_replica_if_available(
-            super(CourseEnrollmentManager, self).get_query_set().filter(course_id=course_id, is_active=True).values(
+            super(CourseEnrollmentManager, self).get_queryset().filter(course_id=course_id, is_active=True).values(
                 'mode').order_by().annotate(Count('mode')))
         total = 0
         enroll_dict = defaultdict(int)
@@ -923,6 +922,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     @classmethod
+    @transaction.atomic
     def get_or_create_enrollment(cls, user, course_key):
         """
         Create an enrollment for a user in a class. By default *this enrollment
@@ -950,32 +950,16 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        try:
-            enrollment, created = CourseEnrollment.objects.get_or_create(
-                user=user,
-                course_id=course_key,
-            )
+        enrollment, created = CourseEnrollment.objects.get_or_create(
+            user=user,
+            course_id=course_key,
+        )
 
-            # If we *did* just create a new enrollment, set some defaults
-            if created:
-                enrollment.mode = "honor"
-                enrollment.is_active = False
-                enrollment.save()
-        except IntegrityError:
-            log.info(
-                (
-                    "An integrity error occurred while getting-or-creating the enrollment"
-                    "for course key %s and student %s. This can occur if two processes try to get-or-create "
-                    "the enrollment at the same time and the database is set to REPEATABLE READ. We will try "
-                    "committing the transaction and retrying."
-                ),
-                course_key, user
-            )
-            transaction.commit()
-            enrollment = CourseEnrollment.objects.get(
-                user=user,
-                course_id=course_key,
-            )
+        # If we *did* just create a new enrollment, set some defaults
+        if created:
+            enrollment.mode = "honor"
+            enrollment.is_active = False
+            enrollment.save()
 
         return enrollment
 
@@ -1948,9 +1932,6 @@ class LanguageField(models.CharField):
             *args,
             **kwargs
         )
-
-
-add_introspection_rules([], [r"^student\.models\.LanguageField"])
 
 
 class LanguageProficiency(models.Model):

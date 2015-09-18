@@ -204,8 +204,8 @@ class UserMappingView(ListAPIView):
 
         query = Q()
 
-        usernames = self.request.QUERY_PARAMS.getlist('username', None)
-        remote_ids = self.request.QUERY_PARAMS.getlist('remote_id', None)
+        usernames = self.request.query_params.getlist('username', None)
+        remote_ids = self.request.query_params.getlist('remote_id', None)
 
         if usernames:
             usernames = ','.join(usernames)
