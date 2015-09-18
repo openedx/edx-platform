@@ -493,6 +493,15 @@ class LTIProviderConfig(ProviderConfig):
             'The name that the LTI Tool Consumer will use to identify itself'
         )
     )
+
+    lti_hostname = models.CharField(
+        max_length=255,
+        help_text=(
+            'The domain that  will be acting as the LTI consumer.'
+        ),
+        db_index=True
+    )
+
     lti_consumer_secret = models.CharField(
         default=long_token,
         max_length=255,

@@ -2,6 +2,7 @@
 Public views
 """
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.clickjacking import xframe_options_deny
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
@@ -17,6 +18,7 @@ __all__ = ['signup', 'login_page', 'howitworks']
 
 
 @ensure_csrf_cookie
+@xframe_options_deny
 def signup(request):
     """
     Display the signup form.
@@ -34,6 +36,7 @@ def signup(request):
 
 @ssl_login_shortcut
 @ensure_csrf_cookie
+@xframe_options_deny
 def login_page(request):
     """
     Display the login form.
