@@ -15,6 +15,7 @@ from django.core.cache import cache
 import dogstats_wrapper as dog_stats_api
 
 from courseware import courses
+from courseware.access import has_access
 from courseware.model_data import FieldDataCache, ScoresClient
 from student.models import anonymous_id_for_user
 from util.module_utils import yield_dynamic_descriptor_descendants
@@ -405,6 +406,10 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
 
                 descendants = yield_dynamic_descriptor_descendants(section_descriptor, student.id, create_module)
                 for module_descriptor in descendants:
+                    user_access = has_access(student, 'load', module_descriptor, module_descriptor.location.course_key)
+                    if not user_access:
+                        continue
+
                     (correct, total) = get_score(
                         student,
                         module_descriptor,
