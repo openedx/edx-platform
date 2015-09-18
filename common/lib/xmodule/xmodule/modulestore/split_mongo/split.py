@@ -1134,8 +1134,19 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         course = self._lookup_course(locator.course_key)
         parent_ids = self._get_parents_from_structure(BlockKey.from_usage_key(locator), course.structure)
+
+        # Possible orphan; if multiple `parent_ids` found
+        if len(parent_ids) > 1:
+            orphan_block_keys = [
+                BlockKey(id=c.block_id, type=c.block_type)
+                for c in self.get_orphans(locator.course_key)
+            ]
+            if orphan_block_keys:
+                parent_ids = [parent for parent in parent_ids if parent not in orphan_block_keys]
+
         if len(parent_ids) == 0:
             return None
+
         # find alphabetically least
         parent_ids.sort(key=lambda parent: (parent.type, parent.id))
         return BlockUsageLocator.make_relative(
