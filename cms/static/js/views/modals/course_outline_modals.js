@@ -304,7 +304,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 }
                 this.$('#id_time_limit').removeAttr('disabled');
                 if (this.options.enable_proctored_exams) {
-                    this.$('#id_practice_exam').removeAttr('disabled');
                     this.$('#id_exam_proctoring').removeAttr('disabled');
                 }
             }
