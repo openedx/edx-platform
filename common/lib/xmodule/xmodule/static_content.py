@@ -97,11 +97,7 @@ def _write_styles(selector, output_root, classes):
 
     module_styles_lines = [
         "@import 'bourbon/bourbon';",
-        "@import 'base/reset';",
         "@import 'base/variables';",
-        "@import 'base/font_face';",
-        "@import 'base/mixins';",
-        "@import 'assets/anims';",
     ]
     for class_, fragment_names in css_imports.items():
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
