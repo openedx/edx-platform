@@ -172,7 +172,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-11 12:16+0000\n"
+"POT-Creation-Date: 2015-09-18 13:23+0000\n"
 "PO-Revision-Date: 2015-06-29 17:10+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -3829,26 +3829,16 @@ msgid "Request user's username"
 msgstr "Solicite el nombre del usuario"
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's username. You must also set Open in New "
-"Page to True to get the user's information."
+msgid "Select True to request the user's username."
 msgstr ""
-"Seleccione True para solicitar el nombre de usuario al usuario. También "
-"puede configurar La apertura en una nueva página en True para obtener la "
-"información del usuario."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Request user's email"
 msgstr "Solicite la dirección de correo del usuario"
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's email address. You must also set Open in "
-"New Page to True to get the user's information."
+msgid "Select True to request the user's email address."
 msgstr ""
-"Seleccione True para solicitar el correo electrónico del usuario. También "
-"puede configurar la apertura en una nueva página en True para obtener la "
-"información del usuario."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI Application Information"
@@ -8628,10 +8618,6 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "El ID de tema proporcionado {topic_id} no es válido"
 
-#: lms/djangoapps/teams/views.py
-msgid "Error connecting to elasticsearch"
-msgstr ""
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -12818,8 +12804,6 @@ msgstr "Publica que te has registrado en este curso"
 msgid "Email someone to say you've registered for this course"
 msgstr "Envía un correo a tus amigos que te has registrado en este curso"
 
-#. Translators: This text will be automatically posted to the student's
-#. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {account}: {url}"
 msgstr ""
@@ -13337,6 +13321,8 @@ msgstr "El PDF se abrirá en una nueva ventana o pestaña del navegador."
 msgid "Download Your Certificate"
 msgstr "Descargar Tu certificaddo"
 
+#. Translators: This message appears to users when the system is processessing
+#. course certificates, which can take a few hours.
 #: lms/templates/courseware/progress.html
 msgid "We're working on it..."
 msgstr "Estamos trabajando en eso..."
@@ -18149,9 +18135,8 @@ msgstr ""
 msgid "Required Information to Create a re-run of a course"
 msgstr "Información requerida para crear una reapertura del curso"
 
-#. Translators: This is an example name for a new course, seen when filling
-#. out
-#. the form to create a new course.
+#. Translators: This is an example name for a new course, seen when
+#. filling out the form to create a new course.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
 msgstr "ej.: Introducción a las Ciencias de la Computación"
@@ -19568,8 +19553,8 @@ msgid "Library Name"
 msgstr "Nombre"
 
 #. Translators: This is an example name for a new content library, seen when
-#. filling out the form to create a new library. (A library is a collection of
-#. content or problems.)
+#. filling out the form to create a new library.
+#. (A library is a collection of content or problems.)
 #: cms/templates/index.html
 msgid "e.g. Computer Science Problems"
 msgstr "ej.: Problemas de Ciencias de la Computación"
@@ -19592,8 +19577,9 @@ msgstr "Código"
 
 #. Translators: This is an example for the "code" used to identify a library,
 #. seen when filling out the form to create a new library. This example is
-#. short for "Computer Science Problems". The example number may contain
-#. letters but must not contain spaces.
+#. short
+#. for "Computer Science Problems". The example number may contain letters
+#. but must not contain spaces.
 #: cms/templates/index.html
 msgid "e.g. CSPROB"
 msgstr "ej: PROBCC"
@@ -19622,10 +19608,11 @@ msgstr "Impartición del Curso:"
 msgid "This course run is currently being created."
 msgstr "Esta instancia del curso está actualmente siendo creada."
 
-#. Translators: This is a status message, used to inform the user of what the
-#. system is doing. This status means that the user has requested to re-run an
-#. existing course, and the system is currently in the process of duplicating
-#. and configuring the existing course so that it can be re-run.
+#. Translators: This is a status message, used to inform the user of
+#. what the system is doing. This status means that the user has
+#. requested to re-run an existing course, and the system is currently
+#. in the process of duplicating and configuring the existing course
+#. so that it can be re-run.
 #: cms/templates/index.html
 msgid "Configuring as re-run"
 msgstr "Está siendo configurado para su reutilización."
@@ -19639,6 +19626,18 @@ msgstr ""
 "El nuevo curso será agregado a su lista de cursos en 5-10 minutos. Regrese a"
 " esta página o {link_start}recarguela{link_end} para actualizar la lista de "
 "cursos. El nuevo curso necesitará alguna configuración manual."
+
+#. Translators: This is a status message for the course re-runs feature.
+#. When a course admin indicates that a course should be re-run, the system
+#. needs to process the request and prepare the new course. The status of
+#. the process will follow this text.
+#: cms/templates/index.html
+msgid "This re-run processing status:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Configuration Error"
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""

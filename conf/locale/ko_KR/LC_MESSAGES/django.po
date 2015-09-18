@@ -87,8 +87,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-11 12:16+0000\n"
-"PO-Revision-Date: 2015-09-11 07:58+0000\n"
+"POT-Creation-Date: 2015-09-18 13:23+0000\n"
+"PO-Revision-Date: 2015-09-18 03:12+0000\n"
 "Last-Translator: Hongseob Lee <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
@@ -3412,20 +3412,16 @@ msgid "Request user's username"
 msgstr "아이디를 요청합니다."
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's username. You must also set Open in New "
-"Page to True to get the user's information."
-msgstr "아이디를 요청하려면 True를 입력하십시오. 아이디를 얻기 위해서는 '신규 페이지에서 열기'가 먼저 설정되어 있어야 합니다."
+msgid "Select True to request the user's username."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Request user's email"
 msgstr "이용자 이메일을 요청합니다."
 
 #: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to request the user's email address. You must also set Open in "
-"New Page to True to get the user's information."
-msgstr "이용자 이메일 주소를 요청하려면 True를 입력합니다. 이를 위해 신규 페이지에서 열기가 먼저 설정되어 있어야 합니다."
+msgid "Select True to request the user's email address."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI Application Information"
@@ -7808,10 +7804,6 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "제공된 주제 ID {topic_id}가 유효하지 않습니다."
 
-#: lms/djangoapps/teams/views.py
-msgid "Error connecting to elasticsearch"
-msgstr ""
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -8292,7 +8284,7 @@ msgstr "마지막 수정:"
 
 #: lms/templates/wiki/article.html
 msgid "See all children"
-msgstr "모든 하위내용 보기"
+msgstr "모든 하위 문서 보기"
 
 #: lms/templates/wiki/article.html
 msgid "This article was last modified:"
@@ -8869,7 +8861,7 @@ msgstr ""
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 msgid "Needed for any certificates you may earn"
-msgstr "앞으로 받게 될 이수증에 필요합니다."
+msgstr "앞으로 받게 될 이수증에 필요합니다. 영문이름 병기를 원하시면 영문이름을 추가하세요."
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -8881,13 +8873,13 @@ msgstr "아이디"
 msgid ""
 "The name that will identify you in your courses - {bold_start}(cannot be "
 "changed later){bold_end}"
-msgstr "강좌에서 표시되길 원하는 이름 -  {bold_start}(변경 불가){bold_end}"
+msgstr "영문/숫자로 이루어진 아이디 -  {bold_start}(변경 불가){bold_end}"
 
 #. Translators: This example username is used as a placeholder in
 #. a field on the registration form meant to hold the user's username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "JaneDoe"
-msgstr "홍길동"
+msgstr "HongGilDong"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -10742,7 +10734,7 @@ msgstr "학습자 상태 삭제"
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Student Submission"
-msgstr "제출 재채점"
+msgstr "답안 재채점"
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -11738,8 +11730,6 @@ msgstr "본 강좌에 등록한 것을 트위터에 트윗하세요."
 msgid "Email someone to say you've registered for this course"
 msgstr "이 강좌에 등록했음을 누군가에게 이메일하세요"
 
-#. Translators: This text will be automatically posted to the student's
-#. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {account}: {url}"
 msgstr "{number} {title} through {account}: {url} 로 방금 등록 완료  "
@@ -12048,7 +12038,7 @@ msgstr "학습자별 세부 성적 검토 및 조정"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Select a problem and an action:"
-msgstr "문제와 동작을 선택하세요:"
+msgstr "문제와 액션을 선택하세요."
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -12071,8 +12061,7 @@ msgid ""
 "To download a CSV file containing profile information for students who are "
 "enrolled in this course, visit the Data Download section of the Instructor "
 "Dashboard."
-msgstr ""
-"강좌에 등록되어 있는 학습자 프로필 정보가 담긴 CSV 파일을 다운로드하기 위해, 교수자 대시보드의 자료 다운로드를 방문하세요. "
+msgstr "강좌에 등록되어 있는 학습자 정보가 담긴 CSV 파일을 다운로드 하기 위해, 교수자 대시보드에서 데이터를 클릭하세요. "
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -12214,6 +12203,8 @@ msgstr "PDF는 새로운 브라우져 창 혹은 탭에 열릴 것입니다."
 msgid "Download Your Certificate"
 msgstr "강좌 이수증 다운로드하기"
 
+#. Translators: This message appears to users when the system is processessing
+#. course certificates, which can take a few hours.
 #: lms/templates/courseware/progress.html
 msgid "We're working on it..."
 msgstr "작업중입니다."
@@ -13419,7 +13410,7 @@ msgstr "[[성함]]에게:"
 msgid ""
 "We have provided a course enrollment code for you in {course_name}. To "
 "enroll in the course, click the following link:"
-msgstr "{course_name}에서 수강신청 코드를 제공했습니다. 강좌에 등록하기 위해 다음 링크를 클릭하세요:"
+msgstr "{course_name}에서 수강신청 코드를 제공했습니다. 강좌에 등록하려면 다음 링크를 클릭하세요."
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "HTML link from the attached CSV file"
@@ -13881,7 +13872,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
-msgstr "성적 설정"
+msgstr "성적 가중치"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to download a CSV of anonymized student IDs:"
@@ -13917,7 +13908,7 @@ msgstr "버튼을 여러번 클릭하지 마세요. 그럴 경우, 생성 과정
 msgid ""
 "Click to generate a CSV file of all students enrolled in this course, along "
 "with profile information such as email address and username:"
-msgstr "이 강좌에 등록된 모든 학습자 CSV 파일과 이메일, 아이디 등의 프로필 정보를 생성하려면 클릭하세요."
+msgstr "이 강좌에 등록된 모든 학습자 CSV 파일과 이메일, 아이디 등의 학습자 정보 보고서를 생성하려면 클릭하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -13931,7 +13922,7 @@ msgstr "강좌에 등록할 수 있으나 아직 처리가 완료되지 않은 �
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of learners who can enroll"
-msgstr "등록할 수 있는 학습자의 CSV를 다운로드 합니다."
+msgstr "등록할 수 있는 학습자의 CSV 다운로드"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -15015,7 +15006,7 @@ msgstr "학습자별 성적 사정"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
-msgstr "학습자의 진도 페이지를 보기 위해서 이 링크를 클릭하세요:"
+msgstr "학습자의 진도 페이지를 보려면 이 링크를 클릭하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Progress Page"
@@ -15027,7 +15018,7 @@ msgstr "학습자별 성적 조정"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Specify a problem in the course here with its complete location:"
-msgstr "강좌에서 발생한 문제를 정확한 위치와 함께 기술하세요:"
+msgstr "강좌에서 발생한 문제를 정확한 위치와 함께 기술하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
@@ -15038,11 +15029,11 @@ msgstr "문제 위치 "
 msgid ""
 "You must provide the complete location of the problem. In the Staff Debug "
 "viewer, the location looks like this:"
-msgstr "문제가 발생하는 자세한 위치를 알려주어야 합니다.  Staff Debug Viewer에서 위치는 다음과 같습니다: "
+msgstr "문제가 발생하는 자세한 위치를 알려주어야 합니다.  Staff Debug Viewer에서 위치는 다음과 같습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Next, select an action to perform for the given user and problem:"
-msgstr "다음 작업은 지정된 사용자와 문제에 대한 수행을 선택합니다 :"
+msgstr "다음 작업은 지정된 사용자와 문제에 대한 수행을 선택합니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -15064,7 +15055,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
-msgstr "학습자에 대한 배경 작업 이력 보기"
+msgstr "학습자 배경 작업 이력 보기"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Entrance Exam Adjustment"
@@ -15112,11 +15103,11 @@ msgstr "액션을 선택하세요"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset ALL students' attempts"
-msgstr "모든 학습자의 시도 초기화"
+msgstr "전체 학습자의 문제 풀이 횟수 초기화"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore ALL students' problem submissions"
-msgstr "모든 학습자의 문제 제출 재채점"
+msgstr "전체 학습자의 답안 재채점"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -15125,7 +15116,7 @@ msgid ""
 "submitted for this problem, click on this button"
 msgstr ""
 "이 작업은 백그라운드에서 이루어지며, 작업 상태가 공지 사항 탭의 표에 나타날 것입니다. 전체 작업의 상태를 보려면, 이 버튼을 "
-"누르세요."
+"클릭하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
@@ -16576,9 +16567,8 @@ msgstr "기관과 강좌 번호, 기관별 강좌 번호는 고유해야 합니�
 msgid "Required Information to Create a re-run of a course"
 msgstr "강좌 재운영을 만드는데 필요한 정보"
 
-#. Translators: This is an example name for a new course, seen when filling
-#. out
-#. the form to create a new course.
+#. Translators: This is an example name for a new course, seen when
+#. filling out the form to create a new course.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
 msgstr "예: 컴퓨터 공학 개론"
@@ -17828,8 +17818,8 @@ msgid "Library Name"
 msgstr "콘텐츠 보관함명"
 
 #. Translators: This is an example name for a new content library, seen when
-#. filling out the form to create a new library. (A library is a collection of
-#. content or problems.)
+#. filling out the form to create a new library.
+#. (A library is a collection of content or problems.)
 #: cms/templates/index.html
 msgid "e.g. Computer Science Problems"
 msgstr "ex 컴퓨터 개론 문제"
@@ -17852,8 +17842,9 @@ msgstr "콘텐츠 보관함 코드"
 
 #. Translators: This is an example for the "code" used to identify a library,
 #. seen when filling out the form to create a new library. This example is
-#. short for "Computer Science Problems". The example number may contain
-#. letters but must not contain spaces.
+#. short
+#. for "Computer Science Problems". The example number may contain letters
+#. but must not contain spaces.
 #: cms/templates/index.html
 msgid "e.g. CSPROB"
 msgstr "예: CSPROB"
@@ -17880,10 +17871,11 @@ msgstr "기관별 강좌 번호"
 msgid "This course run is currently being created."
 msgstr "기관별 강좌 번호가 만들어지고 있습니다."
 
-#. Translators: This is a status message, used to inform the user of what the
-#. system is doing. This status means that the user has requested to re-run an
-#. existing course, and the system is currently in the process of duplicating
-#. and configuring the existing course so that it can be re-run.
+#. Translators: This is a status message, used to inform the user of
+#. what the system is doing. This status means that the user has
+#. requested to re-run an existing course, and the system is currently
+#. in the process of duplicating and configuring the existing course
+#. so that it can be re-run.
 #: cms/templates/index.html
 msgid "Configuring as re-run"
 msgstr "다시 시작하기 위한 설정"
@@ -17896,6 +17888,18 @@ msgid ""
 msgstr ""
 "5-10분 후, 새 강좌가 귀하의 강좌 목록에 추가될 것입니다. 강좌 목록을 업데이트하기 위해, 페이지로 돌아가거나 "
 "{link_start} 새로고침{link_end} 하세요. 새 강좌엔 약간의 수동 설정이 필요할 수 있습니다."
+
+#. Translators: This is a status message for the course re-runs feature.
+#. When a course admin indicates that a course should be re-run, the system
+#. needs to process the request and prepare the new course. The status of
+#. the process will follow this text.
+#: cms/templates/index.html
+msgid "This re-run processing status:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Configuration Error"
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
@@ -19366,7 +19370,7 @@ msgstr "글 주소 \"%s\" 가 이미 존재합니다."
 
 #: wiki/forms.py
 msgid "Yes, I am sure"
-msgstr "예. 확인했습니다."
+msgstr "네, 삭제합니다."
 
 #: wiki/forms.py
 msgid "Purge"

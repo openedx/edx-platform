@@ -53,7 +53,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-11 12:15+0000\n"
+"POT-Creation-Date: 2015-09-18 13:22+0000\n"
 "PO-Revision-Date: 2015-09-11 12:17+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -2602,7 +2602,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
-msgstr "학습자 프로필 정보를 만드는 중 오류가 발생했습니다. 다시 시도하세요."
+msgstr "학습자 정보를 만드는 중 오류가 발생했습니다. 다시 시도하세요."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/templates/search/search_loading.underscore
