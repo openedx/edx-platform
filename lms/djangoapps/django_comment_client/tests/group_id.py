@@ -1,6 +1,6 @@
 import json
 import re
-from teams.tests.factories import CourseTeamFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 
 class GroupIdAssertionMixin(object):

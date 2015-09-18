@@ -22,6 +22,7 @@ class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseAccessRole
+        fields = '__all__'
 
     email = forms.EmailField(required=True)
     COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]

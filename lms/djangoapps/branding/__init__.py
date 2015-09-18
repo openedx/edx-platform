@@ -4,7 +4,7 @@ from django.conf import settings
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from microsite_configuration import microsite
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 def get_visible_courses():

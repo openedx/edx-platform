@@ -45,7 +45,7 @@ class Groups(generics.CreateAPIView, mixins.DestroyModelMixin):
     serializer_class = serializers.GroupSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -106,7 +106,7 @@ class GroupsMembers(generics.CreateAPIView, mixins.DestroyModelMixin):
     serializer_class = serializers.GroupsMembersSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         graph = facebook_graph_api()

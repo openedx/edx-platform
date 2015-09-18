@@ -90,8 +90,8 @@ STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
 # Disable JavaScript compression in development
@@ -160,7 +160,7 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-from django.utils.translation import ugettext as _
+_ = lambda s: s
 LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {

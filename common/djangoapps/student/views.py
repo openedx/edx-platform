@@ -54,7 +54,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
-from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
@@ -1548,7 +1548,7 @@ def create_account_with_params(request, params):
     )
 
     # Perform operations within a transaction that are critical to account creation
-    with transaction.commit_on_success():
+    with transaction.atomic():
         # first, create the account
         (user, profile, registration) = _do_create_account(form)
 

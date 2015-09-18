@@ -24,8 +24,8 @@ from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
-from ..models import CourseTeamMembership
-from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
+from ..models import CourseTeam, CourseTeamMembership
+from ..search_indexes import CourseTeamIndexer, course_team_post_save_callback
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
@@ -467,7 +467,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestListTeamsAPI, self).setUp('teams.views.tracker')
+        super(TestListTeamsAPI, self).setUp('lms.djangoapps.teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -641,7 +641,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team creation endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCreateTeamAPI, self).setUp('teams.views.tracker')
+        super(TestCreateTeamAPI, self).setUp('lms.djangoapps.teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -852,7 +852,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team delete endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestDeleteTeamAPI, self).setUp('teams.views.tracker')
+        super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -902,7 +902,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team update endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestUpdateTeamAPI, self).setUp('teams.views.tracker')
+        super(TestUpdateTeamAPI, self).setUp('lms.djangoapps.teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1231,7 +1231,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCreateMembershipAPI, self).setUp('teams.views.tracker')
+        super(TestCreateMembershipAPI, self).setUp('lms.djangoapps.teams.views.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1395,7 +1395,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership deletion endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestDeleteMembershipAPI, self).setUp('teams.views.tracker')
+        super(TestDeleteMembershipAPI, self).setUp('lms.djangoapps.teams.views.tracker')
 
     @ddt.data(
         (None, 401),

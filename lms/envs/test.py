@@ -181,6 +181,10 @@ DATABASES = {
 
 }
 
+# This hack disables migrations during tests. We want to create tables directly from the models for speed.
+# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
+MIGRATION_MODULES = { app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS }
+
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
@@ -486,8 +490,8 @@ FEATURES['ENABLE_EDXNOTES'] = True
 # Enable teams feature for tests.
 FEATURES['ENABLE_TEAMS'] = True
 
-# Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
+# Add apps to Installed apps for testing
+INSTALLED_APPS += ('openedx.core.djangoapps.call_stack_manager',)
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
@@ -503,7 +507,7 @@ FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
 
 ######### custom courses #########
-INSTALLED_APPS += ('ccx',)
+INSTALLED_APPS += ('lms.djangoapps.ccx',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.

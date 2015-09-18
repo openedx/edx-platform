@@ -7,7 +7,7 @@ from uuid import uuid4
 import factory
 from factory.django import DjangoModelFactory
 
-from ..models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 
 
 LAST_ACTIVITY_AT = datetime(2015, 8, 15, 0, 0, 0, tzinfo=pytz.utc)

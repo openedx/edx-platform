@@ -146,7 +146,7 @@ class AccountView(APIView):
         GET /api/user/v1/accounts/{username}/
         """
         try:
-            account_settings = get_account_settings(request, username, view=request.QUERY_PARAMS.get('view'))
+            account_settings = get_account_settings(request, username, view=request.query_params.get('view'))
         except UserNotFound:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
 
@@ -161,8 +161,8 @@ class AccountView(APIView):
         else an error response with status code 415 will be returned.
         """
         try:
-            with transaction.commit_on_success():
-                update_account_settings(request.user, request.DATA, username=username)
+            with transaction.atomic():
+                update_account_settings(request.user, request.data, username=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
         except UserNotFound:

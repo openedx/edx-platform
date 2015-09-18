@@ -19,23 +19,6 @@ from json import dumps
 import xmodule.modulestore.django
 from xmodule.contentstore.django import _CONTENTSTORE
 
-# There is an import issue when using django-staticfiles with lettuce
-# Lettuce assumes that we are using django.contrib.staticfiles,
-# but the rest of the app assumes we are using django-staticfiles
-# (in particular, django-pipeline and our mako implementation)
-# To resolve this, we check whether staticfiles is installed,
-# then redirect imports for django.contrib.staticfiles
-# to use staticfiles.
-try:
-    import staticfiles
-    import staticfiles.handlers
-except ImportError:
-    pass
-else:
-    import sys
-    sys.modules['django.contrib.staticfiles'] = staticfiles
-    sys.modules['django.contrib.staticfiles.handlers'] = staticfiles.handlers
-
 LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 

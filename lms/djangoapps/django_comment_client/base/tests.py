@@ -24,7 +24,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
-from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -378,10 +378,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 22),
-        (ModuleStoreEnum.Type.mongo, 20, 4, 22),
-        (ModuleStoreEnum.Type.split, 3, 13, 22),
-        (ModuleStoreEnum.Type.split, 20, 13, 22),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 24),
+        (ModuleStoreEnum.Type.mongo, 20, 4, 24),
+        (ModuleStoreEnum.Type.split, 3, 13, 24),
+        (ModuleStoreEnum.Type.split, 20, 13, 24),
     )
     @ddt.unpack
     @count_queries
@@ -389,10 +389,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 16),
-        (ModuleStoreEnum.Type.mongo, 20, 3, 16),
-        (ModuleStoreEnum.Type.split, 3, 10, 16),
-        (ModuleStoreEnum.Type.split, 20, 10, 16),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 18),
+        (ModuleStoreEnum.Type.mongo, 20, 3, 18),
+        (ModuleStoreEnum.Type.split, 3, 10, 18),
+        (ModuleStoreEnum.Type.split, 20, 10, 18),
     )
     @ddt.unpack
     @count_queries

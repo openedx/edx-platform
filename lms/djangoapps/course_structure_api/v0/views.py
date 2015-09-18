@@ -160,7 +160,7 @@ class CourseList(CourseViewMixin, ListAPIView):
     serializer_class = serializers.CourseSerializer
 
     def get_queryset(self):
-        course_ids = self.request.QUERY_PARAMS.get('course_id', None)
+        course_ids = self.request.query_params.get('course_id', None)
 
         results = []
         if course_ids:

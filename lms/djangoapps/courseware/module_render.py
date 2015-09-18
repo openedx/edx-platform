@@ -76,7 +76,7 @@ from xmodule.mixin import wrap_with_license
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
-from verify_student.services import ReverificationService
+from lms.djangoapps.verify_student.services import ReverificationService
 
 from edx_proctoring.services import ProctoringService
 from openedx.core.djangoapps.credit.services import CreditService
@@ -956,7 +956,7 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
         log.error('Failed to load xblock resource', exc_info=True)
         raise Http404
     mimetype, _ = mimetypes.guess_type(uri)
-    return HttpResponse(content, mimetype=mimetype)
+    return HttpResponse(content, content_type=mimetype)
 
 
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):

@@ -823,7 +823,7 @@ class ForumRoleUsersListView(generics.ListAPIView):
         Return a list of users with the specified role/course pair
         """
         name = self.kwargs['name']
-        course_id_string = self.request.QUERY_PARAMS.get('course_id')
+        course_id_string = self.request.query_params.get('course_id')
         if not course_id_string:
             raise ParseError('course_id must be specified')
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
@@ -875,7 +875,7 @@ class UpdateEmailOptInPreference(APIView):
                     assume False.
 
         """
-        course_id = request.DATA['course_id']
+        course_id = request.data['course_id']
         try:
             org = locator.CourseLocator.from_string(course_id).org
         except InvalidKeyError:
@@ -885,6 +885,6 @@ class UpdateEmailOptInPreference(APIView):
                 content_type="text/plain"
             )
         # Only check for true. All other values are False.
-        email_opt_in = request.DATA['email_opt_in'].lower() == 'true'
+        email_opt_in = request.data['email_opt_in'].lower() == 'true'
         update_email_opt_in(request.user, org, email_opt_in)
         return HttpResponse(status=status.HTTP_200_OK)

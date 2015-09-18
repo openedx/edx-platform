@@ -8,8 +8,8 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
-from verify_student.services import ReverificationService
+from lms.djangoapps.verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
+from lms.djangoapps.verify_student.services import ReverificationService
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
