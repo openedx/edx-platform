@@ -135,7 +135,7 @@
             actionContent: function() {
                 return interpolate(
                     gettext('View %(span_start)s %(team_name)s %(span_end)s'),
-                    {span_start: '<span class="sr">', team_name: this.teamModel().get('name'), span_end: '</span>'},
+                    {span_start: '<span class="sr">', team_name: _.escape(this.teamModel().get('name')), span_end: '</span>'},
                     true
                 );
             },

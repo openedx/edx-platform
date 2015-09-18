@@ -1622,7 +1622,6 @@ if os.path.isdir(DATA_DIR):
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
     "*.pyc",
-    "*.html",
 
     # It would be nice if we could do, for example, "**/*.scss",
     # but these strings get passed down to the `fnmatch` module,
