@@ -74,6 +74,9 @@ def handle_activity(user, post, original_author_id=None):
 class CourseTeam(models.Model):
     """This model represents team related info."""
 
+    class Meta(object):
+        app_label = "teams"
+
     team_id = models.CharField(max_length=255, unique=True)
     discussion_topic_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255, db_index=True)
@@ -155,6 +158,7 @@ class CourseTeamMembership(models.Model):
 
     class Meta(object):
         """Stores meta information for the model."""
+        app_label = "teams"
         unique_together = (('user', 'team'),)
 
     user = models.ForeignKey(User)

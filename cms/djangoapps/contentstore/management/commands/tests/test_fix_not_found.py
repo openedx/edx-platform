@@ -2,7 +2,7 @@
 Tests for the fix_not_found management command
 """
 
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -12,12 +12,19 @@ class TestFixNotFound(ModuleStoreTestCase):
     """
     Tests for the fix_not_found management command
     """
+    def test_no_args(self):
+        """
+        Test fix_not_found command with no arguments
+        """
+        with self.assertRaisesRegexp(CommandError, "Error: too few arguments"):
+            call_command('fix_not_found')
+
     def test_fix_not_found_non_split(self):
         """
         The management command doesn't work on non split courses
         """
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
-        with self.assertRaises(SystemExit):
+        with self.assertRaisesRegexp(CommandError, "The owning modulestore does not support this command."):
             call_command("fix_not_found", unicode(course.id))
 
     def test_fix_not_found(self):

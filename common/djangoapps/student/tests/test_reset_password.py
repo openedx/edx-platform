@@ -10,10 +10,11 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.tokens import default_token_generator
 
-from django.utils.http import int_to_base36
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, base36_to_int, int_to_base36
 
 from mock import Mock, patch
 import ddt
@@ -42,12 +43,16 @@ class ResetPasswordTests(EventTestMixin, TestCase):
 
         self.user_bad_passwd = UserFactory.create()
         self.user_bad_passwd.is_active = False
-        self.user_bad_passwd.password = UNUSABLE_PASSWORD
+        self.user_bad_passwd.password = UNUSABLE_PASSWORD_PREFIX
         self.user_bad_passwd.save()
+
+    def uidb36_to_uidb64(self, uidb36=None):
+        """ Converts uidb36 into uidb64 """
+        return force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36 or self.uidb36))))
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
-        """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD"""
+        """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD_PREFIX"""
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
@@ -217,7 +222,9 @@ class ResetPasswordTests(EventTestMixin, TestCase):
         bad_reset_req = self.request_factory.get('/password_reset_confirm/NO-OP/')
         password_reset_confirm_wrapper(bad_reset_req, 'NO', 'OP')
         confirm_kwargs = reset_confirm.call_args[1]
-        self.assertEquals(confirm_kwargs['uidb36'], 'NO')
+
+        self.assertEquals(confirm_kwargs['uidb64'], self.uidb36_to_uidb64('NO'))
+
         self.assertEquals(confirm_kwargs['token'], 'OP')
         self.user = User.objects.get(pk=self.user.pk)
         self.assertFalse(self.user.is_active)
@@ -229,7 +236,7 @@ class ResetPasswordTests(EventTestMixin, TestCase):
         good_reset_req = self.request_factory.get('/password_reset_confirm/{0}-{1}/'.format(self.uidb36, self.token))
         password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
         confirm_kwargs = reset_confirm.call_args[1]
-        self.assertEquals(confirm_kwargs['uidb36'], self.uidb36)
+        self.assertEquals(confirm_kwargs['uidb64'], self.uidb36_to_uidb64())
         self.assertEquals(confirm_kwargs['token'], self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
@@ -251,7 +258,7 @@ class ResetPasswordTests(EventTestMixin, TestCase):
         good_reset_req = self.request_factory.get('/password_reset_confirm/{0}-{1}/'.format(self.uidb36, self.token))
         password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
         confirm_kwargs = reset_confirm.call_args[1]
-        self.assertEquals(confirm_kwargs['uidb36'], self.uidb36)
+        self.assertEquals(confirm_kwargs['uidb64'], self.uidb36_to_uidb64())
         self.assertEquals(confirm_kwargs['token'], self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)

@@ -11,7 +11,7 @@ from django.db import IntegrityError
 from opaque_keys.edx.keys import CourseKey
 
 from student.models import User, CourseEnrollment
-from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
+from lms.djangoapps.verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 
 
 log = logging.getLogger(__name__)

@@ -102,6 +102,8 @@ class CertificateWhitelist(models.Model):
     embargoed country restriction list
     (allow_certificate set to False in userprofile).
     """
+    class Meta(object):
+        app_label = "certificates"
 
     objects = NoneToEmptyManager()
 
@@ -130,14 +132,14 @@ class GeneratedCertificate(models.Model):
     status = models.CharField(max_length=32, default='unavailable')
     mode = models.CharField(max_length=32, choices=MODES, default=MODES.honor)
     name = models.CharField(blank=True, max_length=255)
-    created_date = models.DateTimeField(
-        auto_now_add=True, default=datetime.now)
-    modified_date = models.DateTimeField(
-        auto_now=True, default=datetime.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
+        app_label = "certificates"
+
 
     @classmethod
     def certificate_for_student(cls, student, course_id):
@@ -254,9 +256,10 @@ class ExampleCertificateSet(TimeStampedModel):
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
+        app_label = "certificates"
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def create_example_set(cls, course_key):
         """Create a set of example certificates for a course.
 
@@ -344,6 +347,9 @@ class ExampleCertificate(TimeStampedModel):
     3) We use dummy values.
 
     """
+    class Meta(object):
+        app_label = "certificates"
+
     # Statuses
     STATUS_STARTED = 'started'
     STATUS_SUCCESS = 'success'
@@ -511,6 +517,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
+        app_label = "certificates"
 
     @classmethod
     def is_enabled_for_course(cls, course_key):
@@ -557,7 +564,8 @@ class CertificateGenerationConfiguration(ConfigurationModel):
     certificates.
 
     """
-    pass
+    class Meta(ConfigurationModel.Meta):
+        app_label = "certificates"
 
 
 class CertificateHtmlViewConfiguration(ConfigurationModel):
@@ -576,6 +584,9 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
             }
         }
     """
+    class Meta(ConfigurationModel.Meta):
+        app_label = "certificates"
+
     configuration = models.TextField(
         help_text="Certificate HTML View Parameters (JSON)"
     )
@@ -629,6 +640,7 @@ class BadgeAssertion(models.Model):
         Meta information for Django's construction of the model.
         """
         unique_together = (('course_id', 'user', 'mode'),)
+        app_label = "certificates"
 
 
 def validate_badge_image(image):
@@ -645,6 +657,9 @@ class BadgeImageConfiguration(models.Model):
     """
     Contains the configuration for badges for a specific mode. The mode
     """
+    class Meta(object):
+        app_label = "certificates"
+
     mode = models.CharField(
         max_length=125,
         help_text=_(u'The course mode for this badge image. For example, "verified" or "honor".'),
@@ -659,6 +674,7 @@ class BadgeImageConfiguration(models.Model):
         validators=[validate_badge_image]
     )
     default = models.BooleanField(
+        default=False,
         help_text=_(
             u"Set this value to True if you want this image to be the default image for any course modes "
             u"that do not have a specified badge image. You can have only one default image."
@@ -739,6 +755,7 @@ class CertificateTemplate(TimeStampedModel):
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
         unique_together = (('organization_id', 'course_key', 'mode'),)
+        app_label = "certificates"
 
 
 def template_assets_path(instance, filename):
@@ -790,6 +807,7 @@ class CertificateTemplateAsset(TimeStampedModel):
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
+        app_label = "certificates"
 
 
 @receiver(post_save, sender=GeneratedCertificate)

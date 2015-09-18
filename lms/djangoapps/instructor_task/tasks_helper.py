@@ -31,6 +31,7 @@ from shoppingcart.models import (
 )
 
 from track.views import task_track
+from util.db import outer_atomic
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore.django import modulestore
@@ -63,7 +64,7 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment, CourseAccessRole
 from teams.models import CourseTeamMembership
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -258,9 +259,10 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     # Get the InstructorTask to be updated. If this fails then let the exception return to Celery.
     # There's no point in catching it here.
-    entry = InstructorTask.objects.get(pk=entry_id)
-    entry.task_state = PROGRESS
-    entry.save_now()
+    with outer_atomic():
+        entry = InstructorTask.objects.get(pk=entry_id)
+        entry.task_state = PROGRESS
+        entry.save_now()
 
     # Get inputs to use in this task from the entry
     task_id = entry.task_id
@@ -464,7 +466,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     )
 
 
-@transaction.autocommit
+@outer_atomic
 def rescore_problem_module_state(xmodule_instance_args, module_descriptor, student_module):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
@@ -553,7 +555,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             return UPDATE_STATUS_SUCCEEDED
 
 
-@transaction.autocommit
+@outer_atomic
 def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Resets problem attempts to zero for specified `student_module`.
@@ -580,7 +582,7 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
     return update_status
 
 
-@transaction.autocommit
+@outer_atomic
 def delete_problem_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Delete the StudentModule entry.
@@ -1429,7 +1431,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                 continue
 
             try:
-                with transaction.commit_on_success():
+                with outer_atomic():
                     add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
                 cohorts_status[cohort_name]['Students Added'] += 1
                 task_progress.succeeded += 1

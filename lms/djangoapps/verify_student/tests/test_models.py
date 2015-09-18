@@ -6,7 +6,7 @@ import requests.exceptions
 import pytz
 
 from django.conf import settings
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
 from django.test import TestCase
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from opaque_keys.edx.keys import CourseKey
 
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
     VerificationException, VerificationCheckpoint,
     VerificationStatus, SkippedReverification,
@@ -127,9 +127,9 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
 
 # Lots of patching to stub in our own settings, S3 substitutes, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
-@patch('verify_student.models.S3Connection', new=MockS3Connection)
-@patch('verify_student.models.Key', new=MockKey)
-@patch('verify_student.models.requests.post', new=mock_software_secure_post)
+@patch('lms.djangoapps.verify_student.models.S3Connection', new=MockS3Connection)
+@patch('lms.djangoapps.verify_student.models.Key', new=MockKey)
+@patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
 class TestPhotoVerification(ModuleStoreTestCase):
 
@@ -227,12 +227,12 @@ class TestPhotoVerification(ModuleStoreTestCase):
         assert_equals(attempt.status, "submitted")
 
         # We post, but Software Secure doesn't like what we send for some reason
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_error):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
 
         # We try to post, but run into an error (in this case a newtork connection error)
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
 
@@ -465,7 +465,9 @@ class TestPhotoVerification(ModuleStoreTestCase):
         user = UserFactory.create()
         course = CourseFactory.create()
 
-        with patch('verify_student.models.SoftwareSecurePhotoVerification.user_is_verified') as mock_verification:
+        with patch(
+            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+        ) as mock_verification:
 
             mock_verification.return_value = status
 

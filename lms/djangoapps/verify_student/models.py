@@ -36,7 +36,7 @@ from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from model_utils.models import StatusModel, TimeStampedModel
 from model_utils import Choices
-from verify_student.ssencrypt import (
+from lms.djangoapps.verify_student.ssencrypt import (
     random_aes_key, encrypt_and_encode,
     generate_signed_message, rsa_encrypt
 )
@@ -150,7 +150,7 @@ class PhotoVerification(StatusModel):
     # user IDs or something too easily guessable.
     receipt_id = models.CharField(
         db_index=True,
-        default=lambda: generateUUID(),
+        default=generateUUID,
         max_length=255,
     )
 
@@ -1112,18 +1112,8 @@ class VerificationCheckpoint(models.Model):
         Returns:
             VerificationCheckpoint object if exists otherwise None
         """
-        try:
-            checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
-            return checkpoint
-        except IntegrityError:
-            log.info(
-                u"An integrity error occurred while getting-or-creating the verification checkpoint "
-                "for course %s at location %s.  This can occur if two processes try to get-or-create "
-                "the checkpoint at the same time and the database is set to REPEATABLE READ. "
-                "We will try committing the transaction and retrying."
-            )
-            transaction.commit()
-            return cls.objects.get(course_id=course_id, checkpoint_location=checkpoint_location)
+        checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
+        return checkpoint
 
 
 class VerificationStatus(models.Model):
@@ -1324,6 +1314,7 @@ class SkippedReverification(models.Model):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
+    @transaction.atomic
     def add_skipped_reverification_attempt(cls, checkpoint, user_id, course_id):
         """Create skipped reverification object.
 

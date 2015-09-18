@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
 from xmodule.modulestore.tests.factories import check_mongo_calls_range, CourseFactory, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from ccx_keys.locator import CCXLocator
-from ccx.tests.factories import CcxFactory
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
 @attr('shard_1')
@@ -214,24 +214,24 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
 
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): # of sql queries, # of mongo queries, # of xblocks
-        ('no_overrides', 1, True, False): (24, 6, 13),
-        ('no_overrides', 2, True, False): (69, 6, 84),
-        ('no_overrides', 3, True, False): (264, 6, 335),
-        ('ccx', 1, True, False): (24, 6, 13),
-        ('ccx', 2, True, False): (69, 6, 84),
-        ('ccx', 3, True, False): (264, 6, 335),
-        ('ccx', 1, True, True): (24, 6, 13),
-        ('ccx', 2, True, True): (69, 6, 84),
-        ('ccx', 3, True, True): (264, 6, 335),
-        ('no_overrides', 1, False, False): (24, 6, 13),
-        ('no_overrides', 2, False, False): (69, 6, 84),
-        ('no_overrides', 3, False, False): (264, 6, 335),
-        ('ccx', 1, False, False): (24, 6, 13),
-        ('ccx', 2, False, False): (69, 6, 84),
-        ('ccx', 3, False, False): (264, 6, 335),
-        ('ccx', 1, False, True): (24, 6, 13),
-        ('ccx', 2, False, True): (69, 6, 84),
-        ('ccx', 3, False, True): (264, 6, 335),
+        ('no_overrides', 1, True, False): (30, 6, 13),
+        ('no_overrides', 2, True, False): (105, 6, 84),
+        ('no_overrides', 3, True, False): (430, 6, 335),
+        ('ccx', 1, True, False): (30, 6, 13),
+        ('ccx', 2, True, False): (105, 6, 84),
+        ('ccx', 3, True, False): (430, 6, 335),
+        ('ccx', 1, True, True): (30, 6, 13),
+        ('ccx', 2, True, True): (105, 6, 84),
+        ('ccx', 3, True, True): (430, 6, 335),
+        ('no_overrides', 1, False, False): (30, 6, 13),
+        ('no_overrides', 2, False, False): (105, 6, 84),
+        ('no_overrides', 3, False, False): (430, 6, 335),
+        ('ccx', 1, False, False): (30, 6, 13),
+        ('ccx', 2, False, False): (105, 6, 84),
+        ('ccx', 3, False, False): (430, 6, 335),
+        ('ccx', 1, False, True): (30, 6, 13),
+        ('ccx', 2, False, True): (105, 6, 84),
+        ('ccx', 3, False, True): (430, 6, 335),
     }
 
 
@@ -243,22 +243,22 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (24, 4, 9),
-        ('no_overrides', 2, True, False): (69, 19, 54),
-        ('no_overrides', 3, True, False): (264, 84, 215),
-        ('ccx', 1, True, False): (24, 4, 9),
-        ('ccx', 2, True, False): (69, 19, 54),
-        ('ccx', 3, True, False): (264, 84, 215),
-        ('ccx', 1, True, True): (26, 4, 13),
-        ('ccx', 2, True, True): (71, 19, 84),
-        ('ccx', 3, True, True): (266, 84, 335),
-        ('no_overrides', 1, False, False): (24, 4, 9),
-        ('no_overrides', 2, False, False): (69, 19, 54),
-        ('no_overrides', 3, False, False): (264, 84, 215),
-        ('ccx', 1, False, False): (24, 4, 9),
-        ('ccx', 2, False, False): (69, 19, 54),
-        ('ccx', 3, False, False): (264, 84, 215),
-        ('ccx', 1, False, True): (24, 4, 9),
-        ('ccx', 2, False, True): (69, 19, 54),
-        ('ccx', 3, False, True): (264, 84, 215),
+        ('no_overrides', 1, True, False): (30, 4, 9),
+        ('no_overrides', 2, True, False): (105, 19, 54),
+        ('no_overrides', 3, True, False): (430, 84, 215),
+        ('ccx', 1, True, False): (30, 4, 9),
+        ('ccx', 2, True, False): (105, 19, 54),
+        ('ccx', 3, True, False): (430, 84, 215),
+        ('ccx', 1, True, True): (32, 4, 13),
+        ('ccx', 2, True, True): (107, 19, 84),
+        ('ccx', 3, True, True): (432, 84, 335),
+        ('no_overrides', 1, False, False): (30, 4, 9),
+        ('no_overrides', 2, False, False): (105, 19, 54),
+        ('no_overrides', 3, False, False): (430, 84, 215),
+        ('ccx', 1, False, False): (30, 4, 9),
+        ('ccx', 2, False, False): (105, 19, 54),
+        ('ccx', 3, False, False): (430, 84, 215),
+        ('ccx', 1, False, True): (30, 4, 9),
+        ('ccx', 2, False, True): (105, 19, 54),
+        ('ccx', 3, False, True): (430, 84, 215),
     }

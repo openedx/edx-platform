@@ -11,7 +11,7 @@ from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
 from openedx.core.lib.api.fields import ExpandableField
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 
-from .models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 
 
 class CountryField(serializers.Field):
@@ -209,7 +209,7 @@ class BulkTeamCountTopicSerializer(BaseTopicSerializer):  # pylint: disable=abst
     Serializes a set of topics, adding the team_count field to each topic as a bulk operation.
     Requires that `context` is provided with a valid course_id in order to filter teams within the course.
     """
-    class Meta:  # pylint: disable=missing-docstring,old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         list_serializer_class = BulkTeamCountTopicListSerializer
 
 

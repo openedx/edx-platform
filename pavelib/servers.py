@@ -233,14 +233,16 @@ def run_all_servers(options):
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings"),
+    ("fake-initial", None, "Fake the initial migrations"),
 ])
-def update_db():
+def update_db(options):
     """
     Runs syncdb and then migrate.
     """
     settings = getattr(options, 'settings', DEFAULT_SETTINGS)
+    fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
-        sh(django_cmd(system, settings, 'syncdb', '--migrate', '--traceback', '--pythonpath=.'))
+        sh(django_cmd(system, settings, 'migrate', fake, '--traceback', '--pythonpath=.'))
 
 
 @task

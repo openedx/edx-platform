@@ -431,7 +431,7 @@ class JsonResponse(HttpResponse):
         """
         content = json.dumps(data, cls=i4xEncoder)
         super(JsonResponse, self).__init__(content,
-                                           mimetype='application/json; charset=utf-8')
+                                           content_type='application/json; charset=utf-8')
 
 
 class JsonError(HttpResponse):
@@ -446,7 +446,7 @@ class JsonError(HttpResponse):
             error_messages = [error_messages]
         content = json.dumps({'errors': error_messages}, indent=2, ensure_ascii=False)
         super(JsonError, self).__init__(content,
-                                        mimetype='application/json; charset=utf-8', status=status)
+                                        content_type='application/json; charset=utf-8', status=status)
 
 
 class HtmlResponse(HttpResponse):

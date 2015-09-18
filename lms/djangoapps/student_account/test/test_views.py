@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.test.client import RequestFactory
+from django.http import HttpRequest
 
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
@@ -434,7 +434,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
-        self.request = RequestFactory()
+        self.request = HttpRequest()
         self.request.user = self.user
 
         # For these tests, two third party auth providers are enabled by default:

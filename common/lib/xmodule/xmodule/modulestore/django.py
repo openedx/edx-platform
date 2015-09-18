@@ -214,7 +214,7 @@ def modulestore():
             # should be updated to have a setting that enumerates modulestore
             # wrappers and then uses that setting to wrap the modulestore in
             # appropriate wrappers depending on enabled features.
-            from ccx.modulestore import CCXModulestoreWrapper  # pylint: disable=import-error
+            from lms.djangoapps.ccx.modulestore import CCXModulestoreWrapper
             _MIXED_MODULESTORE = CCXModulestoreWrapper(_MIXED_MODULESTORE)
 
     return _MIXED_MODULESTORE

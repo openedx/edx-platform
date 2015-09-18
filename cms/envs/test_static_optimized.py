@@ -17,6 +17,7 @@ from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        'ATOMIC_REQUESTS': True,
     },
 
 }

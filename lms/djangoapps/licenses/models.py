@@ -68,7 +68,7 @@ def _create_license(user, software):
     try:
         # find one license that has not been assigned, locking the
         # table/rows with select_for_update to prevent race conditions
-        with transaction.commit_on_success():
+        with transaction.atomic():
             selected = UserLicense.objects.select_for_update()
             license = selected.filter(user__isnull=True, software=software)[0]
             license.user = user

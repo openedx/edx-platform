@@ -367,9 +367,19 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             with mock.patch(
                 'openedx.core.djangoapps.content.course_overviews.models.CourseOverview._get_pk_val'
             ) as mock_get_pk_val:
-
                 mock_get_pk_val.return_value = None
+                # This method was not present in django 1.4. Django 1.8 calls this method if _get_pk_val returns None.
+                # This method will return empty str if there is no default value present. So mock it to avoid returning
+                # the empty str as primary key value. Due to empty str, model.save will do an update instead of insert
+                # which is incorrect and get exception in common.djangoapps.xmodule_django.models.OpaqueKeyField.get_prep_value
+                with mock.patch('django.db.models.Field.get_pk_value_on_save') as mock_get_pk_value_on_save:
 
+                    mock_get_pk_value_on_save.return_value = None
+
+                    # verify the CourseOverview is loaded successfully both times,
+                    # including after an IntegrityError exception the 2nd time
+                    for _ in range(2):
+                        self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
                 # verify the CourseOverview is loaded successfully both times,
                 # including after an IntegrityError exception the 2nd time
                 for _ in range(2):
@@ -407,3 +417,4 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             # knows how to write, it's not going to overwrite what's there.
             unmodified_overview = CourseOverview.get_from_id(course.id)
             self.assertEqual(unmodified_overview.version, 11)
+

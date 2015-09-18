@@ -161,7 +161,7 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-from django.utils.translation import ugettext as _
+_ = lambda s: s
 LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {
