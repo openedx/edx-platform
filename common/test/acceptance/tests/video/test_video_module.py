@@ -852,7 +852,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
     def setUp(self):
         super(YouTubeHtml5VideoTest, self).setUp()
 
-    @flaky  # TODO fix this, see TNL-1642
+    @flaky(max_runs=10, min_passes=10)  # TODO fix this, see TNL-1642
     def test_youtube_video_rendering_with_unsupported_sources(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode

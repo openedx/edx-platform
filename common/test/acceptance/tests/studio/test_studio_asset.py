@@ -37,7 +37,7 @@ class AssetIndexTest(StudioCourseTest):
         """
         self.asset_page.visit()
 
-    @flaky  # TODO fix this, see SOL-1160
+    @flaky(max_runs=10, min_passes=10)  # TODO fix this, see SOL-1160
     def test_type_filter_exists(self):
         """
         Make sure type filter is on the page.

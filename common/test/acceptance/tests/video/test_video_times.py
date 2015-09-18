@@ -55,7 +55,7 @@ class VideoTimesTest(VideoBaseTest):
 
         self.assertIn(self.video.position, ('0:05', '0:06'))
 
-    @flaky  # TODO fix this, see TNL-1619
+    @flaky(max_runs=10, min_passes=10)  # TODO fix this, see TNL-1619
     def test_video_end_time_wo_default_start_time(self):
         """
         Scenario: End time works for Youtube video if starts playing from between.

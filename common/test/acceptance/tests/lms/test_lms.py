@@ -109,7 +109,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         self.login_page.visit().toggle_form()
         self.assertEqual(self.login_page.current_form, "register")
 
-    @flaky  # ECOM-1165
+    @flaky(max_runs=10, min_passes=10)  # ECOM-1165
     def test_password_reset_success(self):
         # Create a user account
         email, password = self._create_unique_user()  # pylint: disable=unused-variable

@@ -129,7 +129,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         """
         self.assertFalse(self.browser.find_elements_by_css_selector('span.large-discussion-icon'))
 
-    @flaky  # TODO fix this, see TNL-2322
+    @flaky(max_runs=10, min_passes=10)  # TODO fix this, see TNL-2322
     def test_library_pagination(self):
         """
         Scenario: Ensure that adding several XBlocks to a library results in pagination.
