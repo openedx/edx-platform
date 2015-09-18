@@ -115,6 +115,6 @@ class RefundTests(ModuleStoreTestCase):
         response = self.client.get(response.get('location'))  # pylint: disable=maybe-no-member
 
         self.assertContains(response, "Unenrolled %s from" % self.student)
-        self.assertContains(response, "Refunded 1 for order id")
+        self.assertContains(response, "Refunded 1.00 for order id")
 
         self.assertFalse(CourseEnrollment.is_enrolled(self.student, self.course_id))

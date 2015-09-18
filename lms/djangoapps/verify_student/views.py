@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
@@ -46,17 +47,18 @@ from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors import (
     get_signed_purchase_params, get_purchase_endpoint
 )
-from verify_student.ssencrypt import has_valid_signature
-from verify_student.models import (
+from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
+from lms.djangoapps.verify_student.models import (
     VerificationDeadline,
     SoftwareSecurePhotoVerification,
     VerificationCheckpoint,
     VerificationStatus,
     IcrvStatusEmailsConfiguration,
 )
-from verify_student.image import decode_image_data, InvalidImageData
+from lms.djangoapps.verify_student.image import decode_image_data, InvalidImageData
 from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
+from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 from django.contrib.staticfiles.storage import staticfiles_storage
 
@@ -820,7 +822,12 @@ class SubmitPhotosView(View):
     End-point for submitting photos for verification.
     """
 
+    @method_decorator(transaction.non_atomic_requests)
+    def dispatch(self, *args, **kwargs):    # pylint: disable=missing-docstring
+        return super(SubmitPhotosView, self).dispatch(*args, **kwargs)
+
     @method_decorator(login_required)
+    @method_decorator(outer_atomic(read_committed=True))
     def post(self, request):
         """
         Submit photos for verification.

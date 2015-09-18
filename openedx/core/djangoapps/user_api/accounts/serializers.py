@@ -70,7 +70,11 @@ class UserReadOnlySerializer(serializers.Serializer):
                 reverse('accounts_api', kwargs={'username': user.username})
             ),
             "email": user.email,
-            "date_joined": user.date_joined,
+            # For backwards compatibility: Tables created after the upgrade to Django 1.8 will save microseconds.
+            # However, mobile apps are not expecting microsecond in the serialized value. If we set it to zero the
+            # DRF JSONEncoder will not include it in the serialized value.
+            # https://docs.djangoproject.com/en/1.8/ref/databases/#fractional-seconds-support-for-time-and-datetime-fields
+            "date_joined": user.date_joined.replace(microsecond=0),
             "is_active": user.is_active,
             "bio": AccountLegacyProfileSerializer.convert_empty_to_None(profile.bio),
             "country": AccountLegacyProfileSerializer.convert_empty_to_None(profile.country.code),
