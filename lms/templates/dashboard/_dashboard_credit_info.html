@@ -48,7 +48,6 @@
             <button class="btn credit-btn pending-credit-btn" data-course-key="${credit_status['course_key']}" data-user="${user.username}" data-provider="${credit_status['provider_id']}">${_("Request Credit")}</button>
         % endif
 
-        <form id="credit-pending-form"> </form>
     % elif credit_status["request_status"] == "approved" and not credit_status["error"] :
         <p class="message-copy credit-request-approved-msg">
             ## Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a

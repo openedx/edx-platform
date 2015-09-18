@@ -750,19 +750,15 @@
               font-weight: bold;
             }
           }
-          .credit-eligibility-msg {
+          .credit-eligibility-msg,
+          .credit-request-approved-msg {
             @include float(left);
-            width: flex-grid(10, 12);
+            width: flex-grid(9, 12);
           }
 
           .credit-request-pending-msg {
             @include float(left);
             margin-top: 10px;
-          }
-
-          .credit-request-approved-msg{
-            width: flex-grid(10, 12);
-            @include float(left);
           }
 
           .actions {
