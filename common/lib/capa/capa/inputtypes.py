@@ -1214,9 +1214,11 @@ class FormulaEquationInput(InputTypeBase):
 
     Example:
 
-    <formulaequationinput size="50" label="Enter the equation for motion"/>
+    <formulaequationinput size="50" label="Enter the equation for motion" />
 
     options: size -- width of the textbox.
+             trailing_text -- text to show after the input textbox when
+                              rendered, same as textline (useful for units)
     """
 
     template = "formulaequationinput.html"
@@ -1231,6 +1233,7 @@ class FormulaEquationInput(InputTypeBase):
             Attribute('size', '20'),
             Attribute('inline', False),
             Attribute('label', ''),
+            Attribute('trailing_text', ''),
         ]
 
     def _extra_context(self):
