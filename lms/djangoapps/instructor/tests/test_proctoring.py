@@ -61,13 +61,12 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.assertFalse(self.proctoring_link in response.content)
         self.assertFalse('Allowance Section' in response.content)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': False})
     def test_no_tab_flag_unset(self):
         """
-        Test Pass Proctoring Tab is not in the Instructor Dashboard
-        if the feature flag 'ENABLE_PROCTORED_EXAMS' is unset.
+        Proctoring Tab will not be visible if
+        the user is not a staff member.
         """
-        self.instructor.is_staff = True
+        self.instructor.is_staff = False
         self.instructor.save()
 
         response = self.client.get(self.url)
