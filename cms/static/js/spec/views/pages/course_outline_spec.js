@@ -739,22 +739,34 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     expect($("#id_time_limit").val()).toBe("02:30");
                 });
 
-                it('can be edited and enable/disable proctoring fields, when time_limit checkbox value changes', function() {
+                it('can be edited and enable/disable proctoring fields, when time_limit and exam_proctoring' +
+                ' checkbox value changes', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
                     setModalTimedExaminationPreferenceValues(true, "02:30", true);
                     var target = $('#id_timed_examination');
-                    target.attr("checked","checked");
-                    target.click();
+                    target.prop('checked', false).change();
+
                     expect($('#id_exam_proctoring')).toHaveAttr('disabled','disabled');
                     expect($('#id_time_limit')).toHaveAttr('disabled','disabled');
-                    target.removeAttr("checked");
-                    target.click();
+                    expect($('#id_practice_exam')).toHaveAttr('disabled','disabled');
+
+                    target.prop('checked', true).change();
+
                     expect($('#id_exam_proctoring')).not.toHaveAttr('disabled','disabled');
                     expect($('#id_time_limit')).not.toHaveAttr('disabled','disabled');
                     expect($('#id_time_limit').val()).toBe('00:30');
                     expect($('#id_exam_proctoring')).not.toHaveAttr('checked');
+                    expect($('#id_practice_exam')).toHaveAttr('disabled','disabled');
+
+                    target.prop('checked', true).change();
+
+                    var examProctoringTarget = $('#id_exam_proctoring');
+                    examProctoringTarget.prop('checked', false).change();
+                    expect($('#id_practice_exam')).toHaveAttr('disabled','disabled');
+                    examProctoringTarget.prop('checked', true).change();
+                    expect($('#id_practice_exam')).not.toHaveAttr('disabled','disabled');
                 });
 
                 it('release date, due date, grading type, and staff lock can be cleared.', function() {
