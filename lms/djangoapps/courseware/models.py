@@ -228,6 +228,23 @@ class StudentModuleHistory(CallStackMixin, models.Model):
                 max_grade=instance.max_grade)
             history_entry.save()
 
+    @classmethod
+    def from_archive(cls, archive_entry):
+        """
+        Return a new StudentModuleHistory entry, created from
+        the supplied StudentModuleHistoryArchive entry.
+        """
+        return cls(
+            id=archive_entry.id,
+            usage_key=archive_entry.student_module.module_state_key,
+            course_key=archive_entry.student_module.course_id,
+            username=archive_entry.student_module.student.username,
+            version=archive_entry.version,
+            created=archive_entry.created,
+            state=archive_entry.state,
+            grade=archive_entry.grade,
+            max_grade=archive_entry.max_grade,
+        )
 
 
 class XBlockFieldBase(models.Model):
