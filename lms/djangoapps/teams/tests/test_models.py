@@ -24,8 +24,9 @@ from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from .factories import CourseTeamFactory, CourseTeamMembershipFactory
-from ..models import CourseTeam, CourseTeamMembership
+from teams.models import CourseTeam, CourseTeamMembership
 from teams import TEAM_DISCUSSION_CONTEXT
+from util.testing import EventTestMixin
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')
@@ -114,7 +115,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class TeamSignalsTest(SharedModuleStoreTestCase):
+class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
     """Tests for handling of team-related signals."""
 
     SIGNALS_LIST = (
@@ -133,7 +134,7 @@ class TeamSignalsTest(SharedModuleStoreTestCase):
 
     def setUp(self):
         """Create a user with a team to test signals."""
-        super(TeamSignalsTest, self).setUp()
+        super(TeamSignalsTest, self).setUp('teams.utils.tracker')
         self.user = UserFactory.create(username="user")
         self.moderator = UserFactory.create(username="moderator")
         self.team = CourseTeamFactory(discussion_topic_id=self.DISCUSSION_TOPIC_ID)
@@ -168,9 +169,14 @@ class TeamSignalsTest(SharedModuleStoreTestCase):
             now = datetime.utcnow().replace(tzinfo=pytz.utc)
             self.assertGreater(now, team.last_activity_at)
             self.assertGreater(now, team_membership.last_activity_at)
+            self.assert_event_emitted(
+                'edx.team.activity_updated',
+                team_id=team.id,
+            )
         else:
             self.assertEqual(team.last_activity_at, team_last_activity)
             self.assertEqual(team_membership.last_activity_at, team_membership_last_activity)
+            self.assert_no_events_were_emitted()
 
     @ddt.data(
         *itertools.product(
