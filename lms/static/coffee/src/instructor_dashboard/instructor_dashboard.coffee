@@ -183,16 +183,13 @@ setup_instructor_dashboard_sections = (idash_content) ->
     constructor: window.InstructorDashboard.sections.Certificates
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#certificates"
   ]
-
-  # proctoring can be feature disabled
-  if edx.instructor_dashboard.proctoring != undefined
-    sections_to_initialize = sections_to_initialize.concat [
-      constructor: edx.instructor_dashboard.proctoring.ProctoredExamAllowanceView
-      $element: idash_content.find ".#{CSS_IDASH_SECTION}#proctoring"
-    ,
-      constructor: edx.instructor_dashboard.proctoring.ProctoredExamAttemptView
-      $element: idash_content.find ".#{CSS_IDASH_SECTION}#proctoring"
-    ]
+  sections_to_initialize = sections_to_initialize.concat [
+    constructor: edx.instructor_dashboard.proctoring.ProctoredExamAllowanceView
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#timed_exam"
+  ,
+    constructor: edx.instructor_dashboard.proctoring.ProctoredExamAttemptView
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#timed_exam"
+  ]
 
   sections_to_initialize.map ({constructor, $element}) ->
     # See fault isolation NOTE at top of file.
