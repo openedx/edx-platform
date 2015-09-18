@@ -19,6 +19,7 @@ class CourseAccessRoleForm(forms.ModelForm):
 
     class Meta(object):
         model = CourseAccessRole
+        fields = '__all__'
 
     email = forms.EmailField(required=True)
     COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]

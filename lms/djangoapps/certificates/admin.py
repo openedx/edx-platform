@@ -29,6 +29,7 @@ class CertificateTemplateForm(forms.ModelForm):
 
     class Meta(object):
         model = CertificateTemplate
+        fields = '__all__'
 
 
 class CertificateTemplateAdmin(admin.ModelAdmin):

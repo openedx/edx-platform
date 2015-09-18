@@ -105,6 +105,7 @@ class ProviderConfig(ConfigurationModel):
     # "enabled" field is inherited from ConfigurationModel
 
     class Meta(object):
+        app_label = "third_party_auth"
         abstract = True
 
     @property
@@ -204,6 +205,7 @@ class OAuth2ProviderConfig(ProviderConfig):
     other_settings = models.TextField(blank=True, help_text="Optional JSON object with advanced settings, if any.")
 
     class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "Provider Configuration (OAuth)"
         verbose_name_plural = verbose_name
 
@@ -283,6 +285,7 @@ class SAMLProviderConfig(ProviderConfig):
         self.other_settings = clean_json(self.other_settings, dict)
 
     class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "Provider Configuration (SAML IdP)"
         verbose_name_plural = "Provider Configuration (SAML IdPs)"
 
@@ -374,6 +377,7 @@ class SAMLConfiguration(ConfigurationModel):
     )
 
     class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "SAML Configuration"
         verbose_name_plural = verbose_name
 
@@ -440,6 +444,7 @@ class SAMLProviderData(models.Model):
     public_key = models.TextField()
 
     class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "SAML Provider Data"
         verbose_name_plural = verbose_name
         ordering = ('-fetched_at', )
@@ -495,6 +500,7 @@ class LTIProviderConfig(ProviderConfig):
     )
 
     lti_hostname = models.CharField(
+        default='localhost',
         max_length=255,
         help_text=(
             'The domain that  will be acting as the LTI consumer.'
@@ -552,5 +558,6 @@ class LTIProviderConfig(ProviderConfig):
         return getattr(settings, 'SOCIAL_AUTH_LTI_CONSUMER_SECRETS', {}).get(self.lti_consumer_key, '')
 
     class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "Provider Configuration (LTI)"
         verbose_name_plural = verbose_name

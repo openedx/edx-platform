@@ -107,7 +107,7 @@ class SysadminDashboardView(TemplateView):
                 writer.writerow(row)
             csv_data = read_and_flush()
             yield csv_data
-        response = HttpResponse(csv_data(), mimetype='text/csv')
+        response = HttpResponse(csv_data(), content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(
             filename)
         return response

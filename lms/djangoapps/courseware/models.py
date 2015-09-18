@@ -45,6 +45,9 @@ class ChunkingManager(models.Manager):
     :class:`~Manager` that adds an additional method :meth:`chunked_filter` to provide
     the ability to make select queries with specific chunk sizes.
     """
+    class Meta(object):
+        app_label = "courseware"
+
     def chunked_filter(self, chunk_field, items, **kwargs):
         """
         Queries model_class with `chunk_field` set to chunks of size `chunk_size`,
@@ -102,6 +105,7 @@ class StudentModule(CallStackMixin, models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('student', 'module_state_key', 'course_id'),)
 
     # Internal state of the object
@@ -161,6 +165,7 @@ class StudentModuleHistory(CallStackMixin, models.Model):
     HISTORY_SAVING_TYPES = {'problem'}
 
     class Meta(object):
+        app_label = "courseware"
         get_latest_by = "created"
 
     student_module = models.ForeignKey(StudentModule, db_index=True)
@@ -196,6 +201,7 @@ class XBlockFieldBase(models.Model):
     objects = ChunkingManager()
 
     class Meta(object):
+        app_label = "courseware"
         abstract = True
 
     # The name of the field
@@ -223,6 +229,7 @@ class XModuleUserStateSummaryField(XBlockFieldBase):
     Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('usage_id', 'field_name'),)
 
     # The definition id for the module
@@ -234,6 +241,7 @@ class XModuleStudentPrefsField(XBlockFieldBase):
     Stores data set in the Scope.preferences scope by an xmodule field
     """
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('student', 'module_type', 'field_name'),)
 
     # The type of the module for these preferences
@@ -247,6 +255,7 @@ class XModuleStudentInfoField(XBlockFieldBase):
     Stores data set in the Scope.preferences scope by an xmodule field
     """
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('student', 'field_name'),)
 
     student = models.ForeignKey(User, db_index=True)
@@ -265,6 +274,7 @@ class OfflineComputedGrade(models.Model):
     gradeset = models.TextField(null=True, blank=True)		# grades, stored as JSON
 
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('user', 'course_id'), )
 
     def __unicode__(self):
@@ -277,6 +287,7 @@ class OfflineComputedGradeLog(models.Model):
     Use this to be able to show instructor when the last computed grades were done.
     """
     class Meta(object):
+        app_label = "courseware"
         ordering = ["-created"]
         get_latest_by = "created"
 
@@ -300,6 +311,7 @@ class StudentFieldOverride(TimeStampedModel):
     student = models.ForeignKey(User, db_index=True)
 
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('course_id', 'field', 'location', 'student'),)
 
     field = models.CharField(max_length=255)

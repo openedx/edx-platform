@@ -422,6 +422,7 @@ class CourseFields(object):
     )
     has_children = True
     checklists = List(
+        help=_("Checklist to Follow When Developing a Course"),
         scope=Scope.settings,
         default=[
             {
@@ -792,7 +793,8 @@ class CourseFields(object):
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),
-        scope=Scope.settings
+        scope=Scope.settings,
+        default=""
     )
 
     max_student_enrollments_allowed = Integer(

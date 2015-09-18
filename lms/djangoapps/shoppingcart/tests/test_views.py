@@ -2035,7 +2035,8 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.assertIn("There was an error in your date input.  It should be formatted as YYYY-MM-DD",
                       response.content.decode('UTF-8'))
 
-    CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
+    CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = \
+        ",1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,"
 
     def test_report_csv_itemized(self):
         report_type = 'itemized_purchase_report'

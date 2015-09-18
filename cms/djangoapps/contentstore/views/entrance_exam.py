@@ -221,7 +221,7 @@ def _get_entrance_exam(request, course_key):  # pylint: disable=W0613
         exam_descriptor = modulestore().get_item(exam_key)
         return HttpResponse(
             _serialize_entrance_exam(exam_descriptor),
-            status=200, mimetype='application/json')
+            status=200, content_type='application/json')
     except ItemNotFoundError:
         return HttpResponse(status=404)
 

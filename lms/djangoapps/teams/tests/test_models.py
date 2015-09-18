@@ -23,10 +23,11 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
-from .factories import CourseTeamFactory, CourseTeamMembershipFactory
-from teams.models import CourseTeam, CourseTeamMembership
-from teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from util.testing import EventTestMixin
+
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')
@@ -134,7 +135,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     def setUp(self):
         """Create a user with a team to test signals."""
-        super(TeamSignalsTest, self).setUp('teams.utils.tracker')
+        super(TeamSignalsTest, self).setUp('lms.djangoapps.teams.utils.tracker')
         self.user = UserFactory.create(username="user")
         self.moderator = UserFactory.create(username="moderator")
         self.team = CourseTeamFactory(discussion_topic_id=self.DISCUSSION_TOPIC_ID)
