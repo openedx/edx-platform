@@ -4,12 +4,13 @@
 ;(function (define) {
     'use strict';
     define(["jquery", "underscore", "gettext", "common/js/components/views/feedback_notification",
-        "common/js/components/views/feedback_prompt"],
+        "common/js/components/views/feedback_prompt", "../../../../js/utils/what-input.min"],
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
             setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler,
-            validateRequiredField, validateURLItemEncoding, validateTotalKeyLength, checkTotalKeyLengthViolations;
+            validateRequiredField, validateURLItemEncoding, validateTotalKeyLength, checkTotalKeyLengthViolations,
+            whatInput;
 
         // see https://openedx.atlassian.net/browse/TNL-889 for what is it and why it's 65
         var MAX_SUM_KEY_LENGTH = 65;
