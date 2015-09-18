@@ -127,33 +127,34 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         }
 
         processed_data = {
-            "count_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 7,
-                    "totalAttemptCount": 30,
-                    "totalCorrectCount": 23,
+            u"count_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
+                    u"totalIncorrectCount": 7,
+                    u"totalAttemptCount": 30,
+                    u"totalCorrectCount": 23,
                 },
             },
-            "data_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+            u"data_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
                     {
-                        "count": 7,
-                        "value_id": "choice_0",
-                        "correct": False,
+                        u"count": 7,
+                        u"value_id": u"choice_0",
+                        u"correct": False,
                     },
                     {
-                        "count": 23,
-                        "value_id": "choice_1",
-                        "correct": True,
+                        u"count": 23,
+                        u"value_id": u"choice_1",
+                        u"correct": True,
                     },
                 ]
             },
-            "message_by_part": {
+            u"message_by_part": {
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            u"last_update_date": u"Oct 15, 2014 at 10:13 UTC"
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+        self.maxDiff = None
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_missing_correct(self):
@@ -182,28 +183,29 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         }
 
         processed_data = {
-            "count_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 7,
-                    "totalAttemptCount": 7,
-                    "totalCorrectCount": 0,
+            u"count_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
+                    u"totalIncorrectCount": 7,
+                    u"totalAttemptCount": 7,
+                    u"totalCorrectCount": 0,
                 },
             },
-            "data_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+            u"data_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
                     {
-                        "count": 7,
-                        "value_id": "choice_0",
-                        "correct": False,
+                        u"count": 7,
+                        u"value_id": u"choice_0",
+                        u"correct": False,
                     },
                 ]
             },
-            "message_by_part": {
+            u"message_by_part": {
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            u"last_update_date": u"Oct 15, 2014 at 10:13 UTC"
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+        self.maxDiff = None
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_variant(self):
@@ -244,29 +246,30 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         }
 
         processed_data = {
-            "count_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 0,
-                    "totalAttemptCount": 23,
-                    "totalCorrectCount": 23,
+            u"count_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
+                    u"totalIncorrectCount": 0,
+                    u"totalAttemptCount": 23,
+                    u"totalCorrectCount": 23,
                 },
             },
-            "data_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+            u"data_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
                     {
-                        "count": 23,
-                        "value_id": "choice_1",
-                        "correct": True,
+                        u"count": 23,
+                        u"value_id": u"choice_1",
+                        u"correct": True,
                     },
                 ]
             },
-            "message_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "The analytics cannot be displayed for this question as randomization was set at one time."
+            u"message_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": u"The analytics cannot be displayed for this question as randomization was set at one time."
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            u"last_update_date": u"Oct 15, 2014 at 10:13 UTC"
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+        self.maxDiff = None
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_radio(self):
@@ -307,17 +310,18 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         }
 
         processed_data = {
-            "count_by_part": {
+            u"count_by_part": {
             },
-            "data_by_part": {
+            u"data_by_part": {
             },
-            "message_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+            u"message_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": u"The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            u"last_update_date": u"Oct 15, 2014 at 10:13 UTC"
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+        self.maxDiff = None
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_checkbox(self):
@@ -358,15 +362,16 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         }
 
         processed_data = {
-            "count_by_part": {
+            u"count_by_part": {
             },
-            "data_by_part": {
+            u"data_by_part": {
             },
-            "message_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+            u"message_by_part": {
+                u"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": u"The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            u"last_update_date": u"Oct 15, 2014 at 10:13 UTC"
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+        self.maxDiff = None
         self.assertEquals(json.loads(return_json.content), processed_data)
