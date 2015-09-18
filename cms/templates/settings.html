@@ -220,17 +220,25 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
-
+            <%
+              enrollment_end_readonly = "readonly aria-readonly=\"true\"" if not enrollment_end_editable else ""
+              enrollment_end_editable_class = "is-not-editable" if not enrollment_end_editable else ""
+            %>
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
-              <div class="field date" id="field-enrollment-end-date">
+              <div class="field date ${enrollment_end_editable_class}" id="field-enrollment-end-date">
                 <label for="course-enrollment-end-date">${_("Enrollment End Date")}</label>
-                <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">${_("Last day students can enroll")}</span>
+                <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" ${enrollment_end_readonly} />
+                <span class="tip tip-stacked">
+                  ${_("Last day students can enroll.")}
+                % if not enrollment_end_editable:
+                  ${_("Contact your edX Partner Manager to update these settings.")}
+                % endif
+                </span>
               </div>
 
-              <div class="field time" id="field-enrollment-end-time">
+              <div class="field time ${enrollment_end_editable_class}" id="field-enrollment-end-time">
                 <label for="course-enrollment-end-time">${_("Enrollment End Time")}</label>
-                <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+                <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" ${enrollment_end_readonly} />
                 <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
