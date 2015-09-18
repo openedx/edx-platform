@@ -18,8 +18,9 @@ class CourseTeamFactory(DjangoModelFactory):
 
     Note that team_id is not auto-generated from name when using the factory.
     """
-    FACTORY_FOR = CourseTeam
-    FACTORY_DJANGO_GET_OR_CREATE = ('team_id',)
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CourseTeam
+        django_get_or_create = ('team_id',)
 
     team_id = factory.Sequence('team-{0}'.format)
     discussion_topic_id = factory.LazyAttribute(lambda a: uuid4().hex)
@@ -30,5 +31,6 @@ class CourseTeamFactory(DjangoModelFactory):
 
 class CourseTeamMembershipFactory(DjangoModelFactory):
     """Factory for CourseTeamMemberships."""
-    FACTORY_FOR = CourseTeamMembership
+    class Meta(object):    # pylint: disable=missing-docstring
+        model = CourseTeamMembership
     last_activity_at = LAST_ACTIVITY_AT

@@ -18,7 +18,8 @@ class CohortFactory(DjangoModelFactory):
     """
     Factory for constructing mock cohorts.
     """
-    FACTORY_FOR = CourseUserGroup
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CourseUserGroup
 
     name = Sequence("cohort{}".format)
     course_id = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
@@ -37,7 +38,8 @@ class CourseCohortFactory(DjangoModelFactory):
     """
     Factory for constructing mock course cohort.
     """
-    FACTORY_FOR = CourseCohort
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CourseCohort
 
     course_user_group = factory.SubFactory(CohortFactory)
     assignment_type = 'manual'
@@ -47,7 +49,8 @@ class CourseCohortSettingsFactory(DjangoModelFactory):
     """
     Factory for constructing mock course cohort settings.
     """
-    FACTORY_FOR = CourseCohortsSettings
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CourseCohortsSettings
 
     is_cohorted = False
     course_id = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
