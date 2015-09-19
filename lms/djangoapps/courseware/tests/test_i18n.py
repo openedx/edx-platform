@@ -41,6 +41,9 @@ class BaseI18nTestCase(TestCase):
             enabled=True
         ).save()
 
+    def tearDown(self):
+        response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='en')
+
 
 @attr('shard_1')
 class I18nTestCase(BaseI18nTestCase):
