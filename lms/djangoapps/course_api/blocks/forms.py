@@ -68,11 +68,11 @@ class BlockListGetForm(Form):
             if cleaned_data.get(additional_field):
                 cleaned_data['requested_fields'].add(additional_field)
 
-        # validate and set user
         usage_key = self.cleaned_data.get('usage_key')
         if not usage_key:
             return
 
+        # validate and set user
         requested_username = cleaned_data.get('user', '')
         requesting_user = self.initial['request'].user
 
