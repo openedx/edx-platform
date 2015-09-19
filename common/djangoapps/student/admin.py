@@ -135,8 +135,9 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
-    list_filter = ('mode', 'is_active',)
-    search_fields = ('course_id', 'mode', 'user__username',)
+    list_filter = ('is_active',)
+    # Use exact matches to make use of database indices
+    search_fields = ('=course_id', '=mode', '=user__username',)
     readonly_fields = ('course_id', 'mode', 'user',)
 
     class Meta(object):  # pylint: disable=missing-docstring
