@@ -10,19 +10,17 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from functools import total_ordering
 import hashlib
 from importlib import import_module
 import json
 import logging
-from pytz import UTC
 from urllib import urlencode
 import uuid
 
 import analytics
-from config_models.models import ConfigurationModel
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
@@ -30,7 +28,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError, transaction
-from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
@@ -41,18 +38,19 @@ import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pytz import UTC
 from simple_history.models import HistoricalRecords
 from south.modelsinspector import add_introspection_rules
+
+from config_models.models import ConfigurationModel
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.managers import CourseEnrollmentManager
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from util.query import use_read_replica_if_available
-
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
@@ -754,66 +752,6 @@ class CourseFullError(CourseEnrollmentException):
 
 class AlreadyEnrolledError(CourseEnrollmentException):
     pass
-
-
-class CourseEnrollmentManager(models.Manager):
-    """
-    Custom manager for CourseEnrollment with Table-level filter methods.
-    """
-
-    def num_enrolled_in(self, course_id):
-        """
-        Returns the count of active enrollments in a course.
-
-        'course_id' is the course_id to return enrollments
-        """
-
-        enrollment_number = super(CourseEnrollmentManager, self).get_query_set().filter(
-            course_id=course_id,
-            is_active=1
-        ).count()
-
-        return enrollment_number
-
-    def is_course_full(self, course):
-        """
-        Returns a boolean value regarding whether a course has already reached it's max enrollment
-        capacity
-        """
-        is_course_full = False
-        if course.max_student_enrollments_allowed is not None:
-            is_course_full = self.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
-        return is_course_full
-
-    def users_enrolled_in(self, course_id):
-        """Return a queryset of User for every user enrolled in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id,
-            courseenrollment__is_active=True
-        )
-
-    def enrollment_counts(self, course_id):
-        """
-        Returns a dictionary that stores the total enrollment count for a course, as well as the
-        enrollment count for each individual mode.
-        """
-        # Unfortunately, Django's "group by"-style queries look super-awkward
-        query = use_read_replica_if_available(
-            super(CourseEnrollmentManager, self).get_query_set().filter(course_id=course_id, is_active=True).values(
-                'mode').order_by().annotate(Count('mode')))
-        total = 0
-        enroll_dict = defaultdict(int)
-        for item in query:
-            enroll_dict[item['mode']] = item['mode__count']
-            total += item['mode__count']
-        enroll_dict['total'] = total
-        return enroll_dict
-
-    def enrolled_and_dropped_out_users(self, course_id):
-        """Return a queryset of Users in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id
-        )
 
 
 class CourseEnrollment(models.Model):
