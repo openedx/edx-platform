@@ -86,6 +86,9 @@ urlpatterns = (
     url(r'^api/val/v0/', include('edxval.urls')),
 
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
+
+    # Grades API endpoints
+    url('^api/grades_api/', include('grades_api.urls', namespace='grades_api')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
