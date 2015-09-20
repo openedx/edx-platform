@@ -105,3 +105,14 @@ lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
+
+### IntelliJ ###
+/.idea
+*.iml
+
+### Eclipse ###
+/.settings
+/.project
+
+### Sass ###
+.sass-cache/
