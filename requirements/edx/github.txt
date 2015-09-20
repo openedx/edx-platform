@@ -64,3 +64,5 @@ git+https://github.com/edx/edx-proctoring.git@0.9.6b#egg=edx-proctoring==0.9.6b
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
 -e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
 
+# IONISx Grades API (REST)
+-e git+https://github.com/IONISx/edx-grades-api@v1.0.0#egg=edx-grades-api
