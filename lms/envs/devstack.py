@@ -237,6 +237,6 @@ FEATURES['ENABLE_RENDER_XBLOCK_API'] = True
 
 
 CACHES['lms.course_blocks'] = {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'KEY_FUNCTION': 'util.memcache.safe_key',
 }
