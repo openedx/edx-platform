@@ -31,67 +31,6 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             self._user_enrollments[user] = CourseEnrollment.enrollments_for_user(user)
         return self._user_enrollments[user]
 
-    def filter_dictionary(self, **kwargs):
-        """ LMS implementation, adds filtering by user partition, course id and user """
-
-        def get_group_for_user_partition(user_partition, course_key, user):
-            """ Returns the specified user's group for user partition """
-            if user_partition.scheme in SCHEME_SUPPORTS_ASSIGNMENT:
-                return user_partition.scheme.get_group_for_user(
-                    course_key,
-                    user,
-                    user_partition,
-                    assign=False,
-                )
-            else:
-                return user_partition.scheme.get_group_for_user(
-                    course_key,
-                    user,
-                    user_partition,
-                )
-
-        def get_group_ids_for_user(course, user):
-            """ Collect user partition group ids for user for this course """
-            partition_groups = []
-            for user_partition in course.user_partitions:
-                if user_partition.scheme in INCLUDE_SCHEMES:
-                    group = get_group_for_user_partition(user_partition, course.id, user)
-                    if group:
-                        partition_groups.append(group)
-            partition_group_ids = [unicode(partition_group.id) for partition_group in partition_groups]
-            return partition_group_ids if partition_group_ids else None
-
-        filter_dictionary = super(LmsSearchFilterGenerator, self).filter_dictionary(**kwargs)
-        if 'user' in kwargs:
-            user = kwargs['user']
-
-            if 'course_id' in kwargs and kwargs['course_id']:
-                try:
-                    course_key = CourseKey.from_string(kwargs['course_id'])
-                except InvalidKeyError:
-                    course_key = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
-
-                # Staff user looking at course as staff user
-                if get_user_role(user, course_key) in ('instructor', 'staff'):
-                    return filter_dictionary
-                # Need to check course exist (if course gets deleted enrollments don't get cleaned up)
-                course = modulestore().get_course(course_key)
-                if course:
-                    filter_dictionary['content_groups'] = get_group_ids_for_user(course, user)
-            else:
-                user_enrollments = self._enrollments_for_user(user)
-                content_groups = []
-                for enrollment in user_enrollments:
-                    course = modulestore().get_course(enrollment.course_id)
-                    if course:
-                        enrollment_group_ids = get_group_ids_for_user(course, user)
-                        if enrollment_group_ids:
-                            content_groups.extend(enrollment_group_ids)
-
-                filter_dictionary['content_groups'] = content_groups if content_groups else None
-
-        return filter_dictionary
-
     def field_dictionary(self, **kwargs):
         """ add course if provided otherwise add courses in which the user is enrolled in """
         field_dictionary = super(LmsSearchFilterGenerator, self).field_dictionary(**kwargs)
