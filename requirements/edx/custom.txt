@@ -4,7 +4,7 @@
 # github.txt as well. Deployments install custom.txt before github.txt and github.txt installs xblock-utils. This might
 # lead to installing an outdated version of xblock-utils and causing regressions. A note in github.txt is added to
 # keep xblock-utils version there in sync with this one.
--e git+https://github.com/edx/xblock-utils.git@25f15734ec8d29fde0e114bbd199fd48638865ae#egg=xblock-utils
+-e git+https://github.com/edx/xblock-utils.git@3b58c757f06943072b170654d676e95b9adb37b0#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@bd0b3f413ae7e8274985555adfd7de7af3eca84c#egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@21b9bcc4f2c7917463ab18a596161ac6c58c9c4a#egg=xblock-image-explorer
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
@@ -14,7 +14,7 @@
 -e git+https://github.com/edx-solutions/xblock-adventure.git@effa22006bb6528bc6d3788787466eb4e74e1161#egg=xblock-adventure
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@ca0e6eb4ef10c128d573c3cec015dcfee7984730#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@275b8354593048ecae3e06642985b702b81140cc#egg=edx-notifications
--e git+https://github.com/open-craft/problem-builder.git@6af171bbeca26de434c75105912b563906840b62#egg=problem-builder
+-e git+https://github.com/open-craft/problem-builder.git@eb1f83df58b22fc9ae81b4cfb0f7f15e3782373b#egg=problem-builder
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@648c357c2b57fe6fa5ff68a0c29e6e72f309b9ca#egg=xblock-group-project-v2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/edx-solutions/xblock.git@80d11e883cb0f4b554e1e566294cb7de383cffed#egg=xblock
