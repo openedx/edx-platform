@@ -195,7 +195,7 @@ FEATURES = {
     # Enable URL that shows information about the status of variuous services
     'ENABLE_SERVICE_STATUS': False,
 
-    # Toggle to indicate use of a custom theme
+    # Toggle to indicate use of the Stanford theming system
     'USE_CUSTOM_THEME': False,
 
     # Don't autoplay videos for students
@@ -450,6 +450,9 @@ ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
+
+# comprehensive theming system
+COMP_THEME_DIR = ""
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -1827,6 +1830,9 @@ INSTALLED_APPS = (
     'staticfiles',
     'static_replace',
 
+    # Theming
+    'openedx.core.djangoapps.theming',
+
     # Our courseware
     'circuit',
     'courseware',
@@ -2583,7 +2589,7 @@ PROFILE_IMAGE_BACKEND = {
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
-PROFILE_IMAGE_DEFAULT_FILENAME = 'images/default-theme/default-profile'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 # This secret key is used in generating unguessable URLs to users'
 # profile images.  Once it has been set, changing it will make the
