@@ -120,12 +120,12 @@ class _ContentSerializer(serializers.Serializer):
 
     def _get_user_label(self, user_id):
         """
-        Returns the role label (i.e. "staff" or "community_ta") for the user
+        Returns the role label (i.e. "Staff" or "Community TA") for the user
         with the given id.
         """
         return (
-            "staff" if user_id in self.context["staff_user_ids"] else
-            "community_ta" if user_id in self.context["ta_user_ids"] else
+            "Staff" if user_id in self.context["staff_user_ids"] else
+            "Community TA" if user_id in self.context["ta_user_ids"] else
             None
         )
 
@@ -283,7 +283,7 @@ class CommentSerializer(_ContentSerializer):
 
     def get_endorsed_by_label(self, obj):
         """
-        Returns the role label (i.e. "staff" or "community_ta") for the
+        Returns the role label (i.e. "Staff" or "Community TA") for the
         endorsing user
         """
         endorsement = obj.get("endorsement")
