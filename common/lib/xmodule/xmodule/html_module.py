@@ -71,7 +71,7 @@ class HtmlBlock(object):
         """
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
-        return self.data  
+        return self.data
 
 
 class HtmlModuleMixin(HtmlBlock, XModule):
@@ -98,6 +98,7 @@ class HtmlModule(HtmlModuleMixin):
     """
     Module for putting raw html in a course
     """
+
 
 class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: disable=abstract-method
     """

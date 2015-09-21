@@ -118,6 +118,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
 
     return url
 
+
 def local_resource_url(block, uri):
     """
     local_resource_url for Studio

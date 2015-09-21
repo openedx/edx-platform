@@ -21,7 +21,7 @@ class StudentViewTransformer(BlockStructureTransformer):
             block = block_structure.get_xblock(block_key)
 
             # We're iterating through descriptors (not bound to a user) that are
-            # given to us by the modulestore. The reason we look at 
+            # given to us by the modulestore. The reason we look at
             # block.__class__ is to avoid the XModuleDescriptor -> XModule
             # proxying that would happen if we just examined block directly,
             # since it's likely that student_view() is going to be defined on

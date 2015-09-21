@@ -6,7 +6,7 @@ from ..student_view import StudentViewTransformer
 
 
 class TestStudentViewTransformer(ModuleStoreTestCase):
-    
+
     def setUp(self):
         super(TestStudentViewTransformer, self).setUp()
         self.course_key = self.create_toy_course()
