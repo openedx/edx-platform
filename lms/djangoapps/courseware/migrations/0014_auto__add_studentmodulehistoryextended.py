@@ -10,10 +10,6 @@ csmh_db = dbs['student_module_history']
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
-        # Archive 'StudentModuleHistory'
-        default_db.rename_table('courseware_studentmodulehistory', 'courseware_studentmodulehistoryarchive')
-
         # Create a new 'StudentModuleHistory' with an extended key space
         csmh_db.create_table('courseware_studentmodulehistory', (
             ('id', self.gf('courseware.fields.UnsignedBigIntAutoField')(primary_key=True)),
@@ -55,7 +51,6 @@ class Migration(SchemaMigration):
         # This data will have to be manually cleaned up before the migration can be moved forward again.
 
         csmh_db.rename_table('courseware_studentmodulehistory', 'courseware_studentmodulehistory_extended_archive')
-        default_db.rename_table('courseware_studentmodulehistoryarchive', 'courseware_studentmodulehistory')
 
 
     models = {
@@ -138,7 +133,7 @@ class Migration(SchemaMigration):
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'courseware.studentmodulehistoryarchive': {
-            'Meta': {'object_name': 'StudentModuleHistoryArchive'},
+            'Meta': {'object_name': 'StudentModuleHistoryArchive', 'db_table': "'courseware_studentmodulehistory'"},
             'created': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'}),
             'grade': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
