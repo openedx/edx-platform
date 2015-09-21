@@ -26,7 +26,6 @@ from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
 from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
-log = logging.getLogger(__name__)
 
 log = logging.getLogger("edx.courseware")
 
