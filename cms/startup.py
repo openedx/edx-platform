@@ -13,6 +13,7 @@ from monkey_patch import django_utils_translation
 import xmodule.x_module
 import cms.lib.xblock.runtime
 
+
 def run():
     """
     Executed during django startup
