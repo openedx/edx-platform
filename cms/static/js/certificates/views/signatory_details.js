@@ -73,7 +73,6 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
                     actionableModel.save({}, {
                         success: function() {
                             actionableModel.setOriginalAttributes();
-                            self.model.setOriginalAttributes();
                             dfd.resolve();
                             self.closeSignatoryEditView();
                         }.bind(this)
