@@ -10,7 +10,7 @@ paver coverage
 # Send the coverage data to coveralls. Setting 'TRAVIS_BRANCH' allows the
 # data to be sorted by branch in the coveralls UI. The branch is passed as
 # a param to the coverage job on jenkins.
-pip install coveralls==1.0b1
+pip install coveralls==1.0
 COVERALLS_REPO_TOKEN=$1 TRAVIS_BRANCH=$2 coveralls
 
 # Get coverage reports for bok choy
