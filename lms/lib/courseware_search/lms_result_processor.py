@@ -46,7 +46,7 @@ class LmsSearchResultProcessor(SearchResultProcessor):
         return self._module_store
 
     def get_course_blocks(self, user):
-        """  """
+        """ fetch cached blocks for course - retain for subsequent use"""
         course_usage_key = self.get_course_usage_key()
         if course_usage_key not in self._course_blocks:
             self._course_blocks[course_usage_key] = get_course_blocks(user, course_usage_key)

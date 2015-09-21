@@ -3,20 +3,10 @@ Tests for the lms_filter_generator
 """
 from mock import patch, Mock
 
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
-
-from xmodule.partitions.partitions import Group, UserPartition
-from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
-from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
-from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
-from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
 
 
@@ -57,10 +47,6 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
             display_name="Week 1",
             publish_item=True,
         )
-
-        self.groups = [Group(1, 'Group 1'), Group(2, 'Group 2')]
-
-        self.content_groups = [1, 2]
 
     def setUp(self):
         super(LmsSearchFilterGeneratorTestCase, self).setUp()

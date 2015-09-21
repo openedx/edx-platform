@@ -5,15 +5,9 @@ This file contains implementation override of SearchFilterGenerator which will a
 from microsite_configuration import microsite
 
 from student.models import CourseEnrollment
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
-
 from search.filter_generator import SearchFilterGenerator
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
-from courseware.access import get_user_role
 
 
 INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
