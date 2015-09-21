@@ -29,7 +29,7 @@ from submissions.models import score_set, score_reset
 from courseware.fields import UnsignedBigIntAutoField
 from openedx.core.djangoapps.call_stack_manager import CallStackManager, CallStackMixin
 from xmodule_django.models import CourseKeyField, UsageKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
-log = logging.getLogger(__name__)
+
 
 log = logging.getLogger("edx.courseware")
 
