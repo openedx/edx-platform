@@ -137,13 +137,31 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
     search_fields = ('course_id', 'mode', 'user__username',)
-    readonly_fields = ('course_id', 'mode', 'user',)
+
+    def get_readonly_fields(self, request, obj=None):
+        # The course_id, mode, and user fields should not be editable for an existing enrollment.
+        if obj:
+            return self.readonly_fields + ('course_id', 'mode', 'user',)
+        return self.readonly_fields
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEnrollment
 
 
-admin.site.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    """ Admin interface for UserProfile model. """
+    list_display = ('user', 'name',)
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
+
+    def get_readonly_fields(self, request, obj=None):
+        # The user field should not be editable for an existing user profile.
+        if obj:
+            return self.readonly_fields + ('user',)
+        return self.readonly_fields
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = UserProfile
+
 
 admin.site.register(UserTestGroup)
 
@@ -160,3 +178,5 @@ admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
 
 admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)
+
+admin.site.register(UserProfile, UserProfileAdmin)
