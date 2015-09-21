@@ -31,7 +31,7 @@ dependencies:
     - pip install -r requirements/edx/base.txt
     - if [ -e requirements/edx/post.txt ]; then pip install -r requirements/edx/post.txt ; fi
 
-    - pip install coveralls
+    - pip install coveralls==1.0
 
 test:
   override:
