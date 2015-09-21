@@ -12,7 +12,6 @@ from xmodule.modulestore.django import modulestore
 from lms.djangoapps.course_blocks.api import get_course_blocks
 
 
-
 class LmsSearchResultProcessor(SearchResultProcessor):
 
     """ SearchResultProcessor for LMS Search """
