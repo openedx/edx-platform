@@ -63,6 +63,11 @@ function(_, str, Backbone, BackboneRelational, gettext) {
         setOriginalAttributes: function() {
             // Remember the current state of this model (enables edit->cancel use cases)
             this._originalAttributes = this.parse(this.toJSON());
+        },
+
+        reset: function() {
+            // Revert the attributes of this model instance back to initial state
+            this.set(this._originalAttributes, { parse: true, validate: true });
         }
     });
     return Signatory;
