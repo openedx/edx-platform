@@ -8,7 +8,8 @@ define([ // jshint ignore:line
     'js/views/baseview',
     'js/certificates/models/signatory',
     'js/certificates/views/signatory_details',
-    'common/js/components/utils/view_utils'
+    'common/js/components/utils/view_utils',
+    'jquery.smoothScroll'
 ],
 function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils) {
     'use strict';
@@ -72,7 +73,11 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
             if(this.model.collection.length > 0 && window.certWebPreview) {
                 window.certWebPreview.show();
             }
-
+            $.smoothScroll({
+                offset: 0,
+                easing: 'swing',
+                speed: 1000
+            });
             return this;
         }
     });

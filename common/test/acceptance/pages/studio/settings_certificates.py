@@ -11,6 +11,7 @@ The methods in these classes are organized into several conceptual buckets:
 import os
 
 from bok_choy.promise import EmptyPromise
+from ...tests.helpers import disable_animations
 from .course_page import CoursePage
 from common.test.acceptance.tests.helpers import disable_animations
 
@@ -287,6 +288,7 @@ class Certificate(object):
         """
         Create a new certificate.
         """
+        disable_animations(self.page)
         self.find_css('.action-primary').first.click()
         self.page.wait_for_ajax()
 

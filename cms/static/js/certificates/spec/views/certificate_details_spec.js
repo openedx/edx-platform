@@ -174,6 +174,12 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.view.$('.action-delete .delete').click();
             });
 
+            it('should scroll to top after rendering if necessary', function () {
+                $.smoothScroll = jasmine.createSpy('jQuery.smoothScroll');
+                appendSetFixtures(this.view.render().el);
+                expect($.smoothScroll).toHaveBeenCalled();
+            });
+
         });
 
         describe('Signatory details', function(){
