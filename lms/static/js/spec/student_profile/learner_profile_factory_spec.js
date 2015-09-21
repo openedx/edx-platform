@@ -42,15 +42,12 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
             };
 
-            it("renders the full profile after data is successfully fetched", function() {
+            it("renders the full profile for a user", function() {
 
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true),
                     learnerProfileView = context.learnerProfileView;
-
-                AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
-                AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
 
                 // sets the profile for full view.
                 context.accountPreferencesModel.set({account_privacy: 'all_users'});

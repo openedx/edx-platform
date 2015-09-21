@@ -162,16 +162,18 @@ define([
 
                 this.collection.performSearch('old search');
                 this.collection.performSearch('new search');
+                AjaxHelpers.skipResetRequest(requests);
                 AjaxHelpers.respondWithJson(requests, response);
                 expect(this.onSearch.calls.length).toEqual(1);
 
                 this.collection.performSearch('old search');
                 this.collection.cancelSearch();
-                AjaxHelpers.respondWithJson(requests, response);
+                AjaxHelpers.skipResetRequest(requests);
                 expect(this.onSearch.calls.length).toEqual(1);
 
                 this.collection.loadNextPage();
                 this.collection.loadNextPage();
+                AjaxHelpers.skipResetRequest(requests);
                 AjaxHelpers.respondWithJson(requests, response);
                 expect(this.onNext.calls.length).toEqual(1);
             });

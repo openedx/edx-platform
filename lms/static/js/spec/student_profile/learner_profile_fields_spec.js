@@ -110,6 +110,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     // Verify image upload progress message
                     verifyImageUploadButtonMessage(imageView, true);
 
+                    // Respond to the analytics event
+                    AjaxHelpers.respondWithJson(requests, {});
+
                     // Verify if POST request received for image upload
                     AjaxHelpers.expectRequest(requests, 'POST', Helpers.IMAGE_UPLOAD_API_URL, new FormData());
 
@@ -277,6 +280,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                     // Verify image upload progress message
                     verifyImageUploadButtonMessage(imageView, true);
+
+                    // Respond to the analytics event
+                    AjaxHelpers.respondWithJson(requests, {});
 
                     // Verify if POST request received for image upload
                     AjaxHelpers.expectRequest(requests, 'POST', Helpers.IMAGE_UPLOAD_API_URL, new FormData());

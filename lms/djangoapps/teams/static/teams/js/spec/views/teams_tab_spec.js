@@ -174,7 +174,7 @@ define([
                         userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})
                     });
                 teamsTabView.router.navigate(url, {trigger: true});
-                if (requests.length) {
+                if (AjaxHelpers.currentRequest(requests)) {
                     AjaxHelpers.respondWithJson(requests, {});
                 }
                 expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', expectedEvent);
@@ -229,24 +229,22 @@ define([
                     text_search: 'foo'
                 });
                 AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamsResponse({results: []}));
+
+                // Expect exactly one search request to be fired
+                AjaxHelpers.expectNoRequests(requests);
             };
 
             it('can search teams', function () {
-                var teamsTabView = createTeamsTabView(this),
-                    requestCountBeforeSearch;
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 verifyTeamsRequest({
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
                 AjaxHelpers.respondWithJson(requests, {});
-                requestCountBeforeSearch = requests.length;
                 performSearch(requests, teamsTabView);
                 expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
                 expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
-
-                // Expect exactly one search request to be fired
-                expect(requests.length).toBe(requestCountBeforeSearch + 1);
             });
 
             it('can clear a search', function () {
