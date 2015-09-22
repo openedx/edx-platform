@@ -44,8 +44,8 @@ def run():
 
     # Initialize Segment.io analytics module. Flushes first time a message is received and
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
-        analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
+    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY') and settings.SEGMENT_IO_LMS_KEY:  # pylint: disable=line-too-long
+        analytics.write_key = settings.SEGMENT_IO_LMS_KEY
 
     # register any dependency injections that we need to support in edx_proctoring
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
