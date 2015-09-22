@@ -220,9 +220,8 @@ class OrderTest(ModuleStoreTestCase):
         self.assertEqual(item.status, status)
 
     @override_settings(
-        SEGMENT_IO_LMS_KEY="foobar",
+        SEGMENT_KEY="foobar",
         FEATURES={
-            'SEGMENT_IO_LMS': True,
             'STORE_BILLING_INFO': True,
         }
     )
@@ -884,9 +883,8 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
     @override_settings(
-        SEGMENT_IO_LMS_KEY="foobar",
+        SEGMENT_KEY="foobar",
         FEATURES={
-            'SEGMENT_IO_LMS': True,
             'STORE_BILLING_INFO': True,
         }
     )
@@ -926,9 +924,8 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertEquals(target_certs[0].order.status, 'purchased')
 
     @override_settings(
-        SEGMENT_IO_LMS_KEY="foobar",
+        SEGMENT_KEY="foobar",
         FEATURES={
-            'SEGMENT_IO_LMS': True,
             'STORE_BILLING_INFO': True,
         }
     )

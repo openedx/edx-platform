@@ -146,7 +146,7 @@ selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
 
-# Used for Segment.io analytics
+# Used for Segment analytics
 analytics-python==1.1.0
 
 # Needed for mailchimp(mailing djangoapp)

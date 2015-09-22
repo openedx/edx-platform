@@ -94,7 +94,6 @@ GIT_IMPORT_STATIC = True
 META_UNIVERSITIES = {}
 DATADOG = {}
 EMAIL_FILE_PATH = None
-SEGMENT_IO_LMS = False
 
 MONGODB_LOG = {}
 SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
@@ -282,8 +281,6 @@ vars().update(AUTH_TOKENS)
 ##########################################
 # Manipulate imported settings with code
 #
-
-FEATURES['SEGMENT_IO_LMS'] = SEGMENT_IO_LMS
 
 if AWS_ACCESS_KEY_ID == "":
     AWS_ACCESS_KEY_ID = None

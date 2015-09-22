@@ -919,7 +919,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
-    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    @override_settings(CERT_QUEUE='certificates', SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
@@ -965,7 +965,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertIn("Certificate is being created.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
-    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    @override_settings(CERT_QUEUE='certificates', SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate
         # then json will return cert generating message with bad request code
