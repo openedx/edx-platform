@@ -12,7 +12,7 @@ import HTMLParser
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from staticfiles import finders
+from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
