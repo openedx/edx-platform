@@ -144,7 +144,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "user_id": str(self.author.id),
             "username": self.author.username,
             "read": True,
-            "endorsed": True
+            "endorsed": True,
+            "resp_total": 0,
         }
         merged_overrides.update(overrides)
         return make_minimal_cs_thread(merged_overrides)
@@ -179,7 +180,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "comments_count": 5,
             "unread_comments_count": 3,
             "read": False,
-            "endorsed": False
+            "endorsed": False,
+            "response_count": None,
         }
         expected = {
             "id": "test_thread",
@@ -208,7 +210,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "voted"],
             "read": False,
-            "has_endorsed": False
+            "has_endorsed": False,
+            "response_count": None,
         }
         self.assertEqual(self.serialize(thread), expected)
 
@@ -247,6 +250,12 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.register_get_user_response(self.user, subscribed_thread_ids=[thread_id])
         serialized = self.serialize(self.make_cs_content({"id": thread_id}))
         self.assertEqual(serialized["following"], True)
+
+    def test_response_count(self):
+        thread_data = self.make_cs_content({"resp_total": 2})
+        self.register_get_thread_response(thread_data)
+        serialized = self.serialize(Thread(id=thread_data["id"]))
+        self.assertEqual(serialized["response_count"], 2)
 
 
 @ddt.ddt
