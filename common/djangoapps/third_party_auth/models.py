@@ -178,7 +178,16 @@ class OAuth2ProviderConfig(ProviderConfig):
         )
     )
     key = models.TextField(blank=True, verbose_name="Client ID")
-    secret = models.TextField(blank=True, verbose_name="Client Secret")
+    secret = models.TextField(
+        blank=True,
+        verbose_name="Client Secret",
+        help_text=(
+            'For increased security, you can avoid storing this in your database by leaving '
+            ' this field blank and setting '
+            'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '
+            'in your instance\'s Django settings (or lms.auth.json)'
+        )
+    )
     other_settings = models.TextField(blank=True, help_text="Optional JSON object with advanced settings, if any.")
 
     class Meta(object):  # pylint: disable=missing-docstring
@@ -192,8 +201,13 @@ class OAuth2ProviderConfig(ProviderConfig):
 
     def get_setting(self, name):
         """ Get the value of a setting, or raise KeyError """
-        if name in ("KEY", "SECRET"):
-            return getattr(self, name.lower())
+        if name == "KEY":
+            return self.key
+        if name == "SECRET":
+            if self.secret:
+                return self.secret
+            # To allow instances to avoid storing secrets in the DB, the secret can also be set via Django:
+            return getattr(settings, 'SOCIAL_AUTH_OAUTH_SECRETS', {}).get(self.backend_name, '')
         if self.other_settings:
             other_settings = json.loads(self.other_settings)
             assert isinstance(other_settings, dict), "other_settings should be a JSON object (dictionary)"
@@ -310,10 +324,22 @@ class SAMLConfiguration(ConfigurationModel):
         help_text=(
             'To generate a key pair as two files, run '
             '"openssl req -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.key". '
-            'Paste the contents of saml.key here.'
-        )
+            'Paste the contents of saml.key here. '
+            'For increased security, you can avoid storing this in your database by leaving '
+            'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PRIVATE_KEY setting '
+            'in your instance\'s Django settings (or lms.auth.json).'
+        ),
+        blank=True,
     )
-    public_key = models.TextField(help_text="Public key certificate.")
+    public_key = models.TextField(
+        help_text=(
+            'Public key certificate. '
+            'For increased security, you can avoid storing this in your database by leaving '
+            'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PUBLIC_CERT setting '
+            'in your instance\'s Django settings (or lms.auth.json).'
+        ),
+        blank=True,
+    )
     entity_id = models.CharField(max_length=255, default="http://saml.example.com", verbose_name="Entity ID")
     org_info_str = models.TextField(
         verbose_name="Organization Info",
@@ -360,14 +386,23 @@ class SAMLConfiguration(ConfigurationModel):
         if name == "SP_ENTITY_ID":
             return self.entity_id
         if name == "SP_PUBLIC_CERT":
-            return self.public_key
+            if self.public_key:
+                return self.public_key
+            # To allow instances to avoid storing keys in the DB, the key pair can also be set via Django:
+            return getattr(settings, 'SOCIAL_AUTH_SAML_SP_PUBLIC_CERT', '')
         if name == "SP_PRIVATE_KEY":
-            return self.private_key
-        if name == "TECHNICAL_CONTACT":
-            return {"givenName": "Technical Support", "emailAddress": settings.TECH_SUPPORT_EMAIL}
-        if name == "SUPPORT_CONTACT":
-            return {"givenName": "SAML Support", "emailAddress": settings.TECH_SUPPORT_EMAIL}
+            if self.private_key:
+                return self.private_key
+            # To allow instances to avoid storing keys in the DB, the private key can also be set via Django:
+            return getattr(settings, 'SOCIAL_AUTH_SAML_SP_PRIVATE_KEY', '')
         other_config = json.loads(self.other_config_str)
+        if name in ("TECHNICAL_CONTACT", "SUPPORT_CONTACT"):
+            contact = {
+                "givenName": "{} Support".format(settings.PLATFORM_NAME),
+                "emailAddress": settings.TECH_SUPPORT_EMAIL
+            }
+            contact.update(other_config.get(name, {}))
+            return contact
         return other_config[name]  # SECURITY_CONFIG, SP_EXTRA, or similar extra settings
 
 

@@ -114,6 +114,15 @@ class SAMLTestCase(TestCase):
         with open(os.path.join(os.path.dirname(__file__), 'data', filename)) as f:
             return f.read()
 
+    def enable_saml(self, **kwargs):
+        """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
+        if 'private_key' not in kwargs:
+            kwargs['private_key'] = self._get_private_key()
+        if 'public_key' not in kwargs:
+            kwargs['public_key'] = self._get_public_key()
+        kwargs.setdefault('entity_id', "https://saml.example.none")
+        super(SAMLTestCase, self).enable_saml(**kwargs)
+
 
 @contextmanager
 def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=None, username=None):
