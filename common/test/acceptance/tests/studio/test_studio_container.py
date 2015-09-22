@@ -384,9 +384,16 @@ class EditVisibilityModalTest(ContainerBase):
         """
         Verify that we see validation errors for the given component.
         """
-        self.assertTrue(component.has_validation_error)
-        self.assertEqual(component.validation_error_text, self.VALIDATION_ERROR_LABEL)
-        self.assertEqual([self.VALIDATION_ERROR_MESSAGE], component.validation_error_messages)
+        def check_func():
+            """
+            Check that the validation error is present and has expected text.
+            """
+            error_present = component.has_validation_error
+            correct_label = (component.validation_error_text == self.VALIDATION_ERROR_LABEL)
+            correct_msg = ([self.VALIDATION_ERROR_MESSAGE] == component.validation_error_messages)
+            return error_present and correct_label and correct_msg
+
+        self.container_page.wait_for(check_func, "Expected validation error")
 
     def verify_visibility_set(self, component, is_set):
         """
