@@ -94,11 +94,11 @@ class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         self.assertEqual(actual_serialized_anonymous, expected_serialized_anonymous)
 
     @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, False, "staff"),
+        (FORUM_ROLE_ADMINISTRATOR, False, "Staff"),
         (FORUM_ROLE_ADMINISTRATOR, True, None),
-        (FORUM_ROLE_MODERATOR, False, "staff"),
+        (FORUM_ROLE_MODERATOR, False, "Staff"),
         (FORUM_ROLE_MODERATOR, True, None),
-        (FORUM_ROLE_COMMUNITY_TA, False, "community_ta"),
+        (FORUM_ROLE_COMMUNITY_TA, False, "Community TA"),
         (FORUM_ROLE_COMMUNITY_TA, True, None),
         (FORUM_ROLE_STUDENT, False, None),
         (FORUM_ROLE_STUDENT, True, None),
@@ -108,7 +108,7 @@ class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         """
         Test correctness of the author_label field.
 
-        The label should be "staff", "staff", or "community_ta" for the
+        The label should be "Staff", "Staff", or "Community TA" for the
         Administrator, Moderator, and Community TA roles, respectively, but
         the label should not be present if the content is anonymous.
 
@@ -352,9 +352,9 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         self.assertEqual(actual_endorser_anonymous, expected_endorser_anonymous)
 
     @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, "staff"),
-        (FORUM_ROLE_MODERATOR, "staff"),
-        (FORUM_ROLE_COMMUNITY_TA, "community_ta"),
+        (FORUM_ROLE_ADMINISTRATOR, "Staff"),
+        (FORUM_ROLE_MODERATOR, "Staff"),
+        (FORUM_ROLE_COMMUNITY_TA, "Community TA"),
         (FORUM_ROLE_STUDENT, None),
     )
     @ddt.unpack
@@ -362,7 +362,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         """
         Test correctness of the endorsed_by_label field.
 
-        The label should be "staff", "staff", or "community_ta" for the
+        The label should be "Staff", "Staff", or "Community TA" for the
         Administrator, Moderator, and Community TA roles, respectively.
 
         role_name is the name of the author's role.
