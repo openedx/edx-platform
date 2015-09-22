@@ -677,7 +677,7 @@
         .wrapper-signature-image {
           display: block;
           width: 375px;
-          height: 200px;
+          line-height: 200px;
           overflow: hidden;
           margin: 0 auto;
           border: 1px solid $gray-l4;
@@ -687,9 +687,9 @@
         }
 
         .signature-image {
-          display: block;
+          vertical-align: middle;
           width: 100%;
-          min-height: 100%;
+          max-height: 100%;
         }
       }
     }
