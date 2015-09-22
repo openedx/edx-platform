@@ -100,7 +100,7 @@
         withDisabledElement = function(event, callback, self) {
             event.preventDefault();
             disableElementWhileRunning($(event.currentTarget), function() {
-                return callback.apply(self, []);
+                return self[callback].apply(self, []);
             });
         };
  

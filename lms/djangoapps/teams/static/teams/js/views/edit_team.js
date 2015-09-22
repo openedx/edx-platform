@@ -15,7 +15,7 @@
                 maxTeamDescriptionLength: 300,
 
                 events: {
-                    'click .action-primary': function(event) {ViewUtils.withDisabledElement(event, this.createOrUpdateTeam, this);},
+                    'click .action-primary': ViewUtils.withDisabledElement(event, 'createOrUpdateTeam', this),
                     'submit form': 'createOrUpdateTeam',
                     'click .action-cancel': 'cancelAndGoBack'
                 },
