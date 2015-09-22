@@ -1,5 +1,5 @@
 """
-Serializers for all Course Blocks related return objects.
+Serializers for Course Blocks related return objects.
 """
 from rest_framework import serializers
 from rest_framework.reverse import reverse
