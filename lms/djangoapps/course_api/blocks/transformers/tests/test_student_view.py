@@ -1,5 +1,4 @@
 from openedx.core.lib.block_cache.block_structure import BlockStructureFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..student_view import StudentViewTransformer

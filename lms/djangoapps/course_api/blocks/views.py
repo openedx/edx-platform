@@ -111,7 +111,7 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
         """
         requested_params = request.GET.copy()
         requested_params.update({'usage_key': usage_key_string})
-        params = BlockListGetForm(requested_params, initial={'request': request})
+        params = BlockListGetForm(requested_params, initial={'requesting_user': request.user})
         if not params.is_valid():
             raise ValidationError(params.errors)
 
