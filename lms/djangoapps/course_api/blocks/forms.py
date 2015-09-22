@@ -47,7 +47,7 @@ class BlockListGetForm(Form):
         try:
             return int(value)
         except ValueError:
-            raise ValidationError("'{}' is not a valid depth value".format(value))
+            raise ValidationError("'{}' is not a valid depth value.".format(value))
 
     def clean_usage_key(self):
         usage_key = self.cleaned_data['usage_key']
@@ -56,7 +56,7 @@ class BlockListGetForm(Form):
             usage_key = UsageKey.from_string(usage_key)
             usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid usage key".format(unicode(usage_key)))
+            raise ValidationError("'{}' is not a valid usage key.".format(unicode(usage_key)))
 
         return usage_key
 
@@ -74,7 +74,7 @@ class BlockListGetForm(Form):
 
         # validate and set user
         requested_username = cleaned_data.get('user', '')
-        requesting_user = self.initial['request'].user
+        requesting_user = self.initial['requesting_user']
 
         if requesting_user.username.lower() == requested_username.lower():
             cleaned_data['user'] = requesting_user
