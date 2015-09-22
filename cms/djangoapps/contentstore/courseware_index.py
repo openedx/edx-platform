@@ -7,7 +7,7 @@ import re
 from six import add_metaclass
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy, ugettext as _
 from django.core.urlresolvers import resolve
 
 from contentstore.utils import course_image_url
@@ -350,7 +350,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         'category': 'courseware_index'
     }
 
-    UNNAMED_MODULE_NAME = _("(Unnamed)")
+    UNNAMED_MODULE_NAME = ugettext_lazy("(Unnamed)")
 
     @classmethod
     def normalize_structure_key(cls, structure_key):
@@ -417,7 +417,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         while parent is not None:
             path_component_name = parent.display_name
             if not path_component_name:
-                path_component_name = cls.UNNAMED_MODULE_NAME
+                path_component_name = unicode(cls.UNNAMED_MODULE_NAME)
             location_path.append(path_component_name)
             parent = parent.get_parent()
         location_path.reverse()
