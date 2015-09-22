@@ -5,7 +5,6 @@ import mock
 from mock import patch
 from django.core.management import call_command, CommandError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from common.test.utils import nostderr
 from opaque_keys.edx.keys import CourseKey
 from teams.tests.factories import CourseTeamFactory
 from teams.search_indexes import CourseTeamIndexer
@@ -32,23 +31,20 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments. """
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments .*"):
-                call_command('reindex_course_team')
+        with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments .*"):
+            call_command('reindex_course_team')
 
     def test_teams_search_flag_disabled_raises_command_error(self):
         """ Test that raises CommandError for disabled feature flag. """
         with mock.patch('django.conf.settings.FEATURES') as features:
             features.return_value = {"ENABLE_TEAMS": False}
-            with self.assertRaises(SystemExit), nostderr():
-                with self.assertRaisesRegexp(CommandError, ".* ENABLE_TEAMS must be enabled .*"):
-                    call_command('reindex_course_team')
+            with self.assertRaisesRegexp(CommandError, ".* ENABLE_TEAMS must be enabled .*"):
+                call_command('reindex_course_team')
 
     def test_given_invalid_team_id_raises_command_error(self):
         """ Test that raises CommandError for invalid team id. """
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(CommandError, ".* Argument {0} is not a course_team id .*"):
-                call_command('reindex_course_team', u'team4')
+        with self.assertRaisesRegexp(CommandError, ".* Argument {0} is not a course_team id .*"):
+            call_command('reindex_course_team', u'team4')
 
     @patch.object(CourseTeamIndexer, 'index')
     def test_single_team_id(self, mock_index):

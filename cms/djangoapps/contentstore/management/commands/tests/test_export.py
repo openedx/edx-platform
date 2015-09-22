@@ -25,10 +25,8 @@ class TestArgParsingCourseExport(unittest.TestCase):
         Test export command with no arguments
         """
         errstring = "export requires two arguments: <course id> <output path>"
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, errstring):
-                call_command('export')
-        self.assertEqual(ex.exception.code, 1)
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('export')
 
 
 @ddt.ddt
@@ -60,10 +58,8 @@ class TestCourseExport(ModuleStoreTestCase):
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key 'InvalidCourseID'."
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, errstring):
-                call_command('export', "InvalidCourseID", self.temp_dir_1)
-        self.assertEqual(ex.exception.code, 1)
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('export', "InvalidCourseID", self.temp_dir_1)
 
         # Test `export` management command with correct course_id
         for output_dir in [self.temp_dir_1, self.temp_dir_2]:
@@ -74,7 +70,5 @@ class TestCourseExport(ModuleStoreTestCase):
         Test export command with a valid course key that doesn't exist
         """
         errstring = "Course with x/y/z key not found."
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, errstring):
-                call_command('export', "x/y/z", self.temp_dir_1)
-        self.assertEqual(ex.exception.code, 1)
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('export', "x/y/z", self.temp_dir_1)
