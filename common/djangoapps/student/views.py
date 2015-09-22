@@ -1548,7 +1548,7 @@ def create_account_with_params(request, params):
     )
 
     # Perform operations within a transaction that are critical to account creation
-    with transaction.commit_on_success():
+    with transaction.atomic():
         # first, create the account
         (user, profile, registration) = _do_create_account(form)
 

@@ -125,7 +125,7 @@ def _get_overrides_for_ccx(ccx):
     return overrides_cache[ccx]
 
 
-@transaction.commit_on_success
+@transaction.atomic
 def override_field_for_ccx(ccx, block, name, value):
     """
     Overrides a field for the `ccx`.  `block` and `name` specify the block

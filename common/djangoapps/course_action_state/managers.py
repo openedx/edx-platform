@@ -55,7 +55,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
     """
 
     # add transaction protection to revert changes by get_or_create if an exception is raised before the final save.
-    @transaction.commit_on_success
+    @transaction.atomic
     def update_state(
             self, course_key, new_state, should_display=True, message="", user=None, allow_not_found=False, **kwargs
     ):
