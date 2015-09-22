@@ -83,6 +83,10 @@ def should_show_debug_toolbar(_):
     return True  # We always want the toolbar on devstack regardless of IP, auth, etc.
 
 
+################################ TOTA11Y ################################
+INSTALLED_APPS += ('tota11y',)
+MIDDLEWARE_CLASSES += ('tota11y.middleware.Tota11yMiddleware',)
+
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
