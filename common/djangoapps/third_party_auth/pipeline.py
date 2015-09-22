@@ -501,13 +501,13 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
         # choice of the user.
 
 
-def redirect_to_custom_form(auth_entry, user_details):
+def redirect_to_custom_form(request, auth_entry, user_details):
     """
     If auth_entry is found in AUTH_ENTRY_CUSTOM, this is used to send provider
     data to an external server's registration/login page.
 
-    The data is sent as a base64-encoded GET parameter and includes a
-    cryptographic checksum in case the integrity of the data is important.
+    The data is sent as a base64-encoded values in a POST request and includes
+    a cryptographic checksum in case the integrity of the data is important.
     """
     form_info = AUTH_ENTRY_CUSTOM[auth_entry]
     secret_key = form_info['secret_key']
@@ -518,12 +518,14 @@ def redirect_to_custom_form(auth_entry, user_details):
         "user_details": user_details
     })
     digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
-    query_data = urllib.urlencode({
+    # Store the data in the session temporarily, then redirect to a page that will POST it to
+    # the custom login/register page.
+    request.session['tpa_custom_auth_entry_data'] = {
         'data': base64.b64encode(data_str),
         'hmac': base64.b64encode(digest),
-    })
-    sep = '?' if '?' not in custom_form_url else '&'
-    return redirect(custom_form_url + sep + query_data)
+        'post_url': custom_form_url,
+    }
+    return redirect(reverse('tpa_post_to_custom_auth_form'))
 
 
 @partial.partial
@@ -591,7 +593,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
             # Pass the username, email, etc. via query params to the custom entry page:
-            return redirect_to_custom_form(auth_entry, kwargs['details'])
+            return redirect_to_custom_form(strategy.request, auth_entry, kwargs['details'])
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
 

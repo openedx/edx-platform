@@ -11,7 +11,6 @@ from social.exceptions import AuthException
 from student.tests.factories import UserFactory
 from third_party_auth import pipeline
 from third_party_auth.tests.specs import base
-from urlparse import urlparse, parse_qs
 
 
 class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
@@ -73,11 +72,12 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
             response = self.client.get(complete_url)
         # This should redirect to the custom login/register form:
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'][:50], 'http://testserver/misc/my-custom-registration-form')
-        redirect_query = parse_qs(urlparse(response['Location']).query)
-        self.assertIn('data', redirect_query)
-        self.assertIn('hmac', redirect_query)
-        data_decoded = base64.b64decode(redirect_query['data'][0])
+        self.assertEqual(response['Location'], 'http://testserver/auth/custom_auth_entry')
+
+        response = self.client.get(response['Location'])
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('action="/misc/my-custom-registration-form" method="post"', response.content)
+        data_decoded = base64.b64decode(response.context['data'])  # pylint: disable=no-member
         data_parsed = json.loads(data_decoded)
         # The user's details get passed to the custom page as a base64 encoded query parameter:
         self.assertEqual(data_parsed, {
@@ -92,7 +92,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         # Check the hash that is used to confirm the user's data in the GET parameter is correct
         secret_key = settings.THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS['custom1']['secret_key']
         hmac_expected = hmac.new(secret_key, msg=data_decoded, digestmod=hashlib.sha256).digest()
-        self.assertEqual(base64.b64decode(redirect_query['hmac'][0]), hmac_expected)
+        self.assertEqual(base64.b64decode(response.context['hmac']), hmac_expected)  # pylint: disable=no-member
 
         # Now our custom registration form creates or logs in the user:
         email, password = data_parsed['user_details']['email'], 'random_password'
