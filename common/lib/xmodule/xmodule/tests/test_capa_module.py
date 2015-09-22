@@ -2546,7 +2546,7 @@ class TestProblemCheckTracking(unittest.TestCase):
             },
             factory.answer_key(3): {
                 'question': '',
-                'answer': u'<text>a table</text>',
+                'answer': u'\n        <text>a table</text>\n      ',
                 'response_type': 'multiplechoiceresponse',
                 'input_type': 'choicegroup',
                 'correct': False,
