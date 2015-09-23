@@ -77,7 +77,6 @@ Shapely==1.2.16
 singledispatch==3.4.0.2
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
-South==1.0.1
 stevedore==0.14.1
 sure==1.2.3
 sympy==0.7.1
