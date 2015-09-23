@@ -195,13 +195,12 @@ class UserPartitionTransformer(BlockStructureTransformer):
 
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
 
-        if not user_partitions or user_info.has_staff_access:
+        if not user_partitions:
             return
 
         user_groups = get_user_partition_groups(
             user_info.course_key, user_partitions, user_info.user
         )
-        # TODO test this when deserializing across processes
         block_structure.remove_block_if(
             lambda block_key: not block_structure.get_transformer_block_data(
                 block_key, self, 'merged_group_access'

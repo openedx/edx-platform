@@ -23,26 +23,32 @@ LMS_COURSE_TRANSFORMERS = [
 ]
 
 
-_cache = None
+_COURSE_BLOCKS_CACHE = None
 
 
 def _get_cache():
-    global _cache
-    if not _cache:
-        _cache = get_cache('lms.course_blocks')
-    return _cache
+    global _COURSE_BLOCKS_CACHE
+    if not _COURSE_BLOCKS_CACHE:
+        _COURSE_BLOCKS_CACHE = get_cache('lms.course_blocks')
+    return _COURSE_BLOCKS_CACHE
 
 
 def get_course_blocks(
-        user,
-        root_usage_key,
-        transformers=LMS_COURSE_TRANSFORMERS,
+    user,
+    root_usage_key=None,
+    course_key=None,
+    transformers=None,
 ):
+    store = modulestore()
+
     if transformers is None:
         transformers = LMS_COURSE_TRANSFORMERS
 
+    if root_usage_key is None:
+        root_usage_key = store.make_course_usage_key(course_key)
+
     return get_blocks(
-        _get_cache(), modulestore(), CourseUserInfo(root_usage_key.course_key, user), root_usage_key, transformers,
+        _get_cache(), store, CourseUserInfo(root_usage_key.course_key, user), root_usage_key, transformers,
     )
 
 
