@@ -1603,10 +1603,28 @@ def create_account_with_params(request, params):
     # Track the user's registration
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(user.id, {
-            'email': user.email,
-            'username': user.username,
-        })
+        identity_args = [
+            user.id,  # pylint: disable=no-member
+            {
+                'email': user.email,
+                'username': user.username,
+                'name': profile.name,
+                'age': profile.age,
+                'education': profile.level_of_education_display,
+                'address': profile.mailing_address,
+                'gender': profile.gender_display,
+                'country': profile.country,
+            }
+        ]
+
+        if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
+            identity_args.append({
+                "MailChimp": {
+                    "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
+                }
+            })
+
+        analytics.identify(*identity_args)
 
         analytics.track(
             user.id,
