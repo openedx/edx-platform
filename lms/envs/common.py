@@ -2196,10 +2196,6 @@ PASSWORD_COMPLEXITY = {"UPPER": 1, "LOWER": 1, "DIGITS": 1}
 PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
 PASSWORD_DICTIONARY = []
 
-##################### LinkedIn #####################
-INSTALLED_APPS += ('django_openid_auth',)
-
-
 ############################ ORA 2 ############################################
 
 # By default, don't use a file prefix
