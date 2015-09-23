@@ -112,6 +112,7 @@ END
 
     "js-unit")
         paver test_js --coverage
+        paver coverage
         ;;
 
     "commonlib-js-unit")
