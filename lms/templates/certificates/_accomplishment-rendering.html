@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.template.defaultfilters import linebreaks %>
 <%namespace name='static' file='../static_content.html'/>
 <%
 course_mode_class = course_mode if course_mode else ''
@@ -50,7 +51,7 @@ course_mode_class = course_mode if course_mode else ''
 
                                     <h4 class="signatory-name hd-5">${signatory['name']}</h4>
                                     <p class="signatory-credentials copy copy-micro">
-                                        <span class="role">${signatory['title']}</span>
+                                        <span class="role">${signatory['title']|linebreaks}</span>
                                         <span class="organization">${signatory['organization']}</span>
                                     </p>
                                 </div>

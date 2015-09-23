@@ -51,6 +51,12 @@ class CertificatesPage(CoursePage):
 
         return True
 
+    def get_first_signatory_title(self):
+        """
+        Return signatory title for the first signatory in certificate.
+        """
+        return self.q(css='.signatory-title-value').first.html[0]
+
     ################
     # Properties
     ################
