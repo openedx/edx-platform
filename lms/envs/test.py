@@ -129,8 +129,6 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
 
-############################ STATIC FILES #############################
-
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -148,9 +146,7 @@ STATICFILES_DIRS += [
 # find pipelined assets will raise a ValueError.
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
-
-# Don't use compression during tests
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_ENABLED = False
 
 update_module_store_settings(
     MODULESTORE,

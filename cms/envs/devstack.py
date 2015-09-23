@@ -34,13 +34,12 @@ FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
-PIPELINE_ENABLED = False
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
 ]
 
 ############################# ADVANCED COMPONENTS #############################
