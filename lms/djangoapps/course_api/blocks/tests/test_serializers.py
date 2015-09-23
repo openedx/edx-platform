@@ -4,7 +4,8 @@ Tests for Course Blocks serializers
 from mock import MagicMock
 
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks, LMS_COURSE_TRANSFORMERS
 
 from ..transformers.blocks_api import BlocksAPITransformer
@@ -12,14 +13,19 @@ from ..serializers import BlockSerializer, BlockDictSerializer
 from .test_utils import deserialize_usage_key
 
 
-class TestBlockSerializerBase(ModuleStoreTestCase):
+class TestBlockSerializerBase(SharedModuleStoreTestCase):
     """
     Base class for testing BlockSerializer and BlockDictSerializer
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestBlockSerializerBase, cls).setUpClass()
+
+        cls.course_key = ToyCourseFactory.create().id
+
     def setUp(self):
         super(TestBlockSerializerBase, self).setUp()
 
-        self.course_key = self.create_toy_course()
         self.user = UserFactory.create()
         blocks_api_transformer = BlocksAPITransformer(
             block_types_to_count=['video'],
