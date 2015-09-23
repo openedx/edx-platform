@@ -1,4 +1,4 @@
-.wrapper-auto-cert {
+.wrapper-msg.wrapper-auto-cert {
     @include margin(0, 0, 0, 0); // Overrides .wrapper-msg
     @include padding(0, 0, 0, 0); // Overrides .wrapper-msg
     background: none; // Overrides .wrapper-msg
