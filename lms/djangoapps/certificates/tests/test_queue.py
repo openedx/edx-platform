@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
 from contextlib import contextmanager
+import ddt
 import json
 from mock import patch, Mock
 from nose.plugins.attrib import attr
@@ -28,8 +29,10 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
 )
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 
 
+@ddt.ddt
 @attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
@@ -46,6 +49,8 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             mode="honor",
         )
         self.xqueue = XQueueCertInterface()
+        self.user_2 = UserFactory.create()
+        SoftwareSecurePhotoVerificationFactory.create(user=self.user_2, status='approved')
 
     def test_add_cert_callback_url(self):
         with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
@@ -72,6 +77,50 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         certificate = GeneratedCertificate.objects.get(user=self.user, course_id=self.course.id)
         self.assertEqual(certificate.status, CertificateStatuses.downloadable)
         self.assertIsNotNone(certificate.verify_uuid)
+
+    @ddt.data('honor', 'audit')
+    def test_add_cert_with_honor_certificates(self, mode):
+        """Test certificates generations for honor and audit modes."""
+        template_name = 'certificate-template-{id.org}-{id.course}.pdf'.format(
+            id=self.course.id
+        )
+        self.assert_queue_response(mode, mode, template_name)
+
+    @ddt.data('credit', 'verified')
+    def test_add_cert_with_verified_certificates(self, mode):
+        """Test if enrollment mode is verified or credit along with valid
+        software-secure verification than verified certificate should be generated.
+        """
+        template_name = 'certificate-template-{id.org}-{id.course}-verified.pdf'.format(
+            id=self.course.id
+        )
+
+        self.assert_queue_response(mode, 'verified', template_name)
+
+    def assert_queue_response(self, mode, expected_mode, expected_template_name):
+        """Dry method for course enrollment and adding request to queue."""
+        CourseEnrollmentFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            is_active=True,
+            mode=mode,
+        )
+        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
+                mock_send.return_value = (0, None)
+                self.xqueue.add_cert(self.user_2, self.course.id)
+
+        # Verify that the task was sent to the queue with the correct callback URL
+        self.assertTrue(mock_send.called)
+        __, kwargs = mock_send.call_args_list[0]
+
+        actual_header = json.loads(kwargs['header'])
+        self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+        certificate = GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id)
+        self.assertEqual(certificate.mode, expected_mode)
+
+        body = json.loads(kwargs['body'])
+        self.assertIn(expected_template_name, body['template_pdf'])
 
 
 @attr('shard_1')

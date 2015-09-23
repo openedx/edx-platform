@@ -111,6 +111,8 @@ class GeneratedCertificate(models.Model):
 
     MODES = Choices('verified', 'honor', 'audit')
 
+    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE]
+
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     verify_uuid = models.CharField(max_length=32, blank=True, default='')
