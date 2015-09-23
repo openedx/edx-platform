@@ -4,8 +4,10 @@ define([
     'teams/js/collections/team_membership',
     'teams/js/views/topic_teams',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers'
-], function (Backbone, TeamCollection, TeamMembershipCollection, TopicTeamsView, TeamSpecHelpers, AjaxHelpers) {
+    'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/page_helpers'
+], function (Backbone, TeamCollection, TeamMembershipCollection, TopicTeamsView, TeamSpecHelpers,
+             AjaxHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function () {
         var createTopicTeamsView = function(options) {
@@ -39,6 +41,7 @@ define([
 
         beforeEach(function () {
             setFixtures('<div class="teams-container"></div>');
+            PageHelpers.preventBackboneChangingUrl();
         });
 
         it('can render itself', function () {

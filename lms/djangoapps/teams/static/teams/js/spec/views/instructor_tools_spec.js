@@ -6,8 +6,9 @@ define([
     'teams/js/views/instructor_tools',
     'teams/js/views/team_utils',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers'
-], function ($, Backbone, _, Team, InstructorToolsView, TeamUtils, TeamSpecHelpers, AjaxHelpers) {
+    'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/page_helpers'
+], function ($, Backbone, _, Team, InstructorToolsView, TeamUtils, TeamSpecHelpers, AjaxHelpers, PageHelpers) {
     'use strict';
 
     describe('Instructor Tools', function () {
@@ -37,6 +38,7 @@ define([
 
         beforeEach(function () {
             setFixtures('<div id="page-prompt"></div>');
+            PageHelpers.preventBackboneChangingUrl();
             spyOn(Backbone.history, 'navigate');
             spyOn(TeamUtils, 'showMessage');
             view = createInstructorTools().render();
