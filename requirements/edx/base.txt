@@ -66,7 +66,7 @@ python-social-auth==0.2.12
 pytz==2015.2
 pysrt==0.4.7
 PyYAML==3.10
-requests==2.3.0
+requests==2.7.0
 requests-oauthlib==0.4.1
 scipy==0.14.0
 Shapely==1.2.16
