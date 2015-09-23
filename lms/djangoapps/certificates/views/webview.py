@@ -14,6 +14,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from courseware.courses import course_image_url
+from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from eventtracking import tracker
@@ -287,6 +288,7 @@ def render_html_view(request, user_id, course_id):
     context = {}
     context['platform_name'] = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     context['course_id'] = course_id
+    preview_mode = request.GET.get('preview', None)
 
     # Update the view context with the default ConfigurationModel settings
     configuration = CertificateHtmlViewConfiguration.get_config()
@@ -334,17 +336,27 @@ def render_html_view(request, user_id, course_id):
             raise CourseDoesNotExist
 
         # Attempt to load the user's generated certificate data
-        user_certificate = GeneratedCertificate.objects.get(
-            user=user,
-            course_id=course_key
-        )
+        if preview_mode:
+            user_certificate = GeneratedCertificate.objects.get(
+                user=user,
+                course_id=course_key,
+                mode=preview_mode
+            )
+        else:
+            user_certificate = GeneratedCertificate.objects.get(
+                user=user,
+                course_id=course_key
+            )
 
     # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...
     # If we are, we'll need to create a mock version of the user_certificate container for previewing
     except GeneratedCertificate.DoesNotExist:
-        if request.GET.get('preview', None):
+        if preview_mode and (
+            has_access(request.user, 'instructor', course)
+            or has_access(request.user, 'staff', course)
+        ):
             user_certificate = GeneratedCertificate(
-                mode=request.GET.get('preview'),
+                mode=preview_mode,
                 verify_uuid=unicode(uuid4().hex),
                 modified_date=datetime.now().date()
             )
@@ -383,7 +395,7 @@ def render_html_view(request, user_id, course_id):
     # Get the active certificate configuration for this course
     # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
     # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
-    active_configuration = get_active_web_certificate(course, request.GET.get('preview'))
+    active_configuration = get_active_web_certificate(course, preview_mode)
     if active_configuration is None:
         return render_to_response(invalid_template_path, context)
     else:
