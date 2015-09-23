@@ -590,6 +590,8 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }
 
+    SOCIAL_AUTH_RESPECT_X_FORWARDED_HEADERS = ENV_TOKENS.get('SOCIAL_AUTH_RESPECT_X_FORWARDED_HEADERS')
+
     # FAKE EMAIL DOMAIN setting is used to generate an email for an automatically provisioned account in case
     # it is not provided by IdP (which should'nt normally be the case for providers with automatic provisioning)
     FAKE_EMAIL_DOMAIN = ENV_TOKENS.get('FAKE_EMAIL_DOMAIN', 'fake-email-domain.foo')
