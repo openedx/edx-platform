@@ -619,18 +619,6 @@ REQUIRE_ENVIRONMENT = "node"
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
-################################# TENDER ######################################
-
-# If you want to enable Tender integration (http://tenderapp.com/),
-# put in the subdomain where Tender hosts tender_widget.js. For example,
-# if you want to use the URL https://example.tenderapp.com/tender_widget.js,
-# you should use "example".
-TENDER_SUBDOMAIN = None
-# If you want to have a vanity domain that points to Tender, put that here.
-# For example, "help.myapp.com". Otherwise, should should be your full
-# tenderapp domain name: for example, "example.tenderapp.com".
-TENDER_DOMAIN = None
-
 ################################# CELERY ######################################
 
 # Message configuration
@@ -1004,6 +992,9 @@ ADVANCED_COMPONENT_TYPES = [
 
     # In-course reverification checkpoint
     'edx-reverification-block',
+
+    # Peer instruction tool
+    'ubcpi',
 ]
 
 # Adding components in this list will disable the creation of new problem for

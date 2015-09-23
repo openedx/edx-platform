@@ -94,17 +94,14 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
             structure = CourseStructure.objects.get(course_id=course_key)
             self.assertEqual(structure.structure, ccx_structure)
 
-    def test_course_overview_deleted(self):
-        """Check that course overview is deleted after course published signal is sent
+    def test_course_overview_cached(self):
+        """Check that course overview is cached after course published signal is sent
         """
         course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
-        overview = CourseOverview(id=course_key)
-        overview.version = 1
-        overview.save()
         overview = CourseOverview.objects.filter(id=course_key)
-        self.assertEqual(len(overview), 1)
+        self.assertEqual(len(overview), 0)
         with mock_signal_receiver(SignalHandler.course_published) as receiver:
             self.call_fut(self.course.id)
             self.assertEqual(receiver.call_count, 3)
             overview = CourseOverview.objects.filter(id=course_key)
-            self.assertEqual(len(overview), 0)
+            self.assertEqual(len(overview), 1)

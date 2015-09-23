@@ -46,13 +46,21 @@
   </form>
 </div>
 
-<div class="member-lists-management" style="float:left;width:50%" aria-live="polite">
+<div class="member-lists-management" style="float:left;width:50%">
   <form method="POST" action="ccx_manage_student">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <div class="auth-list-container active">
     <div class="member-list-widget">
       <div class="member-list">
         <h2> ${_("Student List Management")}</h2>
+        %if messages:
+          <label for="ccx_std_list_messages" class="sr">${_("CCX student list management response message")}</label>
+          <div id="ccx_std_list_messages" tabindex="-1" class="request-response-error">
+            %for message in messages:
+              ${message}
+            %endfor
+          </div>
+        %endif
         <table>
           <thead>
             <tr>
@@ -66,7 +74,7 @@
             <tr>
               <td>${member.user}</td>
               <td>${member.user.email}</td>
-              <td><div class="revoke"><i class="fa fa-times-circle" aria-hidden="true"></i> Revoke access</div></td>
+              <td><a class="revoke"><i class="fa fa-times-circle" aria-hidden="true"></i> ${_("Revoke access")}</a></td>
             </tr>
             %endfor
           </tbody>

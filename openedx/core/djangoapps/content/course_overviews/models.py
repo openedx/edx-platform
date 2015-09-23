@@ -9,6 +9,7 @@ from django.db.utils import IntegrityError
 from django.utils.translation import ugettext
 from model_utils.models import TimeStampedModel
 
+from opaque_keys.edx.keys import CourseKey
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
 from xmodule.course_module import CourseDescriptor
@@ -151,7 +152,7 @@ class CourseOverview(TimeStampedModel):
         )
 
     @classmethod
-    def _load_from_module_store(cls, course_id):
+    def load_from_module_store(cls, course_id):
         """
         Load a CourseDescriptor, create a new CourseOverview from it, cache the
         overview, and return it.
@@ -225,7 +226,7 @@ class CourseOverview(TimeStampedModel):
                 course_overview = None
         except cls.DoesNotExist:
             course_overview = None
-        return course_overview or cls._load_from_module_store(course_id)
+        return course_overview or cls.load_from_module_store(course_id)
 
     def clean_id(self, padding_char='='):
         """
@@ -340,3 +341,13 @@ class CourseOverview(TimeStampedModel):
         Returns a list of ID strings for this course's prerequisite courses.
         """
         return json.loads(self._pre_requisite_courses_json)
+
+    @classmethod
+    def get_all_course_keys(cls):
+        """
+        Returns all course keys from course overviews.
+        """
+        return [
+            CourseKey.from_string(course_overview['id'])
+            for course_overview in CourseOverview.objects.values('id')
+        ]

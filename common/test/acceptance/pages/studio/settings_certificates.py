@@ -12,6 +12,7 @@ import os
 
 from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 class CertificatesPage(CoursePage):
@@ -138,8 +139,10 @@ class CertificatesPage(CoursePage):
         """
         Clicks the main action presented by the prompt (such as 'Delete')
         """
+        disable_animations(self)
         self.wait_for_confirmation_prompt()
-        self.q(css='button.action-primary').first.click()
+        self.q(css='.prompt button.action-primary').first.click()
+        self.wait_for_element_invisibility('.prompt', 'wait for pop up to disappear')
         self.wait_for_ajax()
 
 
@@ -263,7 +266,7 @@ class Certificate(object):
         Returns whether or not the certificate delete icon is present.
         """
         EmptyPromise(
-            lambda: self.find_css('.actions .delete').present,
+            lambda: self.find_css('.actions .delete.action-icon').present,
             'Certificate delete button is displayed'
         ).fulfill()
 
@@ -323,8 +326,7 @@ class Certificate(object):
         Remove the first (possibly the only) certificate from the set
         """
         self.wait_for_certificate_delete_button()
-        self.find_css('.actions .delete').first.click()
-        self.page.wait_for_ajax()
+        self.find_css('.actions .delete.action-icon').first.click()
 
 
 class Signatory(object):

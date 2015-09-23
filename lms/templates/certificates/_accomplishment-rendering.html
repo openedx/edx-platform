@@ -1,9 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../static_content.html'/>
 <%
-accomplishment_course_title =  accomplishment_copy_course_name
-if certificate_data and certificate_data.get('course_title', ''):
-    accomplishment_course_title =  certificate_data.get('course_title', '')
 course_mode_class = course_mode if course_mode else ''
 %>
 
@@ -33,7 +30,7 @@ course_mode_class = course_mode if course_mode else ''
                         <span class="accomplishment-course hd-1 emphasized">
                             <span class="accomplishment-course-org">${accomplishment_copy_course_org}  </span>
                             <span class="accomplishment-course-number">${course_number}</span>:
-                            <span class="accomplishment-course-name">${accomplishment_course_title}</span>
+                            <span class="accomplishment-course-name">${accomplishment_copy_course_name}</span>
                         </span>
                     </p>
 

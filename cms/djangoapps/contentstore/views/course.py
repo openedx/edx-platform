@@ -903,11 +903,14 @@ def settings_handler(request, course_key_string):
 
             # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
             # course about page should be editable in Studio
-            about_page_editable = not microsite.get_value_for_org(
+            marketing_site_enabled = microsite.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
             )
+
+            about_page_editable = not marketing_site_enabled
+            enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
 
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
             settings_context = {
@@ -924,6 +927,7 @@ def settings_handler(request, course_key_string):
                 'credit_eligibility_enabled': credit_eligibility_enabled,
                 'is_credit_course': False,
                 'show_min_grade_warning': False,
+                'enrollment_end_editable': enrollment_end_editable,
             }
             if prerequisite_course_enabled:
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)

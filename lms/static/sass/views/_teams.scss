@@ -579,7 +579,10 @@
 
   .join-team-message {
     @extend %t-copy-sub1;
+    @include text-align(right);
     color: $gray-l1;
+    display: block;
+    margin-bottom: ($baseline/4);
   }
 
   .team-actions {

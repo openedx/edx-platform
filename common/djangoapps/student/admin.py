@@ -1,25 +1,22 @@
-'''
-django admin pages for courseware model
-'''
+""" Django admin pages for student app """
 from django import forms
-from config_models.admin import ConfigurationModelAdmin
 from django.contrib.auth.models import User
-
-from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration
-from student.models import (
-    CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
-)
 from ratelimitbackend import admin
-from student.roles import REGISTERED_ACCESS_ROLES
-
 from xmodule.modulestore.django import modulestore
-
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from config_models.admin import ConfigurationModelAdmin
+from student.models import (
+    UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
+    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
+)
+from student.roles import REGISTERED_ACCESS_ROLES
 
 
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
+
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseAccessRole
 
@@ -135,11 +132,20 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     exclude = ('dashboard_tracking_code',)
 
 
+class CourseEnrollmentAdmin(admin.ModelAdmin):
+    """ Admin interface for the CourseEnrollment model. """
+    list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
+    list_filter = ('mode', 'is_active',)
+    search_fields = ('course_id', 'mode', 'user__username',)
+    readonly_fields = ('course_id', 'mode', 'user',)
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CourseEnrollment
+
+
 admin.site.register(UserProfile)
 
 admin.site.register(UserTestGroup)
-
-admin.site.register(CourseEnrollment)
 
 admin.site.register(CourseEnrollmentAllowed)
 
@@ -152,3 +158,5 @@ admin.site.register(CourseAccessRole, CourseAccessRoleAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 
 admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
+
+admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)

@@ -4,12 +4,14 @@ Certificate HTML webview.
 from datetime import datetime
 from uuid import uuid4
 import logging
+import urllib
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 
 from courseware.courses import course_image_url
 from edxmako.shortcuts import render_to_response
@@ -105,9 +107,27 @@ def _update_certificate_context(context, course, user, user_certificate):
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
     context['accomplishment_copy_course_org'] = partner_short_name
-    context['accomplishment_copy_course_name'] = course.display_name
-    context['course_image_url'] = course_image_url(course)
-    context['share_settings'] = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
+    course_title_from_cert = context['certificate_data'].get('course_title', '')
+    accomplishment_copy_course_name = course_title_from_cert if course_title_from_cert else course.display_name
+    context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
+    share_settings = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
+    context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
+    context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
+    context['facebook_share_text'] = share_settings.get(
+        'CERTIFICATE_FACEBOOK_TEXT',
+        _("I completed the {course_title} course on {platform_name}.").format(
+            course_title=accomplishment_copy_course_name,
+            platform_name=platform_name
+        )
+    )
+    context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
+    context['twitter_share_text'] = share_settings.get(
+        'CERTIFICATE_TWITTER_TEXT',
+        _("I completed a course on {platform_name}. Take a look at my certificate.").format(
+            platform_name=platform_name
+        )
+    )
+
     context['course_number'] = course.number
     try:
         badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
@@ -374,6 +394,19 @@ def render_html_view(request, user_id, course_id):
 
     # Append/Override the existing view context values with request-time values
     _update_certificate_context(context, course, user, user_certificate)
+    share_url = request.build_absolute_uri(
+        reverse(
+            'certificates:html_view',
+            kwargs=dict(user_id=str(user_id), course_id=unicode(course_id))
+        )
+    )
+    context['share_url'] = share_url
+    twitter_url = 'https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}'.format(
+        twitter_share_text=context['twitter_share_text'],
+        share_url=urllib.quote_plus(share_url)
+    )
+    context['twitter_url'] = twitter_url
+    context['full_course_image_url'] = request.build_absolute_uri(course_image_url(course))
 
     # If enabled, show the LinkedIn "add to profile" button
     # Clicking this button sends the user to LinkedIn where they
@@ -389,6 +422,8 @@ def render_html_view(request, user_id, course_id):
                 course_id=unicode(course.id)
             ))
         )
+    else:
+        context['linked_in_url'] = None
 
     # Microsites will need to be able to override any hard coded
     # content that was put into the context in the

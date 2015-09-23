@@ -478,12 +478,12 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'lang: fr')
-            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+            self.assertContains(response, 'course name: course_title_0')
             # test with second organization template
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'lang: fr')
-            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+            self.assertContains(response, 'course name: course_title_0')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     def test_certificate_custom_template_with_org(self):
@@ -510,7 +510,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             ]
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+            self.assertContains(response, 'course name: course_title_0')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     def test_certificate_custom_template_with_organization(self):

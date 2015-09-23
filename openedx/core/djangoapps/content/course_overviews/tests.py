@@ -258,31 +258,22 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 self.store.delete_course(course.id, ModuleStoreEnum.UserID.test)
                 CourseOverview.get_from_id(course.id)
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 1), (ModuleStoreEnum.Type.split, 3, 4))
-    @ddt.unpack
-    def test_course_overview_caching(self, modulestore_type, min_mongo_calls, max_mongo_calls):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_overview_caching(self, modulestore_type):
         """
         Tests that CourseOverview structures are actually getting cached.
 
         Arguments:
             modulestore_type (ModuleStoreEnum.Type): type of store to create the
                 course in.
-            min_mongo_calls (int): minimum number of MongoDB queries we expect
-                to be made.
-            max_mongo_calls (int): maximum number of MongoDB queries we expect
-                to be made.
         """
-        course = CourseFactory.create(default_store=modulestore_type)
 
-        # The first time we load a CourseOverview, it will be a cache miss, so
-        # we expect the modulestore to be queried.
-        with check_mongo_calls_range(max_finds=max_mongo_calls, min_finds=min_mongo_calls):
-            _course_overview_1 = CourseOverview.get_from_id(course.id)
+        # Creating a new course will trigger a publish event and the course will be cached
+        course = CourseFactory.create(default_store=modulestore_type, emit_signals=True)
 
-        # The second time we load a CourseOverview, it will be a cache hit, so
-        # we expect no modulestore queries to be made.
+        # The cache will be hit and mongo will not be queried
         with check_mongo_calls(0):
-            _course_overview_2 = CourseOverview.get_from_id(course.id)
+            CourseOverview.get_from_id(course.id)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_get_non_existent_course(self, modulestore_type):
@@ -298,24 +289,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         with self.assertRaises(CourseOverview.DoesNotExist):
             CourseOverview.get_from_id(store.make_course_key('Non', 'Existent', 'Course'))
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_get_errored_course(self, modulestore_type):
+    def test_get_errored_course(self):
         """
         Test that getting an ErrorDescriptor back from the module store causes
-        get_from_id to raise an IOError.
-
-        Arguments:
-            modulestore_type (ModuleStoreEnum.Type): type of store to create the
-                course in.
+        load_from_module_store to raise an IOError.
         """
-        course = CourseFactory.create(default_store=modulestore_type)
         mock_get_course = mock.Mock(return_value=ErrorDescriptor)
         with mock.patch('xmodule.modulestore.mixed.MixedModuleStore.get_course', mock_get_course):
             # This mock makes it so when the module store tries to load course data,
             # an exception is thrown, which causes get_course to return an ErrorDescriptor,
             # which causes get_from_id to raise an IOError.
             with self.assertRaises(IOError):
-                CourseOverview.get_from_id(course.id)
+                CourseOverview.load_from_module_store(self.store.make_course_key('Non', 'Existent', 'Course'))
 
     def test_malformed_grading_policy(self):
         """

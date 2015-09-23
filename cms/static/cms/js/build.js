@@ -83,7 +83,6 @@
             'gettext': 'empty:',
             'xmodule': 'empty:',
             'mathjax': 'empty:',
-            'tender': 'empty:',
             'youtube': 'empty:'
         },
 
