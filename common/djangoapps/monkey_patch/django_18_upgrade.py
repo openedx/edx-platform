@@ -5,15 +5,20 @@ TNL-3387
 
 def scare(msg):
     """Print a message in a really noticeable way."""
-    print "**\n**\n** {}!!!\n**\n**\n".format(msg)
+    print "**\n**\n** {}\n**\n**\n".format(msg)
 
 import django.db.transaction
 
 scare("Monkey-patching django.db.transaction: see TNL-3387")
 
-def commit_manually(f):
+def do_nothing(f):
     """A do-nothing decorator to let us defer deciding what to do with commit_manually being gone."""
-    scare("Using fake commit_manually on {}".format(f))
+    scare("Using fake django.db.transaction decorator on {name} in {file} at {line}".format(
+        name=f.func_name,
+        file=f.func_code.co_filename,
+        line=f.func_code.co_firstlineno,
+    ))
     return f
 
-django.db.transaction.commit_manually = commit_manually
+django.db.transaction.commit_manually = do_nothing
+django.db.transaction.autocommit = do_nothing
