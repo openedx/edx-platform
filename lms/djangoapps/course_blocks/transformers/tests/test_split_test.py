@@ -214,13 +214,13 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                 self.course.location,
                 transformers={self.transformer},
             )
-        # with check_mongo_calls(0):  TODO - debug issue with pickling
-        #     block_structure2 = get_course_blocks(
-        #         self.user,
-        #         self.course.location,
-        #         transformers={self.transformer},
-        #     )
-        # self.assertEqual(
-        #     set(block_structure1.get_block_keys()),
-        #     set(block_structure2.get_block_keys()),
-        # )
+        with check_mongo_calls(0):
+            block_structure2 = get_course_blocks(
+                self.user,
+                self.course.location,
+                transformers={self.transformer},
+            )
+        self.assertEqual(
+            set(block_structure1.get_block_keys()),
+            set(block_structure2.get_block_keys()),
+        )

@@ -97,7 +97,6 @@ class ContentLibraryTransformer(BlockStructureTransformer):
                             selected_children.append(usage_key)
 
         # Check and remove all non-selected children from course structure.
-        if not user_info.has_staff_access:
-            block_structure.remove_block_if(
-                check_child_removal
-            )
+        block_structure.remove_block_if(
+            check_child_removal
+        )

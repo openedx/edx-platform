@@ -160,17 +160,6 @@ class CourseStructureTestCase(ModuleStoreTestCase):
         xblocks = (blocks[ref] for ref in refs)
         return set([xblock.location for xblock in xblocks])
 
-    def assert_staff_access_to_all_blocks(self, course, blocks, transformer):
-        """
-        Assert staff users have access to all blocks
-        """
-        trans_block_structure = get_course_blocks(
-            self.staff,
-            course.location,
-            transformers={transformer}
-        )
-        self.assertEqual(len(list(trans_block_structure.get_block_keys())), len(blocks))
-
 
 class BlockParentsMapTestCase(ModuleStoreTestCase):
     """

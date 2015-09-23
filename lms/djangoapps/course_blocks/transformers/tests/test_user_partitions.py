@@ -184,6 +184,3 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
             set(trans_block_structure.get_block_keys()),
             self.get_block_key_set(self.blocks, *expected_blocks)
         )
-
-    def test_staff_user(self):
-        self.assert_staff_access_to_all_blocks(self.course, self.blocks, self.transformer)
