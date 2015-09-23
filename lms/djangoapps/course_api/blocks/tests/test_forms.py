@@ -3,43 +3,52 @@ Tests for Course Blocks forms
 """
 import ddt
 from django.http import Http404, QueryDict
-from unittest import TestCase
 from urllib import urlencode
 from rest_framework.exceptions import PermissionDenied
 
-from student.tests.factories import UserFactory
-from opaque_keys.edx.keys import UsageKey
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
 from ..forms import BlockListGetForm
 
 
 @ddt.ddt
-class TestBlockListGetForm(FormTestMixin, TestCase):
+class TestBlockListGetForm(FormTestMixin, ModuleStoreTestCase):
     """
     Tests for BlockListGetForm
     """
     FORM_CLASS = BlockListGetForm
 
     def setUp(self):
+        super(TestBlockListGetForm, self).setUp()
+
         self.student = UserFactory.create()
         self.student2 = UserFactory.create()
         self.staff = UserFactory.create(is_staff=True)
-        self.initial = {'requesting_user': self.student}
 
-        usage_key_string = 'block-v1:some_org+split_course+some_run+type@some_block_type+block@some_block_id'
+        self.course = CourseFactory.create()
+        usage_key = self.course.location
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.student2, course_id=self.course.id)
+
+        self.initial = {'requesting_user': self.student}
         self.form_data = QueryDict(
             urlencode({
                 'user': self.student.username,
-                'usage_key': usage_key_string,
+                'usage_key': unicode(usage_key),
             }),
             mutable=True,
         )
         self.cleaned_data = {
             'block_counts': [],
             'depth': 0,
+            'return_type': 'dict',
             'requested_fields': {'display_name', 'type'},
             'student_view_data': [],
-            'usage_key': UsageKey.from_string(usage_key_string),
+            'usage_key': usage_key,
             'user': self.student,
         }
 
@@ -91,6 +100,21 @@ class TestBlockListGetForm(FormTestMixin, TestCase):
         self.initial = {'requesting_user': self.staff}
         self.get_form(expected_valid=True)
 
+    def test_unenrolled_student(self):
+        CourseEnrollment.unenroll(self.student, self.course.id)
+        self.assert_raises_permission_denied()
+
+    def test_unenrolled_staff(self):
+        CourseEnrollment.unenroll(self.staff, self.course.id)
+        self.initial = {'requesting_user': self.staff}
+        self.form_data['user'] = self.staff.username
+        self.get_form(expected_valid=True)
+
+    def test_unenrolled_student_by_staff(self):
+        CourseEnrollment.unenroll(self.student, self.course.id)
+        self.initial = {'requesting_user': self.staff}
+        self.assert_raises_permission_denied()
+
     #-- depth
 
     def test_depth_integer(self):
@@ -106,6 +130,20 @@ class TestBlockListGetForm(FormTestMixin, TestCase):
     def test_depth_invalid(self):
         self.form_data['depth'] = 'not_an_integer'
         self.assert_error('depth', "'not_an_integer' is not a valid depth value.")
+
+    #-- return_type
+
+    def test_return_type(self):
+        self.form_data['return_type'] = 'list'
+        self.cleaned_data['return_type'] = 'list'
+        self.assert_equals_cleaned_data()
+
+    def test_return_type_invalid(self):
+        self.form_data['return_type'] = 'invalid_return_type'
+        self.assert_error(
+            'return_type',
+            "Select a valid choice. invalid_return_type is not one of the available choices."
+        )
 
     #-- requested fields
 

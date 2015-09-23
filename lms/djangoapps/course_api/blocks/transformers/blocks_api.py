@@ -11,8 +11,8 @@ class BlocksAPITransformer(BlockStructureTransformer):
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
-    def __init__(self, block_counts, requested_student_view_data):
-        self.block_counts = block_counts
+    def __init__(self, block_types_to_count, requested_student_view_data):
+        self.block_types_to_count = block_types_to_count
         self.requested_student_view_data = requested_student_view_data
 
     @classmethod
@@ -35,4 +35,4 @@ class BlocksAPITransformer(BlockStructureTransformer):
         Mutates block_structure based on the given user_info.
         """
         StudentViewTransformer(self.requested_student_view_data).transform(user_info, block_structure)
-        BlockCountsTransformer(self.block_counts).transform(user_info, block_structure)
+        BlockCountsTransformer(self.block_types_to_count).transform(user_info, block_structure)
