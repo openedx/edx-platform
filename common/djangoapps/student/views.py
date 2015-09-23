@@ -2133,7 +2133,7 @@ def do_email_change_request(user, new_email, activation_key=None):
 
 
 @ensure_csrf_cookie
-@transaction.commit_manually
+@transaction.non_atomic_requests
 def confirm_email_change(request, key):  # pylint: disable=unused-argument
     """
     User requested a new e-mail. This is called when the activation
