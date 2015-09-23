@@ -52,6 +52,8 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
 
           Example: depth=all
 
+          NOTE: This parameter is currently not honored or supported. For now, it only implements depth=all.
+
         * return_type (string) Indicates in what data type to return the blocks.
           Default is dict. Supported values are: dict, list
 
