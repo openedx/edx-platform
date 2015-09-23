@@ -42,7 +42,6 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from simple_history.models import HistoricalRecords
-from south.modelsinspector import add_introspection_rules
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
@@ -1875,9 +1874,6 @@ class LanguageField(models.CharField):
             *args,
             **kwargs
         )
-
-
-add_introspection_rules([], [r"^student\.models\.LanguageField"])
 
 
 class LanguageProficiency(models.Model):

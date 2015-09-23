@@ -721,7 +721,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djcelery',
-    'south',
     'method_override',
 
     # History tables

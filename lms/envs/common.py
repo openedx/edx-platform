@@ -1808,7 +1808,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'djcelery',
-    'south',
 
     # History tables
     'simple_history',
