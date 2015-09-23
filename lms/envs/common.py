@@ -2198,7 +2198,7 @@ PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
 PASSWORD_DICTIONARY = []
 
 ##################### LinkedIn #####################
-INSTALLED_APPS += ('django_openid_auth',)
+# INSTALLED_APPS += ('django_openid_auth',)
 
 
 ############################ ORA 2 ############################################

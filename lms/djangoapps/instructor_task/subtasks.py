@@ -494,7 +494,7 @@ def update_subtask_status(entry_id, current_task_id, new_subtask_status, retry_c
         _release_subtask_lock(current_task_id)
 
 
-@transaction.commit_manually
+@transaction.atomic
 def _update_subtask_status(entry_id, current_task_id, new_subtask_status):
     """
     Update the status of the subtask in the parent InstructorTask object tracking its progress.
@@ -526,65 +526,62 @@ def _update_subtask_status(entry_id, current_task_id, new_subtask_status):
                   current_task_id, entry_id, new_subtask_status)
 
     try:
-        entry = InstructorTask.objects.select_for_update().get(pk=entry_id)
-        subtask_dict = json.loads(entry.subtasks)
-        subtask_status_info = subtask_dict['status']
-        if current_task_id not in subtask_status_info:
-            # unexpected error -- raise an exception
-            format_str = "Unexpected task_id '{}': unable to update status for subtask of instructor task '{}'"
-            msg = format_str.format(current_task_id, entry_id)
-            TASK_LOG.warning(msg)
-            raise ValueError(msg)
+        with transaction.atomic():
+            entry = InstructorTask.objects.select_for_update().get(pk=entry_id)
+            subtask_dict = json.loads(entry.subtasks)
+            subtask_status_info = subtask_dict['status']
+            if current_task_id not in subtask_status_info:
+                # unexpected error -- raise an exception
+                format_str = "Unexpected task_id '{}': unable to update status for subtask of instructor task '{}'"
+                msg = format_str.format(current_task_id, entry_id)
+                TASK_LOG.warning(msg)
+                raise ValueError(msg)
 
-        # Update status:
-        subtask_status_info[current_task_id] = new_subtask_status.to_dict()
+            # Update status:
+            subtask_status_info[current_task_id] = new_subtask_status.to_dict()
 
-        # Update the parent task progress.
-        # Set the estimate of duration, but only if it
-        # increases.  Clock skew between time() returned by different machines
-        # may result in non-monotonic values for duration.
-        task_progress = json.loads(entry.task_output)
-        start_time = task_progress['start_time']
-        prev_duration = task_progress['duration_ms']
-        new_duration = int((time() - start_time) * 1000)
-        task_progress['duration_ms'] = max(prev_duration, new_duration)
+            # Update the parent task progress.
+            # Set the estimate of duration, but only if it
+            # increases.  Clock skew between time() returned by different machines
+            # may result in non-monotonic values for duration.
+            task_progress = json.loads(entry.task_output)
+            start_time = task_progress['start_time']
+            prev_duration = task_progress['duration_ms']
+            new_duration = int((time() - start_time) * 1000)
+            task_progress['duration_ms'] = max(prev_duration, new_duration)
 
-        # Update counts only when subtask is done.
-        # In future, we can make this more responsive by updating status
-        # between retries, by comparing counts that change from previous
-        # retry.
-        new_state = new_subtask_status.state
-        if new_subtask_status is not None and new_state in READY_STATES:
-            for statname in ['attempted', 'succeeded', 'failed', 'skipped']:
-                task_progress[statname] += getattr(new_subtask_status, statname)
+            # Update counts only when subtask is done.
+            # In future, we can make this more responsive by updating status
+            # between retries, by comparing counts that change from previous
+            # retry.
+            new_state = new_subtask_status.state
+            if new_subtask_status is not None and new_state in READY_STATES:
+                for statname in ['attempted', 'succeeded', 'failed', 'skipped']:
+                    task_progress[statname] += getattr(new_subtask_status, statname)
 
-        # Figure out if we're actually done (i.e. this is the last task to complete).
-        # This is easier if we just maintain a counter, rather than scanning the
-        # entire new_subtask_status dict.
-        if new_state == SUCCESS:
-            subtask_dict['succeeded'] += 1
-        elif new_state in READY_STATES:
-            subtask_dict['failed'] += 1
-        num_remaining = subtask_dict['total'] - subtask_dict['succeeded'] - subtask_dict['failed']
+            # Figure out if we're actually done (i.e. this is the last task to complete).
+            # This is easier if we just maintain a counter, rather than scanning the
+            # entire new_subtask_status dict.
+            if new_state == SUCCESS:
+                subtask_dict['succeeded'] += 1
+            elif new_state in READY_STATES:
+                subtask_dict['failed'] += 1
+            num_remaining = subtask_dict['total'] - subtask_dict['succeeded'] - subtask_dict['failed']
 
-        # If we're done with the last task, update the parent status to indicate that.
-        # At present, we mark the task as having succeeded.  In future, we should see
-        # if there was a catastrophic failure that occurred, and figure out how to
-        # report that here.
-        if num_remaining <= 0:
-            entry.task_state = SUCCESS
-        entry.subtasks = json.dumps(subtask_dict)
-        entry.task_output = InstructorTask.create_output_for_success(task_progress)
+            # If we're done with the last task, update the parent status to indicate that.
+            # At present, we mark the task as having succeeded.  In future, we should see
+            # if there was a catastrophic failure that occurred, and figure out how to
+            # report that here.
+            if num_remaining <= 0:
+                entry.task_state = SUCCESS
+            entry.subtasks = json.dumps(subtask_dict)
+            entry.task_output = InstructorTask.create_output_for_success(task_progress)
 
-        TASK_LOG.debug("about to save....")
-        entry.save()
-        TASK_LOG.info("Task output updated to %s for subtask %s of instructor task %d",
-                      entry.task_output, current_task_id, entry_id)
+            TASK_LOG.debug("about to save....")
+            entry.save()
+            TASK_LOG.info("Task output updated to %s for subtask %s of instructor task %d",
+                          entry.task_output, current_task_id, entry_id)
     except Exception:
         TASK_LOG.exception("Unexpected error while updating InstructorTask.")
-        transaction.rollback()
         dog_stats_api.increment('instructor_task.subtask.update_exception')
         raise
-    else:
-        TASK_LOG.debug("about to commit....")
-        transaction.commit()

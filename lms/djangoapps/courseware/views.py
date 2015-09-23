@@ -925,7 +925,7 @@ def course_about(request, course_id):
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@transaction.commit_manually
+@transaction.atomic
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """
@@ -936,7 +936,7 @@ def progress(request, course_id, student_id=None):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        with grades.manual_transaction():
+        with transaction.atomic():
             return _progress(request, course_key, student_id)
 
 
