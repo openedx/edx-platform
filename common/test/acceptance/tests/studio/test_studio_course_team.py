@@ -11,7 +11,7 @@ from ...pages.studio.users import CourseTeamPage
 from ...pages.studio.index import DashboardPage
 
 
-@flaky  # TODO fix this, see TNL-2667
+@flaky(max_runs=15, min_passes=15)
 @attr('shard_2')
 class CourseTeamPageTest(StudioCourseTest):
     """ As a course author, I want to be able to add others to my team """
