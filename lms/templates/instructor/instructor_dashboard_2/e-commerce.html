@@ -204,11 +204,11 @@ import pytz
            activeHeader: "ui-icon-carat-1-s"
        };
        var act = 0;
-       $("#accordion").accordion(
+       $(".accordion").accordion(
                {
                    heightStyle: 'content',
                    activate: function(event, ui) {
-                    var active = jQuery("#accordion").accordion('option', 'active');
+                    var active = jQuery(".accordion").accordion('option', 'active');
                     $.cookie('saved_index', null);
                     $.cookie('saved_index', active);
                     $('#error-msg').val('');
