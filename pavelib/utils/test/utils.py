@@ -18,7 +18,10 @@ def clean_test_files():
     Clean fixture files used by tests and .pyc files
     """
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
-    sh("find . -type f -name \"*.pyc\" -not -path './.git/*' -delete")
+    # This find command removes all the *.pyc files that aren't in the .git
+    # directory.  See this blog post for more details:
+    # http://nedbatchelder.com/blog/201505/be_careful_deleting_files_around_git.html
+    sh(r"find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \;")
     sh("rm -rf test_root/log/auto_screenshots/*")
     sh("rm -rf /tmp/mako_[cl]ms")
 
