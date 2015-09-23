@@ -221,14 +221,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         proctoring_service = self.runtime.service(self, 'proctoring')
         credit_service = self.runtime.service(self, 'credit')
 
-        # Is the feature turned on and do we have all required services
-        # Also, the ENABLE_PROCTORED_EXAMS feature flag must be set to
-        # True and the Sequence in question, should have the
-        # fields set to indicate this is a timed/proctored exam
+        # Is this sequence designated as a Timed Examination, which includes
+        # Proctored Exams
         feature_enabled = (
             proctoring_service and
             credit_service and
-            (proctoring_service.is_feature_enabled() or (self.is_time_limited and not self.is_proctored_enabled))
+            self.is_time_limited
         )
         if feature_enabled:
             user_id = self.runtime.user_id
