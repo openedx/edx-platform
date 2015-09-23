@@ -30,6 +30,7 @@ class CertificateTemplateForm(forms.ModelForm):
     class Meta(object):
         """ Meta definitions for CertificateTemplateForm  """
         model = CertificateTemplate
+        fields = '__all__'
 
 
 class CertificateTemplateAdmin(admin.ModelAdmin):

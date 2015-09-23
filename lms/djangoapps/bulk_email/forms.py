@@ -78,6 +78,7 @@ class CourseAuthorizationAdminForm(forms.ModelForm):
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseAuthorization
+        fields = '__all__'
 
     def clean_course_id(self):
         """Validate the course id"""

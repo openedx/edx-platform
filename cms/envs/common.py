@@ -903,9 +903,6 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
-
-    # edX Proctoring
-    'edx_proctoring',
 )
 
 
