@@ -7,7 +7,7 @@ from rest_framework.reverse import reverse
 from transformers import SUPPORTED_FIELDS
 
 
-# TODO support depth parameter
+# TODO support depth parameter (MA-1366)
 class BlockSerializer(serializers.Serializer):
     """
     Serializer for single course block
