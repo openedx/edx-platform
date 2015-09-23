@@ -6,21 +6,28 @@ from django.http import Http404, QueryDict
 from urllib import urlencode
 from rest_framework.exceptions import PermissionDenied
 
+from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from openedx.core.djangoapps.util.test_forms import FormTestMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..forms import BlockListGetForm
 
 
 @ddt.ddt
-class TestBlockListGetForm(FormTestMixin, ModuleStoreTestCase):
+class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     """
     Tests for BlockListGetForm
     """
     FORM_CLASS = BlockListGetForm
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestBlockListGetForm, cls).setUpClass()
+
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestBlockListGetForm, self).setUp()
@@ -29,11 +36,10 @@ class TestBlockListGetForm(FormTestMixin, ModuleStoreTestCase):
         self.student2 = UserFactory.create()
         self.staff = UserFactory.create(is_staff=True)
 
-        self.course = CourseFactory.create()
-        usage_key = self.course.location
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
         CourseEnrollmentFactory.create(user=self.student2, course_id=self.course.id)
 
+        usage_key = self.course.location
         self.initial = {'requesting_user': self.student}
         self.form_data = QueryDict(
             urlencode({
@@ -69,7 +75,7 @@ class TestBlockListGetForm(FormTestMixin, ModuleStoreTestCase):
 
     #-- usage key
 
-    def test_missing_usage_key(self):
+    def test_no_usage_key_param(self):
         self.form_data.pop('usage_key')
         self.assert_error('usage_key', "This field is required.")
 
@@ -77,9 +83,13 @@ class TestBlockListGetForm(FormTestMixin, ModuleStoreTestCase):
         self.form_data['usage_key'] = 'invalid_usage_key'
         self.assert_error('usage_key', "'invalid_usage_key' is not a valid usage key.")
 
+    def test_non_existent_usage_key(self):
+        self.form_data['usage_key'] = self.store.make_course_usage_key(CourseLocator('non', 'existent', 'course'))
+        self.assert_raises_permission_denied()
+
     #-- user
 
-    def test_missing_user(self):
+    def test_no_user_param(self):
         self.form_data.pop('user')
         self.assert_raises_permission_denied()
 
