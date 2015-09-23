@@ -92,7 +92,7 @@ class BlockListGetForm(Form):
             try:
                 requested_user = User.objects.get(username=requested_username)
             except (User.DoesNotExist):
-                raise Http404("'{username}' does not exist.".format(username=requested_username))
+                raise Http404("Requested user '{username}' does not exist.".format(username=requested_username))
 
         # verify whether the requested user's blocks can be accessed
         if not can_access_users_blocks(requested_user, course_key):
