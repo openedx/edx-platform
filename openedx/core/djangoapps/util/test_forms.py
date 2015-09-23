@@ -2,6 +2,7 @@
 Mixins for testing forms.
 """
 
+
 class FormTestMixin(object):
     """A mixin for testing forms"""
     def get_form(self, expected_valid):

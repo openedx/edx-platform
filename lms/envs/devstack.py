@@ -234,9 +234,3 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 #####################################################################
 # Mobile
 FEATURES['ENABLE_RENDER_XBLOCK_API'] = True
-
-
-CACHES['lms.course_blocks'] = {
-    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    'KEY_FUNCTION': 'util.memcache.safe_key',
-}
