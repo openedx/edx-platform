@@ -131,3 +131,9 @@ class TestCourseBlocksView(ModuleStoreTestCase):
             self.assert_in_iff('format', block_data, xblock.format is not None)
             self.assert_true_iff(block_data['student_view_multi_device'], block_data['type'] == 'html')
             self.assertNotIn('not_a_field', block_data)
+
+            if xblock.has_children:
+                self.assertSetEqual(
+                    set(unicode(child.location) for child in xblock.get_children()),
+                    set(block_data['children']),
+                )

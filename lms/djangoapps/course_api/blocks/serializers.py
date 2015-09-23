@@ -53,7 +53,7 @@ class BlockSerializer(serializers.Serializer):
         if 'children' in self.context['requested_fields']:
             children = self.context['block_structure'].get_children(block_key)
             if children:
-                data['children'] = children
+                data['children'] = [unicode(child) for child in children]
 
         return data
 
