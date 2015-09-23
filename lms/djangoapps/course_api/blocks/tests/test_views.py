@@ -3,44 +3,50 @@ Tests for Course Blocks views
 """
 
 from django.core.urlresolvers import reverse
+from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from .test_utils import deserialize_usage_key
 
 
-class TestCourseBlocksView(ModuleStoreTestCase):
+class TestCourseBlocksView(SharedModuleStoreTestCase):
     """
     Test class for CourseBlocks view
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseBlocksView, cls).setUpClass()
+
+        cls.course_key = ToyCourseFactory.create().id
+        cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
+
+        cls.non_orphaned_block_usage_keys = set(
+            unicode(item.location)
+            for item in cls.store.get_items(cls.course_key)
+            # remove all orphaned items in the course, except for the root 'course' block
+            if cls.store.get_parent_location(item.location) or item.category == 'course'
+        )
+        cls.url = reverse(
+            'course_blocks',
+            kwargs={'usage_key_string': unicode(cls.course_usage_key)}
+        )
+
     def setUp(self):
         super(TestCourseBlocksView, self).setUp()
 
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password='test')
 
-        self.course_key = self.create_toy_course()
-        self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
 
-        self.non_orphaned_block_usage_keys = set(
-            unicode(item.location)
-            for item in self.store.get_items(self.course_key)
-            # remove all orphaned items in the course, except for the root 'course' block
-            if self.store.get_parent_location(item.location) or item.category == 'course'
-        )
-
-        self.url = reverse(
-            'course_blocks',
-            kwargs={'usage_key_string': unicode(self.course_usage_key)}
-        )
-
-    def verify_response(self, expected_status_code=200, params=None):
+    def verify_response(self, expected_status_code=200, params=None, url=None):
         query_params = {'user': self.user.username}
         if params:
             query_params.update(params)
-        response = self.client.get(self.url, query_params)
+        response = self.client.get(url or self.url, query_params)
         self.assertEquals(response.status_code, expected_status_code)
         return response
 
@@ -77,8 +83,12 @@ class TestCourseBlocksView(ModuleStoreTestCase):
         self.verify_response(403)
 
     def test_non_existent_course(self):
-        self.store.delete_course(self.course_key, self.user)
-        self.verify_response(404)
+        usage_key = self.store.make_course_usage_key(CourseLocator('non', 'existent', 'course'))
+        url = reverse(
+            'course_blocks',
+            kwargs={'usage_key_string': unicode(usage_key)}
+        )
+        self.verify_response(403, url=url)
 
     def test_basic(self):
         response = self.verify_response()
