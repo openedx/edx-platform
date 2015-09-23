@@ -5,7 +5,7 @@ import ddt
 
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -169,7 +169,7 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
             if modulestore_type == 'xml':
                 course_key = self.store.make_course_key('edX', 'toy', '2012_Fall')
             else:
-                course_key = self.create_toy_course('edX', 'toy', '2012_Fall_copy')
+                course_key = ToyCourseFactory.create(run='2012_Fall_copy').id
             course = self.store.get_course(course_key)
 
             self.assertIsNone(course.get_parent())
