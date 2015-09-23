@@ -38,7 +38,7 @@ domReady(function() {
             $('.nav-dd .nav-item .title').removeClass('is-selected');
             $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $title.addClass('is-selected');
-            $subnav.addClass('is-shown');
+            $subnav.addClass('is-shown').focus();
             // if propagation is not stopped, the event will bubble up to the
             // body element, which will close the dropdown.
             e.stopPropagation();

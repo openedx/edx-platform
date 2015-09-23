@@ -47,6 +47,7 @@ require.config({
         "URI": "js/vendor/URI.min",
         "ieshim": "js/src/ie_shim",
         "tooltip_manager": "js/src/tooltip_manager",
+        "what-input": "js/utils/what-input.min.js",
 
         // Files needed for Annotations feature
         "annotator": "js/vendor/ova/annotator-full",
