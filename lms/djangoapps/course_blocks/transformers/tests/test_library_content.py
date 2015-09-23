@@ -156,6 +156,3 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                     'html1'
                 )
             )
-
-    def test_staff_user(self):
-        self.assert_staff_access_to_all_blocks(self.course, self.blocks, self.transformer)
