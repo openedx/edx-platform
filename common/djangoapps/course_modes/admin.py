@@ -33,6 +33,7 @@ class CourseModeForm(forms.ModelForm):
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseMode
+        fields = '__all__'
 
     COURSE_MODE_SLUG_CHOICES = (
         [(CourseMode.DEFAULT_MODE_SLUG, CourseMode.DEFAULT_MODE_SLUG)] +

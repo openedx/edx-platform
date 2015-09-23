@@ -1972,6 +1972,8 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    'sorl.thumbnail',
 )
 
 ######################### CSRF #########################################

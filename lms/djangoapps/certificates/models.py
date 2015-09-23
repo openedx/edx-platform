@@ -122,10 +122,8 @@ class GeneratedCertificate(models.Model):
     status = models.CharField(max_length=32, default='unavailable')
     mode = models.CharField(max_length=32, choices=MODES, default=MODES.honor)
     name = models.CharField(blank=True, max_length=255)
-    created_date = models.DateTimeField(
-        auto_now_add=True, default=datetime.now)
-    modified_date = models.DateTimeField(
-        auto_now=True, default=datetime.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
     class Meta(object):  # pylint: disable=missing-docstring

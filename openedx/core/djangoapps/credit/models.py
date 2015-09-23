@@ -492,6 +492,13 @@ class CreditRequirementStatus(TimeStampedModel):
             return
 
 
+def default_deadline_for_credit_eligibility():
+    """ The default deadline to use when creating a new CreditEligibility model. """
+    return datetime.datetime.now(pytz.UTC) + datetime.timedelta(
+        days=getattr(settings, "CREDIT_ELIGIBILITY_EXPIRATION_DAYS", 365)
+    )
+
+
 class CreditEligibility(TimeStampedModel):
     """
     A record of a user's eligibility for credit from a specific credit
@@ -506,11 +513,7 @@ class CreditEligibility(TimeStampedModel):
     # We save the deadline as a database field just in case
     # we need to override the deadline for particular students.
     deadline = models.DateTimeField(
-        default=lambda: (
-            datetime.datetime.now(pytz.UTC) + datetime.timedelta(
-                days=getattr(settings, "CREDIT_ELIGIBILITY_EXPIRATION_DAYS", 365)
-            )
-        ),
+        default=default_deadline_for_credit_eligibility,
         help_text=ugettext_lazy("Deadline for purchasing and requesting credit.")
     )
 
