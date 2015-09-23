@@ -194,19 +194,11 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     }
 
                     #
-                    # Add in rendering context for proctored exams and timed exams
-                    # if:
-                    # 1. the section is time_limited but not proctored_enabled.
-                    # OR
-                    # 2. the section is proctored_enabled and ENABLE_PROCTORED_EXAMS is set
-                    section_is_proctored_enabled = getattr(section, 'is_proctored_enabled', False)
-                    section_is_time_limited = getattr(section, 'is_time_limited', False)
-                    proctoring_feature_is_enabled = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+                    # Add in rendering context if exam is a timed exam (which includes proctored)
+                    #
 
-                    show_rendering_context = (section_is_time_limited and not section_is_proctored_enabled) or (
-                        section_is_proctored_enabled and proctoring_feature_is_enabled
-                    )
-                    if show_rendering_context:
+                    section_is_time_limited = getattr(section, 'is_time_limited', False)
+                    if section_is_time_limited:
                         # We need to import this here otherwise Lettuce test
                         # harness fails. When running in 'harvest' mode, the
                         # test service appears to get into trouble with
@@ -229,9 +221,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                         # This will return None, if (user, course_id, content_id)
                         # is not applicable
                         #
-                        proctoring_attempt_context = None
+                        timed_exam_attempt_context = None
                         try:
-                            proctoring_attempt_context = get_attempt_status_summary(
+                            timed_exam_attempt_context = get_attempt_status_summary(
                                 user.id,
                                 unicode(course.id),
                                 unicode(section.location)
@@ -243,12 +235,12 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             # unhandled exception
                             log.exception(ex)
 
-                        if proctoring_attempt_context:
+                        if timed_exam_attempt_context:
                             # yes, user has proctoring context about
                             # this level of the courseware
                             # so add to the accordion data context
                             section_context.update({
-                                'proctoring': proctoring_attempt_context,
+                                'proctoring': timed_exam_attempt_context,
                             })
 
                     sections.append(section_context)
