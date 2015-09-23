@@ -28,9 +28,7 @@ class ExpandableField(Field):
         if field.source is None:
             field.bind(self.field_name, self)
 
-            # Exclude fields that should not be expanded in the nested field
             if should_expand:
-                nested_expand_fields = set(field.context.get("expand", []))
-                self.expanded.context["expand"] = list(nested_expand_fields - self.exclude_expand_fields)
+                self.expanded.context["expand"] = set(field.context.get("expand", []))
 
         return field.to_representation(obj)
