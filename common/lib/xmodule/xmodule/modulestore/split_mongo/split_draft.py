@@ -198,6 +198,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
             elif revision is None:
                 branches_to_delete = [ModuleStoreEnum.BranchName.draft]
+
+                if location.category in DIRECT_ONLY_CATEGORIES:
+                    branches_to_delete.append(ModuleStoreEnum.BranchName.published)
             else:
                 raise UnsupportedRevisionError(
                     [
