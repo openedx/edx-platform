@@ -350,7 +350,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         response = self.client.get(test_url + '?preview=honor')
         #accessing certificate web view in preview mode without
         # staff or instructor access should show invalid certificate
-        self.assertIn('This is an invalid certificate number', response.content)
+        self.assertIn('Cannot Find Certificate', response.content)
 
         CourseStaffRole(self.course.id).add_users(self.user)
 
