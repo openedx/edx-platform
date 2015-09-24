@@ -54,6 +54,7 @@
             "URI": "js/vendor/URI.min",
             "string_utils": "js/src/string_utils",
             "utility": "js/src/utility",
+            "what-input": "js/vendor/what-input.min",
 
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
