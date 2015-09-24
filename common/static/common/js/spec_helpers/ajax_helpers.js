@@ -117,7 +117,11 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
     };
 
     /**
-     * Verify that the request was reset, and then skip it.
+     * Verify that the HTTP request was marked as reset, and then skip it.
+     *
+     * Note: this is typically used when code has explicitly canceled a request
+     * after it has been sent. A good example is when a user chooses to cancel
+     * a slow running search.
      */
     skipResetRequest = function(requests) {
         var request = currentRequest(requests);

@@ -609,21 +609,9 @@ define([
                 // send search request to server
                 $('.search-field').val('search string');
                 $('.search-button').trigger('click');
-                // cancel search
+                // cancel the search and then skip the request that was marked as reset
                 $('.cancel-button').trigger('click');
-                AjaxHelpers.respondWithJson(requests, {
-                    total: 1337,
-                    access_denied_count: 12,
-                    results: [{
-                        data: {
-                            location: ['section', 'subsection', 'unit'],
-                            url: '/some/url/to/content',
-                            content_type: 'text',
-                            excerpt: 'this is a short excerpt',
-                            course_name: ''
-                        }
-                    }]
-                });
+                AjaxHelpers.skipResetRequest(requests);
                 // there should be no results
                 expect(this.$contentElement).toBeVisible();
                 expect(this.$searchResults).toBeHidden();

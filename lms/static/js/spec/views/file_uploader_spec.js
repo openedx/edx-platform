@@ -54,9 +54,6 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
                 verifySubmitButtonEnabled(true);
                 fileUploaderView.$('.submit-file-button').click();
 
-                // Respond to the analytics event first
-                AjaxHelpers.respondWithJson(requests, {});
-
                 // No file will actually be uploaded because "uploaded_file.txt" doesn't actually exist.
                 AjaxHelpers.expectRequest(requests, 'POST', url, new FormData());
                 return requests;

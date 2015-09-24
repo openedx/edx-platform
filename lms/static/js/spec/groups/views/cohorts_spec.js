@@ -359,9 +359,6 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                 cohortsView.$(fileUploadForm).fileupload('add', {files: [{name: 'upload_file.txt'}]});
                 cohortsView.$('.submit-file-button').click();
 
-                // Respond to the event request
-                AjaxHelpers.respondWithNoContent(requests);
-
                 // No file will actually be uploaded because "uploaded_file.txt" doesn't actually exist.
                 AjaxHelpers.expectRequest(requests, 'POST', MOCK_UPLOAD_COHORTS_CSV_URL, new FormData());
                 AjaxHelpers.respondWithJson(requests, {});
