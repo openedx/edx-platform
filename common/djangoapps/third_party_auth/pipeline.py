@@ -170,11 +170,17 @@ class ProviderUserState(object):
     lms/templates/dashboard.html.
     """
 
-    def __init__(self, enabled_provider, user, association_id=None):
-        # UserSocialAuth row ID
-        self.association_id = association_id
+    def __init__(self, enabled_provider, user, association):
         # Boolean. Whether the user has an account associated with the provider
-        self.has_account = association_id is not None
+        self.has_account = association is not None
+        if self.has_account:
+            # UserSocialAuth row ID
+            self.association_id = association.id
+            # Identifier of this user according to the remote provider:
+            self.remote_id = enabled_provider.get_remote_id_from_social_auth(association)
+        else:
+            self.association_id = None
+            self.remote_id = None
         # provider.BaseProvider child. Callers must verify that the provider is
         # enabled.
         self.provider = enabled_provider
@@ -367,14 +373,14 @@ def get_provider_user_states(user):
     found_user_auths = list(models.DjangoStorage.user.get_social_auth_for_user(user))
 
     for enabled_provider in provider.Registry.enabled():
-        association_id = None
+        association = None
         for auth in found_user_auths:
             if enabled_provider.match_social_auth(auth):
-                association_id = auth.id
+                association = auth
                 break
-        if enabled_provider.accepts_logins or association_id:
+        if enabled_provider.accepts_logins or association:
             states.append(
-                ProviderUserState(enabled_provider, user, association_id)
+                ProviderUserState(enabled_provider, user, association)
             )
 
     return states
