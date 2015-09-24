@@ -119,7 +119,12 @@ class SessionsList(SecureAPIView):
                         session = engine.SessionStore(session_id)
                         success_status = status.HTTP_200_OK
                         if SESSION_KEY in session:
-                            # Cannot re-login a user who is already logged in:
+                            # Someone is already logged in. The user ID of whoever is logged in
+                            # now might be different than the user ID we've been asked to login,
+                            # which would be bad. But even if it is the same user, we should not
+                            # be asked to login a user who is already logged in. This likely
+                            # indicates some sort of programming/validation error and possibly
+                            # even a potential security issue - so return 403.
                             return Response({}, status=status.HTTP_403_FORBIDDEN)
 
                     # These values are expected to be set in any new session
