@@ -26,7 +26,7 @@ from tempfile import mkdtemp
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
+from xmodule.modulestore.tests.utils import MongoContentstoreBuilder
 from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_course_from_xml
