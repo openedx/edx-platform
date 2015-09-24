@@ -139,6 +139,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
+                AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 
                 var sectionsData = accountSettingsView.options.sectionsData;
 

@@ -72,7 +72,7 @@ define([
         it('can cancel team deletion', function () {
             var requests = AjaxHelpers.requests(this);
             deleteTeam(view, false);
-            expect(requests.length).toBe(0);
+            AjaxHelpers.expectNoRequests(requests);
             expect(Backbone.history.navigate).not.toHaveBeenCalled();
         });
 

@@ -290,6 +290,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
 
             it "should remove the deleted asset from the view", ->
                 {view: @view, requests: requests} = @createAssetsView(this)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 setup.call(this, requests)
                 # Delete the 2nd asset with success from server.
                 @view.$(".remove-asset-button")[1].click()

@@ -55,7 +55,8 @@ define([
                     }
                 });
 
-                expect(requests.length).toBe(0);
+                AjaxHelpers.expectNoRequests(requests);
+
             },
             editTeamID = 'av',
             teamAction;
