@@ -1,42 +1,21 @@
 import unittest
 
-from opaque_keys.edx.locator import LocalId
-
 from xmodule import templates
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests import persistent_factories
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.contentstore.django import _CONTENTSTORE
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
+from xmodule.modulestore.exceptions import DuplicateCourseError
 
 
-class TemplateTests(unittest.TestCase):
+class TemplateTests(ModuleStoreTestCase):
     """
     Test finding and using the templates (boilerplates) for xblocks.
     """
-
-    def setUp(self):
-        super(TemplateTests, self).setUp()
-        clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
-        self.addCleanup(self._drop_mongo_collections)
-        self.addCleanup(clear_existing_modulestores)
-        self.split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
-
-    @staticmethod
-    def _drop_mongo_collections():
-        """
-        If using a Mongo-backed modulestore & contentstore, drop the collections.
-        """
-        module_store = modulestore()
-        if hasattr(module_store, '_drop_database'):
-            module_store._drop_database()  # pylint: disable=protected-access
-        _CONTENTSTORE.clear()
-        if hasattr(module_store, 'close_connections'):
-            module_store.close_connections()
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_get_templates(self):
         found = templates.all_templates()
@@ -69,42 +48,49 @@ class TemplateTests(unittest.TestCase):
         self.assertIsNotNone(HtmlDescriptor.get_template('announcement.yaml'))
 
     def test_factories(self):
-        test_course = persistent_factories.PersistentCourseFactory.create(
-            course='course', run='2014', org='testx',
-            display_name='fun test course', user_id='testbot'
+        test_course = CourseFactory.create(
+            org='testx',
+            course='course',
+            run='2014',
+            display_name='fun test course',
+            user_id='testbot'
         )
         self.assertIsInstance(test_course, CourseDescriptor)
         self.assertEqual(test_course.display_name, 'fun test course')
-        index_info = self.split_store.get_course_index_info(test_course.id)
-        self.assertEqual(index_info['org'], 'testx')
-        self.assertEqual(index_info['course'], 'course')
-        self.assertEqual(index_info['run'], '2014')
+        course_from_store = self.store.get_course(test_course.id)
+        self.assertEqual(course_from_store.id.org, 'testx')
+        self.assertEqual(course_from_store.id.course, 'course')
+        self.assertEqual(course_from_store.id.run, '2014')
 
-        test_chapter = persistent_factories.ItemFactory.create(
-            display_name='chapter 1',
-            parent_location=test_course.location
+        test_chapter = ItemFactory.create(
+            parent_location=test_course.location,
+            category='chapter',
+            display_name='chapter 1'
         )
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
-        test_course = self.split_store.get_course(test_course.id.version_agnostic())
+        test_course = self.store.get_course(test_course.id.version_agnostic())
         self.assertIn(test_chapter.location, test_course.children)
 
         with self.assertRaises(DuplicateCourseError):
-            persistent_factories.PersistentCourseFactory.create(
-                course='course', run='2014', org='testx',
-                display_name='fun test course', user_id='testbot'
+            CourseFactory.create(
+                org='testx',
+                course='course',
+                run='2014',
+                display_name='fun test course',
+                user_id='testbot'
             )
 
     def test_temporary_xblocks(self):
         """
         Test create_xblock to create non persisted xblocks
         """
-        test_course = persistent_factories.PersistentCourseFactory.create(
+        test_course = CourseFactory.create(
             course='course', run='2014', org='testx',
             display_name='fun test course', user_id='testbot'
         )
 
-        test_chapter = self.split_store.create_xblock(
+        test_chapter = self.store.create_xblock(
             test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
             parent_xblock=test_course
         )
@@ -114,7 +100,7 @@ class TemplateTests(unittest.TestCase):
 
         # test w/ a definition (e.g., a problem)
         test_def_content = '<problem>boo</problem>'
-        test_problem = self.split_store.create_xblock(
+        test_problem = self.store.create_xblock(
             test_course.system, test_course.id, 'problem', fields={'data': test_def_content},
             parent_xblock=test_chapter
         )
@@ -124,131 +110,28 @@ class TemplateTests(unittest.TestCase):
         test_problem.display_name = 'test problem'
         self.assertEqual(test_problem.display_name, 'test problem')
 
-    def test_persist_dag(self):
-        """
-        try saving temporary xblocks
-        """
-        test_course = persistent_factories.PersistentCourseFactory.create(
-            course='course', run='2014', org='testx',
-            display_name='fun test course', user_id='testbot'
-        )
-        test_chapter = self.split_store.create_xblock(
-            test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
-            parent_xblock=test_course
-        )
-        self.assertEqual(test_chapter.display_name, 'chapter n')
-        test_def_content = '<problem>boo</problem>'
-        # create child
-        new_block = self.split_store.create_xblock(
-            test_course.system, test_course.id,
-            'problem',
-            fields={
-                'data': test_def_content,
-                'display_name': 'problem'
-            },
-            parent_xblock=test_chapter
-        )
-        self.assertIsNotNone(new_block.definition_locator)
-        self.assertTrue(isinstance(new_block.definition_locator.definition_id, LocalId))
-        # better to pass in persisted parent over the subdag so
-        # subdag gets the parent pointer (otherwise 2 ops, persist dag, update parent children,
-        # persist parent
-        persisted_course = self.split_store.persist_xblock_dag(test_course, 'testbot')
-        self.assertEqual(len(persisted_course.children), 1)
-        persisted_chapter = persisted_course.get_children()[0]
-        self.assertEqual(persisted_chapter.category, 'chapter')
-        self.assertEqual(persisted_chapter.display_name, 'chapter n')
-        self.assertEqual(len(persisted_chapter.children), 1)
-        persisted_problem = persisted_chapter.get_children()[0]
-        self.assertEqual(persisted_problem.category, 'problem')
-        self.assertEqual(persisted_problem.data, test_def_content)
-        # update it
-        persisted_problem.display_name = 'altered problem'
-        persisted_problem = self.split_store.persist_xblock_dag(persisted_problem, 'testbot')
-        self.assertEqual(persisted_problem.display_name, 'altered problem')
-
     def test_delete_course(self):
-        test_course = persistent_factories.PersistentCourseFactory.create(
-            course='history', run='doomed', org='edu.harvard',
+        test_course = CourseFactory.create(
+            org='edu.harvard',
+            course='history',
+            run='doomed',
             display_name='doomed test course',
             user_id='testbot')
-        persistent_factories.ItemFactory.create(
-            display_name='chapter 1',
-            parent_location=test_course.location
+        ItemFactory.create(
+            parent_location=test_course.location,
+            category='chapter',
+            display_name='chapter 1'
         )
 
         id_locator = test_course.id.for_branch(ModuleStoreEnum.BranchName.draft)
-        guid_locator = test_course.location.course_agnostic()
         # verify it can be retrieved by id
-        self.assertIsInstance(self.split_store.get_course(id_locator), CourseDescriptor)
-        # and by guid -- TODO reenable when split_draft supports getting specific versions
-#         self.assertIsInstance(self.split_store.get_item(guid_locator), CourseDescriptor)
-        self.split_store.delete_course(id_locator, 'testbot')
-        # test can no longer retrieve by id
-        self.assertRaises(ItemNotFoundError, self.split_store.get_course, id_locator)
-        # but can by guid -- same TODO as above
-#         self.assertIsInstance(self.split_store.get_item(guid_locator), CourseDescriptor)
-
-    def test_block_generations(self):
-        """
-        Test get_block_generations
-        """
-        test_course = persistent_factories.PersistentCourseFactory.create(
-            course='history', run='hist101', org='edu.harvard',
-            display_name='history test course',
-            user_id='testbot'
-        )
-        chapter = persistent_factories.ItemFactory.create(
-            display_name='chapter 1',
-            parent_location=test_course.location,
-            user_id='testbot'
-        )
-        sub = persistent_factories.ItemFactory.create(
-            display_name='subsection 1',
-            parent_location=chapter.location,
-            user_id='testbot',
-            category='vertical'
-        )
-        first_problem = persistent_factories.ItemFactory.create(
-            display_name='problem 1', parent_location=sub.location, user_id='testbot', category='problem',
-            data="<problem></problem>"
-        )
-        first_problem.max_attempts = 3
-        first_problem.save()  # decache the above into the kvs
-        updated_problem = self.split_store.update_item(first_problem, 'testbot')
-        self.assertIsNotNone(updated_problem.previous_version)
-        self.assertEqual(updated_problem.previous_version, first_problem.update_version)
-        self.assertNotEqual(updated_problem.update_version, first_problem.update_version)
-        self.split_store.delete_item(updated_problem.location, 'testbot')
-
-        second_problem = persistent_factories.ItemFactory.create(
-            display_name='problem 2',
-            parent_location=sub.location.version_agnostic(),
-            user_id='testbot', category='problem',
-            data="<problem></problem>"
-        )
-
-        # The draft course root has 2 revisions: the published revision, and then the subsequent
-        # changes to the draft revision
-        version_history = self.split_store.get_block_generations(test_course.location)
-        self.assertIsNotNone(version_history)
-        self.assertEqual(version_history.locator.version_guid, test_course.location.version_guid)
-        self.assertEqual(len(version_history.children), 1)
-        self.assertEqual(version_history.children[0].children, [])
-        self.assertEqual(version_history.children[0].locator.version_guid, chapter.location.version_guid)
-
-        # sub changed on add, add problem, delete problem, add problem in strict linear seq
-        version_history = self.split_store.get_block_generations(sub.location)
-        self.assertEqual(len(version_history.children), 1)
-        self.assertEqual(len(version_history.children[0].children), 1)
-        self.assertEqual(len(version_history.children[0].children[0].children), 1)
-        self.assertEqual(len(version_history.children[0].children[0].children[0].children), 0)
-
-        # first and second problem may show as same usage_id; so, need to ensure their histories are right
-        version_history = self.split_store.get_block_generations(updated_problem.location)
-        self.assertEqual(version_history.locator.version_guid, first_problem.location.version_guid)
-        self.assertEqual(len(version_history.children), 1)  # updated max_attempts
-        self.assertEqual(len(version_history.children[0].children), 0)
-
-        version_history = self.split_store.get_block_generations(second_problem.location)
-        self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
+        self.assertIsInstance(self.store.get_course(id_locator), CourseDescriptor)
+        # TODO reenable when split_draft supports getting specific versions
+        # guid_locator = test_course.location.course_agnostic()
+        # Verify it can be retrieved by guid
+        # self.assertIsInstance(self.store.get_item(guid_locator), CourseDescriptor)
+        self.store.delete_course(id_locator, 'testbot')
+        # Test can no longer retrieve by id.
+        self.assertIsNone(self.store.get_course(id_locator))
+        # But can retrieve by guid -- same TODO as above
+        # self.assertIsInstance(self.store.get_item(guid_locator), CourseDescriptor)

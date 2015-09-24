@@ -312,7 +312,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
         else:
-            self.db_connection.update_course_index(updated_index_entry, course_key)
+            self.db_connection.update_course_index(updated_index_entry, course_context=course_key)
 
     def get_structure(self, course_key, version_guid):
         bulk_write_record = self._get_bulk_ops_record(course_key)
@@ -2416,14 +2416,36 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             return result
 
-    @contract(block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
-    def _remove_subtree(self, block_key, blocks):
+    @contract(root_block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
+    def _remove_subtree(self, root_block_key, blocks):
         """
-        Remove the subtree rooted at block_key
+        Remove the subtree rooted at root_block_key
+        We do this breadth-first to make sure that we don't remove
+        any children that may have parents that we don't want to delete.
         """
-        for child in blocks[block_key].fields.get('children', []):
-            self._remove_subtree(BlockKey(*child), blocks)
-        del blocks[block_key]
+        # create mapping from each child's key to its parents' keys
+        child_parent_map = defaultdict(set)
+        for block_key, block_data in blocks.iteritems():
+            for child in block_data.fields.get('children', []):
+                child_parent_map[BlockKey(*child)].add(block_key)
+
+        to_delete = {root_block_key}
+        tier = {root_block_key}
+        while tier:
+            next_tier = set()
+            for block_key in tier:
+                for child in blocks[block_key].fields.get('children', []):
+                    child_block_key = BlockKey(*child)
+                    parents = child_parent_map[child_block_key]
+                    # Make sure we want to delete all of the child's parents
+                    # before slating it for deletion
+                    if parents.issubset(to_delete):
+                        next_tier.add(child_block_key)
+            tier = next_tier
+            to_delete.update(tier)
+
+        for block_key in to_delete:
+            del blocks[block_key]
 
     def delete_course(self, course_key, user_id):
         """

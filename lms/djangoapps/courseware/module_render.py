@@ -74,6 +74,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
 from util.json_request import JsonResponse
+from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from verify_student.services import ReverificationService
@@ -165,6 +166,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
+            display_id = slugify(chapter.display_name_with_default)
             local_hide_from_toc = False
             if required_content:
                 if unicode(chapter.location) not in required_content:
@@ -246,6 +248,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     sections.append(section_context)
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
+                'display_id': display_id,
                 'url_name': chapter.url_name,
                 'sections': sections,
                 'active': chapter.url_name == active_chapter

@@ -90,16 +90,20 @@
              */
             setPage: function (page) {
                 var oldPage = this.currentPage,
-                    self = this;
-                return this.goTo(page - (this.isZeroIndexed ? 1 : 0), {reset: true}).then(
+                    self = this,
+                    deferred = $.Deferred();
+                this.goTo(page - (this.isZeroIndexed ? 1 : 0), {reset: true}).then(
                     function () {
                         self.isStale = false;
                         self.trigger('page_changed');
+                        deferred.resolve();
                     },
                     function () {
                         self.currentPage = oldPage;
+                        deferred.fail();
                     }
                 );
+                return deferred.promise();
             },
 
 

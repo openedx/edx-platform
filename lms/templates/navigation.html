@@ -97,7 +97,7 @@ site_status_msg = get_site_status_msg(course_id)
         </ul>
       </li>
     </ol>
-      % if should_display_shopping_cart_func() and not microsite.is_request_in_microsite(): # see shoppingcart.context_processor.user_has_cart_context_processor
+      % if should_display_shopping_cart_func() and not (course and microsite.is_request_in_microsite()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">

@@ -90,6 +90,18 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
         )
 
 
+class CourseTeamSerializerWithoutMembership(CourseTeamSerializer):
+    """The same as the `CourseTeamSerializer`, but elides the membership field.
+
+    Intended to be used as a sub-serializer for serializing team
+    memberships, since the membership field is redundant in that case.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(CourseTeamSerializerWithoutMembership, self).__init__(*args, **kwargs)
+        del self.fields['membership']
+
+
 class MembershipSerializer(serializers.ModelSerializer):
     """Serializes CourseTeamMemberships with information about both teams and users."""
     profile_configuration = deepcopy(settings.ACCOUNT_VISIBILITY_CONFIGURATION)
@@ -112,7 +124,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             view_name='teams_detail',
             read_only=True,
         ),
-        expanded_serializer=CourseTeamSerializer(read_only=True)
+        expanded_serializer=CourseTeamSerializerWithoutMembership(read_only=True),
     )
 
     class Meta(object):

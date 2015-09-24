@@ -4,6 +4,7 @@ Acceptance tests for Studio's Setting pages
 from unittest import skip
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.settings_certificates import CertificatesPage
+from flaky import flaky
 
 
 class CertificatesTest(StudioCourseTest):
@@ -106,7 +107,6 @@ class CertificatesTest(StudioCourseTest):
 
         self.assertIn("Updated Course Title Override 2", certificate.course_title)
 
-    @skip  # TODO fix this, see SOL-1053
     def test_can_delete_certificate(self):
         """
         Scenario: Ensure that the user can delete certificate.
@@ -170,6 +170,8 @@ class CertificatesTest(StudioCourseTest):
 
         self.assertEqual(len(self.certificates_page.certificates), 1)
 
+        #Refreshing the page, So page have the updated certificate object.
+        self.certificates_page.refresh()
         signatory = self.certificates_page.certificates[0].signatories[0]
         self.assertIn("Updated signatory name", signatory.name)
         self.assertIn("Update signatory title", signatory.title)

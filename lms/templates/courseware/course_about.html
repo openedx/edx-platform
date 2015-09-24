@@ -17,7 +17,7 @@ from edxmako.shortcuts import marketing_link
         ga=microsite.get_value('google_analytics_file', 'theme-google-analytics.html')
       )
     else:
-      google_analytics_file = '../google_analytics.html'
+      google_analytics_file = '../google-analytics.html'
   %>
 
   <%include file="${google_analytics_file}" />
@@ -242,8 +242,8 @@ from edxmako.shortcuts import marketing_link
                 site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
                 platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
 
-                # Translators: This text will be automatically posted to the student's
-                # Twitter account. {url} should appear at the end of the text.
+                ## Translators: This text will be automatically posted to the student's
+                ## Twitter account. {url} should appear at the end of the text.
                 tweet_text = _("I just registered for {number} {title} through {account}: {url}").format(
                     number=course.number,
                     title=get_course_about_section(course, 'title'),

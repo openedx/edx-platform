@@ -64,6 +64,7 @@ var edx = edx || {};
                 providerDiv = this.$el.find("#receipt-provider");
             context.course_key = this.courseKey;
             context.username = this.username;
+            context.platformName = this.$el.data('platform-name');
             providerDiv.html(_.template(templateHtml, context)).removeClass('hidden');
         },
 
@@ -301,7 +302,7 @@ function completeOrder (event) {
     );
 
     $.ajax({
-        url: '/api/credit/v1/provider/' + providerId + '/request/',
+        url: '/api/credit/v1/providers/' + providerId + '/request/',
         type: 'POST',
         headers: {
             'X-CSRFToken': $.cookie('csrftoken')

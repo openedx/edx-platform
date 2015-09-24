@@ -334,7 +334,7 @@ class EventsTestMixin(TestCase):
                 captured_events.append(event)
 
     @contextmanager
-    def assert_events_match_during(self, event_filter=None, expected_events=None):
+    def assert_events_match_during(self, event_filter=None, expected_events=None, in_order=True):
         """
         Context manager that ensures that events matching the `event_filter` and `expected_events` are emitted.
 
@@ -351,7 +351,7 @@ class EventsTestMixin(TestCase):
         with self.capture_events(event_filter, len(expected_events), captured_events):
             yield
 
-        self.assert_events_match(expected_events, captured_events)
+        self.assert_events_match(expected_events, captured_events, in_order=in_order)
 
     def wait_for_events(self, start_time=None, event_filter=None, number_of_matches=1, timeout=None):
         """
@@ -477,17 +477,29 @@ class EventsTestMixin(TestCase):
 
         self.assertEquals(len(matching_events), 0, description)
 
-    def assert_events_match(self, expected_events, actual_events):
+    def assert_events_match(self, expected_events, actual_events, in_order=True):
+        """Assert that each actual event matches one of the expected events.
+
+        Args:
+            expected_events (List): a list of dicts representing the expected events.
+            actual_events (List): a list of dicts that were actually recorded.
+            in_order (bool): if True then the events must be in the same order (defaults to True).
         """
-        Assert that each item in the expected events sequence matches its counterpart at the same index in the actual
-        events sequence.
-        """
-        for expected_event, actual_event in zip(expected_events, actual_events):
-            assert_event_matches(
-                expected_event,
-                actual_event,
-                tolerate=EventMatchTolerates.lenient()
-            )
+        if in_order:
+            for expected_event, actual_event in zip(expected_events, actual_events):
+                assert_event_matches(
+                    expected_event,
+                    actual_event,
+                    tolerate=EventMatchTolerates.lenient()
+                )
+        else:
+            for expected_event in expected_events:
+                actual_event = next(event for event in actual_events if is_matching_event(expected_event, event))
+                assert_event_matches(
+                    expected_event,
+                    actual_event or {},
+                    tolerate=EventMatchTolerates.lenient()
+                )
 
     def relative_path_to_absolute_uri(self, relative_path):
         """Return an aboslute URI given a relative path taking into account the test context."""

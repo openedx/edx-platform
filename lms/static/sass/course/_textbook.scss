@@ -72,7 +72,7 @@ div.book-wrapper {
         }
 
         div.hitarea {
-          background-image: url('../images/treeview-default.gif');
+          background-image: url('#{$static-path}/images/treeview-default.gif');
 
           position: relative;
           top: 4px;
@@ -145,12 +145,12 @@ div.book-wrapper {
               display:none;
             }
           }
-          
+
           &.last {
             left: 0;
 
             a {
-              background-image: url('../images/textbook/textbook-left.png');
+              background-image: url('#{$static-path}/images/textbook/textbook-left.png');
             }
           }
 
@@ -158,7 +158,7 @@ div.book-wrapper {
             right: 0;
 
             a {
-              background-image: url('../images/textbook/textbook-right.png');
+              background-image: url('#{$static-path}/images/textbook/textbook-right.png');
             }
           }
 
@@ -207,7 +207,7 @@ div.book-wrapper {
         padding: 0;
 
         a {
-          background-image: url('../images/slide-right-icon.png');
+          background-image: url('#{$static-path}/images/slide-right-icon.png');
         }
 
         h2 {

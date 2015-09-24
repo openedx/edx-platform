@@ -7,7 +7,9 @@ User API User Accounts Resource
 With the User API **User Accounts** resource, you can complete the following
 tasks.
 
-* `Get and Update the User's Account Information`_
+.. contents::
+   :local:
+   :depth: 1
 
 .. _Get and Update the User's Account Information:
 

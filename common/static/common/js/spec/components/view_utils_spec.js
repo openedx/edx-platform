@@ -17,6 +17,29 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "common
                     deferred.resolve();
                     expect(link).not.toHaveClass("is-disabled");
                 });
+
+                it("uses withDisabledElement wrapper to disable element while running a Backbone event handler", function() {
+                    var link,
+                        eventCallback,
+                        event,
+                        deferred = new $.Deferred(),
+                        promise = deferred.promise(),
+                        MockView = Backbone.View.extend({
+                            testFunction: function() {
+                                return promise;
+                            }
+                        }),
+                        testView = new MockView();
+                    setFixtures("<a href='#' id='link'>ripe apples drop about my head</a>");
+                    link = $("#link");
+                    expect(link).not.toHaveClass("is-disabled");
+                    eventCallback = ViewUtils.withDisabledElement('testFunction');
+                    event = {currentTarget: link};
+                    eventCallback.apply(testView, [event]);
+                    expect(link).toHaveClass("is-disabled");
+                    deferred.resolve();
+                    expect(link).not.toHaveClass("is-disabled");
+                });
             });
 
             describe("progress notification", function() {

@@ -139,6 +139,8 @@ class LoncapaResponse(object):
 
     tags = None
     hint_tag = None
+    has_partial_credit = False
+    credit_type = []
 
     max_inputfields = None
     allowed_inputfields = []
@@ -213,6 +215,18 @@ class LoncapaResponse(object):
                 self.default_answer_map[entry.get(
                     'id')] = contextualize_text(answer, self.context)
 
+        # Does this problem have partial credit?
+        # If so, what kind? Get it as a list of strings.
+        partial_credit = xml.xpath('.')[0].get('partial_credit', default=False)
+
+        if str(partial_credit).lower().strip() == 'false':
+            self.has_partial_credit = False
+            self.credit_type = []
+        else:
+            self.has_partial_credit = True
+            self.credit_type = partial_credit.split(',')
+            self.credit_type = [word.strip().lower() for word in self.credit_type]
+
         if hasattr(self, 'setup_response'):
             self.setup_response()
 
@@ -261,7 +275,6 @@ class LoncapaResponse(object):
         new_cmap = self.get_score(student_answers)
         self.get_hints(convert_files_to_filenames(
             student_answers), new_cmap, old_cmap)
-        # log.debug('new_cmap = %s' % new_cmap)
         return new_cmap
 
     def make_hint_div(self, hint_node, correct, student_answer, question_tag,
@@ -814,11 +827,23 @@ class ChoiceResponse(LoncapaResponse):
     def setup_response(self):
         self.assign_choice_names()
 
-        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
-                                     id=self.xml.get('id'))
+        correct_xml = self.xml.xpath(
+            '//*[@id=$id]//choice[@correct="true"]',
+            id=self.xml.get('id')
+        )
 
-        self.correct_choices = set([choice.get(
-            'name') for choice in correct_xml])
+        self.correct_choices = set([
+            choice.get('name') for choice in correct_xml
+        ])
+
+        incorrect_xml = self.xml.xpath(
+            '//*[@id=$id]//choice[@correct="false"]',
+            id=self.xml.get('id')
+        )
+
+        self.incorrect_choices = set([
+            choice.get('name') for choice in incorrect_xml
+        ])
 
     def assign_choice_names(self):
         """
@@ -832,25 +857,153 @@ class ChoiceResponse(LoncapaResponse):
             if not choice.get('id'):
                 choice.set("id", chr(ord("A") + index))
 
+    def grade_via_every_decision_counts(self, **kwargs):
+        """
+        Calculates partial credit on the Every Decision Counts scheme.
+        For each correctly selected or correctly blank choice, score 1 point.
+        Divide by total number of choices.
+        Arguments:
+            all_choices, the full set of checkboxes
+            student_answer, what the student actually chose
+            student_non_answers, what the student didn't choose
+        Returns a CorrectMap.
+        """
+
+        all_choices = kwargs['all_choices']
+        student_answer = kwargs['student_answer']
+        student_non_answers = kwargs['student_non_answers']
+
+        edc_max_grade = len(all_choices)
+        edc_current_grade = 0
+
+        good_answers = sum([1 for answer in student_answer if answer in self.correct_choices])
+        good_non_answers = sum([1 for blank in student_non_answers if blank in self.incorrect_choices])
+        edc_current_grade = good_answers + good_non_answers
+
+        return_grade = round(self.get_max_score() * float(edc_current_grade) / float(edc_max_grade), 2)
+
+        if edc_current_grade == edc_max_grade:
+            return CorrectMap(self.answer_id, correctness='correct')
+        elif edc_current_grade > 0:
+            return CorrectMap(self.answer_id, correctness='partially-correct', npoints=return_grade)
+        else:
+            return CorrectMap(self.answer_id, correctness='incorrect', npoints=0)
+
+    def grade_via_halves(self, **kwargs):
+        """
+        Calculates partial credit on the Halves scheme.
+        If no errors, full credit.
+        If one error, half credit as long as there are 3+ choices
+        If two errors, 1/4 credit as long as there are 5+ choices
+        (If not enough choices, no credit.)
+        Arguments:
+            all_choices, the full set of checkboxes
+            student_answer, what the student actually chose
+            student_non_answers, what the student didn't choose
+        Returns a CorrectMap
+        """
+
+        all_choices = kwargs['all_choices']
+        student_answer = kwargs['student_answer']
+        student_non_answers = kwargs['student_non_answers']
+
+        halves_error_count = 0
+
+        incorrect_answers = sum([1 for answer in student_answer if answer in self.incorrect_choices])
+        missed_answers = sum([1 for blank in student_non_answers if blank in self.correct_choices])
+        halves_error_count = incorrect_answers + missed_answers
+
+        if halves_error_count == 0:
+            return_grade = self.get_max_score()
+            return CorrectMap(self.answer_id, correctness='correct', npoints=return_grade)
+        elif halves_error_count == 1 and len(all_choices) > 2:
+            return_grade = round(self.get_max_score() / 2.0, 2)
+            return CorrectMap(self.answer_id, correctness='partially-correct', npoints=return_grade)
+        elif halves_error_count == 2 and len(all_choices) > 4:
+            return_grade = round(self.get_max_score() / 4.0, 2)
+            return CorrectMap(self.answer_id, correctness='partially-correct', npoints=return_grade)
+        else:
+            return CorrectMap(self.answer_id, 'incorrect')
+
+    def grade_without_partial_credit(self, **kwargs):
+        """
+        Standard grading for checkbox problems.
+        100% credit if all choices are correct; 0% otherwise
+        Arguments: student_answer, which is the items the student actually chose
+        """
+
+        student_answer = kwargs['student_answer']
+
+        required_selected = len(self.correct_choices - student_answer) == 0
+        no_extra_selected = len(student_answer - self.correct_choices) == 0
+
+        correct = required_selected & no_extra_selected
+
+        if correct:
+            return CorrectMap(self.answer_id, 'correct')
+        else:
+            return CorrectMap(self.answer_id, 'incorrect')
+
     def get_score(self, student_answers):
+
+        # Setting up answer sets:
+        #  all_choices: the full set of checkboxes
+        #  student_answer: what the student actually chose (note no "s")
+        #  student_non_answers: what they didn't choose
+        #  self.correct_choices: boxes that should be checked
+        #  self.incorrect_choices: boxes that should NOT be checked
+
+        all_choices = self.correct_choices.union(self.incorrect_choices)
 
         student_answer = student_answers.get(self.answer_id, [])
 
         if not isinstance(student_answer, list):
             student_answer = [student_answer]
 
-        no_empty_answer = student_answer != []
+        # When a student leaves all the boxes unmarked, edX throws an error.
+        # This line checks for blank answers so that we can throw "false".
+        # This is not ideal. "None apply" should be a valid choice.
+        # Sadly, this is not the place where we can fix that problem.
+        empty_answer = student_answer == []
+
+        if empty_answer:
+            return CorrectMap(self.answer_id, 'incorrect')
+
         student_answer = set(student_answer)
 
-        required_selected = len(self.correct_choices - student_answer) == 0
-        no_extra_selected = len(student_answer - self.correct_choices) == 0
+        student_non_answers = all_choices - student_answer
 
-        correct = required_selected & no_extra_selected & no_empty_answer
+        # No partial credit? Get grade right now.
+        if not self.has_partial_credit:
+            return self.grade_without_partial_credit(student_answer=student_answer)
 
-        if correct:
-            return CorrectMap(self.answer_id, 'correct')
-        else:
-            return CorrectMap(self.answer_id, 'incorrect')
+        # This below checks to see whether we're using an alternate grading scheme.
+        #  Set partial_credit="false" (or remove it) to require an exact answer for any credit.
+        #  Set partial_credit="EDC" to count each choice for equal points (Every Decision Counts).
+        #  Set partial_credit="halves" to take half credit off for each error.
+
+        # Translators: 'partial_credit' and the items in the 'graders' object
+        # are attribute names or values and should not be translated.
+        graders = {
+            'edc': self.grade_via_every_decision_counts,
+            'halves': self.grade_via_halves,
+            'false': self.grade_without_partial_credit
+        }
+
+        # Only one type of credit at a time.
+        if len(self.credit_type) > 1:
+            raise LoncapaProblemError('Only one type of partial credit is allowed for Checkbox problems.')
+
+        # Make sure we're using an approved style.
+        if self.credit_type[0] not in graders:
+            raise LoncapaProblemError('partial_credit attribute should be one of: ' + ','.join(graders))
+
+        # Run the appropriate grader.
+        return graders[self.credit_type[0]](
+            all_choices=all_choices,
+            student_answer=student_answer,
+            student_non_answers=student_non_answers
+        )
 
     def get_answers(self):
         return {self.answer_id: list(self.correct_choices)}
@@ -997,6 +1150,14 @@ class MultipleChoiceResponse(LoncapaResponse):
     multi_device_support = True
 
     def setup_response(self):
+        """
+        Collects information from the XML for later use.
+
+        correct_choices is a list of the correct choices.
+        partial_choices is a list of the partially-correct choices.
+        partial_values is a list of the scores that go with those
+          choices, defaulting to 0.5 if no value is specified.
+        """
         # call secondary setup for MultipleChoice questions, to set name
         # attributes
         self.mc_setup_response()
@@ -1011,8 +1172,19 @@ class MultipleChoiceResponse(LoncapaResponse):
             contextualize_text(choice.get('name'), self.context)
             for choice in cxml
             if contextualize_text(choice.get('correct'), self.context).upper() == "TRUE"
-
         ]
+
+        if self.has_partial_credit:
+            self.partial_choices = [
+                contextualize_text(choice.get('name'), self.context)
+                for choice in cxml
+                if contextualize_text(choice.get('correct'), self.context).lower() == 'partial'
+            ]
+            self.partial_values = [
+                float(choice.get('point_value', default='0.5'))    # Default partial credit: 50%
+                for choice in cxml
+                if contextualize_text(choice.get('correct'), self.context).lower() == 'partial'
+            ]
 
     def get_extended_hints(self, student_answer_dict, new_cmap):
         """
@@ -1083,15 +1255,79 @@ class MultipleChoiceResponse(LoncapaResponse):
         self.do_shuffle(self.xml, problem)
         self.do_answer_pool(self.xml, problem)
 
+    def grade_via_points(self, **kwargs):
+        """
+        Calculates partial credit based on the Points scheme.
+        Answer choices marked "partial" are given partial credit.
+        Default is 50%; other amounts may be set in point_value attributes.
+        Arguments: student_answers
+        Returns: a CorrectMap
+        """
+
+        student_answers = kwargs['student_answers']
+
+        if (self.answer_id in student_answers
+                and student_answers[self.answer_id] in self.correct_choices):
+            return CorrectMap(self.answer_id, correctness='correct')
+
+        elif (
+                self.answer_id in student_answers
+                and student_answers[self.answer_id] in self.partial_choices
+        ):
+            choice_index = self.partial_choices.index(student_answers[self.answer_id])
+            credit_amount = self.partial_values[choice_index]
+            return CorrectMap(self.answer_id, correctness='partially-correct', npoints=credit_amount)
+        else:
+            return CorrectMap(self.answer_id, 'incorrect')
+
+    def grade_without_partial_credit(self, **kwargs):
+        """
+        Standard grading for multiple-choice problems.
+        100% credit if choices are correct; 0% otherwise
+        Arguments: student_answers
+        Returns: a CorrectMap
+        """
+
+        student_answers = kwargs['student_answers']
+
+        if (self.answer_id in student_answers
+                and student_answers[self.answer_id] in self.correct_choices):
+            return CorrectMap(self.answer_id, correctness='correct')
+        else:
+            return CorrectMap(self.answer_id, 'incorrect')
+
     def get_score(self, student_answers):
         """
         grade student response.
         """
-        if (self.answer_id in student_answers
-                and student_answers[self.answer_id] in self.correct_choices):
-            return CorrectMap(self.answer_id, 'correct')
-        else:
-            return CorrectMap(self.answer_id, 'incorrect')
+
+        # No partial credit? Grade it right away.
+        if not self.has_partial_credit:
+            return self.grade_without_partial_credit(student_answers=student_answers)
+
+        # This below checks to see whether we're using an alternate grading scheme.
+        #  Set partial_credit="false" (or remove it) to require an exact answer for any credit.
+        #  Set partial_credit="points" to set specific point values for specific choices.
+
+        # Translators: 'partial_credit' and the items in the 'graders' object
+        # are attribute names or values and should not be translated.
+        graders = {
+            'points': self.grade_via_points,
+            'false': self.grade_without_partial_credit
+        }
+
+        # Only one type of credit at a time.
+        if len(self.credit_type) > 1:
+            raise LoncapaProblemError('Only one type of partial credit is allowed for Multiple Choice problems.')
+
+        # Make sure we're using an approved style.
+        if self.credit_type[0] not in graders:
+            raise LoncapaProblemError('partial_credit attribute should be one of: ' + ','.join(graders))
+
+        # Run the appropriate grader.
+        return graders[self.credit_type[0]](
+            student_answers=student_answers
+        )
 
     def get_answers(self):
         return {self.answer_id: self.correct_choices}
@@ -1492,6 +1728,14 @@ class NumericalResponse(LoncapaResponse):
         if self.answer_id not in student_answers:
             return CorrectMap(self.answer_id, 'incorrect')
 
+        # Make sure we're using an approved partial credit style.
+        # Currently implemented: 'close' and 'list'
+        if self.has_partial_credit:
+            graders = ['list', 'close']
+            for style in self.credit_type:
+                if style not in graders:
+                    raise LoncapaProblemError('partial_credit attribute should be one of: ' + ','.join(graders))
+
         student_answer = student_answers[self.answer_id]
 
         _ = self.capa_system.i18n.ugettext
@@ -1526,6 +1770,30 @@ class NumericalResponse(LoncapaResponse):
         except Exception:
             raise general_exception
         # End `evaluator` block -- we figured out the student's answer!
+
+        tree = self.xml
+
+        # What multiple of the tolerance is worth partial credit?
+        has_partial_range = tree.xpath('responseparam[@partial_range]')
+        if has_partial_range:
+            partial_range = float(has_partial_range[0].get('partial_range', default='2'))
+        else:
+            partial_range = 2
+
+        # Take in alternative answers that are worth partial credit.
+        has_partial_answers = tree.xpath('responseparam[@partial_answers]')
+        if has_partial_answers:
+            partial_answers = has_partial_answers[0].get('partial_answers').split(',')
+            for index, word in enumerate(partial_answers):
+                partial_answers[index] = word.strip()
+                partial_answers[index] = self.get_staff_ans(partial_answers[index])
+
+        else:
+            partial_answers = False
+
+        partial_score = 0.5
+        is_correct = 'incorrect'
+
         if self.range_tolerance:
             if isinstance(student_float, complex):
                 raise StudentInputError(_(u"You may not use complex numbers in range tolerance problems"))
@@ -1547,19 +1815,71 @@ class NumericalResponse(LoncapaResponse):
                         tolerance=float_info.epsilon,
                         relative_tolerance=True
                 ):
-                    correct = inclusion
+                    is_correct = 'correct' if inclusion else 'incorrect'
                     break
             else:
-                correct = boundaries[0] < student_float < boundaries[1]
+                if boundaries[0] < student_float < boundaries[1]:
+                    is_correct = 'correct'
+                else:
+                    if self.has_partial_credit is False:
+                        pass
+                    elif 'close' in self.credit_type:
+                        # Partial credit: 50% if the student is outside the specified boundaries,
+                        # but within an extended set of boundaries.
+
+                        extended_boundaries = []
+                        boundary_range = boundaries[1] - boundaries[0]
+                        extended_boundaries.append(boundaries[0] - partial_range * boundary_range)
+                        extended_boundaries.append(boundaries[1] + partial_range * boundary_range)
+                        if extended_boundaries[0] < student_float < extended_boundaries[1]:
+                            is_correct = 'partially-correct'
+
         else:
             correct_float = self.get_staff_ans(self.correct_answer)
-            correct = compare_with_tolerance(
-                student_float, correct_float, self.tolerance
-            )
-        if correct:
-            return CorrectMap(self.answer_id, 'correct')
+
+            # Partial credit is available in three cases:
+            #  If the student answer is within expanded tolerance of the actual answer,
+            #  the student gets 50% credit. (Currently set as the default.)
+            #  Set via partial_credit="close" in the numericalresponse tag.
+            #
+            #  If the student answer is within regular tolerance of an alternative answer,
+            #  the student gets 50% credit. (Same default.)
+            #  Set via partial_credit="list"
+            #
+            #  If the student answer is within expanded tolerance of an alternative answer,
+            #  the student gets 25%. (We take the 50% and square it, at the moment.)
+            #  Set via partial_credit="list,close" or "close, list" or the like.
+
+            if str(self.tolerance).endswith('%'):
+                expanded_tolerance = str(partial_range * float(str(self.tolerance)[:-1])) + '%'
+            else:
+                expanded_tolerance = partial_range * float(self.tolerance)
+
+            if compare_with_tolerance(student_float, correct_float, self.tolerance):
+                is_correct = 'correct'
+            elif self.has_partial_credit is False:
+                pass
+            elif 'list' in self.credit_type:
+                for value in partial_answers:
+                    if compare_with_tolerance(student_float, value, self.tolerance):
+                        is_correct = 'partially-correct'
+                        break
+                    elif 'close' in self.credit_type:
+                        if compare_with_tolerance(student_float, correct_float, expanded_tolerance):
+                            is_correct = 'partially-correct'
+                            break
+                        elif compare_with_tolerance(student_float, value, expanded_tolerance):
+                            is_correct = 'partially-correct'
+                            partial_score = partial_score * partial_score
+                            break
+            elif 'close' in self.credit_type:
+                if compare_with_tolerance(student_float, correct_float, expanded_tolerance):
+                    is_correct = 'partially-correct'
+
+        if is_correct == 'partially-correct':
+            return CorrectMap(self.answer_id, is_correct, npoints=partial_score)
         else:
-            return CorrectMap(self.answer_id, 'incorrect')
+            return CorrectMap(self.answer_id, is_correct)
 
     def compare_answer(self, ans1, ans2):
         """
@@ -1868,6 +2188,9 @@ class CustomResponse(LoncapaResponse):
     code = None
     expect = None
 
+    # Standard amount for partial credit if not otherwise specified:
+    default_pc = 0.5
+
     def setup_response(self):
         xml = self.xml
 
@@ -2044,7 +2367,12 @@ class CustomResponse(LoncapaResponse):
             if grade_decimals:
                 npoints = max_points * grade_decimals[k]
             else:
-                npoints = max_points if correct[k] == 'correct' else 0
+                if correct[k] == 'correct':
+                    npoints = max_points
+                elif correct[k] == 'partially-correct':
+                    npoints = max_points * self.default_pc
+                else:
+                    npoints = 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
@@ -2085,13 +2413,30 @@ class CustomResponse(LoncapaResponse):
             )
             if isinstance(ret, dict):
                 # One kind of dictionary the check function can return has the
-                # form {'ok': BOOLEAN, 'msg': STRING, 'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)}
+                # form {'ok': BOOLEAN or STRING, 'msg': STRING, 'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)}
                 # 'ok' will control the checkmark, while grade_decimal, if present, will scale
                 # the score the student receives on the response.
                 # If there are multiple inputs, they all get marked
                 # to the same correct/incorrect value
                 if 'ok' in ret:
-                    correct = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
+
+                    # Returning any falsy value or the "false" string for "ok" gives incorrect.
+                    # Returning any string that includes "partial" for "ok" gives partial credit.
+                    # Returning any other truthy value for "ok" gives correct
+
+                    ok_val = str(ret['ok']).lower().strip() if bool(ret['ok']) else 'false'
+
+                    if ok_val == 'false':
+                        correct = 'incorrect'
+                    elif 'partial' in ok_val:
+                        correct = 'partially-correct'
+                    else:
+                        correct = 'correct'
+                    correct = [correct] * len(idset)   # All inputs share the same mark.
+
+                    # old version, no partial credit:
+                    # correct = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
+
                     msg = ret.get('msg', None)
                     msg = self.clean_message_html(msg)
 
@@ -2103,9 +2448,14 @@ class CustomResponse(LoncapaResponse):
                         self.context['messages'][0] = msg
 
                     if 'grade_decimal' in ret:
-                        decimal = ret['grade_decimal']
+                        decimal = float(ret['grade_decimal'])
                     else:
-                        decimal = 1.0 if ret['ok'] else 0.0
+                        if correct[0] == 'correct':
+                            decimal = 1.0
+                        elif correct[0] == 'partially-correct':
+                            decimal = self.default_pc
+                        else:
+                            decimal = 0.0
                     grade_decimals = [decimal] * len(idset)
                     self.context['grade_decimals'] = grade_decimals
 
@@ -2113,7 +2463,11 @@ class CustomResponse(LoncapaResponse):
                 # the form:
                 # { 'overall_message': STRING,
                 #   'input_list': [
-                #     { 'ok': BOOLEAN, 'msg': STRING, 'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)},
+                #     {
+                #         'ok': BOOLEAN or STRING,
+                #         'msg': STRING,
+                #         'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)
+                #     },
                 #   ...
                 #   ]
                 # }
@@ -2130,16 +2484,35 @@ class CustomResponse(LoncapaResponse):
                     correct = []
                     messages = []
                     grade_decimals = []
+
+                    # Returning any falsy value or the "false" string for "ok" gives incorrect.
+                    # Returning any string that includes "partial" for "ok" gives partial credit.
+                    # Returning any other truthy value for "ok" gives correct
+
                     for input_dict in input_list:
-                        correct.append('correct'
-                                       if input_dict['ok'] else 'incorrect')
+                        if str(input_dict['ok']).lower().strip() == "false" or not input_dict['ok']:
+                            correct.append('incorrect')
+                        elif 'partial' in str(input_dict['ok']).lower().strip():
+                            correct.append('partially-correct')
+                        else:
+                            correct.append('correct')
+
+                        # old version, no partial credit
+                        # correct.append('correct'
+                        #                if input_dict['ok'] else 'incorrect')
+
                         msg = (self.clean_message_html(input_dict['msg'])
                                if 'msg' in input_dict else None)
                         messages.append(msg)
                         if 'grade_decimal' in input_dict:
                             decimal = input_dict['grade_decimal']
                         else:
-                            decimal = 1.0 if input_dict['ok'] else 0.0
+                            if str(input_dict['ok']).lower().strip() == 'true':
+                                decimal = 1.0
+                            elif 'partial' in str(input_dict['ok']).lower().strip():
+                                decimal = self.default_pc
+                            else:
+                                decimal = 0.0
                         grade_decimals.append(decimal)
 
                     self.context['messages'] = messages
@@ -2156,7 +2529,21 @@ class CustomResponse(LoncapaResponse):
                     )
 
             else:
-                correct = ['correct' if ret else 'incorrect'] * len(idset)
+
+                # Returning any falsy value or the "false" string for "ok" gives incorrect.
+                # Returning any string that includes "partial" for "ok" gives partial credit.
+                # Returning any other truthy value for "ok" gives correct
+
+                if str(ret).lower().strip() == "false" or not bool(ret):
+                    correct = 'incorrect'
+                elif 'partial' in str(ret).lower().strip():
+                    correct = 'partially-correct'
+                else:
+                    correct = 'correct'
+                correct = [correct] * len(idset)
+
+                # old version, no partial credit:
+                # correct = ['correct' if ret else 'incorrect'] * len(idset)
 
             self.context['correct'] = correct
 

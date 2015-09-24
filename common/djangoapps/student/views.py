@@ -447,10 +447,11 @@ def register_user(request, extra_context=None):
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
-        overrides['running_pipeline'] = running_pipeline
-        overrides['selected_provider'] = current_provider.name
-        context.update(overrides)
+        if current_provider is not None:
+            overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+            overrides['running_pipeline'] = running_pipeline
+            overrides['selected_provider'] = current_provider.name
+            context.update(overrides)
 
     return render_to_response('register.html', context)
 
@@ -1602,10 +1603,28 @@ def create_account_with_params(request, params):
     # Track the user's registration
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(user.id, {
-            'email': user.email,
-            'username': user.username,
-        })
+        identity_args = [
+            user.id,  # pylint: disable=no-member
+            {
+                'email': user.email,
+                'username': user.username,
+                'name': profile.name,
+                'age': profile.age,
+                'education': profile.level_of_education_display,
+                'address': profile.mailing_address,
+                'gender': profile.gender_display,
+                'country': profile.country,
+            }
+        ]
+
+        if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
+            identity_args.append({
+                "MailChimp": {
+                    "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
+                }
+            })
+
+        analytics.identify(*identity_args)
 
         analytics.track(
             user.id,

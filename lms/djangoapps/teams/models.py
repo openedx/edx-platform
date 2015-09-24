@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import uuid4
 import pytz
 from datetime import datetime
+from model_utils import FieldTracker
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
@@ -27,6 +28,7 @@ from xmodule_django.models import CourseKeyField
 from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException
+from teams.utils import emit_team_event
 from teams import TEAM_DISCUSSION_CONTEXT
 
 
@@ -88,6 +90,11 @@ class CourseTeam(models.Model):
     last_activity_at = models.DateTimeField(db_index=True)  # indexed for ordering
     users = models.ManyToManyField(User, db_index=True, related_name='teams', through='CourseTeamMembership')
     team_size = models.IntegerField(default=0, db_index=True)  # indexed for ordering
+
+    field_tracker = FieldTracker()
+
+    # Don't emit changed events when these fields change.
+    FIELD_BLACKLIST = ['last_activity_at', 'team_size']
 
     @classmethod
     def create(cls, name, course_id, description, topic_id=None, country=None, language=None):
@@ -241,3 +248,6 @@ class CourseTeamMembership(models.Model):
         membership.team.last_activity_at = now
         membership.team.save()
         membership.save()
+        emit_team_event('edx.team.activity_updated', membership.team.course_id, {
+            'team_id': membership.team_id,
+        })

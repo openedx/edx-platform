@@ -372,9 +372,10 @@ def get_provider_user_states(user):
             if enabled_provider.match_social_auth(auth):
                 association_id = auth.id
                 break
-        states.append(
-            ProviderUserState(enabled_provider, user, association_id)
-        )
+        if enabled_provider.accepts_logins or association_id:
+            states.append(
+                ProviderUserState(enabled_provider, user, association_id)
+            )
 
     return states
 

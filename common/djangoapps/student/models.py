@@ -29,7 +29,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
@@ -282,6 +282,26 @@ class UserProfile(models.Model):
         """
         return self.profile_image_uploaded_at is not None
 
+    @property
+    def age(self):
+        """ Convenience method that returns the age given a year_of_birth. """
+        year_of_birth = self.year_of_birth
+        year = datetime.now(UTC).year
+        if year_of_birth is not None:
+            return year - year_of_birth
+
+    @property
+    def level_of_education_display(self):
+        """ Convenience method that returns the human readable level of education. """
+        if self.level_of_education:
+            return self.__enumerable_to_display(self.LEVEL_OF_EDUCATION_CHOICES, self.level_of_education)
+
+    @property
+    def gender_display(self):
+        """ Convenience method that returns the human readable gender. """
+        if self.gender:
+            return self.__enumerable_to_display(self.GENDER_CHOICES, self.gender)
+
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
         if not js_str:
@@ -336,9 +356,17 @@ class UserProfile(models.Model):
         year_of_birth = self.year_of_birth
         if year_of_birth is None:
             return default_requires_consent
+
         if date is None:
-            date = datetime.now(UTC)
-        return date.year - year_of_birth <= age_limit
+            age = self.age
+        else:
+            age = date.year - year_of_birth
+
+        return age <= age_limit
+
+    def __enumerable_to_display(self, enumerables, enum_value):
+        """ Get the human readable value from an enumerable list of key-value pairs. """
+        return dict(enumerables)[enum_value]
 
 
 @receiver(pre_save, sender=UserProfile)
@@ -894,16 +922,32 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        enrollment, created = CourseEnrollment.objects.get_or_create(
-            user=user,
-            course_id=course_key,
-        )
+        try:
+            enrollment, created = CourseEnrollment.objects.get_or_create(
+                user=user,
+                course_id=course_key,
+            )
 
-        # If we *did* just create a new enrollment, set some defaults
-        if created:
-            enrollment.mode = "honor"
-            enrollment.is_active = False
-            enrollment.save()
+            # If we *did* just create a new enrollment, set some defaults
+            if created:
+                enrollment.mode = "honor"
+                enrollment.is_active = False
+                enrollment.save()
+        except IntegrityError:
+            log.info(
+                (
+                    "An integrity error occurred while getting-or-creating the enrollment"
+                    "for course key %s and student %s. This can occur if two processes try to get-or-create "
+                    "the enrollment at the same time and the database is set to REPEATABLE READ. We will try "
+                    "committing the transaction and retrying."
+                ),
+                course_key, user
+            )
+            transaction.commit()
+            enrollment = CourseEnrollment.objects.get(
+                user=user,
+                course_id=course_key,
+            )
 
         return enrollment
 

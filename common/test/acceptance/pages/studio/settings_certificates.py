@@ -11,7 +11,9 @@ The methods in these classes are organized into several conceptual buckets:
 import os
 
 from bok_choy.promise import EmptyPromise
+from ...tests.helpers import disable_animations
 from .course_page import CoursePage
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 class CertificatesPage(CoursePage):
@@ -26,6 +28,12 @@ class CertificatesPage(CoursePage):
     ################
     # Helpers
     ################
+
+    def refresh(self):
+        """
+        Refresh the certificate page
+        """
+        self.browser.refresh()
 
     def is_browser_on_page(self):
         """
@@ -132,8 +140,10 @@ class CertificatesPage(CoursePage):
         """
         Clicks the main action presented by the prompt (such as 'Delete')
         """
+        disable_animations(self)
         self.wait_for_confirmation_prompt()
-        self.q(css='a.button.action-primary').first.click()
+        self.q(css='.prompt button.action-primary').first.click()
+        self.wait_for_element_invisibility('.prompt', 'wait for pop up to disappear')
         self.wait_for_ajax()
 
 
@@ -257,7 +267,7 @@ class Certificate(object):
         Returns whether or not the certificate delete icon is present.
         """
         EmptyPromise(
-            lambda: self.find_css('.actions .delete').present,
+            lambda: self.find_css('.actions .delete.action-icon').present,
             'Certificate delete button is displayed'
         ).fulfill()
 
@@ -278,6 +288,7 @@ class Certificate(object):
         """
         Create a new certificate.
         """
+        disable_animations(self.page)
         self.find_css('.action-primary').first.click()
         self.page.wait_for_ajax()
 
@@ -317,8 +328,7 @@ class Certificate(object):
         Remove the first (possibly the only) certificate from the set
         """
         self.wait_for_certificate_delete_button()
-        self.find_css('.actions .delete').first.click()
-        self.page.wait_for_ajax()
+        self.find_css('.actions .delete.action-icon').first.click()
 
 
 class Signatory(object):
@@ -434,11 +444,8 @@ class Signatory(object):
         """
         Save signatory.
         """
-        # Move focus from input to save button and then click it
-        self.certificate.page.browser.execute_script(
-            "$('{} .signatory-panel-save').focus()".format(self.get_selector())
-        )
-        self.find_css('.signatory-panel-save').first.click()
+        # Click on the save button.
+        self.certificate.page.q(css='button.signatory-panel-save').click()
         self.mode = 'details'
         self.certificate.page.wait_for_ajax()
         self.wait_for_signatory_detail_view()
@@ -447,7 +454,7 @@ class Signatory(object):
         """
         Cancel signatory editing.
         """
-        self.find_css('.signatory-panel-close').first.click()
+        self.certificate.page.q(css='button.signatory-panel-close').click()
         self.mode = 'details'
         self.wait_for_signatory_detail_view()
 

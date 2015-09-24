@@ -5,7 +5,12 @@ from rest_framework.serializers import CharField, Field
 
 
 class ExpandableField(Field):
-    """Field that can dynamically use a more detailed serializer based on a user-provided "expand" parameter."""
+    """Field that can dynamically use a more detailed serializer based on a user-provided "expand" parameter.
+
+    Kwargs:
+      collapsed_serializer (Serializer): the serializer to use for a non-expanded representation.
+      expanded_serializer (Serializer): the serializer to use for an expanded representation.
+    """
     def __init__(self, **kwargs):
         """Sets up the ExpandableField with the collapsed and expanded versions of the serializer."""
         assert 'collapsed_serializer' in kwargs and 'expanded_serializer' in kwargs

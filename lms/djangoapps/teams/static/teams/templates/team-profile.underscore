@@ -21,7 +21,7 @@
             <% if (hasMembers) { %>
                 <span class="sr"><%- gettext("Team member profiles") %></span>
             <% } %>
-            <div class="members-info"></div>
+            <ul class="members-info"></ul>
         </div>
 
         <div class="team-capacity">

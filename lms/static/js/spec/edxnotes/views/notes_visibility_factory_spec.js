@@ -70,6 +70,16 @@ define([
             expect(this.toggleMessage).toContainText('Notes visible');
             expect(Annotator._instances).toHaveLength(2);
 
+            // TODO: why is the same search request made twice?
+            AjaxHelpers.expectJsonRequest(requests, 'GET',
+                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
+            );
+            AjaxHelpers.respondWithJson(requests, {});
+            AjaxHelpers.expectJsonRequest(requests, 'GET',
+                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
+            );
+            AjaxHelpers.respondWithJson(requests, {});
+
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
                 'visibility': true
             });
@@ -90,6 +100,17 @@ define([
             expect(errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
+
+            // TODO: why is the same search request made twice?
+            AjaxHelpers.expectJsonRequest(requests, 'GET',
+                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
+            );
+            AjaxHelpers.respondWithJson(requests, {});
+            AjaxHelpers.expectJsonRequest(requests, 'GET',
+                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
+            );
+            AjaxHelpers.respondWithJson(requests, {});
+
             AjaxHelpers.respondWithJson(requests, {});
             expect(errorContainer).not.toHaveClass('annotator-notice-show');
         });

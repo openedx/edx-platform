@@ -1,12 +1,31 @@
 """ Search index used to load data into elasticsearch"""
 
+import logging
+from elasticsearch.exceptions import ConnectionError
+
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.utils import translation
+from functools import wraps
 
 from search.search_engine_base import SearchEngine
 
+from .errors import ElasticSearchConnectionError
 from .serializers import CourseTeamSerializer, CourseTeam
+
+
+def if_search_enabled(f):
+    """
+    Only call `f` if search is enabled for the CourseTeamIndexer.
+    """
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        """Wraps the decorated function."""
+        cls = args[0]
+        if cls.search_is_enabled():
+            return f(*args, **kwargs)
+    return wrapper
 
 
 class CourseTeamIndexer(object):
@@ -45,12 +64,14 @@ class CourseTeamIndexer(object):
         """
         Generate the text field used for general search.
         """
-        return "{name}\n{description}\n{country}\n{language}".format(
-            name=self.course_team.name.encode('utf-8'),
-            description=self.course_team.description.encode('utf-8'),
-            country=self.course_team.country.name.format(),
-            language=self._language_name()
-        )
+        # Always use the English version of any localizable strings (see TNL-3239)
+        with translation.override('en'):
+            return u"{name}\n{description}\n{country}\n{language}".format(
+                name=self.course_team.name,
+                description=self.course_team.description,
+                country=self.course_team.country.name.format(),
+                language=self._language_name()
+            )
 
     def _language_name(self):
         """
@@ -63,22 +84,34 @@ class CourseTeamIndexer(object):
             return self.course_team.language
 
     @classmethod
+    @if_search_enabled
     def index(cls, course_team):
         """
         Update index with course_team object (if feature is enabled).
         """
-        if cls.search_is_enabled():
-            search_engine = cls.engine()
-            serialized_course_team = CourseTeamIndexer(course_team).data()
-            search_engine.index(cls.DOCUMENT_TYPE_NAME, [serialized_course_team])
+        search_engine = cls.engine()
+        serialized_course_team = CourseTeamIndexer(course_team).data()
+        search_engine.index(cls.DOCUMENT_TYPE_NAME, [serialized_course_team])
 
     @classmethod
+    @if_search_enabled
+    def remove(cls, course_team):
+        """
+        Remove course_team from the index (if feature is enabled).
+        """
+        cls.engine().remove(cls.DOCUMENT_TYPE_NAME, [course_team.team_id])
+
+    @classmethod
+    @if_search_enabled
     def engine(cls):
         """
         Return course team search engine (if feature is enabled).
         """
-        if cls.search_is_enabled():
+        try:
             return SearchEngine.get_search_engine(index=cls.INDEX_NAME)
+        except ConnectionError as err:
+            logging.error('Error connecting to elasticsearch: %s', err)
+            raise ElasticSearchConnectionError
 
     @classmethod
     def search_is_enabled(cls):
@@ -93,4 +126,18 @@ def course_team_post_save_callback(**kwargs):
     """
     Reindex object after save.
     """
-    CourseTeamIndexer.index(kwargs['instance'])
+    try:
+        CourseTeamIndexer.index(kwargs['instance'])
+    except ElasticSearchConnectionError:
+        pass
+
+
+@receiver(post_delete, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_delete_callback')
+def course_team_post_delete_callback(**kwargs):  # pylint: disable=invalid-name
+    """
+    Reindex object after delete.
+    """
+    try:
+        CourseTeamIndexer.remove(kwargs['instance'])
+    except ElasticSearchConnectionError:
+        pass

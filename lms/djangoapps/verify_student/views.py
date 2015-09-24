@@ -273,7 +273,7 @@ class PayAndVerifyView(View):
         # separate out the payment flow and use the product SKU to figure out what
         # the user is trying to purchase.
         #
-        # Nonethless, for the time being we continue to make the really ugly assumption
+        # Nonetheless, for the time being we continue to make the really ugly assumption
         # that at some point there was a paid course mode we can query for the price.
         relevant_course_mode = self._get_paid_mode(course_key)
 
@@ -509,9 +509,12 @@ class PayAndVerifyView(View):
         # Retrieve all the modes at once to reduce the number of database queries
         all_modes, unexpired_modes = CourseMode.all_and_unexpired_modes_for_courses([course_key])
 
-        # Retrieve the first unexpired, paid mode, if there is one
+        # Retrieve the first mode that matches the following criteria:
+        #  * Unexpired
+        #  * Price > 0
+        #  * Not credit
         for mode in unexpired_modes[course_key]:
-            if mode.min_price > 0:
+            if mode.min_price > 0 and not CourseMode.is_credit_mode(mode):
                 return mode
 
         # Otherwise, find the first expired mode
@@ -763,13 +766,22 @@ def create_order(request):
         return HttpResponseBadRequest(_("Selected price is not valid number."))
 
     current_mode = None
-    paid_modes = CourseMode.paid_modes_for_course(course_id)
-    # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
-    # for course exist then choose the first one
-    if paid_modes:
-        if len(paid_modes) > 1:
-            log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
-        current_mode = paid_modes[0]
+    sku = request.POST.get('sku', None)
+
+    if sku:
+        try:
+            current_mode = CourseMode.objects.get(sku=sku)
+        except CourseMode.DoesNotExist:
+            log.exception(u'Failed to find CourseMode with SKU [%s].', sku)
+
+    if not current_mode:
+        # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
+        # for course exist then choose the first one
+        paid_modes = CourseMode.paid_modes_for_course(course_id)
+        if paid_modes:
+            if len(paid_modes) > 1:
+                log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
+            current_mode = paid_modes[0]
 
     # Make sure this course has a paid mode
     if not current_mode:
@@ -1473,11 +1485,3 @@ class InCourseReverifyView(View):
         params = urllib.urlencode({"checkpoint": checkpoint})
         full_url = u"{base}?{params}".format(base=base_url, params=params)
         return redirect(full_url)
-
-
-class VerifyLaterView(RedirectView):
-    """ This view has been deprecated and should redirect to the unified verification flow. """
-    permanent = True
-
-    def get_redirect_url(self, course_id, **kwargs):    # pylint: disable=unused-argument
-        return reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_id)})

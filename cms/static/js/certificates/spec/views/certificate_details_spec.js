@@ -79,7 +79,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         };
 
         beforeEach(function() {
-            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor'], true);
+            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor', 'signatory-actions'], true);
 
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
@@ -174,6 +174,12 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.view.$('.action-delete .delete').click();
             });
 
+            it('should scroll to top after rendering if necessary', function () {
+                $.smoothScroll = jasmine.createSpy('jQuery.smoothScroll');
+                appendSetFixtures(this.view.render().el);
+                expect($.smoothScroll).toHaveBeenCalled();
+            });
+
         });
 
         describe('Signatory details', function(){
@@ -246,7 +252,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory Test Title longer than 40 characters in length'
+                    inputSignatoryTitle: 'This is a certificate signatory title that has waaaaaaay more than 106 characters, in order to cause an exception.'
                 });
 
                 setValuesToInputs(this.view, {

@@ -111,6 +111,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     helpMessage: '',
                     valueAttribute: 'auth-yet-another',
                     connected: true,
+                    acceptsLogins: 'true',
                     connectUrl: 'yetanother.com/auth/connect',
                     disconnectUrl: 'yetanother.com/auth/disconnect'
                 });

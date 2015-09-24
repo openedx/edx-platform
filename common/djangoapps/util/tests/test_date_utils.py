@@ -146,6 +146,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         (u'%Y년 %m월 %d일', u"2013년 02월 14일"),
         ("%a, %b %d, %Y", "Thu, Feb 14, 2013"),
         ("%I:%M:%S %p", "04:41:17 PM"),
+        ("%A at %-I%P", "Thursday at 4pm"),
     )
     def test_usual_strftime_behavior(self, (fmt, expected)):
         dtime = datetime(2013, 02, 14, 16, 41, 17)
@@ -157,6 +158,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("SHORT_DATE", "Feb 14, 2013"),
         ("LONG_DATE", "Thursday, February 14, 2013"),
         ("TIME", "04:41:17 PM"),
+        ("DAY_AND_TIME", "Thursday at 4pm"),
         ("%x %X!", "Feb 14, 2013 04:41:17 PM!"),
     )
     def test_shortcuts(self, (fmt, expected)):

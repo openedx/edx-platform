@@ -27,6 +27,8 @@ function(_, gettext, BaseView, ViewUtils, NotificationView) {
         },
 
         render: function () {
+            // removing the course mode 'audit' from the preview list.
+            this.course_modes = _.without(this.course_modes, 'audit');
             this.$el.html(this.template({
                 course_modes: this.course_modes,
                 certificate_web_view_url: this.certificate_web_view_url,

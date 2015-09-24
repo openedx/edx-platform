@@ -34,7 +34,7 @@ def run():
     add_mimetypes()
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
-        enable_theme()
+        enable_stanford_theme()
 
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
@@ -69,7 +69,7 @@ def add_mimetypes():
     mimetypes.add_type('application/font-woff', '.woff')
 
 
-def enable_theme():
+def enable_stanford_theme():
     """
     Enable the settings for a custom theme, whose files should be stored
     in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
@@ -77,7 +77,7 @@ def enable_theme():
     # Workaround for setting THEME_NAME to an empty
     # string which is the default due to this ansible
     # bug: https://github.com/ansible/ansible/issues/4812
-    if settings.THEME_NAME == "":
+    if getattr(settings, "THEME_NAME", "") == "":
         settings.THEME_NAME = None
         return
 

@@ -61,9 +61,6 @@ domReady(function() {
     // general link management - smooth scrolling page links
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
-    // tender feedback window scrolling
-    $('a.show-tender').bind('click', smoothScrollTop);
-
     IframeUtils.iframeBinding();
 
     // disable ajax caching in IE so that backbone fetches work

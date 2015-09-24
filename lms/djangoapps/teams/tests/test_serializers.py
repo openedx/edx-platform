@@ -3,18 +3,24 @@
 Tests for custom Teams Serializers.
 """
 from django.core.paginator import Paginator
+from django.test.client import RequestFactory
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.djangoapps.teams.serializers import (
-    BaseTopicSerializer, PaginatedTopicSerializer, BulkTeamCountPaginatedTopicSerializer,
-    TopicSerializer, add_team_count
+    BaseTopicSerializer,
+    PaginatedTopicSerializer,
+    BulkTeamCountPaginatedTopicSerializer,
+    TopicSerializer,
+    MembershipSerializer,
+    add_team_count
 )
 
 
-class TopicTestCase(ModuleStoreTestCase):
+class SerializerTestCase(SharedModuleStoreTestCase):
     """
     Base test class to set up a course with topics
     """
@@ -22,7 +28,7 @@ class TopicTestCase(ModuleStoreTestCase):
         """
         Set up a course with a teams configuration.
         """
-        super(TopicTestCase, self).setUp()
+        super(SerializerTestCase, self).setUp()
         self.course = CourseFactory.create(
             teams_configuration={
                 "max_team_size": 10,
@@ -31,7 +37,43 @@ class TopicTestCase(ModuleStoreTestCase):
         )
 
 
-class BaseTopicSerializerTestCase(TopicTestCase):
+class MembershipSerializerTestCase(SerializerTestCase):
+    """
+    Tests for the membership serializer.
+    """
+
+    def setUp(self):
+        super(MembershipSerializerTestCase, self).setUp()
+        self.team = CourseTeamFactory.create(
+            course_id=self.course.id,
+            topic_id=self.course.teams_topics[0]['id']
+        )
+        self.user = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+        self.team_membership = CourseTeamMembershipFactory.create(team=self.team, user=self.user)
+
+    def test_membership_serializer_expand_user_and_team(self):
+        """Verify that the serializer only expands the user and team one level."""
+        data = MembershipSerializer(self.team_membership, context={
+            'expand': [u'team', u'user'],
+            'request': RequestFactory().get('/api/team/v0/team_membership')
+        }).data
+        username = self.user.username
+        self.assertEqual(data['user'], {
+            'url': 'http://testserver/api/user/v1/accounts/' + username,
+            'username': username,
+            'profile_image': {
+                'image_url_full': 'http://testserver/static/default_500.png',
+                'image_url_large': 'http://testserver/static/default_120.png',
+                'image_url_medium': 'http://testserver/static/default_50.png',
+                'image_url_small': 'http://testserver/static/default_30.png',
+                'has_image': False
+            }
+        })
+        self.assertNotIn('membership', data['team'])
+
+
+class BaseTopicSerializerTestCase(SerializerTestCase):
     """
     Tests for the `BaseTopicSerializer`, which should not serialize team count
     data.
@@ -46,7 +88,7 @@ class BaseTopicSerializerTestCase(TopicTestCase):
             )
 
 
-class TopicSerializerTestCase(TopicTestCase):
+class TopicSerializerTestCase(SerializerTestCase):
     """
     Tests for the `TopicSerializer`, which should serialize team count data for
     a single topic.
@@ -95,7 +137,7 @@ class TopicSerializerTestCase(TopicTestCase):
             )
 
 
-class BasePaginatedTopicSerializerTestCase(TopicTestCase):
+class BasePaginatedTopicSerializerTestCase(SerializerTestCase):
     """
     Base class for testing the two paginated topic serializers.
     """

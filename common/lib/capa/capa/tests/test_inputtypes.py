@@ -1126,8 +1126,52 @@ class FormulaEquationTest(unittest.TestCase):
             'size': self.size,
             'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
             'inline': False,
+            'trailing_text': '',
         }
         self.assertEqual(context, expected)
+
+    def test_trailing_text_rendering(self):
+        """
+        Verify that the render context matches the expected render context with trailing_text
+        """
+        size = "42"
+        # store (xml_text, expected)
+        trailing_text = []
+        # standard trailing text
+        trailing_text.append(('m/s', 'm/s'))
+        # unicode trailing text
+        trailing_text.append((u'\xc3', u'\xc3'))
+        # html escaped trailing text
+        # this is the only one we expect to change
+        trailing_text.append(('a &lt; b', 'a < b'))
+
+        for xml_text, expected_text in trailing_text:
+            xml_str = u"""<formulaequationinput id="prob_1_2"
+                            size="{size}"
+                            trailing_text="{tt}"
+                            />""".format(size=size, tt=xml_text)
+
+            element = etree.fromstring(xml_str)
+
+            state = {'value': 'x^2+1/2', }
+            the_input = lookup_tag('formulaequationinput')(test_capa_system(), element, state)
+
+            context = the_input._get_render_context()  # pylint: disable=protected-access
+
+            expected = {
+                'STATIC_URL': '/dummy-static/',
+                'id': 'prob_1_2',
+                'value': 'x^2+1/2',
+                'status': inputtypes.Status('unanswered'),
+                'label': '',
+                'msg': '',
+                'size': size,
+                'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
+                'inline': False,
+                'trailing_text': expected_text,
+            }
+
+            self.assertEqual(context, expected)
 
     def test_formcalc_ajax_sucess(self):
         """

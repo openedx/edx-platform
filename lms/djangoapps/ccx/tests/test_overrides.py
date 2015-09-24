@@ -94,15 +94,35 @@ class TestFieldOverrides(ModuleStoreTestCase):
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         self.assertEquals(chapter.start, ccx_start)
 
-    def test_override_num_queries(self):
+    def test_override_num_queries_new_field(self):
         """
-        Test that overriding and accessing a field produce same number of queries.
+        Test that for creating new field executed only create query
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(1):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-            dummy = chapter.start
+
+    def test_override_num_queries_update_existing_field(self):
+        """
+        Test that overriding existing field executed create, fetch and update queries.
+        """
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
+        new_ccx_start = datetime.datetime(2015, 12, 25, 00, 00, tzinfo=pytz.UTC)
+        chapter = self.ccx.course.get_children()[0]
+        override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
+        with self.assertNumQueries(2):
+            override_field_for_ccx(self.ccx, chapter, 'start', new_ccx_start)
+
+    def test_override_num_queries_field_value_not_changed(self):
+        """
+        Test that if value of field does not changed no query execute.
+        """
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
+        chapter = self.ccx.course.get_children()[0]
+        override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
+        with self.assertNumQueries(0):
+            override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
 
     def test_overriden_field_access_produces_no_extra_queries(self):
         """
@@ -110,11 +130,8 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(1):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-            dummy1 = chapter.start
-            dummy2 = chapter.start
-            dummy3 = chapter.start
 
     def test_override_is_inherited(self):
         """

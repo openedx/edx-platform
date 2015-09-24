@@ -85,8 +85,17 @@ def should_show_debug_toolbar(_):
 
 ########################### PIPELINE #################################
 
-# # Skip RequireJS optimizer in development
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+# Skip packaging and optimization in development
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+
+# Revert to the default set of finders as we don't want the production pipeline
+STATICFILES_FINDERS = [
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
+]
+
+# Disable JavaScript compression in development
+PIPELINE_JS_COMPRESSOR = None
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
@@ -138,7 +147,7 @@ FEATURES['LICENSING'] = True
 
 
 ########################## Courseware Search #######################
-FEATURES['ENABLE_COURSEWARE_SEARCH'] = False
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 
@@ -167,7 +176,9 @@ COURSE_DISCOVERY_MEANINGS = {
     'language': LANGUAGE_MAP,
 }
 
-FEATURES['ENABLE_COURSE_DISCOVERY'] = False
+FEATURES['ENABLE_COURSE_DISCOVERY'] = True
+# Setting for overriding default filtering facets for Course discovery
+# COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 FEATURES['COURSES_ARE_BROWSEABLE'] = True
 HOMEPAGE_COURSE_MAX = 9
 

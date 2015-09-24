@@ -490,11 +490,17 @@ def _section_extensions(course):
 def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
+
+    show_proctored_report_button = (
+        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and
+        course.enable_proctored_exams
+    )
+
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
-        'show_generate_proctored_exam_report_button': settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False),
+        'show_generate_proctored_exam_report_button': show_proctored_report_button,
         'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
@@ -577,7 +583,7 @@ def _section_analytics(course, access):
     insights_message = _("For analytics about your course, go to {analytics_dashboard_name}.")
 
     insights_message = insights_message.format(
-        analytics_dashboard_name='{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
+        analytics_dashboard_name=u'{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
     )
     section_data = {
         'section_key': 'instructor_analytics',

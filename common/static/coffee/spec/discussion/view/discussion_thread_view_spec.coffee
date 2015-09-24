@@ -158,6 +158,18 @@ describe "DiscussionThreadView", ->
                 expect($.ajax).not.toHaveBeenCalled()
                 expect(@view.$el.find(".responses li").length).toEqual(0)
 
+        describe "focus", ->
+            it "sends focus to the conversation when opened", ->
+                DiscussionViewSpecHelper.setNextResponseContent({resp_total: 0, children: []})
+                @view.render()
+                @view.expand()
+                waitsFor (->
+                    # This is the implementation of "toBeFocused". However, simply calling that method
+                    # with no wait seems to be flaky.
+                    article = @view.$el.find('.discussion-article')
+                    return article[0] == article[0].ownerDocument.activeElement
+                ), "conversation did not receive focus", 3000
+
         describe "expand/collapse", ->
             it "shows/hides appropriate content", ->
                 DiscussionViewSpecHelper.setNextResponseContent({resp_total: 0, children: []})

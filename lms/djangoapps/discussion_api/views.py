@@ -19,6 +19,7 @@ from discussion_api.api import (
     get_comment_list,
     get_course,
     get_course_topics,
+    get_thread,
     get_thread_list,
     update_comment,
     update_thread,
@@ -257,6 +258,12 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             )
         )
 
+    def retrieve(self, request, thread_id=None):
+        """
+        Implements the GET method for thread ID
+        """
+        return Response(get_thread(request, thread_id))
+
     def create(self, request):
         """
         Implements the POST method for the list endpoint as described in the
@@ -351,8 +358,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           comment is anonymous
 
         * author_label: A label indicating whether the author has a special
-          role in the course, either "staff" for moderators and
-          administrators or "community_ta" for community TAs
+          role in the course, either "Staff" for moderators and
+          administrators or "Community TA" for community TAs
 
         * created_at: The ISO 8601 timestamp for the creation of the comment
 

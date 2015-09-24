@@ -98,7 +98,9 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 USE_I18N = True
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
-INSTALLED_APPS += ('lettuce.django',)
+# django.contrib.staticfiles used to be loaded by lettuce, now we must add it ourselves
+# django.contrib.staticfiles is not added to lms as there is a ^/static$ route built in to the app
+INSTALLED_APPS += ('lettuce.django', 'django.contrib.staticfiles')
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 

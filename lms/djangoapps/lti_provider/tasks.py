@@ -72,7 +72,7 @@ def increment_assignment_versions(course_key, usage_key, user_id):
     return assignments
 
 
-@CELERY_APP.task
+@CELERY_APP.task(name='lti_provider.tasks.send_composite_outcome')
 def send_composite_outcome(user_id, course_id, assignment_id, version):
     """
     Calculate and transmit the score for a composite module (such as a

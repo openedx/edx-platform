@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.roles import CourseStaffRole
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -347,6 +348,13 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url + '?preview=honor')
+        #accessing certificate web view in preview mode without
+        # staff or instructor access should show invalid certificate
+        self.assertIn('This is an invalid certificate number', response.content)
+
+        CourseStaffRole(self.course.id).add_users(self.user)
+
+        response = self.client.get(test_url + '?preview=honor')
         self.assertNotIn(self.course.display_name, response.content)
         self.assertIn('course_title_0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
@@ -354,6 +362,27 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         # mark certificate inactive but accessing in preview mode.
         self._add_course_certificates(count=1, signatory_count=2, is_active=False)
         response = self.client.get(test_url + '?preview=honor')
+        self.assertNotIn(self.course.display_name, response.content)
+        self.assertIn('course_title_0', response.content)
+        self.assertIn('Signatory_Title 0', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_with_preview_mode_when_user_already_has_cert(self):
+        """
+        test certificate web view should render properly in
+        preview mode even if user who is previewing already has a certificate
+        generated with different mode.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        CourseStaffRole(self.course.id).add_users(self.user)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        # user has already has certificate generated for 'honor' mode
+        # so let's try to preview in 'verified' mode.
+        response = self.client.get(test_url + '?preview=verified')
         self.assertNotIn(self.course.display_name, response.content)
         self.assertIn('course_title_0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
@@ -460,10 +489,11 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_certificate_custom_template_with_org_mode_course(self):
         """
         Tests custom template search and rendering.
+        This test should check template matching when org={org}, course={course}, mode={mode}.
         """
         self._add_course_certificates(count=1, signatory_count=2)
-        self._create_custom_template(1, mode='honor', course_key=unicode(self.course.id))
-        self._create_custom_template(2, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor', course_key=unicode(self.course.id))
+        self._create_custom_template(org_id=2, mode='honor')
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
@@ -477,21 +507,27 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'lang: fr')
-            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+            self.assertContains(response, 'course name: course_title_0')
             # test with second organization template
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'lang: fr')
-            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+            self.assertContains(response, 'course name: course_title_0')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     def test_certificate_custom_template_with_org(self):
         """
-        Tests custom template search if if have a single template for all courses of organization.
+        Tests custom template search if we have a single template for organization and mode
+        with course set to Null.
+        This test should check template matching when org={org}, course=Null, mode={mode}.
         """
+        course = CourseFactory.create(
+            org='cstX', number='cst_22', display_name='custom template course'
+        )
+
         self._add_course_certificates(count=1, signatory_count=2)
-        self._create_custom_template(1)
-        self._create_custom_template(1, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor', course_key=course.id)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
@@ -503,12 +539,35 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             ]
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+            self.assertContains(response, 'course name: course_title_0')
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    def test_certificate_custom_template_with_organization(self):
+        """
+        Tests custom template search when we have a single template for a organization.
+        This test should check template matching when org={org}, course=Null, mode=null.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(org_id=1, mode='honor')
+        self._create_custom_template(org_id=1, mode='honor', course_key=self.course.id)
+        self._create_custom_template(org_id=2)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.side_effect = [
+                [{"id": 2, "name": "organization name 2"}],
+            ]
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     def test_certificate_custom_template_with_course_mode(self):
         """
-        Tests custom template search if if have a single template for a course mode.
+        Tests custom template search if we have a single template for a course mode.
+        This test should check template matching when org=null, course=Null, mode={mode}.
         """
         mode = 'honor'
         self._add_course_certificates(count=1, signatory_count=2)

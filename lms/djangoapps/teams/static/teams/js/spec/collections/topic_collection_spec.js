@@ -10,11 +10,12 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
 
             var testRequestParam = function (self, param, value) {
                 var requests = AjaxHelpers.requests(self),
+                    request,
                     url,
                     params;
                 topicCollection.fetch();
-                expect(requests.length).toBe(1);
-                url = new URI(requests[0].url);
+                request = AjaxHelpers.currentRequest(requests);
+                url = new URI(request.url);
                 params = url.query(true);
                 expect(params[param]).toBe(value);
             };
@@ -34,6 +35,15 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
             it('URL encodes its course_id ', function () {
                 topicCollection.course_id = 'my+course+id';
                 testRequestParam(this, 'course_id', 'my+course+id');
+            });
+
+            it('sets itself to stale on receiving a teams create or delete event', function () {
+                expect(topicCollection.isStale).toBe(false);
+                TeamSpecHelpers.triggerTeamEvent('create');
+                expect(topicCollection.isStale).toBe(true);
+                topicCollection.isStale = false;
+                TeamSpecHelpers.triggerTeamEvent('delete');
+                expect(topicCollection.isStale).toBe(true);
             });
         });
     });

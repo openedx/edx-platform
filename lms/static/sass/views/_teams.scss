@@ -22,9 +22,12 @@
   %button-reset {
     box-shadow: none;
     border: none;
+    border-radius: 0;
     background-image: none;
     background-color: transparent;
-    font-weight: normal;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
   }
 
 // layout
@@ -148,6 +151,7 @@
     border-bottom: 3px solid $gray-l5;
 
     .nav-item {
+        @extend %button-reset;
         display: inline-block;
         margin-bottom: -3px; // to match the border
         border-bottom: 3px solid $gray-l5;
@@ -175,7 +179,7 @@
   .listing-tools {
     @extend %t-copy-sub1;
     margin: ($baseline/10) $baseline;
-    color: $gray-l1;
+    color: $gray-d1;
 
     label { // override
       color: inherit;
@@ -575,7 +579,10 @@
 
   .join-team-message {
     @extend %t-copy-sub1;
+    @include text-align(right);
     color: $gray-l1;
+    display: block;
+    margin-bottom: ($baseline/4);
   }
 
   .team-actions {
@@ -716,11 +723,11 @@
 
     .u-field.error {
       input, textarea {
-        border-color: $error-red;
+        border-color: $error-color;
       }
 
       .u-field-message-help, .u-field-description-message {
-        color: $error-red !important;
+        color: $error-color !important;
       }
     }
 
@@ -745,5 +752,3 @@
 .create-team.form-actions {
   margin-top: $baseline;
 }
-
-

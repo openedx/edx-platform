@@ -1,8 +1,8 @@
 /*  Team utility methods*/
 ;(function (define) {
     'use strict';
-    define([
-    ], function () {
+    define(["jquery", "underscore"
+    ], function ($, _) {
         return {
 
             /**
@@ -40,9 +40,16 @@
                 );
             },
 
-            showMessage: function (message) {
-                var messageElement = $('.teams-content .wrapper-msg');
-                messageElement.removeClass('is-hidden');
+            hideMessage: function () {
+                $('#teams-message').addClass('.is-hidden');
+            },
+
+            showMessage: function (message, type) {
+                var messageElement = $('#teams-message');
+                if (_.isUndefined(type)) {
+                    type = 'warning';
+                }
+                messageElement.removeClass('is-hidden').addClass(type);
                 $('.teams-content .msg-content .copy').text(message);
                 messageElement.focus();
             },
@@ -50,12 +57,14 @@
             /**
              * Parse `data` and show user message. If parsing fails than show `genericErrorMessage`
              */
-            parseAndShowMessage: function (data, genericErrorMessage) {
+            parseAndShowMessage: function (data, genericErrorMessage, type) {
                 try {
                    var errors = JSON.parse(data.responseText);
-                   this.showMessage(_.isUndefined(errors.user_message) ? genericErrorMessage : errors.user_message);
+                   this.showMessage(
+                       _.isUndefined(errors.user_message) ? genericErrorMessage : errors.user_message, type
+                   );
                 } catch (error) {
-                   this.showMessage(genericErrorMessage);
+                   this.showMessage(genericErrorMessage, type);
                 }
             }
         };

@@ -6,7 +6,7 @@ Admin site configuration for third party authentication
 from django.contrib import admin
 
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
-from .models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, SAMLProviderData
+from .models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, SAMLProviderData, LTIProviderConfig
 from .tasks import fetch_saml_metadata
 
 
@@ -88,3 +88,26 @@ class SAMLProviderDataAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 admin.site.register(SAMLProviderData, SAMLProviderDataAdmin)
+
+
+class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
+    """ Django Admin class for LTIProviderConfig """
+
+    exclude = (
+        'icon_class',
+        'secondary',
+    )
+
+    def get_list_display(self, request):
+        """ Don't show every single field in the admin change list """
+        return (
+            'name',
+            'enabled',
+            'lti_consumer_key',
+            'lti_max_timestamp_age',
+            'change_date',
+            'changed_by',
+            'edit_link',
+        )
+
+admin.site.register(LTIProviderConfig, LTIProviderConfigAdmin)
