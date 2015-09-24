@@ -583,7 +583,7 @@ def _section_analytics(course, access):
     insights_message = _("For analytics about your course, go to {analytics_dashboard_name}.")
 
     insights_message = insights_message.format(
-        analytics_dashboard_name='{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
+        analytics_dashboard_name=u'{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
     )
     section_data = {
         'section_key': 'instructor_analytics',
