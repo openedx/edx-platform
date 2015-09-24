@@ -1,4 +1,8 @@
-from django.conf.urls.defaults import url, patterns
+"""
+Url Bindings for the comment client data service.
+"""
+
+from django.conf.urls import url, patterns
 
 urlpatterns = patterns(
     'django_comment_client.base.views',

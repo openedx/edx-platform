@@ -23,13 +23,14 @@ django-mako==0.1.5pre
 django-model-utils==2.3.1
 django-mptt==0.7.4
 django-openid-auth==0.4
+django-pipeline==1.3.26
 django-sekizai==0.8.2
 django-ses==0.7.0
 django-simple-history==1.6.3
 django-storages==1.1.5
 django-method-override==0.1.0
 djangorestframework==2.3.14
-django==1.4.22
+django==1.5.12
 elasticsearch==0.4.5
 facebook-sdk==0.4.0
 feedparser==5.1.3

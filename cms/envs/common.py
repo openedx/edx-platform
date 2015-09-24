@@ -462,8 +462,8 @@ STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCa
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 ]
 
@@ -519,7 +519,7 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/vendor/ova/annotator.css',
             'css/vendor/ova/edx-annotator.css',
-            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/video-js.css',
             'css/vendor/ova/rangeslider.css',
             'css/vendor/ova/share-annotator.css',
             'css/vendor/ova/richText-annotator.css',
@@ -665,6 +665,9 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
+# For the Result Store, use the django cache named 'default'
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_CACHE_BACKEND = 'default'
 
 ############################## Video ##########################################
 
@@ -704,6 +707,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'django.contrib.messages',
     'djcelery',
     'south',
@@ -738,7 +742,6 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'staticfiles',
     'static_replace',
     'require',
 
