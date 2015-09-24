@@ -365,7 +365,7 @@
 
         .info-date-block {
           @extend %t-title7;
-          color: $gray-l1;
+          color: $gray; // WCAG 2.0 AA compliant
           display: block;
         }
       }
