@@ -56,7 +56,7 @@ git+https://github.com/edx/edx-lint.git@c5745631d2eee4e2efe8c31fa7b42fe2c12a0755
 -e git+https://github.com/edx/edx-reverification-block.git@ned/upgrade-django-1.8#egg=edx-reverification-block
 git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-client==1.1.0
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
-git+https://github.com/edx/edx-organizations.git@4b164877dd8ee38a565abc1baa03ae7d802288be#egg=edx-organizations==0.1.7
+git+https://github.com/edx/edx-organizations.git@822492f2840299b400fc6013403a355120c40468#egg=edx-organizations==0.1.7
 
 git+https://github.com/edx/edx-proctoring.git@django1.8-upgrade#egg=edx-proctoring==0.11.0
 
