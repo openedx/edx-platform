@@ -4,6 +4,7 @@ Module for code that should run during LMS startup
 
 # pylint: disable=unused-argument
 
+import django
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
@@ -25,6 +26,8 @@ def run():
     Executed during django startup
     """
     django_utils_translation.patch()
+
+    django.setup()
 
     autostartup()
 
