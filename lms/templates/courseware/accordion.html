@@ -45,7 +45,7 @@ else:
                 <p class="subtitle">
                     % if 'proctoring' in section:
                         ## Display the proctored exam status icon and status message
-                        <span class="menu-icon icon fa fa-pencil-square-o" aria-hidden="true"></span>
+                        <span class="menu-icon icon fa ${section['proctoring'].get('suggested_icon', 'fa-pencil-square-o')} ${section['proctoring'].get('status', 'eligible')}" aria-hidden="true"></span>
                         <span class="subtitle-name">${section['proctoring'].get('short_description', '')}</span>
 
                         ## completed proctored exam statuses should not show the due date
