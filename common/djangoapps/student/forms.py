@@ -5,7 +5,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.tokens import default_token_generator
 
 from django.utils.http import int_to_base36
@@ -33,7 +33,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
         self.users_cache = User.objects.filter(email__iexact=email)
         if not len(self.users_cache):
             raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password == UNUSABLE_PASSWORD)
+        if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
                for user in self.users_cache):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
