@@ -52,7 +52,7 @@ def on_pre_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argu
         log.info(u"Finished updating in-course reverification access rules")
 
 
-@receiver(GRADES_UPDATED)
+@receiver(GRADES_UPDATED, dispatch_uid="edxapp.credit.grades_updated")
 def listen_for_grade_calculation(sender, username, grade_summary, course_key, deadline, **kwargs):  # pylint: disable=unused-argument
     """Receive 'MIN_GRADE_REQUIREMENT_STATUS' signal and update minimum grade requirement status.
 

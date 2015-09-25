@@ -26,7 +26,7 @@ from edx_notifications.data import NotificationMessage
 log = logging.getLogger(__name__)
 
 
-@receiver(score_changed)
+@receiver(score_changed, dispatch_uid="lms.courseware.score_changed")
 def on_score_changed(sender, **kwargs):
     """
     Listens for a 'score_changed' signal and when observed
