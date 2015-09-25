@@ -18,6 +18,15 @@
                     }
                     // super() in Javascript has awkward syntax :(
                     return SystemFeedbackView.prototype.render.apply(this, arguments);
+                },
+                show: function() {
+                    SystemFeedbackView.prototype.show.apply(this, arguments);
+                    return this.inFocus();
+                },
+
+                hide: function() {
+                    SystemFeedbackView.prototype.hide.apply(this, arguments);
+                    return this.outFocus();
                 }
             });
 
