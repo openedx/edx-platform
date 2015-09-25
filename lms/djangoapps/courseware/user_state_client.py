@@ -169,7 +169,9 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         # The rest of this method exists only to submit DataDog events.
         # Remove it once we're no longer interested in the data.
+        finish_time = time()
         self._ddog_histogram(evt_time, 'get_many.blks_out', block_count)
+        self._ddog_histogram(evt_time, 'get_many.response_time', (finish_time - evt_time) * 1000)
 
     @donottrack(StudentModule, StudentModuleHistory)
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
@@ -243,8 +245,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             num_fields_updated = max(0, len(state) - num_new_fields_set)
             self._ddog_histogram(evt_time, 'set_many.fields_updated', num_fields_updated)
 
-        # Event for the entire set_many call.
+        # Events for the entire set_many call.
+        finish_time = time()
         self._ddog_histogram(evt_time, 'set_many.blks_updated', len(block_keys_to_state))
+        self._ddog_histogram(evt_time, 'set_many.response_time', (finish_time - evt_time) * 1000)
 
     @donottrack(StudentModule, StudentModuleHistory)
     def delete_many(self, username, block_keys, scope=Scope.user_state, fields=None):
@@ -282,6 +286,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             # We just read this object, so we know that we can do an update
             student_module.save(force_update=True)
+
+        # Event for the entire delete_many call.
+        finish_time = time()
+        self._ddog_histogram(evt_time, 'delete_many.response_time', (finish_time - evt_time) * 1000)
 
     @donottrack(StudentModule, StudentModuleHistory)
     def get_history(self, username, block_key, scope=Scope.user_state):
