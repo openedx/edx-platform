@@ -10,7 +10,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.tokens import default_token_generator
 
 from django.utils.http import int_to_base36
@@ -42,12 +42,12 @@ class ResetPasswordTests(EventTestMixin, TestCase):
 
         self.user_bad_passwd = UserFactory.create()
         self.user_bad_passwd.is_active = False
-        self.user_bad_passwd.password = UNUSABLE_PASSWORD
+        self.user_bad_passwd.password = UNUSABLE_PASSWORD_PREFIX
         self.user_bad_passwd.save()
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
-        """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD"""
+        """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD_PREFIX"""
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
