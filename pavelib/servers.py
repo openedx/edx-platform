@@ -240,7 +240,7 @@ def update_db():
     """
     settings = getattr(options, 'settings', DEFAULT_SETTINGS)
     for system in ('lms', 'cms'):
-        sh(django_cmd(system, settings, 'syncdb', '--migrate', '--traceback', '--pythonpath=.'))
+        sh(django_cmd(system, settings, 'migrate', '--traceback', '--pythonpath=.'))
 
 
 @task
