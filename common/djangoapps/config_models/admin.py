@@ -84,7 +84,7 @@ class ConfigurationModelAdmin(admin.ModelAdmin):
             reverse(
                 'admin:{}_{}_change'.format(
                     self.model._meta.app_label,
-                    self.model._meta.module_name,
+                    self.model._meta.model_name,
                 ),
                 args=(target.id,),
             )
@@ -180,7 +180,7 @@ class KeyedConfigurationModelAdmin(ConfigurationModelAdmin):
         """ Edit link for the change view """
         if not inst.is_active:
             return u'--'
-        update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.module_name))
+        update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.model_name))
         update_url += "?source={}".format(inst.pk)
         return u'<a href="{}">{}</a>'.format(update_url, _('Update'))
     edit_link.allow_tags = True

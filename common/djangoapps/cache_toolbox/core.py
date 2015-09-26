@@ -105,7 +105,7 @@ def instance_key(model, instance_or_pk):
 
     return '%s.%s:%d' % (
         model._meta.app_label,
-        model._meta.module_name,
+        model._meta.model_name,
         getattr(instance_or_pk, 'pk', instance_or_pk),
     )
 
