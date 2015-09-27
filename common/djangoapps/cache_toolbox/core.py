@@ -59,7 +59,7 @@ def get_instance(model, instance_or_pk, timeout=None, using=None):
             # fallback and return the underlying instance
             cache.delete(key)
 
-    # Use the default manager so we are never filtered by a .get_query_set()
+    # Use the default manager so we are never filtered by a .get_queryset()
 
 #    import logging
 #    log = logging.getLogger("tracking")

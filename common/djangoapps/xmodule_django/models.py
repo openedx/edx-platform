@@ -21,7 +21,7 @@ class NoneToEmptyManager(models.Manager):
         """
         super(NoneToEmptyManager, self).__init__()
 
-    def get_query_set(self):
+    def get_queryset(self):
         return NoneToEmptyQuerySet(self.model, using=self._db)
 
 

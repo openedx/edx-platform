@@ -1276,17 +1276,17 @@ class RegistrationCodeRedemption(models.Model):
 class SoftDeleteCouponManager(models.Manager):
     """ Use this manager to get objects that have a is_active=True """
 
-    def get_active_coupons_query_set(self):
+    def get_active_coupons_queryset(self):
         """
         filter the is_active = True Coupons only
         """
-        return super(SoftDeleteCouponManager, self).get_query_set().filter(is_active=True)
+        return super(SoftDeleteCouponManager, self).get_queryset().filter(is_active=True)
 
-    def get_query_set(self):
+    def get_queryset(self):
         """
         get all the coupon objects
         """
-        return super(SoftDeleteCouponManager, self).get_query_set()
+        return super(SoftDeleteCouponManager, self).get_queryset()
 
 
 class Coupon(models.Model):
