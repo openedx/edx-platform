@@ -729,7 +729,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             {
                 'status': 'eligible',
                 'short_description': 'Ungraded Practice Exam',
-                'suggested_icon': 'fa-lock',
+                'suggested_icon': 'fa-pencil-square-o',
                 'in_completed_state': False
             }
         ),
@@ -762,7 +762,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             {
                 'status': 'eligible',
                 'short_description': 'Proctored Option Available',
-                'suggested_icon': 'fa-lock',
+                'suggested_icon': 'fa-pencil-square-o',
                 'in_completed_state': False
             }
         ),
@@ -773,7 +773,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             {
                 'status': 'declined',
                 'short_description': 'Taking As Open Exam',
-                'suggested_icon': 'fa-unlock',
+                'suggested_icon': 'fa-pencil-square-o',
                 'in_completed_state': False
             }
         ),
