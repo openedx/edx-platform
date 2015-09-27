@@ -21,4 +21,5 @@ def do_nothing(f):
     return f
 
 django.db.transaction.commit_manually = do_nothing
+django.db.transaction.commit_on_success = do_nothing
 django.db.transaction.autocommit = do_nothing
