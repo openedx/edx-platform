@@ -175,9 +175,6 @@ CACHES = {
     },
 }
 
-# Add external_auth to Installed apps for testing
-INSTALLED_APPS += ('external_auth', )
-
 # Add apps to Installed apps for testing
 INSTALLED_APPS += ('openedx.core.djangoapps.call_stack_manager',)
 
