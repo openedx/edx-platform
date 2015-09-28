@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.views.preview import get_preview_fragment, _preview_module_system
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.test_asides import AsideTestType
-from cms.djangoapps.xblock_config.models import StudioConfig
+from xblock_config.models import StudioConfig
 from xmodule.modulestore.django import modulestore
 
 
