@@ -1176,7 +1176,6 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.locale.LocaleMiddleware',
     'django_locale.middleware.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
