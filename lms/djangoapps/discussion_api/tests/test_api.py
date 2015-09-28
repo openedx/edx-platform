@@ -1146,7 +1146,6 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 4,
-                "children": [],
                 "editable_fields": ["abuse_flagged", "voted"],
             },
             {
@@ -1166,7 +1165,6 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "abuse_flagged": True,
                 "voted": False,
                 "vote_count": 7,
-                "children": [],
                 "editable_fields": ["abuse_flagged", "voted"],
             },
         ]

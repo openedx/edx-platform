@@ -290,6 +290,15 @@ class CommentSerializer(_ContentSerializer):
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
 
+    def __init__(self, *args, **kwargs):
+        remove_fields = kwargs.pop('remove_fields', None)
+        super(CommentSerializer, self).__init__(*args, **kwargs)
+
+        if remove_fields:
+            # for multiple fields in a list
+            for field_name in remove_fields:
+                self.fields.pop(field_name)
+
     def get_endorsed_by(self, obj):
         """
         Returns the username of the endorsing user, if the information is

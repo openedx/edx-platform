@@ -415,7 +415,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read
         raise Http404
     num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
 
-    results = [CommentSerializer(response, context=context).data for response in responses]
+    results = [CommentSerializer(response, remove_fields=["children"], context=context).data for response in responses]
     return get_paginated_data(request, results, page, num_pages)
 
 
@@ -716,6 +716,50 @@ def get_thread(request, thread_id):
     cc_thread, context = _get_thread_and_context(request, thread_id)
     serializer = ThreadSerializer(cc_thread, context=context)
     return serializer.data
+
+
+def get_response_comments(request, comment_id, page, page_size):
+    """
+    Return the list of comments for the given thread response.
+
+    Arguments:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        comment_id: The id of the comment/response to get child comments for.
+
+        page: The page number (1-indexed) to retrieve
+
+        page_size: The number of comments to retrieve per page
+
+    Returns:
+
+        A paginated result containing a list of comments
+
+    """
+    try:
+        cc_comment = Comment(id=comment_id).retrieve()
+        cc_thread, context = _get_thread_and_context(request, cc_comment["thread_id"])
+        if cc_thread["thread_type"] == "question":
+            thread_responses = cc_thread["endorsed_responses"] + cc_thread["non_endorsed_responses"]
+        else:
+            thread_responses = cc_thread["children"]
+        response_comments = []
+        for response in thread_responses:
+            if response["id"] == comment_id:
+                response_comments = response["children"]
+                break
+
+        response_skip = page_size * (page - 1)
+        paged_response_comments = response_comments[response_skip:(response_skip + page_size)]
+        results = [CommentSerializer(comment, context=context).data for comment in paged_response_comments]
+
+        comments_count = len(response_comments)
+        num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
+        return get_paginated_data(request, results, page, num_pages)
+    except CommentClientRequestError:
+        raise Http404
 
 
 def delete_thread(request, thread_id):
