@@ -115,6 +115,11 @@ urlpatterns += patterns(
     url(r'^api/val/v0/', include('edxval.urls')),
 )
 
+urlpatterns += patterns(
+    '',
+    url(r'^labster/api/', include('labster.urls', namespace='labster')),
+)
+
 JS_INFO_DICT = {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
