@@ -198,6 +198,16 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
             elif revision is None:
                 branches_to_delete = [ModuleStoreEnum.BranchName.draft]
+                draft_location = location.for_branch(ModuleStoreEnum.BranchName.draft)
+                try:
+                    item = self.get_item(draft_location)
+                    if getattr(item, 'has_children', False):
+                        # If item have has_published_version then delete published children also.
+                        if self.has_published_version(item):
+                            branches_to_delete.insert(0, ModuleStoreEnum.BranchName.published)
+                except ItemNotFoundError:
+                    # Raises ValueError as in function description
+                    raise ValueError("Cannot delete a block that does not exist")
             else:
                 raise UnsupportedRevisionError(
                     [
