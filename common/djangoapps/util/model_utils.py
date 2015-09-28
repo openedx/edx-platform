@@ -42,7 +42,13 @@ def get_changed_fields_dict(instance, model_class):
         return {}
     else:
         field_names = [
-            field[0].name for field in model_class._meta.get_fields_with_model()
+            # Suggested by https://docs.djangoproject.com/en/1.8/ref/models/meta/#migrating-from-the-old-api
+            f.name for f in model_class._meta.get_fields()
+            if not (
+                f.is_relation
+                or f.one_to_one
+                or (f.many_to_one and f.related_model)
+            )
         ]
         changed_fields = {
             field_name: getattr(old_model, field_name) for field_name in field_names
