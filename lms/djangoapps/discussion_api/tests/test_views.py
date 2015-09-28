@@ -571,7 +571,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             content_type="application/json"
         )
         expected_response_data = {
-            "field_errors": {"title": {"developer_message": "This field may not be blank."}}
+            "field_errors": {"title": {"developer_message": "This field is required."}}
         }
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.content)
@@ -690,7 +690,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             200,
             {
                 "results": expected_comments,
-                "next": "http://testserver/api/discussion/v1/comments/?page=2&thread_id={}".format(
+                "next": "http://testserver/api/discussion/v1/comments/?thread_id={}&page=2".format(
                     self.thread_id
                 ),
                 "previous": None,
@@ -946,7 +946,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             content_type="application/json"
         )
         expected_response_data = {
-            "field_errors": {"raw_body": {"developer_message": "This field may not be blank."}}
+            "field_errors": {"raw_body": {"developer_message": "This field is required."}}
         }
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.content)

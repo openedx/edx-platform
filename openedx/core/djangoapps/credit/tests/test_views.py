@@ -393,7 +393,10 @@ class CreditCourseViewSetTests(TestCase):
 
         # POSTs without a CSRF token should fail.
         response = client.post(self.path, data=json.dumps(data), content_type=JSON)
-        self.assertEqual(response.status_code, 403)
+
+        # NOTE (CCB): Ordinarily we would expect a 403; however, since the CSRF validation and session authentication
+        # fail, DRF considers the request to be unauthenticated.
+        self.assertEqual(response.status_code, 401)
         self.assertIn('CSRF', response.content)
 
         # Retrieve a CSRF token

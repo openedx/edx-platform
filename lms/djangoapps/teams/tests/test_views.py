@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
 import json
-from datetime import datetime
-
 import pytz
+from datetime import datetime
 from dateutil import parser
 import ddt
 from elasticsearch.exceptions import ConnectionError
 from mock import patch
 from search.search_engine_base import SearchEngine
+
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.utils import translation
 from nose.plugins.attrib import attr
 from rest_framework.test import APITestCase, APIClient
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from courseware.tests.factories import StaffFactory
 from common.test.utils import skip_signal
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from util.testing import EventTestMixin
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
+
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 
@@ -35,23 +36,11 @@ class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
     test_password = "test"
 
-    NUM_TOPICS = 10
-
     @classmethod
     def setUpClass(cls):
         super(TestDashboard, cls).setUpClass()
         cls.course = CourseFactory.create(
-            teams_configuration={
-                "max_team_size": 10,
-                "topics": [
-                    {
-                        "name": "Topic {}".format(topic_id),
-                        "id": topic_id,
-                        "description": "Description for topic {}".format(topic_id)
-                    }
-                    for topic_id in range(cls.NUM_TOPICS)
-                ]
-            }
+            teams_configuration={"max_team_size": 10, "topics": [{"name": "foo", "id": 0, "description": "test topic"}]}
         )
 
     def setUp(self):
@@ -107,30 +96,6 @@ class TestDashboard(SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.client.get(teams_url)
         self.assertEqual(404, response.status_code)
-
-    def test_query_counts(self):
-        # Enroll in the course and log in
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-        self.client.login(username=self.user.username, password=self.test_password)
-
-        # Check the query count on the dashboard With no teams
-        with self.assertNumQueries(15):
-            self.client.get(self.teams_url)
-
-        # Create some teams
-        for topic_id in range(self.NUM_TOPICS):
-            team = CourseTeamFactory.create(
-                name=u"Team for topic {}".format(topic_id),
-                course_id=self.course.id,
-                topic_id=topic_id,
-            )
-
-        # Add the user to the last team
-        team.add_user(self.user)
-
-        # Check the query count on the dashboard again
-        with self.assertNumQueries(19):
-            self.client.get(self.teams_url)
 
     def test_bad_course_id(self):
         """
@@ -287,9 +252,6 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 self.users[user], course.id, check_access=True
             )
 
-        # Django Rest Framework v3 requires us to pass a request to serializers
-        # that have URL fields.  Since we're invoking this code outside the context
-        # of a request, we need to simulate that there's a request.
         self.solar_team.add_user(self.users['student_enrolled'])
         self.nuclear_team.add_user(self.users['student_enrolled_both_courses_other_team'])
         self.another_team.add_user(self.users['student_enrolled_both_courses_other_team'])
@@ -349,17 +311,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             response = func(url, data=data, content_type=content_type)
         else:
             response = func(url, data=data)
-
-        self.assertEqual(
-            expected_status,
-            response.status_code,
-            msg="Expected status {expected} but got {actual}: {content}".format(
-                expected=expected_status,
-                actual=response.status_code,
-                content=response.content,
-            )
-        )
-
+        self.assertEqual(expected_status, response.status_code)
         if expected_status == 200:
             return json.loads(response.content)
         else:

@@ -1038,7 +1038,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
     @cross_domain_config
     def test_cross_domain_missing_csrf(self, *args):  # pylint: disable=unused-argument
         resp = self._cross_domain_post('invalid_csrf_token')
-        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.status_code, 401)
 
     def _get_csrf_cookie(self):
         """Retrieve the cross-domain CSRF cookie. """

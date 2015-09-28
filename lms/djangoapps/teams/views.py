@@ -5,14 +5,19 @@ import logging
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import Http404
 from django.conf import settings
+from django.core.paginator import Paginator
+from django.views.generic.base import View
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
+from rest_framework.authentication import (
+    SessionAuthentication,
+    OAuth2Authentication
+)
 from rest_framework import status
 from rest_framework import permissions
+from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
@@ -27,7 +32,8 @@ from openedx.core.lib.api.view_utils import (
     build_api_error,
     ExpandableFieldViewMixin
 )
-from openedx.core.lib.api.paginators import paginate_search_results, DefaultPagination
+from openedx.core.lib.api.serializers import PaginationSerializer
+from openedx.core.lib.api.paginators import paginate_search_results
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -43,8 +49,10 @@ from .serializers import (
     CourseTeamSerializer,
     CourseTeamCreationSerializer,
     TopicSerializer,
-    BulkTeamCountTopicSerializer,
+    PaginatedTopicSerializer,
+    BulkTeamCountPaginatedTopicSerializer,
     MembershipSerializer,
+    PaginatedMembershipSerializer,
     add_team_count
 )
 from .search_indexes import CourseTeamIndexer
@@ -77,42 +85,7 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
                 )
 
 
-class TeamAPIPagination(DefaultPagination):
-    """
-    Pagination format used by the teams API.
-    """
-    page_size_query_param = "page_size"
-
-    def get_paginated_response(self, data):
-        """
-        Annotate the response with pagination information.
-        """
-        response = super(TeamAPIPagination, self).get_paginated_response(data)
-
-        # Add the current page to the response.
-        # It may make sense to eventually move this field into the default
-        # implementation, but for now, teams is the only API that uses this.
-        response.data["current_page"] = self.page.number
-
-        # This field can be derived from other fields in the response,
-        # so it may make sense to have the JavaScript client calculate it
-        # instead of including it in the response.
-        response.data["start"] = (self.page.number - 1) * self.get_page_size(self.request)
-
-        return response
-
-
-class TopicsPagination(TeamAPIPagination):
-    """Paginate topics. """
-    page_size = TOPICS_PER_PAGE
-
-
-class MembershipPagination(TeamAPIPagination):
-    """Paginate memberships. """
-    page_size = TEAM_MEMBERSHIPS_PER_PAGE
-
-
-class TeamsDashboardView(GenericAPIView):
+class TeamsDashboardView(View):
     """
     View methods related to the teams dashboard.
     """
@@ -134,38 +107,29 @@ class TeamsDashboardView(GenericAPIView):
                 not has_access(request.user, 'staff', course, course.id):
             raise Http404
 
-        user = request.user
-
         # Even though sorting is done outside of the serializer, sort_order needs to be passed
         # to the serializer so that the paginated results indicate how they were sorted.
         sort_order = 'name'
         topics = get_alphabetical_topics(course)
-
-        # Paginate and serialize topic data
+        topics_page = Paginator(topics, TOPICS_PER_PAGE).page(1)
         # BulkTeamCountPaginatedTopicSerializer will add team counts to the topics in a single
         # bulk operation per page.
-        topics_data = self._serialize_and_paginate(
-            TopicsPagination,
-            topics,
-            request,
-            BulkTeamCountTopicSerializer,
-            {'course_id': course.id},
+        topics_serializer = BulkTeamCountPaginatedTopicSerializer(
+            instance=topics_page,
+            context={'course_id': course.id, 'sort_order': sort_order}
         )
-        topics_data["sort_order"] = sort_order
+        user = request.user
 
-        # Paginate and serialize team membership data.
-        team_memberships = CourseTeamMembership.get_memberships(user.username, [course.id])
-        memberships_data = self._serialize_and_paginate(
-            MembershipPagination,
-            team_memberships,
-            request,
-            MembershipSerializer,
-            {'expand': ('team', 'user',)}
+        team_memberships = CourseTeamMembership.get_memberships(request.user.username, [course.id])
+        team_memberships_page = Paginator(team_memberships, TEAM_MEMBERSHIPS_PER_PAGE).page(1)
+        team_memberships_serializer = PaginatedMembershipSerializer(
+            instance=team_memberships_page,
+            context={'expand': ('team', 'user'), 'request': request},
         )
 
         context = {
             "course": course,
-            "topics": topics_data,
+            "topics": topics_serializer.data,
             # It is necessary to pass both privileged and staff because only privileged users can
             # administer discussion threads, but both privileged and staff users are allowed to create
             # multiple teams (since they are not automatically added to teams upon creation).
@@ -173,7 +137,7 @@ class TeamsDashboardView(GenericAPIView):
                 "username": user.username,
                 "privileged": has_discussion_privileges(user, course_key),
                 "staff": bool(has_access(user, 'staff', course_key)),
-                "team_memberships_data": memberships_data,
+                "team_memberships_data": team_memberships_serializer.data,
             },
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
@@ -189,39 +153,6 @@ class TeamsDashboardView(GenericAPIView):
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
         }
         return render_to_response("teams/teams.html", context)
-
-    def _serialize_and_paginate(self, pagination_cls, queryset, request, serializer_cls, serializer_ctx):
-        """
-        Serialize and paginate objects in a queryset.
-
-        Arguments:
-            pagination_cls (pagination.Paginator class): Django Rest Framework Paginator subclass.
-            queryset (QuerySet): Django queryset to serialize/paginate.
-            serializer_cls (serializers.Serializer class): Django Rest Framework Serializer subclass.
-            serializer_ctx (dict): Context dictionary to pass to the serializer
-
-        Returns: dict
-
-        """
-        # Django Rest Framework v3 requires that we pass the request
-        # into the serializer's context if the serialize contains
-        # hyperlink fields.
-        serializer_ctx["request"] = request
-
-        # Instantiate the paginator and use it to paginate the queryset
-        paginator = pagination_cls()
-        page = paginator.paginate_queryset(queryset, request)
-
-        # Serialize the page
-        serializer = serializer_cls(page, context=serializer_ctx, many=True)
-
-        # Use the paginator to construct the response data
-        # This will use the pagination subclass for the view to add additional
-        # fields to the response.
-        # For example, if the input data is a list, the output data would
-        # be a dictionary with keys "count", "next", "previous", and "results"
-        # (where "results" is set to the value of the original list)
-        return paginator.get_paginated_response(serializer.data).data
 
 
 def has_team_api_access(user, course_key, access_username=None):
@@ -376,8 +307,11 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     # OAuth2Authentication must come first to return a 401 for unauthenticated users
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
+
+    paginate_by = 10
+    paginate_by_param = 'page_size'
+    pagination_serializer_class = PaginationSerializer
     serializer_class = CourseTeamSerializer
-    pagination_class = TeamAPIPagination
 
     def get(self, request):
         """GET /api/team/v0/teams/"""
@@ -443,18 +377,15 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             paginated_results = paginate_search_results(
                 CourseTeam,
                 search_results,
-                self.paginator.get_page_size(request),
+                self.get_paginate_by(),
                 self.get_page()
             )
+            serializer = self.get_pagination_serializer(paginated_results)
             emit_team_event('edx.team.searched', course_key, {
                 "number_of_results": search_results['total'],
                 "search_text": text_search,
                 "topic_id": topic_id,
             })
-
-            page = self.paginate_queryset(paginated_results)
-            serializer = self.get_serializer(page, many=True)
-            order_by_input = None
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
@@ -476,12 +407,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_pagination_serializer(page)
+            serializer.context.update({'sort_order': order_by_input})  # pylint: disable=maybe-no-member
 
-        response = self.get_paginated_response(serializer.data)
-        if order_by_input is not None:
-            response.data['sort_order'] = order_by_input
-        return response
+        return Response(serializer.data)  # pylint: disable=maybe-no-member
 
     def post(self, request):
         """POST /api/team/v0/teams/"""
@@ -544,16 +473,14 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                         'add_method': 'added_on_create'
                     }
                 )
-
-            data = CourseTeamSerializer(team, context={"request": request}).data
-            return Response(data)
+            return Response(CourseTeamSerializer(team).data)
 
     def get_page(self):
         """ Returns page number specified in args, params, or defaults to 1. """
         # This code is taken from within the GenericAPIView#paginate_queryset method.
         # We need need access to the page outside of that method for our paginate_search_results method
-        page_kwarg = self.kwargs.get(self.paginator.page_query_param)
-        page_query_param = self.request.QUERY_PARAMS.get(self.paginator.page_query_param)
+        page_kwarg = self.kwargs.get(self.page_kwarg)
+        page_query_param = self.request.QUERY_PARAMS.get(self.page_kwarg)
         return page_kwarg or page_query_param or 1
 
 
@@ -765,7 +692,9 @@ class TopicListView(GenericAPIView):
 
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
-    pagination_class = TopicsPagination
+
+    paginate_by = TOPICS_PER_PAGE
+    paginate_by_param = 'page_size'
 
     def get(self, request):
         """GET /api/team/v0/topics/?course_id={course_id}"""
@@ -811,20 +740,18 @@ class TopicListView(GenericAPIView):
             add_team_count(topics, course_id)
             topics.sort(key=lambda t: t['team_count'], reverse=True)
             page = self.paginate_queryset(topics)
-            serializer = TopicSerializer(
-                page,
-                context={'course_id': course_id},
-                many=True,
-            )
+            # Since team_count has already been added to all the topics, use PaginatedTopicSerializer.
+            # Even though sorting is done outside of the serializer, sort_order needs to be passed
+            # to the serializer so that the paginated results indicate how they were sorted.
+            serializer = PaginatedTopicSerializer(page, context={'course_id': course_id, 'sort_order': ordering})
         else:
             page = self.paginate_queryset(topics)
             # Use the serializer that adds team_count in a bulk operation per page.
-            serializer = BulkTeamCountTopicSerializer(page, context={'course_id': course_id}, many=True)
+            serializer = BulkTeamCountPaginatedTopicSerializer(
+                page, context={'course_id': course_id, 'sort_order': ordering}
+            )
 
-        response = self.get_paginated_response(serializer.data)
-        response.data['sort_order'] = ordering
-
-        return response
+        return Response(serializer.data)
 
 
 def get_alphabetical_topics(course_module):
@@ -1033,7 +960,12 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
+
     serializer_class = MembershipSerializer
+
+    paginate_by = 10
+    paginate_by_param = 'page_size'
+    pagination_serializer_class = PaginationSerializer
 
     def get(self, request):
         """GET /api/team/v0/team_membership"""
@@ -1091,8 +1023,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        serializer = self.get_pagination_serializer(page)
+        return Response(serializer.data)  # pylint: disable=maybe-no-member
 
     def post(self, request):
         """POST /api/team/v0/team_membership"""
