@@ -214,7 +214,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
-                SplitMongoModuleStore.delete_item(self, branched_location, user_id)
+                super(DraftVersioningModuleStore, self).delete_item(branched_location, user_id)
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
                 # publish vertical to behave more like the old mongo/draft modulestore - TNL-2593
                 if (
