@@ -265,6 +265,60 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(policy['GRADER'][3]['type'], 'Final Exam')
         self.assertEqual(policy['GRADER'][3]['min_count'], 0)
 
+    @patch('ccx.views.render_to_response', intercept_renderer)
+    def test_save_without_min_count(self):
+        """
+        POST grading policy without min_count field.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+
+        course_id = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        save_policy_url = reverse(
+            'ccx_set_grading_policy', kwargs={'course_id': course_id})
+
+        # This policy doesn't include a min_count field
+        policy = {
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5
+            },
+            "GRADER": [
+                {
+                    "weight": 0.15,
+                    "type": "Homework",
+                    "drop_count": 2,
+                    "short_label": "HW"
+                }
+            ]
+        }
+
+        response = self.client.post(
+            save_policy_url, {"policy": json.dumps(policy)}
+        )
+        self.assertEqual(response.status_code, 302)
+
+        ccx = CustomCourseForEdX.objects.get()
+
+        # Make sure grading policy adjusted
+        policy = get_override_for_ccx(
+            ccx, self.course, 'grading_policy', self.course.grading_policy
+        )
+        self.assertEqual(len(policy['GRADER']), 1)
+        self.assertEqual(policy['GRADER'][0]['type'], 'Homework')
+        self.assertNotIn('min_count', policy['GRADER'][0])
+
+        save_ccx_url = reverse('save_ccx', kwargs={'course_id': course_id})
+        coach_dashboard_url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': course_id}
+        )
+        response = self.client.get(coach_dashboard_url)
+        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        response = self.client.post(
+            save_ccx_url, json.dumps(schedule), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+
     def test_enroll_member_student(self):
         """enroll a list of students who are members of the class
         """
