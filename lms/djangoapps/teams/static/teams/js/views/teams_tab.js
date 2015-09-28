@@ -12,7 +12,7 @@
             'teams/js/collections/topic',
             'teams/js/models/team',
             'teams/js/collections/team',
-            'teams/js/collections/team_membership',
+            'teams/js/collections/my_teams',
             'teams/js/utils/team_analytics',
             'teams/js/views/teams_tabbed_view',
             'teams/js/views/topics',
@@ -26,7 +26,7 @@
             'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, $, _, gettext, SearchFieldView, HeaderView, HeaderModel,
-                  TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection, TeamAnalytics,
+                  TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
                   TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
@@ -95,26 +95,22 @@
 
                     // Create an event queue to track team changes
                     this.teamEvents = _.clone(Backbone.Events);
-
-                    this.teamMemberships = new TeamMembershipCollection(
-                        this.context.userInfo.team_memberships_data,
+                    this.myTeamsCollection = new MyTeamsCollection(
+                        this.context.userInfo.teams,
                         {
                             teamEvents: this.teamEvents,
-                            url: this.context.teamMembershipsUrl,
                             course_id: this.context.courseID,
                             username: this.context.userInfo.username,
-                            privileged: this.context.userInfo.privileged,
-                            staff: this.context.userInfo.staff,
-                            parse: true
+                            per_page: 2,
+                            parse: true,
+                            url: this.context.myTeamsUrl
                         }
-                    ).bootstrap();
-
+                    );
                     this.myTeamsView = new MyTeamsView({
                         router: this.router,
                         teamEvents: this.teamEvents,
                         context: this.context,
-                        collection: this.teamMemberships,
-                        teamMemberships: this.teamMemberships
+                        collection: this.myTeamsCollection
                     });
 
                     this.topicsCollection = new TopicCollection(
@@ -176,7 +172,7 @@
                     // 1. If the user belongs to at least one team, jump to the "My Teams" page
                     // 2. If not, then jump to the "Browse" page
                     if (Backbone.history.getFragment() === '') {
-                        if (this.teamMemberships.length > 0) {
+                        if (this.myTeamsCollection.length > 0) {
                             this.router.navigate('my-teams', {trigger: true});
                         } else {
                             this.router.navigate('browse', {trigger: true});
@@ -351,12 +347,13 @@
                 createTeamsListView: function(options) {
                     var topic = options.topic,
                         collection = options.collection,
+                        self = this,
                         teamsView = new TopicTeamsView({
                             router: this.router,
                             context: this.context,
                             model: topic,
                             collection: collection,
-                            teamMemberships: this.teamMemberships,
+                            myTeamsCollection: this.myTeamsCollection,
                             showSortControls: options.showSortControls
                         }),
                         searchFieldView = new SearchFieldView({
