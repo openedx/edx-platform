@@ -523,9 +523,10 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         data = self.minimal_data.copy()
         data.update({field: value for field in ["topic_id", "title", "raw_body"]})
         serializer = ThreadSerializer(data=data, context=get_context(self.course, self.request))
+        self.assertFalse(serializer.is_valid())
         self.assertEqual(
             serializer.errors,
-            {field: ["This field is required."] for field in ["topic_id", "title", "raw_body"]}
+            {field: ["This field may not be blank."] for field in ["topic_id", "title", "raw_body"]}
         )
 
     def test_create_type(self):
@@ -592,9 +593,10 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
             partial=True,
             context=get_context(self.course, self.request)
         )
+        self.assertFalse(serializer.is_valid())
         self.assertEqual(
             serializer.errors,
-            {field: ["This field is required."] for field in ["topic_id", "title", "raw_body"]}
+            {field: ["This field may not be blank."] for field in ["topic_id", "title", "raw_body"]}
         )
 
     def test_update_course_id(self):
@@ -604,6 +606,7 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
             partial=True,
             context=get_context(self.course, self.request)
         )
+        self.assertFalse(serializer.is_valid())
         self.assertEqual(
             serializer.errors,
             {"course_id": ["This field is not allowed in an update."]}
@@ -769,7 +772,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModul
                     data["parent_id"] = None
                 serializer = CommentSerializer(data=data, context=context)
                 self.assertFalse(serializer.is_valid())
-                self.assertEqual(serializer.errors, {"parent_id": ["Comment level is too deep."]})
+                self.assertEqual(serializer.errors, {"non_field_errors": ["Comment level is too deep."]})
 
     def test_create_missing_field(self):
         for field in self.minimal_data:
@@ -855,9 +858,10 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModul
             partial=True,
             context=get_context(self.course, self.request)
         )
+        self.assertFalse(serializer.is_valid())
         self.assertEqual(
             serializer.errors,
-            {"raw_body": ["This field is required."]}
+            {"raw_body": ["This field may not be blank."]}
         )
 
     @ddt.data("thread_id", "parent_id")
@@ -868,6 +872,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModul
             partial=True,
             context=get_context(self.course, self.request)
         )
+        self.assertFalse(serializer.is_valid())
         self.assertEqual(
             serializer.errors,
             {field: ["This field is not allowed in an update."]}
