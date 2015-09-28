@@ -3,6 +3,7 @@ Super-temporary hack to get past some import errors to find more problems.
 TNL-3387
 """
 
+
 def scare(msg):
     """Print a message in a really noticeable way."""
     print "**\n**\n** {}\n**\n**\n".format(msg)
@@ -10,6 +11,7 @@ def scare(msg):
 import django.db.transaction
 
 scare("Monkey-patching django.db.transaction: see TNL-3387")
+
 
 def do_nothing(f):
     """A do-nothing decorator to let us defer deciding what to do with commit_manually being gone."""
