@@ -1221,6 +1221,8 @@ STATICFILES_FINDERS = [
     'pipeline.finders.PipelineFinder',
 ]
 
+PIPELINE_ENABLED = True
+
 # Don't use compression by default
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
