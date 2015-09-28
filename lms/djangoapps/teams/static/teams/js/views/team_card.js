@@ -1,4 +1,4 @@
-;(function (define) {
+(function (define) {
     'use strict';
     define([
         'jquery',
@@ -99,48 +99,34 @@
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
-                    new TeamMembershipView({memberships: this.getMemberships(), maxTeamSize: this.maxTeamSize}),
+                    new TeamMembershipView({memberships: this.model.get('membership'), maxTeamSize: this.maxTeamSize}),
                     new TeamCountryLanguageView({
-                        model: this.teamModel(),
+                        model: this.model,
                         countries: this.countries,
                         languages: this.languages
                     }),
-                    new TeamActivityView({date: this.teamModel().get('last_activity_at')})
+                    new TeamActivityView({date: this.model.get('last_activity_at')})
                 ];
                 this.model.on('change:membership', function () {
-                    this.detailViews[0].memberships = this.getMemberships();
+                    this.detailViews[0].memberships = this.model.get('membership');
                 }, this);
-            },
-
-            teamModel: function () {
-                if (this.model.has('team')) { return this.model.get('team'); }
-                return this.model;
-            },
-
-            getMemberships: function () {
-                if (this.model.has('team')) {
-                    return [this.model.attributes];
-                }
-                else {
-                    return this.model.get('membership');
-                }
             },
 
             configuration: 'list_card',
             cardClass: 'team-card',
-            title: function () { return this.teamModel().get('name'); },
-            description: function () { return this.teamModel().get('description'); },
+            title: function () { return this.model.get('name'); },
+            description: function () { return this.model.get('description'); },
             details: function () { return this.detailViews; },
             actionClass: 'action-view',
             actionContent: function() {
                 return interpolate(
                     gettext('View %(span_start)s %(team_name)s %(span_end)s'),
-                    {span_start: '<span class="sr">', team_name: _.escape(this.teamModel().get('name')), span_end: '</span>'},
+                    {span_start: '<span class="sr">', team_name: _.escape(this.model.get('name')), span_end: '</span>'},
                     true
                 );
             },
             actionUrl: function () {
-                return '#teams/' + this.teamModel().get('topic_id') + '/' + this.teamModel().get('id');
+                return '#teams/' + this.model.get('topic_id') + '/' + this.model.get('id');
             }
         });
         return TeamCardView;
