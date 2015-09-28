@@ -31,7 +31,7 @@ class CoursesWithFriends(generics.ListAPIView):
     serializer_class = serializers.CoursesWithFriendsSerializer
 
     def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.GET)
+        serializer = self.get_serializer(data=request.GET, files=request.FILES)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -61,5 +61,4 @@ class CoursesWithFriends(generics.ListAPIView):
             and is_mobile_available_for_user(self.request.user, enrollment.course)
         ]
 
-        serializer = CourseEnrollmentSerializer(courses, context={'request': request}, many=True)
-        return Response(serializer.data)
+        return Response(CourseEnrollmentSerializer(courses, context={'request': request}).data)
