@@ -2382,7 +2382,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if original_structure['root'] == block_key:
                 raise ValueError("Cannot delete the root of a course")
             if block_key not in original_structure['blocks']:
-                raise ValueError("Cannot delete a block that does not exist")
+                raise ValueError("Cannot delete block_key {} from course {}, because that block does not exist.".format(
+                    block_key,
+                    usage_locator,
+                ))
             index_entry = self._get_index_if_valid(usage_locator.course_key, force)
             new_structure = self.version_structure(usage_locator.course_key, original_structure, user_id)
             new_blocks = new_structure['blocks']
