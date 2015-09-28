@@ -1,21 +1,7 @@
 <div class="discussion-post">
-    <header>
-        <div class="group-visibility-label">
-            <% if (obj.group_name) { %>
-                <%-
-                interpolate(
-                    gettext('This post is visible only to %(group_name)s.'),
-                    {group_name: obj.group_name},
-                    true
-                )
-                %>
-            <% } else { %>
-                <%- gettext('This post is visible to everyone.') %>
-            <% } %>
-        </div>
-
+    <header class="wrapper-post-header">
         <div class="post-header-content">
-            <h1><%- title %></h1>
+            <h1 class="post-title"><%- title %></h1>
             <p class="posted-details">
             <%
             var timeAgoHtml = interpolate(
@@ -59,16 +45,15 @@
     </header>
 
     <div class="post-body"><%- body %></div>
-
-    <% if (mode == "tab" && obj.courseware_url) { %>
-        <%
-        var courseware_title_linked = interpolate(
-            '<a href="%(courseware_url)s">%(courseware_title)s</a>',
-            {courseware_url: courseware_url, courseware_title: _.escape(courseware_title)},
-            true
-        );
-        %>
-        <div class="post-context">
+    <div class="post-context">
+        <% if (mode == "tab" && obj.courseware_url) { %>
+            <%
+            var courseware_title_linked = interpolate(
+                '<a href="%(courseware_url)s">%(courseware_title)s</a>',
+                {courseware_url: courseware_url, courseware_title: _.escape(courseware_title)},
+                true
+            );
+            %>
             <%=
             interpolate(
                 _.escape(gettext('Related to: %(courseware_title_linked)s')),
@@ -76,6 +61,19 @@
                 true
             )
             %>
+        <% } %>
+        <div class="group-visibility-label">
+            <% if (obj.group_name) { %>
+                <%-
+                interpolate(
+                    gettext('This post is visible only to %(group_name)s.'),
+                    {group_name: obj.group_name},
+                    true
+                )
+                %>
+            <% } else { %>
+                <%- gettext('This post is visible to everyone.') %>
+            <% } %>
         </div>
-    <% } %>
+    </div>
 </div>

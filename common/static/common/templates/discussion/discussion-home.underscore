@@ -1,4 +1,4 @@
-<div class="discussion-article blank-slate">
+<div class="discussion-article view-discussion-home">
   <section class="home-header">
     <span class="label"><%- gettext("DISCUSSION HOME:") %></span>
     <% if (window.courseName) { %>
