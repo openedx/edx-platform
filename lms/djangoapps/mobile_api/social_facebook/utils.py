@@ -40,7 +40,7 @@ def get_friends_from_facebook(serializer):
     the error message.
     """
     try:
-        graph = facebook.GraphAPI(serializer.object['oauth_token'])
+        graph = facebook.GraphAPI(serializer.data['oauth_token'])
         friends = graph.request(settings.FACEBOOK_API_VERSION + "/me/friends")
         return get_pagination(friends)
     except facebook.GraphAPIError, ex:
