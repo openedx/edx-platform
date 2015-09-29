@@ -70,7 +70,7 @@ def test_storage_url_exists(mock_storage):
 
     assert_equals('"/static/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
     mock_storage.exists.assert_called_once_with('file.png')
-    mock_storage.url.assert_called_once_with('data_dir/file.png')
+    mock_storage.url.assert_called_once_with('file.png')
 
 
 @patch('static_replace.staticfiles_storage', autospec=True)
@@ -80,7 +80,7 @@ def test_storage_url_not_exists(mock_storage):
 
     assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
     mock_storage.exists.assert_called_once_with('file.png')
-    mock_storage.url.assert_called_once_with('file.png')
+    mock_storage.url.assert_called_once_with('data_dir/file.png')
 
 
 @patch('static_replace.StaticContent', autospec=True)
