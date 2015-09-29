@@ -136,12 +136,10 @@ from django.utils.http import urlquote_plus
                                     <span>${_("Verification Failed" )}</span>
                                 %elif requirement['status'] == 'satisfied':
                                     <i class="fa fa-check"></i>
-                                    % if requirement['namespace'] == 'reverification':
-                                    <span>Verified on ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
-                                    % elif requirement['namespace'] == 'grade' and 'final_grade' in requirement['reason']:
+                                    % if requirement['namespace'] == 'grade' and 'final_grade' in requirement['reason']:
                                     <span>${int(requirement['reason']['final_grade'] * 100)}%</span>
                                     % else:
-                                    <span>Completed</span>
+                                    <span>${_("Completed")} ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
                                     % endif
                                 %endif
                             %else:
