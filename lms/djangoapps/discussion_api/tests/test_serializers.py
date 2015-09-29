@@ -257,6 +257,12 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         serialized = self.serialize(Thread(id=thread_data["id"]))
         self.assertEqual(serialized["response_count"], 2)
 
+    def test_response_count_missing(self):
+        thread_data = self.make_cs_content({})
+        del thread_data["resp_total"]
+        self.register_get_thread_response(thread_data)
+        serialized = self.serialize(Thread(id=thread_data["id"]))
+        self.assertIsNone(serialized["response_count"], None)
 
 @ddt.ddt
 class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
