@@ -63,7 +63,7 @@ body.discussion, .discussion-module {
       @extend %t-copy-sub2;
       display: inline-block;
       margin-bottom: ($baseline/2);
-      width: flex-grid(10,12);
+      width: flex-grid(9,12);
 
       p + p {
         margin-top: 12px;
