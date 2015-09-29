@@ -107,7 +107,7 @@ class PreferencesView(APIView):
         """
         PATCH /api/user/v1/preferences/{username}/
         """
-        if not request.DATA or not getattr(request.DATA, "keys", None):
+        if not request.data or not getattr(request.data, "keys", None):
             error_message = _("No data provided for user preference update")
             return Response(
                 {
@@ -118,7 +118,7 @@ class PreferencesView(APIView):
             )
         try:
             with transaction.commit_on_success():
-                update_user_preferences(request.user, request.DATA, username=username)
+                update_user_preferences(request.user, request.data, username=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
@@ -218,7 +218,7 @@ class PreferencesDetailView(APIView):
         PUT /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
-            set_user_preference(request.user, preference_key, request.DATA, username=username)
+            set_user_preference(request.user, preference_key, request.data, username=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
