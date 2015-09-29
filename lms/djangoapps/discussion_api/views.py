@@ -269,14 +269,14 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
-        return Response(create_thread(request, request.DATA))
+        return Response(create_thread(request, request.data))
 
     def partial_update(self, request, thread_id):
         """
         Implements the PATCH method for the instance endpoint as described in
         the class docstring.
         """
-        return Response(update_thread(request, thread_id, request.DATA))
+        return Response(update_thread(request, thread_id, request.data))
 
     def destroy(self, request, thread_id):
         """
@@ -424,7 +424,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
-        return Response(create_comment(request, request.DATA))
+        return Response(create_comment(request, request.data))
 
     def destroy(self, request, comment_id):
         """
@@ -439,4 +439,4 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         Implements the PATCH method for the instance endpoint as described in
         the class docstring.
         """
-        return Response(update_comment(request, comment_id, request.DATA))
+        return Response(update_comment(request, comment_id, request.data))

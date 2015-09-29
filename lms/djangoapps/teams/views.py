@@ -499,7 +499,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         field_errors = {}
         course_key = None
 
-        course_id = request.DATA.get('course_id')
+        course_id = request.data.get('course_id')
         try:
             course_key = CourseKey.from_string(course_id)
             # Ensure the course exists
@@ -528,7 +528,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        data = request.DATA.copy()
+        data = request.data.copy()
         data['course_id'] = course_key
 
         serializer = CourseTeamCreationSerializer(data=data)
@@ -1109,10 +1109,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         """POST /api/team/v0/team_membership"""
         field_errors = {}
 
-        if 'username' not in request.DATA:
+        if 'username' not in request.data:
             field_errors['username'] = build_api_error(ugettext_noop("Username is required."))
 
-        if 'team_id' not in request.DATA:
+        if 'team_id' not in request.data:
             field_errors['team_id'] = build_api_error(ugettext_noop("Team id is required."))
 
         if field_errors:
@@ -1121,11 +1121,11 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            team = CourseTeam.objects.get(team_id=request.DATA['team_id'])
+            team = CourseTeam.objects.get(team_id=request.data['team_id'])
         except CourseTeam.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        username = request.DATA['username']
+        username = request.data['username']
         if not has_team_api_access(request.user, team.course_id, access_username=username):
             return Response(status=status.HTTP_404_NOT_FOUND)
 

@@ -478,8 +478,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         """
         # Get the User, Course ID, and Mode from the request.
 
-        username = request.DATA.get('user', request.user.username)
-        course_id = request.DATA.get('course_details', {}).get('course_id')
+        username = request.data.get('user', request.user.username)
+        course_id = request.data.get('course_details', {}).get('course_id')
 
         if not course_id:
             return Response(
@@ -497,7 +497,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
 
-        mode = request.DATA.get('mode', CourseMode.HONOR)
+        mode = request.data.get('mode', CourseMode.HONOR)
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
@@ -536,7 +536,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return embargo_response
 
         try:
-            is_active = request.DATA.get('is_active')
+            is_active = request.data.get('is_active')
             # Check if the requested activation status is None or a Boolean
             if is_active is not None and not isinstance(is_active, bool):
                 return Response(
@@ -546,7 +546,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     }
                 )
 
-            enrollment_attributes = request.DATA.get('enrollment_attributes')
+            enrollment_attributes = request.data.get('enrollment_attributes')
             enrollment = api.get_enrollment(username, unicode(course_id))
             mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
             active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
@@ -586,7 +586,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 # Will reactivate inactive enrollments.
                 response = api.add_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
 
-            email_opt_in = request.DATA.get('email_opt_in', None)
+            email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)
