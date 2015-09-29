@@ -1351,7 +1351,7 @@ class XmlViewInStudioTest(ViewInStudioTest):
 
 @attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
-@patch('courseware.module_render.has_access', Mock(return_value=True))
+@patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(ModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
 
@@ -1483,7 +1483,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
 
-    @patch('courseware.module_render.has_access', Mock(return_value=True))
+    @patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
     def _get_anonymous_id(self, course_id, xblock_class):
         location = course_id.make_usage_key('dummy_category', 'dummy_name')
         descriptor = Mock(
@@ -1550,7 +1550,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr('shard_1')
-@patch('track.views.tracker')
+@patch('track.views.tracker', autospec=True)
 class TestModuleTrackingContext(ModuleStoreTestCase):
     """
     Ensure correct tracking information is included in events emitted during XBlock callback handling.

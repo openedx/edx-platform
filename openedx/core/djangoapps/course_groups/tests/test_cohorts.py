@@ -25,7 +25,7 @@ from ..tests.helpers import (
 )
 
 
-@patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
+@patch("openedx.core.djangoapps.course_groups.cohorts.tracker", autospec=True)
 class TestCohortSignals(TestCase):
     """
     Test cases to validate event emissions for various cohort-related workflows
