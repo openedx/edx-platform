@@ -32,8 +32,6 @@ from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-from teams.tests.factories import CourseTeamFactory
-
 
 log = logging.getLogger(__name__)
 
@@ -1290,6 +1288,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
             topic_id='topic_id',
             discussion_topic_id=self.team_commentable_id
         )
+
         self.team.add_user(self.student_in_team)
 
         # Dummy commentable ID not linked to a team

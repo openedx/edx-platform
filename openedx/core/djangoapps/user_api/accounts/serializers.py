@@ -53,7 +53,7 @@ class UserReadOnlySerializer(serializers.Serializer):
 
         super(UserReadOnlySerializer, self).__init__(*args, **kwargs)
 
-    def to_native(self, user):
+    def to_representation(self, user):
         """
         Overwrite to_native to handle custom logic since we are serializing two models as one here
         :param user: User object
@@ -152,8 +152,8 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     Class that serializes the portion of UserProfile model needed for account information.
     """
     profile_image = serializers.SerializerMethodField("_get_profile_image")
-    requires_parental_consent = serializers.SerializerMethodField("get_requires_parental_consent")
-    language_proficiencies = LanguageProficiencySerializer(many=True, allow_add_remove=True, required=False)
+    requires_parental_consent = serializers.SerializerMethodField()
+    language_proficiencies = LanguageProficiencySerializer(many=True, required=False)
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = UserProfile
@@ -165,25 +165,21 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         read_only_fields = ()
         explicit_read_only_fields = ("profile_image", "requires_parental_consent")
 
-    def validate_name(self, attrs, source):
+    def validate_name(self, new_name):
         """ Enforce minimum length for name. """
-        if source in attrs:
-            new_name = attrs[source].strip()
-            if len(new_name) < NAME_MIN_LENGTH:
-                raise serializers.ValidationError(
-                    "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
-                )
-            attrs[source] = new_name
+        if len(new_name) < NAME_MIN_LENGTH:
+            raise serializers.ValidationError(
+                "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
+            )
+        return new_name
 
-        return attrs
-
-    def validate_language_proficiencies(self, attrs, source):
+    def validate_language_proficiencies(self, value):
         """ Enforce all languages are unique. """
-        language_proficiencies = [language for language in attrs.get(source, [])]
-        unique_language_proficiencies = set(language.code for language in language_proficiencies)
+        language_proficiencies = [language for language in value]
+        unique_language_proficiencies = set(language["code"] for language in language_proficiencies)
         if len(language_proficiencies) != len(unique_language_proficiencies):
             raise serializers.ValidationError("The language_proficiencies field must consist of unique languages")
-        return attrs
+        return value
 
     def transform_gender(self, user_profile, value):
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
@@ -230,3 +226,29 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         call the method with a single argument, the user_profile object.
         """
         return AccountLegacyProfileSerializer.get_profile_image(user_profile, user_profile.user)
+
+    def update(self, instance, validated_data):
+        """
+        Update the profile, including nested fields.
+        """
+        language_proficiencies = validated_data.pop("language_proficiencies", None)
+
+        # Update all fields on the user profile that are writeable,
+        # except for "language_proficiencies", which we'll update separately
+        update_fields = set(self.get_writeable_fields()) - set(["language_proficiencies"])
+        for field_name in update_fields:
+            default = getattr(instance, field_name)
+            field_value = validated_data.get(field_name, default)
+            setattr(instance, field_name, field_value)
+
+        instance.save()
+
+        # Now update the related language proficiency
+        if language_proficiencies is not None:
+            instance.language_proficiencies.all().delete()
+            instance.language_proficiencies.bulk_create([
+                LanguageProficiency(user_profile=instance, code=language["code"])
+                for language in language_proficiencies
+            ])
+
+        return instance

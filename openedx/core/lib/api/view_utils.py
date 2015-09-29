@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import status, response
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import clone_request
 from rest_framework.response import Response
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
@@ -193,3 +194,23 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
         add_serializer_errors(serializer, patch, field_errors)
 
         return field_errors
+
+    def get_object_or_none(self):
+        """
+        Retrieve an object or return None if the object can't be found.
+
+        NOTE: This replaces functionality that was removed in Django Rest Framework v3.1.
+        """
+        try:
+            return self.get_object()
+        except Http404:
+            if self.request.method == 'PUT':
+                # For PUT-as-create operation, we need to ensure that we have
+                # relevant permissions, as if this was a POST request.  This
+                # will either raise a PermissionDenied exception, or simply
+                # return None.
+                self.check_permissions(clone_request(self.request, 'POST'))
+            else:
+                # PATCH requests where the object does not exist should still
+                # return a 404 response.
+                raise
