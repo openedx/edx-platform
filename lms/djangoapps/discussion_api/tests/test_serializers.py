@@ -264,6 +264,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         serialized = self.serialize(Thread(id=thread_data["id"]))
         self.assertIsNone(serialized["response_count"], None)
 
+
 @ddt.ddt
 class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for CommentSerializer."""
