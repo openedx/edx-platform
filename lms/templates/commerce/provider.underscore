@@ -2,7 +2,7 @@
   <div class="provider-info">
     <%= interpolate(
           gettext("You still need to visit the %(display_name)s website to complete the credit process."),
-          { display_name: displayname }, true
+          { display_name: display_name }, true
         ) %>
   </div>
   <div class="provider-more-info">
