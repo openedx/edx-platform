@@ -25,10 +25,14 @@ define('video/09_play_skip_control.js', [], function() {
 
     PlaySkipControl.prototype = {
         template: [
-            '<a class="video_control play play-skip-control" href="#" title="',
-                gettext('Play'), '" role="button" aria-disabled="false">',
-                gettext('Play'),
-            '</a>'
+            '<button class="control video_control play play-skip-control" aria-disabled="false">',
+                '<span class="icon-fallback-img">',
+                    '<span class="icon icon-play" aria-hidden="true"></span>',
+                    '<span class="text control-text">',
+                        gettext('Play'),
+                    '</span>',
+                '</span>',
+            '</button>'
         ].join(''),
 
         destroy: function () {
@@ -72,8 +76,13 @@ define('video/09_play_skip_control.js', [], function() {
 
         play: function () {
             this.el
-                .attr('title', gettext('Skip')).text(gettext('Skip'))
-                .removeClass('play').addClass('skip');
+                .removeClass('play')
+                .addClass('skip')
+                .find('.icon')
+                    .removeClass('icon-play')
+                    .addClass('icon-step-forward')
+                .find('.control-text')
+                    .text(gettext('Skip'));
             // Disable possibility to pause the video.
             this.state.el.find('video').off('click');
         }
