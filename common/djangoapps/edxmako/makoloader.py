@@ -2,7 +2,6 @@ import logging
 
 from django.conf import settings
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import make_origin, get_template_from_string
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 
@@ -71,13 +70,15 @@ class MakoLoader(object):
 
 class MakoFilesystemLoader(MakoLoader):
     is_usable = True
+    _accepts_engine_in_init = True
 
-    def __init__(self):
-        MakoLoader.__init__(self, FilesystemLoader())
+    def __init__(self, *args):
+        MakoLoader.__init__(self, FilesystemLoader(*args))
 
 
 class MakoAppDirectoriesLoader(MakoLoader):
     is_usable = True
+    _accepts_engine_in_init = True
 
-    def __init__(self):
-        MakoLoader.__init__(self, AppDirectoriesLoader())
+    def __init__(self, *args):
+        MakoLoader.__init__(self, AppDirectoriesLoader(*args))
