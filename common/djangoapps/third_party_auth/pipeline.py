@@ -585,7 +585,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 
 @partial.partial
 def login_analytics(strategy, auth_entry, *args, **kwargs):
-    """ Sends login info to Segment.io """
+    """ Sends login info to Segment """
 
     event_name = None
     if auth_entry == AUTH_ENTRY_LOGIN:
@@ -593,7 +593,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
     elif auth_entry in [AUTH_ENTRY_ACCOUNT_SETTINGS]:
         event_name = 'edx.bi.user.account.linked'
 
-    if event_name is not None and hasattr(settings, 'SEGMENT_IO_LMS_KEY') and settings.SEGMENT_IO_LMS_KEY:
+    if event_name is not None and settings.SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.track(
             kwargs['user'].id,

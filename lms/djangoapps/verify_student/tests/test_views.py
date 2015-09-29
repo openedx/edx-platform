@@ -1939,8 +1939,8 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         url += u"?{params}".format(params=urllib.urlencode({"checkpoint": self.reverification_location}))
         self.assertRedirects(response, url)
 
-    @override_settings(SEGMENT_IO_LMS_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True, 'SEGMENT_IO_LMS': True})
+    @override_settings(SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_get(self):
         """
         Test incourse reverification.
@@ -1994,8 +1994,8 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         response = self._submit_photos(self.course_key, self.reverification_location, "")
         self.assertEqual(response.status_code, 400)
 
-    @override_settings(SEGMENT_IO_LMS_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True, 'SEGMENT_IO_LMS': True})
+    @override_settings(SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_post(self):
         self._create_checkpoint()
         self._create_initial_verification()

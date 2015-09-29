@@ -182,9 +182,6 @@ FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
-    # Segment.io for LMS--need to explicitly turn it on for production.
-    'SEGMENT_IO_LMS': False,
-
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': False,
 
@@ -611,6 +608,7 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 
 
 ############################## EVENT TRACKING #################################
+SEGMENT_KEY = None
 
 # FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 50000

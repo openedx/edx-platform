@@ -1163,11 +1163,11 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         LoginFailures.clear_lockout_counter(user)
 
     # Track the user's sign in
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+    if settings.SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.identify(user.id, {
             'email': email,
-            'username': username,
+            'username': username
         })
 
         analytics.track(
@@ -1601,7 +1601,7 @@ def create_account_with_params(request, params):
         third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
     # Track the user's registration
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+    if settings.SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         identity_args = [
             user.id,  # pylint: disable=no-member
