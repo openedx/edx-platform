@@ -36,6 +36,23 @@ class CourseViewTestsMixin(object):
     """
     view = None
 
+    raw_grader = [
+        {
+            "min_count": 24,
+            "weight": 0.2,
+            "type": "Homework",
+            "drop_count": 0,
+            "short_label": "HW"
+        },
+        {
+            "min_count": 4,
+            "weight": 0.8,
+            "type": "Exam",
+            "drop_count": 0,
+            "short_label": "Exam"
+        }
+    ]
+
     def setUp(self):
         super(CourseViewTestsMixin, self).setUp()
         self.create_user_and_access_token()
@@ -51,22 +68,7 @@ class CourseViewTestsMixin(object):
     @classmethod
     def create_course_data(cls):
         cls.invalid_course_id = 'foo/bar/baz'
-        cls.course = CourseFactory.create(display_name='An Introduction to API Testing', raw_grader=[
-            {
-                "min_count": 24,
-                "weight": 0.2,
-                "type": "Homework",
-                "drop_count": 0,
-                "short_label": "HW"
-            },
-            {
-                "min_count": 4,
-                "weight": 0.8,
-                "type": "Exam",
-                "drop_count": 0,
-                "short_label": "Exam"
-            }
-        ])
+        cls.course = CourseFactory.create(display_name='An Introduction to API Testing', raw_grader=cls.raw_grader)
         cls.course_id = unicode(cls.course.id)
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.sequential = ItemFactory.create(
@@ -400,6 +402,55 @@ class CourseGradingPolicyTests(CourseDetailTestMixin, CourseViewTestsMixin, Shar
             },
             {
                 "count": 4,
+                "weight": 0.8,
+                "assignment_type": "Exam",
+                "dropped": 0
+            }
+        ]
+        self.assertListEqual(response.data, expected)
+
+
+class CourseGradingPolicyMissingFieldsTests(CourseDetailTestMixin, CourseViewTestsMixin, SharedModuleStoreTestCase):
+    view = 'course_structure_api:v0:grading_policy'
+
+    # Update the raw grader to have missing keys
+    raw_grader = [
+        {
+            "min_count": 24,
+            "weight": 0.2,
+            "type": "Homework",
+            "drop_count": 0,
+            "short_label": "HW"
+        },
+        {
+            # Deleted "min_count" key
+            "weight": 0.8,
+            "type": "Exam",
+            "drop_count": 0,
+            "short_label": "Exam"
+        }
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        super(CourseGradingPolicyMissingFieldsTests, cls).setUpClass()
+        cls.create_course_data()
+
+    def test_get(self):
+        """
+        The view should return grading policy for a course.
+        """
+        response = super(CourseGradingPolicyMissingFieldsTests, self).test_get()
+
+        expected = [
+            {
+                "count": 24,
+                "weight": 0.2,
+                "assignment_type": "Homework",
+                "dropped": 0
+            },
+            {
+                "count": None,
                 "weight": 0.8,
                 "assignment_type": "Exam",
                 "dropped": 0

@@ -6,8 +6,8 @@ from .models import UserPreference
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    name = serializers.SerializerMethodField("get_name")
-    preferences = serializers.SerializerMethodField("get_preferences")
+    name = serializers.SerializerMethodField()
+    preferences = serializers.SerializerMethodField()
 
     def get_name(self, user):
         profile = UserProfile.objects.get(user=user)
@@ -32,9 +32,10 @@ class UserPreferenceSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RawUserPreferenceSerializer(serializers.ModelSerializer):
-    """Serializer that generates a raw representation of a user preference.
     """
-    user = serializers.PrimaryKeyRelatedField()
+    Serializer that generates a raw representation of a user preference.
+    """
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = UserPreference
@@ -57,3 +58,11 @@ class ReadOnlyFieldsSerializerMixin(object):
         cls.Meta.read_only_fields tuple.
         """
         return getattr(cls.Meta, 'read_only_fields', '') + getattr(cls.Meta, 'explicit_read_only_fields', '')
+
+    @classmethod
+    def get_writeable_fields(cls):
+        """
+        Return all fields on this serializer that are writeable.
+        """
+        all_fields = getattr(cls.Meta, 'fields', tuple())
+        return tuple(set(all_fields) - set(cls.get_read_only_fields()))
