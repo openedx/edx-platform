@@ -173,7 +173,7 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
 
     def patch(self, request, *args, **kwargs):
         """Checks for validation errors, then updates the model using the UpdateModelMixin."""
-        field_errors = self._validate_patch(request.DATA)
+        field_errors = self._validate_patch(request.data)
         if field_errors:
             return Response({'field_errors': field_errors}, status=status.HTTP_400_BAD_REQUEST)
         return self.partial_update(request, *args, **kwargs)

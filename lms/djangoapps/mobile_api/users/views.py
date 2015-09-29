@@ -182,8 +182,8 @@ class UserCourseStatus(views.APIView):
         """
         Update the ID of the module that the specified user last visited in the specified course.
         """
-        module_id = request.DATA.get("last_visited_module_id")
-        modification_date_string = request.DATA.get("modification_date")
+        module_id = request.data.get("last_visited_module_id")
+        modification_date_string = request.data.get("modification_date")
         modification_date = None
         if modification_date_string:
             modification_date = dateparse.parse_datetime(modification_date_string)

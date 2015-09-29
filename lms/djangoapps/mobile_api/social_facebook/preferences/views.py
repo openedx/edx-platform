@@ -39,7 +39,7 @@ class UserSharing(generics.ListCreateAPIView):
     serializer_class = serializers.UserSharingSerializar
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             value = serializer.data['share_with_facebook_friends']
             set_user_preference(request.user, "share_with_facebook_friends", value)

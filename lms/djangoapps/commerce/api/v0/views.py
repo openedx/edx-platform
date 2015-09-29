@@ -45,7 +45,7 @@ class BasketsView(APIView):
         Returns
             Tuple (data_is_valid, course_key, error_msg)
         """
-        course_id = request.DATA.get('course_id')
+        course_id = request.data.get('course_id')
 
         if not course_id:
             return False, None, u'Field course_id is missing.'
@@ -69,7 +69,7 @@ class BasketsView(APIView):
 
         Errors here aren't expected, but should not break the outer enrollment transaction.
         """
-        email_opt_in = request.DATA.get('email_opt_in', None)
+        email_opt_in = request.data.get('email_opt_in', None)
         if email_opt_in is not None:
             try:
                 update_email_opt_in(user, course_key.org, email_opt_in)
