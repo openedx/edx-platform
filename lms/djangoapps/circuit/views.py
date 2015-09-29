@@ -60,6 +60,6 @@ def save_circuit(request, circuit):
     print ":", sc.schematic
     sc.save()
     json_str = json.dumps({'results': 'success'})
-    response = HttpResponse(json_str, mimetype='application/json')
+    response = HttpResponse(json_str, content_type='application/json')
     response['Cache-Control'] = 'no-cache'
     return response

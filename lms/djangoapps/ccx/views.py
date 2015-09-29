@@ -390,7 +390,7 @@ def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
 
     schedule = get_ccx_schedule(course, ccx)
     json_schedule = json.dumps(schedule, indent=4)
-    return HttpResponse(json_schedule, mimetype='application/json')
+    return HttpResponse(json_schedule, content_type='application/json')
 
 
 @ensure_csrf_cookie

@@ -49,7 +49,7 @@ def all_sequential_open_distrib(request, course_id):
     else:
         data = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(json.dumps(data), mimetype="application/json")
+    return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def all_problem_grade_distribution(request, course_id):
@@ -75,7 +75,7 @@ def all_problem_grade_distribution(request, course_id):
     else:
         data = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(json.dumps(data), mimetype="application/json")
+    return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def section_problem_grade_distrib(request, course_id, section):
@@ -106,4 +106,4 @@ def section_problem_grade_distrib(request, course_id, section):
     else:
         data = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(json.dumps(data), mimetype="application/json")
+    return HttpResponse(json.dumps(data), content_type="application/json")
