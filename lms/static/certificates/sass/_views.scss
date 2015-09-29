@@ -11,3 +11,30 @@
 // #DISTINCTION CERT
 // ------------------------------
 
+
+// ------------------------------
+// #INVALID
+// ------------------------------
+
+.wrapper-content.status-invalid {
+    @extend %layout-wrapper;
+
+    .wrapper-content-grid {
+        @extend %layout;
+    }
+
+  .content-main {
+    margin-bottom: spacing-vertical(base);
+
+    @include susy-breakpoint($bp-medium, $susy) {
+      @include span(9 of 12 first);
+    }
+  }
+
+  .content-secondary {
+
+    @include susy-breakpoint($bp-medium, $susy) {
+      @include span(3 of 12 last);
+    }
+  }
+}
