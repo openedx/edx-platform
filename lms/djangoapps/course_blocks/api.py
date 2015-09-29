@@ -1,7 +1,7 @@
 """
 ...
 """
-from django.core.cache import get_cache
+from django.core.cache import cache
 
 from openedx.core.lib.block_cache.block_cache import get_blocks, clear_block_cache
 from xmodule.modulestore.django import modulestore
@@ -23,14 +23,9 @@ LMS_COURSE_TRANSFORMERS = [
 ]
 
 
-_COURSE_BLOCKS_CACHE = None
-
-
 def _get_cache():
-    global _COURSE_BLOCKS_CACHE
-    if not _COURSE_BLOCKS_CACHE:
-        _COURSE_BLOCKS_CACHE = get_cache('lms.course_blocks')
-    return _COURSE_BLOCKS_CACHE
+    """Function exists for mocking/testing, or if we want a custom cache."""
+    return cache
 
 
 def get_course_blocks(
