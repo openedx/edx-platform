@@ -64,6 +64,7 @@ import urllib
 import analytics
 from eventtracking import tracker
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
@@ -592,7 +593,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
     elif auth_entry in [AUTH_ENTRY_ACCOUNT_SETTINGS]:
         event_name = 'edx.bi.user.account.linked'
 
-    if event_name is not None:
+    if event_name is not None and hasattr(settings, 'SEGMENT_IO_LMS_KEY') and settings.SEGMENT_IO_LMS_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.track(
             kwargs['user'].id,
