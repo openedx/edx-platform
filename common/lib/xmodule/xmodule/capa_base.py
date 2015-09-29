@@ -1366,7 +1366,9 @@ class CapaMixin(CapaFields):
         self.track_function_unmask('save_problem_success', event_info)
         msg = _("Your answers have been saved.")
         if not self.max_attempts == 0:
-            msg = _("Your answers have been saved but not graded. Click 'Final Check' to grade them.")
+            msg = _(
+                "Your answers have been saved but not graded. Click '{button_name}' to grade them."
+            ).format(button_name=self.check_button_name())
         return {
             'success': True,
             'msg': msg,

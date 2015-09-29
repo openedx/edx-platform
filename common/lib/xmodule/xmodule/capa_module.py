@@ -211,3 +211,4 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     should_show_reset_button = module_attr('should_show_reset_button')
     should_show_save_button = module_attr('should_show_save_button')
     update_score = module_attr('update_score')
+    problem_attempts=module_attr('attempts')
