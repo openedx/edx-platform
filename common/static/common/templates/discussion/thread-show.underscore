@@ -1,5 +1,8 @@
 <div class="discussion-post">
     <header class="wrapper-post-header">
+        <div class="author-image level-post">
+            <img class="image-frame" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/edx-theme/default-profile_120.41d2f8cbbbbd.png" alt="Profile image for post author">
+        </div>
         <div class="post-header-content">
             <h1 class="post-title"><%- title %></h1>
             <p class="posted-details">
