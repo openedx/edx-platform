@@ -1,64 +1,37 @@
 """
 Asset compilation and collection.
 """
-
 from __future__ import print_function
-
 import argparse
-import glob
-import traceback
-
 from paver import tasks
 from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
-
+import glob
+import traceback
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 
 # setup baseline paths
 
 COFFEE_DIRS = ['lms', 'cms', 'common']
-# A list of directories.  Each will be paired with a sibling /css directory.
-SASS_DIRS = [
-    path("lms/static/sass"),
-    path("lms/static/themed_sass"),
-    path("cms/static/sass"),
-    path("common/static/sass"),
-    path("lms/static/certificates/sass"),
-]
+SASS_DIRS = {
+    "lms/static/sass": "lms/static/css",
+    "cms/static/sass": "cms/static/css",
+    "common/static/sass": "common/static/css",
+    "lms/static/certificates/sass": "lms/static/certificates/css",
+}
 SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
 SASS_CACHE_PATH = '/tmp/sass-cache'
 
 
-def configure_paths():
-    """Configure our paths based on settings.  Called immediately."""
-    edxapp_env = Env()
-    if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
-        theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
-        parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
-        theme_root = parent_dir / "themes" / theme_name
-        COFFEE_DIRS.append(theme_root)
-        sass_dir = theme_root / "static" / "sass"
-        css_dir = theme_root / "static" / "css"
-        if sass_dir.isdir():
-            css_dir.mkdir_p()
-            SASS_DIRS.append(sass_dir)
-
-    if edxapp_env.env_tokens.get("COMP_THEME_DIR", ""):
-        theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
-        lms_sass = theme_dir / "lms" / "static" / "sass"
-        lms_css = theme_dir / "lms" / "static" / "css"
-        if lms_sass.isdir():
-            lms_css.mkdir_p()
-            SASS_DIRS.append(lms_sass)
-        studio_sass = theme_dir / "studio" / "static" / "sass"
-        studio_css = theme_dir / "studio" / "static" / "css"
-        if studio_sass.isdir():
-            studio_css.mkdir_p()
-            SASS_DIRS.append(studio_sass)
-
-configure_paths()
+edxapp_env = Env()
+if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
+    theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
+    parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
+    theme_root = parent_dir / "themes" / theme_name
+    COFFEE_DIRS.append(theme_root)
+    SASS_DIRS[theme_root / "static" / "sass"] = None
 
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
@@ -98,7 +71,7 @@ class SassWatcher(PatternMatchingEventHandler):
         """
         register files with observer
         """
-        for dirname in SASS_LOAD_PATHS + SASS_DIRS:
+        for dirname in SASS_LOAD_PATHS + SASS_DIRS.keys():
             paths = []
             if '*' in dirname:
                 paths.extend(glob.glob(dirname))
@@ -164,7 +137,7 @@ def coffeescript_files():
     """
     return find command for paths containing coffee files
     """
-    dirs = " ".join(Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS)
+    dirs = " ".join([Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS])
     return cmd('find', dirs, '-type f', '-name \"*.coffee\"')
 
 
@@ -203,11 +176,10 @@ def compile_sass(options):
     if options.get('force'):
         parts.append("--force")
     parts.append("--load-path .")
-    for load_path in SASS_LOAD_PATHS + SASS_DIRS:
+    for load_path in SASS_LOAD_PATHS + SASS_DIRS.keys():
         parts.append("--load-path {path}".format(path=load_path))
 
-    for sass_dir in SASS_DIRS:
-        css_dir = sass_dir.parent / "css"
+    for sass_dir, css_dir in SASS_DIRS.items():
         if css_dir:
             parts.append("{sass}:{css}".format(sass=sass_dir, css=css_dir))
         else:
@@ -225,13 +197,7 @@ def compile_templated_sass(systems, settings):
     `settings` is the Django settings module to use.
     """
     for sys in systems:
-        if sys == "studio":
-            sys = "cms"
-        sh(django_cmd(
-            sys, settings, 'preprocess_assets',
-            '{sys}/static/sass/*.scss'.format(sys=sys),
-            '{sys}/static/themed_sass'.format(sys=sys)
-        ))
+        sh(django_cmd(sys, settings, 'preprocess_assets'))
         print("\t\tFinished preprocessing {} assets.".format(sys))
 
 
