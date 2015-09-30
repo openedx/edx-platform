@@ -37,9 +37,6 @@ def run():
 
     add_mimetypes()
 
-    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
-        startup_notification_subsystem()
-
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
 
@@ -48,6 +45,9 @@ def run():
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        startup_notification_subsystem()
 
     # Initialize Segment.io analytics module. Flushes first time a message is received and
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
