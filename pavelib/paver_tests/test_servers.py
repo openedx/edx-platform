@@ -12,23 +12,14 @@ EXPECTED_COFFEE_COMMAND = (
 )
 EXPECTED_SASS_COMMAND = (
     "sass --update --cache-location /tmp/sass-cache --default-encoding utf-8 --style compressed"
-    " --quiet"
-    " --load-path ."
-    " --load-path common/static"
-    " --load-path common/static/sass"
-    " --load-path lms/static/sass"
-    " --load-path lms/static/themed_sass"
+    " --quiet --load-path . --load-path common/static --load-path common/static/sass"
+    " --load-path lms/static/sass --load-path lms/static/certificates/sass"
     " --load-path cms/static/sass --load-path common/static/sass"
-    " --load-path lms/static/certificates/sass"
-    " lms/static/sass:lms/static/css"
-    " lms/static/themed_sass:lms/static/css"
-    " cms/static/sass:cms/static/css"
-    " common/static/sass:common/static/css"
-    " lms/static/certificates/sass:lms/static/certificates/css"
+    " lms/static/sass:lms/static/css lms/static/certificates/sass:lms/static/certificates/css"
+    " cms/static/sass:cms/static/css common/static/sass:common/static/css"
 )
 EXPECTED_PREPROCESS_ASSETS_COMMAND = (
     "python manage.py {system} --settings={asset_settings} preprocess_assets"
-    " {system}/static/sass/*.scss {system}/static/themed_sass"
 )
 EXPECTED_COLLECT_STATIC_COMMAND = (
     "python manage.py {system} --settings={asset_settings} collectstatic --noinput > /dev/null"

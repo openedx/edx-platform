@@ -723,11 +723,11 @@
 
     .u-field.error {
       input, textarea {
-        border-color: $error-color;
+        border-color: $danger-red;
       }
 
       .u-field-message-help, .u-field-description-message {
-        color: $error-color !important;
+        color: $danger-red !important;
       }
     }
 

@@ -137,12 +137,12 @@
   .request-response-error {
     margin: 0;
     padding-bottom: ($baseline);
-    color: $error-color;
+    color: $error-red;
   }
 
   .display-errors {
     line-height: 3em;
-    color: $error-color;
+    color: $error-red;
   }
 
   .slickgrid {
