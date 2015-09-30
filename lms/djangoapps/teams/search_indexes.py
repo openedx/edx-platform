@@ -12,8 +12,8 @@ from functools import wraps
 from search.search_engine_base import SearchEngine
 from request_cache import get_request_or_stub
 
-from .errors import ElasticSearchConnectionError
-from .serializers import CourseTeamSerializer, CourseTeam
+from teams.errors import ElasticSearchConnectionError
+from teams.serializers import CourseTeamSerializer, CourseTeam
 
 
 def if_search_enabled(f):
