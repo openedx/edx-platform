@@ -41,15 +41,9 @@ def get_changed_fields_dict(instance, model_class):
         # an empty dict as a default value.
         return {}
     else:
-        field_names = [
-            # Suggested by https://docs.djangoproject.com/en/1.8/ref/models/meta/#migrating-from-the-old-api
-            f.name for f in model_class._meta.get_fields()
-            if not (
-                f.is_relation
-                or f.one_to_one
-                or (f.many_to_one and f.related_model)
-            )
-        ]
+        # We want to compare all of the scalar fields on the model, but none of
+        # the relations.
+        field_names = [f.name for f in model_class._meta.get_fields() if not f.is_relation]
         changed_fields = {
             field_name: getattr(old_model, field_name) for field_name in field_names
             if getattr(old_model, field_name) != getattr(instance, field_name)
