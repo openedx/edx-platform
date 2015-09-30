@@ -51,6 +51,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.cleaned_data = {
             'block_counts': [],
             'depth': 0,
+            'nav_depth': None,
             'return_type': 'dict',
             'requested_fields': {'display_name', 'type'},
             'student_view_data': [],
@@ -68,7 +69,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
 
     def assert_equals_cleaned_data(self):
         form = self.get_form(expected_valid=True)
-        self.assertEqual(form.cleaned_data, self.cleaned_data)
+        self.assertDictEqual(form.cleaned_data, self.cleaned_data)
 
     def test_basic(self):
         self.assert_equals_cleaned_data()
@@ -141,6 +142,22 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data['depth'] = 'not_an_integer'
         self.assert_error('depth', "'not_an_integer' is not a valid depth value.")
 
+    #-- nav depth
+
+    def test_nav_depth(self):
+        self.form_data['nav_depth'] = 3
+        self.cleaned_data['nav_depth'] = 3
+        self.cleaned_data['requested_fields'] |= {'nav_depth'}
+        self.assert_equals_cleaned_data()
+
+    def test_nav_depth_invalid(self):
+        self.form_data['nav_depth'] = 'not_an_integer'
+        self.assert_error('nav_depth', "Enter a whole number.")
+
+    def test_nav_depth_negative(self):
+        self.form_data['nav_depth'] = -1
+        self.assert_error('nav_depth', "Ensure this value is greater than or equal to 0.")
+
     #-- return_type
 
     def test_return_type(self):
@@ -158,8 +175,8 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     #-- requested fields
 
     def test_requested_fields(self):
-        self.form_data.setlist('requested_fields', ['graded', 'some_other_field'])
-        self.cleaned_data['requested_fields'] |= {'graded', 'some_other_field'}
+        self.form_data.setlist('requested_fields', ['graded', 'nav_depth', 'some_other_field'])
+        self.cleaned_data['requested_fields'] |= {'graded', 'nav_depth', 'some_other_field'}
         self.assert_equals_cleaned_data()
 
     @ddt.data('block_counts', 'student_view_data')

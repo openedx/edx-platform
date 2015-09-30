@@ -8,8 +8,6 @@ from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorVie
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from transformers.blocks_api import BlocksAPITransformer
-from transformers.block_counts import BlockCountsTransformer
-from transformers.student_view import StudentViewTransformer
 from .forms import BlockListGetForm
 from .serializers import BlockSerializer, BlockDictSerializer
 
@@ -127,8 +125,10 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
 
         # transform blocks
         blocks_api_transformer = BlocksAPITransformer(
-            params.cleaned_data.get(BlockCountsTransformer.BLOCK_COUNTS, []),
-            params.cleaned_data.get(StudentViewTransformer.STUDENT_VIEW_DATA, []),
+            params.cleaned_data.get('block_counts', []),
+            params.cleaned_data.get('student_view_data', []),
+            params.cleaned_data.get('depth', None),
+            params.cleaned_data.get('nav_depth', None),
         )
         try:
             blocks = get_course_blocks(

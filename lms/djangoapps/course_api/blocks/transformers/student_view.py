@@ -17,6 +17,9 @@ class StudentViewTransformer(BlockStructureTransformer):
         """
         Collect student_view_multi_device and student_view_data values for each block
         """
+        # collect basic xblock fields
+        block_structure.request_xblock_fields('category')
+
         for block_key in block_structure.topological_traversal():
             block = block_structure.get_xblock(block_key)
 
