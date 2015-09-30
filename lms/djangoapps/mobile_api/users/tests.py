@@ -372,6 +372,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase):
         self.assertEqual(serialized['course']['name'], self.course.display_name)
         self.assertEqual(serialized['course']['number'], self.course.id.course)
         self.assertEqual(serialized['course']['org'], self.course.id.org)
+        self.assertEqual(serialized['course']['root_block_usage_key'], unicode(self.course.location))
 
     def test_with_display_overrides(self):
         self.login_and_enroll()
