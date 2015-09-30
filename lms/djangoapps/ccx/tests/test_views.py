@@ -44,13 +44,9 @@ from xmodule.modulestore.tests.factories import (
 )
 from ccx_keys.locator import CCXLocator
 
-from ..models import (
-    CustomCourseForEdX,
-)
-from ..overrides import get_override_for_ccx, override_field_for_ccx
-from .factories import (
-    CcxFactory,
-)
+from ccx.models import CustomCourseForEdX
+from ccx.overrides import get_override_for_ccx, override_field_for_ccx
+from ccx.tests.factories import CcxFactory
 
 
 def intercept_renderer(path, context):

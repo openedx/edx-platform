@@ -48,8 +48,8 @@ from instructor.enrollment import (
     get_email_params,
 )
 
-from .models import CustomCourseForEdX
-from .overrides import (
+from ccx.models import CustomCourseForEdX
+from ccx.overrides import (
     clear_override_for_ccx,
     get_override_for_ccx,
     override_field_for_ccx,

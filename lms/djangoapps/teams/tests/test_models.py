@@ -23,8 +23,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
-from .factories import CourseTeamFactory, CourseTeamMembershipFactory
-from ..models import CourseTeam, CourseTeamMembership
+from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from teams.models import CourseTeam, CourseTeamMembership
 from teams import TEAM_DISCUSSION_CONTEXT
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
