@@ -164,12 +164,6 @@ FEATURES = {
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
-    # Social Media Sharing on Student Dashboard
-    'SOCIAL_SHARING_SETTINGS': {
-        # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
-        'CUSTOM_COURSE_URLS': False
-    },
-
     # Teams feature
     'ENABLE_TEAMS': True,
 
@@ -194,6 +188,11 @@ FEATURES = {
 
 ENABLE_JASMINE = False
 
+############################# SOCIAL MEDIA SHARING #############################
+SOCIAL_SHARING_SETTINGS = {
+    # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
+    'CUSTOM_COURSE_URLS': False
+}
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
