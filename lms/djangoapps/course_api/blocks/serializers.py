@@ -21,7 +21,7 @@ class BlockSerializer(serializers.Serializer):
         # for example, if student_view_multi_device is false, just don't specify it?
         return value if (value is not None) else default
 
-    def to_native(self, block_key):
+    def to_representation(self, block_key):
         # create response data dict for basic fields
         data = {
             'id': unicode(block_key),
@@ -62,7 +62,7 @@ class BlockDictSerializer(serializers.Serializer):
     Serializer that formats to a dictionary, rather than a list, of blocks
     """
     root = serializers.CharField(source='root_block_key')
-    blocks = serializers.SerializerMethodField('get_blocks')
+    blocks = serializers.SerializerMethodField()
 
     def get_blocks(self, structure):
         """
