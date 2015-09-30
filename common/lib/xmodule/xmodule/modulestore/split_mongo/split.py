@@ -70,6 +70,7 @@ from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
 from xmodule.modulestore import (
@@ -954,7 +955,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
         that matches the supplied course_key.
         """
-        return BlockUsageLocator(course_key, 'course', 'course')
+        locator_cls = CCXBlockUsageLocator if isinstance(course_key, CCXLocator) else BlockUsageLocator
+        return locator_cls(course_key, 'course', 'course')
 
     def _get_structure(self, structure_id, depth, head_validation=True, **kwargs):
         """
