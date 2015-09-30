@@ -156,9 +156,23 @@ from django.core.urlresolvers import reverse
   $(setup_tabs);
   $(setup_management_form)
   $( document ).ready(function() {
-    if ($('#ccx_std_list_messages').length) {
-      $('#ccx_std_list_messages')[0].focus();
-    }
+    %if ccx:
+      %if show_student_admin_tab:
+          $(".instructor-nav a").removeClass("active-section");
+          $("section.idash-section").hide();
+          $("#student_admin").show();
+          $("#student_admin").addClass("active-section");
+      %endif
+      if ($('#ccx_std_list_messages').length) {
+        $('#ccx_std_list_messages')[0].focus();
+      }
+      var grade_book_url = "${gradebook_url}";
+
+      %if grade_book_page and grade_book_page['offset']:
+        grade_book_url += "?offset=${grade_book_page['offset']}";
+      %endif
+      $('#grade-book-ccx').load(grade_book_url);
+    %endif
   });
   function validateForm(form) {
     var newCCXName = $(form).find('#ccx_name').val();

@@ -119,10 +119,12 @@ var Gradebook = function($element) {
     $leftShadow.css('height', tableHeight + 'px');
     $grades.append($leftShadow).append($rightShadow);
     setShadows(0);
-    $grades.css('height', tableHeight);
     $gradeTable.bind('mousedown', startDrag);
     $element.find('tr').bind('mouseover', highlightRow);
     $search.bind('keyup', filter);
+    // Recalculate height of grades table.
+    tableHeight = $gradeTable.height();
+    $grades.css('height', tableHeight);
     $(window).bind('resize', onResizeTable);
 };
 

@@ -64,7 +64,22 @@ def calculate_page_info(offset, total_students):
     }
 
 
-def get_grade_book_page(request, course, course_key):
+def get_grade_book_page(course_key, current_offset):
+    """
+    Returns grade book page information dict
+    """
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_key,
+        courseenrollment__is_active=1
+    ).order_by('username').select_related("profile")
+
+    total_students = enrolled_students.count()
+    page = calculate_page_info(current_offset, total_students)
+
+    return page
+
+
+def get_grade_book(request, course, course_key):
     """
     Get student records per page along with page information i.e current page, total pages and
     offset information.
@@ -76,8 +91,7 @@ def get_grade_book_page(request, course, course_key):
         courseenrollment__is_active=1
     ).order_by('username').select_related("profile")
 
-    total_students = enrolled_students.count()
-    page = calculate_page_info(current_offset, total_students)
+    page = get_grade_book_page(course_key, current_offset)
     offset = page["offset"]
     total_pages = page["total_pages"]
 
@@ -109,7 +123,7 @@ def spoc_gradebook(request, course_id):
     """
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-    student_info, page = get_grade_book_page(request, course, course_key)
+    student_info, page = get_grade_book(request, course, course_key)
 
     return render_to_response('courseware/gradebook.html', {
         'page': page,

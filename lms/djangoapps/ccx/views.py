@@ -38,7 +38,7 @@ from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
 from instructor.views.api import _split_input_list
-from instructor.views.gradebook_api import get_grade_book_page
+from instructor.views.gradebook_api import get_grade_book_page, get_grade_book
 from instructor.enrollment import (
     enroll_email,
     unenroll_email,
@@ -159,6 +159,12 @@ def dashboard(request, course, ccx=None):
         with ccx_course(ccx_locator) as course:
             context['course'] = course
 
+        # Grade book page
+        current_offset = request.GET.get('offset', 0)
+        grade_book_page = get_grade_book_page(ccx_locator, current_offset)
+        context['grade_book_page'] = grade_book_page
+        if current_offset > 0:
+            context['show_student_admin_tab'] = True
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
@@ -493,7 +499,7 @@ def ccx_gradebook(request, course, ccx=None):
     ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
-        student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
+        student_info, page = get_grade_book(request, course, course_key=ccx_key)
 
         return render_to_response('courseware/gradebook.html', {
             'page': page,
@@ -501,6 +507,9 @@ def ccx_gradebook(request, course, ccx=None):
             'students': student_info,
             'course': course,
             'course_id': course.id,
+            'ccx': True,
+            'disable_header': True,
+            'disable_footer': True,
             'staff_access': request.user.is_staff,
             'ordered_grades': sorted(
                 course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
