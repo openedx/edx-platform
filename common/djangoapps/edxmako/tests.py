@@ -15,7 +15,8 @@ from edxmako import add_lookup, LOOKUP
 from edxmako.shortcuts import (
     marketing_link,
     render_to_string,
-    open_source_footer_context_processor
+    open_source_footer_context_processor,
+    custom_theme_context_processor
 )
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
@@ -49,6 +50,14 @@ class ShortcutsTests(UrlResetMixin, TestCase):
         }):
             result = open_source_footer_context_processor({})
             self.assertEquals(expected_result, result.get('IS_EDX_DOMAIN'))
+
+    @ddt.data(True, False)
+    def test_custom_theme(self, expected_result):
+        with patch.dict('django.conf.settings.FEATURES', {
+            'USE_CUSTOM_THEME': expected_result
+        }):
+            result = custom_theme_context_processor({})
+            self.assertEquals(expected_result, result.get('THEME_ENABLED'))
 
 
 class AddLookupTests(TestCase):

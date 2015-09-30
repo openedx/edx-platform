@@ -81,22 +81,21 @@ def open_source_footer_context_processor(request):
     """
     Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
     """
-    return dict(
-        [
-            ("IS_EDX_DOMAIN", settings.FEATURES.get('IS_EDX_DOMAIN', False))
-        ]
-    )
+    return {'IS_EDX_DOMAIN': settings.FEATURES.get('IS_EDX_DOMAIN', False)}
 
 
 def microsite_footer_context_processor(request):
     """
     Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
     """
-    return dict(
-        [
-            ("IS_REQUEST_IN_MICROSITE", microsite.is_request_in_microsite())
-        ]
-    )
+    return {'IS_REQUEST_IN_MICROSITE': microsite.is_request_in_microsite()}
+
+
+def custom_theme_context_processor(request):  # pylint: disable=unused-argument
+    """
+    Sets a boolean context variable to indicate whether the site uses a custom theme.
+    """
+    return {'THEME_ENABLED': settings.FEATURES.get('USE_CUSTOM_THEME', False)}
 
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):

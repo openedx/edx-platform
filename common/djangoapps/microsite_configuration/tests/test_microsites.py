@@ -2,6 +2,7 @@
 """
 Tests microsite_configuration templatetags and helper functions.
 """
+from mock import patch
 from django.test import TestCase
 from django.conf import settings
 from microsite_configuration.templatetags import microsite
@@ -32,3 +33,14 @@ class MicroSiteTests(TestCase):
         expected = u'my | less specific | Page | edX'
         title = microsite.page_title_breadcrumbs_tag(None, *crumbs)
         self.assertEqual(expected, title)
+
+    def test_microsite_template_path(self):
+        relative_path = 'some_template.html'
+        resolved_path = 'resolved/path/to/some_template.html'
+        with patch(
+            'microsite_configuration.microsite.get_template_path',
+            return_value=resolved_path
+        ) as mock:
+            result = microsite.microsite_template_path(relative_path)
+            mock.assert_called_once_with(relative_path)
+            self.assertEqual(result, resolved_path)
