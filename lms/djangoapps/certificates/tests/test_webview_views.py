@@ -254,6 +254,27 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertIn('refundable course', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_course_display_overrides(self):
+        """
+        Tests if `Course Number Display String` or `Course Organization Display` is set for a course
+        in advance settings
+        Then web certificate should display that course number and course org set in advance
+        settings instead of original course number and course org.
+        """
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        self._add_course_certificates(count=1, signatory_count=2)
+        self.course.display_coursenumber = "overridden_number"
+        self.course.display_organization = "overridden_org"
+        self.store.update_item(self.course, self.user.id)
+
+        response = self.client.get(test_url)
+        self.assertIn('overridden_number', response.content)
+        self.assertIn('overridden_org', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_view_without_org_logo(self):
         test_url = get_certificate_url(
             user_id=self.user.id,

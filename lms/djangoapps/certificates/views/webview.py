@@ -90,7 +90,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     user_fullname = user.profile.name
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     certificate_type = context.get('certificate_type')
-    partner_short_name = course.org
+    partner_short_name = course.display_organization if course.display_organization else course.org
     partner_long_name = None
     organizations = organization_api.get_course_organizations(course_id=course.id)
     if organizations:
@@ -129,7 +129,8 @@ def _update_certificate_context(context, course, user, user_certificate):
         )
     )
 
-    context['course_number'] = course.number
+    course_number = course.display_coursenumber if course.display_coursenumber else course.number
+    context['course_number'] = course_number
     try:
         badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
     except BadgeAssertion.DoesNotExist:
@@ -239,13 +240,13 @@ def _update_certificate_context(context, course, user, user_certificate):
         platform_name=platform_name,
         user_name=user_fullname,
         partner_short_name=partner_short_name,
-        course_number=course.number
+        course_number=course_number
     )
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
     context['document_title'] = _("{partner_short_name} {course_number} Certificate | {platform_name}").format(
         partner_short_name=partner_short_name,
-        course_number=course.number,
+        course_number=course_number,
         platform_name=platform_name
     )
 
