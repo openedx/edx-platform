@@ -394,8 +394,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         """GET /api/team/v0/teams/"""
         result_filter = {}
 
-        if 'course_id' in request.query_params:
-            course_id_string = request.query_params['course_id']
+        if 'course_id' in request.QUERY_PARAMS:
+            course_id_string = request.QUERY_PARAMS['course_id']
             try:
                 course_key = CourseKey.from_string(course_id_string)
                 # Ensure the course exists
@@ -418,14 +418,14 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        text_search = request.query_params.get('text_search', None)
-        if text_search and request.query_params.get('order_by', None):
+        text_search = request.QUERY_PARAMS.get('text_search', None)
+        if text_search and request.QUERY_PARAMS.get('order_by', None):
             return Response(
                 build_api_error(ugettext_noop("text_search and order_by cannot be provided together")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        topic_id = request.query_params.get('topic_id', None)
+        topic_id = request.QUERY_PARAMS.get('topic_id', None)
         if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
                 error = build_api_error(
@@ -468,7 +468,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             order_by_input = None
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
-            order_by_input = request.query_params.get('order_by', 'name')
+            order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
             if order_by_input == 'name':
                 # MySQL does case-insensitive order_by.
                 queryset = queryset.order_by('name')
@@ -564,7 +564,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         # This code is taken from within the GenericAPIView#paginate_queryset method.
         # We need need access to the page outside of that method for our paginate_search_results method
         page_kwarg = self.kwargs.get(self.paginator.page_query_param)
-        page_query_param = self.request.query_params.get(self.paginator.page_query_param)
+        page_query_param = self.request.QUERY_PARAMS.get(self.paginator.page_query_param)
         return page_kwarg or page_query_param or 1
 
 
@@ -780,7 +780,7 @@ class TopicListView(GenericAPIView):
 
     def get(self, request):
         """GET /api/team/v0/topics/?course_id={course_id}"""
-        course_id_string = request.query_params.get('course_id', None)
+        course_id_string = request.QUERY_PARAMS.get('course_id', None)
         if course_id_string is None:
             return Response({
                 'field_errors': {
@@ -804,7 +804,7 @@ class TopicListView(GenericAPIView):
         if not has_team_api_access(request.user, course_id):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        ordering = request.query_params.get('order_by', 'name')
+        ordering = request.QUERY_PARAMS.get('order_by', 'name')
         if ordering not in ['name', 'team_count']:
             return Response({
                 'developer_message': "unsupported order_by value {ordering}".format(ordering=ordering),
@@ -1055,16 +1055,16 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         requested_course_key = None
         accessible_course_ids = None
 
-        if 'course_id' in request.query_params:
-            requested_course_id = request.query_params['course_id']
+        if 'course_id' in request.QUERY_PARAMS:
+            requested_course_id = request.QUERY_PARAMS['course_id']
             try:
                 requested_course_key = CourseKey.from_string(requested_course_id)
             except InvalidKeyError:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if 'team_id' in request.query_params:
+        if 'team_id' in request.QUERY_PARAMS:
             specified_username_or_team = True
-            team_id = request.query_params['team_id']
+            team_id = request.QUERY_PARAMS['team_id']
             try:
                 team = CourseTeam.objects.get(team_id=team_id)
             except CourseTeam.DoesNotExist:
@@ -1074,9 +1074,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             if not has_team_api_access(request.user, team.course_id):
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if 'username' in request.query_params:
+        if 'username' in request.QUERY_PARAMS:
             specified_username_or_team = True
-            username = request.query_params['username']
+            username = request.QUERY_PARAMS['username']
             if not request.user.is_staff:
                 enrolled_courses = (
                     CourseEnrollment.enrollments_for_user(request.user).values_list('course_id', flat=True)
@@ -1278,7 +1278,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         if has_team_api_access(request.user, team.course_id, access_username=username):
             membership = self.get_membership(username, team)
             removal_method = 'self_removal'
-            if 'admin' in request.query_params:
+            if 'admin' in request.QUERY_PARAMS:
                 removal_method = 'removed_by_admin'
             membership.delete()
             emit_team_event(
