@@ -11,7 +11,7 @@ celery==3.0.19
 distribute>=0.6.28, <0.7
 django-celery==3.0.17
 django-countries==1.5
-django-filter==0.6.0
+django-filter==0.11.0
 django-mako==0.1.5pre
 django-mptt==0.5.5
 django-openid-auth==0.4
