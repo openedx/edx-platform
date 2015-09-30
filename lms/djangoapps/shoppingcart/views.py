@@ -989,7 +989,7 @@ def csv_report(request):
         report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
         items = report.rows()
 
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         report.write_csv(response)

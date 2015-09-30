@@ -129,7 +129,7 @@ def instructor_dashboard(request, course_id):
     def return_csv(func, datatable, file_pointer=None):
         """Outputs a CSV file from the contents of a datatable."""
         if file_pointer is None:
-            response = HttpResponse(mimetype='text/csv')
+            response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = (u'attachment; filename={0}'.format(func)).encode('utf-8')
         else:
             response = file_pointer

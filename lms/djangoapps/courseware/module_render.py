@@ -956,7 +956,7 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
         log.error('Failed to load xblock resource', exc_info=True)
         raise Http404
     mimetype, _ = mimetypes.guess_type(uri)
-    return HttpResponse(content, mimetype=mimetype)
+    return HttpResponse(content, content_type=mimetype)
 
 
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
