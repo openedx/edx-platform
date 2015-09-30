@@ -23,7 +23,16 @@ else:
 <div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="group" aria-label="${chapter['display_name']} submenu">
     <div class="chapter-menu">
         % for section in chapter['sections']:
-        <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
+        <%
+            # proctored exams supports a 'practice exam' which is ungraded
+            # however it will still need to display iconography
+            # with the defined styles that 'graded' subsections use
+            use_graded_style_class = (
+                ('graded' in section and section['graded'])
+                or 'proctoring' in section
+            )
+        %>
+        <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded' if use_graded_style_class else ''}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
                 <p>${section['display_name']} ${'<span class="sr"> current section</span>' if 'active' in section and section['active'] else ''}</p>
                 <%
