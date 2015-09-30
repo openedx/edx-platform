@@ -129,7 +129,10 @@ class BlockStructureBlockData(BlockStructure):
             return default
         else:
             transformer_data = block_data._transformer_data.get(transformer.name(), {})
-            return transformer_data.get(key, default) if key else transformer_data
+            if key:
+                return transformer_data.get(key, default)
+            else:
+                return transformer_data or default
 
     def set_transformer_block_data(self, usage_key, transformer, key, value):
         self._block_data_map[usage_key]._transformer_data[transformer.name()][key] = value
