@@ -1179,6 +1179,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
                 'provider': None
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1635,6 +1636,7 @@ def create_account_with_params(request, params):
                 'provider': third_party_provider.name if third_party_provider else None
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }

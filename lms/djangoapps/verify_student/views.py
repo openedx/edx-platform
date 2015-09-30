@@ -1105,6 +1105,7 @@ class SubmitPhotosView(View):
         if settings.LMS_SEGMENT_KEY:
             tracking_context = tracker.get_tracker().resolve_context()
             context = {
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1450,6 +1451,7 @@ class InCourseReverifyView(View):
                     'checkpoint': checkpoint
                 },
                 context={
+                    'ip': tracking_context.get('ip'),
                     'Google Analytics': {
                         'clientId': tracking_context.get('client_id')
                     }

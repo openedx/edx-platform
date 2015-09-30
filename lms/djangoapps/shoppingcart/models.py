@@ -517,6 +517,7 @@ class Order(models.Model):
                     'currency': self.currency,
                     'products': [item.analytics_data() for item in orderitems]
                 }, context={
+                    'ip': tracking_context.get('ip'),
                     'Google Analytics': {
                         'clientId': tracking_context.get('client_id')
                     }
