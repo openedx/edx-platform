@@ -1062,6 +1062,7 @@ class CourseEnrollment(models.Model):
                         'run': self.course_id.run,
                         'mode': self.mode,
                     }, context={
+                        'ip': tracking_context.get('ip'),
                         'Google Analytics': {
                             'clientId': tracking_context.get('client_id')
                         }

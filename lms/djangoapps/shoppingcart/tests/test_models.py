@@ -265,7 +265,7 @@ class OrderTest(ModuleStoreTestCase):
                     }
                 ]
             },
-            context={'Google Analytics': {'clientId': None}}
+            context={'ip': None, 'Google Analytics': {'clientId': None}}
         )
 
     def test_purchase_item_failure(self):
@@ -860,7 +860,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                     }
                 ]
             },
-            context={'Google Analytics': {'clientId': None}}
+            context={'ip': None, 'Google Analytics': {'clientId': None}}
         )
 
     def test_existing_enrollment(self):
