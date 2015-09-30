@@ -106,6 +106,9 @@ class CourseMode(models.Model):
     # Modes that allow a student to earn credit with a university partner
     CREDIT_MODES = [CREDIT_MODE]
 
+    # Modes that are allowed to upsell
+    UPSELL_TO_VERIFIED_MODES = [HONOR]
+
     class Meta(object):
         """ meta attributes of this model """
         unique_together = ('course_id', 'mode_slug', 'currency')
