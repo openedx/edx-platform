@@ -3036,9 +3036,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Delete the orphan and any of its descendants which no longer have parents.
         """
         if len(self._get_parents_from_structure(orphan, structure)) == 0:
-            for child in structure['blocks'][orphan].fields.get('children', []):
+            orphan_data = structure['blocks'].pop(orphan)
+            for child in orphan_data.fields.get('children', []):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
-            del structure['blocks'][orphan]
 
     @contract(returns=BlockData)
     def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False, block_defaults=None):

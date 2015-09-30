@@ -3,6 +3,7 @@ Tests of modulestore semantics: How do the interfaces methods of ModuleStore rel
 """
 
 import ddt
+import itertools
 from collections import namedtuple
 
 from xmodule.modulestore.tests.utils import (
@@ -51,45 +52,130 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             modulestore=self.store
         )
 
-    def assertBlockDoesntExist(self):
-        with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(self.block_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
-        with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(self.block_usage_key, revision=ModuleStoreEnum.RevisionOption.draft_only)
+    def assertBlockDoesntExist(self, block_usage_key, draft=None):
+        """
+        Verify that loading ``block_usage_key`` raises an ItemNotFoundError.
 
-        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            with self.assertRaises(ItemNotFoundError):
-                self.store.get_item(self.block_usage_key)
+        Arguments:
+            block_usage_key: The xblock to check.
+            draft (optional): If omitted, verify both published and draft branches.
+                If True, verify only the draft branch. If False, verify only the
+                published branch.
+        """
+        if draft is None or draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                with self.assertRaises(ItemNotFoundError):
+                    self.store.get_item(block_usage_key)
 
-        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
-            with self.assertRaises(ItemNotFoundError):
-                self.store.get_item(self.block_usage_key)
+        if draft is None or not draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                with self.assertRaises(ItemNotFoundError):
+                    self.store.get_item(block_usage_key)
 
-    def assertBlockHasContent(self, test_data, content):
-        target_block = self.store.get_item(
-            self.block_usage_key,
-            revision=ModuleStoreEnum.RevisionOption.published_only
-        )
+    def assertBlockHasContent(self, block_usage_key, field_name, content, draft=None):
+        """
+        Assert that the block ``block_usage_key`` has the value ``content`` for ``field_name``
+        when it is loaded.
 
-        self.assertEquals(content, target_block.fields[test_data.field_name].read_from(target_block))
+        Arguments:
+            block_usage_key: The xblock to check.
+            field_name (string): The name of the field to check.
+            content: The value to assert is in the field.
+            draft (optional): If omitted, verify both published and draft branches.
+                If True, verify only the draft branch. If False, verify only the
+                published branch.
+        """
+        if draft is None or not draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                target_block = self.store.get_item(
+                    block_usage_key,
+                )
+                self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
 
-        target_block = self.store.get_item(
-            self.block_usage_key,
-            revision=ModuleStoreEnum.RevisionOption.draft_only
-        )
-        self.assertEquals(content, target_block.fields[test_data.field_name].read_from(target_block))
+        if draft is None or draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                target_block = self.store.get_item(
+                    block_usage_key,
+                )
+                self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
 
-        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            target_block = self.store.get_item(
-                self.block_usage_key,
-            )
-            self.assertEquals(content, target_block.fields[test_data.field_name].read_from(target_block))
+    def assertParentOf(self, parent_usage_key, child_usage_key, draft=None):
+        """
+        Assert that the block ``parent_usage_key`` has ``child_usage_key`` listed
+        as one of its ``.children``.
 
-        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
-            target_block = self.store.get_item(
-                self.block_usage_key,
-            )
-            self.assertEquals(content, target_block.fields[test_data.field_name].read_from(target_block))
+        Arguments:
+            parent_usage_key: The xblock to check as a parent.
+            child_usage_key: The xblock to check as a child.
+            draft (optional): If omitted, verify both published and draft branches.
+                If True, verify only the draft branch. If False, verify only the
+                published branch.
+        """
+        if draft is None or not draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                parent_block = self.store.get_item(
+                    parent_usage_key,
+                )
+                self.assertIn(child_usage_key, parent_block.children)
+
+        if draft is None or draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                parent_block = self.store.get_item(
+                    parent_usage_key,
+                )
+                self.assertIn(child_usage_key, parent_block.children)
+
+    def assertNotParentOf(self, parent_usage_key, child_usage_key, draft=None):
+        """
+        Assert that the block ``parent_usage_key`` does not have ``child_usage_key`` listed
+        as one of its ``.children``.
+
+        Arguments:
+            parent_usage_key: The xblock to check as a parent.
+            child_usage_key: The xblock to check as a child.
+            draft (optional): If omitted, verify both published and draft branches.
+                If True, verify only the draft branch. If False, verify only the
+                published branch.
+        """
+        if draft is None or not draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                parent_block = self.store.get_item(
+                    parent_usage_key,
+                )
+                self.assertNotIn(child_usage_key, parent_block.children)
+
+        if draft is None or draft:
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                parent_block = self.store.get_item(
+                    parent_usage_key,
+                )
+                self.assertNotIn(child_usage_key, parent_block.children)
+
+    def assertCoursePointsToBlock(self, block_usage_key, draft=None):
+        """
+        Assert that the context course for the test has ``block_usage_key`` listed
+        as one of its ``.children``.
+
+        Arguments:
+            block_usage_key: The xblock to check.
+            draft (optional): If omitted, verify both published and draft branches.
+                If True, verify only the draft branch. If False, verify only the
+                published branch.
+        """
+        self.assertParentOf(self.course.scope_ids.usage_id, block_usage_key, draft=draft)
+
+    def assertCourseDoesntPointToBlock(self, block_usage_key, draft=None):
+        """
+        Assert that the context course for the test does not have ``block_usage_key`` listed
+        as one of its ``.children``.
+
+        Arguments:
+            block_usage_key: The xblock to check.
+            draft (optional): If omitted, verify both published and draft branches.
+                If True, verify only the draft branch. If False, verify only the
+                published branch.
+        """
+        self.assertNotParentOf(self.course.scope_ids.usage_id, block_usage_key, draft=draft)
 
     def is_detached(self, block_type):
         """
@@ -109,9 +195,10 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         and then verify that it was created successfully, and is visible in
         both published and draft branches.
         """
-        self.block_usage_key = self.course.id.make_usage_key(block_type, 'test_block')
+        block_usage_key = self.course.id.make_usage_key(block_type, 'test_block')
 
-        self.assertBlockDoesntExist()
+        self.assertBlockDoesntExist(block_usage_key)
+        self.assertCourseDoesntPointToBlock(block_usage_key)
 
         test_data = self.DATA_FIELDS[block_type]
 
@@ -122,8 +209,8 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                 block = self.store.create_xblock(
                     self.course.runtime,
                     self.course.id,
-                    self.block_usage_key.block_type,
-                    block_id=self.block_usage_key.block_id
+                    block_usage_key.block_type,
+                    block_id=block_usage_key.block_id
                 )
                 block.fields[test_data.field_name].write_to(block, initial_field_value)
                 self.store.update_item(block, ModuleStoreEnum.UserID.test, allow_not_found=True)
@@ -132,18 +219,24 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                     user_id=ModuleStoreEnum.UserID.test,
                     parent_usage_key=self.course.scope_ids.usage_id,
                     block_type=block_type,
-                    block_id=self.block_usage_key.block_id,
+                    block_id=block_usage_key.block_id,
                     fields={test_data.field_name: initial_field_value},
                 )
 
-        self.assertBlockHasContent(test_data, initial_field_value)
+        if self.is_detached(block_type):
+            self.assertCourseDoesntPointToBlock(block_usage_key)
+        else:
+            self.assertCoursePointsToBlock(block_usage_key)
+        self.assertBlockHasContent(block_usage_key, test_data.field_name, initial_field_value)
+
+        return block_usage_key
 
     @ddt.data(*TESTABLE_BLOCK_TYPES)
     def test_update(self, block_type):
-        self._do_create(block_type)
+        block_usage_key = self._do_create(block_type)
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            block = self.store.get_item(self.block_usage_key)
+            block = self.store.get_item(block_usage_key)
 
             test_data = self.DATA_FIELDS[block_type]
 
@@ -154,16 +247,81 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
 
             self.store.update_item(block, ModuleStoreEnum.UserID.test, allow_not_found=True)
 
-        self.assertBlockHasContent(test_data, updated_field_value)
+        self.assertBlockHasContent(block_usage_key, test_data.field_name, updated_field_value)
 
     @ddt.data(*TESTABLE_BLOCK_TYPES)
     def test_delete(self, block_type):
-        self._do_create(block_type)
+        block_usage_key = self._do_create(block_type)
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            self.store.delete_item(self.block_usage_key, ModuleStoreEnum.UserID.test)
+            self.store.delete_item(block_usage_key, ModuleStoreEnum.UserID.test)
 
-        self.assertBlockDoesntExist()
+        self.assertCourseDoesntPointToBlock(block_usage_key)
+        self.assertBlockDoesntExist(block_usage_key)
+
+    @ddt.data(*itertools.product(['chapter', 'sequential'], [True, False]))
+    @ddt.unpack
+    def test_delete_child(self, block_type, child_published):
+        block_usage_key = self.course.id.make_usage_key(block_type, 'test_block')
+        child_usage_key = self.course.id.make_usage_key('html', 'test_child')
+
+        self.assertCourseDoesntPointToBlock(block_usage_key)
+        self.assertBlockDoesntExist(block_usage_key)
+        self.assertBlockDoesntExist(child_usage_key)
+
+        test_data = self.DATA_FIELDS[block_type]
+        child_data = '<div>child value</div>'
+
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            self.store.create_child(
+                user_id=ModuleStoreEnum.UserID.test,
+                parent_usage_key=self.course.scope_ids.usage_id,
+                block_type=block_type,
+                block_id=block_usage_key.block_id,
+                fields={test_data.field_name: test_data.initial},
+            )
+
+            self.store.create_child(
+                user_id=ModuleStoreEnum.UserID.test,
+                parent_usage_key=block_usage_key,
+                block_type=child_usage_key.block_type,
+                block_id=child_usage_key.block_id,
+                fields={'data': child_data},
+            )
+
+        if child_published:
+            self.store.publish(child_usage_key, ModuleStoreEnum.UserID.test)
+
+        self.assertCoursePointsToBlock(block_usage_key)
+
+        if child_published:
+            self.assertParentOf(block_usage_key, child_usage_key)
+        else:
+            self.assertParentOf(block_usage_key, child_usage_key, draft=True)
+            # N.B. whether the direct-only parent block points to the child in the publish branch
+            # is left as undefined behavior
+
+        self.assertBlockHasContent(block_usage_key, test_data.field_name, test_data.initial)
+
+        if child_published:
+            self.assertBlockHasContent(child_usage_key, 'data', child_data)
+        else:
+            self.assertBlockHasContent(child_usage_key, 'data', child_data, draft=True)
+            self.assertBlockDoesntExist(child_usage_key, draft=False)
+
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            self.store.delete_item(child_usage_key, ModuleStoreEnum.UserID.test)
+
+        self.assertCoursePointsToBlock(block_usage_key)
+        self.assertNotParentOf(block_usage_key, child_usage_key)
+
+        if child_published and self.store.get_modulestore_type(self.course.id) == ModuleStoreEnum.Type.mongo:
+            # N.B. This block is being left as an orphan in old-mongo. This test will
+            # fail when that is fixed. At that time, this condition should just be removed,
+            # as SplitMongo and OldMongo will have the same semantics.
+            self.assertBlockHasContent(child_usage_key, 'data', child_data)
+        else:
+            self.assertBlockDoesntExist(child_usage_key)
 
 
 class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):

@@ -189,42 +189,41 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     currently only provided by contentstore.views.item.orphan_handler
                 Otherwise, raises a ValueError.
         """
+        allowed_revisions = [
+            None,
+            ModuleStoreEnum.RevisionOption.published_only,
+            ModuleStoreEnum.RevisionOption.all
+        ]
+        if revision not in allowed_revisions:
+            raise UnsupportedRevisionError(allowed_revisions)
+
+        autopublish_parent = False
         with self.bulk_operations(location.course_key):
             if isinstance(location, LibraryUsageLocator):
                 branches_to_delete = [ModuleStoreEnum.BranchName.library]  # Libraries don't yet have draft/publish support
-            elif revision == ModuleStoreEnum.RevisionOption.published_only:
-                branches_to_delete = [ModuleStoreEnum.BranchName.published]
+            elif location.category in DIRECT_ONLY_CATEGORIES:
+                branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
             elif revision == ModuleStoreEnum.RevisionOption.all:
                 branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
-            elif revision is None:
-                branches_to_delete = [ModuleStoreEnum.BranchName.draft]
-
-                if location.category in DIRECT_ONLY_CATEGORIES:
-                    branches_to_delete.append(ModuleStoreEnum.BranchName.published)
             else:
-                raise UnsupportedRevisionError(
-                    [
-                        None,
-                        ModuleStoreEnum.RevisionOption.published_only,
-                        ModuleStoreEnum.RevisionOption.all
-                    ]
-                )
+                if revision == ModuleStoreEnum.RevisionOption.published_only:
+                    branches_to_delete = [ModuleStoreEnum.BranchName.published]
+                elif revision is None:
+                    branches_to_delete = [ModuleStoreEnum.BranchName.draft]
+                    parent_loc = self.get_parent_location(location.for_branch(ModuleStoreEnum.BranchName.draft))
+                    autopublish_parent = (
+                        not skip_auto_publish and
+                        parent_loc is not None and
+                        parent_loc.block_type in DIRECT_ONLY_CATEGORIES
+                    )
 
             self._flag_publish_event(location.course_key)
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
-                parent_loc = self.get_parent_location(branched_location)
                 super(DraftVersioningModuleStore, self).delete_item(branched_location, user_id)
-                # publish parent w/o child if deleted element is direct only (not based on type of parent)
-                # publish vertical to behave more like the old mongo/draft modulestore - TNL-2593
-                if (
-                        branch == ModuleStoreEnum.BranchName.draft and
-                        branched_location.block_type in (DIRECT_ONLY_CATEGORIES + ['vertical']) and
-                        parent_loc and
-                        not skip_auto_publish
-                ):
-                    # will publish if its not an orphan
-                    self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
+
+            if autopublish_parent:
+                self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
     def _map_revision_to_branch(self, key, revision=None):
         """

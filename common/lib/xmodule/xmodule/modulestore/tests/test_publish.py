@@ -1122,20 +1122,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsPublishedOnly(block_list_to_delete)
             self.delete_item(block_list_to_delete, revision=revision)
             self._check_for_item_deletion(block_list_to_delete, result)
-            # MODULESTORE_DIFFERENCE
-            if self.is_split_modulestore:
-                # Split:
-                if revision == ModuleStoreEnum.RevisionOption.published_only:
-                    # If deleting published_only items, the children that are drafts remain.
-                    self.assertOLXIsDraftOnly(block_list_children)
-                else:
-                    self.assertOLXIsDeleted(block_list_children)
-            elif self.is_old_mongo_modulestore:
-                # Old Mongo:
-                # If deleting draft_only or both items, the drafts will be deleted.
-                self.assertOLXIsDeleted(block_list_children)
-            else:
-                raise Exception("Must test either Old Mongo or Split modulestore!")
+            self.assertOLXIsDeleted(block_list_children)
 
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,
@@ -1176,20 +1163,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             self.delete_item(block_list_to_delete, revision=revision)
             self._check_for_item_deletion(block_list_to_delete, result)
             self.assertOLXIsDeleted(autopublished_children)
-            # MODULESTORE_DIFFERENCE
-            if self.is_split_modulestore:
-                # Split:
-                if revision == ModuleStoreEnum.RevisionOption.published_only:
-                    # If deleting published_only items, the children that are drafts remain.
-                    self.assertOLXIsDraftOnly(block_list_draft_children)
-                else:
-                    self.assertOLXIsDeleted(block_list_draft_children)
-            elif self.is_old_mongo_modulestore:
-                # Old Mongo:
-                # If deleting draft_only or both items, the drafts will be deleted.
-                self.assertOLXIsDeleted(block_list_draft_children)
-            else:
-                raise Exception("Must test either Old Mongo or Split modulestore!")
+            self.assertOLXIsDeleted(block_list_draft_children)
 
 
 @ddt.ddt
