@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
 from xmodule.modulestore.tests.factories import check_mongo_calls_range, CourseFactory, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from ccx_keys.locator import CCXLocator
-from ccx.tests.factories import CcxFactory
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
 @attr('shard_1')

@@ -16,10 +16,10 @@ from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..models import CustomCourseForEdX
-from ..overrides import override_field_for_ccx
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.overrides import override_field_for_ccx
 
-from .test_views import flatten, iter_blocks
+from lms.djangoapps.ccx.tests.test_views import flatten, iter_blocks
 
 
 @attr('shard_1')

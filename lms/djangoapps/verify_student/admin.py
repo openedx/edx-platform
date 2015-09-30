@@ -1,5 +1,5 @@
 from ratelimitbackend import admin
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
     VerificationStatus,
     SkippedReverification,

@@ -11,7 +11,7 @@ from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
 from openedx.core.lib.api.fields import ExpandableField
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 
-from .models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 
 
 class CountryField(serializers.Field):
