@@ -42,7 +42,7 @@ class MockCache(object):
     def set(self, key, val):
         self.map[key] = val
 
-    def get(self, key, default):
+    def get(self, key, default=None):
         return self.map.get(key, default)
 
     def set_many(self, map):
