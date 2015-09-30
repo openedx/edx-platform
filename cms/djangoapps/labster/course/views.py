@@ -2,6 +2,7 @@
 import logging
 
 from django.http import Http404, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -175,6 +176,7 @@ def setup_course(course_key, user_id, license_storage, staff=None):
 
 
 # pylint: disable=unused-argument
+@csrf_exempt
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @authentication_classes((OAuth2Authentication, SessionAuthentication, TokenAuthentication))
 @permission_classes((IsAuthenticated,))
