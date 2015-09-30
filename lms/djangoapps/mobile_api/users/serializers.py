@@ -65,6 +65,7 @@ class CourseOverviewField(serializers.RelatedField):
             "latest_updates": {
                 "video": None
             },
+            "root_block_usage_key": unicode(course_overview.location),
             "video_outline": video_outline_url,
             "course_updates": course_updates_url,
             "course_handouts": course_handouts_url,
