@@ -79,7 +79,7 @@ class ExpandableFieldViewMixin(object):
     def get_serializer_context(self):
         """Adds expand information from query parameters to the serializer context to support expandable fields."""
         result = super(ExpandableFieldViewMixin, self).get_serializer_context()
-        result['expand'] = [x for x in self.request.query_params.get('expand', '').split(',') if x]
+        result['expand'] = [x for x in self.request.QUERY_PARAMS.get('expand', '').split(',') if x]
         return result
 
 
