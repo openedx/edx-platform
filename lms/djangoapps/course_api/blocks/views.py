@@ -24,10 +24,10 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
         GET /api/courses/v1/blocks/<root_block_usage_id>/?depth=all
         GET /api/courses/v1/blocks/<usage_id>/?
             user=anjali,
-            &fields=graded,format,multi_device,
+            &depth=all,
+            &requested_fields=graded,format,student_view_multi_device,
             &block_counts=video,
             &student_view_data=video,
-            &student_view_data.video=mobile_low
 
     **Parameters**:
 
@@ -42,7 +42,7 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
         * requested_fields: (list) Indicates which additional fields to return for each block.
           The following fields are always returned: type, display_name
 
-          Example: requested_fields=graded,format,student_view_multi_device,children
+          Example: requested_fields=graded,format,student_view_multi_device
 
         * depth (integer or all) Indicates how deep to traverse into the blocks hierarchy.
           A value of all means the entire hierarchy.
@@ -50,7 +50,11 @@ class CourseBlocks(DeveloperErrorViewMixin, ListAPIView):
 
           Example: depth=all
 
-          NOTE: This parameter is currently not honored or supported. For now, it only implements depth=all.
+        * nav_depth (integer) Indicates how far deep to traverse into the course hierarchy before bundling
+          all the descendants.
+          Default is 3 since typical navigational views of the course show a maximum of chapter->sequential->vertical.
+
+          Example: nav_depth=3
 
         * return_type (string) Indicates in what data type to return the blocks.
           Default is dict. Supported values are: dict, list
