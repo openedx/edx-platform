@@ -8,9 +8,10 @@
 
 .grid-wrapper {
     position: relative;
+    width: 100%;
     float: left;
-    clear: both;
     margin:0 25px 50px 25px;
+    clear: both;
 }
 
 .grid-block {
@@ -122,6 +123,7 @@
     top: 25px;
     right: 0;
     float: right;
+    z-index: 10;
 }
 
 .header {

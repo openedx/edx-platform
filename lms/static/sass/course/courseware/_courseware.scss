@@ -406,14 +406,14 @@ div.course-wrapper {
         }
       }
 
-      .vert > .xblock-student_view {
+      .vert {
         @extend .clearfix;
         border-bottom: 1px solid #ddd;
         margin-bottom: ($baseline*0.75);
         padding: 0 0 15px;
       }
 
-      .vert > .xblock-student_view.is-hidden {
+      .vert .is-hidden {
           display: none;
           border-bottom: 0px;
           margin-bottom: 0px;
