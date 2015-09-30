@@ -7,7 +7,6 @@ from rest_framework.reverse import reverse
 from transformers import SUPPORTED_FIELDS
 
 
-# TODO support depth parameter (MA-1366)
 class BlockSerializer(serializers.Serializer):
     """
     Serializer for single course block
@@ -48,7 +47,7 @@ class BlockSerializer(serializers.Serializer):
                     supported_field.default_value,
                 )
                 if field_value is not None:
-                    data[supported_field.requested_field_name] = field_value
+                    data[supported_field.serializer_field_name] = field_value
 
         if 'children' in self.context['requested_fields']:
             children = self.context['block_structure'].get_children(block_key)

@@ -3,7 +3,7 @@
 """
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms import Form, CharField, ChoiceField, Field, MultipleHiddenInput
+from django.forms import Form, CharField, ChoiceField, Field, IntegerField, MultipleHiddenInput
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 
@@ -11,8 +11,6 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 
-from transformers.student_view import StudentViewTransformer
-from transformers.block_counts import BlockCountsTransformer
 from .permissions import can_access_other_users_blocks, can_access_users_blocks
 
 
@@ -33,6 +31,7 @@ class BlockListGetForm(Form):
     student_view_data = ListField(required=False)
     block_counts = ListField(required=False)
     depth = CharField(required=False)
+    nav_depth = IntegerField(required=False, min_value=0)
     return_type = ChoiceField(
         required=False,
         choices=[(choice, choice) for choice in ['dict', 'list']],
@@ -107,8 +106,13 @@ class BlockListGetForm(Form):
         cleaned_data = super(BlockListGetForm, self).clean()
 
         # add additional requested_fields that are specified as separate parameters, if they were requested
-        for additional_field in [StudentViewTransformer.STUDENT_VIEW_DATA, BlockCountsTransformer.BLOCK_COUNTS]:
-            if cleaned_data.get(additional_field):
+        additional_requested_fields = [
+            'student_view_data',
+            'block_counts',
+            'nav_depth',
+        ]
+        for additional_field in additional_requested_fields:
+            if not cleaned_data.get(additional_field) in (None, [], {}):  # allow 0 as a requested value
                 cleaned_data['requested_fields'].add(additional_field)
 
         usage_key = cleaned_data.get('usage_key')
