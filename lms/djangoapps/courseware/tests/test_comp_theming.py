@@ -1,5 +1,6 @@
 """Tests of comprehensive theming."""
 
+import unittest
 from django.conf import settings
 from django.test import TestCase
 
@@ -20,6 +21,7 @@ class TestComprehensiveTheming(TestCase):
         staticfiles.finders._finders.clear()                    # pylint: disable=protected-access
 
     @with_comp_theme(settings.REPO_ROOT / 'themes/red-theme')
+    @unittest.skip("Disabled until we can release theming to production")
     def test_red_footer(self):
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
@@ -63,6 +65,7 @@ class TestComprehensiveTheming(TestCase):
 
         do_the_test(self)
 
+    @unittest.skip("Disabled until we can release theming to production")
     def test_default_logo_image(self):
         result = staticfiles.finders.find('images/logo.png')
         self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/logo.png')
