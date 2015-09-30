@@ -729,7 +729,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             {
                 'status': 'eligible',
                 'short_description': 'Ungraded Practice Exam',
-                'suggested_icon': 'fa-pencil-square-o',
+                'suggested_icon': '',
                 'in_completed_state': False
             }
         ),
