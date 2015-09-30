@@ -57,7 +57,7 @@ Get the User's Enrollment Status in a Course
 Get the User's Enrollment Information for a Course
 **************************************************
 
-.. .. autoclass:: enrollment.views.EnrollmentCourseDetailView
+.. autoclass:: enrollment.views.EnrollmentCourseDetailView
 
 **Example response showing a user's course enrollment information**
 
@@ -160,7 +160,7 @@ View a User's Enrollments or Enroll a User in a Course
 .. code-block:: json
 
     {
-        “course_details”: {
-            “course_id”: “edX/DemoX/Demo_Course”
+        "course_details": {
+            "course_id": "edX/DemoX/Demo_Course"
         }
     }
