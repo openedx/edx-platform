@@ -34,6 +34,9 @@ class PersistentCourseFactory(SplitFactory):
     * display_name (xblock field): will default to 'Robot Super Course' unless provided
     """
     class Meta:
+        """
+        Factoryboy factory for the CourseDescriptor model
+        """
         model = CourseDescriptor
 
     # pylint: disable=unused-argument
@@ -58,6 +61,9 @@ class PersistentCourseFactory(SplitFactory):
 
 class ItemFactory(SplitFactory):
     class Meta:
+        """
+        Factoryboy factory for the XModuleDescriptor model
+        """
         model = XModuleDescriptor
 
     display_name = factory.LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
