@@ -752,7 +752,7 @@
           }
           .credit-eligibility-msg {
             @include float(left);
-            margin-top: 10px;
+            width: flex-grid(10, 12);
           }
 
           .credit-request-pending-msg {
