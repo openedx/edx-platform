@@ -7,7 +7,7 @@ import xmodule_django.models
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
-import verify_student.models
+import lms.djangoapps.verify_student.models
 
 
 class Migration(migrations.Migration):
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255, blank=True)),
                 ('face_image_url', models.URLField(max_length=255, blank=True)),
                 ('photo_id_image_url', models.URLField(max_length=255, blank=True)),
-                ('receipt_id', models.CharField(default=verify_student.models.generateUUID, max_length=255, db_index=True)),
+                ('receipt_id', models.CharField(default=lms.djangoapps.verify_student.models.generateUUID, max_length=255, db_index=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('updated_at', models.DateTimeField(auto_now=True, db_index=True)),
                 ('display', models.BooleanField(default=True, db_index=True)),

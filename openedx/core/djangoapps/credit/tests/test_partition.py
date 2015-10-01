@@ -8,7 +8,7 @@ import unittest
 
 from django.conf import settings
 
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     VerificationCheckpoint,
     VerificationStatus,
     SkippedReverification,

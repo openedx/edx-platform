@@ -16,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey
 from student.models import UserProfile, CourseEnrollment
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 from certificates.models import (
     GeneratedCertificate,

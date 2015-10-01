@@ -5,7 +5,7 @@ from django.conf import settings
 from optparse import make_option
 from textwrap import dedent
 
-from teams.models import CourseTeam
+from lms.djangoapps.teams.models import CourseTeam
 
 
 class Command(BaseCommand):

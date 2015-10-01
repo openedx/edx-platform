@@ -6,7 +6,7 @@ from pytz import UTC
 from django.core.urlresolvers import reverse, NoReverseMatch
 
 import third_party_auth
-from verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from course_modes.models import CourseMode
 
 
