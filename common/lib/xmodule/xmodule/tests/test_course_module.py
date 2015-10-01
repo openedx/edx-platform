@@ -354,6 +354,17 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.assertEqual(self.course.teams_topics, topics)
 
 
+class SelfPacedTestCase(unittest.TestCase):
+    """Tests for self-paced courses."""
+
+    def setUp(self):
+        super(SelfPacedTestCase, self).setUp()
+        self.course = get_dummy_course('2012-12-02T12:00')
+
+    def test_default(self):
+        self.assertFalse(self.course.self_paced)
+
+
 class CourseDescriptorTestCase(unittest.TestCase):
     """
     Tests for a select few functions from CourseDescriptor.
