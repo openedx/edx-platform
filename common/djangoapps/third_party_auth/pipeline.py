@@ -593,7 +593,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
     elif auth_entry in [AUTH_ENTRY_ACCOUNT_SETTINGS]:
         event_name = 'edx.bi.user.account.linked'
 
-    if event_name is not None and settings.SEGMENT_KEY:
+    if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.track(
             kwargs['user'].id,

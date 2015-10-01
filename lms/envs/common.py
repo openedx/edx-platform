@@ -608,7 +608,7 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 
 
 ############################## EVENT TRACKING #################################
-SEGMENT_KEY = None
+LMS_SEGMENT_KEY = None
 
 # FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 50000

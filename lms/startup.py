@@ -39,8 +39,8 @@ def run():
         enable_third_party_auth()
 
     # Initialize Segment analytics module by setting the write_key.
-    if settings.SEGMENT_KEY:
-        analytics.write_key = settings.SEGMENT_KEY
+    if settings.LMS_SEGMENT_KEY:
+        analytics.write_key = settings.LMS_SEGMENT_KEY
 
     # register any dependency injections that we need to support in edx_proctoring
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
