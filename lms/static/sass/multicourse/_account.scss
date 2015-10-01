@@ -491,7 +491,7 @@
     position: relative;
     display: block;
     margin: ($baseline*1.5) 0;
-    border-top: ($baseline/5) solid $m-gray-l4;
+    border-top: ($baseline/5) solid white;
 
     .copy {
       @extend %t-copy-lead1;
@@ -500,7 +500,7 @@
       top: -($baseline);
       left: 43%;
       padding: ($baseline/4) ($baseline*1.5);
-      background: white;
+      background: #f2f2f2;
       text-align: center;
       color: $m-gray-l2;
     }
@@ -756,29 +756,12 @@
   }
 }
 
-.sudo {
-  input[type="password"] {
-    background: rgb(255,255,255);
-    display: block;
-    height: 45px;
-    margin-bottom: $baseline;
-    width: 100%;
-  }
+#sudo {
+  margin: 0 auto;
+  width: 480px;
+  padding: 50px;
 
-  button[type="submit"] {
-    border: 1px solid #CFC6C6;
-    border-radius: 3px;
-    box-shadow: 0px 1px 0px 0px #FFF inset;
-    color: #333;
-    display: inline-block;
-    font-weight: bold;
-    background-color: #EEE;
-    background-image: linear-gradient(#EEE, #D6CECE);
-    padding: 12px 18px;
-    text-decoration: none;
-    text-shadow: 0px 1px 0px #F9F8F8;
-    background-clip: padding-box;
-    font-size: 0.8125em;
-    width: 100%;
+  h2 {
+    text-align: center;
   }
 }
