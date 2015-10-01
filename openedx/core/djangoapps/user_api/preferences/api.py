@@ -84,7 +84,7 @@ def get_user_preferences(requesting_user, username=None):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def update_user_preferences(requesting_user, update, username=None):
+def update_user_preferences(requesting_user, update, username=None, existing_user=None):
     """Update the user preferences for the given username.
 
     Note:
@@ -110,7 +110,8 @@ def update_user_preferences(requesting_user, update, username=None):
         PreferenceUpdateError: the operation failed when performing the update.
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    existing_user = _get_user(requesting_user, username)
+    if not existing_user:
+        existing_user = _get_user(requesting_user, username)
 
     # First validate each preference setting
     errors = {}

@@ -270,6 +270,7 @@ class AccountSettingsOnCreationTest(TestCase):
             },
             'requires_parental_consent': True,
             'language_proficiencies': [],
+            'account_privacy': None
         })
 
 
