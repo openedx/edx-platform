@@ -15,7 +15,7 @@
   background: $gray-d2;
   border-radius: 3px;
   box-shadow: 0 0px 5px 0 $shadow-d1;
-  color: $white;
+  color: $base-font-color;
   display: none;
   left: 50%;
   padding: 8px;
@@ -29,6 +29,7 @@
 
     .inner-wrapper {
       background: $black;
+      color: $white;
       box-shadow: none;
       height: 315px;
       padding: ($baseline/2);
@@ -43,6 +44,7 @@
 
     .inner-wrapper {
       background: $black;
+      color: $white;
       box-shadow: none;
       height: 360px;
       padding: ($baseline/2);
