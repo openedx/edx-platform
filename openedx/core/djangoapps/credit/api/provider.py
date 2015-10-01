@@ -242,13 +242,20 @@ def create_credit_request(course_key, provider_id, username):
 
     # Retrieve the final grade from the eligibility table
     try:
-        final_grade = unicode(CreditRequirementStatus.objects.get(
+        final_grade = CreditRequirementStatus.objects.get(
             username=username,
             requirement__namespace="grade",
             requirement__name="grade",
             requirement__course__course_key=course_key,
             status="satisfied"
-        ).reason["final_grade"])
+        ).reason["final_grade"]
+
+        # NOTE (CCB): Limiting the grade to seven characters is a hack for ASU.
+        if len(unicode(final_grade)) > 7:
+            final_grade = u'{:.5f}'.format(final_grade)
+        else:
+            final_grade = unicode(final_grade)
+
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
         log.exception(
             "Could not retrieve final grade from the credit eligibility table "
