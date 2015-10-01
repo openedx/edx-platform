@@ -60,7 +60,7 @@ class UserDetail(generics.RetrieveAPIView):
     """
     queryset = (
         User.objects.all()
-        .select_related('profile', 'course_enrollments')
+        .select_related('profile')
     )
     serializer_class = UserSerializer
     lookup_field = 'username'
