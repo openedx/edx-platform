@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('course_key', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
                 ('action', models.CharField(max_length=100, db_index=True)),
                 ('state', models.CharField(max_length=50)),
-                ('should_display', models.BooleanField()),
+                ('should_display', models.BooleanField(default=False)),
                 ('message', models.CharField(max_length=1000)),
                 ('source_course_key', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
                 ('display_name', models.CharField(default=b'', max_length=255, blank=True)),
