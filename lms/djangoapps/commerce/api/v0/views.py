@@ -17,8 +17,8 @@ from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware import courses
 from embargo import api as embargo_api
-from enrollment.api import add_enrollment
-from enrollment.views import EnrollmentCrossDomainSessionAuth
+from enrollment.api.v1.api import add_enrollment
+from enrollment.api.v1.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment

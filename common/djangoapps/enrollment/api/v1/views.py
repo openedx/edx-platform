@@ -7,33 +7,35 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
-from opaque_keys import InvalidKeyError
-from course_modes.models import CourseMode
-from lms.djangoapps.commerce.utils import audit_log
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from embargo import api as embargo_api
+
+from commerce.utils import audit_log
 from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from course_modes.models import CourseMode
+from embargo import api as embargo_api
+from enrollment.api.v1 import api
+from enrollment.api.v1.errors import (
+    CourseNotFoundError, CourseEnrollmentError,
+    CourseModeNotFoundError, CourseEnrollmentExistsError
+)
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
 )
-from util.disable_rate_limit import can_disable_rate_limit
-from enrollment import api
-from enrollment.errors import (
-    CourseNotFoundError, CourseEnrollmentError,
-    CourseModeNotFoundError, CourseEnrollmentExistsError
-)
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from student.auth import user_has_role
 from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
-
+from util.disable_rate_limit import can_disable_rate_limit
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
@@ -51,6 +53,7 @@ class ApiKeyPermissionMixIn(object):
     This mixin is used to provide a convenience function for doing individual permission checks
     for the presence of API keys.
     """
+
     def has_api_key_permissions(self, request):
         """
         Checks to see if the request was made by a server with an API key.
@@ -574,7 +577,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 actual_attrs = [
                     u"{namespace}:{name}".format(**attr)
                     for attr in enrollment_attributes
-                ]
+                    ]
                 missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
             if has_api_key_permissions and (mode_changed or active_changed):
                 if mode_changed and active_changed and not is_active:

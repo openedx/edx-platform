@@ -11,7 +11,7 @@ from enrollment.errors import (
     CourseNotFoundError, CourseEnrollmentClosedError, CourseEnrollmentFullError,
     CourseEnrollmentExistsError, UserNotFoundError, InvalidEnrollmentAttribute
 )
-from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
+from enrollment.api.v1.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import (
     CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
