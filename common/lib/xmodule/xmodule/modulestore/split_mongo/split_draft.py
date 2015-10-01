@@ -377,6 +377,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         Deletes the published version of the item.
         Returns the newly unpublished item.
         """
+        if location.block_type in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(location)
+
         with self.bulk_operations(location.course_key):
             self.delete_item(location, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
             return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft), **kwargs)

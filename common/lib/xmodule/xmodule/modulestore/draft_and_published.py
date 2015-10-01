@@ -87,6 +87,11 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
 
     @abstractmethod
     def unpublish(self, location, user_id):
+        """
+        Turn the published version into a draft, removing the published version.
+
+        Raises: InvalidVersionError if called on a DIRECT_ONLY_CATEGORY
+        """
         raise NotImplementedError
 
     @abstractmethod

@@ -925,48 +925,15 @@ class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsDraftOnly(block_list_unpublished_children)
             self.assertOLXIsDraftOnly(block_list_untouched)
 
-    @ddt.data(DRAFT_MODULESTORE_SETUP, MongoModulestoreBuilder())
-    def test_unpublish_old_mongo_draft_sequential(self, modulestore_builder):
+    @ddt.data(SPLIT_MODULESTORE_SETUP, DRAFT_MODULESTORE_SETUP, MongoModulestoreBuilder())
+    def test_unpublish_draft_sequential(self, modulestore_builder):
         with self._setup_test(modulestore_builder):
 
-            # MODULESTORE_DIFFERENCE:
-            # In old Mongo, you cannot successfully unpublish an autopublished sequential.
-            # An exception is thrown.
             block_list_to_unpublish = (
                 ('sequential', 'sequential03'),
             )
             with self.assertRaises(InvalidVersionError):
                 self.unpublish(block_list_to_unpublish)
-
-    @ddt.data(SPLIT_MODULESTORE_SETUP)
-    def test_unpublish_split_draft_sequential(self, modulestore_builder):
-        with self._setup_test(modulestore_builder):
-
-            # MODULESTORE_DIFFERENCE:
-            # In Split, the sequential is deleted.
-            # The sequential's children are orphaned - but they stay in
-            # the same draft state they were before.
-            block_list_to_unpublish = (
-                ('sequential', 'sequential03'),
-            )
-            block_list_unpublished_children = (
-                ('vertical', 'vertical06'),
-                ('vertical', 'vertical07'),
-                ('html', 'html12'),
-                ('html', 'html13'),
-                ('html', 'html14'),
-                ('html', 'html15'),
-            )
-            # The autopublished sequential is published - its children are draft.
-            self.assertOLXIsPublishedOnly(block_list_to_unpublish)
-            self.assertOLXIsDraftOnly(block_list_unpublished_children)
-            # Unpublish the sequential.
-            self.unpublish(block_list_to_unpublish)
-            # Since the sequential was autopublished, a draft version of the sequential never existed.
-            # So unpublishing the sequential doesn't make it a draft - it deletes it!
-            self.assertOLXIsDeleted(block_list_to_unpublish)
-            # Its children are orphaned and remain as drafts.
-            self.assertOLXIsDraftOnly(block_list_unpublished_children)
 
 
 @ddt.ddt
