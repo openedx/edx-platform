@@ -52,7 +52,7 @@ class UserAPITestCase(APITestCase):
         client.login(username=user.username, password=self.test_password)
         return client
 
-    def send_patch(self, client, json_data, content_type="application/merge-patch+json", expected_status=204):
+    def send_patch(self, client, json_data, content_type="application/merge-patch+json", expected_status=200):
         """
         Helper method for sending a patch to the server, defaulting to application/merge-patch+json content_type.
         Verifies the expected status and returns the response.
@@ -381,10 +381,8 @@ class TestAccountAPI(UserAPITestCase):
         Test the behavior of patch, when using the correct content_type.
         """
         client = self.login_client("client", "user")
-        self.send_patch(client, {field: value})
-
-        get_response = self.send_get(client)
-        self.assertEqual(value, get_response.data[field])
+        response = self.send_patch(client, {field: value})
+        self.assertEqual(value, response.data[field])
 
         if fails_validation_value:
             error_response = self.send_patch(client, {field: fails_validation_value}, expected_status=400)
@@ -400,19 +398,16 @@ class TestAccountAPI(UserAPITestCase):
             )
         else:
             # If there are no values that would fail validation, then empty string should be supported.
-            self.send_patch(client, {field: ""})
-
-            get_response = self.send_get(client)
-            self.assertEqual("", get_response.data[field])
+            response = self.send_patch(client, {field: ""})
+            self.assertEqual("", response.data[field])
 
     def test_patch_inactive_user(self):
         """ Verify that a user can patch her own account, even if inactive. """
         self.client.login(username=self.user.username, password=self.test_password)
         self.user.is_active = False
         self.user.save()
-        self.send_patch(self.client, {"goals": "to not activate account"})
-        get_response = self.send_get(self.client)
-        self.assertEqual("to not activate account", get_response.data["goals"])
+        response = self.send_patch(self.client, {"goals": "to not activate account"})
+        self.assertEqual("to not activate account", response.data["goals"])
 
     @ddt.unpack
     def test_patch_account_noneditable(self):
@@ -458,15 +453,13 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.client.login(username=self.user.username, password=self.test_password)
         for field_name in ["gender", "level_of_education", "country"]:
-            self.send_patch(self.client, {field_name: ""})
-            response = self.send_get(self.client)
+            response = self.send_patch(self.client, {field_name: ""})
             # Although throwing a 400 might be reasonable, the default DRF behavior with ModelSerializer
             # is to convert to None, which also seems acceptable (and is difficult to override).
             self.assertIsNone(response.data[field_name])
 
             # Verify that the behavior is the same for sending None.
-            self.send_patch(self.client, {field_name: ""})
-            response = self.send_get(self.client)
+            response = self.send_patch(self.client, {field_name: ""})
             self.assertIsNone(response.data[field_name])
 
     def test_patch_name_metadata(self):
@@ -513,12 +506,11 @@ class TestAccountAPI(UserAPITestCase):
         client = self.login_client("client", "user")
         old_email = self.user.email
         new_email = "newemail@example.com"
-        self.send_patch(client, {"email": new_email, "goals": "change my email"})
+        response = self.send_patch(client, {"email": new_email, "goals": "change my email"})
 
         # Since request is multi-step, the email won't change on GET immediately (though goals will update).
-        get_response = self.send_get(client)
-        self.assertEqual(old_email, get_response.data["email"])
-        self.assertEqual("change my email", get_response.data["goals"])
+        self.assertEqual(old_email, response.data["email"])
+        self.assertEqual("change my email", response.data["goals"])
 
         # Now call the method that will be invoked with the user clicks the activation key in the received email.
         # First we must get the activation key that was sent.
@@ -566,8 +558,7 @@ class TestAccountAPI(UserAPITestCase):
         # identifies language proficiencies based on their language code rather
         # than django model id.
         for proficiencies in ([{"code": "en"}, {"code": "fr"}, {"code": "es"}], [{"code": "fr"}], [{"code": "aa"}], []):
-            self.send_patch(client, {"language_proficiencies": proficiencies})
-            response = self.send_get(client)
+            response = self.send_patch(client, {"language_proficiencies": proficiencies})
             self.assertItemsEqual(response.data["language_proficiencies"], proficiencies)
 
     @ddt.data(

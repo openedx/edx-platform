@@ -137,10 +137,14 @@ class TestPreferencesAPI(UserAPITestCase):
         if not is_active:
             self.user.is_active = False
             self.user.save()
-        self.send_patch(self.client, {
-            "dict_pref": {"int_key": 10},
-            "string_pref": "value",
-        })
+        self.send_patch(
+            self.client,
+            {
+                "dict_pref": {"int_key": 10},
+                "string_pref": "value",
+            },
+            expected_status=204
+        )
         response = self.send_get(self.client)
         self.assertEqual({u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}, response.data)
 
@@ -174,11 +178,15 @@ class TestPreferencesAPI(UserAPITestCase):
 
         # Send the patch request
         self.client.login(username=self.user.username, password=self.test_password)
-        self.send_patch(self.client, {
-            "string_pref": "updated_value",
-            "new_pref": "new_value",
-            "extra_pref": None,
-        })
+        self.send_patch(
+            self.client,
+            {
+                "string_pref": "updated_value",
+                "new_pref": "new_value",
+                "extra_pref": None,
+            },
+            expected_status=204
+        )
 
         # Verify that GET returns the updated preferences
         response = self.send_get(self.client)
