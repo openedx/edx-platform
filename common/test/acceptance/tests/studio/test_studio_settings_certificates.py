@@ -208,7 +208,13 @@ class CertificatesTest(StudioCourseTest):
         certificate = self.create_and_verify_certificate(
             "Course Title Override",
             0,
-            [self.make_signatory_data('Signatory title with new line character \n')]
+            [
+                {
+                    'name': 'Signatory Name',
+                    'title': 'Signatory title with new line character \n',
+                    'organization': 'Signatory Organization',
+                }
+            ]
         )
 
         certificate.wait_for_certificate_delete_button()
