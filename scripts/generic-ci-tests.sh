@@ -70,7 +70,6 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
         echo "Finding jshint violations and storing report..."
-        PATH=$PATH:node_modules/.bin
         paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
