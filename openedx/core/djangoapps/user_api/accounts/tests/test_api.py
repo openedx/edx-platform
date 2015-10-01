@@ -150,6 +150,9 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
                 {"language_proficiencies": [{}]}
             )
 
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(self.user, {"account_privacy": ""})
+
     def test_update_multiple_validation_errors(self):
         """Test that all validation errors are built up and returned at once"""
         # Send a read-only error, serializer error, and email validation error.
@@ -275,6 +278,7 @@ class AccountSettingsOnCreationTest(TestCase):
             },
             'requires_parental_consent': True,
             'language_proficiencies': [],
+            'account_privacy': None
         })
 
 

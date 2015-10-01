@@ -65,7 +65,8 @@ class MembershipSerializerTestCase(SerializerTestCase):
                 'image_url_medium': 'http://testserver/static/default_50.png',
                 'image_url_small': 'http://testserver/static/default_30.png',
                 'has_image': False
-            }
+            },
+            'account_privacy': None
         })
         self.assertNotIn('membership', data['team'])
 

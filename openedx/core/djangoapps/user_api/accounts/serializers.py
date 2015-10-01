@@ -91,6 +91,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
             "requires_parental_consent": profile.requires_parental_consent(),
+            "account_privacy": UserPreference.get_value(user, 'account_privacy'),
         }
 
         return self._filter_fields(

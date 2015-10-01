@@ -2544,12 +2544,14 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'time_zone',
         'language_proficiencies',
         'bio',
+        'account_privacy',
     ],
 
     # The list of account fields that are always public
     "public_fields": [
         'username',
         'profile_image',
+        'account_privacy',
     ],
 
     # The list of account fields that are visible only to staff and users viewing their own profiles
@@ -2569,6 +2571,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "level_of_education",
         "mailing_address",
         "requires_parental_consent",
+        "account_privacy",
     ]
 }
 

@@ -45,7 +45,7 @@ def get_user_preference(requesting_user, preference_key, username=None):
          UserNotAuthorized: the requesting_user does not have access to the user preference.
          UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    existing_user = _get_user(requesting_user, username, allow_staff=True)
+    existing_user = _get_authorized_user(requesting_user, username, allow_staff=True)
     return UserPreference.get_value(existing_user, preference_key)
 
 
@@ -68,7 +68,7 @@ def get_user_preferences(requesting_user, username=None):
          UserNotAuthorized: the requesting_user does not have access to the user preference.
          UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    existing_user = _get_user(requesting_user, username, allow_staff=True)
+    existing_user = _get_authorized_user(requesting_user, username, allow_staff=True)
 
     # Django Rest Framework V3 uses the current request to version
     # hyperlinked URLS, so we need to retrieve the request and pass
@@ -84,8 +84,8 @@ def get_user_preferences(requesting_user, username=None):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def update_user_preferences(requesting_user, update, username=None):
-    """Update the user preferences for the given username.
+def update_user_preferences(requesting_user, update, user=None):
+    """Update the user preferences for the given user.
 
     Note:
         It is up to the caller of this method to enforce the contract that this method is only called
@@ -98,8 +98,8 @@ def update_user_preferences(requesting_user, update, username=None):
             Some notes:
                 Values are expected to be strings. Non-string values will be converted to strings.
                 Null values for a preference will be treated as a request to delete the key in question.
-        username (str): Optional username specifying which account should be updated. If not specified,
-            `requesting_user.username` is assumed.
+        user (str/User): Optional, either username string or user object specifying which account should be updated.
+                If not specified, `requesting_user.username` is assumed.
 
     Raises:
         UserNotFound: no user with username `username` exists (or `requesting_user.username` if
@@ -110,7 +110,10 @@ def update_user_preferences(requesting_user, update, username=None):
         PreferenceUpdateError: the operation failed when performing the update.
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    existing_user = _get_user(requesting_user, username)
+    if not user or isinstance(user, basestring):
+        user = _get_authorized_user(requesting_user, user)
+    else:
+        _check_authorized(requesting_user, user.username)
 
     # First validate each preference setting
     errors = {}
@@ -119,7 +122,7 @@ def update_user_preferences(requesting_user, update, username=None):
         preference_value = update[preference_key]
         if preference_value is not None:
             try:
-                serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
+                serializer = create_user_preference_serializer(user, preference_key, preference_value)
                 validate_user_preference_serializer(serializer, preference_key, preference_value)
                 serializers[preference_key] = serializer
             except PreferenceValidationError as error:
@@ -168,7 +171,7 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
         PreferenceUpdateError: the operation failed when performing the update.
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    existing_user = _get_user(requesting_user, username)
+    existing_user = _get_authorized_user(requesting_user, username)
     serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
     validate_user_preference_serializer(serializer, preference_key, preference_value)
     try:
@@ -203,7 +206,7 @@ def delete_user_preference(requesting_user, preference_key, username=None):
         PreferenceUpdateError: the operation failed when performing the update.
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    existing_user = _get_user(requesting_user, username)
+    existing_user = _get_authorized_user(requesting_user, username)
     try:
         user_preference = UserPreference.objects.get(user=existing_user, key=preference_key)
     except ObjectDoesNotExist:
@@ -298,24 +301,31 @@ def _track_update_email_opt_in(user_id, organization, opt_in):
     )
 
 
-def _get_user(requesting_user, username=None, allow_staff=False):
+def _get_authorized_user(requesting_user, username=None, allow_staff=False):
     """
-    Helper method to return the user for a given username.
+    Helper method to return the authorized user for a given username.
     If username is not provided, requesting_user.username is assumed.
     """
     if username is None:
         username = requesting_user.username
-
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
         raise UserNotFound()
 
+    _check_authorized(requesting_user, username, allow_staff)
+    return existing_user
+
+
+def _check_authorized(requesting_user, username, allow_staff=False):
+    """
+    Helper method that raises UserNotAuthorized if requesting user
+    is not owner user or is not staff if access to staff is given
+    (i.e. 'allow_staff' = true)
+    """
     if requesting_user.username != username:
         if not requesting_user.is_staff or not allow_staff:
             raise UserNotAuthorized()
-
-    return existing_user
 
 
 def create_user_preference_serializer(user, preference_key, preference_value):
