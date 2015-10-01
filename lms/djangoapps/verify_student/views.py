@@ -1102,7 +1102,7 @@ class SubmitPhotosView(View):
         Returns: None
 
         """
-        if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        if settings.SEGMENT_KEY:
             tracking_context = tracker.get_tracker().resolve_context()
             context = {
                 'Google Analytics': {
@@ -1439,7 +1439,7 @@ class InCourseReverifyView(View):
             event_name, user_id, course_id, checkpoint
         )
 
-        if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        if settings.SEGMENT_KEY:
             tracking_context = tracker.get_tracker().resolve_context()
             analytics.track(
                 user_id,

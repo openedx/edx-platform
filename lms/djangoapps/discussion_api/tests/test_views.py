@@ -215,7 +215,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "voted"],
             "read": False,
-            "has_endorsed": False
+            "has_endorsed": False,
         }]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": unicode(self.course.id)})
@@ -436,7 +436,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             "read": False,
-            "has_endorsed": False
+            "has_endorsed": False,
         }
         response = self.client.post(
             self.url,
@@ -530,7 +530,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             "read": False,
-            "has_endorsed": False
+            "has_endorsed": False,
         }
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
@@ -1001,7 +1001,8 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase)
             "read": False,
             "has_endorsed": False,
             "id": "test_thread",
-            "type": "discussion"
+            "type": "discussion",
+            "response_count": 0,
         }
         self.register_get_thread_response(cs_thread)
         response = self.client.get(self.url)

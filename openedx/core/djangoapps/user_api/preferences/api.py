@@ -261,7 +261,7 @@ def update_email_opt_in(user, org, opt_in):
     preference.value = str(opt_in)
     try:
         preference.save()
-        if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+        if settings.SEGMENT_KEY:
             _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
         log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))

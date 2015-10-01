@@ -1,5 +1,5 @@
-<article class="discussion-article" data-id="<%- id %>">
-    <div class="thread-wrapper" tabindex="-1">
+<article class="discussion-article" data-id="<%- id %>" tabindex="-1">
+    <div class="thread-wrapper">
         <div class="forum-thread-main-wrapper">
             <div class="thread-content-wrapper"></div>
             <div class="post-extended-content">

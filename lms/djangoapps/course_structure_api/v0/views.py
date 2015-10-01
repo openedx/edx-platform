@@ -254,7 +254,7 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
           * format: The assignment type.
 
           * children: If the block has child blocks, a list of IDs of the child
-            blocks.
+            blocks in the order they appear in the course.
     """
 
     @CourseViewMixin.course_check

@@ -6,16 +6,17 @@
             'gettext',
             'js/views/fields',
             'teams/js/models/team',
+            'common/js/components/utils/view_utils',
             'text!teams/templates/edit-team.underscore'],
-        function (Backbone, _, gettext, FieldViews, TeamModel, editTeamTemplate) {
+        function (Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
             return Backbone.View.extend({
 
                 maxTeamNameLength: 255,
                 maxTeamDescriptionLength: 300,
 
                 events: {
-                    'click .action-primary': 'createOrUpdateTeam',
-                    'submit form': 'createOrUpdateTeam',
+                    'click .action-primary': ViewUtils.withDisabledElement('createOrUpdateTeam'),
+                    'submit form': ViewUtils.withDisabledElement('createOrUpdateTeam'),
                     'click .action-cancel': 'cancelAndGoBack'
                 },
 
@@ -124,10 +125,9 @@
                     var validationResult = this.validateTeamData(data);
                     if (validationResult.status === false) {
                         this.showMessage(validationResult.message, validationResult.srMessage);
-                        return;
+                        return $().promise();
                     }
-
-                    this.teamModel.save(data, saveOptions)
+                    return view.teamModel.save(data, saveOptions)
                         .done(function(result) {
                             view.teamEvents.trigger('teams:update', {
                                 action: view.action,

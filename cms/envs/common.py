@@ -36,7 +36,7 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT,
+    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT, COMP_THEME_DIR,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
@@ -77,8 +77,8 @@ FEATURES = {
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
 
-    # Segment.io - must explicitly turn it on for production
-    'SEGMENT_IO': False,
+    # Segment - must explicitly turn it on for production
+    'SEGMENT_KEY': None,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
@@ -393,6 +393,7 @@ MODULESTORE = {
 DEBUG = False
 TEMPLATE_DEBUG = False
 SESSION_COOKIE_SECURE = False
+SESSION_SAVE_EVERY_REQUEST = False
 
 # Site info
 SITE_ID = 1
@@ -743,6 +744,9 @@ INSTALLED_APPS = (
     'staticfiles',
     'static_replace',
     'require',
+
+    # Theming
+    'openedx.core.djangoapps.theming',
 
     # comment common
     'django_comment_common',

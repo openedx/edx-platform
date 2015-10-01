@@ -4,6 +4,7 @@
 from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language_bidi
 from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
 from branding import api as branding_api
@@ -14,9 +15,7 @@ from branding import api as branding_api
 <head dir="${static.dir_rtl()}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    % if responsive:
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    % endif
 
 ## Define a couple of helper functions to make life easier when
 ## embedding theme conditionals into templates. All inheriting
@@ -159,6 +158,7 @@ from branding import api as branding_api
 
   <%block name="js_extra"/>
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
+  <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
 </body>
 </html>
 

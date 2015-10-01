@@ -40,7 +40,7 @@
             'xmodule': 'xmodule_js/src/xmodule',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.7.1',
+            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
             'jasmine-jquery': 'xmodule_js/common_static/js/vendor/jasmine-jquery',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
@@ -70,6 +70,7 @@
             'history': 'js/vendor/history',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
+            'js/utils/navigation': 'js/utils/navigation',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -686,6 +687,7 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
+        'lms/include/js/spec/navigation_spec.js',
         'lms/include/js/spec/discovery/collections/filters_spec.js',
         'lms/include/js/spec/discovery/models/course_card_spec.js',
         'lms/include/js/spec/discovery/models/course_directory_spec.js',

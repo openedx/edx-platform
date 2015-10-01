@@ -154,7 +154,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             view.$(valueInputSelector).val(fieldData.validValue).change();
             expect(view.fieldValue()).toBe(fieldData.validValue);
             expectMessageContains(view, view.helpMessage);
-            expect(requests.length).toBe(0);
+            AjaxHelpers.expectNoRequests(requests);
         };
 
         var verifyEditableField = function (view, data, requests) {

@@ -359,8 +359,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           comment is anonymous
 
         * author_label: A label indicating whether the author has a special
-          role in the course, either "staff" for moderators and
-          administrators or "community_ta" for community TAs
+          role in the course, either "Staff" for moderators and
+          administrators or "Community TA" for community TAs
 
         * created_at: The ISO 8601 timestamp for the creation of the comment
 

@@ -3,13 +3,16 @@ define([
     'backbone',
     'logger',
     'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/page_helpers',
     'common/js/spec_helpers/spec_helpers',
     'teams/js/views/teams_tab',
     'teams/js/spec_helpers/team_spec_helpers'
-], function ($, Backbone, Logger, AjaxHelpers, SpecHelpers, TeamsTabView, TeamSpecHelpers) {
+], function ($, Backbone, Logger, AjaxHelpers, PageHelpers, SpecHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
     describe('TeamsTab', function() {
+        var requests;
+
         var expectError = function (teamsTabView, text) {
             expect(teamsTabView.$('.warning').text()).toContain(text);
         };
@@ -18,13 +21,31 @@ define([
             expect(element.focus).toHaveBeenCalled();
         };
 
-        var createTeamsTabView = function(options) {
+        var verifyTeamsRequest = function(options) {
+            AjaxHelpers.expectRequestURL(requests, TeamSpecHelpers.testContext.teamsUrl,
+                _.extend(
+                    {
+                        topic_id: TeamSpecHelpers.testTopicID,
+                        expand: 'user',
+                        course_id: TeamSpecHelpers.testCourseID,
+                        order_by: '',
+                        page: '1',
+                        page_size: '10',
+                        text_search: ''
+                    },
+                    options
+                ));
+        };
+
+        var createTeamsTabView = function(test, options) {
             var teamsTabView = new TeamsTabView(
                 {
                     el: $('.teams-content'),
                     context: TeamSpecHelpers.createMockContext(options)
                 }
             );
+            requests = AjaxHelpers.requests(test);
+            PageHelpers.preventBackboneChangingUrl();
             teamsTabView.start();
             return teamsTabView;
         };
@@ -39,7 +60,7 @@ define([
 
         describe('Navigation', function () {
             it('does not render breadcrumbs for the top level tabs', function() {
-                var teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.router.navigate('#my-teams', {trigger: true});
                 expect(teamsTabView.$('.breadcrumbs').length).toBe(0);
                 teamsTabView.router.navigate('#browse', {trigger: true});
@@ -47,21 +68,20 @@ define([
             });
 
             it('does not interfere with anchor links to #content', function () {
-                var teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.router.navigate('#content', {trigger: true});
                 expect(teamsTabView.$('.wrapper-msg')).toHaveClass('is-hidden');
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
-                var teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.router.navigate('no_such_page', {trigger: true});
                 expectError(teamsTabView, 'The page "no_such_page" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.router.navigate('topics/no_such_topic', {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/topics/no_such_topic,course/1', null);
                 AjaxHelpers.respondWithError(requests, 404);
@@ -70,8 +90,7 @@ define([
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent team', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.router.navigate('teams/' + TeamSpecHelpers.testTopicID + '/no_such_team', {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/teams/no_such_team?expand=user', null);
                 AjaxHelpers.respondWithError(requests, 404);
@@ -80,8 +99,7 @@ define([
             });
 
             it('displays and focuses an error message when it receives a 401 AJAX response', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView().render();
+                var teamsTabView = createTeamsTabView(this).render();
                 teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
                 AjaxHelpers.respondWithError(requests, 401);
                 expectError(teamsTabView, "Your request could not be completed. Reload the page and try again.");
@@ -89,8 +107,7 @@ define([
             });
 
             it('displays and focuses an error message when it receives a 500 AJAX response', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView().render();
+                var teamsTabView = createTeamsTabView(this).render();
                 teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
                 AjaxHelpers.respondWithError(requests, 500);
                 expectError(teamsTabView, "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.");
@@ -98,7 +115,7 @@ define([
             });
 
             it('does not navigate to the topics page when syncing its collection if not on the search page', function () {
-                var teamsTabView = createTeamsTabView(),
+                var teamsTabView = createTeamsTabView(this),
                     collection = TeamSpecHelpers.createMockTeams();
                 teamsTabView.createTeamsListView({
                     collection: collection,
@@ -153,12 +170,11 @@ define([
                     }
                 ]
             }, function (url, expectedEvent) {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView({
+                var teamsTabView = createTeamsTabView(this, {
                         userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})
                     });
                 teamsTabView.router.navigate(url, {trigger: true});
-                if (requests.length) {
+                if (AjaxHelpers.currentRequest(requests)) {
                     AjaxHelpers.respondWithJson(requests, {});
                 }
                 expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', expectedEvent);
@@ -167,9 +183,9 @@ define([
 
         describe('Discussion privileges', function () {
             it('allows privileged access to any team', function () {
-                var teamsTabView = createTeamsTabView({
-                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true})
-                });
+                var teamsTabView = createTeamsTabView(this, {
+                        userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true})
+                    });
                 // Note: using `undefined` here to ensure that we
                 // don't even look at the team when the user is
                 // privileged
@@ -177,12 +193,12 @@ define([
             });
 
             it('allows access to a team which an unprivileged user is a member of', function () {
-                var teamsTabView = createTeamsTabView({
-                    userInfo: TeamSpecHelpers.createMockUserInfo({
-                        username: TeamSpecHelpers.testUser,
-                        privileged: false
-                    })
-                });
+                var teamsTabView = createTeamsTabView(this, {
+                        userInfo: TeamSpecHelpers.createMockUserInfo({
+                            username: TeamSpecHelpers.testUser,
+                            privileged: false
+                        })
+                    });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: {
                         membership: [{
@@ -195,9 +211,9 @@ define([
             });
 
             it('does not allow access if the user is neither privileged nor a team member', function () {
-                var teamsTabView = createTeamsTabView({
-                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false, staff: true})
-                });
+                var teamsTabView = createTeamsTabView(this, {
+                        userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false, staff: true})
+                    });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: {membership: []}
                 })).toBe(true);
@@ -205,56 +221,36 @@ define([
         });
 
         describe('Search', function () {
-            var verifyTeamsRequest = function(requests, options) {
-                AjaxHelpers.expectRequestURL(requests, TeamSpecHelpers.testContext.teamsUrl,
-                    _.extend(
-                        {
-                            topic_id: TeamSpecHelpers.testTopicID,
-                            expand: 'user',
-                            course_id: TeamSpecHelpers.testCourseID,
-                            order_by: '',
-                            page: '1',
-                            page_size: '10',
-                            text_search: ''
-                        },
-                        options
-                    ));
-            };
             var performSearch = function(requests, teamsTabView) {
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
-                verifyTeamsRequest(requests, {
+                verifyTeamsRequest({
                     order_by: '',
                     text_search: 'foo'
                 });
                 AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamsResponse({results: []}));
+
+                // Expect exactly one search request to be fired
+                AjaxHelpers.expectNoRequests(requests);
             };
 
             it('can search teams', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView(),
-                    requestCountBeforeSearch;
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
-                verifyTeamsRequest(requests, {
+                verifyTeamsRequest({
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
                 AjaxHelpers.respondWithJson(requests, {});
-                requestCountBeforeSearch = requests.length;
                 performSearch(requests, teamsTabView);
                 expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
                 expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
-
-                // Expect exactly one search request to be fired
-                expect(requests.length).toBe(requestCountBeforeSearch + 1);
             });
 
             it('can clear a search', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 AjaxHelpers.respondWithJson(requests, {});
-                performSearch(requests, teamsTabView);
 
                 // Perform a search
                 performSearch(requests, teamsTabView);
@@ -262,7 +258,7 @@ define([
                 // Clear the search and submit it again
                 teamsTabView.$('.search-field').val('');
                 teamsTabView.$('.action-search').click();
-                verifyTeamsRequest(requests, {
+                verifyTeamsRequest({
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
@@ -272,8 +268,7 @@ define([
             });
 
             it('can navigate back to all teams from a search', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 AjaxHelpers.respondWithJson(requests, {});
 
@@ -283,7 +278,7 @@ define([
                 // Verify the breadcrumbs have a link back to the teams list, and click on it
                 expect(teamsTabView.$('.breadcrumbs a').length).toBe(2);
                 teamsTabView.$('.breadcrumbs a').last().click();
-                verifyTeamsRequest(requests, {
+                verifyTeamsRequest({
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
@@ -293,8 +288,7 @@ define([
             });
 
             it('does not switch to showing results when the search returns an error', function () {
-                var requests = AjaxHelpers.requests(this),
-                    teamsTabView = createTeamsTabView();
+                var teamsTabView = createTeamsTabView(this);
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 AjaxHelpers.respondWithJson(requests, {});
 

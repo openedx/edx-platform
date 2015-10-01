@@ -1,0 +1,26 @@
+// Footer for OpenEdX (right-to-left)
+// ==================================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+
+// base - utilities
+@import 'base/variables';
+@import 'base/mixins';
+
+// This comment is used by preprocess_assets.py to include resources from a
+// theme, for old-style deprecated theming.
+//<THEME-OVERRIDE>
+
+footer#footer-openedx {
+    @import 'base/reset';
+    @import 'base/extends';
+    @import 'base/base';
+}
+
+// base - elements
+@import 'elements/typography';
+
+// shared - platform
+@import 'shared/footer';

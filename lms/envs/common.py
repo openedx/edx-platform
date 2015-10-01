@@ -182,9 +182,6 @@ FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
-    # Segment.io for LMS--need to explicitly turn it on for production.
-    'SEGMENT_IO_LMS': False,
-
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': False,
 
@@ -195,7 +192,7 @@ FEATURES = {
     # Enable URL that shows information about the status of variuous services
     'ENABLE_SERVICE_STATUS': False,
 
-    # Toggle to indicate use of a custom theme
+    # Toggle to indicate use of the Stanford theming system
     'USE_CUSTOM_THEME': False,
 
     # Don't autoplay videos for students
@@ -319,8 +316,7 @@ FEATURES = {
     'ENABLE_MOBILE_REST_API': False,
     'ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES': False,
 
-    # Enable APIs required for xBlocks on Mobile, and supported in general
-    'ENABLE_RENDER_XBLOCK_API': False,
+    # Enable temporary APIs required for xBlocks on Mobile
     'ENABLE_COURSE_BLOCKS_NAVIGATION_API': False,
 
     # Enable the combined login/registration form
@@ -450,6 +446,9 @@ ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
+
+# comprehensive theming system
+COMP_THEME_DIR = ""
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -609,6 +608,7 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 
 
 ############################## EVENT TRACKING #################################
+SEGMENT_KEY = None
 
 # FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 50000
@@ -801,6 +801,7 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
+SESSION_SAVE_EVERY_REQUEST = False
 
 # CMS base
 CMS_BASE = 'localhost:8001'
@@ -1826,6 +1827,9 @@ INSTALLED_APPS = (
     'pipeline',
     'staticfiles',
     'static_replace',
+
+    # Theming
+    'openedx.core.djangoapps.theming',
 
     # Our courseware
     'circuit',

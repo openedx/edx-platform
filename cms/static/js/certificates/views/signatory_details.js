@@ -84,6 +84,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
         closeSignatoryEditView: function(event) {
             // Enable the cancellation workflow for the editing view
             if (event && event.preventDefault) { event.preventDefault(); }
+            if (event) { this.model.reset(); }
             this.render();
         },
 

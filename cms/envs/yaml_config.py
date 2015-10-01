@@ -120,7 +120,7 @@ ADDL_INSTALLED_APPS = []
 AUTH_USE_CAS = False
 CAS_ATTRIBUTE_CALLBACK = None
 MICROSITE_ROOT_DIR = ''
-SEGMENT_IO = False
+SEGMENT_KEY = None
 DATADOG = {}
 ADDL_INSTALLED_APPS = []
 LOCAL_LOGLEVEL = 'INFO'
@@ -234,9 +234,6 @@ vars().update(AUTH_TOKENS)
 ##########################################
 # Manipulate imported settings with code
 #
-
-if SEGMENT_IO_KEY:
-    FEATURES['SEGMENT_IO'] = SEGMENT_IO
 
 if AWS_ACCESS_KEY_ID == "":
     AWS_ACCESS_KEY_ID = None

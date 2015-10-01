@@ -1,10 +1,9 @@
 """
 Acceptance tests for Studio's Setting pages
 """
-from unittest import skip
+import re
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.settings_certificates import CertificatesPage
-from flaky import flaky
 
 
 class CertificatesTest(StudioCourseTest):
@@ -196,3 +195,26 @@ class CertificatesTest(StudioCourseTest):
         certificate.course_title = "Title Override"
         certificate.click_cancel_edit_certificate()
         self.assertEqual(len(self.certificates_page.certificates), 0)
+
+    def test_line_breaks_in_signatory_title(self):
+        """
+        Scenario: Ensure that line breaks are properly reflected in certificate
+
+        Given I have a certificate with signatories
+        When I add signatory title with new line character
+        Then I see line break in certificate title
+        """
+        self.certificates_page.visit()
+        certificate = self.create_and_verify_certificate(
+            "Course Title Override",
+            0,
+            [self.make_signatory_data('Signatory title with new line character \n')]
+        )
+
+        certificate.wait_for_certificate_delete_button()
+
+        # Make sure certificate is created
+        self.assertEqual(len(self.certificates_page.certificates), 1)
+
+        signatory_title = self.certificates_page.get_first_signatory_title()
+        self.assertNotEqual([], re.findall(r'<br\s*/?>', signatory_title))

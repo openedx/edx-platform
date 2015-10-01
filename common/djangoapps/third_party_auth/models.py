@@ -130,6 +130,12 @@ class ProviderConfig(ConfigurationModel):
         """ Is this provider being used for this UserSocialAuth entry? """
         return self.backend_name == social_auth.provider
 
+    def get_remote_id_from_social_auth(self, social_auth):
+        """ Given a UserSocialAuth object, return the remote ID used by this provider. """
+        # This is generally the same thing as the UID, expect when one backend is used for multiple providers
+        assert self.match_social_auth(social_auth)
+        return social_auth.uid
+
     @classmethod
     def get_register_form_data(cls, pipeline_kwargs):
         """Gets dict of data to display on the register form.
@@ -292,6 +298,12 @@ class SAMLProviderConfig(ProviderConfig):
         """ Is this provider being used for this UserSocialAuth entry? """
         prefix = self.idp_slug + ":"
         return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
+
+    def get_remote_id_from_social_auth(self, social_auth):
+        """ Given a UserSocialAuth object, return the remote ID used by this provider. """
+        assert self.match_social_auth(social_auth)
+        # Remove the prefix from the UID
+        return social_auth.uid[len(self.idp_slug) + 1:]
 
     def get_config(self):
         """
@@ -507,6 +519,12 @@ class LTIProviderConfig(ProviderConfig):
         """ Is this provider being used for this UserSocialAuth entry? """
         prefix = self.lti_consumer_key + ":"
         return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
+
+    def get_remote_id_from_social_auth(self, social_auth):
+        """ Given a UserSocialAuth object, return the remote ID used by this provider. """
+        assert self.match_social_auth(social_auth)
+        # Remove the prefix from the UID
+        return social_auth.uid[len(self.lti_consumer_key) + 1:]
 
     def is_active_for_pipeline(self, pipeline):
         """ Is this provider being used for the specified pipeline? """

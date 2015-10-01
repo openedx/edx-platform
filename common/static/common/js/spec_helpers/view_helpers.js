@@ -10,7 +10,8 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
             installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden,
-            clickDeleteItem, patchAndVerifyRequest, submitAndVerifyFormSuccess, submitAndVerifyFormError;
+            clickDeleteItem, patchAndVerifyRequest, submitAndVerifyFormSuccess, submitAndVerifyFormError,
+            verifyElementInFocus, verifyElementNotInFocus;
 
         installViewTemplates = function() {
             appendSetFixtures('<div id="page-notification"></div>');
@@ -127,6 +128,22 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             verifyNotificationShowing(notificationSpy, /Saving/);
         };
 
+        verifyElementInFocus = function(view, selector) {
+            waitsFor(
+              function() { return view.$(selector + ':focus').length === 1; },
+              "element to have focus: " + selector,
+              500
+            );
+        };
+
+        verifyElementNotInFocus = function(view, selector) {
+            waitsFor(
+              function() { return view.$(selector + ':focus').length === 0; },
+              "element to not have focus: " + selector,
+              500
+            );
+        };
+
         return {
             'installViewTemplates': installViewTemplates,
             'createNotificationSpy': createNotificationSpy,
@@ -143,7 +160,9 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             'clickDeleteItem': clickDeleteItem,
             'patchAndVerifyRequest': patchAndVerifyRequest,
             'submitAndVerifyFormSuccess': submitAndVerifyFormSuccess,
-            'submitAndVerifyFormError': submitAndVerifyFormError
+            'submitAndVerifyFormError': submitAndVerifyFormError,
+            'verifyElementInFocus': verifyElementInFocus,
+            'verifyElementNotInFocus': verifyElementNotInFocus
         };
     });
 }).call(this, define || RequireJS.define);

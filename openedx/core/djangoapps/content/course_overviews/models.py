@@ -290,6 +290,13 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.has_course_ended(self.end)
 
+    def starts_within(self, days):
+        """
+        Returns True if the course starts with-in given number of days otherwise returns False.
+        """
+
+        return course_metadata_utils.course_starts_within(self.start, days)
+
     def start_datetime_text(self, format_string="SHORT_DATE"):
         """
         Returns the desired text corresponding the course's start date and

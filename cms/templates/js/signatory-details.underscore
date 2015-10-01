@@ -15,7 +15,7 @@
         </div>
         <div>
           <span class="signatory-title-label"><b><%= gettext("Title") %>:</b>&nbsp;</span>
-          <span class="signatory-title-value"><%= title %></span>
+          <span class="signatory-title-value"><%= title.replace(new RegExp('\r?\n','g'), '<br />') %></span>
         </div>
         <div>
           <span class="signatory-organization-label"><b><%= gettext("Organization") %>:</b>&nbsp;</span>

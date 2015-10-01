@@ -299,7 +299,7 @@
           }
 
           &.is-locked {
-            background-image: url('../images/bg-micro-stripes.png');
+            background-image: url('#{$static-path}/images/bg-micro-stripes.png');
             background-position: 0 0;
             background-repeat: repeat;
           }

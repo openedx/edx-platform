@@ -10,11 +10,12 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
 
             var testRequestParam = function (self, param, value) {
                 var requests = AjaxHelpers.requests(self),
+                    request,
                     url,
                     params;
                 topicCollection.fetch();
-                expect(requests.length).toBe(1);
-                url = new URI(requests[0].url);
+                request = AjaxHelpers.currentRequest(requests);
+                url = new URI(request.url);
                 params = url.query(true);
                 expect(params[param]).toBe(value);
             };
