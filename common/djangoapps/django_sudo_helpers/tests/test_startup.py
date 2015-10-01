@@ -6,6 +6,7 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from mock import patch
+
 from django_sudo_helpers.startup import run
 
 
@@ -18,12 +19,9 @@ class DjangoSudoStartupTestCase(TestCase):
         True,
         False,
     )
-    def test_run_third_party_auth(self, is_enabled):
-        with patch.dict("django.conf.settings.FEATURES", {"ENABLE_THIRD_PARTY_AUTH": is_enabled}):
-            self.assertEqual(settings.FEATURES["ENABLE_THIRD_PARTY_AUTH"], is_enabled)
-            with patch('django_sudo_helpers.startup.enable_third_party_auth_for_sudo') as mock_third_party_for_sudo:
+    def test_run_django_sudo(self, is_enabled):
+        with patch.dict("django.conf.settings.FEATURES", {"ENABLE_DJANGO_SUDO": is_enabled}):
+            self.assertEqual(settings.FEATURES["ENABLE_DJANGO_SUDO"], is_enabled)
+            with patch('django_sudo_helpers.startup.enable_django_sudo') as mock_enable_django_sudo:
                 run()
-                if is_enabled:
-                    self.assertTrue(mock_third_party_for_sudo.called)
-                else:
-                    self.assertFalse(mock_third_party_for_sudo.called)
+                self.assertEqual(mock_enable_django_sudo.called, is_enabled)

@@ -2,6 +2,7 @@
 Unit tests for instructor_dashboard.py.
 """
 import ddt
+import unittest
 from mock import patch
 
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
+from django_sudo_helpers.tests import utils
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -255,6 +257,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertIn('D: 0.5, C: 0.57, B: 0.63, A: 0.75', response.content)
 
+    @unittest.skipUnless(utils.DJANGO_SUDO_FEATURE_ENABLED, 'django-sudo not enabled')
     def test_sudo_required_on_dashboard(self):
         """
         Test that sudo_required redirect user to password page.

@@ -427,6 +427,9 @@ FEATURES = {
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
+
+    # Enable django-sudo
+    'ENABLE_DJANGO_SUDO': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1185,9 +1188,6 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-
-    # force re-authentication before activating administrative functions
-    'sudo.middleware.SudoMiddleware',
 
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
@@ -1951,10 +1951,6 @@ INSTALLED_APPS = (
     # Surveys
     'survey',
 
-    # Allows sudo-mode
-    'sudo',
-    'django_sudo_helpers',
-
     'lms.djangoapps.lms_xblock',
 
     'openedx.core.djangoapps.content.course_overviews',
@@ -2668,3 +2664,16 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+
+########## django-sudo ##########
+def apply_django_sudo_settings(django_settings):
+    """Set provider-independent settings."""
+    # force re-authentication before activating administrative functions
+    django_settings.MIDDLEWARE_CLASSES += ('sudo.middleware.SudoMiddleware',)
+
+    # Allows sudo-mode
+    django_settings.INSTALLED_APPS += (
+        'sudo',
+        'django_sudo_helpers'
+    )

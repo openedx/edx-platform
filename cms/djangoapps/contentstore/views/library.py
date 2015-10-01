@@ -72,7 +72,7 @@ def _display_library(library_key_string, request):
     """
 
     # Revoke sudo privileges from a request explicitly
-    if request.is_sudo(region=library_key_string):
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False) and request.is_sudo(region=library_key_string):
         revoke_sudo_privileges(request, region=library_key_string)
 
     library_key = CourseKey.from_string(library_key_string)

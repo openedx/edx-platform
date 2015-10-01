@@ -9,12 +9,14 @@ from social.apps.django_app.default import models as social_models
 from django.test.client import RequestFactory
 
 from student.helpers import auth_pipeline_urls, get_next_url_for_login_page
+from django_sudo_helpers.tests import utils
 from third_party_auth.tests import testutil
 from third_party_auth.pipeline import AUTH_ENTRY_SUDO
 from django_sudo_helpers.templatetags import third_party_auth_links
 
 
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(utils.DJANGO_SUDO_FEATURE_ENABLED, 'django-sudo not enabled')
 class ThirdPartyAuthLinkTests(testutil.TestCase):
     """
     Make sure some of the templatetags work.

@@ -51,8 +51,6 @@ urlpatterns = patterns(
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-
-    url(r'^sudo/$', 'sudo.views.sudo'),
 )
 
 # User creation and updating views
@@ -214,4 +212,10 @@ urlpatterns += (
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     urlpatterns += (
         url(r'', include('third_party_auth.urls')),
+    )
+
+# Django-sudo
+if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+    urlpatterns += (
+        url(r'^sudo/$', 'sudo.views.sudo'),
     )

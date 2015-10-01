@@ -2,6 +2,7 @@
 Custom decorator for django-sudo.
 """
 from functools import wraps
+from django.conf import settings
 
 from sudo.settings import RESET_TOKEN
 from sudo.utils import new_sudo_token_on_activity
@@ -31,6 +32,10 @@ def sudo_required(func_or_region):
     def wrapper(func):  # pylint: disable=missing-docstring
         @wraps(func)
         def inner(request, *args, **kwargs):    # pylint: disable=missing-docstring
+
+            if not settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+                return func(request, *args, **kwargs)
+
             course_specific_region = kwargs.get('course_id')
             if 'course_key_string' in kwargs:
                 course_specific_region = kwargs.get('course_key_string')
