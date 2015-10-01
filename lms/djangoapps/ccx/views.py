@@ -254,7 +254,7 @@ def save_ccx(request, course, ccx=None):
     grader = policy['GRADER']
     for section in grader:
         count = graded.get(section.get('type'), 0)
-        if count < section['min_count']:
+        if count < section.get('min_count', 0):
             changed = True
             section['min_count'] = count
     if changed:
