@@ -46,6 +46,11 @@ class TeamCardsMixin(object):
         """Return the names of each team on the page."""
         return self.q(css=self._bounded_selector('p.card-description')).map(lambda e: e.text).results
 
+    @property
+    def team_memberships(self):
+        """Return the team memberships text for each card on the page."""
+        return self.q(css=self._bounded_selector('.member-count')).map(lambda e: e.text).results
+
 
 class BreadcrumbsMixin(object):
     """Provides common operations on teams page breadcrumb links."""
