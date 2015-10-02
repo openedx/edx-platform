@@ -400,7 +400,7 @@ FEATURES = {
     'ENABLE_OPENBADGES': False,
 
     # Credit course API
-    'ENABLE_CREDIT_API': False,
+    'ENABLE_CREDIT_API': True,
 
     # The block types to disable need to be specified in "x block disable config" in django admin.
     'ENABLE_DISABLING_XBLOCK_TYPES': True,
@@ -2123,7 +2123,7 @@ if FEATURES.get('CLASS_DASHBOARD'):
     INSTALLED_APPS += ('class_dashboard',)
 
 ################ Enable credit eligibility feature ####################
-ENABLE_CREDIT_ELIGIBILITY = False
+ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
 ######################## CAS authentication ###########################
