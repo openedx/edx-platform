@@ -1858,6 +1858,8 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'oauth2_provider',
 
+    'third_party_auth',
+
     # We don't use this directly (since we use OAuth2), but we need to install it anyway.
     # When a user is deleted, Django queries all tables with a FK to the auth_user table,
     # and since django-rest-framework-oauth imports this, it will try to access tables
@@ -1945,6 +1947,7 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
+    'social.apps.django_app.default',
 
     # Surveys
     'survey',
@@ -1974,6 +1977,11 @@ INSTALLED_APPS = (
 
     'sorl.thumbnail',
 )
+
+# Migrations which are not in the standard module "migrations"
+MIGRATION_MODULES = {
+    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
+}
 
 ######################### CSRF #########################################
 
