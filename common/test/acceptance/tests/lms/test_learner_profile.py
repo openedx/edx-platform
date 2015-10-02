@@ -529,6 +529,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             }
         })
 
+    @flaky  # TODO: fix TNL-3492
     def test_user_can_see_error_for_file_size_below_the_min_limit(self):
         """
         Scenario: Upload profile image does not work for < 100 Bytes image file.
