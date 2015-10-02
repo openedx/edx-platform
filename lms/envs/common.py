@@ -499,9 +499,8 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
     'oauth2_handler.UserInfoHandler'
 )
 
-################################## EDX WEB #####################################
-# This is where we stick our compiled template files. Most of the app uses Mako
-# templates
+################################## TEMPLATE CONFIGURATION #####################################
+# Mako templating
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATES = {}
@@ -510,8 +509,7 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
                           COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
 
-# This is where Django Template lookup is defined. There are a few of these
-# still left lying around.
+# Django templating
 TEMPLATE_DIRS = [
     PROJECT_ROOT / "templates",
     COMMON_ROOT / 'templates',
@@ -546,6 +544,33 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.microsite_footer_context_processor',
 )
+
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'edxmako.makoloader.MakoFilesystemLoader',
+    'edxmako.makoloader.MakoAppDirectoriesLoader',
+
+    # 'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+
+)
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Don't look for template source files inside installed applications.
+        'APP_DIRS': False,
+        # Instead, look for template source files in these dirs.
+        'DIRS': TEMPLATE_DIRS,
+        # Options specific to this backend.
+        'OPTIONS': {
+            'loaders': TEMPLATE_LOADERS,
+            'context_processors': TEMPLATE_CONTEXT_PROCESSORS
+        }
+    }
+]
+
+###############################################################################################
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = (
@@ -1118,16 +1143,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 simplefilter('ignore')
 
 ################################# Middleware ###################################
-
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'edxmako.makoloader.MakoFilesystemLoader',
-    'edxmako.makoloader.MakoAppDirectoriesLoader',
-
-    # 'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-
-)
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
