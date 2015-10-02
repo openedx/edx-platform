@@ -509,7 +509,7 @@ class Order(models.Model):
 
         """
         try:
-            if settings.SEGMENT_KEY:
+            if settings.LMS_SEGMENT_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()
                 analytics.track(self.user.id, event_name, {  # pylint: disable=no-member
                     'orderId': self.id,  # pylint: disable=no-member

@@ -275,7 +275,7 @@ ANALYTICS_API_KEY = ""
 ##### Segment  ######
 
 # If there's an environment variable set, grab it
-SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
+LMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
 
 ###################### Payment ######################
 

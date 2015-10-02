@@ -167,7 +167,7 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 # If there's an environment variable set, grab it to turn on Segment
 # Note that this is the Studio key. There is a separate key for the LMS.
 import os
-SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
+CMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
 
 
 #####################################################################

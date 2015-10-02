@@ -1383,7 +1383,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
         None
 
     """
-    if settings.SEGMENT_KEY:
+    if settings.LMS_SEGMENT_KEY:
         event_name = 'edx.bi.user.certificate.generate'
         tracking_context = tracker.get_tracker().resolve_context()
 
