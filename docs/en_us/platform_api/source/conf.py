@@ -193,7 +193,8 @@ MOCK_MODULES = [
     'student.auth',
     'ccx_keys',
     'ccx_keys.locator',
-    'user_api.preferences.api'
+    'user_api.preferences.api',
+    'rest_framework_oauth.authentication'
 ]
 
 for mod_name in MOCK_MODULES:
