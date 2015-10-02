@@ -215,6 +215,10 @@ div.course-wrapper {
         border-left: 4px solid #C93B34 !important;
         margin: 0 auto;
       }
+      &.warning {
+        border-left: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
     }
 
     div.proctored-exam {
