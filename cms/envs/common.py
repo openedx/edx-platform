@@ -78,7 +78,7 @@ FEATURES = {
     'STUDIO_REQUEST_EMAIL': '',
 
     # Segment - must explicitly turn it on for production
-    'SEGMENT_KEY': None,
+    'CMS_SEGMENT_KEY': None,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
