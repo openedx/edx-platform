@@ -1,5 +1,5 @@
 """
-Tests for Course Blocks views
+Tests for Blocks Views
 """
 
 from django.core.urlresolvers import reverse
@@ -12,16 +12,13 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from .test_utils import deserialize_usage_key
 
 
-class TestCourseBlocksView(SharedModuleStoreTestCase):
+class TestBlocksViewMixin(object):
     """
-    Test class for CourseBlocks view
+    Mixin class for test helpers for BlocksView related classes
     """
     @classmethod
-    def setUpClass(cls):
-        super(TestCourseBlocksView, cls).setUpClass()
-
+    def setup_course(cls):
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
 
         cls.non_orphaned_block_usage_keys = set(
             unicode(item.location)
@@ -29,14 +26,8 @@ class TestCourseBlocksView(SharedModuleStoreTestCase):
             # remove all orphaned items in the course, except for the root 'course' block
             if cls.store.get_parent_location(item.location) or item.category == 'course'
         )
-        cls.url = reverse(
-            'course_blocks',
-            kwargs={'usage_key_string': unicode(cls.course_usage_key)}
-        )
 
-    def setUp(self):
-        super(TestCourseBlocksView, self).setUp()
-
+    def setup_user(self):
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password='test')
 
@@ -74,6 +65,25 @@ class TestCourseBlocksView(SharedModuleStoreTestCase):
         else:
             self.assertFalse(expression)
 
+
+class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):
+    """
+    Test class for BlocksView
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestBlocksView, cls).setUpClass()
+        cls.setup_course()
+        cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
+        cls.url = reverse(
+            'blocks_in_block_tree',
+            kwargs={'usage_key_string': unicode(cls.course_usage_key)}
+        )
+
+    def setUp(self):
+        super(TestBlocksView, self).setUp()
+        self.setup_user()
+
     def test_not_authenticated(self):
         self.client.logout()
         self.verify_response(401)
@@ -85,7 +95,7 @@ class TestCourseBlocksView(SharedModuleStoreTestCase):
     def test_non_existent_course(self):
         usage_key = self.store.make_course_usage_key(CourseLocator('non', 'existent', 'course'))
         url = reverse(
-            'course_blocks',
+            'blocks_in_block_tree',
             kwargs={'usage_key_string': unicode(usage_key)}
         )
         self.verify_response(403, url=url)
@@ -153,3 +163,28 @@ class TestCourseBlocksView(SharedModuleStoreTestCase):
                     set(unicode(child.location) for child in xblock.get_children()),
                     set(block_data['children']),
                 )
+
+
+class TestBlocksInCourseView(TestBlocksViewMixin, SharedModuleStoreTestCase):
+    """
+    Test class for BlocksInCourseView
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestBlocksInCourseView, cls).setUpClass()
+        cls.setup_course()
+        cls.url = reverse('blocks_in_course')
+
+    def setUp(self):
+        super(TestBlocksInCourseView, self).setUp()
+        self.setup_user()
+
+    def test_basic(self):
+        response = self.verify_response(params={'course_id': unicode(self.course_key)})
+        self.verify_response_block_dict(response)
+
+    def test_no_course_id(self):
+        self.verify_response(400)
+
+    def test_invalid_course_id(self):
+        self.verify_response(400, params={'course_id': 'invalid_course_id'})
