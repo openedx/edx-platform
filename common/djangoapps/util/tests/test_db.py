@@ -7,7 +7,7 @@ import unittest
 
 from django.contrib.auth.models import User
 from django.db import connection, IntegrityError
-from django.db.transaction import atomic, TransactionManagementError
+from django.db.transaction import commit_on_success, TransactionManagementError
 from django.test import TestCase, TransactionTestCase
 
 from util.db import commit_on_success_with_read_committed, generate_int_id
@@ -26,7 +26,7 @@ class TransactionIsolationLevelsTestCase(TransactionTestCase):
     """
 
     @ddt.data(
-        (atomic, IntegrityError, None, True),
+        (commit_on_success, IntegrityError, None, True),
         (commit_on_success_with_read_committed, type(None), False, True),
     )
     @ddt.unpack
@@ -92,12 +92,12 @@ class TransactionIsolationLevelsTestCase(TransactionTestCase):
 
         commit_on_success_with_read_committed(do_nothing)()
 
-        with atomic():
+        with commit_on_success():
             commit_on_success_with_read_committed(do_nothing)()
 
         with self.assertRaises(TransactionManagementError):
-            with atomic():
-                with atomic():
+            with commit_on_success():
+                with commit_on_success():
                     commit_on_success_with_read_committed(do_nothing)()
 
 

@@ -137,7 +137,7 @@ def get_cohorted_commentables(course_key):
     return ans
 
 
-@transaction.atomic
+@transaction.commit_on_success
 def get_cohort(user, course_key, assign=True, use_cached=False):
     """Returns the user's cohort for the specified course.
 

@@ -230,7 +230,7 @@ class Order(models.Model):
         """
         self.orderitem_set.all().delete()  # pylint: disable=no-member
 
-    @transaction.atomic
+    @transaction.commit_on_success
     def start_purchase(self):
         """
         Start the purchase process.  This will set the order status to "paying",
@@ -668,7 +668,7 @@ class OrderItem(TimeStampedModel):
         if order.currency != currency and order.orderitem_set.exists():
             raise InvalidCartItem(_("Trying to add a different currency into the cart"))
 
-    @transaction.atomic
+    @transaction.commit_on_success
     def purchase_item(self):
         """
         This is basically a wrapper around purchased_callback that handles
@@ -1483,7 +1483,7 @@ class PaidCourseRegistration(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.atomic
+    @transaction.commit_on_success
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -1657,7 +1657,7 @@ class CourseRegCodeItem(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.atomic
+    @transaction.commit_on_success
     def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=arguments-differ
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -1859,7 +1859,7 @@ class CertificateItem(OrderItem):
         return target_cert
 
     @classmethod
-    @transaction.atomic
+    @transaction.commit_on_success
     def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
         """
         Add a CertificateItem to an order
@@ -2034,7 +2034,7 @@ class Donation(OrderItem):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     @classmethod
-    @transaction.atomic
+    @transaction.commit_on_success
     def add_to_order(cls, order, donation_amount, course_id=None, currency='usd'):
         """Add a donation to an order.
 

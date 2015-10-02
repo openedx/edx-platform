@@ -445,7 +445,7 @@ class CreditRequirementStatus(TimeStampedModel):
         return cls.objects.filter(requirement__in=requirements, username=username)
 
     @classmethod
-    @transaction.atomic
+    @transaction.commit_on_success
     def add_or_update_requirement_status(cls, username, requirement, status="satisfied", reason=None):
         """
         Add credit requirement status for given username.
@@ -468,7 +468,7 @@ class CreditRequirementStatus(TimeStampedModel):
             requirement_status.save()
 
     @classmethod
-    @transaction.atomic
+    @transaction.commit_on_success
     def remove_requirement_status(cls, username, requirement):
         """
         Remove credit requirement status for given username.

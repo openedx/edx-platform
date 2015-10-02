@@ -54,7 +54,7 @@ class Course(object):
 
         return mode.mode_slug
 
-    @transaction.atomic
+    @transaction.commit_on_success
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Save the CourseMode objects to the database. """
 

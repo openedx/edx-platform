@@ -38,7 +38,7 @@ def commit_on_success_with_read_committed(func):  # pylint: disable=invalid-name
             cursor = connection.cursor()
             cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
 
-        with transaction.atomic():
+        with transaction.commit_on_success():
             return func(*args, **kwargs)
 
     return wrapper
