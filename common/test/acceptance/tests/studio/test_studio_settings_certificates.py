@@ -70,13 +70,18 @@ class CertificatesTest(StudioCourseTest):
             shown when no certificate exist.
         Given I have a course without certificates
         When I go to the Certificates page in Studio
-        Then I see "You have not created any certificates yet." message
+        Then I see "You have not created any certificates yet." message and
+        a link with text "Set up your certificate"
         """
         self.certificates_page.visit()
         self.assertTrue(self.certificates_page.no_certificates_message_shown)
         self.assertIn(
             "You have not created any certificates yet.",
             self.certificates_page.no_certificates_message_text
+        )
+        self.assertIn(
+            "Set up your certificate",
+            self.certificates_page.new_certificate_link_text
         )
 
     def test_can_create_and_edit_certficate(self):
