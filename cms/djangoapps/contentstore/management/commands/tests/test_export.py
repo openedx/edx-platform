@@ -24,7 +24,7 @@ class TestArgParsingCourseExport(unittest.TestCase):
         """
         Test export command with no arguments
         """
-        errstring = "export requires two arguments: <course id> <output path>"
+        errstring = "Error: too few arguments"
         with self.assertRaisesRegexp(CommandError, errstring):
             call_command('export')
 
@@ -57,7 +57,7 @@ class TestCourseExport(ModuleStoreTestCase):
             "Could not find course in {}".format(store)
         )
         # Test `export` management command with invalid course_id
-        errstring = "Invalid course_key 'InvalidCourseID'."
+        errstring = "Invalid course_key: 'InvalidCourseID'."
         with self.assertRaisesRegexp(CommandError, errstring):
             call_command('export', "InvalidCourseID", self.temp_dir_1)
 
