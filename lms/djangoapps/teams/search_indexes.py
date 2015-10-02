@@ -12,8 +12,8 @@ from functools import wraps
 from search.search_engine_base import SearchEngine
 from request_cache import get_request_or_stub
 
-from teams.errors import ElasticSearchConnectionError
-from teams.serializers import CourseTeamSerializer, CourseTeam
+from lms.djangoapps.teams.errors import ElasticSearchConnectionError
+from lms.djangoapps.teams.serializers import CourseTeamSerializer, CourseTeam
 
 
 def if_search_enabled(f):

@@ -44,9 +44,9 @@ from xmodule.modulestore.tests.factories import (
 )
 from ccx_keys.locator import CCXLocator
 
-from ccx.models import CustomCourseForEdX
-from ccx.overrides import get_override_for_ccx, override_field_for_ccx
-from ccx.tests.factories import CcxFactory
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
 def intercept_renderer(path, context):

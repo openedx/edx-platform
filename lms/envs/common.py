@@ -1920,7 +1920,7 @@ INSTALLED_APPS = (
     'enrollment',
 
     # Student Identity Verification
-    'verify_student',
+    'lms.djangoapps.verify_student',
 
     # Dark-launching languages
     'dark_lang',
@@ -1971,7 +1971,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     # Course teams
-    'teams',
+    'lms.djangoapps.teams',
 
     'xblock_django',
 
