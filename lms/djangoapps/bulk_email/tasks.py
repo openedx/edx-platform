@@ -25,6 +25,8 @@ from boto.ses.exceptions import (
 )
 from boto.exception import AWSConnectionError
 
+from django.utils.translation import ugettext as _
+
 from celery import task, current_task
 from celery.states import SUCCESS, FAILURE, RETRY
 from celery.exceptions import RetryTaskError
@@ -33,6 +35,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.urlresolvers import reverse
+from django.utils import translation
 
 from bulk_email.models import (
     CourseEmail, Optout,
@@ -50,6 +53,9 @@ from instructor_task.subtasks import (
 )
 from util.query import use_read_replica_if_available
 from util.date_utils import get_default_time_display
+from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+
 
 log = logging.getLogger('edx.celery.task')
 
@@ -387,25 +393,40 @@ def _filter_optouts_from_recipients(to_list, course_id):
     return to_list, num_optout
 
 
-def _get_source_address(course_id, course_title):
+def _get_source_address(user_pk, course_id, course_title):
     """
     Calculates an email address to be used as the 'from-address' for sent emails.
 
-    Makes a unique from name and address for each course, e.g.
+    Makes a unique from name and address for each course,
 
         "COURSE_TITLE" Course Staff <coursenum-no-reply@courseupdates.edx.org>
 
+    The string is localized based on the user's language preference.
     """
     course_title_no_quotes = re.sub(r'"', '', course_title)
 
     # For the email address, get the course.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
-    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
-        course_title_no_quotes,
-        re.sub(r"[^\w.-]", '_', course_id.course),
-        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
+
+    try:
+        user = User.objects.get(pk=user_pk)
+        user_language = get_user_preference(user, LANGUAGE_KEY)
+    except User.DoesNotExist:
+        user_language = settings.LANGUAGE_CODE
+
+    with translation.override(user_language):
+        # Translators: Bulk email from address e.g. ("Physics" Course Staff)
+        course_staff_title = _('"{course_name}" Course Staff')
+
+    from_addr_format = course_staff_title + u' <{course_id}-{from_email}>'
+
+    from_addr = from_addr_format.format(
+        course_name=course_title_no_quotes,
+        course_id=re.sub(r"[^\w.-]", '_', course_id.course),
+        from_email=settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
     )
+
     return from_addr
 
 
@@ -477,10 +498,6 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     course_title = global_email_context['course_title']
 
-    # use the email from address in the CourseEmail, if it is present, otherwise compute it
-    from_addr = course_email.from_addr if course_email.from_addr else \
-        _get_source_address(course_email.course_id, course_title)
-
     # use the CourseEmailTemplate that was associated with the CourseEmail
     course_email_template = course_email.get_template()
     try:
@@ -501,6 +518,18 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             current_recipient = to_list[-1]
             email = current_recipient['email']
             email_context['email'] = email
+
+            # Use the email from address in the CourseEmail, if it is present,
+            # otherwise compute it
+            if course_email.from_addr:
+                from_addr = course_email.from_addr
+            else:
+                from_addr = _get_source_address(
+                    user_pk=current_recipient['pk'],
+                    course_id=course_email.course_id,
+                    course_title=course_title
+                )
+
             email_context['name'] = current_recipient['profile__name']
             email_context['user_id'] = current_recipient['pk']
             email_context['course_id'] = course_email.course_id
