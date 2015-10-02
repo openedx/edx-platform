@@ -7,7 +7,7 @@ from django.utils import importlib
 import logging
 from django.conf import settings
 from django.core.cache import cache
-from enrollment import errors
+from enrollment.api.v1 import errors
 
 log = logging.getLogger(__name__)
 

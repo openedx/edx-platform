@@ -20,7 +20,7 @@ from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
 from ecommerce_api_client import exceptions
 from embargo.test_utils import restrict_course
-from enrollment.api import get_enrollment
+from enrollment.api.v1.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
