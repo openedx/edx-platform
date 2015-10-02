@@ -221,7 +221,7 @@ class RestrictedCourse(models.Model):
         """
         country_rules_for_course = (
             CountryAccessRule.objects
-        ).select_related('restricted_country').filter(restricted_course=self)
+        ).select_related('country').filter(restricted_course=self)
 
         return {
             'enroll_msg': self.enroll_msg_key,
