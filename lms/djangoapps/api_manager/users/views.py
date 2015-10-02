@@ -315,7 +315,9 @@ class UsersList(SecureListAPIView):
         try:
             user = User.objects.create(email=email, username=username, is_staff=is_staff)
         except IntegrityError:
-            response_data['message'] = "User '%s' already exists" % (username)
+            response_data['message'] = _("Username '{username}' or email '{email}' already exists").format(
+                username=username, email=email
+            )
             response_data['field_conflict'] = "username or email"
             return Response(response_data, status=status.HTTP_409_CONFLICT)
 

@@ -371,9 +371,11 @@ class UsersApiTests(ModuleStoreTestCase):
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
-        response = self.do_post(test_uri, data)
+        expected_message = "Username '{username}' or email '{email}' already exists".format(
+            username=local_username, email=self.test_email
+        )
         self.assertEqual(response.status_code, 409)
-        self.assertGreater(response.data['message'], 0)
+        self.assertEqual(response.data['message'], expected_message)
         self.assertEqual(response.data['field_conflict'], 'username or email')
 
     @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": True})
