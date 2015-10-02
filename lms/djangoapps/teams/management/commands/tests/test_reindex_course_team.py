@@ -34,17 +34,18 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments.*"):
             call_command('reindex_course_team')
 
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TEAMS': False})
     def test_teams_search_flag_disabled_raises_command_error(self):
         """ Test that raises CommandError for disabled feature flag. """
-        with mock.patch('django.conf.settings.FEATURES') as features:
-            features.return_value = {"ENABLE_TEAMS": False}
-            with self.assertRaisesRegexp(CommandError, ".* ENABLE_TEAMS must be enabled .*"):
-                call_command('reindex_course_team')
+        with self.assertRaisesRegexp(CommandError, ".*ENABLE_TEAMS must be enabled.*"):
+            call_command('reindex_course_team', self.team1.team_id)
 
     def test_given_invalid_team_id_raises_command_error(self):
         """ Test that raises CommandError for invalid team id. """
-        with self.assertRaisesRegexp(CommandError, ".* Argument {0} is not a course_team id .*"):
-            call_command('reindex_course_team', u'team4')
+        team_id = u'team4'
+        error_str = 'Argument {0} is not a course_team team_id'.format(team_id)
+        with self.assertRaisesRegexp(CommandError, error_str):
+            call_command('reindex_course_team', team_id)
 
     @patch.object(CourseTeamIndexer, 'index')
     def test_single_team_id(self, mock_index):
