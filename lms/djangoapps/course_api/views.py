@@ -22,7 +22,7 @@ class CourseView(APIView):
 
         return Response({
             'blocks_url': reverse(
-                'course_blocks',
+                'blocks_in_block_tree',
                 kwargs={'usage_key_string': unicode(course_usage_key)},
                 request=request,
             )
