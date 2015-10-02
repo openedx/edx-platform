@@ -14,18 +14,19 @@ class Command(BaseCommand):
     |commit|: optional argument. If not provided, will not run task.
     '''
 
-    def handle(self, *args, **options):
-        if len(args) not in {1, 2}:
-            raise CommandError("delete_orphans requires one or more arguments: <course_id> |commit|")
+    def add_arguments(self, parser):
+        parser.add_argument('course_id')
+        parser.add_argument('--commit', action='store')
 
+    def handle(self, *args, **options):
         try:
-            course_key = CourseKey.from_string(args[0])
+            course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
             raise CommandError("Invalid course key.")
 
         commit = False
-        if len(args) == 2:
-            commit = args[1] == 'commit'
+        if options['commit']:
+            commit = options['commit'] == 'commit'
 
         if commit:
             print 'Deleting orphans from the course:'

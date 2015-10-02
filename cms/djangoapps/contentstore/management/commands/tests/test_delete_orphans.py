@@ -1,7 +1,7 @@
 """Tests running the delete_orphan command"""
 
 import ddt
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 from contentstore.tests.test_orphan import TestOrphanBase
 
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -14,6 +14,13 @@ class TestDeleteOrphan(TestOrphanBase):
     Tests for running the delete_orphan management command.
     Inherits from TestOrphan in order to use its setUp method.
     """
+    def test_no_args(self):
+        """
+        Test delete_orphans command with no arguments
+        """
+        with self.assertRaisesRegexp(CommandError, 'Error: too few arguments'):
+            call_command('delete_orphans')
+
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_delete_orphans_no_commit(self, default_store):
         """
@@ -35,7 +42,7 @@ class TestDeleteOrphan(TestOrphanBase):
         """
         course = self.create_course_with_orphans(default_store)
 
-        call_command('delete_orphans', unicode(course.id), 'commit')
+        call_command('delete_orphans', unicode(course.id), commit='commit')
 
         # make sure this module wasn't deleted
         self.assertTrue(self.store.has_item(course.id.make_usage_key('html', 'multi_parent_html')))
@@ -59,7 +66,7 @@ class TestDeleteOrphan(TestOrphanBase):
 
         # call delete orphans, specifying the published branch
         # of the course
-        call_command('delete_orphans', unicode(published_branch), 'commit')
+        call_command('delete_orphans', unicode(published_branch), commit='commit')
 
         # now all orphans should be deleted
         self.assertOrphanCount(course.id, 0)
