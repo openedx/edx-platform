@@ -37,9 +37,8 @@ var edx = edx || {};
                 providerId = $target.data("provider");
 
             edx.commerce.credit.createCreditRequest(providerId, courseKey, username).fail(function () {
-                $(".credit-request-pending-msg").hide("is-hidden");
-                $(".pending-credit-btn").hide();
-                errorContainer.toggleClass("is-hidden");
+                $(".credit-action").hide();
+                $errorContainer.toggleClass("is-hidden");
             });
         });
     });

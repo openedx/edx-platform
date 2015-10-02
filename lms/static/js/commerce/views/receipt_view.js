@@ -297,7 +297,6 @@ function completeOrder(event) {     // jshint ignore:line
     );
 
     edx.commerce.credit.createCreditRequest(providerId, courseKey, username).fail(function () {
-        $errorContainer.removeClass("is-hidden");
         $errorContainer.removeClass("hidden");
     });
 }
