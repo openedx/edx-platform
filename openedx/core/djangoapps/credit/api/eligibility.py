@@ -356,6 +356,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "reason": {},
                         "status": "failed",
                         "status_date": "2015-06-26 07:49:13",
+                        "order": 0,
                     },
                     {
                         "namespace": "proctored_exam",
@@ -365,6 +366,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "reason": {},
                         "status": "satisfied",
                         "status_date": "2015-06-26 11:07:42",
+                        "order": 1,
                     },
                     {
                         "namespace": "grade",
@@ -374,6 +376,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "reason": {"final_grade": 0.95},
                         "status": "satisfied",
                         "status_date": "2015-06-26 11:07:44",
+                        "order": 2,
                     },
                 ]
 
@@ -394,6 +397,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
             "reason": requirement_status.reason if requirement_status else None,
             "status": requirement_status.status if requirement_status else None,
             "status_date": requirement_status.modified if requirement_status else None,
+            "order": requirement.order,
         })
     return statuses
 
