@@ -49,12 +49,12 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
             mutable=True,
         )
         self.cleaned_data = {
-            'block_counts': [],
+            'block_counts': set(),
             'depth': 0,
             'nav_depth': None,
             'return_type': 'dict',
             'requested_fields': {'display_name', 'type'},
-            'student_view_data': [],
+            'student_view_data': set(),
             'usage_key': usage_key,
             'user': self.student,
         }
@@ -181,7 +181,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
 
     @ddt.data('block_counts', 'student_view_data')
     def test_higher_order_field(self, field_name):
-        field_value = ['block_type1', 'block_type2']
+        field_value = {'block_type1', 'block_type2'}
         self.form_data.setlist(field_name, field_value)
         self.cleaned_data[field_name] = field_value
         self.cleaned_data['requested_fields'].add(field_name)
@@ -192,7 +192,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data.setlist('requested_fields', ['field1', 'field2'])
 
         # add higher order fields
-        block_types_list = ['block_type1', 'block_type2']
+        block_types_list = {'block_type1', 'block_type2'}
         for field_name in ['block_counts', 'student_view_data']:
             self.form_data.setlist(field_name, block_types_list)
             self.cleaned_data[field_name] = block_types_list

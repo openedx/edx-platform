@@ -3,22 +3,16 @@
 """
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms import Form, CharField, ChoiceField, Field, IntegerField, MultipleHiddenInput
+from django.forms import Form, CharField, ChoiceField, IntegerField
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 
-from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.util.forms import MultiValueField
+from xmodule.modulestore.django import modulestore
 
 from .permissions import can_access_other_users_blocks, can_access_users_blocks
-
-
-class ListField(Field):
-    """
-    Field for a list of strings
-    """
-    widget = MultipleHiddenInput
 
 
 class BlockListGetForm(Form):
@@ -27,9 +21,9 @@ class BlockListGetForm(Form):
     """
     user = CharField(required=True)  # TODO return all blocks if user is not specified by requesting staff user
     usage_key = CharField(required=True)
-    requested_fields = ListField(required=False)
-    student_view_data = ListField(required=False)
-    block_counts = ListField(required=False)
+    requested_fields = MultiValueField(required=False)
+    student_view_data = MultiValueField(required=False)
+    block_counts = MultiValueField(required=False)
     depth = CharField(required=False)
     nav_depth = IntegerField(required=False, min_value=0)
     return_type = ChoiceField(
@@ -38,8 +32,10 @@ class BlockListGetForm(Form):
     )
 
     def clean_requested_fields(self):
+        requested_fields = self.cleaned_data['requested_fields']
+
         # add default requested_fields
-        return set(self.cleaned_data['requested_fields'] or set()) | {'type', 'display_name'}
+        return (requested_fields or set()) | {'type', 'display_name'}
 
     def clean_depth(self):
         value = self.cleaned_data['depth']
@@ -112,7 +108,8 @@ class BlockListGetForm(Form):
             'nav_depth',
         ]
         for additional_field in additional_requested_fields:
-            if not cleaned_data.get(additional_field) in (None, [], {}):  # allow 0 as a requested value
+            field_value = cleaned_data.get(additional_field)
+            if field_value or field_value == 0:  # allow 0 as a requested value
                 cleaned_data['requested_fields'].add(additional_field)
 
         usage_key = cleaned_data.get('usage_key')
