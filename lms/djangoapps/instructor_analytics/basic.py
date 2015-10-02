@@ -39,6 +39,8 @@ AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
 COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
 
+UNAVAILABLE = "[unavailable]"
+
 
 def sale_order_record_features(course_id, features):
     """
@@ -172,6 +174,7 @@ def enrolled_students_features(course_key, features):
     ]
     """
     include_cohort_column = 'cohort' in features
+    include_team_column = 'team' in features
 
     students = User.objects.filter(
         courseenrollment__course_id=course_key,
@@ -180,6 +183,9 @@ def enrolled_students_features(course_key, features):
 
     if include_cohort_column:
         students = students.prefetch_related('course_groups')
+
+    if include_team_column:
+        students = students.prefetch_related('teams')
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -215,6 +221,12 @@ def enrolled_students_features(course_key, features):
             student_dict['cohort'] = next(
                 (cohort.name for cohort in student.course_groups.all() if cohort.course_id == course_key),
                 "[unassigned]"
+            )
+
+        if include_team_column:
+            student_dict['team'] = next(
+                (team.name for team in student.teams.all() if team.course_id == course_key),
+                UNAVAILABLE
             )
         return student_dict
 

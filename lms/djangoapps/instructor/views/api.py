@@ -1138,6 +1138,10 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features.append('cohort')
         query_features_names['cohort'] = _('Cohort')
 
+    if course.teams_enabled:
+        query_features.append('team')
+        query_features_names['team'] = _('Team')
+
     if not csv:
         student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
         response_payload = {

@@ -2424,6 +2424,26 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         self.assertEqual('cohort' in res_json['feature_names'], is_cohorted)
 
+    @ddt.data(True, False)
+    def test_get_students_features_teams(self, has_teams):
+        """
+        Test that get_students_features includes team info when the course is
+        has teams enabled, and does not when the course does not have teams enabled
+        """
+        if has_teams:
+            self.course = CourseFactory.create(teams_configuration={
+                'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
+            })
+            course_instructor = InstructorFactory(course_key=self.course.id)
+            self.client.login(username=course_instructor.username, password='test')
+
+        url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
+
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+
+        self.assertEqual('team' in res_json['feature_names'], has_teams)
+
     def test_get_students_who_may_enroll(self):
         """
         Test whether get_students_who_may_enroll returns an appropriate
