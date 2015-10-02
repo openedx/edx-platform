@@ -143,12 +143,9 @@ def instructor_dashboard_2(request, course_id):
         sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, is_white_label))
 
     # Gate access to Proctoring tab
-    # only global staff (user.is_staff) is allowed to see this tab
-    can_see_proctoring = (
-        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and
-        course.enable_proctored_exams and
-        request.user.is_staff
-    )
+    # only global staff (user.is_staff) and
+    # instructor of the course is allowed to see this tab
+    can_see_proctoring = request.user.is_staff or access['staff']
     if can_see_proctoring:
         sections.append(_section_timed_exam(course, access))
 

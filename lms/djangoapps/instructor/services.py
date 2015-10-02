@@ -6,6 +6,8 @@ import logging
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from courseware.access import has_access
+from courseware.courses import get_course_by_id
 from courseware.models import StudentModule
 from instructor.views.tools import get_student_from_identifier
 from django.core.exceptions import ObjectDoesNotExist
@@ -69,3 +71,12 @@ class InstructorService(object):
                     )
                 )
                 log.error(err_msg)
+
+    def is_course_staff(self, user, course_id):
+        """
+        Returns True if the user is the course staff
+        else Returns False
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key, depth=0)
+        return bool(has_access(user, 'staff', course))
