@@ -211,7 +211,7 @@ PASSWORD_HASHERS = (
 )
 
 # No segment key
-SEGMENT_KEY = None
+CMS_SEGMENT_KEY = None
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 

@@ -1052,7 +1052,7 @@ class CourseEnrollment(models.Model):
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
 
-                if settings.SEGMENT_KEY:
+                if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
                     tracking_context = tracker.get_tracker().resolve_context()
                     analytics.track(self.user_id, event_name, {
                         'category': 'conversion',
