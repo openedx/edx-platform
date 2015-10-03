@@ -3,29 +3,29 @@ Views for the course_mode module
 """
 
 import decimal
-from ipware.ip import get_ip
+from urlparse import urljoin
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
-from django.views.generic.base import View
-from django.utils.translation import ugettext as _
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
-from edxmako.shortcuts import render_to_response
-
-from course_modes.models import CourseMode
-from courseware.access import has_access
-from student.models import CourseEnrollment
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.utils.translation import ugettext as _
+from django.views.generic.base import View
+from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
-from util.db import outer_atomic
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 from commerce.models import CommerceConfiguration
+from course_modes.models import CourseMode
+from courseware.access import has_access
+from edxmako.shortcuts import render_to_response
 from embargo import api as embargo_api
+from student.models import CourseEnrollment
+from util.db import outer_atomic
 
 
 class ChooseModeView(View):
@@ -40,7 +40,7 @@ class ChooseModeView(View):
     """
 
     @method_decorator(transaction.non_atomic_requests)
-    def dispatch(self, *args, **kwargs):        # pylint: disable=missing-docstring
+    def dispatch(self, *args, **kwargs):  # pylint: disable=missing-docstring
         return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
     @method_decorator(login_required)
@@ -118,7 +118,8 @@ class ChooseModeView(View):
         )
 
         context = {
-            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
+            "course_modes_choose_url": reverse("course_modes_choose",
+                                               kwargs={'course_id': course_key.to_deprecated_string()}),
             "modes": modes,
             "has_credit_upsell": has_credit_upsell,
             "course_name": course.display_name_with_default_escaped,
@@ -130,20 +131,22 @@ class ChooseModeView(View):
             "nav_hidden": True,
         }
         if "verified" in modes:
+            verified_mode = modes["verified"]
             context["suggested_prices"] = [
                 decimal.Decimal(x.strip())
-                for x in modes["verified"].suggested_prices.split(",")
+                for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
-            ]
+                ]
             context["currency"] = verified_mode.currency.upper()
             context["min_price"] = verified_mode.min_price
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
 
             if verified_mode.sku:
-                context["use_ecommerce_payment_flow"] = CommerceConfiguration.current()
+                config = CommerceConfiguration.current()
+                context["use_ecommerce_payment_flow"] = config.checkout_on_ecommerce_service
                 context["ecommerce_payment_page"] = urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT,
-                                                            settings.ECOMMERCE_COURSE_CHECKOUT_PATH)
+                                                            config.single_course_checkout_page)
                 context["sku"] = verified_mode.sku
 
         return render_to_response("course_modes/choose.html", context)
@@ -195,7 +198,7 @@ class ChooseModeView(View):
 
         if requested_mode == 'verified':
             amount = request.POST.get("contribution") or \
-                request.POST.get("contribution-other-amt") or 0
+                     request.POST.get("contribution-other-amt") or 0
 
             try:
                 # Validate the amount passed in and force it into two digits
