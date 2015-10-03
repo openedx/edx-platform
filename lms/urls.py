@@ -655,6 +655,8 @@ urlpatterns += (
         r'^api/branding/v1/',
         include('branding.api_urls')
     ),
+
+    url(r'^api/verification/', include('verify_student.verification_api.urls', namespace='verification_api')),
 )
 
 if settings.FEATURES["ENABLE_TEAMS"]:
