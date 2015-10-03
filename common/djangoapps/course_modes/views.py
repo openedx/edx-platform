@@ -24,6 +24,7 @@ from opaque_keys.edx.keys import CourseKey
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
+from commerce.models import CommerceConfiguration
 from embargo import api as embargo_api
 
 
@@ -134,10 +135,16 @@ class ChooseModeView(View):
                 for x in modes["verified"].suggested_prices.split(",")
                 if x.strip()
             ]
-            context["currency"] = modes["verified"].currency.upper()
-            context["min_price"] = modes["verified"].min_price
-            context["verified_name"] = modes["verified"].name
-            context["verified_description"] = modes["verified"].description
+            context["currency"] = verified_mode.currency.upper()
+            context["min_price"] = verified_mode.min_price
+            context["verified_name"] = verified_mode.name
+            context["verified_description"] = verified_mode.description
+
+            if verified_mode.sku:
+                context["use_ecommerce_payment_flow"] = CommerceConfiguration.current()
+                context["ecommerce_payment_page"] = urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT,
+                                                            settings.ECOMMERCE_COURSE_CHECKOUT_PATH)
+                context["sku"] = verified_mode.sku
 
         return render_to_response("course_modes/choose.html", context)
 
