@@ -3,6 +3,7 @@
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
 import datetime
+from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture
@@ -217,3 +218,25 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         # Test that proper course date with 'starts' message is displayed if a course is about to start in future,
         # and course starts within 5 days
         self.assertEqual(course_date, expected_course_date)
+
+
+@attr('a11y')
+class LmsDashboardA11yTest(BaseLmsDashboardTest):
+    """
+    Class to test lms student dashboard accessibility.
+    """
+
+    def test_dashboard_course_listings_a11y(self):
+        """
+        Test the accessibility of the course listings
+        """
+        course_listings = self.dashboard_page.get_course_listings()
+        self.assertEqual(len(course_listings), 1)
+
+        # There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        self.dashboard_page.a11y_audit.config.set_rules({
+            "ignore": ['color-contrast'],
+        })
+
+        self.dashboard_page.a11y_audit.check_for_accessibility_errors()
