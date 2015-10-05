@@ -113,18 +113,20 @@ if (xblockInfo.get('graded')) {
                 <p>
                     <span class="sr status-release-label"><%= gettext('Release Status:') %></span>
                     <span class="status-release-value">
-                        <% if (xblockInfo.get('released_to_students')) { %>
-                            <i class="icon fa fa-check-square-o"></i>
-                            <%= gettext('Released:') %>
-                        <% } else if (xblockInfo.get('release_date')) { %>
-                            <i class="icon fa fa-clock-o"></i>
-                            <%= gettext('Scheduled:') %>
-                        <% } else { %>
-                            <i class="icon fa fa-clock-o"></i>
-                            <%= gettext('Unscheduled') %>
-                        <% } %>
-                        <% if (xblockInfo.get('release_date')) { %>
-                            <%= xblockInfo.get('release_date') %>
+                        <% if (!course.get('self_paced')) { %>
+                            <% if (xblockInfo.get('released_to_students')) { %>
+                                <i class="icon fa fa-check-square-o"></i>
+                                <%= gettext('Released:') %>
+                            <% } else if (xblockInfo.get('release_date')) { %>
+                                <i class="icon fa fa-clock-o"></i>
+                                <%= gettext('Scheduled:') %>
+                            <% } else { %>
+                                <i class="icon fa fa-clock-o"></i>
+                                <%= gettext('Unscheduled') %>
+                            <% } %>
+                            <% if (xblockInfo.get('release_date')) { %>
+                                <%= xblockInfo.get('release_date') %>
+                            <% } %>
                         <% } %>
                     </span>
                 </p>
