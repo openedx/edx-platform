@@ -23,6 +23,7 @@ var edx = edx || {};
             context: this,
             success: function (requestData) {
                 var $form = $('<form>', {
+                    'class': 'hidden',
                     'action': requestData.url,
                     'method': 'POST',
                     'accept-method': 'UTF-8'
@@ -35,7 +36,7 @@ var edx = edx || {};
                     }).appendTo($form);
                 });
 
-                $form.submit();
+                $form.appendTo('body').submit();
             }
         });
     };
