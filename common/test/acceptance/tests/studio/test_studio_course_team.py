@@ -152,6 +152,7 @@ class CourseTeamPageTest(StudioCourseTest):
 
         self._assert_can_not_manage_users()
 
+    @flaky  # TNL-3515
     def test_admins_can_delete_other_users(self):
         """
         Scenario: Admins can delete other users
