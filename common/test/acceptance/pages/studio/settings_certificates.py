@@ -83,6 +83,13 @@ class CertificatesPage(CoursePage):
         """
         return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content').text[0]
 
+    @property
+    def new_certificate_link_text(self):
+        """
+        Returns text of new-button link .
+        """
+        return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content a.new-button').text[0]
+
     ################
     # Wait Actions
     ################
