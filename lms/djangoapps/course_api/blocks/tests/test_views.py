@@ -3,6 +3,8 @@ Tests for Blocks Views
 """
 
 from django.core.urlresolvers import reverse
+from string import join
+
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -52,6 +54,26 @@ class TestBlocksViewMixin(object):
             set(response.data['blocks'].iterkeys()),
             self.non_orphaned_block_usage_keys,
         )
+
+    requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field']
+
+    def verify_response_with_requested_fields(self, response):
+        self.verify_response_block_dict(response)
+        for block_key_string, block_data in response.data['blocks'].iteritems():
+            block_key = deserialize_usage_key(block_key_string, self.course_key)
+            xblock = self.store.get_item(block_key)
+
+            self.assert_in_iff('children', block_data, xblock.has_children)
+            self.assert_in_iff('graded', block_data, xblock.graded is not None)
+            self.assert_in_iff('format', block_data, xblock.format is not None)
+            self.assert_true_iff(block_data['student_view_multi_device'], block_data['type'] == 'html')
+            self.assertNotIn('not_a_field', block_data)
+
+            if xblock.has_children:
+                self.assertSetEqual(
+                    set(unicode(child.location) for child in xblock.get_children()),
+                    set(block_data['children']),
+                )
 
     def assert_in_iff(self, member, container, predicate):
         if predicate:
@@ -145,24 +167,9 @@ class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):
 
     def test_requested_fields_param(self):
         response = self.verify_response(
-            params={'requested_fields': ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field']}
+            params={'requested_fields': self.requested_fields}
         )
-        self.verify_response_block_dict(response)
-        for block_key_string, block_data in response.data['blocks'].iteritems():
-            block_key = deserialize_usage_key(block_key_string, self.course_key)
-            xblock = self.store.get_item(block_key)
-
-            self.assert_in_iff('children', block_data, xblock.has_children)
-            self.assert_in_iff('graded', block_data, xblock.graded is not None)
-            self.assert_in_iff('format', block_data, xblock.format is not None)
-            self.assert_true_iff(block_data['student_view_multi_device'], block_data['type'] == 'html')
-            self.assertNotIn('not_a_field', block_data)
-
-            if xblock.has_children:
-                self.assertSetEqual(
-                    set(unicode(child.location) for child in xblock.get_children()),
-                    set(block_data['children']),
-                )
+        self.verify_response_with_requested_fields(response)
 
 
 class TestBlocksInCourseView(TestBlocksViewMixin, SharedModuleStoreTestCase):
@@ -188,3 +195,18 @@ class TestBlocksInCourseView(TestBlocksViewMixin, SharedModuleStoreTestCase):
 
     def test_invalid_course_id(self):
         self.verify_response(400, params={'course_id': 'invalid_course_id'})
+
+    def test_with_list_field_url(self):
+        url = '{base_url}?course_id={course_id}&user={username}&depth=all'.format(
+            course_id=unicode(self.course_key),
+            base_url=self.url.format(),
+            username=self.user.username,
+        )
+        url += '&requested_fields={0}&requested_fields={1}&requested_fields={2}'.format(
+            self.requested_fields[0],
+            self.requested_fields[1],
+            join(self.requested_fields[1:], ','),
+        )
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        self.verify_response_with_requested_fields(response)
