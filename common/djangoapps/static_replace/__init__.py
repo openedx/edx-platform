@@ -1,8 +1,8 @@
 import logging
 import re
 
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.contrib.staticfiles import finders
+from staticfiles.storage import staticfiles_storage
+from staticfiles import finders
 from django.conf import settings
 
 from xmodule.modulestore.django import modulestore
