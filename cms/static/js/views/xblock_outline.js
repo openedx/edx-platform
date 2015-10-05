@@ -90,6 +90,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                     defaultNewChildName = childInfo.display_name;
                 }
                 return {
+                    course: course,
                     xblockInfo: xblockInfo,
                     visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(xblockInfo.get('visibility_state')),
                     typeListClass: XBlockViewUtils.getXBlockListTypeClass(xblockType),

@@ -85,7 +85,8 @@ import json
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
                       display_course_number: "${_(context_course.display_coursenumber)}",
-                      revision: "${context_course.location.revision | h}"
+                      revision: "${context_course.location.revision | h}",
+                      self_paced: ${json.dumps(context_course.self_paced)}
                   });
               });
             % endif
