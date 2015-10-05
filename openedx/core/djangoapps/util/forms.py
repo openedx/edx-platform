@@ -4,11 +4,13 @@ from django.forms import Field, MultipleHiddenInput
 
 class MultiValueField(Field):
     """
-    Field class that supports a list of values for a single form field.
+    Field class that supports a set of values for a single form field.
 
-    The field values can be specified as:
+    The field input can be specified as:
         1. a comma-separated-list (foo:bar1,bar2,bar3), or
         2. a repeated field in a MultiValueDict (foo:bar1, foo:bar2, foo:bar3)
+
+    The resulting field value is a python set of the values.
     """
     widget = MultipleHiddenInput
 
