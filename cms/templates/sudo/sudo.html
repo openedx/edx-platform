@@ -1,8 +1,14 @@
-{% block body %}
-    {% load i18n third_party_auth_links %}
-    {% load compressed %}
-    {% compressed_css 'style-vendor' %}
-    {% compressed_css 'style-main' %}
+{% extends "base_django.html" %}
+
+{% load i18n third_party_auth_links %}
+{% load compressed %}
+{% compressed_css 'style-vendor' %}
+{% compressed_css 'style-main' %}
+
+{% block title %}{% trans "Confirm Your Password" %}{% endblock %}
+{%block bodyclass %} is-signedin course view-outline {% endblock %}
+
+{% block content %}
 
 <div class="wrapper-content wrapper">
     <section aria-hidden="true" class="content view-sudo">
