@@ -293,6 +293,24 @@ class EditContainerTest(NestedVerticalTest):
         container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)
 
+    def test_edit_raw_html(self):
+        """
+        Test the raw html editing functionality.
+        """
+        modified_content = "<p>modified content</p>"
+
+        #navigate to and open the component for editing
+        unit = self.go_to_unit_page()
+        container = unit.xblocks[1].go_to_container()
+        component = container.xblocks[1].children[0]
+        component.edit()
+
+        html_editor = HtmlComponentEditorView(self.browser, component.locator)
+        html_editor.set_content_and_save(modified_content, raw=True)
+
+        #note we're expecting the <p> tags to have been removed
+        self.assertEqual(component.student_content, "modified content")
+
 
 class EditVisibilityModalTest(ContainerBase):
     """
