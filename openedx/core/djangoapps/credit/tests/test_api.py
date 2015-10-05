@@ -639,7 +639,8 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         for key in self.USER_INFO.keys():
             param_key = 'user_{key}'.format(key=key)
             self.assertIn(param_key, parameters)
-            self.assertEqual(parameters[param_key], self.USER_INFO[key])
+            expected = '' if key == 'mailing_address' else self.USER_INFO[key]
+            self.assertEqual(parameters[param_key], expected)
 
     def test_create_credit_request_grade_length(self):
         """ Verify the length of the final grade is limited to seven (7) characters total.
@@ -655,6 +656,11 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # Initiate a credit request
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
         self.assertEqual(request['parameters']['final_grade'], u'0.33333')
+
+    def test_create_credit_request_address_empty(self):
+        """ Verify the mailing address is always empty. """
+        request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.user.username)
+        self.assertEqual(request['parameters']['user_mailing_address'], '')
 
     def test_credit_request_disable_integration(self):
         CreditProvider.objects.all().update(enable_integration=False)
