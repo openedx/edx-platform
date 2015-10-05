@@ -1939,6 +1939,7 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
+    'social.apps.django_app.default',
 
     # Surveys
     'survey',
