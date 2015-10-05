@@ -656,6 +656,16 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
         self.assertEqual(request['parameters']['final_grade'], u'0.33333')
 
+    @ddt.data('141 Portland\nCambridge, MA 02141', '141 Portland\rCambridge, MA 02141')
+    def test_create_credit_request_address_newlines(self, mailing_address):
+        """ Verify the mailing address uses CRLF for newlines. """
+        expected = '141 Portland\r\nCambridge, MA 02141'
+        self.user.profile.mailing_address = mailing_address
+        self.user.profile.save()
+
+        request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.user.username)
+        self.assertEqual(request['parameters']['user_mailing_address'], expected)
+
     def test_credit_request_disable_integration(self):
         CreditProvider.objects.all().update(enable_integration=False)
 

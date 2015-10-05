@@ -108,6 +108,15 @@ def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-ar
     return JsonResponse(credit_provider_data)
 
 
+def clean_newlines(s):
+    """
+    Normalize newline characters.
+
+    Use "\r\n" as the newline character.
+    """
+    return s.replace('\r\n', '\n').replace('\r', '\n').replace('\n', '\r\n')
+
+
 @transaction.commit_on_success
 def create_credit_request(course_key, provider_id, username):
     """
@@ -274,11 +283,7 @@ def create_credit_request(course_key, provider_id, username):
         "user_username": user.username,
         "user_email": user.email,
         "user_full_name": user.profile.name,
-        "user_mailing_address": (
-            user.profile.mailing_address
-            if user.profile.mailing_address is not None
-            else ""
-        ),
+        "user_mailing_address": clean_newlines(user.profile.mailing_address or ""),
         "user_country": (
             user.profile.country.code
             if user.profile.country.code is not None
