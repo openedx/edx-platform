@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 
+import ddt
 import mock
 from mock import patch
 from PIL import Image
@@ -17,12 +18,12 @@ from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
-
-from ...user_api.accounts.image_helpers import (
+from openedx.core.djangoapps.user_api.accounts.image_helpers import (
     set_has_profile_image,
     get_profile_image_names,
     get_profile_image_storage,
 )
+
 from ..images import create_profile_images, ImageValidationError
 from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
 from .helpers import make_image_file
@@ -169,6 +170,7 @@ class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assert_no_events_were_emitted()
 
 
+@ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
@@ -196,12 +198,15 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_anonymous_request_rejected('post')
         self.assertFalse(mock_log.info.called)
 
-    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2])
-    def test_upload_self(self, mock_make_image_version, mock_log):  # pylint: disable=unused-argument
+    @ddt.data('.jpg', '.jpeg', '.jpg', '.jpeg', '.png', '.gif', '.GIF')
+    @patch(
+        'openedx.core.djangoapps.profile_images.views._make_upload_dt', side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2]
+    )
+    def test_upload_self(self, extension, _mock_make_image_version, mock_log):
         """
         Test that an authenticated user can POST to their own upload endpoint.
         """
-        with make_image_file() as image_file:
+        with make_image_file(extension=extension) as image_file:
             response = self.client.post(self.url, {'file': image_file}, format='multipart')
             self.check_response(response, 204)
             self.check_images()
@@ -218,6 +223,57 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_response(response, 204)
 
         self.check_upload_event_emitted(old=TEST_UPLOAD_DT, new=TEST_UPLOAD_DT2)
+
+    @ddt.data(
+        ('image/jpeg', '.jpg'),
+        ('image/jpeg', '.jpeg'),
+        ('image/pjpeg', '.jpg'),
+        ('image/pjpeg', '.jpeg'),
+        ('image/png', '.png'),
+        ('image/gif', '.gif'),
+        ('image/gif', '.GIF'),
+    )
+    @ddt.unpack
+    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', return_value=TEST_UPLOAD_DT)
+    def test_upload_by_mimetype(self, content_type, extension, _mock_make_image_version, mock_log):
+        """
+        Test that a user can upload raw content with the appropriate mimetype
+        """
+        with make_image_file(extension=extension) as image_file:
+            data = image_file.read()
+            response = self.client.post(
+                self.url,
+                data,
+                content_type=content_type,
+                HTTP_CONTENT_DISPOSITION='attachment;filename=filename{}'.format(extension),
+            )
+            self.check_response(response, 204)
+            self.check_images()
+            self.check_has_profile_image()
+        mock_log.info.assert_called_once_with(
+            LOG_MESSAGE_CREATE,
+            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+        )
+        self.check_upload_event_emitted()
+
+    def test_upload_unsupported_mimetype(self, mock_log):
+        """
+        Test that uploading an unsupported image as raw content fails with an
+        HTTP 415 Error.
+        """
+        with make_image_file() as image_file:
+            data = image_file.read()
+            response = self.client.post(
+                self.url,
+                data,
+                content_type='image/tiff',
+                HTTP_CONTENT_DISPOSITION='attachment;filename=filename.tiff',
+            )
+            self.check_response(response, 415)
+            self.check_images(False)
+            self.check_has_profile_image(False)
+        self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_upload_other(self, mock_log):
         """
