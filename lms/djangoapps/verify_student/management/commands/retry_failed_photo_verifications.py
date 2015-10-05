@@ -18,6 +18,6 @@ class Command(BaseCommand):
         print("Attempting to retry {0} failed PhotoVerification submissions".format(len(attempts_to_retry)))
         for index, attempt in enumerate(attempts_to_retry):
             print("Retrying submission #{0} (ID: {1}, User: {2})".format(index, attempt.id, attempt.user))
-            attempt.submit()
+            attempt.submit(copy_id_photo_from=attempt.copy_id_photo_from)
             print("Retry result: {0}".format(attempt.status))
         print("Done resubmitting failed photo verifications")
