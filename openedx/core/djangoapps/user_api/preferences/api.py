@@ -290,6 +290,7 @@ def _track_update_email_opt_in(user_id, organization, opt_in):
             'label': organization
         },
         context={
+            'ip': tracking_context.get('ip'),
             'Google Analytics': {
                 'clientId': tracking_context.get('client_id')
             }

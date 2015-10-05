@@ -1395,6 +1395,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
                 'label': unicode(course_id)
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }

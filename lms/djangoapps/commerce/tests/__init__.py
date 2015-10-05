@@ -60,7 +60,7 @@ class EcommerceApiClientTest(TestCase):
         )
 
         mock_tracker = mock.Mock()
-        mock_tracker.resolve_context = mock.Mock(return_value={'client_id': self.TEST_CLIENT_ID})
+        mock_tracker.resolve_context = mock.Mock(return_value={'client_id': self.TEST_CLIENT_ID, 'ip': '127.0.0.1'})
         with mock.patch('commerce.tracker.get_tracker', return_value=mock_tracker):
             ecommerce_api_client(self.user).baskets(1).post()
 
@@ -75,6 +75,7 @@ class EcommerceApiClientTest(TestCase):
             'tracking_context': {
                 'lms_user_id': self.user.id,  # pylint: disable=no-member
                 'lms_client_id': self.TEST_CLIENT_ID,
+                'lms_ip': '127.0.0.1',
             },
         }
 

@@ -1963,6 +1963,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
             },
 
             context={
+                'ip': '127.0.0.1',
                 'Google Analytics':
                 {'clientId': None}
             }
@@ -2020,6 +2021,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
                 'checkpoint': self.reverification_assessment
             },
             context={
+                'ip': '127.0.0.1',
                 'Google Analytics':
                 {'clientId': None}
             }

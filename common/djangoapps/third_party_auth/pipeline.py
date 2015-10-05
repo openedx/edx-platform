@@ -604,6 +604,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
                 'provider': getattr(kwargs['backend'], 'name')
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }

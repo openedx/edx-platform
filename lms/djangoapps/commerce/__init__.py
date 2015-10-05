@@ -7,9 +7,12 @@ from eventtracking import tracker
 def create_tracking_context(user):
     """ Assembles attributes from user and request objects to be sent along
     in ecommerce api calls for tracking purposes. """
+    context_tracker = tracker.get_tracker().resolve_context()
+
     return {
         'lms_user_id': user.id,
-        'lms_client_id': tracker.get_tracker().resolve_context().get('client_id')
+        'lms_client_id': context_tracker.get('client_id'),
+        'lms_ip': context_tracker.get('ip'),
     }
 
 
