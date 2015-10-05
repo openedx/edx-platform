@@ -2474,6 +2474,61 @@ class CapaDescriptorTest(unittest.TestCase):
             }
         )
 
+    @ddt.data(
+        (sample_checkbox_problem_xml, ['choice_0']),
+        (sample_dropdown_problem_xml, 'Spain'),
+        (sample_multichoice_problem_xml, 'choice_0'),
+        (sample_numerical_input_problem_xml, '1.0'),
+        (sample_text_input_problem_xml, 'wrong'),
+        (sample_checkboxes_with_hints_and_feedback_problem_xml, ['choice_0']),
+        (sample_dropdown_with_hints_and_feedback_problem_xml, 'apple'),
+        (sample_multichoice_with_hints_and_feedback_problem_xml, 'choice_0'),
+        (sample_numerical_input_with_hints_and_feedback_problem_xml, '1.0'),
+        (sample_text_input_with_hints_and_feedback_problem_xml, 'wrong'),
+    )
+    @ddt.unpack
+    def test_save_problem_correctness(self, problem_xml, wrong_choice):
+        """
+        Test that correctness property is reset to Default(None).
+        when user attemps wrong choice and after that he saves a choice,
+        the correctness property should reset to Default(None).
+        """
+        # Create the module from xml
+        module = CapaFactory.create(xml=problem_xml)
+
+        # First Check wrong answer choice
+        get_request_dict = {CapaFactory.input_key(): wrong_choice}
+        result = module.check_problem(get_request_dict)
+
+        # Expect that attempt is marked incorrect
+        self.assertTrue(result['success'], 'incorrect')
+
+        # get the lcp answer id
+        answer_id = CapaFactory.answer_key()
+
+        # Expect that state correctness is incorrect
+        state_correctness = module.lcp.correct_map.get_property(answer_id, 'correctness')
+        module_correctness = module.correct_map[answer_id].get('correctness', None)
+        self.assertEqual(state_correctness, module_correctness)
+        self.assertEqual(state_correctness, 'incorrect')
+
+        # Save a choice
+        get_request_dict = {CapaFactory.input_key(): 'choice_3'}
+        result = module.save_problem(get_request_dict)
+
+        # Expect that the result is success
+        self.assertTrue('success' in result and result['success'])
+
+        # Expect that state correctness has been reset after saving problem
+        state_correctness = module.lcp.correct_map.get_property(answer_id, 'correctness')
+        module_correctness = module.correct_map[answer_id].get('correctness', None)
+        self.assertEqual(state_correctness, module_correctness)
+        self.assertEqual(state_correctness, None)
+
+        # For problems with hints and feedback, we need to reset msg property to default state
+        # Check that msg has been reset to default state
+        self.assertEqual(module.lcp.correct_map.get_property(answer_id, 'msg'), '')
+
 
 class ComplexEncoderTest(unittest.TestCase):
     def test_default(self):
