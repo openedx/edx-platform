@@ -1069,6 +1069,25 @@ class CreateTeamTest(TeamFormActions):
         )
         self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
 
+    def test_double_click_bug(self):
+        """
+        Scenario: The create team button should be resistant to double-clicks
+        Given I have the ability to create a team
+        When I click the button to submit my info and create a team
+        And I immediately click the submit button again before ajax handlers finish
+        Then I should still only create 1 instance of my team
+        """
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.browse_teams_page.visit()
+
+        self.verify_and_navigate_to_create_team_page()
+
+        self.fill_create_or_edit_form()
+        self.team_management_page.try_double_create()
+
+        self.teams_page.click_specific_topic("Example Topic")
+        self.teams_page.verify_topic_team_count(1)
+
     def test_user_can_create_new_team_successfully(self):
         """
         Scenario: The user should be able to create new team.
