@@ -89,8 +89,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                     }, true);
                     defaultNewChildName = childInfo.display_name;
                 }
+                /* globals course */
                 return {
-                    course: course,
                     xblockInfo: xblockInfo,
                     visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(xblockInfo.get('visibility_state')),
                     typeListClass: XBlockViewUtils.getXBlockListTypeClass(xblockType),
@@ -105,7 +105,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                     isCollapsed: isCollapsed,
                     includesChildren: this.shouldRenderChildren(),
                     hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
-                    staffOnlyMessage: this.model.get('staff_only_message')
+                    staffOnlyMessage: this.model.get('staff_only_message'),
+                    course: course
                 };
             },
 
