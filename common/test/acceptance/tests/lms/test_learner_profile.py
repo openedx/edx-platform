@@ -641,6 +641,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assert_default_image_has_public_access(profile_page)
         self.assertFalse(profile_page.remove_link_present)
 
+    @flaky  # TNL-3514
     def test_eventing_after_multiple_uploads(self):
         """
         Scenario: An event is fired when a user with a profile image uploads another image
