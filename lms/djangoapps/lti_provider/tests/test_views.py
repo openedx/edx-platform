@@ -149,7 +149,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         SignatureValidator.verify = MagicMock(return_value=False)
         request = build_launch_request()
         request.POST.update(LTI_OPTIONAL_PARAMS)
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             views.lti_launch(request, None, None)
         consumer = models.LtiConsumer.objects.get(
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
