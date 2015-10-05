@@ -63,7 +63,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "course_id": CourseLocator.from_string("Foo/Bar/Baz"),
                 "page": 2,
                 "page_size": 13,
-                "topic_id": [],
+                "topic_id": set(),
                 "text_search": "",
                 "following": None,
                 "view": "",
@@ -77,7 +77,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         form = self.get_form(expected_valid=True)
         self.assertEqual(
             form.cleaned_data["topic_id"],
-            ["example topic_id", "example 2nd topic_id"],
+            {"example topic_id", "example 2nd topic_id"},
         )
 
     def test_text_search(self):
