@@ -86,13 +86,12 @@ def should_show_debug_toolbar(_):
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
-PIPELINE_ENABLED = False
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
 ]
 
 # Disable JavaScript compression in development
