@@ -13,7 +13,7 @@ made here will affect the entire platform.
 That said, if you've decided you really need to monkey-patch the
 platform (and you've convinced enough people that this is best
 solution), kindly follow these guidelines:
-    - Reference django_utils_translation.py for a sample implementation.
+    - Reference django_18_upgrade.py for a sample implementation.
     - Name your module by replacing periods with underscores for the
       module to be patched:
         - patching 'django.utils.translation'

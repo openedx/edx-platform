@@ -8,7 +8,6 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
-from monkey_patch import django_utils_translation
 from monkey_patch import django_18_upgrade              # *** SUPER TEMPORARY!!
 import django
 
@@ -17,8 +16,6 @@ def run():
     """
     Executed during django startup
     """
-    django_utils_translation.patch()
-
     django.setup()
 
     autostartup()
