@@ -211,11 +211,6 @@ div.course-wrapper {
         border-left: 4px solid #FAB95C !important;
         margin: 0 auto;
       }
-    }
-
-    div.proctored-exam {
-      @extend .timed-exam;
-
       .btn {
         @extend %t-strong;
         transition: color $tmg-f3 ease-in-out 0s,border-color
@@ -358,6 +353,10 @@ div.course-wrapper {
             color: $gray-d1;
         }
       }
+    }
+
+    div.proctored-exam {
+      @extend .timed-exam;
 
       .proctored-exam-message {
         border-top: ($baseline/10) solid rgb(207, 216, 220);
