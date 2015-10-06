@@ -274,11 +274,7 @@ def create_credit_request(course_key, provider_id, username):
         "user_username": user.username,
         "user_email": user.email,
         "user_full_name": user.profile.name,
-        "user_mailing_address": (
-            user.profile.mailing_address
-            if user.profile.mailing_address is not None
-            else ""
-        ),
+        "user_mailing_address": "",
         "user_country": (
             user.profile.country.code
             if user.profile.country.code is not None

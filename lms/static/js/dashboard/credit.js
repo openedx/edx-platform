@@ -36,6 +36,8 @@ var edx = edx || {};
                 username = $target.data("user"),
                 providerId = $target.data("provider");
 
+            event.preventDefault();
+
             edx.commerce.credit.createCreditRequest(providerId, courseKey, username).fail(function () {
                 $(".credit-action").hide();
                 $errorContainer.toggleClass("is-hidden");
