@@ -436,8 +436,8 @@ if settings.COURSEWARE_ENABLED:
     if settings.FEATURES["ENABLE_TEAMS"]:
         # Teams endpoints
         urlpatterns += (
-            url(r'^api/team/', include('teams.api_urls')),
-            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
+            url(r'^api/team/', include('lms.djangoapps.teams.api_urls')),
+            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('lms.djangoapps.teams.urls'), name="teams_endpoints"),
         )
 
     if settings.FEATURES.get('ENABLE_RENDER_XBLOCK_API'):

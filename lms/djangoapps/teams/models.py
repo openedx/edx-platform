@@ -27,7 +27,7 @@ from xmodule_django.models import CourseKeyField
 from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException
-from teams import TEAM_DISCUSSION_CONTEXT
+from . import TEAM_DISCUSSION_CONTEXT
 
 
 @receiver(thread_voted)
