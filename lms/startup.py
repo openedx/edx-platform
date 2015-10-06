@@ -52,8 +52,8 @@ def run():
         from openedx.core.djangoapps.credit.services import CreditService
         set_runtime_service('credit', CreditService())
 
-    # register InstructorService (for deleting student attempts and user staff access roles)
-    set_runtime_service('instructor', InstructorService())
+        # register InstructorService (for deleting student attempts and user staff access roles)
+        set_runtime_service('instructor', InstructorService())
 
 
 def add_mimetypes():
