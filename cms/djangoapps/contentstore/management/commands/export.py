@@ -18,23 +18,24 @@ class Command(BaseCommand):
     """
     help = 'Export the specified data directory into the default ModuleStore'
 
-    def handle(self, *args, **options):
-        "Execute the command"
-        if len(args) != 2:
-            raise CommandError("export requires two arguments: <course id> <output path>")
+    def add_arguments(self, parser):
+        parser.add_argument('course_id')
+        parser.add_argument('output_path')
 
+    def handle(self, *args, **options):
+        """Execute the command"""
         try:
-            course_key = CourseKey.from_string(args[0])
+            course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
             try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+                course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course_id'])
             except InvalidKeyError:
-                raise CommandError("Invalid course_key: '%s'. " % args[0])
+                raise CommandError("Invalid course_key: '%s'." % options['course_id'])
 
         if not modulestore().get_course(course_key):
-            raise CommandError("Course with %s key not found." % args[0])
+            raise CommandError("Course with %s key not found." % options['course_id'])
 
-        output_path = args[1]
+        output_path = options['output_path']
 
         print "Exporting course id = {0} to {1}".format(course_key, output_path)
 

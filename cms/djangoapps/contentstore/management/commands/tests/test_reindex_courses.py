@@ -50,22 +50,22 @@ class TestReindexCourse(ModuleStoreTestCase):
         with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments.*"):
             call_command('reindex_course')
 
-    @ddt.data('qwerty', 'invalid_key', 'xblock-v1:qwe+rty')
+    @ddt.data('qwerty', 'invalid_key', 'xblockv1:qwerty')
     def test_given_invalid_course_key_raises_not_found(self, invalid_key):
         """ Test that raises InvalidKeyError for invalid keys """
-        errstring = "Invalid course_key: '%s'." % invalid_key
-        with self.assertRaisesRegexp(CommandError, errstring):
+        err_string = "Invalid course_key: '{0}'".format(invalid_key)
+        with self.assertRaisesRegexp(CommandError, err_string):
             call_command('reindex_course', invalid_key)
 
     def test_given_library_key_raises_command_error(self):
         """ Test that raises CommandError if library key is passed """
-        with self.assertRaisesRegexp(SearchIndexingError, ".* is not a course key"):
+        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
             call_command('reindex_course', unicode(self._get_lib_key(self.first_lib)))
 
-        with self.assertRaisesRegexp(SearchIndexingError, ".* is not a course key"):
+        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
             call_command('reindex_course', unicode(self._get_lib_key(self.second_lib)))
 
-        with self.assertRaisesRegexp(SearchIndexingError, ".* is not a course key"):
+        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
             call_command(
                 'reindex_course',
                 unicode(self.second_course.id),

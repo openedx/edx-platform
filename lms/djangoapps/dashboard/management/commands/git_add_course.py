@@ -29,29 +29,26 @@ class Command(BaseCommand):
             '\n{0}'.format(_('Import the specified git repository and optional branch into the '
                              'modulestore and optionally specified directory.')))
 
+    def add_arguments(self, parser):
+        # Positional arguments
+        parser.add_argument('repository_url')
+        parser.add_argument('--directory_path', action='store')
+        parser.add_argument('--repository_branch', action='store')
+
     def handle(self, *args, **options):
         """Check inputs and run the command"""
 
         if isinstance(modulestore, XMLModuleStore):
             raise CommandError('This script requires a mongo module store')
 
-        if len(args) < 1:
-            raise CommandError('This script requires at least one argument, '
-                               'the git URL')
-
-        if len(args) > 3:
-            raise CommandError('Expected no more than three '
-                               'arguments; received {0}'.format(len(args)))
-
         rdir_arg = None
         branch = None
-
-        if len(args) > 1:
-            rdir_arg = args[1]
-        if len(args) > 2:
-            branch = args[2]
+        if options['directory_path']:
+            rdir_arg = options['directory_path']
+        if options['repository_branch']:
+            branch = options['repository_branch']
 
         try:
-            dashboard.git_import.add_repo(args[0], rdir_arg, branch)
+            dashboard.git_import.add_repo(options['repository_url'], rdir_arg, branch)
         except GitImportError as ex:
             raise CommandError(str(ex))

@@ -57,24 +57,18 @@ class TestGitExport(CourseTestCase):
         test output.
         """
         with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
-            call_command('git_export', 'blah', 'blah', 'blah',
-                            stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
+            call_command('git_export', 'blah', 'blah', 'blah', stderr=StringIO.StringIO())
 
         with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
             call_command('git_export', stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
 
         # Send bad url to get course not exported
         with self.assertRaisesRegexp(CommandError, unicode(GitExportError.URL_BAD)):
-            call_command('git_export', 'foo/bar/baz', 'silly',
-                            stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
+            call_command('git_export', 'foo/bar/baz', 'silly', stderr=StringIO.StringIO())
+
         # Send bad course_id to get course not exported
         with self.assertRaisesRegexp(CommandError, unicode(GitExportError.BAD_COURSE)):
-            call_command('git_export', 'foo/bar:baz', 'silly',
-                            stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
+            call_command('git_export', 'foo/bar:baz', 'silly', stderr=StringIO.StringIO())
 
     def test_error_output(self):
         """
