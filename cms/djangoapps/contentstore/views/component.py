@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 
-import json
 import logging
 
 from django.http import HttpResponseBadRequest, Http404
@@ -153,7 +152,7 @@ def container_handler(request, usage_key_string):
                 'section': section,
                 'new_unit_category': 'vertical',
                 'ancestor_xblocks': ancestor_xblocks,
-                'component_templates': json.dumps(component_templates),
+                'component_templates': component_templates,
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,

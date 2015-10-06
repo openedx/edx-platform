@@ -410,7 +410,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getContext: function () {
             return {
-                graderTypes: JSON.parse(this.model.get('course_graders'))
+                graderTypes: this.model.get('course_graders')
             };
         }
     });

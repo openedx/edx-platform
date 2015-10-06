@@ -376,7 +376,7 @@ def certificates_list_handler(request, course_key_string):
                 'certificate_url': certificate_url,
                 'course_outline_url': course_outline_url,
                 'upload_asset_url': upload_asset_url,
-                'certificates': json.dumps(certificates),
+                'certificates': certificates,
                 'course_modes': course_modes,
                 'certificate_web_view_url': certificate_web_view_url,
                 'is_active': is_active,

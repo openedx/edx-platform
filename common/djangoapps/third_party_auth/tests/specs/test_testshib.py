@@ -9,11 +9,10 @@ from mock import patch
 
 from django.core.urlresolvers import reverse
 
-from openedx.core.lib.json_utils import EscapedEdxJSONEncoder
-
 from student.tests.factories import UserFactory
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
+from openedx.core.lib.js_utils import escape_json_dumps
 
 
 TESTSHIB_ENTITY_ID = 'https://idp.testshib.org/idp/shibboleth'
@@ -190,7 +189,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         response = self.client.get(self.login_page_url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("TestShib", response.content)
-        self.assertIn(json.dumps(TPA_TESTSHIB_LOGIN_URL, cls=EscapedEdxJSONEncoder), response.content)
+        self.assertIn(escape_json_dumps(TPA_TESTSHIB_LOGIN_URL), response.content)
         return response
 
     def _check_register_page(self):
@@ -198,7 +197,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         response = self.client.get(self.register_page_url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("TestShib", response.content)
-        self.assertIn(json.dumps(TPA_TESTSHIB_REGISTER_URL, cls=EscapedEdxJSONEncoder), response.content)
+        self.assertIn(escape_json_dumps(TPA_TESTSHIB_REGISTER_URL), response.content)
         return response
 
     def _configure_testshib_provider(self, **kwargs):
