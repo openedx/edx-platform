@@ -10,7 +10,7 @@
     <span id="turn_in_exam_id" class="pull-right">
         <span id="turn_in_exam_id">
             <% if(attempt_status !== 'ready_to_submit') {%>
-                <button class="exam-button-turn-in-exam">
+                <button class="exam-button-turn-in-exam btn btn-primary">
                     <%- gettext("End My Exam") %>
                 </button>
             <% } %>
