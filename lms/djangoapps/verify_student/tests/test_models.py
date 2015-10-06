@@ -484,9 +484,9 @@ class TestPhotoVerification(ModuleStoreTestCase):
         self.assertIs(result, None)
 
         # Make an initial verification with 'photo_id_key'
-        attempt = SoftwareSecurePhotoVerification(user=user, photo_id_key="dummy_photo_id_key")
-        attempt.status = 'approved'
-        attempt.save()
+        first_attempt = SoftwareSecurePhotoVerification(user=user, photo_id_key="dummy_photo_id_key")
+        first_attempt.status = 'approved'
+        first_attempt.save()
 
         # Check that method 'get_initial_verification' returns the correct
         # initial verification attempt
@@ -494,15 +494,22 @@ class TestPhotoVerification(ModuleStoreTestCase):
         self.assertIsNotNone(first_result)
 
         # Now create a second verification without 'photo_id_key'
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.status = 'submitted'
-        attempt.save()
+        second_attempt = SoftwareSecurePhotoVerification(user=user)
+        second_attempt.mark_ready()
+        # Parameter 'copy_id_photo_from' is used for reverification, in which
+        # new face photos are sent with previously-submitted ID photos
+        second_attempt.submit(copy_id_photo_from=first_result)
 
         # Test method 'get_initial_verification' still returns the correct
         # initial verification attempt which have 'photo_id_key' set
         second_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
         self.assertIsNotNone(second_result)
         self.assertEqual(second_result, first_result)
+
+        # Also verify that second photo verification has set self referencing field
+        # 'copy_id_photo_from' with initial verification
+        self.assertIsNotNone(second_attempt.copy_id_photo_from)
+        self.assertEqual(second_attempt.copy_id_photo_from, first_attempt)
 
 
 @ddt.ddt

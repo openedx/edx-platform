@@ -663,10 +663,12 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     @status_before_must_be("must_retry", "ready", "submitted")
     def submit(self, copy_id_photo_from=None):
-        """
-        Submit our verification attempt to Software Secure for validation. This
-        will set our status to "submitted" if the post is successful, and
+        """Submit our verification attempt to Software Secure for validation.
+
+        This will set our status to "submitted" if the post is successful, and
         "must_retry" if the post fails.
+        This will also set the self referencing field 'copy_id_photo_from' on
+        the software secure photo validation object.
 
         Keyword Arguments:
             copy_id_photo_from (SoftwareSecurePhotoVerification): If provided, re-send the ID photo
@@ -674,6 +676,12 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 are sent with previously-submitted ID photos.
 
         """
+        if copy_id_photo_from:
+            # Update the field 'copy_id_photo_from' with provided software
+            # secure photo verification object
+            self.copy_id_photo_from = copy_id_photo_from
+            self.save()
+
         try:
             response = self.send_request(copy_id_photo_from=copy_id_photo_from)
             if response.ok:
