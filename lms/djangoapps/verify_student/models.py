@@ -588,16 +588,23 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     photo_id_key = models.TextField(max_length=1024)
 
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
+    copy_id_photo_from = models.ForeignKey("self", null=True, blank=True)
 
     @classmethod
     def get_initial_verification(cls, user):
-        """Get initial verification for a user
+        """Get initial verification for a user with the 'photo_id_key'.
+
         Arguments:
             user(User): user object
+
         Return:
             SoftwareSecurePhotoVerification (object)
         """
-        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"])
+        init_verification = cls.objects.filter(
+            user=user,
+            status__in=["submitted", "approved"]
+        ).exclude(photo_id_key='')
+
         return init_verification.latest('created_at') if init_verification.exists() else None
 
     @status_before_must_be("created")
@@ -656,10 +663,12 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     @status_before_must_be("must_retry", "ready", "submitted")
     def submit(self, copy_id_photo_from=None):
-        """
-        Submit our verification attempt to Software Secure for validation. This
-        will set our status to "submitted" if the post is successful, and
+        """Submit our verification attempt to Software Secure for validation.
+
+        This will set our status to "submitted" if the post is successful, and
         "must_retry" if the post fails.
+        This will also set the self referencing field 'copy_id_photo_from' on
+        the software secure photo validation object.
 
         Keyword Arguments:
             copy_id_photo_from (SoftwareSecurePhotoVerification): If provided, re-send the ID photo
@@ -667,6 +676,12 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 are sent with previously-submitted ID photos.
 
         """
+        if copy_id_photo_from:
+            # Update the field 'copy_id_photo_from' with provided software
+            # secure photo verification object
+            self.copy_id_photo_from = copy_id_photo_from
+            self.save()
+
         try:
             response = self.send_request(copy_id_photo_from=copy_id_photo_from)
             if response.ok:

@@ -472,6 +472,45 @@ class TestPhotoVerification(ModuleStoreTestCase):
             status = SoftwareSecurePhotoVerification.verification_status_for_user(user, course.id, enrollment_mode)
             self.assertEqual(status, output)
 
+    def test_initial_verification_for_user(self):
+        """Test that method 'get_initial_verification' of model
+        'SoftwareSecurePhotoVerification' always returns the initial
+        verification with field 'photo_id_key' set against a user.
+        """
+        user = UserFactory.create()
+
+        # No initial verification for the user
+        result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
+        self.assertIs(result, None)
+
+        # Make an initial verification with 'photo_id_key'
+        first_attempt = SoftwareSecurePhotoVerification(user=user, photo_id_key="dummy_photo_id_key")
+        first_attempt.status = 'approved'
+        first_attempt.save()
+
+        # Check that method 'get_initial_verification' returns the correct
+        # initial verification attempt
+        first_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
+        self.assertIsNotNone(first_result)
+
+        # Now create a second verification without 'photo_id_key'
+        second_attempt = SoftwareSecurePhotoVerification(user=user)
+        second_attempt.mark_ready()
+        # Parameter 'copy_id_photo_from' is used for reverification, in which
+        # new face photos are sent with previously-submitted ID photos
+        second_attempt.submit(copy_id_photo_from=first_result)
+
+        # Test method 'get_initial_verification' still returns the correct
+        # initial verification attempt which have 'photo_id_key' set
+        second_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
+        self.assertIsNotNone(second_result)
+        self.assertEqual(second_result, first_result)
+
+        # Also verify that second photo verification has set self referencing field
+        # 'copy_id_photo_from' with initial verification
+        self.assertIsNotNone(second_attempt.copy_id_photo_from)
+        self.assertEqual(second_attempt.copy_id_photo_from, first_attempt)
+
 
 @ddt.ddt
 class VerificationCheckpointTest(ModuleStoreTestCase):

@@ -1420,11 +1420,15 @@ class TestSubmitPhotosForVerification(TestCase):
             "Photo ID image is required if the user does not have an initial verification attempt."
         )
 
-        # Create the initial verification attempt
+        # Create the initial verification attempt with some dummy
+        # value set for field 'photo_id_key'
         self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA,
         )
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        attempt.photo_id_key = "dummy_photo_id_key"
+        attempt.save()
 
         # Now the request should succeed
         self._submit_photos(face_image=self.IMAGE_DATA)
@@ -2037,7 +2041,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         """
         Helper method for initial verification.
         """
-        attempt = SoftwareSecurePhotoVerification(user=self.user)
+        attempt = SoftwareSecurePhotoVerification(user=self.user, photo_id_key="dummy_photo_id_key")
         attempt.mark_ready()
         attempt.save()
         attempt.submit()
