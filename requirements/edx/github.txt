@@ -73,9 +73,8 @@ git+https://github.com/edx/edx-proctoring.git@0.6.2#egg=edx-proctoring==0.6.2
 
 # Third Party XBlocks
 -e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
+-e git+https://github.com/Stanford-Online/edx-sga@0fb3a0e8887c6856f13c1c388661dcc255710b1d#egg=edx-sga
+-e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll
 
 # OLI XBlocks
 -e git+https://github.com/openlearninginitiative/xblock-image-coding.git@cee23e3d59943066159ca13839c82a12d9ccf749#egg=xblock_image_coding
-
--e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
--e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll
