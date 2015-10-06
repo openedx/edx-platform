@@ -27,13 +27,13 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action input:button, div.action [data-type="button"]').click @refreshAnswers
-    @checkButton = @$('div.action .check-answer')
+    @checkButton = @$('div.action .check-answer, div.action .check')
     @checkButtonCheckText = @checkButton.val()
     @checkButtonCheckingText = @checkButton.data('checking')
     @checkButton.click @check_fd
-    @$('div.action .reset-answer').click @reset
-    @$('div.action .show-answer').click @show
-    @$('div.action .save-answer').click @save
+    @$('div.action .reset-answer, div.action .reset').click @reset
+    @$('div.action .show-answer, div.action .show').click @show
+    @$('div.action .save-answer, div.action .save').click @save
 
     @bindResetCorrectness()
 
