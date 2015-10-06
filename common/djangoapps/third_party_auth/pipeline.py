@@ -568,7 +568,6 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     Ensure that we have the necessary information about a user (either an
     existing account or registration data) to proceed with the pipeline.
     """
-
     # We're deliberately verbose here to make it clear what the intended
     # dispatch behavior is for the various pipeline entry points, given the
     # current state of the pipeline. Keep in mind the pipeline is re-entrant
