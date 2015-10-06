@@ -252,7 +252,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'This is a certificate signatory title that has waaaaaaay more than 106 characters, in order to cause an exception.'
+                    inputSignatoryTitle: 'Signatory Title \non three \nlines'
                 });
 
                 setValuesToInputs(this.view, {

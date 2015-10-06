@@ -33,11 +33,6 @@ function(_, str, Backbone, BackboneRelational, gettext) {
 
         validate: function(attrs) {
             var errors = null;
-            if(_.has(attrs, 'name') && attrs.name.length > 40) {
-                errors = _.extend({
-                    'name': gettext('Signatory name should not be more than 40 characters long.')
-                }, errors);
-            }
             if(_.has(attrs, 'title')){
                 var title = attrs.title;
                 var lines = title.split(/\r\n|\r|\n/);
@@ -46,13 +41,6 @@ function(_, str, Backbone, BackboneRelational, gettext) {
                         'title': gettext('Signatory title should span over maximum of 2 lines.')
                     }, errors);
                 }
-                else if ((lines.length > 1 && (lines[0].length > 53 && lines[1].length > 53)) ||
-                    (lines.length === 1 && title.length > 106)) {
-                    errors = _.extend({
-                        'title': gettext('Signatory title should have maximum of 40 characters per line.')
-                    }, errors);
-                }
-
             }
             if (errors !== null){
                 return errors;
