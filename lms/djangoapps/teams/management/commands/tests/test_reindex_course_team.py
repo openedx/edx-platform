@@ -6,8 +6,8 @@ from mock import patch
 from django.core.management import call_command, CommandError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from opaque_keys.edx.keys import CourseKey
-from teams.tests.factories import CourseTeamFactory
-from teams.search_indexes import CourseTeamIndexer
+from ....tests.factories import CourseTeamFactory
+from ....search_indexes import CourseTeamIndexer
 from search.search_engine_base import SearchEngine
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')

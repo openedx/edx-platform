@@ -38,8 +38,8 @@ from track import contexts
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
-from teams import is_feature_enabled
 from util.model_utils import truncate_fields
+from . import is_feature_enabled
 from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
