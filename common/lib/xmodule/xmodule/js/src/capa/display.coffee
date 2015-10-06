@@ -309,7 +309,7 @@ class @Problem
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
-          @$('div.action .check').focus()
+          @$('div.action .check, div.action .check-answer').focus()
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
