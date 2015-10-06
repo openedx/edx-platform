@@ -289,6 +289,12 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
         'url': '/misc/my-custom-registration-form',
         'error_url': '/misc/my-custom-sso-error-page'
     },
+    'custom2': {
+        'secret_key': 'opensesame',
+        'url': '/misc/my-custom-registration-form',
+        'error_url': '/misc/my-custom-sso-error-page',
+        'link_by_email': True
+    },
 }
 
 ################################## OPENID #####################################

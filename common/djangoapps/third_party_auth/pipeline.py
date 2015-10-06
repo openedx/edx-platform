@@ -514,7 +514,6 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     Ensure that we have the necessary information about a user (either an
     existing account or registration data) to proceed with the pipeline.
     """
-
     # We're deliberately verbose here to make it clear what the intended
     # dispatch behavior is for the various pipeline entry points, given the
     # current state of the pipeline. Keep in mind the pipeline is re-entrant
@@ -706,7 +705,9 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, *args, *
 
     This association is done ONLY if the user entered the pipeline through a LOGIN API.
     """
-    if auth_entry == AUTH_ENTRY_LOGIN_API:
+    custom_auth_entry = AUTH_ENTRY_CUSTOM.get(auth_entry)
+
+    if auth_entry == AUTH_ENTRY_LOGIN_API or (custom_auth_entry and custom_auth_entry.get('link_by_email')):
         association_response = associate_by_email(backend, details, user, *args, **kwargs)
         if (
             association_response and
