@@ -974,15 +974,14 @@ ADVANCED_COMPONENT_TYPES = [
     'pb-dashboard',
     'poll',
     'survey',
-    # XBlocks from pmitros repos are prototypes. They should not be used
-    # except for edX Learning Sciences experiments on edge.edx.org without
-    # further work to make them robust, maintainable, finalize data formats,
-    # etc.
+    # Some of the XBlocks from pmitros repos are sometimes prototypes.
+    # Use with caution.
     'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
     'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
     'profile',  # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
+    'rate',  # Allows up-down voting of course content. See https://github.com/pmitros/RateXBlock
 
     'split_test',
     'combinedopenended',
