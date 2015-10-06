@@ -421,6 +421,7 @@ class CourseFields(object):
     )
     has_children = True
     checklists = List(
+        help=_("Checklist to Follow When Developing a Course"),
         scope=Scope.settings,
         default=[
             {
