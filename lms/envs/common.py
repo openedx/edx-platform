@@ -481,6 +481,7 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
+# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATES = {}
@@ -490,65 +491,61 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
 
 # Django templating
-TEMPLATE_DIRS = [
-    PROJECT_ROOT / "templates",
-    COMMON_ROOT / 'templates',
-    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
-    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-    COMMON_ROOT / 'static',  # required to statically include common Underscore templates
-]
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',
-
-    # Added for django-wiki
-    'django.core.context_processors.media',
-    'django.core.context_processors.tz',
-    'django.contrib.messages.context_processors.messages',
-    'sekizai.context_processors.sekizai',
-
-    # Hack to get required link URLs to password reset templates
-    'edxmako.shortcuts.marketing_link_context_processor',
-
-    # Allows the open edX footer to be leveraged in Django Templates.
-    'edxmako.shortcuts.open_source_footer_context_processor',
-
-    # Shoppingcart processor (detects if request.user has a cart)
-    'shoppingcart.context_processor.user_has_cart_context_processor',
-
-    # Allows the open edX footer to be leveraged in Django Templates.
-    'edxmako.shortcuts.microsite_footer_context_processor',
-)
-
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'edxmako.makoloader.MakoFilesystemLoader',
-    'edxmako.makoloader.MakoAppDirectoriesLoader',
-
-    # 'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-
-)
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': TEMPLATE_DIRS,
+        'DIRS': [
+            PROJECT_ROOT / "templates",
+            COMMON_ROOT / 'templates',
+            COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+            COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+            COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+        ],
         # Options specific to this backend.
         'OPTIONS': {
-            'loaders': TEMPLATE_LOADERS,
-            'context_processors': TEMPLATE_CONTEXT_PROCESSORS
+            'loaders': [
+                'edxmako.makoloader.MakoFilesystemLoader',
+                'edxmako.makoloader.MakoAppDirectoriesLoader',
+
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+
+            ],
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
+                'django.contrib.auth.context_processors.auth',  # this is required for admin
+                'django.template.context_processors.csrf',
+
+                # Added for django-wiki
+                'django.template.context_processors.media',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+                'sekizai.context_processors.sekizai',
+
+                # Hack to get required link URLs to password reset templates
+                'edxmako.shortcuts.marketing_link_context_processor',
+
+                # Allows the open edX footer to be leveraged in Django Templates.
+                'edxmako.shortcuts.open_source_footer_context_processor',
+
+                # Shoppingcart processor (detects if request.user has a cart)
+                'shoppingcart.context_processor.user_has_cart_context_processor',
+
+                # Allows the open edX footer to be leveraged in Django Templates.
+                'edxmako.shortcuts.microsite_footer_context_processor',
+            ],
+            # Change 'debug' in your environment settings files - not here.
+            'debug': False
         }
     }
 ]
+DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
 ###############################################################################################
 
@@ -802,9 +799,8 @@ CODE_JAIL = {
 COURSES_WITH_UNSAFE_CODE = []
 
 ############################### DJANGO BUILT-INS ###############################
-# Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
+# Change DEBUG in your environment settings files, not here
 DEBUG = False
-TEMPLATE_DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
