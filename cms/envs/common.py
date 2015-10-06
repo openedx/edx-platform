@@ -212,8 +212,8 @@ sys.path.append(COMMON_ROOT / 'djangoapps')
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
-############################# WEB CONFIGURATION #############################
-# This is where we stick our compiled template files.
+############################# TEMPLATE CONFIGURATION #############################
+# Mako templating
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
 MAKO_TEMPLATES = {}
@@ -228,13 +228,8 @@ MAKO_TEMPLATES['main'] = [
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
     MAKO_TEMPLATES['lms.' + namespace] = template_dirs
 
+# Django templating
 TEMPLATE_DIRS = MAKO_TEMPLATES['main']
-
-EDX_ROOT_URL = ''
-
-LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
-LOGIN_URL = EDX_ROOT_URL + '/signin'
-
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
@@ -246,6 +241,34 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'dealer.contrib.django.staff.context_processor',  # access git revision
     'contentstore.context_processors.doc_url',
 )
+
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Don't look for template source files inside installed applications.
+        'APP_DIRS': False,
+        # Instead, look for template source files in these dirs.
+        'DIRS': TEMPLATE_DIRS,
+        # Options specific to this backend.
+        'OPTIONS': {
+            'loaders': TEMPLATE_LOADERS,
+            'context_processors': TEMPLATE_CONTEXT_PROCESSORS
+        }
+    }
+]
+
+##############################################################################
+
+EDX_ROOT_URL = ''
+
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
+LOGIN_URL = EDX_ROOT_URL + '/signin'
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = (
@@ -280,12 +303,6 @@ XQUEUE_INTERFACE = {
 simplefilter('ignore')
 
 ################################# Middleware ###################################
-
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
