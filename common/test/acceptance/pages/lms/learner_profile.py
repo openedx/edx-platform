@@ -175,7 +175,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_field('image')
         default_links = self.q(css='.image-frame').attrs('src')
-        return 'default-profile' in default_links[0] if default_links else False
+        return 'profiles/default' in default_links[0] if default_links else False
 
     def mouse_hover(self, element):
         """
