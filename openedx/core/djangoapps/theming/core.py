@@ -29,20 +29,25 @@ def comprehensive_theme_changes(theme_dir):
         'mako_paths': [],
     }
 
-    templates_dir = theme_dir / "lms" / "templates"
+    if settings.PROJECT_ROOT.endswith("cms"):
+        theme_subdir = theme_dir / "studio"
+    else:
+        theme_subdir = theme_dir / "lms"
+
+    templates_dir = theme_subdir / "templates"
     if templates_dir.isdir():
         changes['settings']['TEMPLATE_DIRS'] = [templates_dir] + settings.TEMPLATE_DIRS
         changes['mako_paths'].append(templates_dir)
 
-    staticfiles_dir = theme_dir / "lms" / "static"
+    staticfiles_dir = theme_subdir / "static"
     if staticfiles_dir.isdir():
         changes['settings']['STATICFILES_DIRS'] = [staticfiles_dir] + settings.STATICFILES_DIRS
 
-    locale_dir = theme_dir / "lms" / "conf" / "locale"
+    locale_dir = theme_subdir / "conf" / "locale"
     if locale_dir.isdir():
         changes['settings']['LOCALE_PATHS'] = [locale_dir] + settings.LOCALE_PATHS
 
-    favicon = theme_dir / "lms" / "static" / "images" / "favicon.ico"
+    favicon = theme_subdir / "static" / "images" / "favicon.ico"
     if favicon.isfile():
         changes['settings']['FAVICON_PATH'] = str(favicon)
 
