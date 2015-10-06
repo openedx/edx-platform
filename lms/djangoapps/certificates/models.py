@@ -647,6 +647,7 @@ class BadgeImageConfiguration(models.Model):
         validators=[validate_badge_image]
     )
     default = models.BooleanField(
+        default=False,
         help_text=_(
             u"Set this value to True if you want this image to be the default image for any course modes "
             u"that do not have a specified badge image. You can have only one default image."
