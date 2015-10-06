@@ -853,7 +853,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "due_date": get_default_time_display(xblock.due),
         "due": xblock.fields['due'].to_json(xblock.due),
         "format": xblock.format,
-        "course_graders": json.dumps([grader.get('type') for grader in graders]),
+        "course_graders": [grader.get('type') for grader in graders],
         "has_changes": has_changes,
         "actions": xblock_actions,
         "explanatory_message": explanatory_message,
