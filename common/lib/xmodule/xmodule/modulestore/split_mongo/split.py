@@ -865,17 +865,18 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         # collect ids and then query for those
         version_guids = []
-        id_version_map = {}
+        id_version_map = defaultdict(list)
         for course_index in matching_indexes:
             version_guid = course_index['versions'][branch]
             version_guids.append(version_guid)
-            id_version_map[version_guid] = course_index
+            id_version_map[version_guid].append(course_index)
 
         if not version_guids:
             return
 
         for entry in self.find_structures_by_id(version_guids):
-            yield entry, id_version_map[entry['_id']]
+            for course_index in id_version_map[entry['_id']]:
+                yield entry, course_index
 
     def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
 
