@@ -62,8 +62,6 @@ from xmodule.mixin import LicenseMixin
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
 FEATURES = {
-    'USE_DJANGO_PIPELINE': True,
-
     'GITHUB_PUSH': False,
 
     # for consistency in user-experience, keep the value of the following 3 settings

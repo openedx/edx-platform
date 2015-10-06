@@ -22,7 +22,7 @@ except:
         group = rtl_group
   %>
 
-  % if settings.FEATURES['USE_DJANGO_PIPELINE']:
+  % if settings.PIPELINE_ENABLED:
     ${compressed_css(group, raw=raw)}
   % else:
     % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
@@ -32,7 +32,7 @@ except:
 </%def>
 
 <%def name='js(group)'>
-  % if settings.FEATURES['USE_DJANGO_PIPELINE']:
+  % if settings.PIPELINE_ENABLED:
     ${compressed_js(group)}
   % else:
     % for filename in settings.PIPELINE_JS[group]['source_filenames']:
