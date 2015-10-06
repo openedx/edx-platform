@@ -1,13 +1,12 @@
 """Tests of comprehensive theming."""
 
-import unittest
 from django.conf import settings
 from django.test import TestCase
 
 from path import path           # pylint: disable=no-name-in-module
 from django.contrib import staticfiles
 
-from openedx.core.djangoapps.theming.test_util import with_comp_theme
+from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 
@@ -20,8 +19,7 @@ class TestComprehensiveTheming(TestCase):
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
 
-    @with_comp_theme(settings.REPO_ROOT / 'themes/red-theme')
-    @unittest.skip("Disabled until we can release theming to production")
+    @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
     def test_red_footer(self):
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
@@ -42,7 +40,7 @@ class TestComprehensiveTheming(TestCase):
         with open(template_dir / "footer.html", "w") as footer:
             footer.write("<footer>TEMPORARY THEME</footer>")
 
-        @with_comp_theme(tmp_theme)
+        @with_comprehensive_theme(tmp_theme)
         def do_the_test(self):
             """A function to do the work so we can use the decorator."""
             resp = self.client.get('/')
@@ -56,7 +54,7 @@ class TestComprehensiveTheming(TestCase):
         before_finders = list(settings.STATICFILES_FINDERS)
         before_dirs = list(settings.STATICFILES_DIRS)
 
-        @with_comp_theme(settings.REPO_ROOT / 'themes/red-theme')
+        @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
         def do_the_test(self):
             """A function to do the work so we can use the decorator."""
             self.assertEqual(list(settings.STATICFILES_FINDERS), before_finders)
@@ -65,12 +63,11 @@ class TestComprehensiveTheming(TestCase):
 
         do_the_test(self)
 
-    @unittest.skip("Disabled until we can release theming to production")
     def test_default_logo_image(self):
         result = staticfiles.finders.find('images/logo.png')
         self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/logo.png')
 
-    @with_comp_theme(settings.REPO_ROOT / 'themes/red-theme')
+    @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
     def test_overridden_logo_image(self):
         result = staticfiles.finders.find('images/logo.png')
         self.assertEqual(result, settings.REPO_ROOT / 'themes/red-theme/lms/static/images/logo.png')

@@ -10,18 +10,6 @@ from edxmako.shortcuts import marketing_link
 
 <%inherit file="../main.html" />
 <%block name="headextra">
-
-  <%
-    if self.theme_enabled():
-      google_analytics_file = u'../{ga}'.format(
-        ga=microsite.get_value('google_analytics_file', 'theme-google-analytics.html')
-      )
-    else:
-      google_analytics_file = '../google_analytics.html'
-  %>
-
-  <%include file="${google_analytics_file}" />
-
   ## OG (Open Graph) title and description added below to give social media info to display
   ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
   <meta property="og:title" content="${get_course_about_section(request, course, 'title')}" />

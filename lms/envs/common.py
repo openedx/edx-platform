@@ -426,7 +426,7 @@ COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
 # comprehensive theming system
-COMP_THEME_DIR = ""
+COMPREHENSIVE_THEME_DIR = ""
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -1087,7 +1087,7 @@ FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/edx-openedx-log
 
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
-FOOTER_ORGANIZATION_IMAGE = "images/default-theme/logo.png"
+FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
 
 # These are referred to both by the Django asset pipeline
 # AND by the branding footer API, which needs to decide which
@@ -1197,12 +1197,12 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 PIPELINE_ENABLED = True
 
-# Process static files using RequireJS Optimizer
-STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -2550,7 +2550,7 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 PDF_RECEIPT_LOGO_PATH = PROJECT_ROOT + '/static/images/openedx-logo-tag.png'
 # Height of the Logo in mm
 PDF_RECEIPT_LOGO_HEIGHT_MM = 12
-PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/logo.png'
+PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/logo.png'
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
@@ -2647,7 +2647,7 @@ PROFILE_IMAGE_BACKEND = {
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
-PROFILE_IMAGE_DEFAULT_FILENAME = 'images/default-theme/default-profile'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 # This secret key is used in generating unguessable URLs to users'
 # profile images.  Once it has been set, changing it will make the
