@@ -40,8 +40,8 @@ from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
 from teams import is_feature_enabled
 from util.model_utils import truncate_fields
-from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from lms.djangoapps.teams.serializers import (
+from .models import CourseTeam, CourseTeamMembership
+from .serializers import (
     CourseTeamSerializer,
     CourseTeamCreationSerializer,
     TopicSerializer,
@@ -49,8 +49,8 @@ from lms.djangoapps.teams.serializers import (
     MembershipSerializer,
     add_team_count
 )
-from lms.djangoapps.teams.search_indexes import CourseTeamIndexer
-from lms.djangoapps.teams.errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
+from .search_indexes import CourseTeamIndexer
+from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
