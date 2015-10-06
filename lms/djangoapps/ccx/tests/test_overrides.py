@@ -100,7 +100,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
 
     def test_override_num_queries_update_existing_field(self):
@@ -121,7 +121,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(2): # 2 savepoints
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
 
     def test_overriden_field_access_produces_no_extra_queries(self):
@@ -130,7 +130,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
 
     def test_override_is_inherited(self):
