@@ -81,4 +81,4 @@ def get_logo_url():
     elif university:
         return staticfiles_storage.url('images/{uni}-on-edx-logo.png'.format(uni=university))
     else:
-        return staticfiles_storage.url('images/default-theme/logo.png')
+        return staticfiles_storage.url('images/logo.png')
