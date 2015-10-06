@@ -111,7 +111,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         new_ccx_start = datetime.datetime(2015, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             override_field_for_ccx(self.ccx, chapter, 'start', new_ccx_start)
 
     def test_override_num_queries_field_value_not_changed(self):
