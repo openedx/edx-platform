@@ -7,7 +7,7 @@ from decimal import Decimal
 import json
 import analytics
 from io import BytesIO
-from django.db.models import Q
+from django.db.models import Q, F
 import pytz
 import logging
 import smtplib
@@ -1474,7 +1474,7 @@ class PaidCourseRegistration(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum('unit_cost', field='qty * unit_cost')
+            total=Sum(F('qty') * F('unit_cost'))
         )
 
         if result['total'] is not None:
@@ -1648,7 +1648,7 @@ class CourseRegCodeItem(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum('unit_cost', field='qty * unit_cost')
+            total=Sum(F('qty') * F('unit_cost'))
         )
 
         if result['total'] is not None:
