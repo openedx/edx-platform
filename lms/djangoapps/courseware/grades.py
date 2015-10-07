@@ -8,7 +8,6 @@ import logging
 
 from contextlib import contextmanager
 from django.conf import settings
-from django.db import transaction
 from django.test.client import RequestFactory
 from django.core.cache import cache
 
@@ -17,6 +16,7 @@ import dogstats_wrapper as dog_stats_api
 from courseware import courses
 from courseware.model_data import FieldDataCache, ScoresClient
 from student.models import anonymous_id_for_user
+from util.db import commit_on_success
 from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule import graders
 from xmodule.graders import Score
@@ -294,14 +294,13 @@ def answer_distributions(course_key):
     return answer_counts
 
 
-@transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False, field_data_cache=None, scores_client=None):
     """
-    Wraps "_grade" with the manual_transaction context manager just in case
+    Wraps "_grade" with the commit_on_success context manager just in case
     there are unanticipated errors.
     Send a signal to update the minimum grade requirement status.
     """
-    with manual_transaction():
+    with commit_on_success():
         grade_summary = _grade(student, request, course, keep_raw_scores, field_data_cache, scores_client)
         responses = GRADES_UPDATED.send_robust(
             sender=None,
@@ -339,7 +338,7 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
     More information on the format is in the docstring for CourseGrader.
     """
     if field_data_cache is None:
-        with manual_transaction():
+        with commit_on_success():
             field_data_cache = field_data_cache_for_grading(course, student)
     if scores_client is None:
         scores_client = ScoresClient.from_field_data_cache(field_data_cache)
@@ -501,13 +500,12 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-@transaction.commit_manually
 def progress_summary(student, request, course, field_data_cache=None, scores_client=None):
     """
-    Wraps "_progress_summary" with the manual_transaction context manager just
+    Wraps "_progress_summary" with the commit_on_success context manager just
     in case there are unanticipated errors.
     """
-    with manual_transaction():
+    with commit_on_success():
         progress = _progress_summary(student, request, course, field_data_cache, scores_client)
         if progress:
             return progress.chapters
@@ -515,13 +513,12 @@ def progress_summary(student, request, course, field_data_cache=None, scores_cli
             return None
 
 
-@transaction.commit_manually
 def get_weighted_scores(student, course, field_data_cache=None, scores_client=None):
     """
     Uses the _progress_summary method to return a ProgressSummmary object
     containing details of a students weighted scores for the course.
     """
-    with manual_transaction():
+    with commit_on_success():
         request = _get_mock_request(student)
         return _progress_summary(student, request, course, field_data_cache, scores_client)
 
@@ -550,7 +547,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
     will return None.
 
     """
-    with manual_transaction():
+    with commit_on_success():
         if field_data_cache is None:
             field_data_cache = field_data_cache_for_grading(course, student)
         if scores_client is None:
@@ -589,7 +586,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
         sections = []
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            with manual_transaction():
+            with commit_on_success():
                 if section_module.hide_from_toc:
                     continue
 
@@ -738,19 +735,6 @@ def get_score(user, problem_descriptor, module_creator, scores_client, submissio
             max_scores_cache.set(problem_descriptor.location, total)
 
     return weighted_score(correct, total, problem_descriptor.weight)
-
-
-@contextmanager
-def manual_transaction():
-    """A context manager for managing manual transactions"""
-    try:
-        yield
-    except Exception:
-        transaction.rollback()
-        log.exception('Due to an error, this transaction has been rolled back')
-        raise
-    else:
-        transaction.commit()
 
 
 def iterate_grades_for(course_or_id, students, keep_raw_scores=False):

@@ -78,13 +78,6 @@ class CourseEmail(Email):
     def create(cls, course_id, sender, to_option, subject, html_message, text_message=None, template_name=None, from_addr=None):
         """
         Create an instance of CourseEmail.
-
-        The CourseEmail.save_now method makes sure the CourseEmail entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, an autocommit buried within here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
         """
         # automatically generate the stripped version of the text from the HTML markup:
         if text_message is None:
@@ -107,23 +100,9 @@ class CourseEmail(Email):
             template_name=template_name,
             from_addr=from_addr,
         )
-        course_email.save_now()
+        course_email.save()
 
         return course_email
-
-    @transaction.autocommit
-    def save_now(self):
-        """
-        Writes CourseEmail immediately, ensuring the transaction is committed.
-
-        Autocommit annotation makes sure the database entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, this autocommit here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
-        """
-        self.save()
 
     def get_template(self):
         """

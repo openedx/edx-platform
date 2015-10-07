@@ -18,6 +18,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
@@ -26,7 +27,6 @@ from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
@@ -63,6 +63,7 @@ from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
+from util.db import outer_atomic, commit_on_success
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -78,8 +79,6 @@ from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from instructor.enrollment import uses_shib
-
-from util.db import commit_on_success_with_read_committed
 
 import survey.utils
 import survey.views
@@ -313,11 +312,12 @@ def chat_settings(course, user):
     }
 
 
+@transaction.non_atomic_requests
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
-@commit_on_success_with_read_committed
+@outer_atomic(read_committed=True)
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
@@ -923,20 +923,21 @@ def course_about(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@transaction.commit_manually
+@commit_on_success
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """
-    Wraps "_progress" with the manual_transaction context manager just in case
+    Wraps "_progress" with the commit_on_success context manager just in case
     there are unanticipated errors.
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        with grades.manual_transaction():
+        with commit_on_success():
             return _progress(request, course_key, student_id)
 
 
@@ -1026,7 +1027,7 @@ def _progress(request, course_key, student_id):
                     'download_url': None
                 })
 
-    with grades.manual_transaction():
+    with commit_on_success():
         response = render_to_response('courseware/progress.html', context)
 
     return response

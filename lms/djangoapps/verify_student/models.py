@@ -1105,18 +1105,8 @@ class VerificationCheckpoint(models.Model):
         Returns:
             VerificationCheckpoint object if exists otherwise None
         """
-        try:
-            checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
-            return checkpoint
-        except IntegrityError:
-            log.info(
-                u"An integrity error occurred while getting-or-creating the verification checkpoint "
-                "for course %s at location %s.  This can occur if two processes try to get-or-create "
-                "the checkpoint at the same time and the database is set to REPEATABLE READ. "
-                "We will try committing the transaction and retrying."
-            )
-            transaction.commit()
-            return cls.objects.get(course_id=course_id, checkpoint_location=checkpoint_location)
+        checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
+        return checkpoint
 
 
 class VerificationStatus(models.Model):

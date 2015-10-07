@@ -767,7 +767,6 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # coerces None values to empty strings.
         query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
-        transaction.commit_unless_managed()
 
         # Request should include an empty country field
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO["username"])
