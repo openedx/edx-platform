@@ -4,6 +4,7 @@ Acceptance tests for Studio's Setting pages
 import re
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.settings_certificates import CertificatesPage
+from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
 
 class CertificatesTest(StudioCourseTest):
@@ -18,6 +19,13 @@ class CertificatesTest(StudioCourseTest):
             self.course_info['number'],
             self.course_info['run']
         )
+        self.advanced_settings_page = AdvancedSettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.course_advanced_settings = dict()
 
     def make_signatory_data(self, prefix='First'):
         """
@@ -229,3 +237,59 @@ class CertificatesTest(StudioCourseTest):
 
         signatory_title = self.certificates_page.get_first_signatory_title()
         self.assertNotEqual([], re.findall(r'<br\s*/?>', signatory_title))
+
+    def test_course_number_in_certificate_details_view(self):
+        """
+        Scenario: Ensure that Course Number is displayed in certificate details view
+
+        Given I have a certificate
+        When I visit certificate details page on studio
+        Then I see Course Number next to Course Name
+        """
+        self.certificates_page.visit()
+        certificate = self.create_and_verify_certificate(
+            "Course Title Override",
+            0,
+            [self.make_signatory_data('first')]
+        )
+
+        certificate.wait_for_certificate_delete_button()
+
+        # Make sure certificate is created
+        self.assertEqual(len(self.certificates_page.certificates), 1)
+        course_number = self.certificates_page.get_course_number()
+        self.assertEqual(self.course_info['number'], course_number)
+
+    def test_course_number_override_in_certificate_details_view(self):
+        """
+        Scenario: Ensure that Course Number Override is displayed in certificate details view
+
+        Given I have a certificate
+        When I visit certificate details page on studio
+        Then I see Course Number Override next to Course Name
+        """
+
+        self.course_advanced_settings.update(
+            {'Course Number Display String': 'Course Number Override String'}
+        )
+
+        self.certificates_page.visit()
+        certificate = self.create_and_verify_certificate(
+            "Course Title Override",
+            0,
+            [self.make_signatory_data('first')]
+        )
+
+        certificate.wait_for_certificate_delete_button()
+
+        # Make sure certificate is created
+        self.assertEqual(len(self.certificates_page.certificates), 1)
+
+        # set up course number override in Advanced Settings Page
+        self.advanced_settings_page.visit()
+        self.advanced_settings_page.set_values(self.course_advanced_settings)
+        self.advanced_settings_page.wait_for_ajax()
+
+        self.certificates_page.visit()
+        course_number_override = self.certificates_page.get_course_number_override()
+        self.assertEqual(self.course_advanced_settings['Course Number Display String'], course_number_override)
