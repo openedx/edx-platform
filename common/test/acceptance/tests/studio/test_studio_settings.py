@@ -4,7 +4,6 @@ Acceptance tests for Studio's Setting pages
 """
 from __future__ import unicode_literals
 from nose.plugins.attrib import attr
-from unittest import skip
 
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
@@ -152,7 +151,6 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config = self.group_configurations_page.content_groups[0]
         self.assertTrue(config.delete_button_is_disabled)
 
-    @skip("TNL-3258")
     def test_can_delete_unused_content_group(self):
         """
         Scenario: Ensure that the user can delete unused content group.
