@@ -653,7 +653,7 @@ class TestCohorts(ModuleStoreTestCase):
         # Error cases
         # Should get AlreadyAddedToCohortException if user already in cohort
         self.assertRaises(
-            ValueError,
+            cohorts.AlreadyAddedToCohortException,
             lambda: cohorts.add_user_to_cohort(second_cohort, "Username")
         )
         # UserDoesNotExist if user truly does not exist
