@@ -74,27 +74,15 @@ class TestGitExport(CourseTestCase):
         """
         Verify that error output is actually resolved as the correct string
         """
-        output = StringIO.StringIO()
         with self.assertRaisesRegexp(CommandError, unicode(GitExportError.BAD_COURSE)):
             call_command(
-                'git_export', 'foo/bar:baz', 'silly',
-                stdout=output, stderr=output
+                'git_export', 'foo/bar:baz', 'silly'
             )
-        self.assertIn('Bad course location provided', output.getvalue())
-        output.close()
 
-        output = StringIO.StringIO()
         with self.assertRaisesRegexp(CommandError, unicode(GitExportError.URL_BAD)):
             call_command(
-                'git_export', 'foo/bar/baz', 'silly',
-                stdout=output, stderr=output
+                'git_export', 'foo/bar/baz', 'silly'
             )
-        self.assertIn(
-            'Non writable git url provided. Expecting something like:'
-            ' git@github.com:mitocw/edx4edx_lite.git',
-            output.getvalue()
-        )
-        output.close()
 
     def test_bad_git_url(self):
         """
