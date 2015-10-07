@@ -280,3 +280,6 @@ FEATURES['ENABLE_TEAMS'] = True
 
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# Turn off course structure memory cache in tests
+COURSE_STRUCTURE_MEMORY_CACHE_SIZE = 0
