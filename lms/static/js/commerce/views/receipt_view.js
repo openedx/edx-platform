@@ -288,6 +288,12 @@ function completeOrder(event) {     // jshint ignore:line
         providerId = $(event).data("provider"),
         $errorContainer = $("#error-container");
 
+    try {
+        event.preventDefault();
+    } catch (err) {
+        // Ignore the error as not all event inputs have the preventDefault method.
+    }
+
     analytics.track(
         "edx.bi.credit.clicked_complete_credit",
         {

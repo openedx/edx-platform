@@ -23,8 +23,8 @@
         % if not credit_status["purchased"] and not credit_status["error"] :
             <p class="message-copy credit-msg credit-eligibility-msg">
                 ## Translators: provider_name is the name of a credit provider or university (e.g. State University)
-                ${_("You are now eligible to purchase course credit from {provider_name} for this course. Click <strong>Get Credit</strong> to get started.").format(
-                provider_name=credit_status["provider_name"],
+                ${_("You are now eligible to purchase course credit for this course. Click <strong>Get Credit</strong> to get started.").format(
+                    provider_name=credit_status["provider_name"],
                 )}
             </p>
             <div class="purchase_credit">
