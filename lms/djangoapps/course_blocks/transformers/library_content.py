@@ -6,6 +6,10 @@ from courseware.access import _has_access_to_course
 from courseware.models import StudentModule
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
+from xmodule.library_content_module import LibraryContentModule
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore.django import modulestore
+from eventtracking import tracker
 
 
 class ContentLibraryTransformer(BlockStructureTransformer):
@@ -47,6 +51,9 @@ class ContentLibraryTransformer(BlockStructureTransformer):
         Returns:
             dict[UsageKey: dict]
         """
+        block_structure.request_xblock_fields('mode')
+        block_structure.request_xblock_fields('max_count')
+
         # For each block check if block is library_content.
         # If library_content add children array to content_library_children field
         for block_key in block_structure.topological_traversal():
@@ -63,6 +70,22 @@ class ContentLibraryTransformer(BlockStructureTransformer):
             user_info(object)
             block_structure (BlockStructureCollectedData)
         """
+        store = modulestore()
+        lib_tools = LibraryToolsService(store)
+
+        def build_key(block_type, block_id):
+            """
+            Helper method to build a BlockUsageLocator for user_info.course_key
+            """
+            return BlockUsageLocator(user_info.course_key, block_type, block_id)
+
+        def update_selection(selected, children, max_count, mode, location):
+            """
+            Helper method to update library content selection
+            """
+            return LibraryContentModule.make_selection(
+                selected, children, max_count, mode, location, lib_tools, tracker.emit
+            )
 
         def check_child_removal(block_key):
             """
@@ -82,19 +105,25 @@ class ContentLibraryTransformer(BlockStructureTransformer):
             library_children = block_structure.get_transformer_block_data(block_key, self, 'content_library_children')
             if library_children:
                 children.extend(library_children)
+                selected = []
+                mode = block_structure.get_xblock_field(block_key, 'mode')
+                max_count = block_structure.get_xblock_field(block_key, 'max_count')
+
                 # Retrieve "selected" json from LMS MySQL database.
                 modules = self._get_selected_modules(user_info.user, user_info.course_key, block_key)
                 for module in modules:
                     module_state = module.state
                     state_dict = json.loads(module_state)
                     # Check all selected entries for this user on selected library.
-                    # Add all selected to selected_children list.
+                    # Add all selected to selected list.
                     for state in state_dict['selected']:
-                        usage_key = BlockUsageLocator(
-                            user_info.course_key, block_type=state[0], block_id=state[1]
-                        )
+                        usage_key = build_key(state[0], state[1])
                         if usage_key in library_children:
-                            selected_children.append(usage_key)
+                            selected.append((state[0], state[1]))
+
+                # update selected
+                selected = update_selection(selected, children, max_count, mode, block_key)
+                selected_children.extend([build_key(s[0], s[1]) for s in selected])
 
         # Check and remove all non-selected children from course structure.
         block_structure.remove_block_if(

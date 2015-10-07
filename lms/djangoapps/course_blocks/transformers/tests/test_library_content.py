@@ -127,10 +127,15 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             transformers={self.transformer}
         )
 
-        self.assertEqual(
-            set(trans_block_structure.get_block_keys()),
-            self.get_block_key_set(self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1')
-        )
+        # Should dynamically assign a block to student
+        trans_keys = set(trans_block_structure.get_block_keys())
+        block_key_set = self.get_block_key_set(self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1')
+        for key in block_key_set:
+            self.assertIn(key, trans_keys)
+
+        vertical2_selected = self.get_block_key_set(self.blocks, 'vertical2').pop() in trans_keys
+        vertical3_selected = self.get_block_key_set(self.blocks, 'vertical3').pop() in trans_keys
+        self.assertTrue(vertical2_selected or vertical3_selected)
 
         # Check course structure again, with mocked selected modules for a user.
         with mock.patch(
