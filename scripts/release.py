@@ -17,6 +17,7 @@ try:
     from path import Path as path
     from git import Repo, Commit
     from git.refs.symbolic import SymbolicReference
+    from git.exc import GitCommandError
     from dateutil.parser import parse as parse_datestring
     import requests
     import yaml
@@ -99,6 +100,9 @@ def make_parser():
     parser.add_argument(
         '--table', '-t', action="store_true", default=False,
         help="only print table")
+    parser.add_argument(
+        '--cut-branch', '-b', action="store_true", default=False,
+        help="automatically cut the release branch")
     return parser
 
 
@@ -522,6 +526,26 @@ def generate_email(start_ref, end_ref, release_date=None):
     return textwrap.dedent(email).strip()
 
 
+def cut_release_branch(release_date=None):
+    if release_date is None:
+        release_date = default_release_date()
+
+    release_branch_name = "rc/{date}".format(date=release_date)
+
+    print("Cutting release branch '{name}'...".format(name=release_branch_name))
+
+    try:
+        print(git.checkout('master'))
+        print(git.pull())
+        print(git.checkout('HEAD', b=release_branch_name))
+        print(git.push())
+    except GitCommandError as exception:
+        print(exception)
+        return None
+
+    return release_branch_name
+
+
 def main():
     parser = make_parser()
     args = parser.parse_args()
@@ -559,6 +583,17 @@ def main():
         )
         print("\n")
         print(generate_commit_table(args.previous, args.current))
+
+    if args.cut_branch:
+        branch_name = cut_release_branch(args.date)
+        if branch_name:
+            print(
+                "OPEN THE PULL REQUEST: https://github.com/edx/edx-platform/compare/release...{name}".format(
+                    name=branch_name
+                )
+            )
+    else:
+        print("Skipping branch cut")
 
 
 if __name__ == "__main__":
