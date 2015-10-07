@@ -529,7 +529,7 @@
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
     .exam-time-list-fields {
-      margin-bottom: ($baseline/2);
+      margin: 0 0 ($baseline/2) ($baseline/2);
     }
     .list-fields {
       .field-message {
@@ -687,12 +687,6 @@
 
       // give a little space between the sections
       padding-bottom: 10px;
-
-      // indent this group a bit to make it seem like
-      // it is one group, under a header
-      .modal-section-content {
-        margin-left: 25px;
-      }
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
