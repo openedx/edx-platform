@@ -592,13 +592,35 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 };
 
                 setModalTimedExaminationPreferenceValues = function(
-                    is_timed_examination,
+                    is_time_limited,
+                    id_timed_exam,
                     time_limit,
-                    is_exam_proctoring_enabled
+                    is_practice_exam,
+                    is_proctored_enabled,
+                    enable_proctored_exams
                 ){
-                    $("#id_time_limit").val(time_limit);
-                    $("#id_exam_proctoring").prop('checked', is_exam_proctoring_enabled);
-                    $("#id_timed_examination").prop('checked', is_timed_examination);
+                    if (!is_time_limited) {
+                        this.$("#id_not_timed").prop('checked', true);
+                        return;
+                    }
+                    if (enable_proctored_exams) {
+                        $("#id_time_limit").val(time_limit);
+                        this.$('#id_time_limit_div').show();
+                        if (is_proctored_enabled) {
+                            if (is_practice_exam) {
+                                this.$('#id_practice_exam').prop('checked', true);
+                            } else {
+                                this.$('#id_proctored_exam').prop('checked', true);
+                            }
+
+                        } else {
+                            this.$("#id_timed_exam").prop('checked', true);
+                        }
+                    } else  {
+                        this.$("#id_timed_exam").prop('checked', true);
+                        $("#id_time_limit").val(time_limit);
+                        this.$('#id_time_limit_div').show();
+                    }
                 };
 
                 // Contains hard-coded dates because dates are presented in different formats.
@@ -692,7 +714,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
-                    setModalTimedExaminationPreferenceValues(true, "02:30", true);
+                    setModalTimedExaminationPreferenceValues(true, true, "02:30", false, true, true);
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
@@ -733,40 +755,25 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
                     expect($("#staff_lock").is(":checked")).toBe(true);
-                    expect($("#id_timed_examination").is(":checked")).toBe(true);
-                    expect($("#id_exam_proctoring").is(":checked")).toBe(true);
-                    expect($("#is_practice_exam").is(":checked")).toBe(false);
+                    expect($("#id_timed_exam").is(":checked")).toBe(false);
+                    expect($("#id_proctored_exam").is(":checked")).toBe(true);
+                    expect($("#id_not_timed").is(":checked")).toBe(false);
+                    expect($("#id_practice_exam").is(":checked")).toBe(false);
                     expect($("#id_time_limit").val()).toBe("02:30");
                 });
 
-                it('can be edited and enable/disable proctoring fields, when time_limit and exam_proctoring' +
-                ' checkbox value changes', function() {
+                it('can hide the time limit field when the None radio box is selected', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
-                    setModalTimedExaminationPreferenceValues(true, "02:30", true);
-                    var target = $('#id_timed_examination');
-                    target.prop('checked', false).change();
+                    setModalTimedExaminationPreferenceValues(false, true, "00:30", false, false, true);
 
-                    expect($('#id_exam_proctoring')).toHaveAttr('disabled','disabled');
-                    expect($('#id_time_limit')).toHaveAttr('disabled','disabled');
-                    expect($('#id_practice_exam')).toHaveAttr('disabled','disabled');
+                    // id_time_limit_div should be hidden when None is specified
+                    expect($('#id_time_limit_div')).toHaveClass('is-hidden');
 
-                    target.prop('checked', true).change();
-
-                    expect($('#id_exam_proctoring')).not.toHaveAttr('disabled','disabled');
-                    expect($('#id_time_limit')).not.toHaveAttr('disabled','disabled');
-                    expect($('#id_time_limit').val()).toBe('00:30');
-                    expect($('#id_exam_proctoring')).not.toHaveAttr('checked');
-                    expect($('#id_practice_exam')).toHaveAttr('disabled','disabled');
-
-                    target.prop('checked', true).change();
-
-                    var examProctoringTarget = $('#id_exam_proctoring');
-                    examProctoringTarget.prop('checked', false).change();
-                    expect($('#id_practice_exam')).toHaveAttr('disabled','disabled');
-                    examProctoringTarget.prop('checked', true).change();
-                    expect($('#id_practice_exam')).not.toHaveAttr('disabled','disabled');
+                    // id_time_limit_div should not be hidden when timed_exam is specified
+                    setModalTimedExaminationPreferenceValues(true, true, "00:30", false, false, true);
+                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
                 });
 
                 it('release date, due date, grading type, and staff lock can be cleared.', function() {
