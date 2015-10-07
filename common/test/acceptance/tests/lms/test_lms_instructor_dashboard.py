@@ -117,6 +117,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
 
 
+@attr('shard_1')
 class ProctoredExamsTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.
@@ -169,12 +170,32 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Auto-auth register for the course.
         self._auto_auth(self.USERNAME, self.EMAIL, False)
 
-    def _auto_auth(self, username, email, staff, enrollment_mode="honor"):
+    def _auto_auth(self, username, email, staff):
         """
         Logout and login with given credentials.
         """
         AutoAuthPage(self.browser, username=username, email=email,
-                     course_id=self.course_id, staff=staff, enrollment_mode=enrollment_mode).visit()
+                     course_id=self.course_id, staff=staff).visit()
+
+    def _login_as_a_verified_user(self):
+        """
+        login as a verififed user
+        """
+
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+
+        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
+        # Navigate to the track selection page
+        self.track_selection_page.visit()
+
+        # Enter the payment and verification flow by choosing to enroll as verified
+        self.track_selection_page.enroll('verified')
+
+        # Proceed to the fake payment page
+        self.payment_and_verification_flow.proceed_to_payment()
+
+        # Submit payment
+        self.fake_payment_page.submit_payment()
 
     def _create_a_proctored_exam_and_attempt(self):
         """
@@ -186,14 +207,14 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        #open the exam settings to make it a proctored exam.
+        # open the exam settings to make it a proctored exam.
         self.course_outline.open_exam_settings_dialog()
         self.course_outline.make_exam_proctored()
         time.sleep(2)  # Wait for 2 seconds to save the settings.
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
-        self._auto_auth(self.USERNAME, self.EMAIL, False, enrollment_mode="verified")
+        self._login_as_a_verified_user()
         self.courseware_page.visit()
 
         # Start the proctored exam.
@@ -216,7 +237,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
-        self._auto_auth(self.USERNAME, self.EMAIL, False, enrollment_mode="verified")
+        self._login_as_a_verified_user()
         self.courseware_page.visit()
 
         # Start the proctored exam.
@@ -231,7 +252,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self._create_a_timed_exam_and_attempt()
 
         # When I log in as an instructor,
-        self.log_in_as_instructor()
+        __, __ = self.log_in_as_instructor()
 
         # And visit the Allowance Section of Instructor Dashboard's Timed Exam tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -244,12 +265,11 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
         Make sure that Exam attempts are visible and can be reset.
         """
-
         # Given that an exam has been configured to be a proctored exam.
         self._create_a_timed_exam_and_attempt()
 
         # When I log in as an instructor,
-        self.log_in_as_instructor()
+        __, __ = self.log_in_as_instructor()
 
         # And visit the Student Proctored Exam Attempts Section of Instructor Dashboard's Timed Exam tab
         instructor_dashboard_page = self.visit_instructor_dashboard()

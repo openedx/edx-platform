@@ -534,8 +534,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Makes a Proctored exam.
         """
-        self.q(css="#id_timed_examination").first.click()
-        self.q(css="#id_exam_proctoring").first.click()
+        self.q(css="#id_proctored_exam").first.click()
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
@@ -543,28 +542,59 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Makes a timed exam.
         """
-        self.q(css="#id_timed_examination").first.click()
+        self.q(css="#id_timed_exam").first.click()
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
+
+    def select_none_exam(self):
+        """
+        Choose "none" exam but do not press enter
+        """
+        self.q(css="#id_not_timed").first.click()
+
+    def select_timed_exam(self):
+        """
+        Choose a timed exam but do not press enter
+        """
+        self.q(css="#id_timed_exam").first.click()
+
+    def select_proctored_exam(self):
+        """
+        Choose a proctored exam but do not press enter
+        """
+        self.q(css="#id_proctored_exam").first.click()
+
+    def select_practice_exam(self):
+        """
+        Choose a practice exam but do not press enter
+        """
+        self.q(css="#id_practice_exam").first.click()
+
+    def time_allotted_field_visible(self):
+        """
+        returns whether the time allotted field is visible
+        """
+        return self.q(css="#id_time_limit_div").visible
 
     def proctoring_items_are_displayed(self):
         """
         Returns True if all the items are found.
         """
-        # The Timed exam checkbox
-        if not self.q(css="#id_timed_examination").present:
+
+        # The None radio button
+        if not self.q(css="#id_not_timed").present:
             return False
 
-        # The time limit field
-        if not self.q(css="#id_time_limit").present:
+        # The Timed exam radio button
+        if not self.q(css="#id_timed_exam").present:
             return False
 
-        # The Practice exam checkbox
+        # The Proctored exam radio button
+        if not self.q(css="#id_proctored_exam").present:
+            return False
+
+        # The Practice exam radio button
         if not self.q(css="#id_practice_exam").present:
-            return False
-
-        # The Proctored exam checkbox
-        if not self.q(css="#id_exam_proctoring").present:
             return False
 
         return True

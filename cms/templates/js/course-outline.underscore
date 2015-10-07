@@ -30,7 +30,7 @@ if (statusType === 'warning') {
     statusIconClass = 'fa-lock';
 }
 
-var gradingType = gettext('Not Graded');
+var gradingType = gettext('Ungraded');
 if (xblockInfo.get('graded')) {
     gradingType = xblockInfo.get('format')
 }
@@ -39,11 +39,11 @@ var is_proctored_exam = xblockInfo.get('is_proctored_enabled');
 var is_practice_exam = xblockInfo.get('is_practice_exam');
 if (is_proctored_exam) {
     if (is_practice_exam) {
-        var exam_label = gettext('Practice Exam');
-        var exam_value = gettext('Timed and Practice Proctored Exam');
+        var exam_label = gettext('Practice proctored Exam');
+        var exam_value = gettext('Practice proctored Exam');
     } else {
         var exam_label = gettext('Proctored Exam');
-        var exam_value = gettext('Timed and Proctored Exam');
+        var exam_value = gettext('Proctored Exam');
     }
 
 } else {
@@ -146,7 +146,21 @@ if (is_proctored_exam) {
                 </p>
               </div>
             <% } %>
-            <% if (xblockInfo.get('due_date') || xblockInfo.get('graded')) { %>
+            <% if (xblockInfo.get('is_time_limited')) { %>
+                <div class="status-timed-proctored-exam">
+                    <p>
+                        <span class="sr status-grading-label"> <%= gettext('Graded as:') %> </span>
+                        <i class="icon fa fa-check"></i>
+                        <span class="status-grading-value"> <%= gradingType %> </span>
+                         - 
+                        <span class="sr status-proctored-exam-label"> <%= exam_label %> </span>
+                        <span class="status-proctored-exam-value"> <%= exam_value %> </span>
+                        <% if (xblockInfo.get('due_date')) { %>
+                            <span class="status-grading-date"> <%= gettext('Due:') %> <%= xblockInfo.get('due_date') %> </span>
+                        <% } %>
+                    </p>
+                </div>
+            <% } else if (xblockInfo.get('due_date') || xblockInfo.get('graded')) { %>
                 <div class="status-grading">
                     <p>
                         <span class="sr status-grading-label"> <%= gettext('Graded as:') %> </span>
@@ -157,19 +171,7 @@ if (is_proctored_exam) {
                         <% } %>
                     </p>
                 </div>
-            <% } %>
-            <% if (xblockInfo.get('is_time_limited')) { %>
-                <div class="status-timed-proctored-exam">
-                    <p>
-                        <span class="sr status-proctored-exam-label"> <%= exam_label %> </span>
-                        <i class="icon fa fa-check"></i>
-                        <span class="status-proctored-exam-value"> <%= exam_value %> </span>
-                        <% if (xblockInfo.get('due_date')) { %>
-                            <span class="status-due-date"> <%= gettext('Due Date') %> <%= xblockInfo.get('due_date') %> </span>
-                        <% } %>
-                    </p>
-                </div>
-            <% } %>
+            <% }  %>
         <% } %>
         <% if (statusMessage) { %>
         <div class="status-message">
