@@ -24,8 +24,8 @@ from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
-from ..models import CourseTeamMembership
-from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
+from ..models import CourseTeam, CourseTeamMembership
+from ..search_indexes import CourseTeamIndexer, course_team_post_save_callback
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles

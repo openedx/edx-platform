@@ -40,7 +40,7 @@ from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
 from util.model_utils import truncate_fields
 from . import is_feature_enabled
-from .models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
     CourseTeamCreationSerializer,
