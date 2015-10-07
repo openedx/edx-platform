@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.db import connection, transaction
+from django.db import connection
 from django.core.urlresolvers import reverse, NoReverseMatch
 from unittest import skipUnless
 
@@ -767,7 +767,6 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # coerces None values to empty strings.
         query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
-        transaction.commit_unless_managed()
 
         # Request should include an empty country field
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO["username"])
