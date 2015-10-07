@@ -2,6 +2,7 @@
 Utility functions for validating forms
 """
 from django import forms
+from django.forms import widgets
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
@@ -79,16 +80,20 @@ class PasswordResetFormNoActive(PasswordResetForm):
             send_mail(subject, email, from_email, [user.email])
 
 
+class TrueCheckbox(widgets.CheckboxInput):
+    """
+    A checkbox widget that only accepts "true" (case-insensitive) as true.
+    """
+    def value_from_datadict(self, data, files, name):
+        value = data.get(name, '')
+        return value.lower() == 'true'
+
+
 class TrueField(forms.BooleanField):
     """
     A boolean field that only accepts "true" (case-insensitive) as true
     """
-    def to_python(self, value):
-        # CheckboxInput converts string to bool by case-insensitive match to "true" or "false"
-        if value is True:
-            return value
-        else:
-            return None
+    widget = TrueCheckbox
 
 
 _USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
