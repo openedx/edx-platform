@@ -24,6 +24,16 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
     ACCOUNT_SETTINGS_REFERER = u"/account/settings"
 
+    def visit_account_settings_page(self):
+        """
+        Visit the account settings page for the current user, and store the page instance
+        as self.account_settings_page.
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.account_settings_page = AccountSettingsPage(self.browser)
+        self.account_settings_page.visit()
+        self.account_settings_page.wait_for_ajax()
+
     def log_in_as_unique_user(self, email=None):
         """
         Create a unique user and return the account's username and id.
@@ -115,14 +125,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         super(AccountSettingsPageTest, self).setUp()
         self.username, self.user_id = self.log_in_as_unique_user()
         self.visit_account_settings_page()
-
-    def visit_account_settings_page(self):
-        """
-        Visit the account settings page for the current user.
-        """
-        self.account_settings_page = AccountSettingsPage(self.browser)
-        self.account_settings_page.visit()
-        self.account_settings_page.wait_for_ajax()
 
     def test_page_view_event(self):
         """
