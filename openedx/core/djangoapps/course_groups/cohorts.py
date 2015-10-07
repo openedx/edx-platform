@@ -29,6 +29,13 @@ from .models import (
     UnregisteredLearnerCohortAssignments
 )
 
+class AlreadyAddedToCohortException(ValueError):
+    """
+    Raised when an attempt is made to add user to a cohort he's already added to
+    """
+    pass
+
+
 log = logging.getLogger(__name__)
 
 
