@@ -16,12 +16,9 @@
             },
 
             initialize: function (options) {
-                this.topic = options.topic;
-                this.teamMemberships = options.teamMemberships;
                 this.context = options.context;
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
-                    topic: options.topic,
                     maxTeamSize: this.context.maxTeamSize,
                     srInfo: this.srInfo,
                     countries: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries),

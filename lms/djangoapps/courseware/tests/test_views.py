@@ -680,6 +680,16 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
+    @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
+    def test_progress_page_xss_prevent(self, malicious_code):
+        """
+        Test that XSS attack is prevented
+        """
+        resp = views.progress(self.request, course_id=unicode(self.course.id), student_id=self.user.id)
+        self.assertEqual(resp.status_code, 200)
+        # Test that malicious code does not appear in html
+        self.assertNotIn(malicious_code, resp.content)
+
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
 

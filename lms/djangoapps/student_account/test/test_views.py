@@ -354,6 +354,24 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertContains(resp, "Register for Test Microsite")
         self.assertContains(resp, "register-form")
 
+    def test_login_registration_xframe_protected(self):
+        resp = self.client.get(
+            reverse("register_user"),
+            {},
+            HTTP_REFERER="http://localhost/iframe"
+        )
+
+        self.assertEqual(resp['X-Frame-Options'], 'DENY')
+
+        self.configure_lti_provider(name='Test', lti_hostname='localhost', lti_consumer_key='test_key', enabled=True)
+
+        resp = self.client.get(
+            reverse("register_user"),
+            HTTP_REFERER="http://localhost/iframe"
+        )
+
+        self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
+
     def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
         finish_auth_url = None
