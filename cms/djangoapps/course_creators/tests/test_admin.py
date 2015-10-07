@@ -166,10 +166,10 @@ class CourseCreatorAdminTest(TestCase):
             # try logging in 30 times, the default limit in the number of failed
             # login attempts in one 5 minute period before the rate gets limited
             for _ in xrange(30):
-                response = self.client.post('/admin/', post_params)
+                response = self.client.post('/admin/login/', post_params)
                 self.assertEquals(response.status_code, 200)
 
-            response = self.client.post('/admin/', post_params)
+            response = self.client.post('/admin/login/', post_params)
             # Since we are using the default rate limit behavior, we are
             # expecting this to return a 403 error to indicate that there have
             # been too many attempts
