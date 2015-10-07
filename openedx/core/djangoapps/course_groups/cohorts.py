@@ -20,6 +20,13 @@ from student.models import get_user_by_username_or_email
 from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup
 
 
+class AlreadyAddedToCohortException(ValueError):
+    """
+    Raised when an attempt is made to add user to a cohort he's already added to
+    """
+    pass
+
+
 log = logging.getLogger(__name__)
 
 
@@ -386,7 +393,7 @@ def add_user_to_cohort(cohort, username_or_email):
     )
     if course_cohorts.exists():
         if course_cohorts[0] == cohort:
-            raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+            raise AlreadyAddedToCohortException("User {user_name} already present in cohort {cohort_name}".format(
                 user_name=user.username,
                 cohort_name=cohort.name
             ))
