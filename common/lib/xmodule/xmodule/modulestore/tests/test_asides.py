@@ -5,7 +5,7 @@ from xblock.core import XBlockAside
 from xblock.fields import Scope, String
 from xblock.fragment import Fragment
 from unittest import TestCase
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import XmlModulestoreBuilder
+from xmodule.modulestore.tests.utils import XmlModulestoreBuilder
 from mock import patch
 
 

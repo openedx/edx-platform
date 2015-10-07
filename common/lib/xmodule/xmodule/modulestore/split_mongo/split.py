@@ -2383,7 +2383,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if original_structure['root'] == block_key:
                 raise ValueError("Cannot delete the root of a course")
             if block_key not in original_structure['blocks']:
-                raise ValueError("Cannot delete a block that does not exist")
+                raise ValueError("Cannot delete block_key {} from course {}, because that block does not exist.".format(
+                    block_key,
+                    usage_locator,
+                ))
             index_entry = self._get_index_if_valid(usage_locator.course_key, force)
             new_structure = self.version_structure(usage_locator.course_key, original_structure, user_id)
             new_blocks = new_structure['blocks']
@@ -3034,9 +3037,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Delete the orphan and any of its descendants which no longer have parents.
         """
         if len(self._get_parents_from_structure(orphan, structure)) == 0:
-            for child in structure['blocks'][orphan].fields.get('children', []):
+            orphan_data = structure['blocks'].pop(orphan)
+            for child in orphan_data.fields.get('children', []):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
-            del structure['blocks'][orphan]
 
     @contract(returns=BlockData)
     def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False, block_defaults=None):
