@@ -368,15 +368,34 @@ class UsersApiTests(ModuleStoreTestCase):
     def test_user_list_post_duplicate(self):
         test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
+
+        def post_duplicate_and_assert_409(email, username):
+            """
+            Posts user data with and asserts that return status code was 409 CONFLICT
+            """
+            data = {'email': email, 'username': username, 'password': self.test_password}
+            expected_message = "Username '{username}' or email '{email}' already exists".format(
+                username=username, email=email
+            )
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 409)
+            self.assertEqual(response.data['message'], expected_message)
+            self.assertEqual(response.data['field_conflict'], 'username or email')
+
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
-        expected_message = "Username '{username}' or email '{email}' already exists".format(
-            username=local_username, email=self.test_email
-        )
-        self.assertEqual(response.status_code, 409)
-        self.assertEqual(response.data['message'], expected_message)
-        self.assertEqual(response.data['field_conflict'], 'username or email')
+        self.assertEqual(response.status_code, 201)
+
+        # try creating a user with same email and username
+        post_duplicate_and_assert_409(self.test_email, local_username)
+
+        # try creating a user with same username
+        post_duplicate_and_assert_409(str(uuid.uuid4()) + '@test.org', local_username)
+
+        # creating a user with same email - does not work, since auth_user table in test database does not have unique
+        # constraint on email, added by a migration in common/djangoapps/student/migrations/0004_add_email_index.py
+        # Test engine uses in-memory sqlite DB, so migrations are not applied to it
 
     @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": True})
     def test_user_list_post_discussion_digest_email(self):
@@ -833,6 +852,26 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['id'], unicode(self.course.id))
         self.assertTrue(response.data['is_active'])
+
+    def test_user_courses_list_post_duplicate(self):
+        # creating user
+        test_uri = self.users_base_uri
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        user_id = response.data['id']
+
+        # adding it to a cohort
+        test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
+        data = {'course_id': unicode(self.course.id)}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        # and trying to add it second time
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 409)
+        self.assertIn("already added to cohort", response.data['message'])
 
     def test_user_courses_list_post_undefined_user(self):
         course = CourseFactory.create()
