@@ -2,7 +2,6 @@
 """
 End-to-end tests for Student's Profile Page.
 """
-from flaky import flaky
 from contextlib import contextmanager
 
 from datetime import datetime
@@ -48,7 +47,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
-        profile_page.value_for_textarea_field('bio', 'Nothing Special')
+        profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
 
     def visit_profile_page(self, username, privacy=None):
         """
@@ -306,7 +305,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         Test behaviour of a textarea field.
         """
-        profile_page.value_for_textarea_field(field_id, new_value)
+        profile_page.set_value_for_textarea_field(field_id, new_value)
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
@@ -473,7 +472,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
-    @flaky  # TODO fix this, see TNL-2704
     def test_user_can_upload_the_profile_image_with_success(self):
         """
         Scenario: Upload profile image works correctly.
@@ -529,7 +527,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             }
         })
 
-    @flaky  # TODO: fix TNL-3492
     def test_user_can_see_error_for_file_size_below_the_min_limit(self):
         """
         Scenario: Upload profile image does not work for < 100 Bytes image file.
@@ -641,7 +638,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assert_default_image_has_public_access(profile_page)
         self.assertFalse(profile_page.remove_link_present)
 
-    @flaky  # TNL-3514
     def test_eventing_after_multiple_uploads(self):
         """
         Scenario: An event is fired when a user with a profile image uploads another image
@@ -706,7 +702,6 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
-    @flaky  # TODO fix this, see TNL-2199
     def test_different_user_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's public profile.

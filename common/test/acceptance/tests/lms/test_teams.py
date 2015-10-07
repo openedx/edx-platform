@@ -425,7 +425,7 @@ class BrowseTopicsTest(TeamsTabBase):
         browse_teams_page.click_create_team_link()
         create_team_page = TeamManagementPage(self.browser, self.course_id, topic)
         create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
-        create_team_page.value_for_textarea_field(
+        create_team_page.set_value_for_textarea_field(
             field_id='description',
             value='Team description.'
         )
@@ -960,7 +960,7 @@ class TeamFormActions(TeamsTabBase):
             value=self.TEAMS_NAME,
             press_enter=False
         )
-        self.team_management_page.value_for_textarea_field(
+        self.team_management_page.set_value_for_textarea_field(
             field_id='description',
             value=self.TEAM_DESCRIPTION
         )

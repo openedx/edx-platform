@@ -163,26 +163,19 @@ class FieldsMixin(object):
                 query.results[0].send_keys(u'\ue007')  # Press Enter
         return query.attrs('value')[0]
 
-    def value_for_textarea_field(self, field_id, value=None):
+    def set_value_for_textarea_field(self, field_id, value):
         """
-        Get or set the value of a textarea field.
+        Set the value of a textarea field.
         """
         self.wait_for_field(field_id)
-
         self.make_field_editable(field_id)
 
-        query = self.q(css='.u-field-{} textarea'.format(field_id))
-        if not query.present:
-            return None
+        field_selector = '.u-field-{} textarea'.format(field_id)
+        self.wait_for_element_presence(field_selector, 'Editable textarea is present.')
 
-        if value is not None:
-            query.fill(value)
-            query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
-
-        if self.mode_for_field(field_id) == 'edit':
-            return query.text[0]
-        else:
-            return self.get_non_editable_mode_value(field_id)
+        query = self.q(css=field_selector)
+        query.fill(value)
+        query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
 
     def get_non_editable_mode_value(self, field_id):
         """
