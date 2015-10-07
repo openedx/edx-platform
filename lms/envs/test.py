@@ -532,3 +532,6 @@ AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
+
+# Enable self-paced courses
+FEATURES['ENABLE_SELF_PACED_COURSES'] = True

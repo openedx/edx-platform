@@ -279,3 +279,6 @@ FEATURES['ENABLE_TEAMS'] = True
 
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# Enable self-paced courses
+FEATURES['ENABLE_SELF_PACED_COURSES'] = True

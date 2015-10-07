@@ -128,6 +128,9 @@ FEATURES['ENABLE_TEAMS'] = True
 # Enable custom content licensing
 FEATURES['LICENSING'] = True
 
+# Enable self-paced courses
+FEATURES['ENABLE_SELF_PACED_COURSES'] = True
+
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
