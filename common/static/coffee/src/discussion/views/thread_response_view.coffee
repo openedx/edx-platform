@@ -211,12 +211,10 @@ if Backbone?
           url: url
           type: "POST"
           dataType: 'json'
-          async: false # TODO when the rest of the stuff below is made to work properly..
           data:
               body: newBody
           error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
           success: (response, textStatus) =>
-              # TODO: Move this out of the callback, this makes it feel sluggish
               @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
               @editView.$(".wmd-preview p").html("")
 
