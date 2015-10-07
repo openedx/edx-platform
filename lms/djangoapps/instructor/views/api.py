@@ -888,6 +888,7 @@ def list_course_role_members(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1090,6 +1091,7 @@ def re_validate_invoice(obj_invoice):
     return JsonResponse({'message': message})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1164,6 +1166,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             return JsonResponse({"status": already_running_status})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1195,6 +1198,7 @@ def get_students_who_may_enroll(request, course_id):
         return JsonResponse({"status": already_running_status})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_POST
@@ -1269,6 +1273,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', csv_columns, data_rows)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1292,6 +1297,7 @@ def get_enrollment_report(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1316,6 +1322,7 @@ def get_exec_summary_report(request, course_id):
     })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1750,6 +1757,7 @@ def get_student_progress_url(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1831,6 +1839,7 @@ def reset_student_attempts(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1896,6 +1905,7 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -1951,6 +1961,7 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -2157,6 +2168,7 @@ def list_financial_report_downloads(_request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2179,6 +2191,7 @@ def calculate_grades_csv(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2267,6 +2280,7 @@ def list_forum_members(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2622,6 +2636,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff

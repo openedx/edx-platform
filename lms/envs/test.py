@@ -26,6 +26,11 @@ from warnings import filterwarnings, simplefilter
 
 from openedx.core.lib.tempdir import mkdtemp_clean
 
+# This patch disabes the commit_on_success decorator during tests
+# in TestCase subclasses.
+from util.testing import patch_testcase
+patch_testcase()
+
 # Silence noisy logs to make troubleshooting easier when tests fail.
 import logging
 LOG_OVERRIDES = [
@@ -180,7 +185,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'edx.db'
+        'NAME': TEST_ROOT / 'db' / 'edx.db',
+        'ATOMIC_REQUESTS': True,
     },
 
 }

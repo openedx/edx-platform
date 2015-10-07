@@ -13,7 +13,6 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
-from monkey_patch import django_18_upgrade              # *** SUPER TEMPORARY!!
 import analytics
 
 

@@ -161,8 +161,7 @@ class AccountView(APIView):
         else an error response with status code 415 will be returned.
         """
         try:
-            with transaction.atomic():
-                update_account_settings(request.user, request.data, username=username)
+            update_account_settings(request.user, request.data, username=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
         except UserNotFound:
