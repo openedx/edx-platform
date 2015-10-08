@@ -136,7 +136,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     """
 
     @classmethod
-    def make_selection(cls, selected, children, max_count, mode, location, lib_tools, emit):
+    def make_selection(cls, selected, children, max_count, mode):
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
 
@@ -145,29 +145,17 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             children - children of this block
             max_count - number of components to display to each student
             mode - how content is drawn from the library
-            location -
-            lib_tools - instance of LibraryToolsService
-            emit - function to emit events
 
         Returns:
-            a set of (block_type, block_id) tuples used to record
-            which random/first set of matching blocks was selected per user
+            A dict containing the following keys:
+
+            'selected' (set) of (block_type, block_id) tuples assigned to this student
+            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
+            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
+            'added' (set) of newly added (block_type, block_id) tuples
         """
-
-        def publish_event(event_name, result, **kwargs):
-            """ Helper method to publish an event for analytics purposes """
-            event_data = {
-                "location": unicode(location),
-                "result": result,
-                "previous_count": last_event_result_count,
-                "max_count": max_count,
-            }
-            event_data.update(kwargs)
-            emit("edx.librarycontentblock.content.{}".format(event_name), event_data)
-
         last_event_result_count = len(selected)
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
-        format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(location.course_key, keys)
 
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])  # pylint: disable=no-member
@@ -175,28 +163,11 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         invalid_block_keys = (selected - valid_block_keys)
         if invalid_block_keys:
             selected -= invalid_block_keys
-            # Publish an event for analytics purposes:
-            # reason "invalid" means deleted from library or a different library is now being used.
-            publish_event(
-                "removed",
-                result=format_block_keys(selected),
-                removed=format_block_keys(invalid_block_keys),
-                reason="invalid"
-            )
 
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
         while len(selected) > max_count:
             overlimit_block_keys.add(selected.pop())
-
-        if overlimit_block_keys:
-            # Publish an event for analytics purposes:
-            publish_event(
-                "removed",
-                result=format_block_keys(selected),
-                removed=format_block_keys(overlimit_block_keys),
-                reason="overlimit"
-            )
 
         # Do we have enough blocks now?
         num_to_add = max_count - len(selected)
@@ -213,15 +184,24 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 raise NotImplementedError("Unsupported mode.")
             selected |= added_block_keys
 
-            if added_block_keys:
-                # Publish an event for analytics purposes:
-                publish_event(
-                    "assigned",
-                    result=format_block_keys(selected),
-                    added=format_block_keys(added_block_keys)
-                )
+        return {
+            'selected': selected,
+            'invalid': invalid_block_keys,
+            'overlimit': overlimit_block_keys,
+            'added': added_block_keys,
+        }
 
-        return selected
+    def _publish_event(self, event_name, result, **kwargs):
+        """ Helper method to publish an event for analytics purposes """
+        event_data = {
+            "location": unicode(self.location),
+            "result": result,
+            "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
+            "max_count": self.max_count,
+        }
+        event_data.update(kwargs)
+        self.runtime.publish(self, "edx.librarycontentblock.content.{}".format(event_name), event_data)
+        self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     def selected_children(self):
         """
@@ -238,17 +218,42 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             # Already done:
             return self._selected_set  # pylint: disable=access-member-before-definition
 
-        lib_tools = self.runtime.service(self, 'library_tools')
-        emit = lambda *args: self.runtime.publish(self, *args)
-
-        selected = self.make_selection(
-            self.selected, self.children, self.max_count, "random", self.location, lib_tools, emit
-        )
+        block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")
+        selected = block_keys['selected']
 
         # Save our selections to the user state, to ensure consistency:
         self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
         # Cache the results
         self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
+
+        # Publish events for analytics purposes:
+        lib_tools = self.runtime.service(self, 'library_tools')
+        format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
+
+        if block_keys['invalid']:
+            # reason "invalid" means deleted from library or a different library is now being used.
+            self._publish_event(
+                "removed",
+                result=format_block_keys(selected),
+                removed=format_block_keys(block_keys['invalid']),
+                reason="invalid"
+            )
+
+        if block_keys['overlimit']:
+            self._publish_event(
+                "removed",
+                result=format_block_keys(selected),
+                removed=format_block_keys(block_keys['overlimit']),
+                reason="overlimit"
+            )
+
+        if block_keys['added']:
+            self._publish_event(
+                "assigned",
+                result=format_block_keys(selected),
+                added=format_block_keys(block_keys['added'])
+            )
+
         return selected
 
     def _get_selected_child_blocks(self):
