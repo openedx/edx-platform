@@ -135,6 +135,11 @@ class CourseDetailsTestCase(CourseTestCase):
             jsondetails.self_paced
         )
 
+    @override_settings(FEATURES=dict(settings.FEATURES, ENABLE_SELF_PACED_COURSES=False))
+    def test_enable_self_paced(self):
+        details = CourseDetails.fetch(self.course.id)
+        self.assertNotIn('self_paced', details.__dict__)
+
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_marketing_site_fetch(self):
         settings_details_url = get_url(self.course.id)
