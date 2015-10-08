@@ -237,6 +237,7 @@ class SearchIndexerBase(object):
                 if item.start:
                     item_index['start_date'] = item.start
                 item_index['content_groups'] = item_content_groups if item_content_groups else None
+                item_index['staff_visibility'] = item.visible_to_staff_only if item.visible_to_staff_only else None
                 item_index.update(cls.supplemental_fields(item))
                 items_index.append(item_index)
                 indexed_count["count"] += 1

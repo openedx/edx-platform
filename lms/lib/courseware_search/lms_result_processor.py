@@ -9,7 +9,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from search.result_processor import SearchResultProcessor
 from xmodule.modulestore.django import modulestore
 
-from courseware.access import has_access
+from student.auth import has_access
+from student.roles import CourseInstructorRole, CourseStaffRole
 
 
 class LmsSearchResultProcessor(SearchResultProcessor):
@@ -60,10 +61,7 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def should_remove(self, user):
         """ Test to see if this result should be removed due to access restriction """
-        user_has_access = has_access(
-            user,
-            "load",
-            self.get_item(self.get_usage_key()),
-            self.get_course_key()
-        )
-        return not user_has_access
+        if self._results_fields['staff_visibility']:
+            return not (has_access(user, CourseStaffRole(self.get_course_key()))
+                or has_access(user, CourseInstructorRole(self.get_course_key())))
+        return False
