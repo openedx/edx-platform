@@ -511,7 +511,7 @@ class CourseWikiTest(UniqueCourseTest):
 
         # Access course wiki page
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Wiki')
+        self.tab_nav.go_to_tab('Theory')
 
     def _open_editor(self):
         self.course_wiki_page.open_editor()
@@ -637,8 +637,8 @@ class HighLevelTabTest(UniqueCourseTest):
         course_wiki = CourseWikiPage(self.browser, self.course_id)
         # From the course info page, navigate to the wiki tab
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Wiki')
-        self.assertTrue(self.tab_nav.is_on_tab('Wiki'))
+        self.tab_nav.go_to_tab('Theory')
+        self.assertTrue(self.tab_nav.is_on_tab('Theory'))
 
         # Assert that a default wiki is created
         expected_article_name = "{org}.{course_number}.{course_run}".format(
