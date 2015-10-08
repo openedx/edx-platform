@@ -131,6 +131,23 @@ class SettingsPage(CoursePage):
             raise Exception("Invalid license name: {name}".format(name=license_name))
         button.click()
 
+    @property
+    def course_pacing(self):
+        """
+        Returns the label text corresponding to the checked pacing radio button.
+        """
+        checked = self.q(css='section.pacing input[type=radio]:checked').results[0]
+        checked_id = checked.get_attribute('id')
+        return self.q(css='label[for={checked_id}]'.format(checked_id=checked_id)).results[0].text
+
+    @course_pacing.setter
+    def course_pacing(self, pacing):
+        """
+        Sets the course to either self-paced or instructor-led by checking
+        the appropriate radio button.
+        """
+        self.q(xpath="//label[contains(text(), '{pacing}')]".format(pacing=pacing)).click()
+
     ################
     # Waits
     ################

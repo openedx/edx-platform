@@ -410,6 +410,24 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             </section>
           % endif
 
+          % if settings.FEATURES.get("ENABLE_SELF_PACED_COURSES", False):
+
+            <hr class="divide" />
+
+            <section class="group-settings pacing">
+              <header>
+                <h2 class="title-2">${_("Course Pacing")}</h2>
+                <span class="tip">${_("Set the pacing for this course")}</span>
+              </header>
+
+              <input type="radio" name="self-paced" id="course-pace-self-paced" value="true"/>
+              <label for="course-pace-self-paced">Self-Paced</label>
+              <input type="radio" name="self-paced" id="course-pace-instructor-led" value="false"/>
+              <label for="course-pace-instructor-led">Instructor Led</label>
+            </section>
+
+          % endif
+
           % if settings.FEATURES.get("LICENSING", False):
             <hr class="divide" />
 
