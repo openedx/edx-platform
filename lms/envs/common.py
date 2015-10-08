@@ -802,6 +802,7 @@ TEMPLATE_DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
+SESSION_ENGINE = 'openedx.core.djangoapps.safe_sessions.backends.db'
 
 # CMS base
 CMS_BASE = 'localhost:8001'
