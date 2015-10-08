@@ -316,6 +316,28 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('To access course materials, you must score', resp.content)
 
+    def test_entrance_exam_requirement_message_with_correct_percentage(self):
+        """
+        Unit Test: entrance exam requirement message should be present in response
+        and percentage of required score should be rounded as expected
+        """
+        minimum_score_pct = 29
+        self.course.entrance_exam_minimum_score_pct = float(minimum_score_pct) / 100
+        modulestore().update_item(self.course, self.request.user.id)  # pylint: disable=no-member
+        url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'chapter': self.entrance_exam.location.name,
+                'section': self.exam_1.location.name
+            }
+        )
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('To access course materials, you must score {required_score}% or higher'.format(
+            required_score=minimum_score_pct
+        ), resp.content)
+
     def test_entrance_exam_requirement_message_hidden(self):
         """
         Unit Test: entrance exam message should not be present outside the context of entrance exam subsection.
