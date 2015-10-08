@@ -347,8 +347,13 @@ def get_ccx_schedule(course, ccx):
         Recursive generator function which yields CCX schedule nodes.
         We convert dates to string to get them ready for use by the js date
         widgets, which use text inputs.
+        Visits students visible nodes only; nodes children of hidden ones
+        are skipped as well.
         """
         for child in node.get_children():
+            # in case the children are visible to staff only, skip them
+            if child.visible_to_staff_only:
+                continue
             start = get_override_for_ccx(ccx, child, 'start', None)
             if start:
                 start = str(start)[:-9]
