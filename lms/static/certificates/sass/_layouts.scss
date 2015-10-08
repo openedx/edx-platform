@@ -276,7 +276,7 @@
             .signatory-signature {
                 display: block;
                 max-width: 100%;
-                height: rem(100);
+                max-height: rem(100);
                 padding: spacing-vertical(small) spacing-horizontal(small);
             }
         }
