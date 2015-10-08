@@ -49,6 +49,9 @@ var edx = edx || {};
         self.render();
       });
 
+      // By default input date and time fileds are disable.
+      self.disableFields($('.ccx_due_date_time_fields'));
+      self.disableFields($('.ccx_start_date_time_fields'));
       // Add unit handlers
       this.chapter_select.on('change', function() {
         var chapter_location = self.chapter_select.val();
@@ -60,10 +63,15 @@ var edx = edx || {};
           .append(self.schedule_options(chapter.children));
           self.sequential_select.prop('disabled', false);
           $('#add-unit-button').prop('disabled', false);
-          self.set_datetime('start', chapter.start);
-          self.set_datetime('due', chapter.due);
+          // When a chapter is selected, start date fields are enabled and due date
+          // fields are disabled because due dates are not applicable on a chapter.
+          self.disableFields($('.ccx_due_date_time_fields'));
+          self.enableFields($('.ccx_start_date_time_fields'));
         } else {
           self.sequential_select.html('').prop('disabled', true);
+          // When no chapter is selected, all date fields are disabled.
+          self.disableFields($('.ccx_due_date_time_fields'));
+          self.disableFields($('.ccx_start_date_time_fields'));
         }
       });
 
@@ -78,8 +86,15 @@ var edx = edx || {};
            self.vertical_select.prop('disabled', false);
            self.set_datetime('start', sequential.start);
            self.set_datetime('due', sequential.due);
+           // When a subsection (aka sequential) is selected,
+           // both start and due date fields are enabled.
+           self.enableFields($('.ccx_due_date_time_fields'));
+           self.enableFields($('.ccx_start_date_time_fields'));
          } else {
+           // When "All subsections" is selected, all date fields are disabled.
            self.vertical_select.html('').prop('disabled', true);
+           self.disableFields($('.ccx_due_date_time_fields'));
+           self.enableFields($('.ccx_start_date_time_fields'));
          }
       });
 
@@ -90,8 +105,16 @@ var edx = edx || {};
           sequential = self.sequential_select.val();
           var vertical = self.find_unit(
           self.hidden, chapter, sequential, vertical_location);
-          self.set_datetime('start', vertical.start);
-          self.set_datetime('due', vertical.due);
+          // When a unit (aka vertical) is selected, all date fields are disabled because units
+          // inherit dates from subsection
+          self.disableFields($('.ccx_due_date_time_fields'));
+          self.disableFields($('.ccx_start_date_time_fields'));
+        } else {
+          // When "All units" is selected, all date fields are enabled,
+          // because units inherit dates from subsections and we
+          // are showing dates from the selected subsection.
+          self.enableFields($('.ccx_due_date_time_fields'));
+          self.enableFields($('.ccx_start_date_time_fields'));
         }
       });
 
@@ -330,6 +353,14 @@ var edx = edx || {};
         });
     },
 
+    disableFields: function($selector) {
+      $selector.find('select,input,button').prop('disabled', true);
+    },
+
+    enableFields: function($selector) {
+      $selector.find('select,input,button').prop('disabled', false);
+    },
+
     toggle_collapse: function(event) {
       event.preventDefault();
       var row = $(this).closest('tr');
@@ -344,10 +375,19 @@ var edx = edx || {};
         $(this).attr('aria-expanded', 'true');
         $(this).find(".fa-caret-right").removeClass('fa-caret-right').addClass('fa-caret-down');
         row.removeClass('collapsed').addClass('expanded');
-        children.filter('.collapsed').each(function() {
-          children = children.not(self.get_children(this));
-        });
-         children.show();
+        var depth = $(row).data('depth');
+        var $childNodes = children.filter('.collapsed');
+        if ($childNodes.length <= 0) {
+          children.show();
+        } else {
+          // this will expand units.
+          $childNodes.each(function() {
+            var depthChild = $(this).data('depth');
+            if (depth === (depthChild - 1)) {
+              $(this).show();
+            }
+          });
+        }
       }
     },
 
@@ -374,9 +414,9 @@ var edx = edx || {};
           $(row).find('.ccx_sr_alert').attr('aria-expanded', 'false');
           $(row).find('.fa-caret-down').removeClass('fa-caret-down').addClass('fa-caret-right');
           row.removeClass('expanded').addClass('collapsed');
-          $('table.ccx-schedule .sequential,.vertical').hide();
         }
       });
+      $('table.ccx-schedule .sequential,.vertical').hide();
     },
 
     enterNewDate: function(what) {
@@ -429,8 +469,14 @@ var edx = edx || {};
           }
           if (what === 'start') {
             unit.start = date + ' ' + time;
+            if (unit.category === "sequential") {
+              self.updateChildrenDates(unit, what, unit.start);
+            }
           } else {
             unit.due = date + ' ' + time;
+            if (unit.category === "sequential") {
+              self.updateChildrenDates(unit, what, unit.due);
+            }
           }
           modal.find('.close-modal').click();
           self.dirty = true;
@@ -438,6 +484,19 @@ var edx = edx || {};
           self.render();
         });
       };
+    },
+
+    updateChildrenDates: function(sequential, date_type, date) {
+      // This code iterates the children (aka verticals) of a sequential.
+      // It updates start and due dates to corresponding dates
+      // of sequential (parent).
+      _.forEach(sequential.children, function (unit) {
+        if (date_type === 'start') {
+          unit.start = date;
+        } else {
+          unit.due = date;
+        }
+      });
     },
 
     find_unit: function(tree, chapter, sequential, vertical) {
