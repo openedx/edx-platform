@@ -25,6 +25,7 @@ def third_party_auth_links(context):
         redirect_to = get_next_url_for_login_page(request)
         third_party_auth_context = {
             'pipeline_url': auth_pipeline_urls(AUTH_ENTRY_SUDO, redirect_url=redirect_to),
+            'has_enabled_account': any(state.has_account for state in auth_states),
             'providers': [{
                 'provider_id': state.provider.provider_id,
                 'has_account': state.has_account,

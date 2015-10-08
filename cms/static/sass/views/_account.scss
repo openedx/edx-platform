@@ -246,15 +246,21 @@
 }
 
 .view-sudo {
-  margin-top: $baseline;
 
   .sudo-content {
     width: 580px;
     margin: 0 auto;
     float: unset;
 
-    h1 {
+    h2 {
       text-align: center;
+    }
+
+    .errorlist {
+      border-left: 3px solid $error-red;
+      padding: 10px 15px;
+      background-color: $gray-l6;
+      list-style-type: none;
     }
 
     form {
@@ -299,7 +305,7 @@
       width: flex-grid(8, 8);
       margin-bottom: $baseline;
 
-      button[type="submit"] {
+      button.button-primary {
         @extend %btn-secondary-blue;
         background: white;
         width: flex-grid(4, 8);

@@ -491,7 +491,7 @@
     position: relative;
     display: block;
     margin: ($baseline*1.5) 0;
-    border-top: ($baseline/5) solid white;
+    border-top: ($baseline/5) solid $m-gray-l4;
 
     .copy {
       @extend %t-copy-lead1;
@@ -500,7 +500,7 @@
       top: -($baseline);
       left: 43%;
       padding: ($baseline/4) ($baseline*1.5);
-      background: #f2f2f2;
+      background: white;
       text-align: center;
       color: $m-gray-l2;
     }
@@ -756,12 +756,27 @@
   }
 }
 
-#sudo {
+.sudo {
   margin: 0 auto;
-  width: 480px;
+  max-width: 480px;
   padding: 50px;
+
+  .deco-divider {
+    border-top: ($baseline/5) solid $white;
+
+    .copy {
+      background: $light-gray1;
+    }
+  }
 
   h2 {
     text-align: center;
+  }
+
+  .errorlist {
+    border-left: 3px solid $error-color;
+    padding: 10px 15px;
+    background-color: $gray-l4;
+    list-style-type: none;
   }
 }
