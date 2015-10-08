@@ -41,7 +41,7 @@
                 <div class="signature-upload-wrapper">
                   <div class="signature-upload-input-wrapper">
                     <input id="signatory-signature-<%= signatory_number %>" class="collection-name-input input-text signatory-signature-input" name="signatory-signature-url" type="text" placeholder="<%= gettext("Path to Signature Image") %>" value="<%= signature_image_path %>"  aria-describedby="signatory-signature-<%= signatory_number %>-tip" readonly />
-                    <span id="signatory-signature-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Image must be 450px X 150px transparent PNG") %></span>
+                    <span id="signatory-signature-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Image must be in PNG format") %></span>
                   </div>
                   <button type="button" class="action action-upload-signature">Upload Signature Image</button>
                 </div>
