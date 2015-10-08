@@ -192,9 +192,9 @@ class CourseDetails(object):
             descriptor.language = jsondict['language']
             dirty = True
 
-        if (settings.FEATURES.get('ENABLE_SELF_PACED_COURSES') and
-            'self_paced' in jsondict and
-            jsondict['self_paced'] != descriptor.self_paced):
+        if (settings.FEATURES.get('ENABLE_SELF_PACED_COURSES')
+                and 'self_paced' in jsondict
+                and jsondict['self_paced'] != descriptor.self_paced):
             descriptor.self_paced = jsondict['self_paced']
             dirty = True
 
