@@ -68,6 +68,37 @@ class TrackMiddlewareTestCase(TestCase):
             'client_id': None,
         })
 
+    def test_no_forward_for_header_ip_context(self):
+        request = self.request_factory.get('/courses/')
+        remote_addr = '127.0.0.1'
+
+        request.META['REMOTE_ADDR'] = remote_addr
+        context = self.get_context_for_request(request)
+
+        self.assertEquals(context['ip'], remote_addr)
+
+    def test_single_forward_for_header_ip_context(self):
+        request = self.request_factory.get('/courses/')
+        remote_addr = '127.0.0.1'
+        forwarded_ip = '11.22.33.44'
+
+        request.META['REMOTE_ADDR'] = remote_addr
+        request.META['HTTP_X_FORWARDED_FOR'] = forwarded_ip
+        context = self.get_context_for_request(request)
+
+        self.assertEquals(context['ip'], forwarded_ip)
+
+    def test_multiple_forward_for_header_ip_context(self):
+        request = self.request_factory.get('/courses/')
+        remote_addr = '127.0.0.1'
+        forwarded_ip = '11.22.33.44, 10.0.0.1, 127.0.0.1'
+
+        request.META['REMOTE_ADDR'] = remote_addr
+        request.META['HTTP_X_FORWARDED_FOR'] = forwarded_ip
+        context = self.get_context_for_request(request)
+
+        self.assertEquals(context['ip'], '11.22.33.44')
+
     def get_context_for_path(self, path):
         """Extract the generated event tracking context for a given request for the given path."""
         request = self.request_factory.get(path)
