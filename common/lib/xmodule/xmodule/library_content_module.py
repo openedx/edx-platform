@@ -221,11 +221,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")
         selected = block_keys['selected']
 
-        # Save our selections to the user state, to ensure consistency:
-        self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
-        # Cache the results
-        self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
-
         # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
@@ -253,6 +248,11 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 result=format_block_keys(selected),
                 added=format_block_keys(block_keys['added'])
             )
+
+        # Save our selections to the user state, to ensure consistency:
+        self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
+        # Cache the results
+        self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
 
         return selected
 
