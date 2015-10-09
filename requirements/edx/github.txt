@@ -13,8 +13,6 @@ git+https://github.com/edx/django-wiki.git@dc121c3b400ca02ced2158d5ac1ad135933a3
 -e git+https://github.com/edx/django-oauth2-provider.git@django1.8-upgrade#egg=django-oauth2-provider
 -e git+https://github.com/edx/django-rest-framework-oauth.git@f0b503fda8c254a38f97fef802ded4f5fe367f7a#egg=djangorestframework-oauth
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
-# TODO: macdiesel remove this?
-# git+https://github.com/edx/django-staticfiles.git@031bdeaea85798b8c284e2a09977df3e32d06b5d#egg=django-staticfiles==1.2.1.0003
 git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
