@@ -665,9 +665,9 @@ ECOMMERCE_API_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_API_TIMEOUT', ECOMMERCE_API_TI
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ('ccx',)
+    INSTALLED_APPS += ('lms.djangoapps.ccx',)
     FIELD_OVERRIDE_PROVIDERS += (
-        'ccx.overrides.CustomCoursesForEdxOverrideProvider',
+        'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
 
 ##### Individual Due Date Extensions #####

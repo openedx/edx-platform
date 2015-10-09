@@ -108,7 +108,7 @@ class CourseOverview(TimeStampedModel):
         start = course.start
         end = course.end
         if isinstance(course.id, CCXLocator):
-            from ccx.utils import get_ccx_from_ccx_locator  # pylint: disable=import-error
+            from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
             ccx = get_ccx_from_ccx_locator(course.id)
             display_name = ccx.display_name
             start = ccx.start

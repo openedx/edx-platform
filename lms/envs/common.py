@@ -1910,7 +1910,7 @@ INSTALLED_APPS = (
     'enrollment',
 
     # Student Identity Verification
-    'verify_student',
+    'lms.djangoapps.verify_student',
 
     # Dark-launching languages
     'dark_lang',
@@ -1937,6 +1937,7 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
+    'social.apps.django_app.default',
 
     # Surveys
     'survey',
@@ -1960,7 +1961,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     # Course teams
-    'teams',
+    'lms.djangoapps.teams',
 
     'xblock_django',
 )

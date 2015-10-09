@@ -23,9 +23,9 @@ from common.test.utils import skip_signal
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from util.testing import EventTestMixin
-from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
-from ..models import CourseTeamMembership
-from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, LAST_ACTIVITY_AT
+from lms.djangoapps.teams.models import CourseTeamMembership
+from lms.djangoapps.teams.search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 

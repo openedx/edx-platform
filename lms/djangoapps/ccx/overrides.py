@@ -13,7 +13,7 @@ from courseware.field_overrides import FieldOverrideProvider  # pylint: disable=
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
-from .models import CcxFieldOverride, CustomCourseForEdX
+from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 
 
 log = logging.getLogger(__name__)

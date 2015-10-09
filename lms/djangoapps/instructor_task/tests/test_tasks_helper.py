@@ -28,7 +28,7 @@ from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistratio
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from instructor_task.models import ReportStore

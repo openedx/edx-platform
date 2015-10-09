@@ -77,7 +77,7 @@ from util.json_request import JsonResponse
 from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
-from verify_student.services import ReverificationService
+from lms.djangoapps.verify_student.services import ReverificationService
 
 from edx_proctoring.services import ProctoringService
 from openedx.core.djangoapps.credit.services import CreditService

@@ -48,9 +48,8 @@ from instructor.enrollment import (
     get_email_params,
 )
 
-from .models import CustomCourseForEdX
-from .overrides import (
-    clear_override_for_ccx,
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
     override_field_for_ccx,
     clear_ccx_field_info_from_ccx_map,

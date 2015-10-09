@@ -4,7 +4,7 @@ Dummy factories for tests
 from factory import SubFactory
 from factory.django import DjangoModelFactory
 from student.tests.factories import UserFactory
-from ccx.models import CustomCourseForEdX  # pylint: disable=import-error
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 class CcxFactory(DjangoModelFactory):  # pylint: disable=missing-docstring

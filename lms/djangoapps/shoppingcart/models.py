@@ -32,7 +32,7 @@ from django.core.mail.message import EmailMessage
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
 
-from courseware.courses import get_course_by_id
+import courseware
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
@@ -330,7 +330,7 @@ class Order(models.Model):
         csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
         for item in orderitems:
             course_id = item.course_id
-            course = get_course_by_id(getattr(item, 'course_id'), depth=0)
+            course = courseware.courses.get_course_by_id(item.course_id, depth=0)
             registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id, order=self)
             course_info.append((course.display_name, ' (' + course.start_datetime_text() + '-' + course.end_datetime_text() + ')'))
             for registration_code in registration_codes:
@@ -759,7 +759,7 @@ class OrderItem(TimeStampedModel):
         """
         course_key = getattr(self, 'course_id', None)
         if course_key:
-            course = get_course_by_id(course_key, depth=0)
+            course = courseware.courses.get_course_by_id(course_key, depth=0)
             return course.display_name
         else:
             raise Exception(

@@ -21,7 +21,7 @@ from course_modes.admin import CourseModeForm
 # defined in the LMS and course_modes is in common.  However, the benefits
 # of putting all this configuration in one place outweigh the downsides.
 # Once the course admin tool is deployed, we can remove this dependency.
-from verify_student.models import VerificationDeadline  # pylint: disable=import-error
+from lms.djangoapps.verify_student.models import VerificationDeadline
 
 
 # We can only test this in the LMS because the course modes admin relies

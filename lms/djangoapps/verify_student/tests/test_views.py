@@ -42,11 +42,11 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
-from verify_student.views import (
+from lms.djangoapps.verify_student.views import (
     checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
     _compose_message_reverification_email
 )
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     VerificationDeadline, SoftwareSecurePhotoVerification,
     VerificationCheckpoint, VerificationStatus
 )

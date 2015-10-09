@@ -787,6 +787,11 @@ INSTALLED_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # These are apps that aren't strictly needed by Studio, but are imported by
+    # other apps that are.  Django 1.8 wants to have imported models supported
+    # by installed apps.
+    'lms.djangoapps.verify_student',
 )
 
 
