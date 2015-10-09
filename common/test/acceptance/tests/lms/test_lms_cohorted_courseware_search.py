@@ -3,6 +3,7 @@ Test courseware search
 """
 import os
 import json
+import uuid
 
 from ..helpers import remove_file
 from ...pages.common.logout import LogoutPage
@@ -57,14 +58,14 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.content_group_b = "Content Group B"
 
         # Create a student who will be in "Cohort A"
-        self.cohort_a_student_username = "cohort_a_student"
+        self.cohort_a_student_username = "cohort_a_student" + "_" + str(uuid.uuid4().hex)[:5]
         self.cohort_a_student_email = "cohort_a_student@example.com"
         StudioAutoAuthPage(
             self.browser, username=self.cohort_a_student_username, email=self.cohort_a_student_email, no_login=True
         ).visit()
 
         # Create a student who will be in "Cohort B"
-        self.cohort_b_student_username = "cohort_b_student"
+        self.cohort_b_student_username = "cohort_b_student" + "_" + str(uuid.uuid4().hex)[:5]
         self.cohort_b_student_email = "cohort_b_student@example.com"
         StudioAutoAuthPage(
             self.browser, username=self.cohort_b_student_username, email=self.cohort_b_student_email, no_login=True
