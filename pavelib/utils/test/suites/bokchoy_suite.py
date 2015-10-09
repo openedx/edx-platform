@@ -3,7 +3,9 @@ Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
 
-from paver.easy import sh
+from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
+
+from paver.easy import sh, BuildFailure
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test import bokchoy_utils
@@ -15,6 +17,9 @@ except ImportError:
     colorize = lambda color, text: text  # pylint: disable=invalid-name
 
 __test__ = False  # do not collect
+
+DEFAULT_NUM_PROCESSES = 1
+DEFAULT_VERBOSITY = 2
 
 
 class BokChoyTestSuite(TestSuite):
@@ -30,6 +35,9 @@ class BokChoyTestSuite(TestSuite):
       testsonly - assume servers are running (as per above) and run tests with no setup or cleaning of environment
       test_spec - when set, specifies test files, classes, cases, etc. See platform doc.
       default_store - modulestore to use when running tests (split or draft)
+      num_processes - number of processes or threads to use in tests. Recommendation is that this
+      is less than or equal to the number of available processors.
+      See nosetest documentation: http://nose.readthedocs.org/en/latest/usage.html
     """
     def __init__(self, *args, **kwargs):
         super(BokChoyTestSuite, self).__init__(*args, **kwargs)
@@ -43,7 +51,8 @@ class BokChoyTestSuite(TestSuite):
         self.testsonly = kwargs.get('testsonly', False)
         self.test_spec = kwargs.get('test_spec', None)
         self.default_store = kwargs.get('default_store', None)
-        self.verbosity = kwargs.get('verbosity', 2)
+        self.verbosity = kwargs.get('verbosity', DEFAULT_VERBOSITY)
+        self.num_processes = kwargs.get('num_processes', DEFAULT_NUM_PROCESSES)
         self.extra_args = kwargs.get('extra_args', '')
         self.har_dir = self.log_dir / 'hars'
         self.imports_dir = kwargs.get('imports_dir', None)
@@ -70,6 +79,16 @@ class BokChoyTestSuite(TestSuite):
         msg = colorize('green', "Confirming servers have started...")
         print msg
         bokchoy_utils.wait_for_test_servers()
+        try:
+            # Create course in order to seed forum data underneath. This is
+            # a workaround for a race condition. The first time a course is created;
+            # role permissions are set up for forums.
+            CourseFixture('foobar_org', '1117', 'seed_forum', 'seed_foo').install()
+            print 'Forums permissions/roles data has been seeded'
+        except FixtureError:
+            # this means it's already been done
+            pass
+
         if self.serversonly:
             self.run_servers_continuously()
 
@@ -82,6 +101,34 @@ class BokChoyTestSuite(TestSuite):
         # Clean up data we created in the databases
         sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
         bokchoy_utils.clear_mongo()
+
+    def verbosity_processes_string(self):
+        """
+        Multiprocessing, xunit, color, and verbosity do not work well together. We need to construct
+        the proper combination for use with nosetests.
+        """
+        substring = []
+
+        if self.verbosity != DEFAULT_VERBOSITY and self.num_processes != DEFAULT_NUM_PROCESSES:
+            msg = 'Cannot pass in both num_processors and verbosity. Quitting'
+            raise BuildFailure(msg)
+
+        if self.num_processes != 1:
+            # Construct "multiprocess" nosetest substring
+            substring = [
+                "--with-xunitmp --xunitmp-file={}".format(self.xunit_report),
+                "--processes={}".format(self.num_processes),
+                "--no-color --process-timeout=1200"
+            ]
+
+        else:
+            substring = [
+                "--with-xunit",
+                "--xunit-file={}".format(self.xunit_report),
+                "--verbosity={}".format(self.verbosity),
+            ]
+
+        return " ".join(substring)
 
     def prepare_bokchoy_run(self):
         """
@@ -160,9 +207,7 @@ class BokChoyTestSuite(TestSuite):
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
             "nosetests",
             test_spec,
-            "--with-xunit",
-            "--xunit-file={}".format(self.xunit_report),
-            "--verbosity={}".format(self.verbosity),
+            "{}".format(self.verbosity_processes_string())
         ]
         if self.pdb:
             cmd.append("--pdb")
