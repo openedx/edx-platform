@@ -2,7 +2,6 @@
 Content Library Transformer, used to filter course structure per user.
 """
 import json
-from courseware.access import _has_access_to_course
 from courseware.models import StudentModule
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 from xmodule.library_content_module import LibraryContentModule
@@ -45,9 +44,6 @@ class ContentLibraryTransformer(BlockStructureTransformer):
 
         Arguments:
             block_structure (BlockStructureCollectedData)
-
-        Returns:
-            dict[UsageKey: dict]
         """
         block_structure.request_xblock_fields('mode')
         block_structure.request_xblock_fields('max_count')
