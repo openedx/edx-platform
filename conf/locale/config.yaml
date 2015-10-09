@@ -95,7 +95,6 @@ ignore_dirs:
     # Directories with no user-facing code.
     - '*/migrations'
     # Directories that are not our code.
-    - common/static/js/vendor/mathjax-MathJax-c9db6ac
     - node_modules
     # Directories containing files that can't have strings in them.
     - conf
