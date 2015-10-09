@@ -44,3 +44,4 @@ jenkins_source =
 
 devstack_source =
     /edx/app/edxapp/edx-platform
+
