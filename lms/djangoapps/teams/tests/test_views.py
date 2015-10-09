@@ -24,14 +24,8 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from student.models import CourseEnrollment
 from util.testing import EventTestMixin
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
-<<<<<<< HEAD
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
-=======
-from ..models import CourseTeam, CourseTeamMembership
-from ..search_indexes import CourseTeamIndexer, course_team_post_save_callback
-
->>>>>>> 88de80f... Upgrade Django to v1.8.4
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 
