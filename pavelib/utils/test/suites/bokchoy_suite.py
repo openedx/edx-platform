@@ -162,7 +162,9 @@ class BokChoyTestSuite(TestSuite):
             test_spec,
             "--with-xunit",
             "--xunit-file={}".format(self.xunit_report),
-            "--verbosity={}".format(self.verbosity),
+            # "--verbosity={}".format(self.verbosity),
+            "--processes=2",
+            "--no-color --process-timeout=150",
         ]
         if self.pdb:
             cmd.append("--pdb")
