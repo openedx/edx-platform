@@ -10,7 +10,7 @@ from django.http import HttpResponse, Http404
 from django.utils import translation
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from edxmako.shortcuts import render_to_response
 import student.views

@@ -8,7 +8,7 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/edx/django-pipeline.git@1.5.3+importfixes#egg=django-pipeline
+-e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 git+https://github.com/edx/django-wiki.git@dc121c3b400ca02ced2158d5ac1ad135933a396f#egg=django-wiki==0.0.2
 -e git+https://github.com/edx/django-oauth2-provider.git@django1.8-upgrade#egg=django-oauth2-provider
 -e git+https://github.com/edx/django-rest-framework-oauth.git@f0b503fda8c254a38f97fef802ded4f5fe367f7a#egg=djangorestframework-oauth
@@ -63,4 +63,3 @@ git+https://github.com/edx/edx-proctoring.git@django1.8-upgrade#egg=edx-proctori
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
 -e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
-
