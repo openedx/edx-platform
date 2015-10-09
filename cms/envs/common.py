@@ -394,6 +394,7 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
+SESSION_ENGINE = 'openedx.core.djangoapps.safe_sessions.backends.db'
 
 # Site info
 SITE_ID = 1

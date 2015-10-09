@@ -73,7 +73,7 @@ def gen_all_identities():
 
 
 @ddt
-@override_settings(SESSION_ENGINE='django.contrib.sessions.backends.cache')
+@override_settings(SESSION_ENGINE='openedx.core.djangoapps.safe_sessions.backends.cache')
 class ShibSPTest(SharedModuleStoreTestCase):
     """
     Tests for the Shibboleth SP, which communicates via request.META

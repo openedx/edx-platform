@@ -48,7 +48,7 @@ CACHES = {
     }
 }
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_ENGINE = 'openedx.core.djangoapps.safe_sessions.backends.cache'
 
 
 ################################ DEBUG TOOLBAR #################################
