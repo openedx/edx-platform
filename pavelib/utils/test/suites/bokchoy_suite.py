@@ -163,7 +163,7 @@ class BokChoyTestSuite(TestSuite):
             "--with-xunitmp",
             "--xunitmp-file={}".format(self.xunit_report),
             # "--verbosity={}".format(self.verbosity),
-            "--processes=2",
+            "--processes=4",
             "--no-color --process-timeout=150",
         ]
         if self.pdb:
