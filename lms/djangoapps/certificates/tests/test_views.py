@@ -308,8 +308,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 "company_about_title": "Microsite title"
             },
             "honor": {
-                "certificate_type": "Honor Code",
-                "document_body_class_append": "is-honorcode"
+                "certificate_type": "Honor Code"
             }
         }"""
 
@@ -343,8 +342,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 "company_about_description": "This should not survive being overwritten by static content"
             },
             "honor": {
-                "certificate_type": "Honor Code",
-                "document_body_class_append": "is-honorcode"
+                "certificate_type": "Honor Code"
             }
         }"""
         config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
@@ -377,7 +375,7 @@ class TrackShareRedirectTest(UrlResetMixin, ModuleStoreTestCase, EventTrackingTe
             user=self.user, course_id=self.course.id, data={
                 'image': 'http://www.example.com/image.png',
                 'json': {'id': 'http://www.example.com/assertion.json'},
-                'issuer': 'http://www.example.com/issuer.json',
+                'issuer': 'http://www.example.com/issuer.json'
             },
         )
 
@@ -402,7 +400,7 @@ class TrackShareRedirectTest(UrlResetMixin, ModuleStoreTestCase, EventTrackingTe
                     'assertion_image_url': 'http://www.example.com/image.png',
                     'user_id': self.user.id,
                     'issuer': 'http://www.example.com/issuer.json',
-                    'enrollment_mode': 'honor',
+                    'enrollment_mode': 'honor'
                 },
             },
             self.get_event()
