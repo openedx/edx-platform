@@ -206,6 +206,16 @@ ${fragment.foot_html()}
                     current_score=int(entrance_exam_current_score * 100)
                 )}
             </p>
+            <script type="text/javascript">
+            $(document).ajaxSuccess(function(event, xhr, settings) {
+                if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.entrance_exam_passed){
+                        location.reload();
+                    }
+                }
+            });
+            </script>
             % else:
               <p class="sequential-status-message">
                 ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
