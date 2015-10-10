@@ -180,6 +180,49 @@ class UserAttributeAdmin(admin.ModelAdmin):
         model = UserAttribute
 
 
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the user profile.
+    """
+
+    search_fields = (
+        'user__email', 'user__username', 'user__pk',
+    )
+
+    list_display = (
+        'name', 'username',  'email', 'user_pk',
+    )
+
+    readonly_fields = (
+        'user',
+    )
+
+    def username(self, profile):
+        """
+        Provide the `username` for `list_display` profiles admin.
+        """
+
+        return profile.user.username
+
+    def email(self, profile):
+        """
+        Provide the `email` for `list_display` profiles admin.
+        """
+
+        return profile.user.email
+
+    def user_pk(self, profile):
+        """
+        Provide the `user_pk` for `list_display` profiles admin.
+        """
+
+        return profile.user.pk
+
+    class Meta:
+        model = UserProfile
+
+
 admin.site.register(UserTestGroup)
 admin.site.register(CourseEnrollmentAllowed)
 admin.site.register(Registration)
