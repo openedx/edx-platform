@@ -48,7 +48,11 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course and not disable_courseware_header:
-    <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    <h2 class="course-header">
+      <span class="provider">${course.display_org_with_default | h}:</span>
+      <span class="course-number">${course.display_number_with_default | h}</span>
+      <span class="course-name">${course.display_name_with_default}</span>
+    </h2>
     % endif
 
     % if user.is_authenticated():
