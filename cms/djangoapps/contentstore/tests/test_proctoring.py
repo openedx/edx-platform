@@ -4,6 +4,8 @@ Tests for the edx_proctoring integration into Studio
 
 from mock import patch
 import ddt
+from datetime import datetime, timedelta
+from pytz import UTC
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -70,7 +72,8 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=is_time_limited,
             default_time_limit_minutes=default_time_limit_minutes,
-            is_proctored_enabled=is_procted_enabled
+            is_proctored_enabled=is_procted_enabled,
+            due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes+1)
         )
 
         listen_for_course_publish(self, self.course.id)

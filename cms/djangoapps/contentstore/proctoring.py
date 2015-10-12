@@ -65,6 +65,7 @@ def register_proctored_exams(course_key):
                 exam_id=exam['id'],
                 exam_name=timed_exam.display_name,
                 time_limit_mins=timed_exam.default_time_limit_minutes,
+                due_date=timed_exam.due,
                 is_proctored=timed_exam.is_proctored_enabled,
                 is_practice_exam=timed_exam.is_practice_exam,
                 is_active=True
@@ -77,6 +78,7 @@ def register_proctored_exams(course_key):
                 content_id=unicode(timed_exam.location),
                 exam_name=timed_exam.display_name,
                 time_limit_mins=timed_exam.default_time_limit_minutes,
+                due_date=timed_exam.due,
                 is_proctored=timed_exam.is_proctored_enabled,
                 is_practice_exam=timed_exam.is_practice_exam,
                 is_active=True
