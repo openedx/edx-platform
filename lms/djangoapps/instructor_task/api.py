@@ -38,6 +38,7 @@ from instructor_task.api_helper import (
     submit_task,
 )
 from bulk_email.models import CourseEmail
+from util import milestones_helpers
 
 
 def get_running_instructor_tasks(course_id):
@@ -269,6 +270,8 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     Module state for all problems in entrance exam will be deleted
     for specified student.
 
+    All User Milestones of entrance exam will be removed for the specified student
+
     Parameters are `usage_key`, which must be a :class:`Location`
     representing entrance exam section and the `student` as a User object.
 
@@ -285,6 +288,14 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     """
     # check arguments:  make sure entrance exam(section) exists for given usage_key
     modulestore().get_item(usage_key)
+
+    # Remove Content milestones that user has completed
+    milestones_helpers.remove_course_content_user_milestones(
+        course_key=usage_key.course_key,
+        content_key=usage_key,
+        user=student,
+        relationship='fulfills'
+    )
 
     task_type = 'delete_problem_state'
     task_class = delete_problem_state

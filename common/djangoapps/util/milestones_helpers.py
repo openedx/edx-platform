@@ -175,6 +175,18 @@ def fulfill_course_milestone(course_key, user):
         milestones_api.add_user_milestone({'id': user.id}, milestone)
 
 
+def remove_course_milestones(course_key, user, relationship):
+    """
+    Remove all user milestones for the course specified by course_key.
+    """
+    if not settings.FEATURES.get('MILESTONES_APP', False):
+        return None
+    from milestones import api as milestones_api
+    course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship=relationship)
+    for milestone in course_milestones:
+        milestones_api.remove_user_milestone({'id': user.id}, milestone)
+
+
 def get_required_content(course, user):
     """
     Queries milestones subsystem to see if the specified course is gated on one or more milestones,
@@ -319,6 +331,19 @@ def get_course_content_milestones(course_id, content_id, relationship):
         return []
     from milestones import api as milestones_api
     return milestones_api.get_course_content_milestones(course_id, content_id, relationship)
+
+
+def remove_course_content_user_milestones(course_key, content_key, user, relationship):
+    """
+    Removes the specified User-Milestone link from the system for the specified course content module.
+    """
+    if not settings.FEATURES.get('MILESTONES_APP', False):
+        return []
+    from milestones import api as milestones_api
+
+    course_content_milestones = milestones_api.get_course_content_milestones(course_key, content_key, relationship)
+    for milestone in course_content_milestones:
+        milestones_api.remove_user_milestone({'id': user.id}, milestone)
 
 
 def remove_content_references(content_id):
