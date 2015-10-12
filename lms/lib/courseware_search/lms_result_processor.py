@@ -23,20 +23,20 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def get_course_key(self):
         """ fetch course key object from string representation - retain result for subsequent uses """
-        # if self._course_key is None:
-        self._course_key = SlashSeparatedCourseKey.from_deprecated_string(self._results_fields["course"])
+        if self._course_key is None:
+            self._course_key = SlashSeparatedCourseKey.from_deprecated_string(self._results_fields["course"])
         return self._course_key
 
     def get_course_usage_key(self):
         """ fetch usage key for course from string representation - retain result for subsequent uses """
-        # if self._course_usage_key is None:
-        self._course_usage_key = self.get_module_store().make_course_usage_key(self.get_course_key())
+        if self._course_usage_key is None:
+            self._course_usage_key = self.get_module_store().make_course_usage_key(self.get_course_key())
         return self._course_usage_key
 
     def get_usage_key(self):
         """ fetch usage key for component from string representation - retain result for subsequent uses """
-        # if self._usage_key is None:
-        self._usage_key = self.get_course_key().make_usage_key_from_deprecated_string(self._results_fields["id"])
+        if self._usage_key is None:
+            self._usage_key = self.get_course_key().make_usage_key_from_deprecated_string(self._results_fields["id"])
         return self._usage_key
 
     def get_module_store(self):
@@ -47,11 +47,10 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def get_course_blocks(self, user):
         """ fetch cached blocks for course - retain for subsequent use"""
-        course_usage_key = self.get_course_usage_key()
         course_key = self.get_course_key()
-        # if course_usage_key not in self._course_blocks:
-        self._course_blocks[course_usage_key] = get_course_blocks(user, course_key=course_key)
-        return self._course_blocks[course_usage_key]
+        if course_key not in self._course_blocks:
+            self._course_blocks[course_key] = get_course_blocks(user, course_key=course_key)
+        return self._course_blocks[course_key]
 
     @property
     def url(self):
