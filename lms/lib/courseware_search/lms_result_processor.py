@@ -9,7 +9,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from search.result_processor import SearchResultProcessor
 from xmodule.modulestore.django import modulestore
 from lms.djangoapps.course_blocks.api import get_course_blocks
-
+from lms.djangoapps.courseware.access import has_access
 
 class LmsSearchResultProcessor(SearchResultProcessor):
 
@@ -48,8 +48,9 @@ class LmsSearchResultProcessor(SearchResultProcessor):
     def get_course_blocks(self, user):
         """ fetch cached blocks for course - retain for subsequent use"""
         course_usage_key = self.get_course_usage_key()
+        course_key = self.get_course_key()
         # if course_usage_key not in self._course_blocks:
-        self._course_blocks[course_usage_key] = get_course_blocks(user, course_usage_key)
+        self._course_blocks[course_usage_key] = get_course_blocks(user, course_key=course_key)
         return self._course_blocks[course_usage_key]
 
     @property
@@ -67,4 +68,6 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def should_remove(self, user):
         """ Test to see if this result should be removed due to access restriction """
+        if has_access(user, 'staff', self.get_course_key()):
+            return False
         return self.get_usage_key() not in self.get_course_blocks(user).get_block_keys()
