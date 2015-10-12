@@ -11,14 +11,13 @@ from xmodule.modulestore.django import modulestore
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.access import has_access
 
-class LmsSearchResultProcessor(SearchResultProcessor):
 
+class LmsSearchResultProcessor(SearchResultProcessor):
     """ SearchResultProcessor for LMS Search """
     _course_key = None
     _usage_key = None
     _module_store = None
     _course_blocks = {}
-
 
     def get_course_key(self):
         """ fetch course key object from string representation - retain result for subsequent uses """

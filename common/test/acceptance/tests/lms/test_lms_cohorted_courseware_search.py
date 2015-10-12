@@ -188,7 +188,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         set_visibility(1, self.content_group_a)
         set_visibility(2, self.content_group_b)
         set_visibility(3, self.content_group_a, self.content_group_b)
-        set_visibility(4, 'All Students and Staff') # Does not work without this
+        set_visibility(4, 'All Students and Staff')  # Does not work without this
 
         container_page.publish_action.click()
 
