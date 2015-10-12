@@ -4,6 +4,7 @@ Student and course analytics.
 Serve miscellaneous course and student data
 """
 import json
+import datetime
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, CourseRegCodeItem,
     RegistrationCodeRedemption, CourseRegistrationCodeInvoiceItem
@@ -19,6 +20,9 @@ from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
 from edx_proctoring.api import get_all_exam_attempts
 from courseware.models import StudentModule
+from certificates.models import GeneratedCertificate
+from django.db.models import Count
+from certificates.models import CertificateStatuses
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -38,6 +42,7 @@ SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_co
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
 COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
+CERTIFICATE_FEATURES = ('course_id', 'mode', 'status', 'grade', 'created_date', 'is_active', 'error_reason')
 
 UNAVAILABLE = "[unavailable]"
 
@@ -160,6 +165,32 @@ def sale_record_features(course_id, features):
         return sale_dict
 
     return [sale_records_info(sale, features) for sale in sales]
+
+
+def issued_certificates(course_key, features):
+    """
+    Return list of issued certificates as dictionaries against the given course key.
+
+    issued_certificates(course_key, features)
+    would return [
+        {course_id: 'abc', 'total_issued_certificate': '5', 'mode': 'honor'}
+        {course_id: 'abc', 'total_issued_certificate': '10', 'mode': 'verified'}
+        {course_id: 'abc', 'total_issued_certificate': '15', 'mode': 'Professional Education'}
+    ]
+    """
+
+    report_run_date = datetime.date.today().strftime("%B %d, %Y")
+    certificate_features = [x for x in CERTIFICATE_FEATURES if x in features]
+    generated_certificates = list(GeneratedCertificate.objects.filter(
+        course_id=course_key,
+        status=CertificateStatuses.downloadable
+    ).values(*certificate_features).annotate(total_issued_certificate=Count('mode')))
+
+    # Report run date
+    for data in generated_certificates:
+        data['report_run_date'] = report_run_date
+
+    return generated_certificates
 
 
 def enrolled_students_features(course_key, features):

@@ -136,9 +136,9 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         """Check that the certificates section is visible on the instructor dash. """
         response = self.client.get(self.url)
         if is_visible:
-            self.assertContains(response, "Certificates")
+            self.assertContains(response, "Student-Generated Certificates")
         else:
-            self.assertNotContains(response, "Certificates")
+            self.assertNotContains(response, "Student-Generated Certificates")
 
     @contextlib.contextmanager
     def _certificate_status(self, description, status):
