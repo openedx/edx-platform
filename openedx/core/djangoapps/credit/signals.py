@@ -30,7 +30,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         log.info(u'Added task to update credit requirements for course "%s" to the task queue', course_key)
 
 
-@receiver(GRADES_UPDATED)
+@receiver(GRADES_UPDATED, dispatch_uid="edxapp.credit.grades_updated")
 def listen_for_grade_calculation(sender, username, grade_summary, course_key, deadline, **kwargs):  # pylint: disable=unused-argument
     """Receive 'MIN_GRADE_REQUIREMENT_STATUS' signal and update minimum grade
     requirement status.

@@ -1073,6 +1073,7 @@ NOTIFICATION_CLICK_LINK_URL_MAPS = {
     'open-edx.lms.leaderboard.*': '/courses/{course_id}/cohort',
     'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/{commentable_id}/threads/{thread_id}',
     'open-edx.xblock.group-project.*': '/courses/{course_id}/group_work?seqid={activity_location}',
+    'open-edx.xblock.group-project-v2.*': '/courses/{course_id}/group_work?activate_block_id={location}',
 }
 
 # list all known channel providers
