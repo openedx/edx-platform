@@ -182,6 +182,7 @@ class FieldsMixin(object):
         Return value of field in `display` or `placeholder` mode.
         """
         self.wait_for_field(field_id)
+        self.wait_for_ajax()
 
         return self.q(css='.u-field-{} .u-field-value .u-field-value-readonly'.format(field_id)).text[0]
 

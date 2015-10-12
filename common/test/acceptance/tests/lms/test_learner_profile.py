@@ -375,10 +375,10 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Given that I am a registered user.
         And I visit my Profile page.
         And I set the profile visibility to public and set default values for public fields.
-        Then I set about me value to `Eat Sleep Code`.
-        Then displayed about me should be `Eat Sleep Code` and about me field mode should be `display`
+        Then I set about me value to `ThisIsIt`.
+        Then displayed about me should be `ThisIsIt` and about me field mode should be `display`
         And I reload the page.
-        Then displayed about me should be `Eat Sleep Code` and about me field mode should be `display`
+        Then displayed about me should be `ThisIsIt` and about me field mode should be `display`
         Then I set empty value for about me.
         Then displayed about me should be `Tell other edX learners a little about yourself: where you live,
         what your interests are, why you're taking courses on edX, or what you hope to learn.` and about me
