@@ -15,7 +15,6 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     """ SearchResultProcessor for LMS Search """
     _course_key = None
-    _course_usage_key = None
     _usage_key = None
     _module_store = None
     _course_blocks = {}
@@ -26,12 +25,6 @@ class LmsSearchResultProcessor(SearchResultProcessor):
         if self._course_key is None:
             self._course_key = SlashSeparatedCourseKey.from_deprecated_string(self._results_fields["course"])
         return self._course_key
-
-    def get_course_usage_key(self):
-        """ fetch usage key for course from string representation - retain result for subsequent uses """
-        if self._course_usage_key is None:
-            self._course_usage_key = self.get_module_store().make_course_usage_key(self.get_course_key())
-        return self._course_usage_key
 
     def get_usage_key(self):
         """ fetch usage key for component from string representation - retain result for subsequent uses """
