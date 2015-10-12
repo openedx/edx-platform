@@ -291,7 +291,7 @@ def get_thread_list(
     if exclusive_param_count > 1:  # pragma: no cover
         raise ValueError("More than one mutually exclusive param passed to get_thread_list")
 
-    cc_map = {"last_activity_at": "date", "comment_count": "comments", "vote_count": "votes"}
+    cc_map = {"last_activity_at": "activity", "comment_count": "comments", "vote_count": "votes"}
     if order_by not in cc_map:
         raise ValidationError({
             "order_by":
