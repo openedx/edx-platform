@@ -519,20 +519,20 @@ class CohortManagementSection(PageObject):
         """
         Uploads a file with cohort assignment information.
         """
+        assert False, "This has a file upload and needs a browser"
         # Toggle on the CSV upload section.
         cvs_upload_toggle_css = '.toggle-cohort-management-secondary'
         self.wait_for_element_visibility(cvs_upload_toggle_css, "Wait for csv upload link to appear")
-        cvs_upload_toggle = self.q(css=self._bounded_selector(cvs_upload_toggle_css)).first
-        if cvs_upload_toggle:
-            cvs_upload_toggle.click()
-            self.wait_for_element_visibility(
-                self._bounded_selector(self.csv_browse_button_selector_css),
-                'File upload link visible'
-            )
+        cvs_upload_toggle = self.q(css=self._bounded_selector(cvs_upload_toggle_css)).first.click()
+        self.wait_for_element_visibility(
+            self._bounded_selector(self.csv_browse_button_selector_css),
+            'File upload link visible'
+        )
         path = InstructorDashboardPage.get_asset_path(filename)
         file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector_css)).results[0]
         file_input.send_keys(path)
-        self.q(css=self._bounded_selector(self.csv_upload_button_selector_css)).first.click()
+        upload_file_button = self.q(css=self._bounded_selector(self.csv_upload_button_selector_css)).first.results[0]
+        upload_file_button.click()
 
     @property
     def is_cohorted(self):

@@ -355,6 +355,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         cohort_name = str(uuid.uuid4().get_hex()[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type='random')
 
+    @attr('nophantom')  # _get_messages
     def test_update_existing_cohort_settings(self):
         """
         Scenario: Update existing cohort settings(cohort name, assignment type)
@@ -426,6 +427,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         message = "There must be one cohort to which students can automatically be assigned."
         self.assertEqual(message, self.cohort_management_page.assignment_settings_message)
 
+    @attr('nophantom')  # something about enable/disable or maybe the refresh
     def test_cohort_enable_disable(self):
         """
         Scenario: Cohort Enable/Disable checkbox related functionality is working as intended.
@@ -461,6 +463,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         data_download_page = DataDownloadPage(self.browser)
         data_download_page.wait_for_page()
 
+    @attr('nophantom')
     def test_cohort_by_csv_both_columns(self):
         """
         Scenario: the instructor can upload a file with user and cohort assignments, using both emails and usernames.
@@ -475,6 +478,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         # student_user to AutoCohort1 via email
         self._verify_csv_upload_acceptable_file("cohort_users_both_columns.csv")
 
+    @attr('nophantom')
     def test_cohort_by_csv_only_email(self):
         """
         Scenario: the instructor can upload a file with user and cohort assignments, using only emails.
@@ -488,6 +492,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         # cohort_users_only_email.csv adds instructor_user to ManualCohort1 and student_user to AutoCohort1 via email
         self._verify_csv_upload_acceptable_file("cohort_users_only_email.csv")
 
+    @attr('nophantom')
     def test_cohort_by_csv_only_username(self):
         """
         Scenario: the instructor can upload a file with user and cohort assignments, using only usernames.
@@ -566,6 +571,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         )
         self.assertLessEqual(start_time.replace(second=0, microsecond=0), utc.localize(report_datetime))
 
+    @attr('nophantom')
     def test_cohort_by_csv_wrong_file_type(self):
         """
         Scenario: if the instructor uploads a non-csv file, an error message is presented.
@@ -578,6 +584,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.cohort_management_page.upload_cohort_file("image.jpg")
         self._verify_cohort_by_csv_notification("The file must end with the extension '.csv'.")
 
+    @attr('nophantom')
     def test_cohort_by_csv_missing_cohort(self):
         """
         Scenario: if the instructor uploads a csv file with no cohort column, an error message is presented.
@@ -590,6 +597,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_cohort_column.csv")
         self._verify_cohort_by_csv_notification("The file must contain a 'cohort' column containing cohort names.")
 
+    @attr('nophantom')
     def test_cohort_by_csv_missing_user(self):
         """
         Scenario: if the instructor uploads a csv file with no username or email column, an error message is presented.
@@ -715,6 +723,7 @@ class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
         self.reload_page()
         self.assertEqual(self.cohort_management_page.get_cohorted_topics_count(key), cohorted_topics)
 
+    @attr('nophantom')
     def test_cohort_course_wide_discussion_topic(self):
         """
         Scenario: cohort a course-wide discussion topic.
@@ -788,6 +797,7 @@ class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
         self.reload_page()
         self.assertIsNotNone(self.cohort_management_page.cohort_some_inline_discussion_selected())
 
+    @attr('nophantom')
     def test_cohort_inline_discussion_topic(self):
         """
         Scenario: cohort inline discussion topic.
@@ -877,6 +887,7 @@ class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
         # category should not be selected.
         self.assertFalse(self.cohort_management_page.is_category_selected())
 
+    @attr('nophantom')
     def test_verify_that_correct_subset_of_category_being_selected_after_save(self):
         """
         Scenario: Category should be selected on selecting final child.
@@ -966,6 +977,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
         self.assertEquals(["Apples", "Bananas"], self.cohort_management_page.get_all_content_groups())
 
+    @attr('nophantom')  # _get_messages
     def test_link_to_content_group(self):
         """
         Scenario: In a course with content groups, cohorts can be linked to content groups
@@ -981,6 +993,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self._link_cohort_to_content_group(self.cohort_name, "Bananas")
         self.assertEqual("Bananas", self.cohort_management_page.get_cohort_associated_content_group())
 
+    @attr('nophantom')  # _get_messages
     def test_unlink_from_content_group(self):
         """
         Scenario: In a course with content groups, cohorts can be unlinked from content groups
@@ -1021,6 +1034,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.select_cohort(new_cohort)
         self.assertEqual("Apples", self.cohort_management_page.get_cohort_associated_content_group())
 
+    @attrib('nophantom')
     def test_missing_content_group(self):
         """
         Scenario: In a course with content groups, if a cohort is associated with a content group that no longer

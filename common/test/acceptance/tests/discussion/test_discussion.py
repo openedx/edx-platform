@@ -600,6 +600,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
 
 
 @attr('shard_2')
+@attr('nophantom')
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
