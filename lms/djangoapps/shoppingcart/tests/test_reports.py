@@ -84,7 +84,7 @@ class ReportTypeTests(ModuleStoreTestCase):
 
         self.cart = Order.get_cart_for_user(self.second_refund_user)
         CertificateItem.add_to_order(self.cart, self.course_key, self.cost, 'verified')
-        self.cart.purchase(self.second_refund_user, self.course_key)
+        self.cart.purchase(self.second_refund_user.username, self.course_key)
         CourseEnrollment.unenroll(self.second_refund_user, self.course_key)
 
         self.test_time = datetime.datetime.now(pytz.UTC)
@@ -101,8 +101,8 @@ class ReportTypeTests(ModuleStoreTestCase):
 
         self.CORRECT_REFUND_REPORT_CSV = dedent("""
             Order Number,Customer Name,Date of Original Transaction,Date of Refund,Amount of Refund,Service Fees (if any)
-            3,King Bowsér,{time_str},{time_str},40,0
-            4,Súsan Smith,{time_str},{time_str},40,0
+            3,King Bowsér,{time_str},{time_str},40.00,0.00
+            4,Súsan Smith,{time_str},{time_str},40.00,0.00
             """.format(time_str=str(self.test_time)))
 
         self.CORRECT_CERT_STATUS_CSV = dedent("""
