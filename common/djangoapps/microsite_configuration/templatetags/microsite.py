@@ -6,7 +6,7 @@ from django import template
 from django.conf import settings
 from microsite_configuration import microsite
 from django.templatetags.static import static
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 register = template.Library()
 
