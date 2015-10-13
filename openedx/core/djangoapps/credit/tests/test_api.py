@@ -746,11 +746,11 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
             api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
     @ddt.data("pending", "failed")
-    def test_user_is_not_eligible(self, status):
+    def test_user_is_not_eligible(self, requirement_status):
         # Simulate a user who is not eligible for credit
         CreditEligibility.objects.all().delete()
         status = CreditRequirementStatus.objects.get(username=self.USER_INFO['username'])
-        status.status = status
+        status.status = requirement_status
         status.reason = {}
         status.save()
 
