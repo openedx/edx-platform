@@ -6,7 +6,7 @@ import requests.exceptions
 import pytz
 
 from django.conf import settings
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
 from django.test import TestCase
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
