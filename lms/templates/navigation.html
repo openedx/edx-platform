@@ -124,7 +124,7 @@ site_status_msg = get_site_status_msg(course_id)
         % endif
       </%block>
       % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+
           <li class="nav-global-05">
             <a class="cta cta-discovery" href="/courses">${_("Browse Labs")}</a>
           </li>
