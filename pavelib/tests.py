@@ -25,7 +25,7 @@ __test__ = False  # do not collect
     ("system=", "s", "System to act on"),
     ("test_id=", "t", "Test id"),
     ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Run only failed tests"),
+    ("fail_fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
