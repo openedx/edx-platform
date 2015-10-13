@@ -6,7 +6,7 @@ import requests.exceptions
 import pytz
 
 from django.conf import settings
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError
 from django.test import TestCase
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
@@ -770,10 +770,9 @@ class SkippedReverificationTest(ModuleStoreTestCase):
             checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
         )
         with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                SkippedReverification.add_skipped_reverification_attempt(
-                    checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
-                )
+            SkippedReverification.add_skipped_reverification_attempt(
+                checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
+            )
 
         # create skipped attempt for different user
         user2 = UserFactory.create()

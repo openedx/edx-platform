@@ -6,7 +6,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError
 
 from opaque_keys.edx.keys import CourseKey
 
@@ -99,8 +99,7 @@ class ReverificationService(object):
         # user can skip a reverification attempt only if that user has not already
         # skipped an attempt
         try:
-            with transaction.atomic():
-                SkippedReverification.add_skipped_reverification_attempt(checkpoint, user_id, course_key)
+            SkippedReverification.add_skipped_reverification_attempt(checkpoint, user_id, course_key)
         except IntegrityError:
             log.exception("Skipped attempt already exists for user %s: with course %s:", user_id, unicode(course_id))
 

@@ -1324,6 +1324,7 @@ class SkippedReverification(models.Model):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
+    @transaction.atomic
     def add_skipped_reverification_attempt(cls, checkpoint, user_id, course_id):
         """Create skipped reverification object.
 
