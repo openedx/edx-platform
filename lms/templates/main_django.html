@@ -20,7 +20,7 @@
   {% endblock %}
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
-
+    {% include "theme-head-extra.html" %}
   {% microsite_css_overrides_file %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
@@ -33,7 +33,7 @@
       {% if IS_EDX_DOMAIN %}
         {% include "navigation-edx.html" %}
       {% else %}
-        {% include "navigation.html" %}
+        {% include "theme-header.html" %}
       {% endif %}
     {% endwith %}
     <div class="content-wrapper" id="content">
@@ -45,7 +45,7 @@
     {% elif IS_EDX_DOMAIN %}
       {% include "footer-edx-v3.html" %}
     {% else %}
-      {% include "footer.html" %}
+      {% include "theme-footer.html" %}
     {% endif %}
 
   </div>
