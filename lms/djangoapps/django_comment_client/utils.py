@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 import json
 import logging
+from django.conf import settings
 
 import pytz
 from django.contrib.auth.models import User
@@ -13,6 +14,7 @@ import pystache_custom as pystache
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
+from ccx.overrides import get_current_ccx
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
@@ -716,3 +718,13 @@ def is_commentable_cohorted(course_key, commentable_id):
 
     log.debug(u"is_commentable_cohorted(%s, %s) = {%s}", course_key, commentable_id, ans)
     return ans
+
+
+def is_discussion_enabled(course_id):
+    """
+    Return True if Discussion is enabled for a course; else False
+    """
+    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+        if get_current_ccx(course_id):
+            return False
+    return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')

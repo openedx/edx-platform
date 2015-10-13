@@ -239,6 +239,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             the course.
           * video_outline: The URI to get the list of all videos that the user
             can access in the course.
+          * discussion_url: The URI to access data for course discussions if
+            it is enabled, otherwise null.
 
         * created: The date the course was created.
         * is_active: Whether the course is currently active. Possible values

@@ -13,8 +13,8 @@ from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
-
 from courseware.courses import get_course_with_access
+
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
@@ -55,7 +55,7 @@ def _get_course_or_404(course_key, user):
     disabled for the course.
     """
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
-    if not any([tab.type == 'discussion' for tab in course.tabs]):
+    if not any([tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs]):
         raise Http404
     return course
 

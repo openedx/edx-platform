@@ -34,6 +34,8 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)
     NEXT_MONTH = TODAY + datetime.timedelta(days=30)
 
+    COURSE_OVERVIEW_TABS = {'courseware', 'info', 'textbooks', 'discussion', 'wiki', 'progress'}
+
     def check_course_overview_against_course(self, course):
         """
         Compares a CourseOverview object against its corresponding
@@ -163,6 +165,12 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         for (course_value, cache_miss_value, cache_hit_value) in others_to_test:
             self.assertEqual(course_value, cache_miss_value)
             self.assertEqual(cache_miss_value, cache_hit_value)
+
+        # test tabs for both cached miss and cached hit courses
+        for course_overview in [course_overview_cache_miss, course_overview_cache_hit]:
+            course_overview_tabs = course_overview.tabs.all()
+            course_resp_tabs = {tab.tab_id for tab in course_overview_tabs}
+            self.assertEqual(self.COURSE_OVERVIEW_TABS, course_resp_tabs)
 
     @ddt.data(*itertools.product(
         [

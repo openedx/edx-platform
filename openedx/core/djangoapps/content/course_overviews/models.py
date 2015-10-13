@@ -1,15 +1,17 @@
 """
 Declaration of CourseOverview model
 """
-
 import json
+from django.db import models
 
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
 from django.utils.translation import ugettext
+from lms.djangoapps import django_comment_client
 from model_utils.models import TimeStampedModel
 
 from opaque_keys.edx.keys import CourseKey
+
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
 from xmodule.course_module import CourseDescriptor
@@ -30,7 +32,7 @@ class CourseOverview(TimeStampedModel):
     """
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 1
+    VERSION = 2
 
     # Cache entry versioning.
     version = IntegerField()
@@ -176,6 +178,10 @@ class CourseOverview(TimeStampedModel):
                 course_overview = cls._create_from_course(course)
                 try:
                     course_overview.save()
+                    CourseOverviewTab.objects.bulk_create([
+                        CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                        for tab in course.tabs
+                    ])
                 except IntegrityError:
                     # There is a rare race condition that will occur if
                     # CourseOverview.get_from_id is called while a
@@ -358,3 +364,22 @@ class CourseOverview(TimeStampedModel):
             CourseKey.from_string(course_overview['id'])
             for course_overview in CourseOverview.objects.values('id')
         ]
+
+    def is_discussion_tab_enabled(self):
+        """
+        Returns True if course has discussion tab and is enabled
+        """
+        tabs = self.tabs.all()  # pylint: disable=E1101
+        # creates circular import; hence explicitly referenced is_discussion_enabled
+        for tab in tabs:
+            if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
+                return True
+        return False
+
+
+class CourseOverviewTab(models.Model):
+    """
+    Model for storing and caching tabs information of a course.
+    """
+    tab_id = models.CharField(max_length=50)
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs")
