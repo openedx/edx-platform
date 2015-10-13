@@ -1285,6 +1285,7 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
     'js/vendor/afontgarde/afontgarde.js',
     'js/vendor/afontgarde/edx-icons.js',
+    'js/vendor/draggabilly.pkgd.js',
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
