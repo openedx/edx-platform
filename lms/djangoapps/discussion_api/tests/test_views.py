@@ -400,12 +400,13 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
     def test_basic(self):
         self.register_get_user_response(self.user)
-        self.register_post_thread_response({
+        cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
             "username": self.user.username,
             "created_at": "2015-05-19T00:00:00Z",
             "updated_at": "2015-05-19T00:00:00Z",
         })
+        self.register_post_thread_response(cs_thread)
         request_data = {
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
@@ -441,6 +442,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             "read": False,
             "has_endorsed": False,
+            "response_count": 0,
         }
         response = self.client.post(
             self.url,
@@ -536,6 +538,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             "read": False,
             "has_endorsed": False,
+            "response_count": 0,
         }
         response = self.client.patch(  # pylint: disable=no-member
             self.url,

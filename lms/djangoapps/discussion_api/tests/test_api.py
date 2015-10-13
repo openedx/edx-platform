@@ -1368,12 +1368,13 @@ class CreateThreadTest(
 
     @mock.patch("eventtracking.tracker.emit")
     def test_basic(self, mock_emit):
-        self.register_post_thread_response({
+        cs_thread = make_minimal_cs_thread({
             "id": "test_id",
             "username": self.user.username,
             "created_at": "2015-05-19T00:00:00Z",
             "updated_at": "2015-05-19T00:00:00Z",
         })
+        self.register_post_thread_response(cs_thread)
         with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
             actual = create_thread(self.request, self.minimal_data)
         expected = {
@@ -1403,7 +1404,8 @@ class CreateThreadTest(
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             'read': False,
-            'has_endorsed': False
+            'has_endorsed': False,
+            'response_count': 0,
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1949,6 +1951,7 @@ class UpdateThreadTest(
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             'read': False,
             'has_endorsed': False,
+            'response_count': 0
         }
         self.assertEqual(actual, expected)
         self.assertEqual(

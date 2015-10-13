@@ -211,7 +211,6 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "editable_fields": ["abuse_flagged", "following", "voted"],
             "read": False,
             "has_endorsed": False,
-            "response_count": None,
         }
         self.assertEqual(self.serialize(thread), expected)
 
@@ -262,7 +261,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         del thread_data["resp_total"]
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(Thread(id=thread_data["id"]))
-        self.assertIsNone(serialized["response_count"], None)
+        self.assertNotIn("response_count", serialized)
 
 
 @ddt.ddt
