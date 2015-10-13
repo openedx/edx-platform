@@ -76,7 +76,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         # Enable Cohorting and assign cohorts and content groups
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], True)
         self.enable_cohorting(self.course_fixture)
-        self.create_content_groups()
+        self.create_content_groups()  # TODO: this fails under phantomjs
         self.link_html_to_content_groups_and_publish()
         self.create_cohorts_and_assign_students()
 

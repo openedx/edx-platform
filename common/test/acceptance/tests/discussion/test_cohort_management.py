@@ -62,6 +62,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
+        assert False, "This test should have visited the instructor dashboard page"
         self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
 
     def verify_cohort_description(self, cohort_name, expected_description):

@@ -21,6 +21,7 @@ class CourseDiscoveryPage(PageObject):
         loading_css = "#loading-indicator"
         courses_css = '.courses-listing'
 
+        assert False, "Another loading indicator page"
         return self.q(css=courses_css).visible \
             and self.q(css=loading_css).present \
             and not self.q(css=loading_css).visible
