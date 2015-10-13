@@ -3,10 +3,13 @@ Test finding orphans via the view and django config
 """
 import json
 import ddt
+
 from contentstore.tests.utils import CourseTestCase
-from student.models import CourseEnrollment
 from contentstore.utils import reverse_course_url
+from opaque_keys.edx.locator import BlockUsageLocator
+from student.models import CourseEnrollment
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -128,3 +131,113 @@ class TestOrphan(TestOrphanBase):
         self.assertEqual(response.status_code, 403)
         response = test_user_client.delete(orphan_url)
         self.assertEqual(response.status_code, 403)
+
+    @ddt.data(ModuleStoreEnum.Type.split)
+    def test_path_to_location_for_orphan_vertical(self, module_store):
+        r"""
+        Make sure that path_to_location works with a component having multiple vertical parents,
+        from which one of them is orphan.
+
+         course
+            |
+         chapter
+           |
+         vertical vertical
+            \     /
+              html
+        """
+        # Get a course with orphan modules
+        course = self.create_course_with_orphans(module_store)
+
+        # Fetch the required course components.
+        vertical1 = self.store.get_item(BlockUsageLocator(course.id, 'vertical', 'Vertical1'))
+        chapter1 = self.store.get_item(BlockUsageLocator(course.id, 'chapter', 'Chapter1'))
+        orphan_vertical = self.store.get_item(BlockUsageLocator(course.id, 'vertical', 'OrphanVert'))
+        multi_parent_html = self.store.get_item(BlockUsageLocator(course.id, 'html', 'multi_parent_html'))
+
+        # Verify `OrphanVert` is an orphan
+        self.assertIn(orphan_vertical.location, self.store.get_orphans(course.id))
+
+        # Verify `multi_parent_html` is child of both `Vertical1` and `OrphanVert`
+        self.assertIn(multi_parent_html.location, orphan_vertical.children)
+        self.assertIn(multi_parent_html.location, vertical1.children)
+
+        # HTML component has `vertical1` as its parent.
+        html_parent = self.store.get_parent_location(multi_parent_html.location)
+        self.assertNotEqual(unicode(html_parent), unicode(orphan_vertical.location))
+        self.assertEqual(unicode(html_parent), unicode(vertical1.location))
+
+        # Get path of the `multi_parent_html` & verify path_to_location returns a expected path
+        path = path_to_location(self.store, multi_parent_html.location)
+        expected_path = (
+            course.id,
+            chapter1.location.block_id,
+            vertical1.location.block_id,
+            multi_parent_html.location.block_id,
+            "",
+            path[-1]
+        )
+        self.assertIsNotNone(path)
+        self.assertEqual(len(path), 6)
+        self.assertEqual(path, expected_path)
+
+    @ddt.data(ModuleStoreEnum.Type.split)
+    def test_path_to_location_for_orphan_chapter(self, module_store):
+        r"""
+        Make sure that path_to_location works with a component having multiple chapter parents,
+        from which one of them is orphan
+
+         course
+            |
+        chapter   chapter
+           |         |
+        vertical  vertical
+              \    /
+               html
+
+        """
+        # Get a course with orphan modules
+        course = self.create_course_with_orphans(module_store)
+        orphan_chapter = self.store.get_item(BlockUsageLocator(course.id, 'chapter', 'OrphanChapter'))
+        chapter1 = self.store.get_item(BlockUsageLocator(course.id, 'chapter', 'Chapter1'))
+        vertical1 = self.store.get_item(BlockUsageLocator(course.id, 'vertical', 'Vertical1'))
+
+        # Verify `OrhanChapter` is an orphan
+        self.assertIn(orphan_chapter.location, self.store.get_orphans(course.id))
+
+        # Create a vertical (`Vertical0`) in orphan chapter (`OrphanChapter`).
+        # OrphanChapter -> Vertical0
+        vertical0 = self.store.create_child(self.user.id, orphan_chapter.location, 'vertical', "Vertical0")
+        self.store.publish(vertical0.location, self.user.id)
+
+        # Create a component in `Vertical0`
+        # OrphanChapter -> Vertical0 -> Html
+        html = self.store.create_child(self.user.id, vertical0.location, 'html', "HTML0")
+        self.store.publish(html.location, self.user.id)
+
+        # Verify chapter1 is parent of vertical1.
+        vertical1_parent = self.store.get_parent_location(vertical1.location)
+        self.assertEqual(unicode(vertical1_parent), unicode(chapter1.location))
+
+        # Make `Vertical1` the parent of `HTML0`. So `HTML0` will have to parents (`Vertical0` & `Vertical1`)
+        vertical1.children.append(html.location)
+        self.store.update_item(vertical1, self.user.id)
+
+        # Get parent location & verify its either of the two verticals. As both parents are non-orphan,
+        # alphabetically least is returned
+        html_parent = self.store.get_parent_location(html.location)
+        self.assertEquals(unicode(html_parent), unicode(vertical1.location))
+
+        # verify path_to_location returns a expected path
+        path = path_to_location(self.store, html.location)
+        expected_path = (
+            course.id,
+            chapter1.location.block_id,
+            vertical1.location.block_id,
+            html.location.block_id,
+            "",
+            path[-1]
+        )
+        self.assertIsNotNone(path)
+        self.assertEqual(len(path), 6)
+        self.assertEqual(path, expected_path)

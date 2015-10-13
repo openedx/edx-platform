@@ -643,7 +643,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
 
         # create sequential and vertical to test against
-        sequential = self.store.create_item(self.user_id, test_course.id, 'sequential', 'test_sequential')
+        sequential = self.store.create_child(self.user_id, test_course.location, 'sequential', 'test_sequential')
         vertical = self.store.create_child(self.user_id, sequential.location, 'vertical', 'test_vertical')
 
         # publish sequential changes
