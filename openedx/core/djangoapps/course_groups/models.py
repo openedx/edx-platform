@@ -31,7 +31,7 @@ class CourseUserGroup(models.Model):
     INTERNAL_NAME = '_db_internal_'
 
     users = models.ManyToManyField(User, db_index=True, related_name='course_groups',
-                                   help_text="Who is in this group?")
+                                   help_text="Who is in this group?", through='CourseUserGroupMembership')
 
     # Note: groups associated with particular runs of a course.  E.g. Fall 2012 and Spring
     # 2013 versions of 6.00x will have separate groups.
