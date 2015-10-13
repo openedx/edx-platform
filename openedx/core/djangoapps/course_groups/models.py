@@ -7,6 +7,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db import IntegrityError
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class CourseUserGroup(models.Model):
                             help_text=("What is the name of this group?  "
                                        "Must be unique within a course."))
     users = models.ManyToManyField(User, db_index=True, related_name='course_groups',
-                                   help_text="Who is in this group?")
+                                   help_text="Who is in this group?", through='CourseUserGroupMembership')
 
     # Note: groups associated with particular runs of a course.  E.g. Fall 2012 and Spring
     # 2013 versions of 6.00x will have separate groups.
@@ -56,6 +57,73 @@ class CourseUserGroup(models.Model):
             group_type=group_type,
             name=name
         )
+
+class CourseUserGroupMembership(models.Model):
+    """Used internally to enforce our particular definition of uniqueness"""
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        #used to ensure only one version of a given membership exists
+        unique_together = (('user', 'course_user_group'), )
+
+    def save(self, *args, **kwargs):
+        if self.course_user_group.group_type != CourseUserGroup.COHORT or self.version == 0:
+            if 'get_previous' in kwargs:
+                del kwargs['get_previous']
+            super(CourseUserGroupMembership, self).save(*args, **kwargs)
+            return
+        self.trying_to_save = True
+        while(self.trying_to_save):
+            try:
+                saved_membership = CourseUserGroupMembership.objects.exclude(
+                    id = self.id
+                ).get(
+                    user__id = self.user.id,
+                    course_user_group__course_id = self.course_user_group.course_id,
+                    course_user_group__group_type = CourseUserGroup.COHORT
+                )
+            except CourseUserGroupMembership.DoesNotExist:
+                new_membership = CourseUserGroupMembership(user=self.user, course_user_group=self.course_user_group)
+                try:
+                    new_membership.save()
+                    return
+                except IntegrityError: #TODO: verify that this is the right error class to catch
+                    #this means we've hit a race condition. Try again!
+                    continue
+
+            if saved_membership.course_user_group == self.course_user_group:
+                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                    user_name=self.user.username,
+                    cohort_name=self.course_user_group.name
+                ))
+            elif 'get_previous' in kwargs and kwargs['get_previous']:
+                self.previous_cohort = saved_membership.course_user_group
+                self.previous_cohort_name = saved_membership.course_user_group.name
+                self.previous_cohort_id = saved_membership.course_user_group.id
+
+            saved_membership.course_user_group = self.course_user_group
+
+            #this is the magic that defeats race conditions; it will be translated to a single UPDATE
+            updated = CourseUserGroupMembership.objects.filter(
+                id = saved_membership.id,
+                version = saved_membership.version
+            ).update(
+                course_user_group = self.course_user_group,
+                version = saved_membership.version + 1
+            )
+            if not updated:
+                #race condition, try again!
+                continue
+
+            self.trying_to_save = False
+
+    id = models.AutoField(primary_key=True)
+    course_user_group = models.ForeignKey(CourseUserGroup)
+    user = models.ForeignKey(User)
+    version = models.IntegerField(default=0)
+
+    previous_cohort = None
+    previous_cohort_name = None
+    previous_cohort_id = None
 
 
 class CourseUserGroupPartitionGroup(models.Model):
