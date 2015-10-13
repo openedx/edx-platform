@@ -30,7 +30,7 @@ class StaffPage(CoursewarePage):
         """
         Set the current view mode, e.g. "Staff", "Student" or a content group.
         """
-        self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.text == view_mode).first.click()
+        self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.text.strip() == view_mode).first.click()
         self.wait_for_ajax()
 
     def set_staff_view_mode_specific_student(self, username_or_email):
