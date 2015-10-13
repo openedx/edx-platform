@@ -309,6 +309,7 @@
         .signatory-credentials {
 
             .role, .organization {
+                white-space: pre-line;
                 display: block;
             }
         }
