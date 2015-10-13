@@ -11,7 +11,8 @@ class @Conditional
         return
 
     @url = @el.data('url')
-    @render(element)
+    if @url
+      @render(element)
 
   render: (element) ->
       $.postWithPrefix "#{@url}/conditional_get", (response) =>
