@@ -149,7 +149,7 @@ END
                 ;;
 
             "1")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1,single_thread=False --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_1,single_thread=False' --with-flaky"
                 ;;
 
             "2")
@@ -166,7 +166,7 @@ END
 
             # confusingly, shard5 is really for shards 5 and 6
             "5")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_5,shard_6,single_thread=False' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_5 -a shard_6 -a single_thread=False' --with-flaky"
                 ;;
 
             # shard 6 is for single thread tests
