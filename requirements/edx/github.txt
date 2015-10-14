@@ -50,7 +50,7 @@ git+https://github.com/edx/edx-oauth2-provider.git@0.5.7#egg=oauth2-provider==0.
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 -e git+https://github.com/edx/edx-search.git@release-2015-09-11a#egg=edx-search
 -e git+https://github.com/edx/edx-milestones.git@9b44a37edc3d63a23823c21a63cdd53ef47a7aa4#egg=edx-milestones
-git+https://github.com/edx/edx-lint.git@c5745631d2eee4e2efe8c31fa7b42fe2c12a0755#egg=edx_lint==0.2.7
+git+https://github.com/edx/edx-lint.git@v0.2.9#egg=edx_lint==0.2.9
 -e git+https://github.com/edx/xblock-utils.git@213a97a50276d6a2504d8133650b2930ead357a0#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@5162ca169ca1486479e02f6ad2f538e6b8ae6f00#egg=edx-reverification-block

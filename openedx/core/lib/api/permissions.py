@@ -1,3 +1,7 @@
+"""
+API library for Django REST Framework permissions-oriented workflows
+"""
+
 from django.conf import settings
 from rest_framework import permissions
 from django.http import Http404
@@ -6,6 +10,9 @@ from student.roles import CourseStaffRole
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
+    """
+    Django REST Framework permissions class used to manage API Key integrations
+    """
     def has_permission(self, request, view):
         """
         Check for permissions by matching the configured API key and header

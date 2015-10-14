@@ -10,6 +10,9 @@ REPO_DIR = os.getcwd()
 
 
 class TestPaverBokChoyCmd(unittest.TestCase):
+    """
+    Paver Bok Choy Command test cases
+    """
 
     def _expected_command(self, name, store=None):
         """

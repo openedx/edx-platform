@@ -38,6 +38,9 @@ def _cohort_added(sender, **kwargs):
 def _cohort_membership_changed(sender, **kwargs):
     """Emits a tracking log event each time cohort membership is modified"""
     def get_event_iter(user_id_iter, cohort_iter):
+        """
+        Returns a dictionary containing a mashup of cohort and user information for the given lists
+        """
         return (
             {"cohort_id": cohort.id, "cohort_name": cohort.name, "user_id": user_id}
             for user_id in user_id_iter

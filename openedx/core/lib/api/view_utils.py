@@ -24,7 +24,6 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import IsUserInUrl
-from util.milestones_helpers import any_unfulfilled_milestones
 
 
 class DeveloperErrorViewMixin(object):
@@ -63,6 +62,10 @@ class DeveloperErrorViewMixin(object):
             return self.make_error_response(400, validation_error.messages[0])
 
     def handle_exception(self, exc):
+        """
+        Generalized helper method for managing specific API exception workflows
+        """
+
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404):

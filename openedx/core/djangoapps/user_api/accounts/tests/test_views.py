@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Test cases to cover Accounts-related behaviors of the User API application
+"""
 import datetime
 from copy import deepcopy
 import ddt
@@ -109,7 +112,9 @@ class UserAPITestCase(APITestCase):
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    {'full': 50, 'small': 10},
+    clear=True
 )
 class TestAccountAPI(UserAPITestCase):
     """
@@ -261,6 +266,9 @@ class TestAccountAPI(UserAPITestCase):
         Test the return from GET based on user visibility setting.
         """
         def verify_fields_visible_to_all_users(response):
+            """
+            Confirms that private fields are private, and public/shareable fields are public/shareable
+            """
             if preference_visibility == PRIVATE_VISIBILITY:
                 self._verify_private_account_response(response)
             else:
@@ -288,6 +296,9 @@ class TestAccountAPI(UserAPITestCase):
         as created by the test UserFactory).
         """
         def verify_get_own_information():
+            """
+            Internal helper to perform the actual assertions
+            """
             response = self.send_get(self.client)
             data = response.data
             self.assertEqual(15, len(data))
@@ -417,6 +428,9 @@ class TestAccountAPI(UserAPITestCase):
         client = self.login_client("client", "user")
 
         def verify_error_response(field_name, data):
+            """
+            Internal helper to check the error messages returned
+            """
             self.assertEqual(
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
@@ -467,12 +481,18 @@ class TestAccountAPI(UserAPITestCase):
         Test the metadata stored when changing the name field.
         """
         def get_name_change_info(expected_entries):
+            """
+            Internal method to encapsulate the retrieval of old names used
+            """
             legacy_profile = UserProfile.objects.get(id=self.user.id)
             name_change_info = legacy_profile.get_meta()["old_names"]
             self.assertEqual(expected_entries, len(name_change_info))
             return name_change_info
 
         def verify_change_info(change_info, old_name, requester, new_name):
+            """
+            Internal method to validate name changes
+            """
             self.assertEqual(3, len(change_info))
             self.assertEqual(old_name, change_info[0])
             self.assertEqual("Name change requested through account API by {}".format(requester), change_info[1])
@@ -566,7 +586,10 @@ class TestAccountAPI(UserAPITestCase):
         ([u"not_a_JSON_object"], [{u'non_field_errors': [u'Invalid data. Expected a dictionary, but got unicode.']}]),
         ([{}], [{"code": [u"This field is required."]}]),
         ([{u"code": u"invalid_language_code"}], [{'code': [u'"invalid_language_code" is not a valid choice.']}]),
-        ([{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}], [u'The language_proficiencies field must consist of unique languages']),
+        (
+            [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
+            [u'The language_proficiencies field must consist of unique languages']
+        ),
     )
     @ddt.unpack
     def test_patch_invalid_language_proficiencies(self, patch_value, expected_error_message):
@@ -578,7 +601,10 @@ class TestAccountAPI(UserAPITestCase):
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         self.assertEqual(
             response.data["field_errors"]["language_proficiencies"]["developer_message"],
-            u"Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(patch_value=patch_value, error_message=expected_error_message)
+            u"Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(
+                patch_value=patch_value,
+                error_message=expected_error_message
+            )
         )
 
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')

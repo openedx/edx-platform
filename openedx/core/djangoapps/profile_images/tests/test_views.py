@@ -196,7 +196,10 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_anonymous_request_rejected('post')
         self.assertFalse(mock_log.info.called)
 
-    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2])
+    @patch(
+        'openedx.core.djangoapps.profile_images.views._make_upload_dt',
+        side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2]
+    )
     def test_upload_self(self, mock_make_image_version, mock_log):  # pylint: disable=unused-argument
         """
         Test that an authenticated user can POST to their own upload endpoint.
