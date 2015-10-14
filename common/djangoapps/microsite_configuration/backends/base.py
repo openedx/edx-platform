@@ -96,7 +96,7 @@ class BaseMicrositeBackend(object):
 
         microsites_root = settings.MICROSITE_ROOT_DIR
 
-        if microsites_root.isdir():
+        if os.path.isdir(microsites_root):
             settings.TEMPLATE_DIRS.append(microsites_root)
             edxmako.paths.add_lookup('main', microsites_root)
             settings.STATICFILES_DIRS.insert(0, microsites_root)

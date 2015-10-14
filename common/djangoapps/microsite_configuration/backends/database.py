@@ -36,8 +36,7 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         for microsite in candidates:
             subdomain = microsite.subdomain
             if subdomain and domain.startswith(subdomain):
-                values = json.loads(microsite.values)
-                self._set_microsite_config_from_obj(subdomain, domain, values)
+                self._set_microsite_config_from_obj(subdomain, domain, microsite)
                 return
 
         # if no match on subdomain then see if there is a 'default' microsite
@@ -67,7 +66,7 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         """
         Helper internal method to actually find the microsite configuration
         """
-        config = microsite_object.copy()
+        config = json.loads(microsite_object.values)
         config['subdomain'] = subdomain
         config['site_domain'] = domain
         config['microsite_config_key'] = microsite_object.key
