@@ -3,12 +3,15 @@
 Test Microsite backends.
 """
 
+import logging
 from mock import patch
 from django.test import TestCase
 
 from microsite_configuration.backends.database import DatabaseMicrositeBackend
 from microsite_configuration.backends.base import BaseMicrositeBackend
 from microsite_configuration.backends.filebased import SettingsFileMicrositeBackend
+
+log = logging.getLogger(__name__)
 
 
 class NullBackend(BaseMicrositeBackend):
@@ -115,9 +118,6 @@ class BaseBackendTests(TestCase):
 
         with self.assertRaises(NotImplementedError):
             backend.has_override_value(None)
-
-        with self.assertRaises(NotImplementedError):
-            backend.enable_microsites(None)
 
         with self.assertRaises(NotImplementedError):
             backend.get_all_config()
