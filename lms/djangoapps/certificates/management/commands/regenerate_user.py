@@ -16,6 +16,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    Management command to recreate the certificate for
+    a given user in a given course.
+    """
+
     help = """Put a request on the queue to recreate the certificate for a particular user in a particular course."""
 
     option_list = BaseCommand.option_list + (

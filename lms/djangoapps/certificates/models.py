@@ -71,6 +71,9 @@ LOGGER = logging.getLogger(__name__)
 
 
 class CertificateStatuses(object):
+    """
+    Enum for certificate statuses
+    """
     deleted = 'deleted'
     deleting = 'deleting'
     downloadable = 'downloadable'
@@ -108,6 +111,9 @@ class CertificateWhitelist(models.Model):
 
 
 class GeneratedCertificate(models.Model):
+    """
+    Base model for generated certificates
+    """
 
     MODES = Choices('verified', 'honor', 'audit', 'professional', 'no-id-professional')
 
@@ -191,14 +197,16 @@ def certificate_status_for_student(student, course_id):
     try:
         generated_certificate = GeneratedCertificate.objects.get(
             user=student, course_id=course_id)
-        d = {'status': generated_certificate.status,
-             'mode': generated_certificate.mode}
+        cert_status = {
+            'status': generated_certificate.status,
+            'mode': generated_certificate.mode
+        }
         if generated_certificate.grade:
-            d['grade'] = generated_certificate.grade
+            cert_status['grade'] = generated_certificate.grade
         if generated_certificate.status == CertificateStatuses.downloadable:
-            d['download_url'] = generated_certificate.download_url
+            cert_status['download_url'] = generated_certificate.download_url
 
-        return d
+        return cert_status
     except GeneratedCertificate.DoesNotExist:
         pass
     return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}

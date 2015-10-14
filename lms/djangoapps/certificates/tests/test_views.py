@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import UserFactory
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -26,21 +26,12 @@ from certificates.models import (
     ExampleCertificateSet,
     ExampleCertificate,
     GeneratedCertificate,
-    BadgeAssertion,
-    CertificateStatuses,
     CertificateHtmlViewConfiguration,
-    CertificateSocialNetworks,
-    CertificateTemplate,
 )
 
 from certificates.tests.factories import (
-    CertificateHtmlViewConfigurationFactory,
-    LinkedInAddToProfileConfigurationFactory,
     BadgeAssertionFactory,
 )
-from util import organizations_helpers as organizations_api
-from django.test.client import RequestFactory
-import urllib
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True

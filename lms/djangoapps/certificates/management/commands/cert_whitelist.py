@@ -25,6 +25,10 @@ def get_user_from_identifier(identifier):
 
 
 class Command(BaseCommand):
+    """
+    Management command to set or get the certificate whitelist
+    for a given user(s)/course
+    """
 
     help = """
     Sets or gets the certificate whitelist for a given
@@ -88,7 +92,8 @@ class Command(BaseCommand):
         try:
             course = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(course_id))
+            print(("Course id {} could not be parsed as a CourseKey; "
+                   "falling back to SSCK.from_dep_str").format(course_id))
             course = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         if options['add'] and options['del']:
