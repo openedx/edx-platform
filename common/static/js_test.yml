@@ -42,6 +42,7 @@ lib_paths:
     - js/test/add_ajax_prefix.js
     - js/test/i18n.js
     - coffee/src/jquery.immediateDescendents.js
+    - js/vendor/require.js
 
 # Paths to source JavaScript files
 src_paths:
@@ -63,7 +64,7 @@ spec_paths:
 # When loading many files, this can be slow, so
 # exclude any files you don't need.
 #exclude_from_page:
-#    - path/to/lib/include/exception_*.js
+#    - path/to/lib/exclude/exception_*.js
 
 # Regular expression used to guarantee that a *.js file
 # is included in the test runner page.
@@ -72,7 +73,7 @@ spec_paths:
 # You can use this to exclude all files in a directory,
 # but make an exception for particular files.
 #include_in_page:
-#    - path/to/lib/exclude/exception_*.js
+#    - path/to/lib/include/exception_*.js
 
 # Paths to fixture files (optional)
 # You can access these within JavaScript code

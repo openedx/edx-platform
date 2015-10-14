@@ -40,10 +40,15 @@ describe "XBlock", ->
       @vANode = $('#vA')[0]
       @vZNode = $('#vZ')[0]
 
-      @vABlock = XBlock.initializeBlock(@vANode, 'req-token-a')
-      @vZBlock = XBlock.initializeBlock(@vZNode)
-      @missingVersionBlock = XBlock.initializeBlock($('#missing-version')[0])
-      @missingInitBlock = XBlock.initializeBlock($('#missing-init')[0])
+      @vABlock = null
+      @vZBlock = null
+      @missingVersionBlock = null
+      @missingInitBlock = null
+
+      XBlock.initializeBlock(@vANode, 'req-token-a').done((block) => @vABlock = block)
+      XBlock.initializeBlock(@vZNode).done((block) => @vZBlock = block)
+      XBlock.initializeBlock($('#missing-version')[0]).done((block) => @missingVersionBlock = block)
+      XBlock.initializeBlock($('#missing-init')[0]).done((block) => @missingInitBlock = block)
 
     it "loads the right runtime version", ->
       expect(TestRuntime.vA).toHaveBeenCalledWith()

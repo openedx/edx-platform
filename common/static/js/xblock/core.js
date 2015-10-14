@@ -161,4 +161,4 @@
 
     this.XBlock = XBlock;
 
-}).call(this, $, require, JSON);
+}).call(this, $, require || RequireJS.require, JSON);
