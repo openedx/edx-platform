@@ -6,4 +6,13 @@ from django.contrib import admin
 from .models import Microsite
 
 
-admin.site.register(Microsite)
+class MicrositeAdmin(admin.ModelAdmin):
+    """ Admin interface for the Microsite object. """
+    list_display = ('key', 'subdomain')
+    search_fields = ('key', 'subdomain', 'values')
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = Microsite
+
+
+admin.site.register(Microsite, MicrositeAdmin)
