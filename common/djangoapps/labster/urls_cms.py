@@ -9,7 +9,11 @@ from django.conf.urls import patterns, url, include
 urlpatterns = patterns(
     '',
     url(
-        r'^course/({})?$'.format(settings.COURSE_KEY_PATTERN), 'labster.course.views.course_handler',
+        r'^course/?$', 'labster.course.views.course_handler',
         name='course_handler'
+    ),
+    url(
+        r'^course/({})/?$'.format(settings.COURSE_KEY_PATTERN), 'labster.course.views.course_handler',
+        name='course_handler_detail'
     )
 )

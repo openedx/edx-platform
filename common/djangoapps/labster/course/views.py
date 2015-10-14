@@ -63,8 +63,8 @@ class LicenseStore(object):
     def factory(licenses):
         try:
             return LicenseStore(licenses)
-        except Exception:
-            raise LicenseStoreError
+        except Exception as err:
+            raise LicenseStoreError(err)
 
 
 class XBlockInfo(object):
@@ -306,9 +306,12 @@ def course_handler(request, course_key_string=None):
                 delete_course_and_groups(course_key, request.user.id)
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
-    except LicenseStoreError:
-        raise HttpResponseBadRequest({
-            'ErrMsg': 'Incorrect license format.'
+    except LicenseStoreError as err:
+        log.exception(
+            'Incorrect licenses format: %s - %r', request.json.get('licenses', None), err
+        )
+        return HttpResponseBadRequest({
+            'ErrMsg': 'Incorrect licenses format.'
         })
     except InvalidKeyError:
         raise Http404
