@@ -53,6 +53,7 @@ paramiko==1.9.0
 path.py==7.2
 Pillow==2.7.0
 polib==1.0.3
+py2neo==2.0.8
 pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1

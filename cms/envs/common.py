@@ -1091,3 +1091,23 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+
+# NEO4J settings
+NEO4J_DATABASE = {
+    'PROTOCOL': 'http',
+    'USERNAME': 'neo4j',
+    'PASSWORD': 'edx',
+    'HOST':'localhost',
+    'PORT':7474,
+    'ENDPOINT':'/db/data',
+}
+
+NEO4J_URI = '{protocol}://{username}:{password}@{host}:{port}{endpoint}'.format(
+    protocol=NEO4J_DATABASE['PROTOCOL'],
+    username=NEO4J_DATABASE['USERNAME'],
+    password=NEO4J_DATABASE['PASSWORD'],
+    host=NEO4J_DATABASE['HOST'],
+    port=NEO4J_DATABASE['POST'],
+    endpoint=NEO4J_DATABASE['ENDPOINT'],
+)
