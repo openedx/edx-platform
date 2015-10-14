@@ -1004,6 +1004,9 @@ ADVANCED_COMPONENT_TYPES = [
 
     # Peer instruction tool
     'ubcpi',
+
+    # Hackathon demo XBlock
+    'xblock-hello-require',
 ]
 
 # Adding components in this list will disable the creation of new problem for
