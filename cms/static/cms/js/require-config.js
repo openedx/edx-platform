@@ -40,7 +40,6 @@ require.config({
         "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
         "xmodule": "/xmodule/xmodule",
-        "xblock/core": "js/xblock/core-async",
         "xblock": "coffee/src/xblock",
         "utility": "js/src/utility",
         "accessibility": "js/src/accessibility_tools",

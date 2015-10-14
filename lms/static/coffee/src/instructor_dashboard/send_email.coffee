@@ -18,7 +18,8 @@ KeywordValidator = -> window.InstructorDashboard.util.KeywordValidator
 class SendEmail
   constructor: (@$container) ->
     # gather elements
-    @$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
+    @$emailEditor = null;
+    XBlock.initializeBlock($('.xblock-studio_view')).done(block -> @$emailEditor = block);
     @$send_to = @$container.find("select[name='send_to']'")
     @$subject = @$container.find("input[name='subject']'")
     @$btn_send = @$container.find("input[name='send']'")

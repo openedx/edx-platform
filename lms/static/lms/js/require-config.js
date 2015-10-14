@@ -32,6 +32,7 @@
         // NOTE: baseUrl has been previously set in lms/templates/main.html
         waitSeconds: 60,
         paths: {
+            "xblock_resource": "../../xblock/resource",
             "gettext": "/i18n",
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
