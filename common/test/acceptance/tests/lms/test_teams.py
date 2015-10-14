@@ -223,6 +223,7 @@ class TeamsTabTest(TeamsTabBase):
         )
         self.verify_teams_present(True)
 
+    @attr('nophantom')  # TODO: fails under phantomjs because of the warning_message method
     @ddt.data(
         'topics/{topic_id}',
         'topics/{topic_id}/search',
