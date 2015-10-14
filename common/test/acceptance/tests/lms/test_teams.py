@@ -1071,6 +1071,7 @@ class CreateTeamTest(TeamFormActions):
 
     def test_user_can_create_new_team_successfully(self):
         """
+        HACKATHON: broken
         Scenario: The user should be able to create new team.
         Given I am enrolled in a course with a team configuration and a topic
         When I visit the Create Team page for that topic
@@ -1147,6 +1148,7 @@ class CreateTeamTest(TeamFormActions):
 
     def test_page_viewed_event(self):
         """
+        HACKATHON: broken
         Scenario: Visiting the create team page should fire a page viewed event.
         Given I am enrolled in a course with a team configuration and a topic
         When I visit the create team page
@@ -1211,6 +1213,7 @@ class DeleteTeamTest(TeamFormActions):
     @ddt.data('Moderator', 'Community TA', 'Administrator', None)
     def test_delete_team(self, role):
         """
+        HACKATHON: broken
         Scenario: The user should be able to see and navigate to the delete team page.
         Given I am staff user for a course with a team
         When I visit the Team profile page
@@ -1443,6 +1446,7 @@ class EditTeamTest(TeamFormActions):
     @ddt.data('Moderator', 'Community TA', 'Administrator')
     def test_discussion_privileged_user_can_edit_team(self, role):
         """
+        HACKATHON: broken
         Scenario: The user with specified role should see the edit team button.
         Given I am user with privileged role for a course with a team
         When I visit the Team profile page
@@ -1483,6 +1487,7 @@ class EditTeamTest(TeamFormActions):
 
     def test_page_viewed_event(self):
         """
+        HACKATHON: broken
         Scenario: Visiting the edit team page should fire a page viewed event.
         Given I am enrolled in a course with a team configuration and a topic
         When I visit the edit team page
