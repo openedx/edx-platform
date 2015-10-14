@@ -992,6 +992,10 @@ class TeamFormActions(TeamsTabBase):
 
 @ddt.ddt
 class CreateTeamTest(TeamFormActions):
+
+    _multiprocess_can_split_ = False
+
+
     """
     Tests for creating a new Team within a Topic on the Teams page.
     """
