@@ -286,6 +286,7 @@ def get_modal_alert(browser):
     Returns instance of modal alert box shown in browser after waiting
     for 6 seconds
     """
+    assert False, "These test conditions show a mobile alert"
     WebDriverWait(browser, 6).until(EC.alert_is_present())
     return browser.switch_to.alert
 
