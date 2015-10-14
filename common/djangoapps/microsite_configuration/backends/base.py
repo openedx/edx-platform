@@ -8,6 +8,9 @@ Contains the base class for microsite backends.
 from __future__ import absolute_import
 
 import abc
+import edxmako
+
+from django.conf import settings
 
 
 # pylint: disable=unused-argument
@@ -69,13 +72,26 @@ class BaseMicrositeBackend(object):
         """
         raise NotImplementedError()
 
-    @abc.abstractmethod
     def enable_microsites(self, log):
         """
-        Enable the use of microsites.
-        Used during the startup.py script
+        Enable the use of microsites, from a dynamic defined list in the db
         """
-        raise NotImplementedError()
+        if not settings.FEATURES['USE_MICROSITES']:
+            return
+
+        microsites_root = settings.MICROSITE_ROOT_DIR
+
+        if microsites_root.isdir():
+            settings.TEMPLATE_DIRS.append(microsites_root)
+            edxmako.paths.add_lookup('main', microsites_root)
+            settings.STATICFILES_DIRS.insert(0, microsites_root)
+
+            log.info('Loading microsite path at %s', microsites_root)
+        else:
+            log.error(
+                'Error loading %s. Directory does not exist',
+                microsites_root
+            )
 
     @abc.abstractmethod
     def get_value_for_org(self, org, val_name, default):

@@ -143,4 +143,5 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         config = microsite_object.copy()
         config['subdomain'] = subdomain
         config['site_domain'] = domain
+        config['microsite_config_key'] = microsite_object.key
         self.current_request_configuration.data = config
