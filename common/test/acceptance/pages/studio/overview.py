@@ -425,6 +425,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
     BOTTOM_ADD_SECTION_BUTTON = '.outline > .add-section .button-new'
 
     def is_browser_on_page(self):
+        assert False, "This test visits the course outline page"
         return self.q(css='body.view-outline').present and self.q(css='div.ui-loading.is-hidden').present
 
     def view_live(self):

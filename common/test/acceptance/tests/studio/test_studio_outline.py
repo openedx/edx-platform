@@ -25,6 +25,7 @@ SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
+
 @attr('nophantom')  # TODO fails under phantom
 class CourseOutlineTest(StudioCourseTest):
     """
