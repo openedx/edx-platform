@@ -1,8 +1,8 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
-
 from flaky import flaky
+from nose.plugins.attrib import attr
 
 from ...pages.studio.asset_index import AssetIndexPage
 
@@ -15,7 +15,9 @@ class AssetIndexTest(StudioCourseTest):
     """
     Tests for the Asset index page.
     """
-
+    # TODO: visit fails under phantom.
+    # Probably same root cause as the flakiness.
+    @attr('nophantom')
     def setUp(self, is_staff=False):
         super(AssetIndexTest, self).setUp()
         self.asset_page = AssetIndexPage(
