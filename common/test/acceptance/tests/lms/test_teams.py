@@ -372,6 +372,8 @@ class BrowseTopicsTest(TeamsTabBase):
     Tests for the Browse tab of the Teams page.
     """
 
+    _multiprocess_can_split_ = False
+
     def setUp(self):
         super(BrowseTopicsTest, self).setUp()
         self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
@@ -589,6 +591,8 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
     """
     Tests for browsing Teams within a Topic on the Teams page.
     """
+
+    _multiprocess_can_split_ = False
     TEAMS_PAGE_SIZE = 10
 
     def setUp(self):
@@ -1174,6 +1178,8 @@ class DeleteTeamTest(TeamFormActions):
     Tests for deleting teams.
     """
 
+    _multiprocess_can_split_ = False
+
     def setUp(self):
         super(DeleteTeamTest, self).setUp()
 
@@ -1296,6 +1302,8 @@ class EditTeamTest(TeamFormActions):
     """
     Tests for editing the team.
     """
+
+    _multiprocess_can_split_ = False
 
     def setUp(self):
         super(EditTeamTest, self).setUp()
@@ -1509,6 +1517,8 @@ class EditMembershipTest(TeamFormActions):
     """
     Tests for administrating from the team membership page
     """
+
+    _multiprocess_can_split_ = False
 
     def setUp(self):
         super(EditMembershipTest, self).setUp()
