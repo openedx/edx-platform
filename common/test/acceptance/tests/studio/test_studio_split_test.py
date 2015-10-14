@@ -356,6 +356,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.assertTrue(select_element.is_present())
         return [option.text for option in Select(select_element[0]).options]
 
+    @attr('nophantom')  # TODO: self.page.visit fails under phantom
     def test_no_group_configurations_added(self):
         """
         Scenario: Ensure that message telling me to create a new group configuration is
@@ -372,6 +373,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             self.page.no_experiment_groups_message_text
         )
 
+    @attr('nophantom')  # TODO: self.page.visit fails under phantom
     def test_group_configurations_have_correct_data(self):
         """
         Scenario: Ensure that the group configuration is rendered correctly in expanded/collapsed mode.
@@ -422,6 +424,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["Alpha", "Beta", "Gamma"]
         )
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_can_create_and_edit_group_configuration(self):
         """
         Scenario: Ensure that the group configuration can be created and edited correctly.
@@ -481,6 +484,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["First Group", "Group C", "Group D"]
         )
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_use_group_configuration(self):
         """
         Scenario: Ensure that the group configuration can be used by split_module correctly
@@ -512,6 +516,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         component_editor.set_select_value_and_save('Group Configuration', 'New Group Configuration Name')
         self.verify_groups(container, ['Group A', 'Group B', 'New group'], [])
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_container_page_active_verticals_names_are_synced(self):
         """
         Scenario: Ensure that the Content Experiment display synced vertical names and correct groups.
@@ -578,6 +583,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         container.add_missing_groups()
         self.verify_groups(container, ['Group B', 'Second Group', 'Group D'], ['Group ID 0'])
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_can_cancel_creation_of_group_configuration(self):
         """
         Scenario: Ensure that creation of the group configuration can be canceled correctly.
@@ -603,6 +609,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         self.assertEqual(len(self.page.experiment_group_configurations), 0)
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_can_cancel_editing_of_group_configuration(self):
         """
         Scenario: Ensure that editing of the group configuration can be canceled correctly.
@@ -647,6 +654,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["Group 0", "Group 1"]
         )
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_group_configuration_validation(self):
         """
         Scenario: Ensure that validation of the group configuration works correctly.
@@ -698,6 +706,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["Group A"]
         )
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_group_configuration_empty_usage(self):
         """
         Scenario: When group configuration is not used, ensure that the link to outline page works correctly.
@@ -733,6 +742,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             timeout=30
         ).fulfill()
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_group_configuration_non_empty_usage(self):
         """
         Scenario: When group configuration is used, ensure that the links to units using a group configuration work correctly.
@@ -782,6 +792,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         self.assertIn(unit.name, usage)
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_can_delete_unused_group_configuration(self):
         """
         Scenario: Ensure that the user can delete unused group configuration.
@@ -826,6 +837,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         config.delete()
         self.assertEqual(len(self.page.experiment_group_configurations), 0)
 
+    @attr('nophantom')  # TODO: fails under phantom
     def test_cannot_delete_used_group_configuration(self):
         """
         Scenario: Ensure that the user cannot delete unused group configuration.
@@ -921,6 +933,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             self.page.experiment_group_configurations[1].name
         )
 
+    @attr('nophantom')  # TODO: create_group_configuration_experiment fails under phantom
     def test_details_error_validation_message(self):
         """
         Scenario: When a Content Experiment uses a Group Configuration, ensure
@@ -959,6 +972,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             config.details_message_text
         )
 
+    @attr('nophantom')  # TODO: create_group_configuration_experiment fails under phantom
     def test_details_warning_validation_message(self):
         """
         Scenario: When a Content Experiment uses a Group Configuration, ensure
@@ -997,6 +1011,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             config.details_message_text
         )
 
+    @attr('nophantom')  # TODO: create_group_configuration_experiment fails under phantom
     def test_edit_warning_message_empty_usage(self):
         """
         Scenario: When a Group Configuration is not used, ensure that there are no warning icon and message.
@@ -1013,6 +1028,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.assertFalse(config.edit_warning_icon_is_present)
         self.assertFalse(config.edit_warning_message_is_present)
 
+    @attr('nophantom')  # TODO: create_group_configuration_experiment fails under phantom
     def test_edit_warning_message_non_empty_usage(self):
         """
         Scenario: When a Group Configuration is used, ensure that there are a warning icon and message.
@@ -1043,6 +1059,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         rendered_group_names = self.get_select_options(page=courseware_page, selector=".split-test-select")
         self.assertListEqual(group_names, rendered_group_names)
 
+    @attr('nophantom')  # TODO: create_group_configuration_experiment fails under phantom
     def test_split_test_LMS_staff_view(self):
         """
         Scenario: Ensure that split test is correctly rendered in LMS staff mode as it is

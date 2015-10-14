@@ -39,6 +39,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn(self.library_info['display_name'], self.lib_page.get_header_title())
         self.assertIn(self.library_info['display_name'], self.browser.title)
 
+    @attr('nophantom')
     def test_add_duplicate_delete_actions(self):
         """
         Scenario: Ensure that we can add an HTML block, duplicate it, then delete the original.
@@ -68,7 +69,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertNotEqual(first_block_id, second_block_id)
 
         # Delete the first block:
-        self.lib_page.click_delete_button(first_block_id, confirm=True)
+        self.lib_page.click_delete_button(first_block_id, confirm=True)  # TODO: fails in phantomjs
         self.assertEqual(len(self.lib_page.xblocks), 1)
         self.assertEqual(self.lib_page.xblocks[0].locator, second_block_id)
 
@@ -130,6 +131,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertFalse(self.browser.find_elements_by_css_selector('span.large-discussion-icon'))
 
     @flaky  # TODO fix this, see TNL-2322
+    @attr('nophantom')
     def test_library_pagination(self):
         """
         Scenario: Ensure that adding several XBlocks to a library results in pagination.
@@ -147,7 +149,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertEqual(len(self.lib_page.xblocks), 10)
         add_component(self.lib_page, "problem", "Multiple Choice")
         self.assertEqual(len(self.lib_page.xblocks), 1)
-        self.lib_page.click_delete_button(self.lib_page.xblocks[0].locator)
+        self.lib_page.click_delete_button(self.lib_page.xblocks[0].locator)  # TODO: fails in phantomjs
         self.assertEqual(len(self.lib_page.xblocks), 10)
 
     @data('top', 'bottom')
@@ -164,6 +166,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         add_component(self.lib_page, "problem", "Multiple Choice")
         self.assertTrue(self.lib_page.nav_disabled(position))
 
+    @attr('nophantom')
     def test_delete_deletes_only_desired_block(self):
         """
         Scenario: Ensure that when deleting XBlock only desired XBlock is deleted
@@ -180,7 +183,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertEqual(len(self.lib_page.xblocks), 2)
         self.assertIn("Blank Common Problem", self.lib_page.xblocks[0].name)
         self.assertIn("Checkboxes", self.lib_page.xblocks[1].name)
-        self.lib_page.click_delete_button(self.lib_page.xblocks[0].locator)
+        self.lib_page.click_delete_button(self.lib_page.xblocks[0].locator)  # TODO: fails in phantomjs
         self.assertEqual(len(self.lib_page.xblocks), 1)
         problem_block = self.lib_page.xblocks[0]
         self.assertIn("Checkboxes", problem_block.name)
@@ -297,6 +300,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         self.assertEqual(self.lib_page.xblocks[0].name, '1')
         self.assertTrue(self.lib_page.nav_disabled(position, ['previous']))
 
+    @attr('nophantom')
     def test_library_pagination(self):
         """
         Scenario: Ensure that adding several XBlocks to a library results in pagination.
@@ -321,12 +325,13 @@ class LibraryNavigationTest(StudioLibraryTest):
         self.assertEqual(len(self.lib_page.xblocks), 1)
         self.assertEqual(self.lib_page.get_page_number(), '5')
         self.assertEqual(self.lib_page.xblocks[0].name, "Multiple Choice")
-        self.lib_page.click_delete_button(self.lib_page.xblocks[0].locator)
+        self.lib_page.click_delete_button(self.lib_page.xblocks[0].locator)  # TODO: fails in phantomjs
         self.assertEqual(len(self.lib_page.xblocks), 10)
         self.assertEqual(self.lib_page.get_page_number(), '4')
         self.assertEqual(self.lib_page.xblocks[0].name, '31')
         self.assertEqual(self.lib_page.xblocks[-1].name, '40')
 
+    @attr('nophantom')
     def test_delete_shifts_blocks(self):
         """
         Scenario: Ensure that removing an XBlock shifts other blocks back.
@@ -341,7 +346,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         """
         self.assertEqual(len(self.lib_page.xblocks), 10)
         self.assertEqual(self.lib_page.get_page_number(), '1')
-        self.lib_page.click_delete_button(self.lib_page.xblocks[2].locator, confirm=True)
+        self.lib_page.click_delete_button(self.lib_page.xblocks[2].locator, confirm=True)  # TODO: fails in phantomjs
         self.assertEqual(len(self.lib_page.xblocks), 10)
         self.assertEqual(self.lib_page.xblocks[0].name, '1')
         self.assertEqual(self.lib_page.xblocks[-1].name, '11')

@@ -832,6 +832,7 @@ class UnitPublishingTest(ContainerBase):
         # Switch to student view and verify visible.
         self._verify_student_view_visible(['discussion'])
 
+    @attr('nophantom')
     def test_explicit_lock_overrides_implicit_subsection_lock_information(self):
         """
         Scenario: A unit's explicit staff lock hides its inherited subsection staff lock information
@@ -844,7 +845,7 @@ class UnitPublishingTest(ContainerBase):
             And when I disable explicit staff locking
             Then the unit page now shows its inherited staff lock
         """
-        self.outline.visit()
+        self.outline.visit()  # TODO: fails under phantomjs
         self.outline.expand_all_subsections()
         subsection = self.outline.section_at(0).subsection_at(0)
         unit = subsection.unit_at(0)
@@ -852,6 +853,7 @@ class UnitPublishingTest(ContainerBase):
         unit_page = unit.go_to()
         self._verify_explicit_lock_overrides_implicit_lock_information(unit_page)
 
+    @attr('nophantom')
     def test_explicit_lock_overrides_implicit_section_lock_information(self):
         """
         Scenario: A unit's explicit staff lock hides its inherited subsection staff lock information
@@ -864,7 +866,7 @@ class UnitPublishingTest(ContainerBase):
             And when I disable explicit staff locking
             Then the unit page now shows its inherited staff lock
         """
-        self.outline.visit()
+        self.outline.visit()  # TODO: fails under phantom
         self.outline.expand_all_subsections()
         section = self.outline.section_at(0)
         unit = section.subsection_at(0).unit_at(0)

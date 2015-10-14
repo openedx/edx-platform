@@ -834,6 +834,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_nav = CourseNavPage(self.browser)
 
+    @attr('nophantom')
     def test_visible_to_staff(self):
         """
         Scenario: All content is visible for a user marked is_staff (different from course staff)
@@ -847,7 +848,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertEqual(3, len(self.course_nav.sections['Test Section']))
 
-        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
+        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")  # TODO: fails under phantom
         self.assertEqual(["Html Child in locked unit", "Html Child in unlocked unit"], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
@@ -856,6 +857,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.course_nav.go_to_section("Test Section", "Locked Subsection")
         self.assertEqual(["Html Child in locked subsection"], self.course_nav.sequence_items)
 
+    @attr('nophantom')
     def test_visible_to_student(self):
         """
         Scenario: Content marked 'visible_to_staff_only' is not visible for students in the course
@@ -869,7 +871,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertEqual(2, len(self.course_nav.sections['Test Section']))
 
-        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
+        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")  # TODO: fails under phantom
         self.assertEqual(["Html Child in unlocked unit"], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")

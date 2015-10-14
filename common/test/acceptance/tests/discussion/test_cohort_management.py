@@ -1034,7 +1034,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.select_cohort(new_cohort)
         self.assertEqual("Apples", self.cohort_management_page.get_cohort_associated_content_group())
 
-    @attrib('nophantom')
+    @attr('nophantom')  # TODO fails under phantom
     def test_missing_content_group(self):
         """
         Scenario: In a course with content groups, if a cohort is associated with a content group that no longer

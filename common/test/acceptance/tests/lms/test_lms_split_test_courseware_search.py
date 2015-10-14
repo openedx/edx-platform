@@ -22,6 +22,7 @@ from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 
 
 @attr('shard_1')
+@attr('nophantom')
 class SplitTestCoursewareSearchTest(ContainerBase):
     """
     Test courseware search on Split Test Module.
@@ -53,7 +54,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         )
 
         self._add_and_configure_split_test()
-        self._studio_reindex()
+        self._studio_reindex()  # TODO: this fails under phantomjs
 
     def _auto_auth(self, username, email, staff):
         """
