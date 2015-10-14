@@ -1108,6 +1108,6 @@ NEO4J_URI = '{protocol}://{username}:{password}@{host}:{port}{endpoint}'.format(
     username=NEO4J_DATABASE['USERNAME'],
     password=NEO4J_DATABASE['PASSWORD'],
     host=NEO4J_DATABASE['HOST'],
-    port=NEO4J_DATABASE['POST'],
+    port=NEO4J_DATABASE['PORT'],
     endpoint=NEO4J_DATABASE['ENDPOINT'],
 )
