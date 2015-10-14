@@ -217,11 +217,8 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
         self.browser.execute_script('$(".upload-submit").show();')
 
-        # First send_keys will initialize the jquery auto upload plugin.
-        self.q(css='.upload-button-input').results[0].send_keys(file_path)
         self.q(css='.upload-submit').first.click()
         self.q(css='.upload-button-input').results[0].send_keys(file_path)
-
         self.wait_for_ajax()
 
     @property
