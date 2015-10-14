@@ -25,9 +25,9 @@ from boto.ses.exceptions import (
 )
 from boto.exception import AWSConnectionError
 
-from celery import task, current_task
-from celery.states import SUCCESS, FAILURE, RETRY
-from celery.exceptions import RetryTaskError
+from celery import task, current_task  # pylint: disable=no-name-in-module
+from celery.states import SUCCESS, FAILURE, RETRY  # pylint: disable=no-name-in-module, import-error
+from celery.exceptions import RetryTaskError  # pylint: disable=no-name-in-module, import-error
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -310,7 +310,8 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     subtask_status = SubtaskStatus.from_dict(subtask_status_dict)
     current_task_id = subtask_status.task_id
     num_to_send = len(to_list)
-    log.info(u"Preparing to send email %s to %d recipients as subtask %s for instructor task %d: context = %s, status=%s",
+    log.info((u"Preparing to send email %s to %d recipients as subtask %s "
+              u"for instructor task %d: context = %s, status=%s"),
              email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status)
 
     # Check that the requested subtask is actually known to the current InstructorTask entry.
@@ -663,20 +664,22 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     except BULK_EMAIL_FAILURE_ERRORS as exc:
         dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
         num_pending = len(to_list)
-        log.exception('Task %s: email with id %d caused send_course_email task to fail with "fatal" exception.  %d emails unsent.',
+        log.exception(('Task %s: email with id %d caused send_course_email task to fail '
+                       'with "fatal" exception.  %d emails unsent.'),
                       task_id, email_id, num_pending)
         # Update counters with progress to date, counting unsent emails as failures,
         # and set the state to FAILURE:
         subtask_status.increment(failed=num_pending, state=FAILURE)
         return subtask_status, exc
 
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-except
         # Errors caught here cause the email to be retried.  The entire task is actually retried
         # without popping the current recipient off of the existing list.
         # These are unexpected errors.  Since they might be due to a temporary condition that might
         # succeed on retry, we give them a retry.
         dog_stats_api.increment('course_email.limited_retry', tags=[_statsd_tag(course_title)])
-        log.exception('Task %s: email with id %d caused send_course_email task to fail with unexpected exception.  Generating retry.',
+        log.exception(('Task %s: email with id %d caused send_course_email task to fail '
+                       'with unexpected exception.  Generating retry.'),
                       task_id, email_id)
         # Increment the "retried_withmax" counter, update other counters with progress to date,
         # and set the state to RETRY:
@@ -709,7 +712,8 @@ def _get_current_task():
     return current_task
 
 
-def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current_exception, subtask_status, skip_retry_max=False):
+def _submit_for_retry(entry_id, email_id, to_list, global_email_context,
+                      current_exception, subtask_status, skip_retry_max=False):
     """
     Helper function to requeue a task for retry, using the new version of arguments provided.
 
@@ -762,7 +766,8 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
     # retries are deferred by the same amount.
     countdown = ((2 ** retry_index) * base_delay) * random.uniform(.75, 1.25)
 
-    log.warning('Task %s: email with id %d not delivered due to %s error %s, retrying send to %d recipients in %s seconds (with max_retry=%s)',
+    log.warning(('Task %s: email with id %d not delivered due to %s error %s, '
+                 'retrying send to %d recipients in %s seconds (with max_retry=%s)'),
                 task_id, email_id, exception_type, current_exception, len(to_list), countdown, max_retries)
 
     # we make sure that we update the InstructorTask with the current subtask status
@@ -793,7 +798,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         log.exception(u'Task %s: email with id %d caused send_course_email task to retry.',
                       task_id, email_id)
         return subtask_status, retry_error
-    except Exception as retry_exc:
+    except Exception as retry_exc:  # pylint: disable=broad-except
         # If there are no more retries, because the maximum has been reached,
         # we expect the original exception to be raised.  We catch it here
         # (and put it in retry_exc just in case it's different, but it shouldn't be),
