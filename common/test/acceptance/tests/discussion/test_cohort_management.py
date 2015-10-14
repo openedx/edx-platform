@@ -25,6 +25,10 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
     Tests for cohort management on the LMS Instructor Dashboard
     """
 
+    _multiprocess_can_split_ = False
+    # _multiprocess_can_share_ = True
+
+
     def setUp(self):
         """
         Set up a cohorted course
