@@ -22,22 +22,6 @@ __all__ = [
 BACKEND = None
 
 
-def get_key_from_cache(key):
-    """
-    Retrieves a key from a cache scoped to the thread
-    """
-    if hasattr(CURRENT_REQUEST_CONFIGURATION, 'cache'):
-        return CURRENT_REQUEST_CONFIGURATION.cache.get(key)
-
-
-def set_key_to_cache(key, value):
-    """
-    Stores a key value pair in a cache scoped to the thread
-    """
-    if hasattr(CURRENT_REQUEST_CONFIGURATION, 'cache'):
-        CURRENT_REQUEST_CONFIGURATION.cache[key] = value
-
-
 def is_request_in_microsite():
     """
     This will return if current request is a request within a microsite
@@ -52,25 +36,14 @@ def get_value(val_name, default=None, **kwargs):
     return BACKEND.get_value(val_name, default, **kwargs)
 
 
-def get_dict(dict_name, default=None):
+def get_dict(dict_name, default=None, **kwargs):
     """
     Returns a dictionary product of merging the request's microsite and
     the default value.
     This can be used, for example, to return a merged dictonary from the
     settings.FEATURES dict, including values defined at the microsite
     """
-    cached_dict = get_key_from_cache(dict_name)
-    if cached_dict:
-        return cached_dict
-
-    if default is None:
-        default = {}
-
-    output = default.copy()
-    output.update(get_value(dict_name, {}))
-
-    set_key_to_cache(dict_name, output)
-    return output
+    return BACKEND.get_dict(dict_name, default, **kwargs)
 
 
 def has_override_value(val_name):
