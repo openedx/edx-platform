@@ -996,6 +996,8 @@ class CreateTeamTest(TeamFormActions):
     Tests for creating a new Team within a Topic on the Teams page.
     """
 
+    multiprocess_shared_ = True
+
     def setUp(self):
         super(CreateTeamTest, self).setUp()
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
