@@ -1,3 +1,12 @@
+"""
+EdX Branding package.
+
+Provides a way to retrieve "branded" parts of the site.
+
+This module provides functions to retrieve basic branded parts
+such as the site visible courses, university name and logo.
+"""
+
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from django.conf import settings
@@ -27,7 +36,9 @@ def get_visible_courses():
 
     # this is legacy format which is outside of the microsite feature -- also handle dev case, which should not filter
     if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS and not settings.DEBUG:
-        filtered_visible_ids = frozenset([SlashSeparatedCourseKey.from_deprecated_string(c) for c in settings.COURSE_LISTINGS[subdomain]])
+        filtered_visible_ids = frozenset(
+            [SlashSeparatedCourseKey.from_deprecated_string(c) for c in settings.COURSE_LISTINGS[subdomain]]
+        )
 
     if filtered_by_org:
         return [course for course in courses if course.location.org == filtered_by_org]
