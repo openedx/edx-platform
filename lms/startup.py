@@ -24,6 +24,10 @@ def run():
     """
     Executed during django startup
     """
+    # To override the settings before executing the autostartup() for python-social-auth
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
+        enable_third_party_auth()
+
     django.setup()
 
     autostartup()
@@ -35,9 +39,6 @@ def run():
 
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
-
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
-        enable_third_party_auth()
 
     # Initialize Segment analytics module by setting the write_key.
     if settings.LMS_SEGMENT_KEY:
