@@ -4,7 +4,7 @@ Unit tests for handling email sending errors
 """
 from itertools import cycle
 
-from celery.states import SUCCESS, RETRY
+from celery.states import SUCCESS, RETRY  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
