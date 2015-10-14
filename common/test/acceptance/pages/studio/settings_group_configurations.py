@@ -19,6 +19,7 @@ class GroupConfigurationsPage(CoursePage):
         """
         Verify that the browser is on the page and it is not still loading.
         """
+        assert False, "This test visits the group configurations page"
         EmptyPromise(
             lambda: self.q(css='body.view-group-configurations').present,
             'On the group configuration page'
