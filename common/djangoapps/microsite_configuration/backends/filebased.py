@@ -2,9 +2,7 @@
 Microsite backend that reads the configuration from a file
 
 """
-import os.path
 import threading
-import edxmako
 
 from django.conf import settings
 from microsite_configuration.backends.base import BaseMicrositeBackend
@@ -72,30 +70,6 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
             self._set_microsite_config('default', subdomain, domain)
             return
 
-    def get_template_path(self, relative_path, **kwargs):
-        """
-        Returns a path (string) to a Mako template, which can either be in
-        a microsite directory (as an override) or will just return what is passed in which is
-        expected to be a string
-        """
-
-        if not self.is_request_in_microsite():
-            return relative_path
-
-        microsite_template_path = str(self.get_value('template_dir', None))
-
-        if microsite_template_path:
-            search_path = os.path.join(microsite_template_path, relative_path)
-
-            if os.path.isfile(search_path):
-                path = '/{0}/templates/{1}'.format(
-                    self.get_value('microsite_config_key'),
-                    relative_path
-                )
-                return path
-
-        return relative_path
-
     def get_value(self, val_name, default=None, **kwargs):
         """
         Returns a value associated with the request's microsite, if present
@@ -133,37 +107,16 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
         configuration = self.get_configuration()
         return val_name in configuration
 
-    def get_value_for_org(self, org, val_name, default):
+    def get_all_config(self):
         """
-        Returns a configuration value for a microsite which has an org_filter that matches
-        what is passed in
+        This returns all configuration for all microsites
         """
-        if not self.has_configuration_set():
-            return default
+        config = {}
 
-        # Filter at the setting file
-        for value in settings.MICROSITE_CONFIGURATION.values():
-            org_filter = value.get('course_org_filter', None)
-            if org_filter == org:
-                return value.get(val_name, default)
-        return default
+        for key, value in settings.MICROSITE_CONFIGURATION.iteritems():
+            config[key] = value
 
-    def get_all_orgs(self):
-        """
-        This returns a set of orgs that are considered within all microsites.
-        This can be used, for example, to do filtering
-        """
-        org_filter_set = set()
-        if not self.has_configuration_set():
-            return org_filter_set
-
-        # Get the orgs in the settings file
-        for value in settings.MICROSITE_CONFIGURATION.values():
-            org_filter = value.get('course_org_filter')
-            if org_filter:
-                org_filter_set.add(org_filter)
-
-        return org_filter_set
+        return config
 
     def _set_microsite_config(self, microsite_config_key, subdomain, domain):
         """

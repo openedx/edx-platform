@@ -66,7 +66,15 @@ def get_value_for_org(org, val_name, default=None):
     This returns a configuration value for a microsite which has an org_filter that matches
     what is passed in
     """
-    return BACKEND.get_value_for_org(org, val_name, default)
+    if not BACKEND.has_configuration_set():
+        return default
+
+    # Filter at the setting file
+    for key, value in BACKEND.get_all_config().iteritems():
+        org_filter = value.get('course_org_filter', None)
+        if org_filter == org:
+            return value.get(val_name, default)
+    return default
 
 
 def get_all_orgs():
@@ -74,7 +82,17 @@ def get_all_orgs():
     This returns a set of orgs that are considered within a microsite. This can be used,
     for example, to do filtering
     """
-    return BACKEND.get_all_orgs()
+    org_filter_set = set()
+    if not BACKEND.has_configuration_set():
+        return org_filter_set
+
+    # Get the orgs in the db
+    for key, microsite in BACKEND.get_all_config().iteritems():
+        org_filter = microsite.get('course_org_filter')
+        if org_filter:
+            org_filter_set.add(org_filter)
+
+    return org_filter_set
 
 
 def clear():
