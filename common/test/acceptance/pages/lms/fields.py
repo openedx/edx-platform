@@ -190,6 +190,7 @@ class FieldsMixin(object):
         """
         Get or set the value in a dropdown field.
         """
+        assert False, "This test uses value_for_dropdown_field"
         self.wait_for_field(field_id)
 
         self.make_field_editable(field_id)
