@@ -105,7 +105,7 @@ class BokChoyTestSuite(TestSuite):
             substring = [
                 "--with-xunitmp --xunitmp-file={}".format(self.xunit_report),
                 "--processes={}".format(self.num_processors),
-                "--no-color --process-timeout=150"
+                "--no-color --process-timeout=300"
                 ]
 
         else:
