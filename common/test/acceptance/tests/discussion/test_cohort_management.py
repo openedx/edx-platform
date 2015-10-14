@@ -39,23 +39,27 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.manual_cohort_id = self.add_manual_cohort(self.course_fixture, self.manual_cohort_name)
 
         # create a non-instructor who will be registered for the course and in the manual cohort.
-        self.student_name = "student_user"
+        self.student_name = "student_" + str(uuid.uuid4().hex)[:12]
+        self.student_email = self.student_name + "@example.com"
         self.student_id = AutoAuthPage(
-            self.browser, username=self.student_name, email="student_user@example.com",
+            self.browser, username=self.student_name, email=self.student_email,
             course_id=self.course_id, staff=False
         ).visit().get_user_id()
         self.add_user_to_cohort(self.course_fixture, self.student_name, self.manual_cohort_id)
 
         # create a second student user
+        self.other_student_name = "other_" + str(uuid.uuid4().hex)[:12]
+        self.other_student_email = self.other_student_name + "@example.com"
         self.other_student_id = AutoAuthPage(
-            self.browser, username="other_student_user", email="other_student_user@example.com",
+            self.browser, username=self.other_student_name, email=self.other_student_email,
             course_id=self.course_id, staff=False
         ).visit().get_user_id()
 
         # login as an instructor
-        self.instructor_name = "instructor_user"
+        self.instructor_name = "instructor_" + str(uuid.uuid4().hex)[:12]
+        self.instructor_email = self.instructor_name + "@example.com"
         self.instructor_id = AutoAuthPage(
-            self.browser, username=self.instructor_name, email="instructor_user@example.com",
+            self.browser, username=self.instructor_name, email=self.instructor_email,
             course_id=self.course_id, staff=True
         ).visit().get_user_id()
 

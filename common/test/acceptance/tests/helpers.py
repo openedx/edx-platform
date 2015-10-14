@@ -294,6 +294,12 @@ class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted
     """
+
+    # Because of the setup/teardown and where the events land, this cannot be multiprocessed
+    # right now. TODO: make this mixin and related assertions capable of multiprocessing
+    _multiprocess_can_split_ = False
+    _multiprocess_shared_ = False
+
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
