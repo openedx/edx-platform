@@ -114,6 +114,7 @@ def wrap_xblock(
         shim_xmodule_js(block, frag)
 
     if frag.js_init_fn:
+        data['use-require'] = frag.use_require_js
         data['init'] = frag.js_init_fn
         data['runtime-class'] = runtime_class
         data['runtime-version'] = frag.js_init_version

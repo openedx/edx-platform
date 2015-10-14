@@ -1,4 +1,4 @@
-(function($, JSON) {
+(function($, require, JSON) {
 
     'use strict';
 
@@ -54,22 +54,30 @@
 
 
         if (runtime) {
-
-            block = (function() {
-                var initFn = window[$element.data('init')],
-                    useRequire = window[$element.data('use-require')];
-
+            var createBlockInstance = function(initFunction) {
+                var block;
                 // This create a new constructor that can then apply() the block_args
                 // to the initFn.
                 function Block() {
-                    return initFn.apply(this, block_args);
+                    return initFunction.apply(this, block_args);
                 }
-                Block.prototype = initFn.prototype;
+                Block.prototype = initFunction.prototype;
+                block = new Block();
+                block.runtime = runtime;
+                deferred.resolve(block);
+            };
 
-                return new Block();
+            block = (function() {
+                var init = $element.data('init'),
+                    useRequire = $element.data('use-require');
+                if (useRequire === 'True') {
+                    require([init], function(initFunction) {
+                        createBlockInstance(initFunction);
+                    });
+                } else {
+                    createBlockInstance(window[init]);
+                }
             })();
-            block.runtime = runtime;
-            deferred.resolve(block);
         } else {
             block = {};
             deferred.resolve(block);
@@ -151,4 +159,4 @@
 
     this.XBlock = XBlock;
 
-}).call(this, $, JSON);
+}).call(this, $, require, JSON);
