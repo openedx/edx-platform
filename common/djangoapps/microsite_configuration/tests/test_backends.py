@@ -64,14 +64,7 @@ class NullBackend(BaseMicrositeBackend):
         """
         return super(NullBackend, self).enable_microsites(log)
 
-    def get_value_for_org(self, org, val_name, default):
-        """
-        Returns a configuration value for a microsite which has an org_filter that matches
-        what is passed in
-        """
-        return super(NullBackend, self).get_value_for_org(org, val_name, default)
-
-    def get_all_orgs(self):
+    def get_all_config(self):
         """
         This returns a set of orgs that are considered within all microsites.
         This can be used, for example, to do filtering
@@ -127,10 +120,7 @@ class BaseBackendTests(TestCase):
             backend.enable_microsites(None)
 
         with self.assertRaises(NotImplementedError):
-            backend.get_value_for_org(None, None, None)
-
-        with self.assertRaises(NotImplementedError):
-            backend.get_all_orgs()
+            backend.get_all_config()
 
         with self.assertRaises(NotImplementedError):
             backend.clear()
