@@ -23,6 +23,13 @@ from util.password_policy_validators import (
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
+    error_messages = {
+        'unknown': _("That e-mail address doesn't have an associated "
+                     "user account. Are you sure you've registered?"),
+        'unusable': _("The user account associated with this e-mail "
+                      "address cannot reset the password."),
+    }
+
     def clean_email(self):
         """
         This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
