@@ -552,7 +552,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_key": ["date"],
+            "sort_key": ["activity"],
             "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["1"],
@@ -565,7 +565,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_key": ["date"],
+            "sort_key": ["activity"],
             "sort_order": ["desc"],
             "page": ["6"],
             "per_page": ["14"],
@@ -776,7 +776,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_key": ["date"],
+            "sort_key": ["activity"],
             "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
@@ -804,7 +804,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_key": ["date"],
+            "sort_key": ["activity"],
             "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["11"],
@@ -831,7 +831,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_key": ["date"],
+            "sort_key": ["activity"],
             "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["11"],
@@ -840,7 +840,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         })
 
     @ddt.data(
-        ("last_activity_at", "date"),
+        ("last_activity_at", "activity"),
         ("comment_count", "comments"),
         ("vote_count", "votes")
     )
@@ -900,7 +900,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_key": ["date"],
+            "sort_key": ["activity"],
             "sort_order": [http_query],
             "page": ["1"],
             "per_page": ["11"],
