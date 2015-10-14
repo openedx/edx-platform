@@ -1,5 +1,7 @@
 # Configuration for i18n workflow.
 
+# **************** IMPORTANT *****************
+# Keep all rules in sync with conf/locale/release_config.yaml
 locales:
     - en  # English - Source Language
     # - am  # Amharic
@@ -112,6 +114,9 @@ third_party:
 # We segregate Studio so we can provide new languages for LMS without having to
 # also translate the Studio strings. LMS needs the strings from lms/* and
 # common/*, so those will stay in the main .po file.
+
+# **************** IMPORTANT *****************
+# Keep segmentation rules in sync with conf/locale/release_config.yaml
 segment:
     django-partial.po:          # This .po file..
         django-studio.po:       #  produces this .po file..
@@ -128,6 +133,8 @@ segment:
             - cms/*
 
 # How should the generate step merge files?
+# **************** IMPORTANT *****************
+# Keep generation rules in sync with conf/locale/release_config.yaml
 generate_merge:
     django.po:
         - django-partial.po
