@@ -10,23 +10,22 @@ from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.courses import get_course_by_id  # pyline: disable=import-error
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
-from courseware.tests.factories import StudentModuleFactory  # pylint: disable=import-error
-from courseware.tests.helpers import LoginEnrollmentTestCase  # pylint: disable=import-error
+from courseware.courses import get_course_by_id
+from courseware.tests.factories import StudentModuleFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
 from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.test import RequestFactory
-from edxmako.shortcuts import render_to_response  # pylint: disable=import-error
+from edxmako.shortcuts import render_to_response
 from request_cache.middleware import RequestCache
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
 )
-from student.tests.factories import (  # pylint: disable=import-error
+from student.tests.factories import (
     AdminFactory,
     CourseEnrollmentFactory,
     UserFactory,
@@ -638,7 +637,8 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 metadata={'graded': True, 'format': 'Homework'})
             for _ in xrange(4)
         ]
-        problems = [
+        # making problems available at class level for possible future use in tests
+        cls.problems = [
             [
                 ItemFactory.create(
                     parent=section,
