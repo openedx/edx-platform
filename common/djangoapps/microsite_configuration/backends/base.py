@@ -9,6 +9,7 @@ from __future__ import absolute_import
 
 import abc
 import edxmako
+import os.path
 
 from django.conf import settings
 
@@ -32,13 +33,27 @@ class BaseMicrositeBackend(object):
         """
         raise NotImplementedError()
 
-    @abc.abstractmethod
     def get_template_path(self, relative_path, **kwargs):
         """
         Returns a path (string) to a Mako template, which can either be in
         an override or will just return what is passed in which is expected to be a string
         """
-        raise NotImplementedError()
+        if not self.is_request_in_microsite():
+            return relative_path
+
+        microsite_template_path = str(self.get_value('template_dir', None))
+
+        if microsite_template_path:
+            search_path = os.path.join(microsite_template_path, relative_path)
+
+            if os.path.isfile(search_path):
+                path = '/{0}/templates/{1}'.format(
+                    self.get_value('microsite_config_key'),
+                    relative_path
+                )
+                return path
+
+        return relative_path
 
     @abc.abstractmethod
     def get_value(self, val_name, default=None, **kwargs):
@@ -81,7 +96,7 @@ class BaseMicrositeBackend(object):
 
         microsites_root = settings.MICROSITE_ROOT_DIR
 
-        if microsites_root.isdir():
+        if os.path.isdir(microsites_root):
             settings.TEMPLATE_DIRS.append(microsites_root)
             edxmako.paths.add_lookup('main', microsites_root)
             settings.STATICFILES_DIRS.insert(0, microsites_root)
@@ -94,15 +109,7 @@ class BaseMicrositeBackend(object):
             )
 
     @abc.abstractmethod
-    def get_value_for_org(self, org, val_name, default):
-        """
-        Returns a configuration value for a microsite which has an org_filter that matches
-        what is passed in
-        """
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def get_all_orgs(self):
+    def get_all_config(self):
         """
         This returns a set of orgs that are considered within all microsites.
         This can be used, for example, to do filtering
