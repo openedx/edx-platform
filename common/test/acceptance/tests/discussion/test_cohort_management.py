@@ -5,6 +5,7 @@ End-to-end tests related to the cohort management on the LMS Instructor Dashboar
 
 from datetime import datetime
 
+from path import path
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
@@ -16,6 +17,8 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 
+import csv
+import os
 import uuid
 
 
@@ -39,23 +42,27 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.manual_cohort_id = self.add_manual_cohort(self.course_fixture, self.manual_cohort_name)
 
         # create a non-instructor who will be registered for the course and in the manual cohort.
-        self.student_name = "student_user"
+        self.student_name = "student_" + str(uuid.uuid4().hex)[:12]
+        self.student_email = self.student_name + "@example.com"
         self.student_id = AutoAuthPage(
-            self.browser, username=self.student_name, email="student_user@example.com",
+            self.browser, username=self.student_name, email=self.student_email,
             course_id=self.course_id, staff=False
         ).visit().get_user_id()
         self.add_user_to_cohort(self.course_fixture, self.student_name, self.manual_cohort_id)
 
         # create a second student user
+        self.other_student_name = "other_" + str(uuid.uuid4().hex)[:12]
+        self.other_student_email = self.other_student_name + "@example.com"
         self.other_student_id = AutoAuthPage(
-            self.browser, username="other_student_user", email="other_student_user@example.com",
+            self.browser, username=self.other_student_name, email=self.other_student_email,
             course_id=self.course_id, staff=False
         ).visit().get_user_id()
 
         # login as an instructor
-        self.instructor_name = "instructor_user"
+        self.instructor_name = "instructor_" + str(uuid.uuid4().hex)[:12]
+        self.instructor_email = self.instructor_name + "@example.com"
         self.instructor_id = AutoAuthPage(
-            self.browser, username=self.instructor_name, email="instructor_user@example.com",
+            self.browser, username=self.instructor_name, email=self.instructor_email,
             course_id=self.course_id, staff=True
         ).visit().get_user_id()
 
@@ -63,6 +70,11 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
         self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
+
+        test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname()
+        self.files_path = test_dir + '/data/uploads/'
+
+        test_dir2 = self.instructor_dashboard_page.get_asset_path('.')
 
     def verify_cohort_description(self, cohort_name, expected_description):
         """
@@ -310,6 +322,16 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
                     self.cohort_management_page.get_cohort_associated_assignment_type()
                 )
 
+    def _create_csv_file(self, filename, csv_text_as_lists):
+        import csv
+        filename = self.instructor_dashboard_page.get_asset_path(filename)
+        # filename = self.files_path + filename
+        with open(filename, 'w+') as csv_file:
+            writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+            for line in csv_text_as_lists:
+                writer.writerow(line)
+        self.addCleanup(os.remove, filename)
+
     def test_add_new_cohort(self):
         """
         Scenario: A new manual cohort can be created, and a student assigned to it.
@@ -471,9 +493,16 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then I can download a file with results
         And appropriate events have been emitted
         """
-        # cohort_users_both_columns.csv adds instructor_user to ManualCohort1 via username and
-        # student_user to AutoCohort1 via email
-        self._verify_csv_upload_acceptable_file("cohort_users_both_columns.csv")
+        csv_contents = [
+            ['username','email','ignored_column','cohort'],
+            [self.instructor_name,'','June','ManualCohort1'],
+            ['',self.student_email,'Spring','AutoCohort1'],
+            [self.other_student_name,'','Fall','ManualCohort1'],
+        ]
+        filename = "cohort_csv_both_columns_1.csv"
+        self._create_csv_file(filename, csv_contents)
+        self._verify_csv_upload_acceptable_file(filename)
+        # self._verify_csv_upload_acceptable_file("cohort_users_both_columns.csv")
 
     def test_cohort_by_csv_only_email(self):
         """
@@ -485,8 +514,15 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then I can download a file with results
         And appropriate events have been emitted
         """
-        # cohort_users_only_email.csv adds instructor_user to ManualCohort1 and student_user to AutoCohort1 via email
-        self._verify_csv_upload_acceptable_file("cohort_users_only_email.csv")
+        csv_contents = [
+            ['email', 'cohort'],
+            [self.instructor_email, 'ManualCohort1'],
+            [self.student_email, 'AutoCohort1'],
+            [self.other_student_email, 'ManualCohort1'],
+        ]
+        filename = "cohort_csv_emails_only.csv"
+        self._create_csv_file(filename, csv_contents)
+        self._verify_csv_upload_acceptable_file(filename)
 
     def test_cohort_by_csv_only_username(self):
         """
@@ -498,9 +534,15 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then I can download a file with results
         And appropriate events have been emitted
         """
-        # cohort_users_only_username.csv adds instructor_user to ManualCohort1 and
-        # student_user to AutoCohort1 via username
-        self._verify_csv_upload_acceptable_file("cohort_users_only_username.csv")
+        csv_contents = [
+            ['username', 'cohort'],
+            [self.instructor_name,'ManualCohort1'],
+            [self.student_name, 'AutoCohort1'],
+            [self.other_student_name, 'ManualCohort1'],
+        ]
+        filename = "cohort_users_only_username1.csv"
+        self._create_csv_file(filename, csv_contents)
+        self._verify_csv_upload_acceptable_file(filename)
 
     def _verify_csv_upload_acceptable_file(self, filename):
         """
