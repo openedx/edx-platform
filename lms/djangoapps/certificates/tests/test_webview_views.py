@@ -24,6 +24,7 @@ from certificates.models import (
     CertificateStatuses,
     CertificateSocialNetworks,
     CertificateTemplate,
+    CertificateHtmlViewConfiguration
 )
 
 from certificates.tests.factories import (
@@ -416,6 +417,17 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         response = self.client.get(test_url)
         self.assertIn("Invalid Certificate", response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_500_view_invalid_certificate_configuration(self):
+        CertificateHtmlViewConfiguration.objects.all().update(enabled=False)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertIn("Invalid Certificate Configuration", response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):
