@@ -31,6 +31,3 @@ class MicrositeAwareSettings(object):
             return microsite.get_value(name, base_settings.__getattr__(name))
         except KeyError:
             base_settings.__getattr__(name)
-
-
-settings = MicrositeAwareSettings()  # pylint: disable=invalid-name

@@ -27,7 +27,7 @@ class BaseMicrositeBackend(object):
         For a given request domain, find a match in our microsite configuration
         and make it available to the complete django request process
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def get_template_path(self, relative_path, **kwargs):
@@ -35,14 +35,14 @@ class BaseMicrositeBackend(object):
         Returns a path (string) to a Mako template, which can either be in
         an override or will just return what is passed in which is expected to be a string
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def get_value(self, val_name, default=None, **kwargs):
         """
         Returns a value associated with the request's microsite, if present
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def get_dict(self, dict_name, default={}, **kwargs):
@@ -52,14 +52,14 @@ class BaseMicrositeBackend(object):
         This can be used, for example, to return a merged dictonary from the
         settings.FEATURES dict, including values defined at the microsite
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def is_request_in_microsite(self):
         """
         This will return True/False if the current request is a request within a microsite
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def has_override_value(self, val_name):
@@ -67,7 +67,7 @@ class BaseMicrositeBackend(object):
         Returns True/False whether a Microsite has a definition for the
         specified named value
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def enable_microsites(self, log):
@@ -75,7 +75,7 @@ class BaseMicrositeBackend(object):
         Enable the use of microsites.
         Used during the startup.py script
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def get_value_for_org(self, org, val_name, default):
@@ -83,7 +83,7 @@ class BaseMicrositeBackend(object):
         Returns a configuration value for a microsite which has an org_filter that matches
         what is passed in
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def get_all_orgs(self):
@@ -91,11 +91,11 @@ class BaseMicrositeBackend(object):
         This returns a set of orgs that are considered within all microsites.
         This can be used, for example, to do filtering
         """
-        pass
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def clear(self):
         """
         Clears out any microsite configuration from the current request/thread
         """
-        pass
+        raise NotImplementedError()
