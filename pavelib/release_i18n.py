@@ -6,10 +6,15 @@ from path import Path
 from paver.easy import task, cmdopts, needs, sh
 
 # Set this to the name of the current release
+# If you change this, be sure to reflect the change in the
+# .tx/RELEASE_CONFIGFILE as well.
 RELEASE_NAME = 'cypress-release'
-# Set this to the directory where the transifex config is for releases
-RELEASE_UTIL_DIRNAME = 'openedx_release_utilities'
 
+# **** Stuff to configure Transifex's configuration file ****
+# Name of the Transifex release configuration file (must be present in .tx/ directory)
+RELEASE_CONFIGFILE = 'release_config'
+
+# **** Stuff to configure i18n_tool's yaml configuration file ****
 BASE_DIR = Path('.').abspath()
 # LOCALE_DIR contains the locale files.
 # Typically this should be 'edx-platform/conf/locale'
@@ -17,7 +22,6 @@ LOCALE_DIR = BASE_DIR.joinpath('conf', 'locale')
 # Make sure that we read from conf/locale/release_config.yaml,
 # so all calls should include `-c LOCALE_DIR.joinpath('release_config.yaml').normpath()`
 CONFIG_LOCATION = LOCALE_DIR.joinpath('release_config.yaml').normpath()
-
 
 @task
 @needs(
@@ -65,28 +69,57 @@ def release_i18n_dummy():
     sh(cmd)
 
 
-def assert_proper_location():
+def swap_configuration_files():
     """
-    Assert that we're running this task from the openedx_release_utilities
-    directory, so we pick up the specific .tx configuration file needed for release.
+    We need to override the default .tx/config file.
+    The utility provides no way to do this, so temporarily swap in the
+    RELEASE_CONFIGFILE for the .tx/config file.
+
+    Be sure to execute cleanup_configfiles() after running this function.
     """
     # Figure out what directory we're running this command from, and get
     # into the proper place.
-    cwd = Path('.').abspath()
-    if cwd.name != RELEASE_UTIL_DIRNAME:
-        try:
-            Path.cd(cwd.joinpath(RELEASE_UTIL_DIRNAME))
-        except OSError:
+    cwd = Path.getcwd()
+    try:
+        Path.cd(cwd.joinpath('.tx'))
+    except OSError:
             msg = (
-                "This utility must be run from the edx-platform/{} directory. "
+                "This utility must be run from the edx-platform directory. "
                 "Please change to this directory before executing this command."
-            ).format(RELEASE_UTIL_DIRNAME)
+            )
             raise IOError(msg)
-    if cwd.joinpath('.tx') not in cwd.dirs():
+    # Move config to config.swp
+    # Move RELEASE_CONFIGFILE to config
+    cwd = Path.getcwd()
+    for filename in ['config', RELEASE_CONFIGFILE]:
+        if cwd.joinpath('filename') not in cwd.files():
             msg = (
-                "Expected to find .tx directory in {}. Something has gone wrong."
-            ).format(cwd)
+                "ERROR: Did not find file named {} in .tx/ directory."
+            ).format(filename)
             raise IOError(msg)
+    Path.move(cwd.joinpath('config'), cwd.joinpath('config.swp'))
+    Path.move(cwd.joinpath(RELEASE_CONFIGFILE), cwd.joinpath('config'))
+
+
+def cleanup_configfiles():
+    """
+    Cleans up the mess made by swap_configuration_files
+    """
+    # Move config to RELEASE_CONFIGFILE
+    # Move config.swp to config
+    cwd = Path.getcwd()
+    if cwd.name != '.tx':
+        Path.cd(cwd.joinpath('.tx'))
+        cwd = Path.getcwd()
+    # If swaps didn't finish all the way, these may not work; try anyway.
+    try:
+        Path.move(cwd.joinpath('config'), cwd.joinpath(RELEASE_CONFIGFILE))
+    except IOError:
+        pass
+    try:
+        Path.move(cwd.joinpath('config.swp'), cwd.joinpath('config'))
+    except IOError:
+        pass
 
 
 @task
@@ -96,10 +129,12 @@ def release_i18n_transifex_push():
     Push source strings to Transifex for translation
     """
     # Need to override default platform .tx/config before running this command
-    assert_proper_location()
-    cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
-    sh("{cmd} push".format(cmd=cmd))
-
+    try:
+        swap_configuration_files()
+        cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
+        sh("{cmd} push".format(cmd=cmd))
+    finally:
+        cleanup_configfiles()
 
 @task
 @needs(
@@ -111,10 +146,14 @@ def release_i18n_transifex_push_new():
     Push source strings to Transifex for translation
     """
     # Need to override default platform .tx/config before running this command
-    assert_proper_location()
-    print("\nThis command is intended to push new strings for an Open edX release with name '{}'\n".format(RELEASE_NAME))
-    cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
-    sh("{cmd} push_all".format(cmd=cmd))
+    try:
+        swap_configuration_files()
+        print("\nThis command is intended to push new strings for an Open edX release with name '{}'\n".format(RELEASE_NAME))
+        cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
+        sh("{cmd} push_all".format(cmd=cmd))
+    finally:
+        # Make sure we straighten up configfiles
+        cleanup_configfiles()
 
 
 @task
