@@ -150,10 +150,6 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
         # We are doing these operations on this top-level page object to avoid reloading the page.
         self.teams_page.verify_my_team_count(expected_number_of_teams)
 
-    def only_team_events(self, event):
-        """Filter out all non-team events."""
-        return event['event_type'].startswith('edx.team.')
-
 
 @ddt.ddt
 @attr('shard_5')
@@ -312,14 +308,14 @@ class MyTeamsTest(TeamsTabBase):
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.my_teams_page = MyTeamsPage(self.browser, self.course_id)
-        self.page_viewed_event = {
-            'event_type': 'edx.team.page_viewed',
+        self.page_viewed_event_filter = {'event_type': 'edx.team.page_viewed'}
+        self.page_viewed_event = [{
             'event': {
                 'page_name': 'my-teams',
                 'topic_id': None,
                 'team_id': None
             }
-        }
+        }]
 
     def test_not_member_of_any_teams(self):
         """
@@ -329,7 +325,7 @@ class MyTeamsTest(TeamsTabBase):
         And I should see no teams
         And I should see a message that I belong to no teams.
         """
-        with self.assert_events_match_during(self.only_team_events, expected_events=[self.page_viewed_event]):
+        with self.assert_events_match_during(self.page_viewed_event_filter, expected_events=self.page_viewed_event):
             self.my_teams_page.visit()
         self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertEqual(
@@ -348,7 +344,7 @@ class MyTeamsTest(TeamsTabBase):
         """
         teams = self.create_teams(self.topic, 1)
         self.create_membership(self.user_info['username'], teams[0]['id'])
-        with self.assert_events_match_during(self.only_team_events, expected_events=[self.page_viewed_event]):
+        with self.assert_events_match_during(self.page_viewed_event_filter, expected_events=self.page_viewed_event):
             self.my_teams_page.visit()
         self.verify_teams(self.my_teams_page, teams)
 
@@ -571,15 +567,15 @@ class BrowseTopicsTest(TeamsTabBase):
         self.set_team_configuration(
             {u"max_team_size": 1, u"topics": [topic]}
         )
-        events = [{
-            'event_type': 'edx.team.page_viewed',
+        event_filter = {'event_type':'edx.team.page_viewed'}
+        event = [{
             'event': {
                 'page_name': 'browse',
                 'topic_id': None,
                 'team_id': None
             }
         }]
-        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+        with self.assert_events_match_during(event_filter, expected_events=event):
             self.topics_page.visit()
 
 
@@ -831,22 +827,24 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         search_text = 'banana'
         self.create_teams(self.topic, 5)
         self.browse_teams_page.visit()
-        events = [{
+        event_filter = {
             'event_type': 'edx.team.page_viewed',
+            'event_type': 'edx.team.searched'
+        }
+        events = [{
             'event': {
                 'page_name': 'search-teams',
                 'topic_id': self.topic['id'],
                 'team_id': None
             }
         }, {
-            'event_type': 'edx.team.searched',
             'event': {
                 'search_text': search_text,
                 'topic_id': self.topic['id'],
                 'number_of_results': 0
             }
         }]
-        with self.assert_events_match_during(self.only_team_events, expected_events=events, in_order=False):
+        with self.assert_events_match_during(event_filter, expected_events=events):
             search_results_page = self.browse_teams_page.search(search_text)
         self.verify_search_header(search_results_page, search_text)
         self.assertTrue(search_results_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
@@ -859,15 +857,15 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         Then my browser should post a page viewed event for the teams page
         """
         self.create_teams(self.topic, 5)
-        events = [{
-            'event_type': 'edx.team.page_viewed',
+        event_filter = {'event_type': 'edx.team.page_viewed'}
+        event = [{
             'event': {
                 'page_name': 'single-topic',
                 'topic_id': self.topic['id'],
                 'team_id': None
             }
         }]
-        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+        with self.assert_events_match_during(event_filter, expected_events=event):
             self.browse_teams_page.visit()
 
     def test_team_name_xss(self):
@@ -1091,18 +1089,21 @@ class CreateTeamTest(TeamFormActions):
 
         self.fill_create_or_edit_form()
 
-        expected_events = [
+        event_filter = {
+            'event_type': 'edx.team.created',
+            'event_type': 'edx.team.learner_added'
+        }
+        events = [
             {
-                'event_type': 'edx.team.created'
+                'event_type': 'edx.team.created',
             },
             {
-                'event_type': 'edx.team.learner_added',
                 'event': {
                     'add_method': 'added_on_create',
                 }
             }
         ]
-        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+        with self.assert_events_match_during(event_filter, expected_events=events):
             self.team_management_page.submit_form()
 
         # Verify that the page is shown for the new team
@@ -1152,15 +1153,15 @@ class CreateTeamTest(TeamFormActions):
         When I visit the create team page
         Then my browser should post a page viewed event
         """
-        events = [{
-            'event_type': 'edx.team.page_viewed',
+        event_filter = {'event_type': 'edx.team.page_viewed'}
+        event = [{
             'event': {
                 'page_name': 'new-team',
                 'topic_id': self.topic['id'],
                 'team_id': None
             }
         }]
-        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+        with self.assert_events_match_during(event_filter, expected_events=event):
             self.verify_and_navigate_to_create_team_page()
 
 
@@ -1251,15 +1252,17 @@ class DeleteTeamTest(TeamFormActions):
         if 'cancel' in kwargs and kwargs['cancel'] is True:
             confirm_prompt(self.team_management_page, **kwargs)
         else:
-            expected_events = [
+            event_filter = {
+                'event_type': 'edx.team.deleted',
+                'event_type': 'edx.team.learner_removed'
+            }
+            events = [
                 {
-                    'event_type': 'edx.team.deleted',
                     'event': {
                         'team_id': self.team['id']
                     }
                 },
                 {
-                    'event_type': 'edx.team.learner_removed',
                     'event': {
                         'team_id': self.team['id'],
                         'remove_method': 'team_deleted',
@@ -1267,9 +1270,7 @@ class DeleteTeamTest(TeamFormActions):
                     }
                 }
             ]
-            with self.assert_events_match_during(
-                event_filter=self.only_team_events, expected_events=expected_events
-            ):
+            with self.assert_events_match_during(event_filter, expected_events=events):
                 confirm_prompt(self.team_management_page, **kwargs)
 
     def test_delete_team_updates_topics(self):
@@ -1342,9 +1343,9 @@ class EditTeamTest(TeamFormActions):
 
         self.fill_create_or_edit_form()
 
-        expected_events = [
+        event_filter = {'event_type': 'edx.team.changed'}
+        events = [
             {
-                'event_type': 'edx.team.changed',
                 'event': {
                     'team_id': self.team['id'],
                     'field': 'country',
@@ -1354,7 +1355,6 @@ class EditTeamTest(TeamFormActions):
                 }
             },
             {
-                'event_type': 'edx.team.changed',
                 'event': {
                     'team_id': self.team['id'],
                     'field': 'name',
@@ -1364,7 +1364,6 @@ class EditTeamTest(TeamFormActions):
                 }
             },
             {
-                'event_type': 'edx.team.changed',
                 'event': {
                     'team_id': self.team['id'],
                     'field': 'language',
@@ -1374,7 +1373,6 @@ class EditTeamTest(TeamFormActions):
                 }
             },
             {
-                'event_type': 'edx.team.changed',
                 'event': {
                     'team_id': self.team['id'],
                     'field': 'description',
@@ -1384,7 +1382,7 @@ class EditTeamTest(TeamFormActions):
                 }
             },
         ]
-        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+        with self.assert_events_match_during(event_filter, expected_events=events):
             self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()
@@ -1488,15 +1486,15 @@ class EditTeamTest(TeamFormActions):
         When I visit the edit team page
         Then my browser should post a page viewed event
         """
-        events = [{
-            'event_type': 'edx.team.page_viewed',
+        event_filter = {'event_type': 'edx.team.page_viewed'}
+        event = [{
             'event': {
                 'page_name': 'edit-team',
                 'topic_id': self.topic['id'],
                 'team_id': self.team['id']
             }
         }]
-        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+        with self.assert_events_match_during(event_filter, expected_events=event):
             self.verify_and_navigate_to_edit_team_page()
 
 
@@ -1551,9 +1549,9 @@ class EditMembershipTest(TeamFormActions):
             self.edit_membership_page.cancel_delete_membership_dialog()
             self.assertEqual(self.edit_membership_page.team_members, 1)
         else:
-            expected_events = [
+            event_filter = {'event_type': 'edx.team.learner_removed'}
+            event = [
                 {
-                    'event_type': 'edx.team.learner_removed',
                     'event': {
                         'team_id': self.team['id'],
                         'remove_method': 'removed_by_admin',
@@ -1561,9 +1559,7 @@ class EditMembershipTest(TeamFormActions):
                     }
                 }
             ]
-            with self.assert_events_match_during(
-                event_filter=self.only_team_events, expected_events=expected_events
-            ):
+            with self.assert_events_match_during(event_filter, expected_events=event):
                 self.edit_membership_page.confirm_delete_membership_dialog()
             self.assertEqual(self.edit_membership_page.team_members, 0)
         self.assertTrue(self.edit_membership_page.is_browser_on_page)
@@ -1836,15 +1832,15 @@ class TeamPageTest(TeamsTabBase):
         teams_page.visit()
         teams_page.view_first_team()
         self.assertTrue(self.team_page.join_team_button_present)
-        expected_events = [
+        event_filter = {'event_type': 'edx.team.learner_added'}
+        event = [
             {
-                'event_type': 'edx.team.learner_added',
                 'event': {
                     'add_method': 'joined_from_team_view'
                 }
             }
         ]
-        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+        with self.assert_events_match_during(event_filter, expected_events=event):
             self.team_page.click_join_team_button()
         self.assertFalse(self.team_page.join_team_button_present)
         self.assertFalse(self.team_page.join_team_message_present)
@@ -1914,15 +1910,15 @@ class TeamPageTest(TeamsTabBase):
         self.team_page.visit()
         self.assertFalse(self.team_page.join_team_button_present)
         self.assert_team_details(num_members=1)
-        expected_events = [
+        event_filter = {'event_type': 'edx.team.learner_removed'}
+        event = [
             {
-                'event_type': 'edx.team.learner_removed',
                 'event': {
                     'remove_method': 'self_removal'
                 }
             }
         ]
-        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+        with self.assert_events_match_during(event_filter, expected_events=event):
             self.team_page.click_leave_team_link()
         self.assert_team_details(num_members=0, is_member=False)
         self.assertTrue(self.team_page.join_team_button_present)
@@ -1939,13 +1935,13 @@ class TeamPageTest(TeamsTabBase):
         Then my browser should post a page viewed event
         """
         self._set_team_configuration_and_membership()
-        events = [{
-            'event_type': 'edx.team.page_viewed',
+        event_filter = {'event_type': 'edx.team.page_viewed'}
+        event = [{
             'event': {
                 'page_name': 'single-team',
                 'topic_id': self.topic['id'],
                 'team_id': self.teams[0]['id']
             }
         }]
-        with self.assert_events_match_during(self.only_team_events, expected_events=events):
+        with self.assert_events_match_during(event_filter, expected_events=event):
             self.team_page.visit()

@@ -348,6 +348,7 @@ class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted
     """
+
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
