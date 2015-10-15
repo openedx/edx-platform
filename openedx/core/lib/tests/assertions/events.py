@@ -241,9 +241,9 @@ def compare_structs(expected, actual, should_strict_compare=None, path=None):
     return differences
 
 
-def is_matching_event(expected_event, actual_event, tolerate=None):
+def is_matching_event(expected_event, actual_event):
     """Return True iff the `actual_event` matches the `expected_event` given the tolerances."""
-    return len(get_event_differences(expected_event, actual_event, tolerate=tolerate)) == 0
+    return len(get_event_differences(expected_event, actual_event, tolerate=EventMatchTolerates.lenient())) == 0
 
 
 def _path_to_string(path):
