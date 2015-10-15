@@ -54,7 +54,6 @@ src_paths:
 # Paths to spec (test) JavaScript files
 spec_paths:
     - common/js/spec
-    - js/spec/main_requirejs.js
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -70,7 +69,7 @@ fixture_paths:
 
 requirejs:
   paths:
-    main: js/spec/main_requirejs
+    main: common/js/spec/main_requirejs
 
 # Because require.js is responsible for loading all dependencies, we exclude
 # all files from being included in <script> tags
