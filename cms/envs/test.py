@@ -186,6 +186,12 @@ filterwarnings('ignore', message='No request passed to the backend, unable to ra
 # or "error" to convert all into errors
 simplefilter('ignore')
 
+################################# Middleware ######################################
+
+DJANGO_HTML5VALIDATOR_DIR = _REPORT_DIR / "html_validation"
+
+MIDDLEWARE_CLASSES += ('django_html5validator.middleware.DjangoHTML5Validator',)
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True

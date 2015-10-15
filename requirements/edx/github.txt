@@ -32,6 +32,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 # Used for testing
 -e git+https://github.com/gabrielfalcao/lettuce.git@b18b8fb711eb7a178c58574716032ad8de525912#egg=lettuce=1.8-support
+git+https://github.com/clytwynec/django-html5validator.git@master#egg=django-html5validator
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@32fca2a954745315be97b91ef0d5ad4eb38cf365#egg=XBlock
