@@ -4,7 +4,7 @@
             'jquery',
             'underscore',
             'backbone',
-            'js/utils/edx.utils.validate'
+            'common/js/utils/edx.utils.validate'
         ],
         function($, _, Backbone, EdxUtilsValidate) {
 

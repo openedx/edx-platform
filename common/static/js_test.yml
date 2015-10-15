@@ -48,7 +48,6 @@ src_paths:
     - js/xblock
     - coffee/src
     - js/src
-    - js/utils
     - js/capa/src
 
 # Paths to spec (test) JavaScript files
