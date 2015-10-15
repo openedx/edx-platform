@@ -10,22 +10,25 @@ RELEASE_NAME = 'cypress-release'
 # Set this to the directory where the transifex config is for releases
 RELEASE_UTIL_DIRNAME = 'openedx_release_utilities'
 
+BASE_DIR = Path('.').abspath()
+# LOCALE_DIR contains the locale files.
+# Typically this should be 'edx-platform/conf/locale'
+LOCALE_DIR = BASE_DIR.joinpath('conf', 'locale')
 # Make sure that we read from conf/locale/release_config.yaml,
-# so all calls should include `-c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()`
-from i18n import config
-CONFIG_LOCATION = "config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+# so all calls should include `-c LOCALE_DIR.joinpath('release_config.yaml').normpath()`
+CONFIG_LOCATION = LOCALE_DIR.joinpath('release_config.yaml').normpath()
 
 
 @task
 @needs(
     "pavelib.prereqs.install_prereqs",
-    "pavelib.release_i18n.i18n_validate_gettext",
+    "pavelib.i18n.i18n_validate_gettext",
     "pavelib.assets.compile_coffeescript",
 )
 @cmdopts([
     ("verbose", "v", "Sets 'verbose' to True"),
 ])
-def i18n_extract(options):
+def release_i18n_extract(options):
     """
     Extract localizable strings from sources
     """
@@ -38,8 +41,8 @@ def i18n_extract(options):
     sh(cmd)
 
 @task
-@needs("pavelib.release_i18n.i18n_extract")
-def i18n_generate_strict():
+@needs("pavelib.release_i18n.release_i18n_extract")
+def release_i18n_generate_strict():
     """
     Compile localizable strings from sources, extracting strings first.
     Complains if files are missing.
@@ -49,8 +52,8 @@ def i18n_generate_strict():
 
 
 @task
-@needs("pavelib.release_i18n.i18n_extract")
-def i18n_dummy():
+@needs("pavelib.release_i18n.release_i18n_extract")
+def release_i18n_dummy():
     """
     Simulate international translation by generating dummy strings
     corresponding to source strings.
@@ -62,7 +65,6 @@ def i18n_dummy():
     sh(cmd)
 
 
-@task
 def assert_proper_location():
     """
     Assert that we're running this task from the openedx_release_utilities
@@ -89,7 +91,7 @@ def assert_proper_location():
 
 @task
 @needs("pavelib.i18n.i18n_validate_transifex_config")
-def i18n_transifex_push():
+def release_i18n_transifex_push():
     """
     Push source strings to Transifex for translation
     """
@@ -98,9 +100,26 @@ def i18n_transifex_push():
     cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
     sh("{cmd} push".format(cmd=cmd))
 
+
+@task
+@needs(
+    "pavelib.release_i18n.release_i18n_extract",
+    "pavelib.i18n.i18n_validate_transifex_config"
+)
+def release_i18n_transifex_push_new():
+    """
+    Push source strings to Transifex for translation
+    """
+    # Need to override default platform .tx/config before running this command
+    assert_proper_location()
+    print("\nThis command is intended to push new strings for an Open edX release with name '{}'\n".format(RELEASE_NAME))
+    cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
+    sh("{cmd} push_all".format(cmd=cmd))
+
+
 @task
 @needs("pavelib.i18n.i18n_validate_transifex_config")
-def i18n_transifex_pull():
+def release_i18n_transifex_pull():
     """
     Pull translated strings from Transifex
     """
@@ -112,13 +131,13 @@ def i18n_transifex_pull():
 
 @task
 @needs(
-    "pavelib.release_i18n.i18n_clean",
-    "pavelib.release_i18n.i18n_transifex_pull",
-    "pavelib.release_i18n.i18n_extract",
-    "pavelib.release_i18n.i18n_dummy",
-    "pavelib.release_i18n.i18n_generate_strict",
+    "pavelib.i18n.i18n_clean",
+    "pavelib.release_i18n.release_i18n_transifex_pull",
+    "pavelib.release_i18n.release_i18n_extract",
+    "pavelib.release_i18n.release_i18n_dummy",
+    "pavelib.release_i18n.release_i18n_generate_strict",
 )
-def i18n_robot_pull():
+def release_i18n_robot_pull():
     """
     Pull source strings, generate po and mo files, and validate
     """
@@ -150,10 +169,10 @@ def i18n_clean():
 
 @task
 @needs(
-    "pavelib.release_i18n.i18n_extract",
-    "pavelib.release_i18n.i18n_transifex_push",
+    "pavelib.release_i18n.release_i18n_extract",
+    "pavelib.release_i18n.release_i18n_transifex_push",
 )
-def i18n_robot_push():
+def release_i18n_robot_push():
     """
     Extract new strings, and push to transifex
     """
