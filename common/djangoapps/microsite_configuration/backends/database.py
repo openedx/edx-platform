@@ -5,7 +5,10 @@ Microsite backend that reads the configuration from the database
 import json
 
 from microsite_configuration.backends.filebased import SettingsFileMicrositeBackend
-from microsite_configuration.models import Microsite
+from microsite_configuration.models import (
+    Microsite,
+    MicrositeOrgMapping
+)
 
 
 class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
@@ -32,28 +35,26 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         and then assign it to the thread local in order to make it available
         to the complete Django request processing
         """
-        if not self.has_configuration_set() or not domain:
+
+        if not self.has_configuration_set or not domain:
             return
 
-        # CDODGE: I'm concerned about this performance. Seems like we should cache this mapping
-        # and maybe auto expire the cache extry after 5 minutes. This method will be called on
-        # every request into edx-platform
-        candidates = Microsite.objects.all()
-        for microsite in candidates:
-            subdomain = microsite.subdomain
-            if subdomain and domain.startswith(subdomain):
-                self._set_microsite_config_from_obj(subdomain, domain, microsite)
-                return
+        # look up based on the HTTP request domain name
+        # this will need to be a full domain name match,
+        # not a 'startswith' match
+        microsite = Microsite.get_microsite_for_domain(domain)
 
-        # if no match on subdomain then see if there is a 'default' microsite
-        # defined in the db. If so, then use it
-        try:
-            microsite = Microsite.objects.get(key='default')
-            values = json.loads(microsite.values)
-            self._set_microsite_config_from_obj(subdomain, domain, values)
-            return
-        except Microsite.DoesNotExist:
-            return
+        if not microsite:
+            # if no match, then try to find a 'default' key in Microsites
+            try:
+                microsite = Microsite.objects.get(key='default')
+            except Microsite.DoesNotExist:
+                pass
+
+        if microsite:
+            # if we have a match, then set up the microsite thread local
+            # data
+            self._set_microsite_config_from_obj(microsite.subdomain, domain, microsite)
 
     def get_all_config(self):
         """
@@ -68,6 +69,31 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
 
         return config
 
+    def get_value_for_org(self, org, val_name, default=None):
+        """
+        This returns a configuration value for a microsite which has an org_filter that matches
+        what is passed in
+        """
+
+        microsite = MicrositeOrgMapping.get_microsite_for_org(org)
+        if not microsite:
+            return default
+
+        # cdodge: This approach will not leverage any caching, although I think only Studio calls
+        # this
+        config = json.loads(microsite.values)
+        return config.get(val_name, default)
+
+    def get_all_orgs(self):
+        """
+        This returns a set of orgs that are considered within a microsite. This can be used,
+        for example, to do filtering
+        """
+
+        # This should be cacheable (via memcache to keep consistent across a cluster)
+        # I believe this is called on the dashboard and catalog pages, so it'd be good to optimize
+        return set(MicrositeOrgMapping.objects.all().values_list('org', flat=True))
+
     def _set_microsite_config_from_obj(self, subdomain, domain, microsite_object):
         """
         Helper internal method to actually find the microsite configuration
@@ -76,4 +102,20 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         config['subdomain'] = subdomain
         config['site_domain'] = domain
         config['microsite_config_key'] = microsite_object.key
+
+        # we take the list of ORGs associated with this microsite from the database mapping
+        # tables. NOTE, for now, we assume one ORG per microsite
+        orgs = microsite_object.get_orgs()
+
+        # we must have at least one ORG defined
+        if not orgs:
+            raise Exception(
+                'Configuration error. Microsite {key} does not have any ORGs mapped to it!'.format(
+                    key=microsite_object.key
+                )
+            )
+
+        # just take the first one for now, we'll have to change the upstream logic to allow
+        # for more than one ORG binding
+        config['course_org_filter'] = orgs[0]
         self.current_request_configuration.data = config

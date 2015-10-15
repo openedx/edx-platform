@@ -117,6 +117,22 @@ class BaseMicrositeBackend(object):
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def get_value_for_org(self, org, val_name, default=None):
+        """
+        This returns a configuration value for a microsite which has an org_filter that matches
+        what is passed in
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_all_orgs(self):
+        """
+        This returns a set of orgs that are considered within a microsite. This can be used,
+        for example, to do filtering
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def clear(self):
         """
         Clears out any microsite configuration from the current request/thread
