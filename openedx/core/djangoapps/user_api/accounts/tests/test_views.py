@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import datetime
+from collections import OrderedDict
 from copy import deepcopy
+import datetime
 import ddt
 import hashlib
 import json
@@ -573,9 +574,15 @@ class TestAccountAPI(UserAPITestCase):
     @ddt.data(
         (u"not_a_list", {u'non_field_errors': [u'Expected a list of items but got type "unicode".']}),
         ([u"not_a_JSON_object"], [{u'non_field_errors': [u'Invalid data. Expected a dictionary, but got unicode.']}]),
-        ([{}], [{"code": [u"This field is required."]}]),
-        ([{u"code": u"invalid_language_code"}], [{'code': [u'"invalid_language_code" is not a valid choice.']}]),
-        ([{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}], [u'The language_proficiencies field must consist of unique languages']),
+        ([{}], [OrderedDict([('code', [u'This field is required.'])])]),
+        (
+            [{u"code": u"invalid_language_code"}],
+            [OrderedDict([('code', [u'"invalid_language_code" is not a valid choice.'])])]
+        ),
+        (
+            [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
+            ['The language_proficiencies field must consist of unique languages']
+        ),
     )
     @ddt.unpack
     def test_patch_invalid_language_proficiencies(self, patch_value, expected_error_message):
