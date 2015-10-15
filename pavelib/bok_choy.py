@@ -27,6 +27,7 @@ __test__ = False  # do not collect
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('default_store=', 's', 'Default modulestore'),
     ('test_dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
+    ('num_processors=', 'n', 'Number of test threads (for multiprocessing)'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
@@ -58,6 +59,7 @@ def test_bokchoy(options):
 
     opts = {
         'test_spec': getattr(options, 'test_spec', None),
+        'num_processors': getattr(options, 'num_processors', 1),
         'fasttest': getattr(options, 'fasttest', False),
         'serversonly': getattr(options, 'serversonly', False),
         'testsonly': getattr(options, 'testsonly', False),

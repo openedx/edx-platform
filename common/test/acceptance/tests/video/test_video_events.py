@@ -5,6 +5,7 @@ import json
 import ddt
 import unittest
 
+from nose.plugins.attrib import attr
 from ..helpers import EventsTestMixin
 from .test_video_module import VideoBaseTest
 from ...pages.lms.video.video import _parse_time_str
@@ -58,6 +59,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
         )
 
 
+@attr('single_thread')
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
@@ -150,6 +152,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
+@attr('single_thread')
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """

@@ -851,6 +851,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.verify_search_header(search_results_page, search_text)
         self.assertTrue(search_results_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
+    @attr('single_thread')
     def test_page_viewed_event(self):
         """
         Scenario: Visiting the browse page should fire a page viewed event.
@@ -1069,6 +1070,7 @@ class CreateTeamTest(TeamFormActions):
         )
         self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
 
+    @attr('single_thread')
     def test_user_can_create_new_team_successfully(self):
         """
         Scenario: The user should be able to create new team.
@@ -1145,6 +1147,7 @@ class CreateTeamTest(TeamFormActions):
 
         self.verify_my_team_count(0)
 
+    @attr('single_thread')
     def test_page_viewed_event(self):
         """
         Scenario: Visiting the create team page should fire a page viewed event.

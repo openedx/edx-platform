@@ -566,6 +566,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         )
         self.assertLessEqual(start_time.replace(second=0, microsecond=0), utc.localize(report_datetime))
 
+    @attr('single_thread')
     def test_cohort_by_csv_wrong_file_type(self):
         """
         Scenario: if the instructor uploads a non-csv file, an error message is presented.
@@ -578,6 +579,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.cohort_management_page.upload_cohort_file("image.jpg")
         self._verify_cohort_by_csv_notification("The file must end with the extension '.csv'.")
 
+    @attr('single_thread')
     def test_cohort_by_csv_missing_cohort(self):
         """
         Scenario: if the instructor uploads a csv file with no cohort column, an error message is presented.
@@ -590,6 +592,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_cohort_column.csv")
         self._verify_cohort_by_csv_notification("The file must contain a 'cohort' column containing cohort names.")
 
+    @attr('single_thread')
     def test_cohort_by_csv_missing_user(self):
         """
         Scenario: if the instructor uploads a csv file with no username or email column, an error message is presented.
