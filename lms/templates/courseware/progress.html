@@ -134,6 +134,9 @@ from django.utils.http import urlquote_plus
                                 %elif requirement['status'] == 'failed':
                                     <i class="fa fa-times"></i>
                                     <span>${_("Verification Failed" )}</span>
+                                %elif requirement['status'] == 'declined':
+                                    <i class="fa fa-times"></i>
+                                    <span>${_("Verification Declined" )}</span>
                                 %elif requirement['status'] == 'satisfied':
                                     <i class="fa fa-check"></i>
                                     % if requirement['namespace'] == 'grade' and 'final_grade' in requirement['reason']:
