@@ -19,7 +19,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
     """
 
     # cannot multithread this class due to events-related tests
-    _multiprocess_can_split_ = False
+    # _multiprocess_can_split_ = False
 
     def assert_payload_contains_ids(self, video_event):
         """
@@ -66,7 +66,7 @@ class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
     # cannot multithread this class due to events-related tests
-    _multiprocess_can_split_ = False
+    # _multiprocess_can_split_ = False
 
     @unittest.skip('AN-5867')
     def test_video_control_events(self):
@@ -111,7 +111,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         """
 
         captured_events = []
-        with self.capture_events(lambda e: e['event_type'] == 'load_video', captured_events=captured_events):
+        with self.capture_events(lambda e: e['event_type'] == 'load_video' and e['username'] == self.user_info['username'], captured_events=captured_events):
             self.navigate_to_video()
 
         load_video_event = captured_events[0]
@@ -162,7 +162,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
 
     # cannot multiprocess this class due to underlying usage of events mixin
-    _multiprocess_can_split_ = False
+    # _multiprocess_can_split_ = False
 
     # helper methods
     def watch_video_and_skip(self):
@@ -234,7 +234,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
                 'load_video',
                 'play_video',
                 'pause_video'
-            ) and self.video.state != 'buffering'
+            ) and self.video.state != 'buffering' and event['username'] == self.user_info['username']
 
         captured_events = []
         self.add_bumper()
@@ -306,7 +306,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
 
         captured_events = []
         self.add_bumper()
-        filter_event = lambda e: e['event_type'] == 'edx.video.bumper.loaded'
+        filter_event = lambda e: e['event_type'] == 'edx.video.bumper.loaded' and e['username'] == self.user_info['username']
         with self.capture_events(filter_event, captured_events=captured_events):
             self.navigate_to_video_no_render()
             self.video.click_on_poster()
