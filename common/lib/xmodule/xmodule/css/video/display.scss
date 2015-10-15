@@ -248,15 +248,17 @@ html:not('.afontgarde') .icon-fallback-img {
     }
 
     .closed-captions {
-      display: none;
       position: absolute;
       width: 85%;
-      max-height: ($baseline * 3);
       left: 5%;
       top: 70%;
+    }
+
+    .closed-captions.is-visible {
+      max-height: ($baseline * 3);
       border-radius: ($baseline / 5);
       padding: 8px ($baseline / 2) 8px ($baseline * 1.5);
-      background: rgba(0, 0, 0, .35);
+      background: rgba(0, 0, 0, .75);
       color: $yellow;
 
       &:before {
@@ -273,7 +275,7 @@ html:not('.afontgarde') .icon-fallback-img {
 
       &:hover,
       &.is-dragging {
-        background: rgba(0, 0, 0, .75);
+        background: rgba(0, 0, 0, 1.0);
         cursor: move;
 
         &:before {

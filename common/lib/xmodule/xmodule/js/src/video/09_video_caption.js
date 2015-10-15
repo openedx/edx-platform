@@ -6,8 +6,6 @@
     'video/09_video_caption.js',
     ['video/00_sjson.js', 'video/00_async_process.js', 'draggabilly'],
     function (Sjson, AsyncProcess, Draggabilly) {
-        // TODO: remove once the Jasmine tests are able to load Draggabilly correctly
-        Draggabilly = Draggabilly || window.Draggabilly;
 
         /**
          * @desc VideoCaption module exports a function.
@@ -177,8 +175,8 @@
 
                     this.container.on({
                         mouseenter: this.onContainerMouseEnter,
-                        mouseleave: this.onContainerMouseLeave,
-                    })
+                        mouseleave: this.onContainerMouseLeave
+                    });
                 }
 
                 state.el
@@ -210,7 +208,7 @@
                     case KEY.SPACE:
                     case KEY.ENTER:
                         event.preventDefault();
-                        this.toggleClosedCaptions;
+                        this.toggleClosedCaptions();
                 }
             },
 
@@ -226,7 +224,7 @@
                         index = this.languageChooserEl.find('li').index(focused);
                         total = this.languageChooserEl.find('li').size() - 1;
 
-                        this.previousLanguageMenuItem(event, index, total);
+                        this.previousLanguageMenuItem(event, index);
                         break;
 
                     case KEY.DOWN:
@@ -291,7 +289,7 @@
                 return false;
             },
 
-            previousLanguageMenuItem: function(event, index, total) {
+            previousLanguageMenuItem: function(event, index) {
                 event.preventDefault();
 
                 if (event.altKey || event.shiftKey) {
@@ -394,7 +392,7 @@
             *
             * @param {jquery Event} event
             */
-            onMouseEnter: function (event) {
+            onMouseEnter: function () {
                 if (this.frozen) {
                     clearTimeout(this.frozen);
                 }
@@ -410,7 +408,7 @@
             *
             * @param {jquery Event} event
             */
-            onMouseLeave: function (event) {
+            onMouseLeave: function () {
                 if (this.frozen) {
                     clearTimeout(this.frozen);
                 }
@@ -427,7 +425,7 @@
             *
             * @param {jquery Event} event
             */
-            onMovement: function (event) {
+            onMovement: function () {
                 this.onMouseEnter();
             },
 
@@ -601,7 +599,7 @@
                             self.renderLanguageMenu(newLanguages);
                         }
                     },
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    error: function () {
                         self.hideCaptions(true, false);
                         self.state.el.find('.lang').hide();
                         self.state.el.find('.transcript-control').hide();
@@ -1055,7 +1053,7 @@
             },
 
             handleCaptioningCookie: function() {
-                if ($.cookie('show_closed_captions')) {
+                if ($.cookie('show_closed_captions') === 'true') {
                     this.state.showClosedCaptions = true;
                     this.showClosedCaptions();
 
@@ -1071,8 +1069,12 @@
                 event.preventDefault();
 
                 if (this.state.el.hasClass('has-captions')) {
+                    this.state.showClosedCaptions = false;
+                    this.updateCaptioningCookie(false);
                     this.hideClosedCaptions();
                 } else {
+                    this.state.showClosedCaptions = true;
+                    this.updateCaptioningCookie(true);
                     this.showClosedCaptions();
                 }
             },
@@ -1086,16 +1088,15 @@
 
                 if (this.subtitlesEl.find('.current').text()) {
                     this.captionDisplayEl
-                        .text(this.subtitlesEl.find('.current').text())
-                        .show();
+                        .text(this.subtitlesEl.find('.current').text());
                 } else {
                     this.captionDisplayEl
-                        .text(this.subtitlesEl.find('li').not('.spacing').text())
-                        .show();
+                        .text(gettext('(Captions will appear here once the video plays.)'));
                 }
 
-                this.state.showClosedCaptions = true;
-                this.updateCaptioningCookie(true);
+                this.captionDisplayEl
+                    .show()
+                    .addClass('is-visible');
             },
 
             hideClosedCaptions: function() {
@@ -1105,14 +1106,28 @@
                     .find('.control-text')
                         .text(gettext('Turn on closed captioning'));
 
-                this.captionDisplayEl.hide();
+                this.captionDisplayEl
+                    .hide()
+                    .removeClass('is-visible');
+            },
 
-                this.state.showClosedCaptions = false;
-                this.updateCaptioningCookie(false);
+            updateCaptioningCookie: function(method) {
+                if (method) {
+                    $.cookie('show_closed_captions', 'true', {
+                        expires: 3650,
+                        path: '/'
+                    });
+                } else {
+                    $.cookie('show_closed_captions', null, {
+                        path: '/'
+                    });
+                }
             },
 
             getCaptionText: function() {
-                this.captionDisplayEl.text(this.subtitlesEl.find('.current').text());
+                if (this.state.el.hasClass('is-playing')) {
+                    this.captionDisplayEl.text(this.subtitlesEl.find('.current').text());
+                }
                 this.updateCaptionText();
             },
 
@@ -1132,17 +1147,6 @@
                     draggable = new Draggabilly(captions, { containment: true });
                 } else {
                     console.log('Closed captioning available but not draggable');
-                }
-            },
-
-            updateCaptioningCookie: function(method) {
-                if (method) {
-                    $.cookie('show_closed_captions', 'true', {
-                        expires: 3650,
-                        path: '/'
-                    });
-                } else {
-                    $.cookie('show_closed_captions', '');
                 }
             },
 
