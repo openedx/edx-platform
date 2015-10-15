@@ -2,22 +2,22 @@
 Module with code executed during Studio startup
 """
 
-from django.conf import settings
-
-# Force settings to run so that the python path is modified
-settings.INSTALLED_APPS  # pylint: disable=pointless-statement
-
-from openedx.core.lib.django_startup import autostartup
 import django
+from django.conf import settings
 from monkey_patch import (
     third_party_auth,
     django_db_models_options
 )
 
-import xmodule.x_module
-import cms.lib.xblock.runtime
+# Force settings to run so that the python path is modified
+settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.djangoapps.theming.core import enable_comprehensive_theming
+from openedx.core.lib.django_startup import autostartup
+from openedx.core.lib.xblock_utils import xblock_local_resource_url
+
+import xmodule.x_module
+import cms.lib.xblock.runtime
 
 
 def run():
@@ -46,7 +46,7 @@ def run():
     # TODO: Remove this code when Runtimes are no longer created by modulestores
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
     xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
-    xmodule.x_module.descriptor_global_local_resource_url = cms.lib.xblock.runtime.local_resource_url
+    xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
 
 
 def add_mimetypes():

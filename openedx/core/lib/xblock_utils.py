@@ -8,11 +8,14 @@ import logging
 import markupsafe
 import re
 import static_replace
+import sys
 import uuid
 from lxml import html, etree
 from contracts import contract
 
 from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
@@ -446,3 +449,33 @@ def get_course_update_items(course_updates, provided_index=0):
                         return payload
 
     return course_update_items
+
+
+def xblock_local_resource_url(block, uri):
+    """
+    Returns the URL for an XBlock's local resource.
+
+    Note: when running with the full Django pipeline, the file will be accessed
+    as a static asset which will use a CDN in production.
+    """
+    xblock_class = block.__class__.unmixed_class
+    # TODO: how can we cache XBlocks that are local to edx-platform?
+    if is_installed_xblock(xblock_class) and (settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG):
+        return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
+            package_name=xblock_class.__module__,
+            path=uri
+        ))
+    else:
+        return reverse('xblock_resource_url', kwargs={
+            'block_type': block.scope_ids.block_type,
+            'uri': uri,
+        })
+
+
+def is_installed_xblock(xblock_class):
+    """
+    Returns true if the specified XBlock class belongs to an installed package,
+    i.e. it is not defined in edx-platform.
+    """
+    local_file = sys.modules[xblock_class.__module__].__file__
+    return "edx-platform" not in local_file

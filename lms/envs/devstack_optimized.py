@@ -32,6 +32,9 @@ DEBUG = True
 # Set REQUIRE_DEBUG to false so that it behaves like production
 REQUIRE_DEBUG = False
 
+# Fetch static files out of the pipeline's static root
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
 #  Serve static files at /static directly from the staticfiles directory under test root.
 # Note: optimized files for testing are generated with settings from test_static_optimized
 STATIC_URL = "/static/"
