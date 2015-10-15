@@ -12,6 +12,9 @@ RELEASE_UTIL_DIRNAME = 'openedx_release_utilities'
 
 # Make sure that we read from conf/locale/release_config.yaml,
 # so all calls should include `-c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()`
+from i18n import config
+CONFIG_LOCATION = "config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+
 
 @task
 @needs(
@@ -27,7 +30,7 @@ def i18n_extract(options):
     Extract localizable strings from sources
     """
     verbose = getattr(options, "verbose", None)
-    cmd = "i18n_tool extract -c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+    cmd = "i18n_tool extract -c {config}".format(config=CONFIG_LOCATION)
 
     if verbose:
         cmd += " -vv"
@@ -41,7 +44,7 @@ def i18n_generate_strict():
     Compile localizable strings from sources, extracting strings first.
     Complains if files are missing.
     """
-    cmd = "i18n_tool generate -c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+    cmd = "i18n_tool generate -c {config}".format(config=CONFIG_LOCATION)
     sh(cmd + " --strict")
 
 
@@ -52,10 +55,10 @@ def i18n_dummy():
     Simulate international translation by generating dummy strings
     corresponding to source strings.
     """
-    cmd = "i18n_tool dummy -c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+    cmd = "i18n_tool dummy -c {config}".format(config=CONFIG_LOCATION)
     sh(cmd)
     # Need to then compile the new dummy strings
-    cmd = "i18n_tool generate -c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+    cmd = "i18n_tool generate -c {config}".format(config=CONFIG_LOCATION)
     sh(cmd)
 
 
@@ -92,7 +95,7 @@ def i18n_transifex_push():
     """
     # Need to override default platform .tx/config before running this command
     assert_proper_location()
-    cmd = "i18n_tool transifex -c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+    cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
     sh("{cmd} push".format(cmd=cmd))
 
 @task
@@ -103,7 +106,7 @@ def i18n_transifex_pull():
     """
     # Need to override default platform .tx/config before running this command
     assert_proper_location()
-    cmd = "i18n_tool transifex -c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+    cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
     sh("{cmd} pull".format(cmd=cmd))
 
 
@@ -122,7 +125,7 @@ def i18n_robot_pull():
     # Validate the recently pulled translations, and give a bail option
     sh('git clean -fdX conf/locale/rtl')
     sh('git clean -fdX conf/locale/eo')
-    cmd = "i18n_tool validate -c config.LOCALE_DIR.joinpath('release_config.yaml').normpath()"
+    cmd = "i18n_tool validate -c {config}".format(config=CONFIG_LOCATION)
     print("\n\nValidating translations with `i18n_tool validate`...")
     sh("{cmd}".format(cmd=cmd))
 
