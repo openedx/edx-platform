@@ -186,7 +186,7 @@ class UserStanding(models.Model):
         (ACCOUNT_ENABLED, u"Account Enabled"),
     )
 
-    user = models.ForeignKey(User, db_index=True, related_name='standing', unique=True)
+    user = models.OneToOneField(User, db_index=True, related_name='standing')
     account_status = models.CharField(
         blank=True, max_length=31, choices=USER_STANDING_CHOICES
     )
@@ -464,7 +464,7 @@ class Registration(models.Model):
     class Meta(object):  # pylint: disable=missing-docstring
         db_table = "auth_registration"
 
-    user = models.ForeignKey(User, unique=True)
+    user = models.OneToOneField(User)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
     def register(self, user):
