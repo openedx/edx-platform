@@ -315,6 +315,21 @@ class CreditRequirementApiTests(CreditApiTestBase):
         req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
         self.assertEqual(req_status[0]["status"], "failed")
 
+        # Set the requirement to "declined" and check that it's actually set
+        api.set_credit_requirement_status(
+            "staff", self.course_key,
+            "reverification",
+            "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+            status="declined"
+        )
+        req_status = api.get_credit_requirement_status(
+            self.course_key,
+            "staff",
+            namespace="reverification",
+            name="i4x://edX/DemoX/edx-reverification-block/assessment_uuid"
+        )
+        self.assertEqual(req_status[0]["status"], "declined")
+
     def test_remove_credit_requirement_status(self):
         self.add_credit_course()
         requirements = [
