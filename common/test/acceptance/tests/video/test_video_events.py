@@ -65,6 +65,9 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
+    # cannot multithread this class due to events-related tests
+    _multiprocess_can_split_ = False
+
     @unittest.skip('AN-5867')
     def test_video_control_events(self):
         """
