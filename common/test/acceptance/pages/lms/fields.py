@@ -171,13 +171,15 @@ class FieldsMixin(object):
         """
         Set the value of a textarea field.
         """
+        assert False, "Cannot set value for textarea"
         self.wait_for_field(field_id)
         self.make_field_editable(field_id)
 
         field_selector = '.u-field-{} textarea'.format(field_id)
         self.wait_for_element_presence(field_selector, 'Editable textarea is present.')
 
-        query = self.q(css=field_selector)
+        query = self.q(css=field_selector).first
+        query.click()
         query.fill(value)
         query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
 

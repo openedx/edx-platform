@@ -308,18 +308,18 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
-    def _test_textarea_field(self, profile_page, field_id, new_value, displayed_value, mode):
+    def _test_textarea_field(self, profile_page, field_id, new_value, expected_value, mode):
         """
         Test behaviour of a textarea field.
         """
         profile_page.set_value_for_textarea_field(field_id, new_value)
-        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
+        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), expected_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
         self.browser.refresh()
         profile_page.wait_for_page()
 
-        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
+        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), expected_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
     def test_country_field(self):
