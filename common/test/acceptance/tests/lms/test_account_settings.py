@@ -106,6 +106,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
     """
     Tests that verify behaviour of the Account Settings page.
     """
+
+    _multiprocess_can_split_ = False
+
     SUCCESS_MESSAGE = 'Your changes have been saved.'
 
     def setUp(self):
