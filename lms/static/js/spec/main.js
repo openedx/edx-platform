@@ -89,7 +89,7 @@
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
 
             // Common edx utils
-            'js/utils/edx.utils.validate': 'xmodule_js/common_static/js/utils/edx.utils.validate'
+            'common/js/utils/edx.utils.validate': 'xmodule_js/common_static/common/js/utils/edx.utils.validate'
         },
         shim: {
             'gettext': {
