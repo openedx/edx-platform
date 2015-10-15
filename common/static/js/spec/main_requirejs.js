@@ -162,7 +162,8 @@
         'common-requirejs/include/common/js/spec/components/paging_header_spec.js',
         'common-requirejs/include/common/js/spec/components/paging_footer_spec.js',
         'common-requirejs/include/common/js/spec/components/search_field_spec.js',
-        'common-requirejs/include/common/js/spec/components/view_utils_spec.js'
+        'common-requirejs/include/common/js/spec/components/view_utils_spec.js',
+        'common-requirejs/include/common/js/spec/utils/edx.utils.validate_spec.js'
     ]);
 
 }).call(this, requirejs, define);
