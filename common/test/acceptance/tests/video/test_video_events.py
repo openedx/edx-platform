@@ -17,6 +17,10 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
     """
     Useful helper methods to test video player event emission.
     """
+
+    # cannot multithread this class due to events-related tests
+    _multiprocess_can_split_ = False
+
     def assert_payload_contains_ids(self, video_event):
         """
         Video events should all contain "id" and "code" attributes in their payload.
@@ -153,6 +157,9 @@ class VideoEventsTest(VideoEventsTestMixin):
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
+
+    # cannot multiprocess this class due to underlying usage of events mixin
+    _multiprocess_can_split_ = False
 
     # helper methods
     def watch_video_and_skip(self):
