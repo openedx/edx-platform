@@ -33,12 +33,12 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def get_module_store(self):
         """ module store accessor - retain result for subsequent uses """
-        # if self._module_store is None:
-        self._module_store = modulestore()
+        if self._module_store is None:
+            self._module_store = modulestore()
         return self._module_store
 
     def get_course_blocks(self, user):
-        """ fetch cached blocks for course - retain for subsequent use"""
+        """ fetch cached blocks for course - retain for subsequent use """
         course_key = self.get_course_key()
         if course_key not in self._course_blocks:
             self._course_blocks[course_key] = get_course_blocks(user, course_key=course_key)

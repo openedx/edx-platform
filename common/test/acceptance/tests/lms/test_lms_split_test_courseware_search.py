@@ -76,7 +76,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         """
         Create a group configuration for course
         """
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [

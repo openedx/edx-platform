@@ -240,7 +240,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.courseware_search_page.search_for_term(self.group_a_html)
         assert self.group_a_html not in self.courseware_search_page.search_results.html[0]
 
-    def test_cohorted_search_user_c_ab_content(self):
+    def test_cohorted_search_user_default_ab_content(self):
         """
         Test user not enrolled in any cohorts can't see any of restricted content.
         """
@@ -249,7 +249,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.courseware_search_page.search_for_term(self.group_a_and_b_html)
         assert self.group_a_and_b_html not in self.courseware_search_page.search_results.html[0]
 
-    def test_cohorted_search_user_c_all_content(self):
+    def test_cohorted_search_user_default_all_content(self):
         """
         Test user can search public content if cohorts used on course.
         """
