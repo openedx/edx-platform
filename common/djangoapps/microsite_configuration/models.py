@@ -13,7 +13,10 @@ from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from model_utils.models import TimeStampedModel
 
+from simple_history.models import HistoricalRecords
+
 from django.db.models.signals import pre_save, pre_delete
+from django.db.models.base import ObjectDoesNotExist
 
 
 def validate_json(values):
@@ -46,6 +49,25 @@ class Microsite(models.Model):
 
     def __unicode__(self):
         return self.key
+
+    def get_orgs(self):
+        """
+        Helper method to return a list of ORGs associated with our particular Microsite
+        """
+        return MicrositeOrgMapping.get_orgs_for_microsite_by_pk(self.id)
+
+    @classmethod
+    def get_microsite_for_domain(cls, domain):
+        """
+        Returns the microsite associated with this domain. Note that we always convert to lowercase, or
+        None if no match
+        """
+
+        # remove any port number from the hostname
+        domain = domain.split(':')[0]
+        microsites = cls.objects.filter(subdomain__iexact=domain)
+
+        return microsites[0] if microsites else None
 
 
 class MicrositeHistory(TimeStampedModel):
@@ -96,3 +118,42 @@ def on_microsite_updated(sender, instance, **kwargs):  # pylint: disable=unused-
         # on an update case, get the original and archive it
         original = Microsite.objects.get(id=instance.id)
         _make_archive_copy(original)
+
+
+class MicrositeOrgMapping(models.Model):
+    """
+    Mapping of ORG to which Microsite it belongs
+    """
+
+    org = models.CharField(max_length=63, db_index=True, unique=True)
+    microsite = models.ForeignKey(Microsite, db_index=True)
+
+    # for archiving
+    history = HistoricalRecords()
+
+    @classmethod
+    def get_orgs_for_microsite(cls, microsite_key):
+        """
+        Returns a list of ORGs associated with the microsite key, returned as a set
+        """
+        return cls.objects.filter(microsite__key=microsite_key).values_list('org', flat=True)
+
+    @classmethod
+    def get_orgs_for_microsite_by_pk(cls, microsite_pk):
+        """
+        Returns a list of ORGs associated with the microsite key, returned as a set
+        """
+        return cls.objects.filter(microsite_id=microsite_pk).values_list('org', flat=True)
+
+    @classmethod
+    def get_microsite_for_org(cls, org):
+        """
+        Returns the microsite object for a given ORG based on the table mapping, None if
+        no mapping exists
+        """
+
+        try:
+            item = cls.objects.get(org=org).select_related()
+            return item.microsite
+        except ObjectDoesNotExist:
+            return None
