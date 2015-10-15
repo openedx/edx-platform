@@ -10,6 +10,7 @@ import pprint
 import requests
 import os
 import urlparse
+import multiprocessing
 from contextlib import contextmanager
 from datetime import datetime
 from path import Path as path
@@ -325,13 +326,13 @@ class EventsTestMixin(TestCase):
     Helpers and setup for running tests that evaluate events emitted
     """
 
+    #to allow for use of a shared lock object
     _multiprocess_can_split_ = False
-    # _multiprocess_can_share_ = True
 
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
-        self.reset_event_tracking()
+        #self.reset_event_tracking()
 
     def reset_event_tracking(self):
         """Drop any events that have been collected thus far and start collecting again from scratch."""
