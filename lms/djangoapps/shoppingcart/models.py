@@ -1020,7 +1020,10 @@ class InvoiceTransaction(TimeStampedModel):
         returns the total amount of the paid invoices.
         """
         result = cls.objects.filter(amount__gt=0, invoice__course_id=course_key, status='completed').aggregate(
-            total=Sum('amount')
+            total=Sum(
+                'amount',
+                output_field=models.DecimalField(decimal_places=2, max_digits=30)
+            )
         )
 
         total = result.get('total', 0)
@@ -1474,7 +1477,10 @@ class PaidCourseRegistration(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum(F('qty') * F('unit_cost'))
+            total=Sum(
+                F('qty') * F('unit_cost'),
+                output_field=models.DecimalField(decimal_places=2, max_digits=30)
+            )
         )
 
         if result['total'] is not None:
@@ -1648,7 +1654,10 @@ class CourseRegCodeItem(OrderItem):
         """
         total_cost = 0
         result = cls.objects.filter(course_id=course_key, status=status).aggregate(
-            total=Sum(F('qty') * F('unit_cost'))
+            total=Sum(
+                F('qty') * F('unit_cost'),
+                output_field=models.DecimalField(decimal_places=2, max_digits=30)
+            )
         )
 
         if result['total'] is not None:
