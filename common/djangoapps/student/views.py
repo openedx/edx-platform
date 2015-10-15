@@ -25,8 +25,9 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
+from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
-from django.utils.http import base36_to_int
+from django.utils.http import base36_to_int, urlsafe_base64_encode
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -2026,12 +2027,19 @@ def password_reset_confirm_wrapper(
         # we also want to pass settings.PLATFORM_NAME in as extra_context
         extra_context = {"platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)}
 
+        # Support old password reset URLs that used base36 encoded user IDs.
+        # See https://github.com/django/django/commit/1184d077893ff1bc947e45b00a4d565f3df81776#diff-c571286052438b2e3190f8db8331a92bR231
+        try:
+          uidb64 = force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36))))
+        except ValueError:
+          uidb64 = '1' # dummy invalid ID (incorrect padding for base64)
+
         if request.method == 'POST':
             # remember what the old password hash is before we call down
             old_password_hash = user.password
 
             result = password_reset_confirm(
-                request, uidb36=uidb36, token=token, extra_context=extra_context
+                request, uidb64=uidb64, token=token, extra_context=extra_context
             )
 
             # get the updated user
@@ -2045,7 +2053,7 @@ def password_reset_confirm_wrapper(
             return result
         else:
             return password_reset_confirm(
-                request, uidb36=uidb36, token=token, extra_context=extra_context
+                request, uidb64=uidb64, token=token, extra_context=extra_context
             )
 
 
