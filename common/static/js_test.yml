@@ -42,6 +42,9 @@ lib_paths:
     - js/test/add_ajax_prefix.js
     - js/test/i18n.js
     - coffee/src/jquery.immediateDescendents.js
+    # in some cases core.js now uses require, so the lib should always be present
+    # it is not the same as using jasmin-requirejs runner, since all the tests in this suite are not written in
+    # require-define manner
     - js/vendor/require.js
 
 # Paths to source JavaScript files

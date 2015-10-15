@@ -1,3 +1,4 @@
+/* globals require, RequireJS */
 (function($, require, JSON) {
 
     'use strict';
@@ -48,12 +49,11 @@
         var runtime = elementRuntime(element);
         var deferred = $.Deferred();
         var initialized = $.Deferred();
+        var init = $element.data('init');
+        var useRequire = $element.data('use-require');
 
         block_args.unshift(element);
         block_args.unshift(runtime);
-
-        var true_require = require || RequireJS.require;
-
 
         if (runtime) {
             var createBlockInstance = function(initFunction) {
@@ -70,10 +70,8 @@
             };
 
             block = (function() {
-                var init = $element.data('init'),
-                    useRequire = $element.data('use-require');
                 if (useRequire === 'True') {
-                    true_require([init], function(initFunction) {
+                    require([init], function(initFunction) {
                         createBlockInstance(initFunction);
                     });
                 } else {

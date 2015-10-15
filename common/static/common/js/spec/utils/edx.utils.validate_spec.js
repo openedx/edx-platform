@@ -4,8 +4,7 @@
         function($, EdxUtilsValidate) {
 
         describe("EdxUtilsValidate", function() {
-            var fixture = null,
-                field = null,
+            var field = null,
                 result = null,
                 MIN_LENGTH = 2,
                 MAX_LENGTH = 20,
@@ -68,16 +67,20 @@
                 expectInvalid(MIN_ERROR_FRAGMENT);
             });
 
-            it('succeeds if a field with no minimum character limit is provided a value below its maximum character limit', function () {
-                createFixture('text', 'username', false, null, MAX_LENGTH, SHORT_STRING);
+            it(
+                'succeeds if a field with no minimum character limit is provided a value ' +
+                'below its maximum character limit',
+                function () {
+                    createFixture('text', 'username', false, null, MAX_LENGTH, SHORT_STRING);
 
-                // Verify optional field behavior
-                expectValid();
+                    // Verify optional field behavior
+                    expectValid();
 
-                // Verify required field behavior
-                field.prop('required', true);
-                expectValid();
-            });
+                    // Verify required field behavior
+                    field.prop('required', true);
+                    expectValid();
+                }
+            );
 
             it('fails if a required field with no minimum character limit is left blank', function () {
                 createFixture('text', 'username', true, null, MAX_LENGTH, '');
@@ -95,16 +98,20 @@
                 expectInvalid(MAX_ERROR_FRAGMENT);
             });
 
-            it('succeeds if a field with no maximum character limit is provided a value above its minimum character limit', function () {
-                createFixture('text', 'username', false, MIN_LENGTH, null, LONG_STRING);
+            it(
+                'succeeds if a field with no maximum character limit is provided a value ' +
+                'above its minimum character limit',
+                function () {
+                    createFixture('text', 'username', false, MIN_LENGTH, null, LONG_STRING);
 
-                // Verify optional field behavior
-                expectValid();
+                    // Verify optional field behavior
+                    expectValid();
 
-                // Verify required field behavior
-                field.prop('required', true);
-                expectValid();
-            });
+                    // Verify required field behavior
+                    field.prop('required', true);
+                    expectValid();
+                }
+            );
 
             it('succeeds if a field with no character limits is provided a value', function () {
                 createFixture('text', 'username', false, null, null, VALID_STRING);
@@ -139,49 +146,57 @@
                 expectValid();
             });
 
-            it('succeeds if a checkbox is optional, or required and checked, but fails if a required checkbox is unchecked', function () {
-                createFixture('checkbox', 'checkbox', false, null, null, 'value');
+            it(
+                'succeeds if a checkbox is optional, or required and checked, ' +
+                'but fails if a required checkbox is unchecked',
+                function () {
+                    createFixture('checkbox', 'checkbox', false, null, null, 'value');
 
-                // Optional, unchecked
-                expectValid();
+                    // Optional, unchecked
+                    expectValid();
 
-                // Optional, checked
-                field.prop('checked', true);
-                expectValid();
+                    // Optional, checked
+                    field.prop('checked', true);
+                    expectValid();
 
-                // Required, checked
-                field.prop('required', true);
-                expectValid();
+                    // Required, checked
+                    field.prop('required', true);
+                    expectValid();
 
-                // Required, unchecked
-                field.prop('checked', false);
-                expectInvalid(REQUIRED_ERROR_FRAGMENT);
-            });
+                    // Required, unchecked
+                    field.prop('checked', false);
+                    expectInvalid(REQUIRED_ERROR_FRAGMENT);
+                }
+            );
 
-            it('succeeds if a select is optional, or required and default is selected, but fails if a required select has the default option selected', function () {
-                var select = [
-                    '<select id="dropdown" name="country">',
-                        '<option value="" data-isdefault="true">Please select a country</option>',
-                        '<option value="BE">Belgium</option>',
-                        '<option value="DE">Germany</option>',
-                    '</select>'
-                ].join('');
+            it(
+                'succeeds if a select is optional, or required and default is selected, ' +
+                'but fails if a required select has the default option selected',
+                function () {
+                    var select = [
+                        '<select id="dropdown" name="country">',
+                            '<option value="" data-isdefault="true">Please select a country</option>',
+                            '<option value="BE">Belgium</option>',
+                            '<option value="DE">Germany</option>',
+                        '</select>'
+                    ].join('');
 
-                setFixtures(select);
+                    setFixtures(select);
 
-                field = $('#dropdown');
+                    field = $('#dropdown');
 
-                // Optional
-                expectValid();
+                    // Optional
+                    expectValid();
 
-                // Required, default text selected
-                field.attr('required', true);
-                expectInvalid(REQUIRED_ERROR_FRAGMENT);
+                    // Required, default text selected
+                    field.attr('required', true);
+                    expectInvalid(REQUIRED_ERROR_FRAGMENT);
 
-                // Required, country selected
-                field.val('BE');
-                expectValid();
-            });
+                    // Required, country selected
+                    field.val('BE');
+                    expectValid();
+                }
+            );
 
             it('returns a custom error message if an invalid field has one attached', function () {
                 // Create a blank required field

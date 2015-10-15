@@ -40,11 +40,6 @@ describe "XBlock", ->
       @vANode = $('#vA')[0]
       @vZNode = $('#vZ')[0]
 
-      @vABlock = null
-      @vZBlock = null
-      @missingVersionBlock = null
-      @missingInitBlock = null
-
       XBlock.initializeBlock(@vANode, 'req-token-a').done((block) => @vABlock = block)
       XBlock.initializeBlock(@vZNode).done((block) => @vZBlock = block)
       XBlock.initializeBlock($('#missing-version')[0]).done((block) => @missingVersionBlock = block)
