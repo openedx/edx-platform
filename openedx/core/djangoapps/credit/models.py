@@ -411,6 +411,7 @@ class CreditRequirementStatus(TimeStampedModel):
     REQUIREMENT_STATUS_CHOICES = (
         ("satisfied", "satisfied"),
         ("failed", "failed"),
+        ("declined", "declined"),
     )
 
     username = models.CharField(max_length=255, db_index=True)

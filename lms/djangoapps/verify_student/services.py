@@ -95,6 +95,7 @@ class ReverificationService(object):
             course_id=course_key,
             checkpoint_location=related_assessment_location
         )
+        user = User.objects.get(id=user_id)
 
         # user can skip a reverification attempt only if that user has not already
         # skipped an attempt
@@ -102,6 +103,24 @@ class ReverificationService(object):
             SkippedReverification.add_skipped_reverification_attempt(checkpoint, user_id, course_key)
         except IntegrityError:
             log.exception("Skipped attempt already exists for user %s: with course %s:", user_id, unicode(course_id))
+            return
+
+        try:
+            # Avoid circular import
+            from openedx.core.djangoapps.credit.api import set_credit_requirement_status
+
+            # As a user skips the reverification it declines to fulfill the requirement so
+            # requirement sets to declined.
+            set_credit_requirement_status(
+                user.username,
+                course_key,
+                'reverification',
+                checkpoint.checkpoint_location,
+                status='declined'
+            )
+
+        except Exception as err:  # pylint: disable=broad-except
+            log.error("Unable to add credit requirement status for user with id %d: %s", user_id, err)
 
     def get_attempts(self, user_id, course_id, related_assessment_location):
         """Get re-verification attempts against a user for a given 'checkpoint'

@@ -132,10 +132,13 @@ from django.utils.http import urlquote_plus
                                 %if requirement['status'] == 'submitted':
                                     <span class="requirement-submitted">${_("Verification Submitted")}</span>
                                 %elif requirement['status'] == 'failed':
-                                    <i class="fa fa-times"></i>
+                                    <i class="fa fa-times" aria-hidden="true"></i>
                                     <span>${_("Verification Failed" )}</span>
+                                %elif requirement['status'] == 'declined':
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    <span>${_("Verification Declined" )}</span>
                                 %elif requirement['status'] == 'satisfied':
-                                    <i class="fa fa-check"></i>
+                                    <i class="fa fa-check" aria-hidden="true"></i>
                                     % if requirement['namespace'] == 'grade' and 'final_grade' in requirement['reason']:
                                     <span>${int(requirement['reason']['final_grade'] * 100)}%</span>
                                     % else:
@@ -149,7 +152,7 @@ from django.utils.http import urlquote_plus
                     </div>
                 %endfor
                  </div>
-                <button class="detail-collapse" aria-live="polite"><i class="fa fa-caret-up"></i>
+                <button class="detail-collapse" aria-live="polite"><i class="fa fa-caret-up" aria-hidden="true"></i>
                     <span class="requirement-detail">${_("Less")}</span>
                 </button>
             </div>
