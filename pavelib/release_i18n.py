@@ -92,10 +92,10 @@ def swap_configuration_files():
     # Move RELEASE_CONFIGFILE to config
     cwd = Path.getcwd()
     for filename in ['config', RELEASE_CONFIGFILE]:
-        if cwd.joinpath('filename') not in cwd.files():
+        if cwd.joinpath(filename) not in cwd.files():
             msg = (
-                "ERROR: Did not find file named {} in .tx/ directory."
-            ).format(filename)
+                "ERROR: Did not find file named {0} in {1} directory."
+            ).format(filename, cwd, cwd.files())
             raise IOError(msg)
     Path.move(cwd.joinpath('config'), cwd.joinpath('config.swp'))
     Path.move(cwd.joinpath(RELEASE_CONFIGFILE), cwd.joinpath('config'))
@@ -114,11 +114,11 @@ def cleanup_configfiles():
     # If swaps didn't finish all the way, these may not work; try anyway.
     try:
         Path.move(cwd.joinpath('config'), cwd.joinpath(RELEASE_CONFIGFILE))
-    except IOError:
+    except Exception:  # pylint: disable=broad-except
         pass
     try:
         Path.move(cwd.joinpath('config.swp'), cwd.joinpath('config'))
-    except IOError:
+    except Exception:  # pylint: disable=broad-except
         pass
 
 
@@ -146,9 +146,13 @@ def release_i18n_transifex_push_new():
     Push source strings to Transifex for translation
     """
     # Need to override default platform .tx/config before running this command
+
+    ## TODO: When cutting Dogwood, need to add in some logic to first pull_all
+    ## existing translations (even unreviewed), then push all up to the new instance.
+
     try:
         swap_configuration_files()
-        print("\nThis command is intended to push new strings for an Open edX release with name '{}'\n".format(RELEASE_NAME))
+        print("\nThis command is intended to push new strings for an Open edX release with name '{}'\nDo NOT run if you're not sure if you're doing the right thing.".format(RELEASE_NAME))
         cmd = "i18n_tool transifex -c {config}".format(config=CONFIG_LOCATION)
         sh("{cmd} push_all".format(cmd=cmd))
     finally:
