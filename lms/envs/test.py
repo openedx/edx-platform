@@ -110,7 +110,7 @@ DATA_DIR = COURSES_ROOT
 
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
-GITHUB_REPO_ROOT = ENV_ROOT / "data"
+GITHUB_REPO_ROOT = TEST_ROOT / "data"
 
 USE_I18N = True
 LANGUAGE_CODE = 'en'  # tests assume they will get English.
