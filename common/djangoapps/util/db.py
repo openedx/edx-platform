@@ -179,8 +179,25 @@ def outer_atomic(using=None, savepoint=True, read_committed=False):
     """
     A variant of Django's atomic() which cannot be nested inside another atomic.
 
-    This is useful if you want to ensure that a commit happens at
-    the end of the wrapped block.
+    With the upgrade to Django 1.8, all views by default are wrapped
+    in an atomic block. Because of this, a commit to the database can
+    only happen once the view returns. This is because nested atomic
+    blocks use savepoints and the transaction only gets committed when
+    the outermost atomic block returns. See the official Django docs
+    for details: https://docs.djangoproject.com/en/1.8/topics/db/transactions/
+
+    However, in some cases, we need to be able to commit to the
+    database in the middle of a view. The only way to do this
+    is to disable automatic transaction management for the view by
+    adding @transaction.non_atomic_requests to it and then using
+    atomic() inside it in relevant places. To help ensure that queries
+    inside a piece of code are committed, you can wrap it in
+    outer_atomic(). outer_atomic() will ensure that it is not nested
+    inside another atomic block.
+
+    Additionally, some views need to use READ COMMITTED isolation level.
+    For this add @transaction.non_atomic_requests and
+    @outer_atomic(read_committed=True) decorators on it.
 
     Arguments:
         using (str): the name of the database.
