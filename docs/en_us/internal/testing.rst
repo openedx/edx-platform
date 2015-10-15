@@ -96,14 +96,12 @@ Test Locations
 
 -  Content type examples:
 
-   The Demo Testing Course
-   `Demo Testing Course
+   The `Demo Testing Course
    <https://github.com/edx/demo-test-course>`_ provides
    a comprehensive collection of all edX content types. The course exercises
    all possible Studio content creation and is a valuable testing resource.
 
-   The Demo Performance Course
-   `https://github.com/edx/demo-performance-course
+   The `Demo Performance Course
    <https://github.com/edx/demo-performance-course>`_ is a demonstration
    course you can import into edX Studio. Use it to evaluate performance
    implications of individual components.
