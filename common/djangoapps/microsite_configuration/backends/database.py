@@ -18,6 +18,9 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         """
         Returns whether there is any Microsite configuration settings
         """
+
+        # CDODGE: I believe this will be called on every request into edx-platform
+        # so it seems more expensive than it should be. Like set_config_by_domain
         if Microsite.objects.count():
             return True
         else:
@@ -32,6 +35,9 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         if not self.has_configuration_set() or not domain:
             return
 
+        # CDODGE: I'm concerned about this performance. Seems like we should cache this mapping
+        # and maybe auto expire the cache extry after 5 minutes. This method will be called on
+        # every request into edx-platform
         candidates = Microsite.objects.all()
         for microsite in candidates:
             subdomain = microsite.subdomain
