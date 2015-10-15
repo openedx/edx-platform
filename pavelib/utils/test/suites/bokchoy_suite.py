@@ -3,6 +3,8 @@ Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
 
+from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
+
 from paver.easy import sh
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
@@ -75,6 +77,16 @@ class BokChoyTestSuite(TestSuite):
         msg = colorize('green', "Confirming servers have started...")
         print msg
         bokchoy_utils.wait_for_test_servers()
+        try:
+            # Create course in order to seed forum data underneath. This is
+            # a workaround for a race condition. The first time a course is created;
+            # role permissions are set up for forums.
+            CourseFixture('foobar_org','1117','seed_forum','seed_foo').install()
+            print 'hi ben'
+        except FixtureError:
+            # this means it's already been done
+            pass
+
         if self.serversonly:
             self.run_servers_continuously()
 
