@@ -117,7 +117,8 @@ class PreferencesView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            update_user_preferences(request.user, request.data, username=username)
+            with transaction.atomic():
+                update_user_preferences(request.user, request.data, username=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
