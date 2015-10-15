@@ -341,12 +341,11 @@ class ImportTestCase(CourseTestCase):
         self.assertIn(test_block3.url_name, children)
         self.assertIn(test_block4.url_name, children)
 
-        extract_dir = path(tempfile.mkdtemp(dir=settings.DATA_DIR))
+        extract_dir = path(mkdtemp_clean(dir=settings.DATA_DIR))
         # the extract_dir needs to be passed as a relative dir to
         # import_library_from_xml
         extract_dir_relative = path.relpath(extract_dir, settings.DATA_DIR)
 
-        extract_dir = path(mkdtemp_clean())
         with tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz') as tar:
             safetar_extractall(tar, extract_dir)
         library_items = import_library_from_xml(
