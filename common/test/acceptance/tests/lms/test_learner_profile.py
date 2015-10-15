@@ -154,6 +154,8 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     Tests that verify a student's own profile page.
     """
 
+    _multiprocess_can_split_ = False
+
     def verify_profile_forced_private_message(self, username, birth_year, message=None):
         """
         Verify age limit messages for a user.
@@ -668,6 +670,9 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify viewing the profile page of a different user.
     """
+
+    _multiprocess_can_split_ = False
+
     def test_different_user_private_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's private profile.
