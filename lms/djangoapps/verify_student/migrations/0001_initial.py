@@ -75,6 +75,7 @@ class Migration(migrations.Migration):
                 ('error_msg', models.TextField(blank=True)),
                 ('error_code', models.CharField(max_length=50, blank=True)),
                 ('photo_id_key', models.TextField(max_length=1024)),
+                ('copy_id_photo_from', models.ForeignKey(blank=True, to='verify_student.SoftwareSecurePhotoVerification', null=True)),
                 ('reviewing_user', models.ForeignKey(related_name='photo_verifications_reviewed', default=None, to=settings.AUTH_USER_MODEL, null=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
