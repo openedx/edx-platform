@@ -328,8 +328,10 @@ class EventsTestMixin(TestCase):
 
     #to allow for use of a shared lock object
     _multiprocess_can_split_ = False
+    _multiprocess_shared_ = True
 
     def setUp(self):
+        print "EventsTestMixin setUp()"
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
         self.reset_event_tracking()
@@ -359,6 +361,7 @@ class EventsTestMixin(TestCase):
         `captured_events`.
         """
         self.event_lock.acquire()
+        print "lock acquired!"
         start_time = datetime.utcnow()
 
         yield
@@ -369,6 +372,7 @@ class EventsTestMixin(TestCase):
         if captured_events is not None and hasattr(captured_events, 'append') and callable(captured_events.append):
             for event in events:
                 captured_events.append(event)
+        print "releasing lock..."
         self.event_lock.release()
 
     @contextmanager
