@@ -23,6 +23,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
+from util.views import handle_500
 from xmodule.modulestore.django import modulestore
 
 from certificates.api import (
@@ -279,6 +280,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     )
 
 
+@handle_500(template_path="certificates/server-error.html")
 def render_html_view(request, user_id, course_id):
     """
     This public view generates an HTML representation of the specified student's certificate

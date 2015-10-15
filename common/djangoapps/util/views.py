@@ -56,6 +56,39 @@ def jsonable_server_error(request, template_name='500.html'):
         return server_error(request, template_name=template_name)
 
 
+def handle_500(template_path, context=None):
+    """
+    Decorator for view specific 500 error handling.
+
+    Usage::
+
+        @handle_500(template_path='certificates/server-error.html', context={'error-info': 'Internal Server Error'})
+        def my_view(request):
+            # Any unhandled exception in this view would be handled by the handle_500 decorator
+            # ...
+
+    """
+    def decorator(func):
+        """
+        Decorator to render custom html template in case of uncaught exception in wrapped function
+        """
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            """
+            Execute the function in try..except block and return custom server-error page in case of unhandled exception
+            """
+            try:
+                return func(request, *args, **kwargs)
+            except Exception:  # pylint: disable=broad-except
+                if settings.DEBUG:
+                    # In debug mode let django process the 500 errors and display debug info for the developer
+                    raise
+                else:
+                    return render_to_response(template_path, context)
+        return inner
+    return decorator
+
+
 def calculate(request):
     ''' Calculator in footer of every page. '''
     equation = request.GET['equation']
