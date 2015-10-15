@@ -72,7 +72,7 @@ class NullBackend(BaseMicrositeBackend):
         This returns a set of orgs that are considered within all microsites.
         This can be used, for example, to do filtering
         """
-        return super(NullBackend, self).get_all_orgs()
+        return super(NullBackend, self).get_all_config()
 
     def clear(self):
         """
