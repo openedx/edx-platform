@@ -96,12 +96,11 @@ Test Locations
 
 -  Content type examples:
 
-   The Accessibility Mega Course
-   `https://github.com/cptvitamin/demo-test-course
-   <https://github.com/cptvitamin/demo-test-course>`_ provides
+   The Demo Testing Course
+   `Demo Testing Course
+   <https://github.com/edx/demo-test-course>`_ provides
    a comprehensive collection of all edX content types. The course exercises
    all possible Studio content creation and is a valuable testing resource.
-   It is available by default in sandboxes.
 
    The Demo Performance Course
    `https://github.com/edx/demo-performance-course
