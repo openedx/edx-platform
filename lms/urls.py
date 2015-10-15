@@ -153,7 +153,7 @@ urlpatterns += (
 favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
 urlpatterns += (url(
     r'^favicon\.ico$',
-    RedirectView.as_view(url=settings.STATIC_URL + favicon_path)
+    RedirectView.as_view(url=settings.STATIC_URL + favicon_path, permanent=True)
 ),)
 
 # Semi-static views only used by edX, not by themes
