@@ -58,7 +58,7 @@ git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-clie
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
 git+https://github.com/edx/edx-organizations.git@822492f2840299b400fc6013403a355120c40468#egg=edx-organizations==0.1.7
 
-git+https://github.com/edx/edx-proctoring.git@django1.8-upgrade#egg=edx-proctoring==0.11.0
+git+https://github.com/edx/edx-proctoring.git@django1.8-upgrade#egg=edx-proctoring==0.11.2
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
