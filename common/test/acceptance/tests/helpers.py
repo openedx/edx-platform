@@ -10,6 +10,7 @@ import pprint
 import requests
 import os
 import urlparse
+import multiprocessing
 from contextlib import contextmanager
 from datetime import datetime
 from path import Path as path
@@ -325,13 +326,14 @@ class EventsTestMixin(TestCase):
     Helpers and setup for running tests that evaluate events emitted
     """
 
+    #to allow for use of a shared lock object
     _multiprocess_can_split_ = False
-    # _multiprocess_can_share_ = True
 
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
         self.reset_event_tracking()
+        self.event_lock = multiprocessing.Lock()
 
     def reset_event_tracking(self):
         """Drop any events that have been collected thus far and start collecting again from scratch."""
@@ -356,6 +358,7 @@ class EventsTestMixin(TestCase):
         *at least* this many events have been emitted, so `number_of_matches` is simply a lower bound for the size of
         `captured_events`.
         """
+        self.event_lock.acquire()
         start_time = datetime.utcnow()
 
         yield
@@ -366,6 +369,7 @@ class EventsTestMixin(TestCase):
         if captured_events is not None and hasattr(captured_events, 'append') and callable(captured_events.append):
             for event in events:
                 captured_events.append(event)
+        self.event_lock.release()
 
     @contextmanager
     def assert_events_match_during(self, event_filter=None, expected_events=None, in_order=True):
