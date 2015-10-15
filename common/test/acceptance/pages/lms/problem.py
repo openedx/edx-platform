@@ -84,6 +84,13 @@ class ProblemPage(PageObject):
         self.q(css='div.problem button.hint-button').click()
         self.wait_for_ajax()
 
+    def click_choice(self, choice_value):
+        """
+        Click the choice input(radio, checkbox or option) where value matches `choice_value` in choice group.
+        """
+        self.q(css='div.problem .choicegroup input[value="' + choice_value + '"]').click()
+        self.wait_for_ajax()
+
     def is_correct(self):
         """
         Is there a "correct" status showing?

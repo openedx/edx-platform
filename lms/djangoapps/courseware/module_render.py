@@ -38,7 +38,8 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
 from courseware.models import SCORE_CHANGED
 from courseware.entrance_exams import (
     get_entrance_exam_score,
-    user_must_complete_entrance_exam
+    user_must_complete_entrance_exam,
+    user_has_passed_entrance_exam
 )
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
@@ -1062,6 +1063,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         try:
             with tracker.get_tracker().context(tracking_context_name, tracking_context):
                 resp = instance.handle(handler, req, suffix)
+                if suffix == 'problem_check' \
+                        and course \
+                        and getattr(course, 'entrance_exam_enabled', False) \
+                        and getattr(instance, 'in_entrance_exam', False):
+                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request, course)}
+                    resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:
             log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
@@ -1178,3 +1185,22 @@ def _check_files_limits(files):
                 return msg
 
     return None
+
+
+def append_data_to_webob_response(response, data):
+    """
+    Appends data to a JSON webob response.
+
+    Arguments:
+        response (webob response object):  the webob response object that needs to be modified
+        data (dict):  dictionary containing data that needs to be appended to response body
+
+    Returns:
+        (webob response object):  webob response with updated body.
+
+    """
+    if getattr(response, 'content_type', None) == 'application/json':
+        response_data = json.loads(response.body)
+        response_data.update(data)
+        response.body = json.dumps(response_data)
+    return response

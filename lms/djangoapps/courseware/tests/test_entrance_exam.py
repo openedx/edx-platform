@@ -4,10 +4,12 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 from mock import patch, Mock
 
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.model_data import FieldDataCache
-from courseware.module_render import toc_for_course, get_module
+from courseware.module_render import toc_for_course, get_module, handle_xblock_callback
 from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
 from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
@@ -115,10 +117,16 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category='vertical',
             display_name='Exam Vertical - Unit 1'
         )
+        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+            question_text='The correct answer is Choice 3',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
         self.problem_1 = ItemFactory.create(
             parent=subsection,
             category="problem",
-            display_name="Exam Problem - Problem 1"
+            display_name="Exam Problem - Problem 1",
+            data=problem_xml
         )
         self.problem_2 = ItemFactory.create(
             parent=subsection,
@@ -532,6 +540,28 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
         course = CourseFactory.create(
         )
         self.assertTrue(user_has_passed_entrance_exam(self.request, course))
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MASQUERADE': False})
+    def test_entrance_exam_xblock_response(self):
+        """
+        Tests entrance exam xblock has `entrance_exam_passed` key in json response.
+        """
+        request_factory = RequestFactory()
+        data = {'input_{}_2_1'.format(unicode(self.problem_1.location.html_id())): 'choice_2'}
+        request = request_factory.post(
+            'problem_check',
+            data=data
+        )
+        request.user = self.user
+        response = handle_xblock_callback(
+            request,
+            unicode(self.course.id),
+            unicode(self.problem_1.location),
+            'xmodule_handler',
+            'problem_check',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('entrance_exam_passed', response.content)
 
     def _assert_chapter_loaded(self, course, chapter):
         """
