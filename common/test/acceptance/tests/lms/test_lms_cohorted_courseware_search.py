@@ -25,7 +25,6 @@ from bok_choy.promise import EmptyPromise
 
 
 @attr('shard_1')
-@attr('nophantom')
 class CoursewareSearchCohortTest(ContainerBase):
     """
     Test courseware search.

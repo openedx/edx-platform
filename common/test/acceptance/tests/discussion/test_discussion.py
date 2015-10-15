@@ -600,13 +600,13 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
 
 
 @attr('shard_2')
-@attr('nophantom')
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
     """
 
     def setUp(self):
+        assert False, "Inline discussions fail under phantomjs"
         super(InlineDiscussionTest, self).setUp()
         self.thread_ids = []
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)

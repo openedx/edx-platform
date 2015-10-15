@@ -49,7 +49,6 @@ class CourseRerunTest(StudioCourseTest):
             )
         )
 
-    @attr('nophantom')
     def test_course_rerun(self):
         """
         Scenario: Courses can be rerun
@@ -73,6 +72,7 @@ class CourseRerunTest(StudioCourseTest):
         self.dashboard_page.create_rerun(self.course_info['display_name'])
 
         rerun_page = CourseRerunPage(self.browser, *course_info)
+        assert False, "Wait for page fails under phantomjs"
         rerun_page.wait_for_page()  # TODO this fails under phantom
         course_run = 'test_rerun_' + str(random.randrange(1000000, 9999999))
         rerun_page.course_run = course_run

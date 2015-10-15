@@ -15,10 +15,11 @@ class AssetIndexTest(StudioCourseTest):
     """
     Tests for the Asset index page.
     """
-    # TODO: visit fails under phantom.
-    # Probably same root cause as the flakiness.
-    @attr('nophantom')
     def setUp(self, is_staff=False):
+        # TODO: visit fails under phantom.
+        # Probably same root cause as the flakiness.
+        assert False, "Visiting the asset page fails in phantomjs"
+
         super(AssetIndexTest, self).setUp()
         self.asset_page = AssetIndexPage(
             self.browser,

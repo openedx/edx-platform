@@ -26,7 +26,6 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr('nophantom')  # TODO fails under phantom
 class CourseOutlineTest(StudioCourseTest):
     """
     Base class for all course outline tests
