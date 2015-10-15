@@ -1,5 +1,5 @@
 <form>
-    <h3 class="modal-section-title"><%- gettext('Aditional Options:') %></h3>
+    <h3 class="modal-section-title"><%- gettext('Additional Options:') %></h3>
 
     <div class="modal-section-content has-actions">
 
@@ -22,7 +22,7 @@
                       <%- gettext('Timed') %>
                     </label>
                 </li>
-                <p class='field-message'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time on per student basis through the Instructor Dashboard.') %> </p>
+                <p class='field-message'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time on per learner basis through the Instructor Dashboard.') %> </p>
 
             </ul>
         </div>
