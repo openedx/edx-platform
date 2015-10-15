@@ -118,6 +118,42 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
 
         return config
 
+    def get_value_for_org(self, org, val_name, default=None):
+        """
+        This returns a configuration value for a microsite which has an org_filter that matches
+        what is passed in
+        """
+
+        if not self.has_configuration_set():
+            return default
+
+        # Filter at the setting file
+        for key, value in settings.MICROSITE_CONFIGURATION.iteritems():
+            org_filter = value.get('course_org_filter', None)
+            if org_filter == org:
+                return value.get(val_name, default)
+        return default
+
+    def get_all_orgs(self):
+        """
+        This returns a set of orgs that are considered within a microsite. This can be used,
+        for example, to do filtering
+        """
+        org_filter_set = set()
+
+        # cdodge: is this really needed? Right now it could be expensive as it does
+        # a full table count...
+        if not self.has_configuration_set():
+            return org_filter_set
+
+        # Get the orgs in the db
+        for key, microsite in settings.MICROSITE_CONFIGURATION.iteritems():
+            org_filter = microsite.get('course_org_filter')
+            if org_filter:
+                org_filter_set.add(org_filter)
+
+        return org_filter_set
+
     def _set_microsite_config(self, microsite_config_key, subdomain, domain):
         """
         Helper internal method to actually find the microsite configuration

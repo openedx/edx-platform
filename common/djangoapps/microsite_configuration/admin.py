@@ -3,7 +3,7 @@ Django admin page for microsite models
 """
 from django.contrib import admin
 
-from .models import Microsite, MicrositeHistory
+from .models import Microsite, MicrositeHistory, MicrositeOrgMapping
 
 
 class MicrositeAdmin(admin.ModelAdmin):
@@ -34,5 +34,15 @@ class MicrositeHistoryAdmin(admin.ModelAdmin):
         return False
 
 
+class MicrositeOrgMappingAdmin(admin.ModelAdmin):
+    """ Admin interface for the Microsite object. """
+    list_display = ('org', 'microsite')
+    search_fields = ('org', 'microsite')
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = MicrositeOrgMapping
+
+
 admin.site.register(Microsite, MicrositeAdmin)
 admin.site.register(MicrositeHistory, MicrositeHistoryAdmin)
+admin.site.register(MicrositeOrgMapping, MicrositeOrgMappingAdmin)
