@@ -67,7 +67,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
         # Reset event tracking so that the tests only see events from
         # loading the profile page.
-        self.reset_event_tracking()
+        # self.reset_event_tracking()
+        self.start_time = datetime.now()
 
         # Load the page
         profile_page.visit()
@@ -112,11 +113,14 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
 
         actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.user.settings.viewed'}, number_of_matches=1)
+            start_time=self.start_time,
+            event_filter={'event_type': 'edx.user.settings.viewed', 'username': requesting_username},
+            number_of_matches=1)
         self.assert_events_match(
             [
                 {
                     'username': requesting_username,
+                    # "time": {"$gt": self.start_time},
                     'event': {
                         'user_id': int(profile_user_id),
                         'page': 'profile',
@@ -132,6 +136,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """Assert that a single setting changed event is emitted for the user_api_userpreference table."""
         expected_event = {
             'username': username,
+            # "time": {"$gt": self.start_time},
             'event': {
                 'setting': setting,
                 'user_id': int(user_id),
@@ -142,7 +147,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         expected_event['event'].update(kwargs)
 
         event_filter = {
-            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
+            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME, 'username': username,
         }
         with self.assert_events_match_during(event_filter=event_filter, expected_events=[expected_event]):
             yield
@@ -154,7 +159,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     Tests that verify a student's own profile page.
     """
 
-    _multiprocess_can_split_ = False
+    # _multiprocess_can_split_ = False
 
     def verify_profile_forced_private_message(self, username, birth_year, message=None):
         """
@@ -671,7 +676,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     Tests that verify viewing the profile page of a different user.
     """
 
-    _multiprocess_can_split_ = False
+    # _multiprocess_can_split_ = False
 
     def test_different_user_private_profile(self):
         """
