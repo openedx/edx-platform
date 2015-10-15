@@ -993,8 +993,8 @@ class TeamFormActions(TeamsTabBase):
 @ddt.ddt
 class CreateTeamTest(TeamFormActions):
 
+    # events-related tests cannot be multithreaded for now
     _multiprocess_can_split_ = False
-
 
     """
     Tests for creating a new Team within a Topic on the Teams page.

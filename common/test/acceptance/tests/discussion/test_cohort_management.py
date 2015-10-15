@@ -26,8 +26,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
     """
 
     _multiprocess_can_split_ = False
-    # _multiprocess_can_share_ = True
-
 
     def setUp(self):
         """

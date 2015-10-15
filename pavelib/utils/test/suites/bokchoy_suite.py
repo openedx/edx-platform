@@ -21,6 +21,7 @@ __test__ = False  # do not collect
 DEFAULT_NUM_PROCESSORS = 1
 DEFAULT_VERBOSITY = 2
 
+
 class BokChoyTestSuite(TestSuite):
     """
     TestSuite for running Bok Choy tests
@@ -81,8 +82,8 @@ class BokChoyTestSuite(TestSuite):
             # Create course in order to seed forum data underneath. This is
             # a workaround for a race condition. The first time a course is created;
             # role permissions are set up for forums.
-            CourseFixture('foobar_org','1117','seed_forum','seed_foo').install()
-            print 'hi ben'
+            CourseFixture('foobar_org', '1117', 'seed_forum', 'seed_foo').install()
+            print "Forums roles have been seeded"
         except FixtureError:
             # this means it's already been done
             pass
@@ -118,14 +119,13 @@ class BokChoyTestSuite(TestSuite):
                 "--with-xunitmp --xunitmp-file={}".format(self.xunit_report),
                 "--processes={}".format(self.num_processors),
                 "--no-color --process-timeout=1200"
-                ]
+            ]
 
         else:
             substring = [
-            "--with-xunit",
-            "--xunit-file={}".format(self.xunit_report),
-            "--verbosity={}".format(self.verbosity),
-
+                "--with-xunit",
+                "--xunit-file={}".format(self.xunit_report),
+                "--verbosity={}".format(self.verbosity),
             ]
 
         return " ".join(substring)
