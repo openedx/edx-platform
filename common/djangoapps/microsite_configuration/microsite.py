@@ -66,6 +66,9 @@ def get_value_for_org(org, val_name, default=None):
     This returns a configuration value for a microsite which has an org_filter that matches
     what is passed in
     """
+
+    # cdodge: is this really needed? Right now it could be expensive as it does
+    # a full table count...
     if not BACKEND.has_configuration_set():
         return default
 
@@ -83,6 +86,9 @@ def get_all_orgs():
     for example, to do filtering
     """
     org_filter_set = set()
+
+    # cdodge: is this really needed? Right now it could be expensive as it does
+    # a full table count...
     if not BACKEND.has_configuration_set():
         return org_filter_set
 
