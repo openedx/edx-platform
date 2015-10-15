@@ -18,10 +18,7 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         """
         Returns whether there is any Microsite configuration settings
         """
-
-        # CDODGE: I believe this will be called on every request into edx-platform
-        # so it seems more expensive than it should be. Like set_config_by_domain
-        if Microsite.objects.count():
+        if Microsite.objects.all()[:1].exists():
             return True
         else:
             return False
