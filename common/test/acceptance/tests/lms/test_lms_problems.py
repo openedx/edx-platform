@@ -96,6 +96,8 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
     Test that extended hint features plumb through to the page html and tracking log.
     """
 
+    _multiprocess_can_split_ = False
+
     def get_problem(self):
         """
         Problem with extended hint features.
@@ -170,6 +172,8 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
     """
     Tests that hints containing html get rendered properly
     """
+
+    _multiprocess_can_split_ = False
 
     def get_problem(self):
         """
