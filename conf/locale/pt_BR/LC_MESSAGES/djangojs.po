@@ -5,7 +5,7 @@
 # 
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
-# Allan Melo <allmelo@gmail.com>, 2015
+# Allan Melo, 2015
 # Andre Eduardo <andre_meneses2001@hotmail.com>, 2015
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
@@ -33,7 +33,7 @@
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
-# Lulatini <lulatini@gmail.com>, 2014
+# Lulatini <inactive+Lulatini@transifex.com>, 2014
 # Maíta Medeiros e Silva <moliveira.maita@gmail.com>, 2015
 # Marcelo Soares Souza <marcelo@juntadados.org>, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
@@ -61,7 +61,7 @@
 # Translators:
 # Alexander Rodrigo Ferreira <dr.alexander.ferreira@hotmail.com>, 2015
 # Álex Filipe <alexfilipe@outlook.com>, 2014
-# Allan Melo <allmelo@gmail.com>, 2015
+# Allan Melo, 2015
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # Antonio Henrique Dianin <antoniohdianin@hotmail.com>, 2015
 # brk0_0, 2013
@@ -89,6 +89,7 @@
 # niels006 <niels006@gmail.com>, 2014
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2015
 # Rafael Escrich <rafaelescrich@gmail.com>, 2015
+# Raíssa Teles Bicock <raissa.bicock@gmail.com>, 2015
 # RenataBarboza, 2013
 # Renata Barboza-Murray, 2014-2015
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -118,7 +119,7 @@
 # Jaqueline Knebel Wildner <jaquelinewildner@gmail.com>, 2015
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # lukassem <lucas_sem@hotmail.com>, 2014
-# Lulatini <lulatini@gmail.com>, 2015
+# Lulatini <inactive+Lulatini@transifex.com>, 2015
 # Maurício Gonçalves Melara Camargo <mauriciogmc@gmail.com>, 2015
 # Andrew Melim <nokostya.translation@gmail.com>, 2015
 # sgtmarciosilva <sgtmarciosilva@ibest.com.br>, 2015
@@ -154,9 +155,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-18 13:22+0000\n"
-"PO-Revision-Date: 2015-09-13 01:15+0000\n"
-"Last-Translator: Mariana Jó de Souza <mariana.jsouza@gmail.com>\n"
+"POT-Creation-Date: 2015-10-16 13:04+0000\n"
+"PO-Revision-Date: 2015-10-14 15:52+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2575,7 +2576,7 @@ msgid "All teams"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "teams"
+msgid "Topics"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -4318,19 +4319,7 @@ msgid "Signatory field(s) has invalid data."
 msgstr ""
 
 #: cms/static/js/certificates/models/signatory.js
-msgid "Signatory name should not be more than 40 characters long."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
 msgid "Signatory title should span over maximum of 2 lines."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory title should have maximum of 40 characters per line."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory organization should not be more than 40 characters long."
 msgstr ""
 
 #: cms/static/js/certificates/views/certificate_details.js
@@ -4354,6 +4343,10 @@ msgstr ""
 msgid "certificate"
 msgstr ""
 
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "Set up your certificate"
+msgstr ""
+
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
@@ -4374,7 +4367,7 @@ msgid "Upload signature image."
 msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Image must be 450px X 150px transparent PNG."
+msgid "Image must be in PNG format."
 msgstr ""
 
 #: cms/static/js/collections/group.js
@@ -4746,6 +4739,10 @@ msgid "content group"
 msgstr ""
 
 #: cms/static/js/views/content_group_list.js
+msgid "Add your first content group"
+msgstr ""
+
+#: cms/static/js/views/content_group_list.js
 msgid "You have not created any content groups yet."
 msgstr ""
 
@@ -4789,6 +4786,10 @@ msgstr ""
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
+msgstr ""
+
+#: cms/static/js/views/group_configurations_list.js
+msgid "Add your first group configuration"
 msgstr ""
 
 #: cms/static/js/views/group_configurations_list.js
@@ -5368,10 +5369,8 @@ msgid "DISCUSSION HOME:"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-#: lms/templates/commerce/provider.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/discovery/course_card.underscore
-msgid "gettext("
+#, python-format
+msgid "How to use %(platform_name)s discussions"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
@@ -5642,15 +5641,6 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
 msgstr ""
 
@@ -5661,6 +5651,15 @@ msgstr ""
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
@@ -5897,6 +5896,20 @@ msgstr ""
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
+msgid ""
+"You still need to visit the %(display_name)s website to complete the credit "
+"process."
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
+msgid ""
+"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"learners to submit a credit request."
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
 msgid "<img src='%s' alt='%s'></image>"
 msgstr ""
 
@@ -5905,6 +5918,15 @@ msgstr ""
 msgid ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid "Get Credit"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#, python-format
+msgid "Thank you! We have received your payment for %(course_name)s."
 msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
@@ -5990,6 +6012,11 @@ msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
+msgstr ""
+
+#: lms/templates/discovery/course_card.underscore
+#, python-format
+msgid "Starts: %(start_date)s"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
@@ -6162,6 +6189,20 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
+" content group was deleted. Select another content group."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
+"exist."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -6999,6 +7040,14 @@ msgid "Course Title Override"
 msgstr ""
 
 #: cms/templates/js/certificate-details.underscore
+msgid "Course Number"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Course Number Override"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Signatories"
 msgstr ""
@@ -7431,7 +7480,7 @@ msgstr ""
 
 #: cms/templates/js/list.underscore
 #, python-format
-msgid "Add your first %(item_type)s"
+msgid "%(new_item_message)s"
 msgstr ""
 
 #: cms/templates/js/list.underscore
@@ -7607,9 +7656,7 @@ msgid "Name of the signatory"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid ""
-"The name of this signatory as it should appear on certificates. Maximum 40 "
-"characters."
+msgid "The name of this signatory as it should appear on certificates."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7618,8 +7665,8 @@ msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
-"The title of this signatory as it should appear on certificates. Maximum 2 "
-"lines, 40 characters each."
+"Titles more than 100 characters may prevent students from printing their "
+"certificate on a single page."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7629,7 +7676,7 @@ msgstr ""
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
 "The organization that this signatory belongs to, as it should appear on "
-"certificates. Maximum 40 characters."
+"certificates."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7641,7 +7688,7 @@ msgid "Path to Signature Image"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Image must be 450px X 150px transparent PNG"
+msgid "Image must be in PNG format"
 msgstr ""
 
 #: cms/templates/js/staff-lock-editor.underscore
