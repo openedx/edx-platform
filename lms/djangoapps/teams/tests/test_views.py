@@ -114,7 +114,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.test_password)
 
         # Check the query count on the dashboard With no teams
-        with self.assertNumQueries(15):
+        with self.assertNumQueries(17):
             self.client.get(self.teams_url)
 
         # Create some teams
