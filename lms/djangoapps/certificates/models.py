@@ -244,7 +244,7 @@ class ExampleCertificateSet(TimeStampedModel):
         get_latest_by = 'created'
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def create_example_set(cls, course_key):
         """Create a set of example certificates for a course.
 

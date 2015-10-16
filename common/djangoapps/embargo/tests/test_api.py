@@ -159,7 +159,6 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # (because when we save it, it will set the database field to an empty string instead of NULL)
         query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
-        transaction.commit_unless_managed()
 
         # Verify that we can check the user's access without error
         result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')

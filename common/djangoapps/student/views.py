@@ -89,7 +89,7 @@ import track.views
 
 import dogstats_wrapper as dog_stats_api
 
-from util.db import commit_on_success_with_read_committed
+from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.milestones_helpers import (
@@ -905,8 +905,9 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
+@transaction.non_atomic_requests
 @require_POST
-@commit_on_success_with_read_committed
+@outer_atomic(read_committed=True)
 def change_enrollment(request, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
@@ -1548,7 +1549,7 @@ def create_account_with_params(request, params):
     )
 
     # Perform operations within a transaction that are critical to account creation
-    with transaction.commit_on_success():
+    with transaction.atomic():
         # first, create the account
         (user, profile, registration) = _do_create_account(form)
 
@@ -2133,18 +2134,17 @@ def do_email_change_request(user, new_email, activation_key=None):
 
 
 @ensure_csrf_cookie
-@transaction.commit_manually
 def confirm_email_change(request, key):  # pylint: disable=unused-argument
     """
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
-    try:
+    with transaction.atomic():
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)
         except PendingEmailChange.DoesNotExist:
             response = render_to_response("invalid_email_key.html", {})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         user = pec.user
@@ -2155,7 +2155,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
 
         if len(User.objects.filter(email=pec.new_email)) != 0:
             response = render_to_response("email_exists.html", {})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         subject = render_to_string('emails/email_change_subject.txt', address_context)
@@ -2174,7 +2174,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         user.email = pec.new_email
@@ -2186,16 +2186,11 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         response = render_to_response("email_change_successful.html", address_context)
-        transaction.commit()
         return response
-    except Exception:  # pylint: disable=broad-except
-        # If we get an unexpected exception, be sure to rollback the transaction
-        transaction.rollback()
-        raise
 
 
 @require_POST

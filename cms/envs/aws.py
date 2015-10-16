@@ -261,6 +261,11 @@ else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 DATABASES = AUTH_TOKENS['DATABASES']
+
+# Enable automatic transaction management on all databases
+for database_name in DATABASES:
+    DATABASES[database_name]['ATOMIC_REQUESTS'] = True
+
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
 DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
