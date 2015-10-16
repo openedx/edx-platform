@@ -119,9 +119,6 @@ class BaseBackendTests(TestCase):
             backend.set_config_by_domain(None)
 
         with self.assertRaises(NotImplementedError):
-            backend.get_template_path(None)
-
-        with self.assertRaises(NotImplementedError):
             backend.get_value(None, None)
 
         with self.assertRaises(NotImplementedError):

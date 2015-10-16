@@ -46,6 +46,19 @@ class DynamicTemplateLookup(TemplateLookup):
         self._collection.clear()
         self._uri_cache.clear()
 
+    def get_template(self, uri):
+        """
+        Overridden method which will allow us to look up templates from a database (optionally)
+        """
+        from microsite_configuration.microsite import get_template as get_microsite_template
+        microsite_template = get_microsite_template(uri)
+
+        return (
+            microsite_template
+            if microsite_template
+            else super(DynamicTemplateLookup, self).get_template(uri)
+        )
+
 
 def clear_lookups(namespace):
     """
