@@ -36,12 +36,12 @@ from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
-from instructor.offline_gradecalc import student_grades  # pylint: disable=import-error
-from instructor.views.api import _split_input_list  # pylint: disable=import-error
-from instructor.views.tools import get_student_from_identifier  # pylint: disable=import-error
+from instructor.offline_gradecalc import student_grades
+from instructor.views.api import _split_input_list
+from instructor.views.tools import get_student_from_identifier
 from instructor.enrollment import (
     enroll_email,
     unenroll_email,
@@ -50,7 +50,6 @@ from instructor.enrollment import (
 
 from .models import CustomCourseForEdX
 from .overrides import (
-    clear_override_for_ccx,
     get_override_for_ccx,
     override_field_for_ccx,
     clear_ccx_field_info_from_ccx_map,
