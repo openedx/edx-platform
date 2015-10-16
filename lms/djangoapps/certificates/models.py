@@ -99,6 +99,8 @@ class CertificateWhitelist(models.Model):
     embargoed country restriction list
     (allow_certificate set to False in userprofile).
     """
+    class Meta(object):
+        app_label = "certificates"
 
     objects = NoneToEmptyManager()
 
@@ -128,6 +130,8 @@ class GeneratedCertificate(models.Model):
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
+        app_label = "certificates"
+
 
     @classmethod
     def certificate_for_student(cls, student, course_id):
@@ -242,6 +246,7 @@ class ExampleCertificateSet(TimeStampedModel):
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
+        app_label = "certificates"
 
     @classmethod
     @transaction.atomic
@@ -332,6 +337,9 @@ class ExampleCertificate(TimeStampedModel):
     3) We use dummy values.
 
     """
+    class Meta(object):
+        app_label = "certificates"
+
     # Statuses
     STATUS_STARTED = 'started'
     STATUS_SUCCESS = 'success'
@@ -499,6 +507,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
+        app_label = "certificates"
 
     @classmethod
     def is_enabled_for_course(cls, course_key):
@@ -545,7 +554,8 @@ class CertificateGenerationConfiguration(ConfigurationModel):
     certificates.
 
     """
-    pass
+    class Meta(ConfigurationModel.Meta):
+        app_label = "certificates"
 
 
 class CertificateHtmlViewConfiguration(ConfigurationModel):
@@ -564,6 +574,9 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
             }
         }
     """
+    class Meta(ConfigurationModel.Meta):
+        app_label = "certificates"
+
     configuration = models.TextField(
         help_text="Certificate HTML View Parameters (JSON)"
     )
@@ -617,6 +630,7 @@ class BadgeAssertion(models.Model):
         Meta information for Django's construction of the model.
         """
         unique_together = (('course_id', 'user', 'mode'),)
+        app_label = "certificates"
 
 
 def validate_badge_image(image):
@@ -633,6 +647,9 @@ class BadgeImageConfiguration(models.Model):
     """
     Contains the configuration for badges for a specific mode. The mode
     """
+    class Meta(object):
+        app_label = "certificates"
+
     mode = models.CharField(
         max_length=125,
         help_text=_(u'The course mode for this badge image. For example, "verified" or "honor".'),
@@ -728,6 +745,7 @@ class CertificateTemplate(TimeStampedModel):
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
         unique_together = (('organization_id', 'course_key', 'mode'),)
+        app_label = "certificates"
 
 
 def template_assets_path(instance, filename):
@@ -779,6 +797,7 @@ class CertificateTemplateAsset(TimeStampedModel):
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
+        app_label = "certificates"
 
 
 @receiver(post_save, sender=GeneratedCertificate)
