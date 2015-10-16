@@ -2,7 +2,9 @@
 Tests for third_party_auth decorators.
 """
 import ddt
+import unittest
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory
 
@@ -16,6 +18,11 @@ def mock_view(_request):
     return HttpResponse()
 
 
+# remove this decorator once third_party_auth is enabled in CMS
+@unittest.skipIf(
+    'third_party_auth' not in settings.INSTALLED_APPS,
+    'third_party_auth is not currently installed in CMS'
+)
 @ddt.ddt
 class TestXFrameWhitelistDecorator(TestCase):
     """ Test the xframe_allow_whitelisted decorator. """
