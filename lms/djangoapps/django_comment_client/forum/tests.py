@@ -1343,14 +1343,13 @@ class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     @patch('student.models.cc.User.from_django_user')
-    def test_forum_discussion_xss_prevent(self, malicious_code, mock_from_django_user, mock_request):
+    def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):  # pylint: disable=unused-argument
         """
         Test that XSS attack is prevented
         """
         reverse_url = "%s%s" % (reverse(
             "django_comment_client.forum.views.forum_form_discussion",
-            kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion'
-        )
+            kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
         resp = self.client.get(url)
