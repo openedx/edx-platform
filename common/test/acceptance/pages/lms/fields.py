@@ -143,7 +143,11 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        return self.value_for_text_field(field_id)
+        query = self.q(css='.u-field-{} .u-field-value'.format(field_id))
+        if not query.present:
+            return None
+
+        return query.text[0]
 
     def value_for_text_field(self, field_id, value=None, press_enter=True):
         """
