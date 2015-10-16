@@ -42,17 +42,17 @@ urlpatterns = (
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
-    url(r'^password_change/$', django.contrib.auth.views.password_change,
-        name='auth_password_change'),
-    url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
-        name='auth_password_change_done'),
+    url(r'^password_change/$', 'django.contrib.auth.views.password_change',
+        name='password_change'),
+    url(r'^password_change_done/$', 'django.contrib.auth.views.password_change_done',
+        name='password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'student.views.password_reset_confirm_wrapper',
-        name='auth_password_reset_confirm'),
-    url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
-        name='auth_password_reset_complete'),
-    url(r'^password_reset_done/$', django.contrib.auth.views.password_reset_done,
-        name='auth_password_reset_done'),
+        name='password_reset_confirm'),
+    url(r'^password_reset_complete/$', 'django.contrib.auth.views.password_reset_complete',
+        name='password_reset_complete'),
+    url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done',
+        name='password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
