@@ -26,7 +26,7 @@ class CustomCourseForEdX(models.Model):
     coach = models.ForeignKey(User, db_index=True)
 
     class Meta(object):
-        app_label = 'lms.djangoapps.ccx'
+        app_label = 'ccx'
 
     @lazy
     def course(self):
@@ -107,7 +107,7 @@ class CcxFieldOverride(models.Model):
     field = models.CharField(max_length=255)
 
     class Meta(object):  # pylint: disable=missing-docstring
-        app_label = 'lms.djangoapps.ccx'
+        app_label = 'ccx'
         unique_together = (('ccx', 'location', 'field'),)
 
     value = models.TextField(default='null')

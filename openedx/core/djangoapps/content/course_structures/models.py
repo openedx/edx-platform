@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 class CourseStructure(TimeStampedModel):
 
     class Meta(object):
-        app_label = 'openedx.core.djangoapps.course_structures'
+        app_label = 'course_structures'
 
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True, verbose_name='Course ID')
 
