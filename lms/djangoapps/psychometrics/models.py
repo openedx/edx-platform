@@ -20,6 +20,9 @@ class PsychometricData(models.Model):
     checktimes is extracted from tracking logs, or added by capa module via psychometrics callback.
     """
 
+    class Meta(object):
+        app_label = "psychometrics"
+
     studentmodule = models.ForeignKey(StudentModule, db_index=True, unique=True)   # contains student, module_state_key, course_id
 
     done = models.BooleanField(default=False)

@@ -45,6 +45,7 @@ class Email(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     class Meta(object):  # pylint: disable=missing-docstring
+        app_label = "bulk_email"
         abstract = True
 
 
@@ -52,6 +53,9 @@ class CourseEmail(Email):
     """
     Stores information for an email to a course.
     """
+    class Meta(object):
+        app_label = "bulk_email"
+
     # Three options for sending that we provide from the instructor dashboard:
     # * Myself: This sends an email to the staff member that is composing the email.
     #
@@ -122,6 +126,7 @@ class Optout(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta(object):  # pylint: disable=missing-docstring
+        app_label = "bulk_email"
         unique_together = ('user', 'course_id')
 
 
@@ -139,6 +144,9 @@ class CourseEmailTemplate(models.Model):
     The admin console interface disables add and delete operations.
     Validation is handled in the CourseEmailTemplateForm class.
     """
+    class Meta(object):
+        app_label = "bulk_email"
+
     html_template = models.TextField(null=True, blank=True)
     plain_template = models.TextField(null=True, blank=True)
     name = models.CharField(null=True, max_length=255, unique=True, blank=True)
@@ -212,6 +220,9 @@ class CourseAuthorization(models.Model):
     """
     Enable the course email feature on a course-by-course basis.
     """
+    class Meta(object):
+        app_label = "bulk_email"
+
     # The course that these features are attached to.
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True)
 

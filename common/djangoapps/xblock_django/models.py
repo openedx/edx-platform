@@ -13,7 +13,7 @@ class XBlockDisableConfig(ConfigurationModel):
     Configuration for disabling XBlocks.
     """
 
-    class Meta(object):
+    class Meta(ConfigurationModel.Meta):
         app_label = 'xblock_django'
 
     disabled_blocks = TextField(

@@ -20,7 +20,8 @@ class RateLimitConfiguration(ConfigurationModel):
     When enabled, it will disable rate limiting on any view decorated
     with the `can_disable_rate_limit` class decorator.
     """
-    pass
+    class Meta(ConfigurationModel.Meta):
+        app_label = "util"
 
 
 def decompress_string(value):
