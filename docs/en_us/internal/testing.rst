@@ -94,6 +94,19 @@ Test Locations
    -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/accessibility``
    -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
 
+-  Content type examples:
+
+   The `Demo Testing Course
+   <https://github.com/edx/demo-test-course>`_ provides
+   a comprehensive collection of all edX content types. The course exercises
+   all possible Studio content creation and is a valuable testing resource.
+
+   The `Demo Performance Course
+   <https://github.com/edx/demo-performance-course>`_ is a demonstration
+   course you can import into edX Studio. Use it to evaluate performance
+   implications of individual components.
+
+
 Factories
 ---------
 
@@ -290,13 +303,13 @@ To run JavaScript tests in a browser:
     paver test_js_dev -s xmodule
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
-    
+
 To debug these tests on devstack in a local browser:
 
  * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
  * open the same URL in your browser but change the IP address to 192.168.33.10, e.g.
     http://192.168.33.10:TEST_PORT/suite/cms
- * this will run all the tests and show you the results including details of any failures 
+ * this will run all the tests and show you the results including details of any failures
  * you can click on an individually failing test and/or suite to re-run it by itself
  * you can now use the browser's developer tools to debug as you would any other JavaScript code
 
