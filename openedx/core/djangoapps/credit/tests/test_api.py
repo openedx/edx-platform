@@ -453,7 +453,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Delete the eligibility entries and satisfy the user's eligibility
         # requirement again to trigger eligibility notification
         CreditEligibility.objects.all().delete()
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(13):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
