@@ -119,6 +119,19 @@ class ThirdPartyAuthTestMixin(object):
         with open(os.path.join(os.path.dirname(__file__), 'data', filename)) as f:
             return f.read()
 
+    def assert_user_does_not_exist(self, username):
+        """ Asserts that user with specified username does not exist """
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(username=username)
+
+    def assert_account_created(self, username, email, full_name, activated=True):
+        """ Asserts that user with specified username exists, activated and have specified full name and email """
+        user = User.objects.get(username=username)
+        self.assertIsNotNone(user.profile)
+        self.assertEqual(user.email, email)
+        self.assertEqual(user.profile.name, full_name)
+        self.assertEqual(user.is_active, activated)
+
 
 class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
     """Base class for auth test cases."""
