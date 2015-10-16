@@ -29,6 +29,9 @@ class CourseOverview(TimeStampedModel):
     a course as part of a user dashboard or enrollment API.
     """
 
+    class Meta(object):
+        app_label = 'openedx.core.djangoapps.content'
+
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
     VERSION = 1
 

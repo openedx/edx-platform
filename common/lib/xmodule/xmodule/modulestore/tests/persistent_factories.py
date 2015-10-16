@@ -33,7 +33,7 @@ class PersistentCourseFactory(SplitFactory):
     * user_id: (optional) defaults to 'test_user'
     * display_name (xblock field): will default to 'Robot Super Course' unless provided
     """
-    class Meta:
+    class Meta(object):
         """
         Factoryboy factory for the CourseDescriptor model
         """
@@ -60,7 +60,7 @@ class PersistentCourseFactory(SplitFactory):
 
 
 class ItemFactory(SplitFactory):
-    class Meta:
+    class Meta(object):
         """
         Factoryboy factory for the XModuleDescriptor model
         """

@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class CourseStructure(TimeStampedModel):
+
+    class Meta(object):
+        app_label = 'openedx.core.djangoapps.course_structures'
+
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True, verbose_name='Course ID')
 
     # Right now the only thing we do with the structure doc is store it and
