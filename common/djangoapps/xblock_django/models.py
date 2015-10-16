@@ -13,6 +13,9 @@ class XBlockDisableConfig(ConfigurationModel):
     Configuration for disabling XBlocks.
     """
 
+    class Meta(object):
+        app_label = 'xblock_django'
+
     disabled_blocks = TextField(
         default='', blank=True,
         help_text=_('Space-separated list of XBlocks which should not render.')
