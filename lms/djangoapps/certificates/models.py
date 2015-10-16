@@ -64,7 +64,7 @@ from model_utils.models import TimeStampedModel
 from xmodule.modulestore.django import modulestore
 from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone
+from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from course_modes.models import CourseMode
 
 LOGGER = logging.getLogger(__name__)
@@ -161,7 +161,7 @@ def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=n
     User is assumed to have passed the course if certificate status is either 'generating' or 'downloadable'.
     """
     allowed_cert_states = [CertificateStatuses.generating, CertificateStatuses.downloadable]
-    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status in allowed_cert_states:
+    if is_prerequisite_courses_enabled() and instance.status in allowed_cert_states:
         fulfill_course_milestone(instance.course_id, instance.user)
 
 

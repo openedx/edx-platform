@@ -376,7 +376,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                   <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
                   <span class="tip tip-inline">${_("Time spent on all course work")}</span>
                 </li>
-                % if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
+                % if is_prerequisite_courses_enabled:
                 <li class="field field-select" id="field-pre-requisite-course">
                     <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
                     <select class="input" id="pre-requisite-course">
