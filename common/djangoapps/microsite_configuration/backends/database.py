@@ -4,10 +4,14 @@ Microsite backend that reads the configuration from the database
 """
 import json
 
+from mako.template import Template
+
 from microsite_configuration.backends.filebased import SettingsFileMicrositeBackend
+from microsite_configuration.backends.base import BaseMicrositeTemplateBackend
 from microsite_configuration.models import (
     Microsite,
-    MicrositeOrgMapping
+    MicrositeOrgMapping,
+    MicrositeTemplate
 )
 
 
@@ -116,3 +120,28 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         # for more than one ORG binding
         config['course_org_filter'] = orgs[0]
         self.current_request_configuration.data = config
+
+
+class DatabaseMicrositeTemplateBackend(BaseMicrositeTemplateBackend):
+    """
+    Specialized class to pull templates from the database
+    """
+
+    def get_template(self, uri):
+        """
+        Override of the base class for us to look into the
+        database tables for a template definition, if we can't find
+        one we'll return None which means "use default means" (aka filesystem)
+        """
+
+        from microsite_configuration.microsite import get_value as microsite_get_value
+
+        template_text = MicrositeTemplate.get_template_for_microsite(microsite_get_value('microsite_config_key'), uri)
+        if not template_text:
+            return None
+
+        # cdodge: this should be cacheable. It seems expensive to create a new instance of this every
+        # time...
+        return Template(
+            text=template_text.template
+        )

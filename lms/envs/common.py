@@ -2695,6 +2695,7 @@ NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.pn
 
 ### Select an implementation for the microsite backend
 MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.SettingsFileMicrositeBackend'
+MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.base.BaseMicrositeTemplateBackend'
 
 
 #### PROCTORING CONFIGURATION DEFAULTS
