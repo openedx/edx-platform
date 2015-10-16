@@ -207,13 +207,16 @@ def select_option_by_text(select_browser_query, option_text):
     from being raised while the DOM is still being rewritten
     """
     def select_option(query, value):
+        """ Get the first select element that matches the query and select the desired value. """
         try:
             select = Select(query.first.results[0])
             select.select_by_visible_text(value)
             return True
         except StaleElementReferenceException:
             return False
-    EmptyPromise(lambda: select_option(select_browser_query, option_text), 'Selected option {}'.format(option_text)).fulfill()
+
+    msg = 'Selected option {}'.format(option_text)
+    EmptyPromise(lambda: select_option(select_browser_query, option_text), msg).fulfill()
 
 
 def get_selected_option_text(select_browser_query):
@@ -224,14 +227,16 @@ def get_selected_option_text(select_browser_query):
     from being raised while the DOM is still being rewritten
     """
     def get_option(query):
+        """ Get the first select element that matches the query and return its value. """
         try:
-            select = Select(select_browser_query.first.results[0])
+            select = Select(query.first.results[0])
             return (True, select.first_selected_option.text)
         except StaleElementReferenceException:
             return (False, None)
 
     text = Promise(lambda: get_option(select_browser_query), 'Retrieved selected option text').fulfill()
     return text
+
 
 def get_options(select_browser_query):
     """
