@@ -1,23 +1,22 @@
 define([
     'backbone',
-    'teams/js/collections/team',
-    'teams/js/collections/team_membership',
+    'underscore',
     'teams/js/views/topic_teams',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers',
     'common/js/spec_helpers/page_helpers'
-], function (Backbone, TeamCollection, TeamMembershipCollection, TopicTeamsView, TeamSpecHelpers,
-             AjaxHelpers, PageHelpers) {
+], function (Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function () {
         var createTopicTeamsView = function(options) {
+            options = options || {};
+            var myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
             return new TopicTeamsView({
                 el: '.teams-container',
                 model: TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
-                teamMemberships: options.teamMemberships || TeamSpecHelpers.createMockTeamMemberships(),
+                myTeamsCollection: myTeamsCollection,
                 showActions: true,
-                context: TeamSpecHelpers.testContext
+                context: _.extend({}, TeamSpecHelpers.testContext, options)
             }).render();
         };
 
@@ -49,8 +48,7 @@ define([
                 teamsView = createTopicTeamsView({
                     teams: TeamSpecHelpers.createMockTeams({
                         results: testTeamData
-                    }),
-                    teamMemberships: TeamSpecHelpers.createMockTeamMemberships([])
+                    })
                 });
 
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
@@ -64,24 +62,21 @@ define([
         });
 
         it('can browse all teams', function () {
-            var emptyMembership = TeamSpecHelpers.createMockTeamMemberships([]),
-                teamsView = createTopicTeamsView({ teamMemberships: emptyMembership });
+            var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('.browse-teams').click();
             expect(Backbone.history.navigate.calls[0].args).toContain('browse');
         });
 
         it('gives the search field focus when clicking on the search teams link', function () {
-            var emptyMembership = TeamSpecHelpers.createMockTeamMemberships([]),
-                teamsView = createTopicTeamsView({ teamMemberships: emptyMembership });
+            var teamsView = createTopicTeamsView();
             spyOn($.fn, 'focus').andCallThrough();
             teamsView.$('.search-teams').click();
             expect(teamsView.$('.search-field').first().focus).toHaveBeenCalled();
         });
 
         it('can show the create team modal', function () {
-            var emptyMembership = TeamSpecHelpers.createMockTeamMemberships([]),
-                teamsView = createTopicTeamsView({ teamMemberships: emptyMembership });
+            var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('a.create-team').click();
             expect(Backbone.history.navigate.calls[0].args).toContain(
@@ -90,25 +85,17 @@ define([
         });
 
         it('does not show actions for a user already in a team', function () {
-            var teamsView = createTopicTeamsView({});
+            var teamsView = createTopicTeamsView({myTeamsCollection: TeamSpecHelpers.createMockTeams()});
             verifyActions(teamsView, {showActions: false});
         });
 
         it('shows actions for a privileged user already in a team', function () {
-            var staffMembership = TeamSpecHelpers.createMockTeamMemberships(
-                    TeamSpecHelpers.createMockTeamMembershipsData(1, 5),
-                    { privileged: true }
-                ),
-                teamsView = createTopicTeamsView({ teamMemberships: staffMembership });
+            var teamsView = createTopicTeamsView({ privileged: true });
             verifyActions(teamsView);
         });
 
         it('shows actions for a staff user already in a team', function () {
-            var staffMembership = TeamSpecHelpers.createMockTeamMemberships(
-                    TeamSpecHelpers.createMockTeamMembershipsData(1, 5),
-                    { privileged: false, staff: true }
-                ),
-                teamsView = createTopicTeamsView({ teamMemberships: staffMembership });
+            var teamsView = createTopicTeamsView({ privileged: false, staff: true });
             verifyActions(teamsView);
         });
 

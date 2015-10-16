@@ -107,8 +107,8 @@ class TopicsPagination(TeamAPIPagination):
     page_size = TOPICS_PER_PAGE
 
 
-class MembershipPagination(TeamAPIPagination):
-    """Paginate memberships. """
+class MyTeamsPagination(TeamAPIPagination):
+    """Paginate the user's teams. """
     page_size = TEAM_MEMBERSHIPS_PER_PAGE
 
 
@@ -153,14 +153,15 @@ class TeamsDashboardView(GenericAPIView):
         )
         topics_data["sort_order"] = sort_order
 
-        # Paginate and serialize team membership data.
-        team_memberships = CourseTeamMembership.get_memberships(user.username, [course.id])
-        memberships_data = self._serialize_and_paginate(
-            MembershipPagination,
-            team_memberships,
+        user = request.user
+
+        user_teams = CourseTeam.objects.filter(membership__user=user)
+        user_teams_data = self._serialize_and_paginate(
+            MyTeamsPagination,
+            user_teams,
             request,
-            MembershipSerializer,
-            {'expand': ('team', 'user',)}
+            CourseTeamSerializer,
+            {'expand': ('user',)}
         )
 
         context = {
@@ -173,7 +174,7 @@ class TeamsDashboardView(GenericAPIView):
                 "username": user.username,
                 "privileged": has_discussion_privileges(user, course_key),
                 "staff": bool(has_access(user, 'staff', course_key)),
-                "team_memberships_data": memberships_data,
+                "teams": user_teams_data
             },
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
@@ -182,6 +183,7 @@ class TeamsDashboardView(GenericAPIView):
             "teams_url": reverse('teams_list', request=request),
             "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_memberships_url": reverse('team_membership_list', request=request),
+            "my_teams_url": reverse('teams_list', request=request),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
             "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],  # pylint: disable=translation-of-non-string
             "countries": list(countries),
@@ -282,6 +284,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
                 * last_activity_at: Orders result by team activity, with most active first
                   (for tie-breaking, open_slots is used, with most open slots first).
+
+            * username: Return teams whose membership contains the given user.
 
             * page_size: Number of results to return per page.
 
@@ -413,6 +417,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 build_api_error(ugettext_noop("text_search and order_by cannot be provided together")),
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        username = request.QUERY_PARAMS.get('username', None)
+        if username is not None:
+            result_filter.update({'membership__user__username': username})
 
         topic_id = request.QUERY_PARAMS.get('topic_id', None)
         if topic_id is not None:

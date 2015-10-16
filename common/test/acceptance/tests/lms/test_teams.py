@@ -78,6 +78,18 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
         self.assertEqual(response.status_code, 200)
         return json.loads(response.text)
 
+    def create_memberships(self, num_memberships, team_id):
+        """Create `num_memberships` users and assign them to `team_id`. The
+        last user created becomes the current user."""
+        memberships = []
+        for __ in xrange(num_memberships):
+            user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
+            memberships.append(user_info)
+            self.create_membership(user_info['username'], team_id)
+        #pylint: disable=attribute-defined-outside-init
+        self.user_info = memberships[-1]
+        return memberships
+
     def create_membership(self, username, team_id):
         """Assign `username` to `team_id`."""
         response = self.course_fixture.session.post(
@@ -338,6 +350,18 @@ class MyTeamsTest(TeamsTabBase):
         with self.assert_events_match_during(self.only_team_events, expected_events=[self.page_viewed_event]):
             self.my_teams_page.visit()
         self.verify_teams(self.my_teams_page, teams)
+
+    def test_multiple_team_members(self):
+        """
+        Scenario: Visiting the My Teams page when user is a member of a team should display the teams.
+        Given I am a member of a team with multiple members
+        When I visit the My Teams page
+        Then I should see the correct number of team members on my membership
+        """
+        teams = self.create_teams(self.topic, 1)
+        self.create_memberships(4, teams[0]['id'])
+        self.my_teams_page.visit()
+        self.assertEqual(self.my_teams_page.team_memberships[0], '4 / 10 Members')
 
 
 @attr('shard_5')

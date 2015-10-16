@@ -22,12 +22,11 @@
                 },
 
                 initialize: function(options) {
-                    this.teamMembershipDetailUrl = options.context.teamMembershipDetailUrl;
                     // The URL ends with team_id,request_username. We want to replace
                     // the last occurrence of team_id with the actual team_id, and remove request_username
                     // as the actual user to be removed from the team will be added on before calling DELETE.
-                    this.teamMembershipDetailUrl = this.teamMembershipDetailUrl.substring(
-                        0, this.teamMembershipDetailUrl.lastIndexOf('team_id')
+                    this.teamMembershipDetailUrl = options.context.teamMembershipDetailUrl.substring(
+                        0, this.options.context.teamMembershipDetailUrl.lastIndexOf('team_id')
                     ) + this.model.get('id') + ",";
 
                     this.teamEvents = options.teamEvents;

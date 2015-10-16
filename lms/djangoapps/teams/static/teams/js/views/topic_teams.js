@@ -16,38 +16,44 @@
 
                 initialize: function(options) {
                     this.showSortControls = options.showSortControls;
+                    this.context = options.context;
+                    this.myTeamsCollection = options.myTeamsCollection;
                     TeamsView.prototype.initialize.call(this, options);
+                },
+
+                canUserCreateTeam: function () {
+                    // Note: non-staff and non-privileged users are automatically added to any team
+                    // that they create. This means that if multiple team membership is
+                    // disabled that they cannot create a new team when they already
+                    // belong to one.
+                    return this.context.staff || this.context.privileged || this.myTeamsCollection.length === 0;
                 },
 
                 render: function() {
                     var self = this;
-                    $.when(
-                        this.collection.refresh(),
-                        this.teamMemberships.refresh()
-                    ).done(function() {
-                            TeamsView.prototype.render.call(self);
-
-                            if (self.teamMemberships.canUserCreateTeam()) {
-                                var message = interpolate_text(
-                                    // Translators: this string is shown at the bottom of the teams page
-                                    // to find a team to join or else to create a new one. There are three
-                                    // links that need to be included in the message:
-                                    // 1. Browse teams in other topics
-                                    // 2. search teams
-                                    // 3. create a new team
-                                    // Be careful to start each link with the appropriate start indicator
-                                    // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
-                                    _.escape(gettext("{browse_span_start}Browse teams in other topics{span_end} or {search_span_start}search teams{span_end} in this topic. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
-                                    {
-                                        'browse_span_start': '<a class="browse-teams" href="">',
-                                        'search_span_start': '<a class="search-teams" href="">',
-                                        'create_span_start': '<a class="create-team" href="">',
-                                        'span_end': '</a>'
-                                    }
-                                );
-                                self.$el.append(_.template(teamActionsTemplate, {message: message}));
-                            }
-                        });
+                    this.collection.refresh().done(function() {
+                        TeamsView.prototype.render.call(self);
+                        if (self.canUserCreateTeam()) {
+                            var message = interpolate_text(
+                                // Translators: this string is shown at the bottom of the teams page
+                                // to find a team to join or else to create a new one. There are three
+                                // links that need to be included in the message:
+                                // 1. Browse teams in other topics
+                                // 2. search teams
+                                // 3. create a new team
+                                // Be careful to start each link with the appropriate start indicator
+                                // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
+                                _.escape(gettext("{browse_span_start}Browse teams in other topics{span_end} or {search_span_start}search teams{span_end} in this topic. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
+                                {
+                                    'browse_span_start': '<a class="browse-teams" href="">',
+                                    'search_span_start': '<a class="search-teams" href="">',
+                                    'create_span_start': '<a class="create-team" href="">',
+                                    'span_end': '</a>'
+                                }
+                            );
+                            self.$el.append(_.template(teamActionsTemplate, {message: message}));
+                        }
+                    });
                     return this;
                 },
 
@@ -68,7 +74,10 @@
 
                 showCreateTeamForm: function (event) {
                     event.preventDefault();
-                    Backbone.history.navigate('topics/' + this.model.id + '/create-team', {trigger: true});
+                    Backbone.history.navigate(
+                        'topics/' + this.model.id + '/create-team',
+                        {trigger: true}
+                    );
                 },
 
                 createHeaderView: function () {

@@ -1,10 +1,9 @@
 define([
     'backbone',
     'teams/js/collections/team',
-    'teams/js/collections/team_membership',
     'teams/js/views/teams',
     'teams/js/spec_helpers/team_spec_helpers'
-], function (Backbone, TeamCollection, TeamMembershipCollection, TeamsView, TeamSpecHelpers) {
+], function (Backbone, TeamCollection, TeamsView, TeamSpecHelpers) {
     'use strict';
     describe('Teams View', function () {
         beforeEach(function () {
@@ -15,7 +14,6 @@ define([
             return new TeamsView({
                 el: '.teams-container',
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
-                teamMemberships: options.teamMemberships || TeamSpecHelpers.createMockTeamMemberships(),
                 showActions: true,
                 context: TeamSpecHelpers.testContext
             }).render();

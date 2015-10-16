@@ -507,6 +507,10 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     def test_filter_topic_id(self):
         self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
 
+    def test_filter_username(self):
+        self.verify_names({'course_id': self.test_course_1.id, 'username': 'student_enrolled'}, 200, [u'Sólar team'])
+        self.verify_names({'course_id': self.test_course_1.id, 'username': 'staff'}, 200, [])
+
     @ddt.data(
         (None, 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
         ('name', 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),

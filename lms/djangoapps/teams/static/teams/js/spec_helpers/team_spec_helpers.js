@@ -56,14 +56,18 @@ define([
         );
     };
 
-    var createMockTeams = function(options) {
-        return new TeamCollection(
-            createMockTeamsResponse(options),
-            {
+    var createMockTeams = function(responseOptions, options, collectionType) {
+        if(_.isUndefined(collectionType)) {
+            collectionType = TeamCollection;
+        }
+        return new collectionType(
+            createMockTeamsResponse(responseOptions),
+            _.extend({
                 teamEvents: teamEvents,
                 course_id: testCourseID,
+                per_page: 2,
                 parse: true
-            }
+            }, options)
         );
     };
 
@@ -81,35 +85,6 @@ define([
                 team: teams[i-1]
             };
         });
-    };
-
-    var createMockTeamMemberships = function(teamMembershipData, options) {
-        if (!teamMembershipData) {
-            teamMembershipData = createMockTeamMembershipsData(1, 5);
-        }
-        return new TeamMembershipCollection(
-            {
-                count: 11,
-                num_pages: 3,
-                current_page: 1,
-                start: 0,
-                sort_order: 'last_activity_at',
-                results: teamMembershipData
-            },
-            _.extend(
-                {},
-                {
-                    teamEvents: teamEvents,
-                    course_id: testCourseID,
-                    parse: true,
-                    url: testContext.teamMembershipsUrl,
-                    username: testUser,
-                    privileged: false,
-                    staff: false
-                },
-                options
-            )
-        );
     };
 
     var createMockUserInfo = function(options) {
@@ -291,6 +266,7 @@ define([
         teamsDetailUrl: '/api/team/v0/teams/team_id',
         teamMembershipsUrl: '/api/team/v0/team_memberships/',
         teamMembershipDetailUrl: '/api/team/v0/team_membership/team_id,' + testUser,
+        myTeamsUrl: '/api/team/v0/teams/',
         userInfo: createMockUserInfo()
     };
 
@@ -331,8 +307,6 @@ define([
         createMockTeamData: createMockTeamData,
         createMockTeamsResponse: createMockTeamsResponse,
         createMockTeams: createMockTeams,
-        createMockTeamMembershipsData: createMockTeamMembershipsData,
-        createMockTeamMemberships: createMockTeamMemberships,
         createMockUserInfo: createMockUserInfo,
         createMockContext: createMockContext,
         createMockTopic: createMockTopic,
