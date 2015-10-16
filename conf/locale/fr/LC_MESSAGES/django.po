@@ -30,6 +30,7 @@
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Justine Seran, 2015
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
+# Kulgar <kulgar@ct2c.fr>, 2015
 # laurentFUN <laurent.at.fun@gmail.com>, 2014-2015
 # Marco Morales, 2014
 # moocit-france <contact@moocit.fr>, 2014-2015
@@ -107,6 +108,7 @@
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Justine Seran, 2015
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
+# Kulgar <kulgar@ct2c.fr>, 2015
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Leslie Bordonné <leslie@bordonne.com>, 2015
 # madmarsu <madmarsu@gmail.com>, 2014
@@ -144,6 +146,7 @@
 # Gilles Langevin <langevin.net@gmail.com>, 2013
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
+# Kulgar <kulgar@ct2c.fr>, 2015
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # madmarsu <madmarsu@gmail.com>, 2014
 # moocit-france <contact@moocit.fr>, 2015
@@ -178,7 +181,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-18 13:23+0000\n"
+"POT-Creation-Date: 2015-10-16 13:05+0000\n"
 "PO-Revision-Date: 2015-06-19 17:16+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -318,7 +321,7 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Course"
 msgstr "Cours"
 
@@ -1373,6 +1376,10 @@ msgid "incorrect"
 msgstr "incorrect"
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "partially correct"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
 msgstr "incomplet"
 
@@ -1393,6 +1400,10 @@ msgstr "Ceci est correct."
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "Ceci est incorrect."
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is partially correct."
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -2001,6 +2012,21 @@ msgid "Enable LaTeX templates?"
 msgstr "Autoriser les modèles LaTeX ?"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Matlab API key"
+msgstr "Clé de l'API Matlab"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use by this course for the "
+"specified duration. Please do not share the API key with other courses and "
+"notify MathWorks immediately if you believe the key is exposed or "
+"compromised. To obtain a key for your course, or to report an issue, please "
+"contact moocsupport@mathworks.com"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
 msgstr "Valider"
 
@@ -2108,10 +2134,9 @@ msgstr "Vos réponses ont été sauvegardées."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
-"Your answers have been saved but not graded. Click 'Check' to grade them."
+"Your answers have been saved but not graded. Click '{button_name}' to grade "
+"them."
 msgstr ""
-"Vos réponses ont été enregistrées mais pas encore évaluées. Cliquez sur "
-"«Vérifier» pour les évaluer. "
 
 #. Translators: A student must "make an attempt" to solve the problem on the
 #. page before they can reset it.
@@ -3187,6 +3212,7 @@ msgstr "Les deux"
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "A propos"
 
@@ -4202,10 +4228,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Matlab API key"
-msgstr "Clé de l'API Matlab"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use in this course for the "
@@ -4810,6 +4832,10 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Video Available on Web Only"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
@@ -4836,7 +4862,11 @@ msgstr ""
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated.
 #. See http://openedx.org for more information.
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
 #: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr ""
 
@@ -4844,7 +4874,7 @@ msgstr ""
 msgid "Blog"
 msgstr "Blog"
 
-#: lms/djangoapps/branding/api.py
+#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
 msgid "News"
 msgstr ""
 
@@ -4853,10 +4883,12 @@ msgid "FAQs"
 msgstr ""
 
 #: lms/templates/static_templates/contact.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Contact"
 msgstr "Contact"
 
 #: lms/templates/static_templates/jobs.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
 msgstr "Recrutement"
 
@@ -4874,6 +4906,7 @@ msgstr ""
 
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Privacy Policy"
 msgstr "Politique de confidentialité"
 
@@ -4882,6 +4915,7 @@ msgid "Accessibility Policy"
 msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Terms of Service"
 msgstr "Conditions générales du service"
 
@@ -4909,6 +4943,14 @@ msgstr ""
 msgid ""
 "You cannot create a CCX from a course using a deprecated id. Please create a"
 " rerun of this course in the studio to allow this action."
+msgstr ""
+
+#: lms/djangoapps/ccx/views.py
+msgid "Could not find a user with name or email \"{email}\" "
+msgstr ""
+
+#: lms/djangoapps/ccx/views.py
+msgid "Please enter a valid username or email."
 msgstr ""
 
 #: lms/djangoapps/certificates/badge_handler.py
@@ -5069,6 +5111,15 @@ msgstr ""
 msgid ""
 "An {cert_type} Certificate demonstrates a high level of achievement in a "
 "program of study, and includes verification of the student's identity."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid "I completed the {course_title} course on {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"I completed a course on {platform_name}. Take a look at my certificate."
 msgstr ""
 
 #. Translators:  The format of the date includes the full name of the month
@@ -5844,9 +5895,7 @@ msgid "Credit Card - Individual"
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid ""
-"manually enrolled by user_id {user_id}, enrollment state transition: "
-"{transition}"
+msgid "manually enrolled by {username} - reason: {reason}"
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
@@ -5999,6 +6048,10 @@ msgstr "Buts"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Cohorte"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Team"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -7220,7 +7273,7 @@ msgstr ""
 msgid "Amount"
 msgstr "Montant"
 
-#: lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
@@ -8138,6 +8191,10 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr ""
 
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
+msgstr ""
+
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -8443,16 +8500,11 @@ msgid "Password Reset Form"
 msgstr "Formulaire de réinitialisation de mot de passe"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
-"                We're sorry, %(platform_name)s enrollment is not available in your region\n"
+"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
 "            "
 msgstr ""
-"\n"
-"Nous sommes désolé, l'inscription pour %(platform_name)s n'est pas disponible dans votre région\n"
-"\n"
-" "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
@@ -8543,8 +8595,7 @@ msgid "Password Reset Help"
 msgstr "Aide à la réinitialisation du mot de passe"
 
 #: lms/templates/registration/password_reset_confirm.html
-#: cms/templates/login.html lms/templates/login-sidebar.html
-#: lms/templates/register-sidebar.html
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "Besoin d'aide ?"
 
@@ -9791,10 +9842,6 @@ msgstr "Page non trouvée"
 msgid "Loading"
 msgstr "Chargement en cours"
 
-#: cms/templates/asset_index.html lms/templates/courseware/courseware.html
-msgid "close"
-msgstr "fermer"
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -9838,6 +9885,7 @@ msgstr "Numéro du cours :"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "Cours"
 
@@ -9922,10 +9970,6 @@ msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr ""
 "Accédez à votre {link_start}tableau de bord{link_end} pour voir vos cours."
 
-#: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
-msgid "Course Navigation"
-msgstr "Menu du cours"
-
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Account"
@@ -9937,7 +9981,7 @@ msgid "Help"
 msgstr "Aide"
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Se déconnecter"
 
@@ -10050,6 +10094,12 @@ msgid ""
 msgstr ""
 
 #: common/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
+"certificates to help fund free education for everyone globally"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "Suivre ce Cours"
 
@@ -10106,8 +10156,8 @@ msgid "Dashboard"
 msgstr "Tableau de bord"
 
 #: lms/templates/dashboard.html
-msgid "Current Courses"
-msgstr "Mes cours"
+msgid "My Courses"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
@@ -10128,6 +10178,12 @@ msgstr "Rechercher vos cours"
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
 msgid "Clear search"
 msgstr "Effacer la recherche"
+
+#: lms/templates/dashboard.html
+msgid ""
+"Check out our recently launched courses and what's new in your favorite "
+"subjects"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Find New Courses"
@@ -10271,6 +10327,7 @@ msgid "About edX"
 msgstr "A propos d'edX"
 
 #: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "Légal"
 
@@ -10737,10 +10794,12 @@ msgid "Home Page"
 msgstr "Page d'accueil"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "How it Works"
 msgstr "Comment ça marche"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
 msgstr "Trouver un cours"
 
@@ -10749,10 +10808,12 @@ msgid "Schools & Partners"
 msgstr "Écoles et Partenaires"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Dashboard for:"
 msgstr "Tableau de bord pour :"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "More options dropdown"
 msgstr "Liste déroulante d'options supplémentaires"
 
@@ -10762,10 +10823,12 @@ msgstr "Profil"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/shoppingcart/shopping_cart.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Shopping Cart"
 msgstr "Panier"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "Connexion"
 
@@ -10775,6 +10838,7 @@ msgid "Register"
 msgstr "Inscription"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -10782,16 +10846,16 @@ msgstr ""
 "<strong>Attention :</strong> Votre navigateur n'est pas complètement "
 "supporté. Nous recommandons vivement d'utiliser {chrome_link} ou {ff_link}."
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Mondial"
 
 #. Translators: This is short for "System administration".
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "Administrateur système"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
 msgstr "Écoles"
 
@@ -10856,10 +10920,9 @@ msgstr "Bienvenue {username} ! Merci de choisir vos préférences ci-dessous"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid ""
-"We're sorry, {platform_name} enrollment is not available in your region"
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
 msgstr ""
-"Désolé, l'inscription à {platform_name} n'est pas disponible pour votre "
-"région"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "The following errors occurred while processing your registration:"
@@ -11755,6 +11818,14 @@ msgid "Student List Management"
 msgstr "Gestion de la liste des étudiants"
 
 #: lms/templates/ccx/enrollment.html
+msgid "CCX student list management response message"
+msgstr ""
+
+#: lms/templates/ccx/enrollment.html
+msgid "Revoke access"
+msgstr ""
+
+#: lms/templates/ccx/enrollment.html
 msgid "Enter username or email"
 msgstr ""
 
@@ -11860,15 +11931,6 @@ msgid "Print or share your certificate:"
 msgstr "Imprimer ou partager votre certificat:"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "I completed the {course_title} course on {platform_name}."
-msgstr ""
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid ""
-"I completed a course on {platform_name}. Take a look at my certificate."
-msgstr "J'ai terminé un cours sur {platform_name}. Voici mon certificat."
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Click the link to see my certificate."
 msgstr "Cliquer sur le lien pour voir mon certificat."
 
@@ -11910,32 +11972,46 @@ msgid "Supported by the following organizations"
 msgstr "Supporté par les organisations suivantes"
 
 #: lms/templates/certificates/invalid.html
-msgid "This is an invalid certificate number"
-msgstr "Ceci est un numéro de certificat incorrect"
-
-#: lms/templates/certificates/invalid.html
-msgid "This Certificate Does Not Exist"
-msgstr "Ce certificat n'existe pas"
-
-#: lms/templates/certificates/invalid.html
-msgid ""
-"We cannot find a certificate on file that matches this URL or ID number."
-msgstr ""
-
-#: lms/templates/certificates/invalid.html
-msgid "Looking for a Particular Certificate?"
+msgid "Cannot Find Certificate"
 msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"Ensure that the ID number is an exact match of the ID number on the PDF or "
-"print certificate you are referencing."
+"We cannot find a certificate with this URL or ID number. If you are trying "
+"to validate a certificate, make sure that the URL or ID number is correct. "
+"If you are sure that the URL or ID number is correct, contact support."
 msgstr ""
 
-#: lms/templates/certificates/invalid.html
+#: lms/templates/certificates/server-error.html
+msgid "Invalid Certificate Configuration."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
+msgid "There is a problem with this certificate on {platform_name}"
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
 msgid ""
-"If you are trying to validate a certificate with this ID number, it may be a"
-" forgery."
+"To resolve the problem, your partner manager should verify that the "
+"following information is correct."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
+msgid "The institution&#39;s logo."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
+msgid "The institution that is linked to the course."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
+msgid "The course information in the Course Administration tool."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
+msgid ""
+"If all of the information is correct and the problem persists, contact "
+"technical support."
 msgstr ""
 
 #: lms/templates/chat/toggle_chat.html
@@ -12128,8 +12204,8 @@ msgid "Please wait while we retrieve your order details."
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
-msgid "{chapter}, current chapter"
-msgstr "{chapter}, chapitre en cours"
+msgid "{chapter} current chapter"
+msgstr ""
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
@@ -12137,8 +12213,8 @@ msgid "due {date}"
 msgstr "Echéance le {date}"
 
 #: lms/templates/courseware/accordion.html
-msgid "This section is graded."
-msgstr "Cette section est notée."
+msgid "This content is graded"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
@@ -12148,17 +12224,13 @@ msgstr "Une erreur s'est produite. Merci d'essayer de nouveau plus tard."
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
-" register button again. Please visit the {start_help_tag}help page{end_tag} "
+" enroll button again. Please visit the {start_help_tag}help page{end_tag} "
 "for a possible solution."
 msgstr ""
-"L'utilisateur connecté actuellement n'a pas la permission de s'inscrire à ce"
-" cours. Tentez de vous {start_logout_tag}déconnecter{end_tag}, puis "
-"recliquez sur le bouton d'inscription. Veuillez visiter la "
-"{start_help_tag}page d'aide{end_tag} afin de trouver une solution."
 
 #: lms/templates/courseware/course_about.html
-msgid "You are registered for this course"
-msgstr "Vous êtes inscrit à ce cours"
+msgid "You are enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -12185,8 +12257,8 @@ msgid "Add {course_name} to Cart <span>({price} USD)</span>"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Register for {course_name}"
-msgstr "S'inscrire à {course_name}"
+msgid "Enroll in {course_name}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -12205,28 +12277,28 @@ msgid "Share with friends and family!"
 msgstr "Partager avec ses amis et sa famille !"
 
 #: lms/templates/courseware/course_about.html
-msgid "Tweet that you've registered for this course"
-msgstr "Tweetez que vous êtes inscrits pour ce cours"
+msgid "Tweet that you've enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Email someone to say you've registered for this course"
-msgstr "Envoyez par e-mail que vous êtes inscrits à ce cours"
+msgid "Email someone to say you've enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "I just registered for {number} {title} through {account}: {url}"
-msgstr "Je viens de m'inscrire pour {number} {title} via {account}: {url}"
+msgid "I just enrolled in {number} {title} through {account}: {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Take a course with {platform} online"
 msgstr "Suivez un cours en ligne avec {platform}"
 
 #: lms/templates/courseware/course_about.html
-msgid "I just registered for {number} {title} through {platform} {url}"
-msgstr "Je viens de m'inscrire pour {number} {title} via {platform} {url}"
+msgid "I just enrolled in {number} {title} through {platform} {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Post a Facebook message to say you've registered for this course"
-msgstr "Postez sur Facebook que vous êtes inscrits à ce cours"
+msgid "Post a Facebook message to say you've enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -12774,6 +12846,14 @@ msgid "Verification Failed"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
+msgid "Verification Declined"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Completed"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Upcoming"
 msgstr ""
 
@@ -12816,6 +12896,10 @@ msgid "Hi {name},"
 msgstr "Bonjour {name},"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid "Hi,"
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
 "completing your {platform_name} course! {link_start}Get your credit "
@@ -12832,8 +12916,9 @@ msgstr ""
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
 "To get course credit, simply go to your {link_start}{platform_name} "
-"dashboard{link_end} and click the <b>Get Credit</b> button. No application, "
-"transcript, or grade report is required."
+"dashboard{link_end} and click the <b>Get Credit</b> button. After you "
+"receive your credit, you will also have an official academic transcript at "
+"the institution that granted the credit."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -13145,64 +13230,50 @@ msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
 
+#. Translators: provider_name is the name of a credit provider or university
+#. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "You are now eligible for credit. <b>Congratulations!</b>"
+msgid ""
+"You are now eligible to purchase course credit for this course. Click "
+"<strong>Get Credit</strong> to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Get credit"
+msgid "Get Credit"
+msgstr ""
+
+#. Translators: provider_name is the name of a credit provider or university
+#. (e.g. State University)
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"Thank you for your payment. To receive course credit, you must now request "
+"credit at the {provider_name} website."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Finalize Credit"
+msgstr ""
+
+#. Translators: provider_name is the name of a credit provider or university
+#. (e.g. State University)
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"<strong>Congratulations!</strong> {provider_name} has converted your course "
+"credit. To see your course credit, click <strong>Access Credit</strong>."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Access Credit"
 msgstr ""
 
 #. Translators: link_to_provider_site is a link to an external webpage. The
 #. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
+#. credit provider, such as 'State University' or 'Happy Fun Company'.
+#. provider_name is the name of credit provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you. Your credit is processing. Please see {link_to_provider_site} for"
-" more information."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Learn more"
-msgstr ""
-
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Thank you for your purchase. Please proceed to {link_to_provider_site} to "
-"finalize your credit."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Finalize credit"
-msgstr ""
-
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Your credit has been processed and approved. <b>Congratulations!</b>. Please"
-" see {link_to_provider_site} for more information."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Access credit"
-msgstr ""
-
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Your credit has been processed but denied. Please contact "
-"{link_to_provider_site} for more information."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Contact {provider}"
+"{provider_name} did not approve your request for course credit. For more "
+"information, contact {link_to_provider_site} directly."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -16581,6 +16652,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/static_templates/faq.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "FAQ"
 msgstr "FAQ"
 
@@ -16624,6 +16696,7 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr "Les serveurs de {platform_name} sont actuellement surchargés"
 
 #: lms/templates/student_account/account_settings.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Account Settings"
 msgstr "Paramètres du compte"
 
@@ -16851,6 +16924,28 @@ msgstr "{span_start}actif{span_end}"
 msgid "Add article"
 msgstr "Ajouter un article"
 
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
+"trademarks of {link_start}edX Inc.{link_end}"
+msgstr ""
+
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
+"Code{honor_link_end}"
+msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid "My Profile"
+msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid "Register Now"
+msgstr ""
+
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
 msgstr "La page que vous recherchiez n'a pas été trouvée."
@@ -16945,10 +17040,6 @@ msgstr ""
 "Pendant ce temps, vous pouvez toujours retourner sur {link_start} l'accueil "
 "{studio_name}.{link_end}"
 
-#: cms/templates/activation_invalid.html
-msgid "Contact {platform_name} Support"
-msgstr "Contactez le support {platform_name}"
-
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files &amp; Uploads"
 msgstr "Fichiers et uploads"
@@ -17034,6 +17125,10 @@ msgstr ""
 #: cms/templates/asset_index.html
 msgid "Learn more about managing files"
 msgstr "En savoir plus à propos de la gestion de fichiers"
+
+#: cms/templates/asset_index.html
+msgid "close"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Max per-file size: {max_filesize}MB"
@@ -17719,11 +17814,6 @@ msgstr "Fermer la fenêtre contextuelle"
 #: cms/templates/error.html
 msgid "Internal Server Error"
 msgstr "Erreur Interne Serveur"
-
-#: cms/templates/error.html cms/templates/widgets/footer.html
-#: cms/templates/widgets/sock.html
-msgid "Use our feedback tool, Tender, to share your feedback"
-msgstr "Utilisez notre outil Tender pour partager votre feedback"
 
 #: cms/templates/error.html
 msgid "The Page You Requested Page Cannot be Found"
@@ -18872,14 +18962,6 @@ msgid "Getting Started with {studio_name}"
 msgstr "Démarrer avec {studio_name}"
 
 #: cms/templates/index.html
-msgid "Use our feedback tool, Tender, to request help"
-msgstr ""
-
-#: cms/templates/index.html cms/templates/widgets/sock.html
-msgid "Request help with {studio_name}"
-msgstr "Demander de l'aide sur {studio_name}"
-
-#: cms/templates/index.html
 msgid "Can I create courses in {studio_name}?"
 msgstr "Puis je créer des cours dans {studio_name}?"
 
@@ -18940,10 +19022,6 @@ msgstr ""
 "toujours pas le mail de vérification ? Demandez de l'aide via le lien ci-"
 "dessous."
 
-#: cms/templates/index.html
-msgid "Request help with your {studio_name} account"
-msgstr "Demandez de l'aide avec votre compte {studio_name}"
-
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Bibliothèque de contenu"
@@ -19002,21 +19080,6 @@ msgstr "Pas de compte {studio_name}? Inscrivez vous !"
 #: cms/templates/login.html
 msgid "Required Information to Sign In to {studio_name}"
 msgstr "Information requise pour se connecter à {studio_name}"
-
-#: cms/templates/login.html
-msgid "{studio_name} Support"
-msgstr "Support {studio_name}"
-
-#: cms/templates/login.html
-msgid ""
-"Having trouble with your account? Use {link_start}our support "
-"center{link_end} to look over self help steps, find solutions others have "
-"found to the same problem, or let us know of your issue."
-msgstr ""
-"Des problèmes avec votre compte ? Utilisez {link_start}notre centre de "
-"support{link_end} pour obtenir des démarches de résolution, voir les "
-"solutions de ceux qui ont eu les mêmes problèmes que vous, ou nous signaler "
-"votre problème."
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
@@ -19375,8 +19438,12 @@ msgid "Enrollment End Date"
 msgstr "Date de fin d'inscription"
 
 #: cms/templates/settings.html
-msgid "Last day students can enroll"
-msgstr "Dernier jour d'inscription des étudiants"
+msgid "Last day students can enroll."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Contact your edX Partner Manager to update these settings."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
@@ -19809,6 +19876,16 @@ msgid ""
 msgstr ""
 
 #: cms/templates/videos_index.html
+msgid "Maximum Video File Size"
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid ""
+"The maximum size for each video file that you upload is 5 GB. The upload "
+"process fails for larger files."
+msgstr ""
+
+#: cms/templates/videos_index.html
 msgid "Monitoring files as they upload"
 msgstr "Suivre le chargement des fichiers"
 
@@ -19825,12 +19902,11 @@ msgstr ""
 
 #: cms/templates/videos_index.html
 msgid ""
-"After a file uploads successfully, automated processing begins. After "
-"automated processing begins for a file it is listed under Previous Uploads "
-"as {em_start}In Progress{em_end}. You can add the video to your course as "
-"soon as it has a unique video ID and the status is {em_start}Ready{em_end}. "
-"Allow 24 hours for file processing at the external video hosting sites to "
-"complete."
+"After a file uploads successfully, automated processing begins. The file is "
+"then listed under Previous Uploads as {em_start}In Progress{em_end}. You can"
+" add the video to your course as soon as it has a unique video ID and the "
+"status is {em_start}Ready{em_end}. Allow 24 hours for file processing at the"
+" external video hosting sites to complete."
 msgstr ""
 
 #: cms/templates/videos_index.html
@@ -19845,13 +19921,13 @@ msgstr ""
 
 #: cms/templates/videos_index.html
 msgid ""
-"As soon as the status for a file is {em_start}Ready{em_end}, you can add "
-"that video to a component in your course. Copy the unique video ID. In "
-"another browser window, on the Course Outline page, create or locate a video"
-" component to play this video. Edit the video component to paste the ID into"
-" the Advanced {em_start}Video ID{em_end} field. The video can play in the "
-"LMS as soon as its status is {em_start}Ready{em_end}, although processing "
-"may not be complete for all encodings and all video hosting sites."
+"When status for a file is {em_start}Ready{em_end}, you can add that video to"
+" a component in your course. Copy the unique video ID. In another browser "
+"window, on the Course Outline page, create or locate a video component to "
+"play this video. Edit the video component to paste the ID into the Advanced "
+"{em_start}Video ID{em_end} field. The video can play in the LMS as soon as "
+"its status is {em_start}Ready{em_end}, although processing may not be "
+"complete for all encodings and all video hosting sites."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -19986,10 +20062,6 @@ msgstr ""
 "Un lien d'activation a été envoyé à {email}, contenant des instructions pour"
 " activer votre compte."
 
-#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
-msgid "Contact Us"
-msgstr "Nous contacter"
-
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
 #: cms/templates/widgets/footer.html
@@ -20001,6 +20073,10 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
 msgstr "Cours actuel :"
+
+#: cms/templates/widgets/header.html
+msgid "Course Navigation"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
@@ -20079,19 +20155,33 @@ msgid "{studio_name} Documentation"
 msgstr "{studio_name} Documentation"
 
 #: cms/templates/widgets/sock.html
+msgid "Access documentation on http://docs.edx.org"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "edX Documentation"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
 msgid ""
-"You can click Help in the upper right corner of any page to get more "
-"information about the page you're on. You can also use the links below to "
-"download the Building and Running an {platform_name} Course PDF file, to go "
-"to the {platform_name} Author Support site, or to enroll in edX101."
+"Access Course Staff Support on the Partner Portal to submit or review "
+"support tickets"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Building and Running an {platform_name} Course PDF"
+msgid "edX Partner Portal"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "{studio_name} Author Support"
+msgid "Access the Open edX Portal"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Open edX Portal"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Enroll in edX101: Overview of Creating an edX Course"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
@@ -20099,12 +20189,20 @@ msgid "Enroll in edX101"
 msgstr "S'inscrire à edX101"
 
 #: cms/templates/widgets/sock.html
-msgid "How to use {studio_name} to build your course"
-msgstr "Comment utiliser{studio_name} pour construire votre cours"
+msgid "Enroll in StudioX: Creating a Course with edX Studio"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Have problems, questions, or suggestions about {studio_name}?"
-msgstr "Avez-vous des problèmes, questions ou suggestions sur {studio_name} ?"
+msgid "Enroll in StudioX"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Send an email to {email}"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Contact Us"
+msgstr "Nous contacter"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"

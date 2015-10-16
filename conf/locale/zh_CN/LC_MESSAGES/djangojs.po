@@ -100,9 +100,11 @@
 # jsgang <jsgang9@gmail.com>, 2014-2015
 # Lionel Chen <chenlinchuan@me.com>, 2014
 # LIU NIAN <lauraqq@gmail.com>, 2015
+# meelo <bbvy@qq.com>, 2015
 # Rom, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
 # viztor <viztor@outlook.com>, 2015
+# Zihui Cheng <z7cheng@ucsd.edu>, 2015
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 成羽丰 <onetwogoo@gmail.com>, 2015
 # 汤和果 <hgtang93@163.com>, 2015
@@ -128,8 +130,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-18 13:22+0000\n"
-"PO-Revision-Date: 2015-09-11 12:17+0000\n"
+"POT-Creation-Date: 2015-10-16 13:04+0000\n"
+"PO-Revision-Date: 2015-10-14 15:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -2545,7 +2547,7 @@ msgid "All teams"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "teams"
+msgid "Topics"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -4193,19 +4195,7 @@ msgid "Signatory field(s) has invalid data."
 msgstr ""
 
 #: cms/static/js/certificates/models/signatory.js
-msgid "Signatory name should not be more than 40 characters long."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
 msgid "Signatory title should span over maximum of 2 lines."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory title should have maximum of 40 characters per line."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory organization should not be more than 40 characters long."
 msgstr ""
 
 #: cms/static/js/certificates/views/certificate_details.js
@@ -4229,6 +4219,10 @@ msgstr ""
 msgid "certificate"
 msgstr ""
 
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "Set up your certificate"
+msgstr ""
+
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
@@ -4249,7 +4243,7 @@ msgid "Upload signature image."
 msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Image must be 450px X 150px transparent PNG."
+msgid "Image must be in PNG format."
 msgstr ""
 
 #: cms/static/js/collections/group.js
@@ -4614,6 +4608,10 @@ msgid "content group"
 msgstr "内容组"
 
 #: cms/static/js/views/content_group_list.js
+msgid "Add your first content group"
+msgstr ""
+
+#: cms/static/js/views/content_group_list.js
 msgid "You have not created any content groups yet."
 msgstr "您还没有创建任何内容组。"
 
@@ -4657,6 +4655,10 @@ msgstr "该组配置未在使用。可通过%(outlineAnchor)s将内容实验添�
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
 msgstr "组配置"
+
+#: cms/static/js/views/group_configurations_list.js
+msgid "Add your first group configuration"
+msgstr ""
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "You have not created any group configurations yet."
@@ -5230,18 +5232,16 @@ msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "DISCUSSION HOME:"
-msgstr ""
+msgstr "讨论区主页："
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-#: lms/templates/commerce/provider.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/discovery/course_card.underscore
-msgid "gettext("
+#, python-format
+msgid "How to use %(platform_name)s discussions"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Find discussions"
-msgstr ""
+msgstr "搜索讨论帖"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Focus in on specific topics"
@@ -5349,7 +5349,7 @@ msgstr ""
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
 "students or specify a single cohort."
-msgstr ""
+msgstr "讨论区管理员、版主以及助教可以将它们的帖子设置为对所有学生可见或者仅对某个群组可见。"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Title:"
@@ -5390,7 +5390,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 msgid "View discussion"
-msgstr ""
+msgstr "查看讨论"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 msgid "Editing comment"
@@ -5425,7 +5425,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "discussion"
-msgstr ""
+msgstr "讨论"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "answered question"
@@ -5507,15 +5507,6 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
 msgstr ""
 
@@ -5528,6 +5519,15 @@ msgstr ""
 msgid "Related to: %(courseware_title_linked)s"
 msgstr ""
 
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type:"
 msgstr ""
@@ -5538,13 +5538,13 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Discussion"
-msgstr ""
+msgstr "讨论"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations."
-msgstr ""
+msgstr "“问题”提出需要答案的议题，“讨论”分享想法并开始会话。"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
@@ -5556,11 +5556,11 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
-msgstr ""
+msgstr "展开讨论"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Collapse discussion"
-msgstr ""
+msgstr "折叠讨论"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Topic Area:"
@@ -5762,6 +5762,20 @@ msgstr ""
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
+msgid ""
+"You still need to visit the %(display_name)s website to complete the credit "
+"process."
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
+msgid ""
+"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"learners to submit a credit request."
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
 msgid "<img src='%s' alt='%s'></image>"
 msgstr ""
 
@@ -5770,6 +5784,15 @@ msgstr ""
 msgid ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid "Get Credit"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#, python-format
+msgid "Thank you! We have received your payment for %(course_name)s."
 msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
@@ -5855,6 +5878,11 @@ msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
+msgstr ""
+
+#: lms/templates/discovery/course_card.underscore
+#, python-format
+msgid "Starts: %(start_date)s"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
@@ -6028,6 +6056,20 @@ msgstr "未选择"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
 msgstr "删除内容组"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
+" content group was deleted. Select another content group."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
+"exist."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
@@ -6866,6 +6908,14 @@ msgid "Course Title Override"
 msgstr ""
 
 #: cms/templates/js/certificate-details.underscore
+msgid "Course Number"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Course Number Override"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Signatories"
 msgstr ""
@@ -7298,8 +7348,8 @@ msgstr ""
 
 #: cms/templates/js/list.underscore
 #, python-format
-msgid "Add your first %(item_type)s"
-msgstr "添加第一个%(item_type)s"
+msgid "%(new_item_message)s"
+msgstr ""
 
 #: cms/templates/js/list.underscore
 #, python-format
@@ -7474,9 +7524,7 @@ msgid "Name of the signatory"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid ""
-"The name of this signatory as it should appear on certificates. Maximum 40 "
-"characters."
+msgid "The name of this signatory as it should appear on certificates."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7485,8 +7533,8 @@ msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
-"The title of this signatory as it should appear on certificates. Maximum 2 "
-"lines, 40 characters each."
+"Titles more than 100 characters may prevent students from printing their "
+"certificate on a single page."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7496,7 +7544,7 @@ msgstr ""
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
 "The organization that this signatory belongs to, as it should appear on "
-"certificates. Maximum 40 characters."
+"certificates."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7508,7 +7556,7 @@ msgid "Path to Signature Image"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Image must be 450px X 150px transparent PNG"
+msgid "Image must be in PNG format"
 msgstr ""
 
 #: cms/templates/js/staff-lock-editor.underscore

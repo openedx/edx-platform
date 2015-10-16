@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-18 13:38+0000\n"
-"PO-Revision-Date: 2015-09-18 13:39:23.855088\n"
+"POT-Creation-Date: 2015-10-16 13:11+0000\n"
+"PO-Revision-Date: 2015-10-16 13:12:16.769412\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2558,8 +2558,8 @@ msgid "All teams"
 msgstr "شمم فثشوس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "teams"
-msgstr "فثشوس"
+msgid "Topics"
+msgstr "فخحهذس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Teams"
@@ -4335,20 +4335,8 @@ msgid "Signatory field(s) has invalid data."
 msgstr "سهلرشفخقغ بهثمي(س) اشس هردشمهي يشفش."
 
 #: cms/static/js/certificates/models/signatory.js
-msgid "Signatory name should not be more than 40 characters long."
-msgstr "سهلرشفخقغ رشوث ساخعمي رخف زث وخقث فاشر 40 ذاشقشذفثقس مخرل."
-
-#: cms/static/js/certificates/models/signatory.js
 msgid "Signatory title should span over maximum of 2 lines."
 msgstr "سهلرشفخقغ فهفمث ساخعمي سحشر خدثق وشطهوعو خب 2 مهرثس."
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory title should have maximum of 40 characters per line."
-msgstr "سهلرشفخقغ فهفمث ساخعمي اشدث وشطهوعو خب 40 ذاشقشذفثقس حثق مهرث."
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory organization should not be more than 40 characters long."
-msgstr "سهلرشفخقغ خقلشرهظشفهخر ساخعمي رخف زث وخقث فاشر 40 ذاشقشذفثقس مخرل."
 
 #: cms/static/js/certificates/views/certificate_details.js
 msgid "Edit this certificate?"
@@ -4373,6 +4361,10 @@ msgstr "غثس, شممخص ثيهفس فخ فاث شذفهدث ذثقفهبهذ�
 msgid "certificate"
 msgstr "ذثقفهبهذشفث"
 
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "Set up your certificate"
+msgstr "سثف عح غخعق ذثقفهبهذشفث"
+
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
@@ -4393,8 +4385,8 @@ msgid "Upload signature image."
 msgstr "عحمخشي سهلرشفعقث هوشلث."
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Image must be 450px X 150px transparent PNG."
-msgstr "هوشلث وعسف زث 450حط ط 150حط فقشرسحشقثرف حرل."
+msgid "Image must be in PNG format."
+msgstr "هوشلث وعسف زث هر حرل بخقوشف."
 
 #: cms/static/js/collections/group.js
 #, c-format
@@ -4785,6 +4777,10 @@ msgid "content group"
 msgstr "ذخرفثرف لقخعح"
 
 #: cms/static/js/views/content_group_list.js
+msgid "Add your first content group"
+msgstr "شيي غخعق بهقسف ذخرفثرف لقخعح"
+
+#: cms/static/js/views/content_group_list.js
 msgid "You have not created any content groups yet."
 msgstr "غخع اشدث رخف ذقثشفثي شرغ ذخرفثرف لقخعحس غثف."
 
@@ -4831,6 +4827,10 @@ msgstr ""
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
 msgstr "لقخعح ذخربهلعقشفهخر"
+
+#: cms/static/js/views/group_configurations_list.js
+msgid "Add your first group configuration"
+msgstr "شيي غخعق بهقسف لقخعح ذخربهلعقشفهخر"
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "You have not created any group configurations yet."
@@ -5449,11 +5449,9 @@ msgid "DISCUSSION HOME:"
 msgstr "يهسذعسسهخر اخوث:"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-#: lms/templates/commerce/provider.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/discovery/course_card.underscore
-msgid "gettext("
-msgstr "لثففثطف("
+#, python-format
+msgid "How to use %(platform_name)s discussions"
+msgstr "اخص فخ عسث %(platform_name)s يهسذعسسهخرس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Find discussions"
@@ -5729,15 +5727,6 @@ msgstr "شيي ش ذخووثرف"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr "فاهس حخسف هس دهسهزمث خرمغ فخ %(group_name)s."
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr "فاهس حخسف هس دهسهزمث فخ ثدثقغخرث."
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
 msgstr "%(post_type)s حخسفثي %(time_ago)s زغ %(author)s"
 
@@ -5749,6 +5738,15 @@ msgstr "ذمخسثي"
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
 msgstr "قثمشفثي فخ: %(courseware_title_linked)s"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr "فاهس حخسف هس دهسهزمث خرمغ فخ %(group_name)s."
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr "فاهس حخسف هس دهسهزمث فخ ثدثقغخرث."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type:"
@@ -5991,6 +5989,24 @@ msgstr "سعزسثذفهخر"
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
+msgid ""
+"You still need to visit the %(display_name)s website to complete the credit "
+"process."
+msgstr ""
+"غخع سفهمم رثثي فخ دهسهف فاث %(display_name)s صثزسهفث فخ ذخوحمثفث فاث ذقثيهف "
+"حقخذثسس."
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
+msgid ""
+"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"learners to submit a credit request."
+msgstr ""
+"فخ بهرشمهظث ذخعقسث ذقثيهف, %(provider_id)s قثضعهقثس %(platform_name)s "
+"مثشقرثقس فخ سعزوهف ش ذقثيهف قثضعثسف."
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
 msgid "<img src='%s' alt='%s'></image>"
 msgstr "<img src='%s' alt='%s'></image>"
 
@@ -6002,6 +6018,15 @@ msgid ""
 msgstr ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+
+#: lms/templates/commerce/provider.underscore
+msgid "Get Credit"
+msgstr "لثف ذقثيهف"
+
+#: lms/templates/commerce/receipt.underscore
+#, python-format
+msgid "Thank you! We have received your payment for %(course_name)s."
+msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف بخق %(course_name)s."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6092,6 +6117,11 @@ msgstr "ثري وغ ثطشو"
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
+
+#: lms/templates/discovery/course_card.underscore
+#, python-format
+msgid "Starts: %(start_date)s"
+msgstr "سفشقفس: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "Starts"
@@ -6273,6 +6303,24 @@ msgstr "رخف سثمثذفثي"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
 msgstr "يثمثفثي ذخرفثرف لقخعح"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
+" content group was deleted. Select another content group."
+msgstr ""
+"%(screen_reader_start)sصشقرهرل:%(screen_reader_end)s فاث حقثدهخعسمغ سثمثذفثي"
+" ذخرفثرف لقخعح صشس يثمثفثي. سثمثذف شرخفاثق ذخرفثرف لقخعح."
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
+"exist."
+msgstr ""
+"%(screen_reader_start)sصشقرهرل:%(screen_reader_end)s رخ ذخرفثرف لقخعحس "
+"ثطهسف."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
@@ -7181,6 +7229,14 @@ msgid "Course Title Override"
 msgstr "ذخعقسث فهفمث خدثققهيث"
 
 #: cms/templates/js/certificate-details.underscore
+msgid "Course Number"
+msgstr "ذخعقسث رعوزثق"
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Course Number Override"
+msgstr "ذخعقسث رعوزثق خدثققهيث"
+
+#: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Signatories"
 msgstr "ذثقفهبهذشفث سهلرشفخقهثس"
@@ -7627,8 +7683,8 @@ msgstr "سخوث قهلافس قثسثقدثي"
 
 #: cms/templates/js/list.underscore
 #, python-format
-msgid "Add your first %(item_type)s"
-msgstr "شيي غخعق بهقسف %(item_type)s"
+msgid "%(new_item_message)s"
+msgstr "%(new_item_message)s"
 
 #: cms/templates/js/list.underscore
 #, python-format
@@ -7804,12 +7860,8 @@ msgid "Name of the signatory"
 msgstr "رشوث خب فاث سهلرشفخقغ"
 
 #: cms/templates/js/signatory-editor.underscore
-msgid ""
-"The name of this signatory as it should appear on certificates. Maximum 40 "
-"characters."
-msgstr ""
-"فاث رشوث خب فاهس سهلرشفخقغ شس هف ساخعمي شححثشق خر ذثقفهبهذشفثس. وشطهوعو 40 "
-"ذاشقشذفثقس."
+msgid "The name of this signatory as it should appear on certificates."
+msgstr "فاث رشوث خب فاهس سهلرشفخقغ شس هف ساخعمي شححثشق خر ذثقفهبهذشفثس."
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Title of the signatory"
@@ -7817,11 +7869,11 @@ msgstr "فهفمث خب فاث سهلرشفخقغ"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
-"The title of this signatory as it should appear on certificates. Maximum 2 "
-"lines, 40 characters each."
+"Titles more than 100 characters may prevent students from printing their "
+"certificate on a single page."
 msgstr ""
-"فاث فهفمث خب فاهس سهلرشفخقغ شس هف ساخعمي شححثشق خر ذثقفهبهذشفثس. وشطهوعو 2 "
-"مهرثس, 40 ذاشقشذفثقس ثشذا."
+"فهفمثس وخقث فاشر 100 ذاشقشذفثقس وشغ حقثدثرف سفعيثرفس بقخو حقهرفهرل فاثهق "
+"ذثقفهبهذشفث خر ش سهرلمث حشلث."
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization of the signatory"
@@ -7830,10 +7882,10 @@ msgstr "خقلشرهظشفهخر خب فاث سهلرشفخقغ"
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
 "The organization that this signatory belongs to, as it should appear on "
-"certificates. Maximum 40 characters."
+"certificates."
 msgstr ""
 "فاث خقلشرهظشفهخر فاشف فاهس سهلرشفخقغ زثمخرلس فخ, شس هف ساخعمي شححثشق خر "
-"ذثقفهبهذشفثس. وشطهوعو 40 ذاشقشذفثقس."
+"ذثقفهبهذشفثس."
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signature Image"
@@ -7844,8 +7896,8 @@ msgid "Path to Signature Image"
 msgstr "حشفا فخ سهلرشفعقث هوشلث"
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Image must be 450px X 150px transparent PNG"
-msgstr "هوشلث وعسف زث 450حط ط 150حط فقشرسحشقثرف حرل"
+msgid "Image must be in PNG format"
+msgstr "هوشلث وعسف زث هر حرل بخقوشف"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Student Visibility"

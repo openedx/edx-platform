@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-18 13:38+0000\n"
-"PO-Revision-Date: 2015-09-18 13:39:23.855088\n"
+"POT-Creation-Date: 2015-10-16 13:11+0000\n"
+"PO-Revision-Date: 2015-10-16 13:12:16.769412\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2692,8 +2692,8 @@ msgid "All teams"
 msgstr "Àll téäms Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "teams"
-msgstr "téäms Ⱡ'σяєм ιρѕ#"
+msgid "Topics"
+msgstr "Töpïçs Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Teams"
@@ -4783,28 +4783,10 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: cms/static/js/certificates/models/signatory.js
-msgid "Signatory name should not be more than 40 characters long."
-msgstr ""
-"Sïgnätörý nämé shöüld nöt ßé möré thän 40 çhäräçtérs löng. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/static/js/certificates/models/signatory.js
 msgid "Signatory title should span over maximum of 2 lines."
 msgstr ""
 "Sïgnätörý tïtlé shöüld spän övér mäxïmüm öf 2 lïnés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory title should have maximum of 40 characters per line."
-msgstr ""
-"Sïgnätörý tïtlé shöüld hävé mäxïmüm öf 40 çhäräçtérs pér lïné. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory organization should not be more than 40 characters long."
-msgstr ""
-"Sïgnätörý örgänïzätïön shöüld nöt ßé möré thän 40 çhäräçtérs löng. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/static/js/certificates/views/certificate_details.js
 msgid "Edit this certificate?"
@@ -4831,6 +4813,10 @@ msgstr ""
 msgid "certificate"
 msgstr "çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "Set up your certificate"
+msgstr "Sét üp ýöür çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
@@ -4855,10 +4841,8 @@ msgid "Upload signature image."
 msgstr "Ûplöäd sïgnätüré ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Image must be 450px X 150px transparent PNG."
-msgstr ""
-"Ìmägé müst ßé 450px X 150px tränspärént PNG. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+msgid "Image must be in PNG format."
+msgstr "Ìmägé müst ßé ïn PNG förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/static/js/collections/group.js
 #, c-format
@@ -5316,6 +5300,10 @@ msgid "content group"
 msgstr "çöntént gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/static/js/views/content_group_list.js
+msgid "Add your first content group"
+msgstr "Àdd ýöür fïrst çöntént gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/static/js/views/content_group_list.js
 msgid "You have not created any content groups yet."
 msgstr ""
 "Ýöü hävé nöt çréätéd äný çöntént gröüps ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -5367,6 +5355,11 @@ msgstr ""
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
 msgstr "gröüp çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/static/js/views/group_configurations_list.js
+msgid "Add your first group configuration"
+msgstr ""
+"Àdd ýöür fïrst gröüp çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "You have not created any group configurations yet."
@@ -6067,11 +6060,10 @@ msgid "DISCUSSION HOME:"
 msgstr "DÌSÇÛSSÌÖN HÖMÉ: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-#: lms/templates/commerce/provider.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/discovery/course_card.underscore
-msgid "gettext("
-msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
+#, python-format
+msgid "How to use %(platform_name)s discussions"
+msgstr ""
+"Höw tö üsé %(platform_name)s dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Find discussions"
@@ -6353,18 +6345,6 @@ msgstr "Àdd ä çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-"Thïs pöst ïs vïsïßlé önlý tö %(group_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тє#"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-"Thïs pöst ïs vïsïßlé tö évérýöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
 msgstr ""
 "%(post_type)s pöstéd %(time_ago)s ßý %(author)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
@@ -6378,6 +6358,18 @@ msgstr "Çlöséd Ⱡ'σяєм ιρѕυ#"
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
 msgstr "Rélätéd tö: %(courseware_title_linked)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+"Thïs pöst ïs vïsïßlé önlý tö %(group_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+"Thïs pöst ïs vïsïßlé tö évérýöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type:"
@@ -6632,6 +6624,24 @@ msgstr "Süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
+msgid ""
+"You still need to visit the %(display_name)s website to complete the credit "
+"process."
+msgstr ""
+"Ýöü stïll nééd tö vïsït thé %(display_name)s wéßsïté tö çömplété thé çrédït "
+"pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
+msgid ""
+"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"learners to submit a credit request."
+msgstr ""
+"Tö fïnälïzé çöürsé çrédït, %(provider_id)s réqüïrés %(platform_name)s "
+"léärnérs tö süßmït ä çrédït réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
 msgid "<img src='%s' alt='%s'></image>"
 msgstr "<img src='%s' alt='%s'></image> Ⱡ'σяєм ιρѕυ#"
 
@@ -6644,6 +6654,17 @@ msgstr ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button> Ⱡ'σяєм "
 "ιρѕυм ∂σł#"
+
+#: lms/templates/commerce/provider.underscore
+msgid "Get Credit"
+msgstr "Gét Çrédït Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/commerce/receipt.underscore
+#, python-format
+msgid "Thank you! We have received your payment for %(course_name)s."
+msgstr ""
+"Thänk ýöü! Wé hävé réçéïvéd ýöür päýmént för %(course_name)s. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6744,6 +6765,11 @@ msgstr "Énd Mý Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "LÉÀRN MÖRÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/discovery/course_card.underscore
+#, python-format
+msgid "Starts: %(start_date)s"
+msgstr "Stärts: %(start_date)s Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "Starts"
@@ -6940,6 +6966,25 @@ msgstr "Nöt séléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
 msgstr "Délétéd Çöntént Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
+" content group was deleted. Select another content group."
+msgstr ""
+"%(screen_reader_start)sWärnïng:%(screen_reader_end)s Thé prévïöüslý séléçtéd"
+" çöntént gröüp wäs délétéd. Séléçt änöthér çöntént gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
+"exist."
+msgstr ""
+"%(screen_reader_start)sWärnïng:%(screen_reader_end)s Nö çöntént gröüps "
+"éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
@@ -7992,6 +8037,14 @@ msgid "Course Title Override"
 msgstr "Çöürsé Tïtlé Övérrïdé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/certificate-details.underscore
+msgid "Course Number"
+msgstr "Çöürsé Nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Course Number Override"
+msgstr "Çöürsé Nümßér Övérrïdé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Signatories"
 msgstr "Çértïfïçäté Sïgnätörïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
@@ -8484,8 +8537,8 @@ msgstr "Sömé Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 
 #: cms/templates/js/list.underscore
 #, python-format
-msgid "Add your first %(item_type)s"
-msgstr "Àdd ýöür fïrst %(item_type)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgid "%(new_item_message)s"
+msgstr "%(new_item_message)s Ⱡ'σяєм#"
 
 #: cms/templates/js/list.underscore
 #, python-format
@@ -8670,12 +8723,10 @@ msgid "Name of the signatory"
 msgstr "Nämé öf thé sïgnätörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/signatory-editor.underscore
-msgid ""
-"The name of this signatory as it should appear on certificates. Maximum 40 "
-"characters."
+msgid "The name of this signatory as it should appear on certificates."
 msgstr ""
-"Thé nämé öf thïs sïgnätörý äs ït shöüld äppéär ön çértïfïçätés. Mäxïmüm 40 "
-"çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+"Thé nämé öf thïs sïgnätörý äs ït shöüld äppéär ön çértïfïçätés. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Title of the signatory"
@@ -8683,11 +8734,11 @@ msgstr "Tïtlé öf thé sïgnätörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
-"The title of this signatory as it should appear on certificates. Maximum 2 "
-"lines, 40 characters each."
+"Titles more than 100 characters may prevent students from printing their "
+"certificate on a single page."
 msgstr ""
-"Thé tïtlé öf thïs sïgnätörý äs ït shöüld äppéär ön çértïfïçätés. Mäxïmüm 2 "
-"lïnés, 40 çhäräçtérs éäçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Tïtlés möré thän 100 çhäräçtérs mäý prévént stüdénts fröm prïntïng théïr "
+"çértïfïçäté ön ä sïnglé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization of the signatory"
@@ -8696,10 +8747,10 @@ msgstr "Örgänïzätïön öf thé sïgnätörý Ⱡ'σяєм ιρѕυм ∂σ�
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
 "The organization that this signatory belongs to, as it should appear on "
-"certificates. Maximum 40 characters."
+"certificates."
 msgstr ""
 "Thé örgänïzätïön thät thïs sïgnätörý ßélöngs tö, äs ït shöüld äppéär ön "
-"çértïfïçätés. Mäxïmüm 40 çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+"çértïfïçätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signature Image"
@@ -8710,10 +8761,8 @@ msgid "Path to Signature Image"
 msgstr "Päth tö Sïgnätüré Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Image must be 450px X 150px transparent PNG"
-msgstr ""
-"Ìmägé müst ßé 450px X 150px tränspärént PNG Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+msgid "Image must be in PNG format"
+msgstr "Ìmägé müst ßé ïn PNG förmät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Student Visibility"
