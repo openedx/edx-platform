@@ -33,28 +33,6 @@ class BaseMicrositeBackend(object):
         """
         raise NotImplementedError()
 
-    def get_template_path(self, relative_path, **kwargs):
-        """
-        Returns a path (string) to a Mako template, which can either be in
-        an override or will just return what is passed in which is expected to be a string
-        """
-        if not self.is_request_in_microsite():
-            return relative_path
-
-        microsite_template_path = str(self.get_value('template_dir', None))
-
-        if microsite_template_path:
-            search_path = os.path.join(microsite_template_path, relative_path)
-
-            if os.path.isfile(search_path):
-                path = '/{0}/templates/{1}'.format(
-                    self.get_value('microsite_config_key'),
-                    relative_path
-                )
-                return path
-
-        return relative_path
-
     @abc.abstractmethod
     def get_value(self, val_name, default=None, **kwargs):
         """
@@ -138,3 +116,40 @@ class BaseMicrositeBackend(object):
         Clears out any microsite configuration from the current request/thread
         """
         raise NotImplementedError()
+
+
+class BaseMicrositeTemplateBackend(object):
+    """
+    Interface for microsite template providers. Base implementation is to use the filesystem
+    """
+
+    def get_template_path(self, relative_path, **kwargs):
+        """
+        Returns a path (string) to a Mako template, which can either be in
+        an override or will just return what is passed in which is expected to be a string
+        """
+
+        from microsite_configuration.microsite import get_value as microsite_get_value
+
+        microsite_template_path = str(microsite_get_value('template_dir', None))
+
+        if microsite_template_path:
+            search_path = os.path.join(microsite_template_path, relative_path)
+
+            if os.path.isfile(search_path):
+                path = '/{0}/templates/{1}'.format(
+                    self.get_value('microsite_config_key'),
+                    relative_path
+                )
+                return path
+
+        return relative_path
+
+    def get_template(self, uri):
+        """
+        Returns the actual template for the microsite with the specified URI,
+        default implementation returns None, which means that the caller framework
+        should use default behavior
+        """
+
+        return

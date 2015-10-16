@@ -1128,6 +1128,8 @@ DEPRECATED_BLOCK_TYPES = [
 
 ### Select an implementation for the microsite backend
 MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.SettingsFileMicrositeBackend'
+MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.base.BaseMicrositeTemplateBackend'
+
 
 #### PROCTORING CONFIGURATION DEFAULTS
 

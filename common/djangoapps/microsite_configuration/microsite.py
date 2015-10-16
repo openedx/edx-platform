@@ -10,7 +10,7 @@ import inspect
 
 from importlib import import_module
 from django.conf import settings
-from microsite_configuration.backends.base import BaseMicrositeBackend
+from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
 
 
 __all__ = [
@@ -20,6 +20,7 @@ __all__ = [
 ]
 
 BACKEND = None
+TEMPLATES_BACKEND = None
 
 
 def is_request_in_microsite():
@@ -52,13 +53,6 @@ def has_override_value(val_name):
     specified named value
     """
     return BACKEND.has_override_value(val_name)
-
-
-def get_template_path(relative_path, **kwargs):
-    """
-    Returns a path (string) to a Mako template
-    """
-    return BACKEND.get_template_path(relative_path, **kwargs)
 
 
 def get_value_for_org(org, val_name, default=None):
@@ -99,13 +93,33 @@ def enable_microsites(log):
     BACKEND.enable_microsites(log)
 
 
-def get_backend(backend_name=None, **kwds):
+def get_template(uri):
+    """
+    Returns a template for the specified URI, None if none exists or if caller should
+    use default templates/search paths
+    """
+    return TEMPLATES_BACKEND.get_template(uri)
+
+
+def get_template_path(relative_path, **kwargs):
+    """
+    Returns a path (string) to a Mako template
+    """
+    if not is_request_in_microsite():
+        return relative_path
+
+    return TEMPLATES_BACKEND.get_template_path(relative_path, **kwargs)
+
+
+def get_backend(name, expected_base_class, **kwds):
     """
     Load a microsites backend and return an instance of it.
     If backend is None (default) settings.MICROSITE_BACKEND is used.
     Any aditional args(kwds) will be used in the constructor of the backend.
     """
-    name = backend_name or settings.MICROSITE_BACKEND
+    if not name:
+        return None
+
     try:
         parts = name.split('.')
         module_name = '.'.join(parts[:-1])
@@ -116,7 +130,7 @@ def get_backend(backend_name=None, **kwds):
     try:
         module = import_module(module_name)
         cls = getattr(module, class_name)
-        if not inspect.isclass(cls) or not issubclass(cls, BaseMicrositeBackend):
+        if not inspect.isclass(cls) or not issubclass(cls, expected_base_class):
             raise TypeError
     except (AttributeError, ValueError):
         raise ValueError('Cannot find microsites backend %s' % module_name)
@@ -124,4 +138,5 @@ def get_backend(backend_name=None, **kwds):
     return cls(**kwds)
 
 
-BACKEND = get_backend()
+BACKEND = get_backend(settings.MICROSITE_BACKEND, BaseMicrositeBackend)
+TEMPLATES_BACKEND = get_backend(settings.MICROSITE_TEMPLATE_BACKEND, BaseMicrositeTemplateBackend)
