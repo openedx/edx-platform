@@ -20,7 +20,7 @@ def create_csv_response(filename, header, datarows):
         .format(filename)
     csvwriter = csv.writer(
         response,
-        dialect='excel',
+        `
         quotechar='"',
         quoting=csv.QUOTE_ALL)
 

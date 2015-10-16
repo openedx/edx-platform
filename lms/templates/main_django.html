@@ -20,7 +20,9 @@
   {% endblock %}
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
+    {% if settings.USE_CUSTOM_THEME %}
     {% include "theme-head-extra.html" %}
+    {% endif %}
   {% microsite_css_overrides_file %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
