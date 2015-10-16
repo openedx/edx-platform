@@ -98,6 +98,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         """
         Click on the delete button for the given XBlock
         """
+        assert False, "Click delete button fails under phantomjs"
         self._action_btn_for_xblock_id(xblock_id, "delete").click()
         if confirm:
             confirm_prompt(self)  # this will also wait_for_notification()

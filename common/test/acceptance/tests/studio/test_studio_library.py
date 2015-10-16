@@ -68,7 +68,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertNotEqual(first_block_id, second_block_id)
 
         # Delete the first block:
-        self.lib_page.click_delete_button(first_block_id, confirm=True)
+        self.lib_page.click_delete_button(first_block_id, confirm=True)  # TODO: fails in phantomjs
         self.assertEqual(len(self.lib_page.xblocks), 1)
         self.assertEqual(self.lib_page.xblocks[0].locator, second_block_id)
 

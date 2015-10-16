@@ -885,6 +885,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             'language': 'aa',
             'country': 'AF'
         })
+        assert False, "This test shows a modal alert"
         with self.assertRaises(TimeoutException):
             self.browser.get(self.browse_teams_page.url)
             alert = get_modal_alert(self.browser)

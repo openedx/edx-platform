@@ -74,12 +74,12 @@ class CourseTeamPageTest(StudioCourseTest):
         """ Checks if specified user present on Course Team page """
         if present:
             self.page.wait_for(
-                lambda: user.get('username') in self.page.usernames,
+                lambda: user.get('username') in self.page._usernames,
                 description="Wait for user to be present"
             )
         else:
             self.page.wait_for(
-                lambda: user.get('username') not in self.page.usernames,
+                lambda: user.get('username') not in self.page._usernames,
                 description="Wait for user to be absent"
             )
 

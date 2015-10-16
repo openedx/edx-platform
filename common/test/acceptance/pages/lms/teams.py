@@ -135,6 +135,7 @@ class TeamsPage(CoursePage, BreadcrumbsMixin):
     @property
     def warning_message(self):
         """Return the text of the team warning message."""
+        assert False, "Warning message fails under phantomjs"
         return self.q(css='.warning').results[0].text
 
 

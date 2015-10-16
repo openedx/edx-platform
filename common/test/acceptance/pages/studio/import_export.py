@@ -232,6 +232,7 @@ class ImportMixin(object):
         """
         Wait for the upload to be confirmed.
         """
+        assert False, "Needs to wait for upload"
         EmptyPromise(self.is_upload_finished, 'Upload Finished', timeout=30).fulfill()
 
     def is_filename_error_showing(self):
@@ -267,6 +268,7 @@ class ImportMixin(object):
         """
         Wait for the upload field to display an error.
         """
+        assert False, "Needs to wait for filename error"
         EmptyPromise(self.is_filename_error_showing, 'Upload Error Displayed', timeout=30).fulfill()
 
     def finished_target_url(self):

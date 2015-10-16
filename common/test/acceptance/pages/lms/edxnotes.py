@@ -532,6 +532,7 @@ class EdxNoteHighlight(NoteChild):
         Creates selection for the element and clicks `add note` button.
         """
         ActionChains(self.browser).double_click(self.element).release().perform()
+        assert False, "Needs to wait for adder visibility"
         self.wait_for_adder_visibility()
         self.q(css=self._bounded_selector(self.ADDER_SELECTOR)).first.click()
         self.wait_for_editor_visibility()

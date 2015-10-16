@@ -355,6 +355,8 @@ class CourseWithContentGroupsTest(StaffViewTest):
                 lambda: cohort_name == cohort_management_page.get_selected_cohort(), "Waiting for new cohort"
             ).fulfill()
             cohort_management_page.add_students_to_selected_cohort([student])
+
+        assert False, "Need to add a cohort"
         add_cohort_with_student("Cohort Alpha", "alpha", student_a_username)
         add_cohort_with_student("Cohort Beta", "beta", student_b_username)
         cohort_management_page.wait_for_ajax()

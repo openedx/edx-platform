@@ -200,6 +200,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         Test behaviour of a text field.
         """
+        assert False, "This test refreshes the browser"
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
         self.assertEqual(self.account_settings_page.value_for_text_field(field_id), initial_value)
 

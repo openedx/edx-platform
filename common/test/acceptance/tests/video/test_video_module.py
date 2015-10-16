@@ -42,6 +42,7 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Initialization of pages and course fixture for video tests
         """
+        assert False, "Video tests fail under phantomjs"
         super(VideoBaseTest, self).setUp()
 
         self.video = VideoPage(self.browser)

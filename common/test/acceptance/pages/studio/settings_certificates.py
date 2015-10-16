@@ -487,6 +487,8 @@ class Signatory(object):
         Opens upload image dialog and upload given image file.
         """
         self.wait_for_signature_image_upload_button()
+        # TODO fix this!
+        assert False, "This test needs to upload a signature"
         self.find_css('.action-upload-signature').first.click()
         self.find_css('.action-upload-signature').first.click()
         self.wait_for_signature_image_upload_prompt()

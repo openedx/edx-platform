@@ -26,6 +26,7 @@ class NonCohortedDiscussionTestMixin(BaseDiscussionMixin):
         pass
 
     def test_non_cohort_visibility_label(self):
+        assert False, "Visibility label fails in phantomjs"
         self.setup_thread(1)
         self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
@@ -43,6 +44,7 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         self.cohort_1_id = self.add_manual_cohort(self.course_fixture, self.cohort_1_name)
 
     def test_cohort_visibility_label(self):
+        assert False, "Visibility label fails in phantomjs"
         # Must be moderator to view content in a cohort other than your own
         AutoAuthPage(self.browser, course_id=self.course_id, roles="Moderator").visit()
         self.thread_id = self.setup_thread(1, group_id=self.cohort_1_id)

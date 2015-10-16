@@ -39,6 +39,7 @@ class CreateLibraryTest(WebAppTest):
 
         self.auth_page.visit()
         self.dashboard_page.visit()
+        assert False, "Needed to visit the dashboard page"
         self.assertFalse(self.dashboard_page.has_library(name=name, org=org, number=number))
         self.assertTrue(self.dashboard_page.has_new_library_button())
 

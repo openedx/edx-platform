@@ -101,6 +101,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         Clicks the add response button and ensures that the response text
         field receives focus
         """
+        assert False, "Needs click add response button"
         self._find_within(".add-response-btn").first.click()
         EmptyPromise(
             lambda: self._find_within(".discussion-reply-new textarea:focus").present,
