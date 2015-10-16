@@ -3,9 +3,6 @@ Discussion API views
 """
 from django.core.exceptions import ValidationError
 
-from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
@@ -26,16 +23,16 @@ from discussion_api.api import (
     update_thread,
 )
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 
+@view_auth_classes()
 class _ViewMixin(object):
     """
     Mixin to provide common characteristics and utility functions for Discussion
     API views
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (IsAuthenticated,)
+    pass
 
 
 class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
