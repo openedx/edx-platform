@@ -30,7 +30,7 @@
                 <% } %>
              </div>
 
-            <div class='course-number-section pull-right'>
+            <div class='course-number-section pull-left'>
                 <div class="actual-course-number">
                         <span class="certificate-label"><b><%= gettext('Course Number') %>: </b> </span>
                         <span class="certificate-value"><%= course.get('num') %></span>
