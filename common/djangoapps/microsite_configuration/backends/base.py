@@ -138,7 +138,7 @@ class BaseMicrositeTemplateBackend(object):
 
             if os.path.isfile(search_path):
                 path = '/{0}/templates/{1}'.format(
-                    self.get_value('microsite_config_key'),
+                    microsite_get_value('microsite_config_key'),
                     relative_path
                 )
                 return path
