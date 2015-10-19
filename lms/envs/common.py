@@ -1852,7 +1852,7 @@ INSTALLED_APPS = (
     'static_template_view',
     'staticbook',
     'track',
-    'eventtracking.django',
+    'eventtracking.django.apps.EventTrackingConfig',
     'util',
     'certificates',
     'dashboard',
