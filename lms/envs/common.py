@@ -2577,7 +2577,6 @@ ECOMMERCE_PUBLIC_URL_ROOT = None
 ECOMMERCE_API_URL = None
 ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
-ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
