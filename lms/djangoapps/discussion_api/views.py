@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
 
 from discussion_api.api import (
     create_comment,
@@ -100,7 +101,9 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
         course_key = CourseKey.from_string(course_id)
-        return Response(get_course_topics(request, course_key))
+        with modulestore().bulk_operations(course_key):
+            response = get_course_topics(request, course_key)
+        return Response(response)
 
 
 class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):

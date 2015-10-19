@@ -13,6 +13,8 @@ from pytz import UTC
 from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIClient
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 
 from common.test.utils import disable_signal
 from discussion_api import api
@@ -24,7 +26,7 @@ from discussion_api.tests.utils import (
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
 
 
 class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
@@ -104,12 +106,39 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
+@ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseTopicsView"""
     def setUp(self):
         super(CourseTopicsViewTest, self).setUp()
         self.url = reverse("course_topics", kwargs={"course_id": unicode(self.course.id)})
+
+    def create_course(self, modules_count, module_store, topics):
+        """
+        Create a course in a specified module store with discussion module and topics
+        """
+        course = CourseFactory.create(
+            org="a",
+            course="b",
+            run="c",
+            start=datetime.now(UTC),
+            default_store=module_store,
+            discussion_topics=topics
+        )
+        CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
+        course_url = reverse("course_topics", kwargs={"course_id": unicode(course.id)})
+        # add some discussion modules
+        for i in range(modules_count):
+            ItemFactory.create(
+                parent_location=course.location,
+                category='discussion',
+                discussion_id='id_module_{}'.format(i),
+                discussion_category='Category {}'.format(i),
+                discussion_target='Discussion {}'.format(i),
+                publish_item=False,
+            )
+        return course_url
 
     def test_404(self):
         response = self.client.get(
@@ -137,6 +166,22 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 }],
             }
         )
+
+    @ddt.data(
+        (2, ModuleStoreEnum.Type.mongo, 2, {"Test Topic 1": {"id": "test_topic_1"}}),
+        (2, ModuleStoreEnum.Type.mongo, 2,
+         {"Test Topic 1": {"id": "test_topic_1"}, "Test Topic 2": {"id": "test_topic_2"}}),
+        (2, ModuleStoreEnum.Type.split, 3, {"Test Topic 1": {"id": "test_topic_1"}}),
+        (2, ModuleStoreEnum.Type.split, 3,
+         {"Test Topic 1": {"id": "test_topic_1"}, "Test Topic 2": {"id": "test_topic_2"}}),
+        (10, ModuleStoreEnum.Type.split, 3, {"Test Topic 1": {"id": "test_topic_1"}}),
+    )
+    @ddt.unpack
+    def test_bulk_response(self, modules_count, module_store, mongo_calls, topics):
+        course_url = self.create_course(modules_count, module_store, topics)
+        with check_mongo_calls(mongo_calls):
+            with modulestore().default_store(module_store):
+                self.client.get(course_url)
 
 
 @ddt.ddt
