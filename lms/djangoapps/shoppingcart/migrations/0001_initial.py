@@ -2,20 +2,18 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import datetime
-from django.utils.timezone import utc
-import model_utils.fields
-import xmodule_django.models
 import django.utils.timezone
 import django.db.models.deletion
 from django.conf import settings
+import model_utils.fields
+import xmodule_django.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('student', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('student', '0001_initial'),
     ]
 
     operations = [
@@ -27,7 +25,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=255, null=True, blank=True)),
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
                 ('percentage_discount', models.IntegerField(default=0)),
-                ('created_at', models.DateTimeField(default=datetime.datetime(2015, 9, 23, 16, 8, 38, 484457, tzinfo=utc))),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('expiration_date', models.DateTimeField(null=True, blank=True)),
                 ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
@@ -54,7 +52,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('code', models.CharField(unique=True, max_length=32, db_index=True)),
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
-                ('created_at', models.DateTimeField(default=datetime.datetime(2015, 9, 23, 16, 8, 38, 482244, tzinfo=utc))),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('mode_slug', models.CharField(max_length=100, null=True)),
                 ('is_valid', models.BooleanField(default=True)),
                 ('created_by', models.ForeignKey(related_name='created_by_user', to=settings.AUTH_USER_MODEL)),
@@ -97,9 +95,6 @@ class Migration(migrations.Migration):
                 ('customer_reference_number', models.CharField(help_text="Customer's reference code for this invoice.", max_length=63, null=True, blank=True)),
                 ('is_valid', models.BooleanField(default=True)),
             ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='InvoiceHistory',
@@ -123,9 +118,6 @@ class Migration(migrations.Migration):
                 ('unit_price', models.DecimalField(default=0.0, help_text='The price per item sold, including discounts.', max_digits=30, decimal_places=2)),
                 ('currency', models.CharField(default=b'usd', help_text='Lower-case ISO currency codes', max_length=8)),
             ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='InvoiceTransaction',
@@ -141,9 +133,6 @@ class Migration(migrations.Migration):
                 ('invoice', models.ForeignKey(to='shoppingcart.Invoice')),
                 ('last_modified_by', models.ForeignKey(related_name='last_modified_by_user', to=settings.AUTH_USER_MODEL)),
             ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='Order',
@@ -191,9 +180,6 @@ class Migration(migrations.Migration):
                 ('service_fee', models.DecimalField(default=0.0, max_digits=30, decimal_places=2)),
                 ('report_comments', models.TextField(default=b'')),
             ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='PaidCourseRegistrationAnnotation',
@@ -207,7 +193,7 @@ class Migration(migrations.Migration):
             name='RegistrationCodeRedemption',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('redeemed_at', models.DateTimeField(default=datetime.datetime(2015, 9, 23, 16, 8, 38, 483441, tzinfo=utc), null=True)),
+                ('redeemed_at', models.DateTimeField(auto_now_add=True, null=True)),
                 ('course_enrollment', models.ForeignKey(to='student.CourseEnrollment', null=True)),
                 ('order', models.ForeignKey(to='shoppingcart.Order', null=True)),
                 ('redeemed_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
@@ -222,9 +208,6 @@ class Migration(migrations.Migration):
                 ('mode', models.SlugField()),
                 ('course_enrollment', models.ForeignKey(to='student.CourseEnrollment')),
             ],
-            options={
-                'abstract': False,
-            },
             bases=('shoppingcart.orderitem',),
         ),
         migrations.CreateModel(
@@ -234,9 +217,6 @@ class Migration(migrations.Migration):
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=128, db_index=True)),
                 ('mode', models.SlugField(default=b'honor')),
             ],
-            options={
-                'abstract': False,
-            },
             bases=('shoppingcart.orderitem',),
         ),
         migrations.CreateModel(
@@ -245,9 +225,6 @@ class Migration(migrations.Migration):
                 ('invoiceitem_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='shoppingcart.InvoiceItem')),
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=128, db_index=True)),
             ],
-            options={
-                'abstract': False,
-            },
             bases=('shoppingcart.invoiceitem',),
         ),
         migrations.CreateModel(
@@ -257,9 +234,6 @@ class Migration(migrations.Migration):
                 ('donation_type', models.CharField(default=b'general', max_length=32, choices=[(b'general', b'A general donation'), (b'course', b'A donation to a particular course')])),
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
             ],
-            options={
-                'abstract': False,
-            },
             bases=('shoppingcart.orderitem',),
         ),
         migrations.CreateModel(
@@ -270,9 +244,6 @@ class Migration(migrations.Migration):
                 ('mode', models.SlugField(default=b'honor')),
                 ('course_enrollment', models.ForeignKey(to='student.CourseEnrollment', null=True)),
             ],
-            options={
-                'abstract': False,
-            },
             bases=('shoppingcart.orderitem',),
         ),
         migrations.AddField(

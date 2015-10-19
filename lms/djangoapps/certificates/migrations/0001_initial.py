@@ -132,9 +132,6 @@ class Migration(migrations.Migration):
                 ('error_reason', models.TextField(default=None, help_text='The reason an error occurred during certificate generation.', null=True)),
                 ('download_url', models.CharField(default=None, max_length=255, null=True, help_text='The download URL for the generated certificate.')),
             ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='ExampleCertificateSet',

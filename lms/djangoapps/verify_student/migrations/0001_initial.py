@@ -2,12 +2,12 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import lms.djangoapps.verify_student.models
 import model_utils.fields
 import xmodule_django.models
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
-import lms.djangoapps.verify_student.models
 
 
 class Migration(migrations.Migration):

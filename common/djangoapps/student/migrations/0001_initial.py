@@ -190,7 +190,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('activation_key', models.CharField(unique=True, max_length=32, verbose_name=b'activation key', db_index=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, unique=True)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'db_table': 'auth_registration',
@@ -236,7 +236,7 @@ class Migration(migrations.Migration):
                 ('account_status', models.CharField(blank=True, max_length=31, choices=[(b'disabled', 'Account Disabled'), (b'enabled', 'Account Enabled')])),
                 ('standing_last_changed_at', models.DateTimeField(auto_now=True)),
                 ('changed_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, blank=True)),
-                ('user', models.ForeignKey(related_name='standing', to=settings.AUTH_USER_MODEL, unique=True)),
+                ('user', models.OneToOneField(related_name='standing', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(

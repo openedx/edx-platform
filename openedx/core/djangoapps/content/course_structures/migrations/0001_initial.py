@@ -24,8 +24,5 @@ class Migration(migrations.Migration):
                 ('structure_json', util.models.CompressedTextField(null=True, verbose_name=b'Structure JSON', blank=True)),
                 ('discussion_id_map_json', util.models.CompressedTextField(null=True, verbose_name=b'Discussion ID Map JSON', blank=True)),
             ],
-            options={
-                'abstract': False,
-            },
         ),
     ]

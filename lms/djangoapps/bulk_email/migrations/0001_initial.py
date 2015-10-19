@@ -37,9 +37,6 @@ class Migration(migrations.Migration):
                 ('from_addr', models.CharField(max_length=255, null=True)),
                 ('sender', models.ForeignKey(default=1, blank=True, to=settings.AUTH_USER_MODEL, null=True)),
             ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='CourseEmailTemplate',

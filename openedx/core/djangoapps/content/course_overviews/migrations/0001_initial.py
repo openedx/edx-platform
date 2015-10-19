@@ -48,8 +48,5 @@ class Migration(migrations.Migration):
                 ('invitation_only', models.BooleanField(default=False)),
                 ('max_student_enrollments_allowed', models.IntegerField(null=True)),
             ],
-            options={
-                'abstract': False,
-            },
         ),
     ]
