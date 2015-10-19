@@ -23,6 +23,8 @@ urlpatterns = patterns(
         'instructor.views.api.get_grading_config', name="get_grading_config"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
+    url(r'^get_issued_certificates/$',
+        'instructor.views.api.get_issued_certificates', name="get_issued_certificates"),
     url(r'^get_students_who_may_enroll$',
         'instructor.views.api.get_students_who_may_enroll', name="get_students_who_may_enroll"),
     url(r'^get_user_invoice_preference$',
