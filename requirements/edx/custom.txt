@@ -1,9 +1,6 @@
 # Custom requirements to be customized by individual OpenEdX instances
 
-# When updating a hash of an XBlock that uses xblock-utils, please update xblock-utils version hash here and in
-# github.txt as well. Deployments install custom.txt before github.txt and github.txt installs xblock-utils. This might
-# lead to installing an outdated version of xblock-utils and causing regressions. A note in github.txt is added to
-# keep xblock-utils version there in sync with this one.
+# When updating a hash of an XBlock that users xblock-utils, please update its version hash in github.txt
 -e git+https://github.com/edx/xblock-utils.git@3b58c757f06943072b170654d676e95b9adb37b0#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@bd0b3f413ae7e8274985555adfd7de7af3eca84c#egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@21b9bcc4f2c7917463ab18a596161ac6c58c9c4a#egg=xblock-image-explorer
