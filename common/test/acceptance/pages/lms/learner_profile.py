@@ -3,7 +3,6 @@ Bok-Choy PageObject class for learner profile page.
 """
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
-from bok_choy.javascript import wait_for_js, requirejs
 from selenium.webdriver import ActionChains
 
 from . import BASE_URL
@@ -17,7 +16,6 @@ FIELD_ICONS = {
 }
 
 
-@requirejs('js/student_profile/views/learner_profile_factory')
 class LearnerProfilePage(FieldsMixin, PageObject):
     """
     PageObject methods for Learning Profile Page.
@@ -41,15 +39,13 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         return BASE_URL + "/u/" + self.username
 
-    @wait_for_js
     def is_browser_on_page(self):
         """
         Check if browser is showing correct page.
         """
         return all([
             self.q(css='body.view-profile').present,
-            self.q(css='page-header').present,
-            not self.q(css='ui-loading-indicator').visible,
+            not self.q(css='ui-loading-indicator').visible
         ])
 
     @property
