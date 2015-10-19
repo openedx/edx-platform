@@ -68,7 +68,7 @@ class TestCCX(ModuleStoreTestCase):
         self.set_ccx_override('start', expected)
         actual = self.ccx.start  # pylint: disable=no-member
         diff = expected - actual
-        self.assertTrue(abs(diff.total_seconds()) < 1)
+        self.assertLess(abs(diff.total_seconds()), 1)
 
     def test_ccx_start_caching(self):
         """verify that caching the start property works to limit queries"""
@@ -93,7 +93,7 @@ class TestCCX(ModuleStoreTestCase):
         self.set_ccx_override('due', expected)
         actual = self.ccx.due  # pylint: disable=no-member
         diff = expected - actual
-        self.assertTrue(abs(diff.total_seconds()) < 1)
+        self.assertLess(abs(diff.total_seconds()), 1)
 
     def test_ccx_due_caching(self):
         """verify that caching the due property works to limit queries"""
