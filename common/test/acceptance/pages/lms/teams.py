@@ -248,7 +248,7 @@ class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin, BreadcrumbsMix
         query = self.q(css=CREATE_TEAM_LINK_CSS)
         if query.present:
             query.first.click()
-            self.wait_for_ajax()
+            self.wait_for_element_presence('.create-team-instructions', 'Create Team view has rendered.')
 
     def click_search_team_link(self):
         """ Click on create team link."""
