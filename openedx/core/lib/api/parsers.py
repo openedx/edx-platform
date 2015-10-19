@@ -1,3 +1,6 @@
+"""
+Custom Django REST Framework request/response pipeline parsers
+"""
 from rest_framework import parsers
 
 

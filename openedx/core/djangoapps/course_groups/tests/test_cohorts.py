@@ -26,6 +26,10 @@ from ..tests.helpers import (
 
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
 class TestCohortSignals(TestCase):
+    """
+    Test cases to validate event emissions for various cohort-related workflows
+    """
+
     def setUp(self):
         super(TestCohortSignals, self).setUp()
         self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
@@ -67,6 +71,9 @@ class TestCohortSignals(TestCase):
         mock_tracker.reset_mock()
 
         def assert_events(event_name_suffix, user_list, cohort_list):
+            """
+            Confirms the presence of the specifed event for each user in the specified list of cohorts
+            """
             mock_tracker.emit.assert_has_calls([
                 call(
                     "edx.cohort.user_" + event_name_suffix,

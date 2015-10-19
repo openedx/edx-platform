@@ -133,6 +133,9 @@ class TestPreferencesAPI(UserAPITestCase):
         self._do_create_preferences_test(False)
 
     def _do_create_preferences_test(self, is_active):
+        """
+        Internal helper to generalize the creation of a set of preferences
+        """
         self.client.login(username=self.user.username, password=self.test_password)
         if not is_active:
             self.user.is_active = False
@@ -361,6 +364,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._set_url(self.test_pref_key)
 
     def _set_url(self, preference_key):
+        """
+        Sets the url attribute including the username and provided preference key
+        """
         self.url = reverse(
             self.url_endpoint_name,
             kwargs={'username': self.user.username, 'preference_key': preference_key}
@@ -448,6 +454,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._do_create_preference_test(False)
 
     def _do_create_preference_test(self, is_active):
+        """
+        Generalization of the actual test workflow
+        """
         self.client.login(username=self.user.username, password=self.test_password)
         if not is_active:
             self.user.is_active = False

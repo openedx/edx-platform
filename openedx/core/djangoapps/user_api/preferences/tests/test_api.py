@@ -293,7 +293,9 @@ class TestPreferenceAPI(TestCase):
 
 @ddt.ddt
 class UpdateEmailOptInTests(ModuleStoreTestCase):
-
+    """
+    Test cases to cover API-driven email list opt-in update workflows
+    """
     USERNAME = u'frank-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'frank+underwood@example.com'
@@ -385,6 +387,9 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         self.assertEqual(result_obj.value, expected_result)
 
     def _assert_is_datetime(self, timestamp):
+        """
+        Internal helper to assert the type of the provided timestamp value
+        """
         if not timestamp:
             return False
         try:

@@ -100,6 +100,9 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         self.assertRaises(Http404, view, *view_args)
 
     def create_cohorted_discussions(self):
+        """
+        Set up a cohorted discussion in the system, complete with all the fixings
+        """
         cohorted_inline_discussions = ['Topic A']
         cohorted_course_wide_discussions = ["Topic B"]
         cohorted_discussions = cohorted_inline_discussions + cohorted_course_wide_discussions

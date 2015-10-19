@@ -194,8 +194,6 @@ def coverage(options):
     """
     Build the html, xml, and diff coverage reports
     """
-    compare_branch = getattr(options, 'compare_branch', 'origin/master')
-
     report_dir = Env.REPORT_DIR
     rcfile = Env.PYTHON_COVERAGERC
 
@@ -262,4 +260,4 @@ def diff_coverage(options):
             )
         )
 
-        print("\n")
+        print "\n"

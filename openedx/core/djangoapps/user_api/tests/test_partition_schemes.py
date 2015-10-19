@@ -53,7 +53,11 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
 
         # make sure we get the same group back out every time
         for __ in range(10):
-            group2_id = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
+            group2_id = RandomUserPartitionScheme.get_group_for_user(
+                self.MOCK_COURSE_ID,
+                self.user,
+                self.user_partition
+            )
             self.assertEqual(group1_id, group2_id)
 
     def test_get_group_for_user_with_assign(self):

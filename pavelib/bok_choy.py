@@ -107,7 +107,7 @@ def run_bokchoy(**opts):
             default_store=test_suite.default_store,
         )
     )
-    print(msg)
+    print msg
     test_suite.run()
 
 
@@ -120,12 +120,12 @@ def bokchoy_coverage():
     coveragerc = Env.BOK_CHOY_COVERAGERC
 
     msg = colorize('green', "Combining coverage reports")
-    print(msg)
+    print msg
 
     sh("coverage combine --rcfile={}".format(coveragerc))
 
     msg = colorize('green', "Generating coverage reports")
-    print(msg)
+    print msg
 
     sh("coverage html --rcfile={}".format(coveragerc))
     sh("coverage xml --rcfile={}".format(coveragerc))

@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 finally:
                     tar_file.close()
 
-            print("Created archive {0}".format(archive_name))
+            print "Created archive {0}".format(archive_name)
 
         except ValueError as err:
             raise CommandError(err)
