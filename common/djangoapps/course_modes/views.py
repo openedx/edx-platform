@@ -38,7 +38,12 @@ class ChooseModeView(View):
 
     """
 
+    @method_decorator(transaction.non_atomic_requests)
+    def dispatch(self, *args, **kwargs):
+        return super(ChooseModeView, self).dispatch(*args, **kwargs)
+
     @method_decorator(login_required)
+    @method_decorator(transaction.atomic)
     def get(self, request, course_id, error=None):
         """Displays the course mode choice page.
 
@@ -136,7 +141,6 @@ class ChooseModeView(View):
 
         return render_to_response("course_modes/choose.html", context)
 
-    @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)
     @method_decorator(outer_atomic(read_committed=True))
     def post(self, request, course_id):
