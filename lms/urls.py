@@ -307,7 +307,7 @@ if settings.COURSEWARE_ENABLED:
         # xblock Resource URL
         url(
             r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
-            'courseware.module_render.xblock_resource',
+            'openedx.core.djangoapps.common_views.xblock.xblock_resource',
             name='xblock_resource_url',
         ),
 

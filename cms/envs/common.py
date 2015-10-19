@@ -711,6 +711,9 @@ INSTALLED_APPS = (
     'south',
     'method_override',
 
+    # Common views
+    'openedx.core.djangoapps.common_views',
+
     # History tables
     'simple_history',
 
