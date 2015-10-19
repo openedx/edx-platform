@@ -39,10 +39,6 @@ class SettingsUnitTest(testutil.TestCase):
         settings.apply_settings(self.settings)
         self.assertEqual(settings._FIELDS_STORED_IN_SESSION, self.settings.FIELDS_STORED_IN_SESSION)
 
-    def test_apply_settings_adds_third_party_auth_to_installed_apps(self):
-        settings.apply_settings(self.settings)
-        self.assertIn('third_party_auth', self.settings.INSTALLED_APPS)
-
     @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
     def test_apply_settings_enables_no_providers_by_default(self):
         # Providers are only enabled via ConfigurationModels in the database
