@@ -6,13 +6,13 @@ import json
 from django.core.urlresolvers import reverse
 from django.db.utils import DatabaseError
 from django.test.client import Client
-from django.test.testcases import TestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from mock import patch
 
 from xmodule.exceptions import HeartbeatFailure
 
 
-class HeartbeatTestCase(TestCase):
+class HeartbeatTestCase(ModuleStoreTestCase):
     """
     Test the heartbeat
     """
