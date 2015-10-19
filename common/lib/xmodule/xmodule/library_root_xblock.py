@@ -3,6 +3,8 @@
 """
 import logging
 
+from django.utils.translation import ugettext_noop as _
+
 from xmodule.studio_editable import StudioEditableModule
 
 from xblock.fields import Scope, String, List, Boolean
@@ -10,9 +12,6 @@ from xblock.fragment import Fragment
 from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class LibraryRoot(XBlock):

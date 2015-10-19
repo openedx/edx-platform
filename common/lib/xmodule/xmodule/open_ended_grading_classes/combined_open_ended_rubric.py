@@ -1,4 +1,6 @@
 import logging
+
+from django.utils.translation import ugettext_noop as _
 from lxml import etree
 
 log = logging.getLogger(__name__)
@@ -10,8 +12,6 @@ GRADER_TYPE_IMAGE_DICT = {
     'IN': '/static/images/peer_grading_icon.png',
     'BC': '/static/images/ml_grading_icon.png',
 }
-
-_ = lambda text: text
 
 HUMAN_GRADER_TYPE = {
     # Translators: "Self-Assessment" refers to the self-assessed mode of openended evaluation

@@ -66,6 +66,8 @@ from webob import Response
 import mock
 from xml.sax.saxutils import escape
 
+from django.utils.translation import ugettext_noop as _
+
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
@@ -75,9 +77,6 @@ from xblock.core import String, Scope, List, XBlock
 from xblock.fields import Boolean, Float
 
 log = logging.getLogger(__name__)
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 DOCS_ANCHOR_TAG_OPEN = (
     "<a target='_blank' "

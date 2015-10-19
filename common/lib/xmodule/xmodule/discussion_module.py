@@ -1,14 +1,13 @@
+import json
 from pkg_resources import resource_string
 
-import json
+from django.utils.translation import ugettext_noop as _
+
 from xblock.core import XBlock
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope, UNIQUE_ID
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class DiscussionFields(object):

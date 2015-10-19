@@ -8,6 +8,8 @@ from webob import Response
 from uuid import uuid4
 from operator import itemgetter
 
+from django.utils.translation import ugettext_noop as _
+
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
@@ -22,9 +24,6 @@ from xblock.fields import Scope, Integer, String, ReferenceValueDict
 from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 DEFAULT_GROUP_NAME = _(u'Group ID {group_id}')
 

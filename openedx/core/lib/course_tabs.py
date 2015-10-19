@@ -1,9 +1,9 @@
 """
 Tabs for courseware.
 """
-from openedx.core.lib.api.plugins import PluginManager
+from django.utils.translation import ugettext_noop as _
 
-_ = lambda text: text
+from openedx.core.lib.api.plugins import PluginManager
 
 
 # Stevedore extension point namespaces

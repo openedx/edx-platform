@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext_noop as _
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -22,9 +23,6 @@ from xmodule.validation import StudioValidation, StudioValidationMessage
 from open_ended_grading_classes import combined_open_ended_rubric
 
 log = logging.getLogger(__name__)
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."

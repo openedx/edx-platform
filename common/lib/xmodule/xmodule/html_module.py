@@ -9,6 +9,7 @@ from path import Path as path
 from fs.errors import ResourceNotFoundError
 from pkg_resources import resource_string
 
+from django.utils.translation import ugettext_noop as _
 import dogstats_wrapper as dog_stats_api
 from xmodule.util.misc import escape_html_characters
 from xmodule.contentstore.content import StaticContent
@@ -22,9 +23,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String, Boolean, List
 
 log = logging.getLogger("edx.courseware")
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class HtmlFields(object):

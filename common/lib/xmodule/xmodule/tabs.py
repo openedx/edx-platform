@@ -1,16 +1,13 @@
 """
 Implement CourseTab
 """
-
 from abc import ABCMeta
 import logging
 
+from django.utils.translation import ugettext_noop as _
+
 from xblock.fields import List
 from openedx.core.lib.api.plugins import PluginError
-
-# We should only scrape strings for i18n in this file, since the target language is known only when
-# they are rendered in the template.  So ugettext gets called in the template.
-_ = lambda text: text
 
 log = logging.getLogger("edx.courseware")
 

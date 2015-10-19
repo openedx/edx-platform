@@ -9,6 +9,8 @@ from capa.responsetypes import registry
 from gettext import ngettext
 from lazy import lazy
 
+from django.utils.translation import ugettext_noop as _
+
 from .mako_module import MakoModuleDescriptor
 from opaque_keys.edx.locator import LibraryLocator
 import random
@@ -21,10 +23,6 @@ from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from .xml_module import XmlDescriptor
 from pkg_resources import resource_string  # pylint: disable=no-name-in-module
-
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 ANY_CAPA_TYPE_VALUE = 'any'

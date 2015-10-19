@@ -27,13 +27,11 @@ from xmodule.exceptions import NotFoundError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext_noop as _
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from django.conf import settings
 
 log = logging.getLogger("edx.courseware")
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 # Generate this many different variants of problems with rerandomize=per_student

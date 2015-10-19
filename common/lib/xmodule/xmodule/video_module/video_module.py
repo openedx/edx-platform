@@ -24,6 +24,7 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from django.conf import settings
+from django.utils.translation import ugettext_noop as _
 
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xblock.core import XBlock
@@ -83,7 +84,6 @@ except ImportError:
     BrandingInfoConfig = None
 
 log = logging.getLogger(__name__)
-_ = lambda text: text
 
 
 @XBlock.wants('settings')

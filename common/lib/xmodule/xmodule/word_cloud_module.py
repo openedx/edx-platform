@@ -8,8 +8,10 @@ If student have answered - words he entered and cloud.
 
 import json
 import logging
-
 from pkg_resources import resource_string
+
+from django.utils.translation import ugettext_noop as _
+
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
@@ -17,9 +19,6 @@ from xmodule.x_module import XModule
 from xblock.fields import Scope, Dict, Boolean, List, Integer, String
 
 log = logging.getLogger(__name__)
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 def pretty_bool(value):

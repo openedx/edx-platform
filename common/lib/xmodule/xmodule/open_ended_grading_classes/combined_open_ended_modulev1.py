@@ -1,7 +1,10 @@
 import json
 import logging
 import traceback
+
+from django.utils.translation import ugettext_noop as _
 from lxml import etree
+
 from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
 from xmodule.progress import Progress
@@ -33,8 +36,6 @@ ACCEPT_FILE_UPLOAD = False
 
 # Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
-
-_ = lambda text: text
 
 HUMAN_TASK_TYPE = {
     # Translators: "Self" is used to denote an openended response that is self-graded
