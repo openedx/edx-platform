@@ -216,7 +216,7 @@ from student.helpers import (
                       % if not is_course_blocked:
                       <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
                          onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified {cert_name_long} track of %(course_name)s (%(course_number)s)?").format(cert_name_long=cert_name_long)}',
+                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
                                       '${_("You will be refunded the amount you paid.")}'
                                   )"
                       >
@@ -225,7 +225,7 @@ from student.helpers import (
                       % else:
                       <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
                          onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified {cert_name_long} track of %(course_name)s (%(course_number)s)?").format(cert_name_long=cert_name_long)}',
+                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
                                       '${_("You will be refunded the amount you paid.")}'
                                   )"
                       >
@@ -237,7 +237,7 @@ from student.helpers import (
                       % if not is_course_blocked:
                       <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
                          onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified {cert_name_long} track of %(course_name)s (%(course_number)s)?").format(cert_name_long=cert_name_long)}',
+                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
                                       '${_("The refund deadline for this course has passed, so you will not receive a refund.")}'
                                   )"
                       >
@@ -246,7 +246,7 @@ from student.helpers import (
                       % else:
                       <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
                          onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified {cert_name_long} track of %(course_name)s (%(course_number)s)?").format(cert_name_long=cert_name_long)}',
+                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
                                       '${_("The refund deadline for this course has passed, so you will not receive a refund.")}'
                                   )"
                       >
@@ -395,7 +395,11 @@ from student.helpers import (
            });
 
            function set_unenroll_message(track_info, refund_info) {
-               document.getElementById('track-info').innerHTML = interpolate(track_info, {course_number: "<span id='unenroll_course_number'></span>", course_name: "<span id='unenroll_course_name'></span>"}, true);
+               document.getElementById('track-info').innerHTML = interpolate(track_info, {
+                  course_number: "<span id='unenroll_course_number'></span>",
+                  course_name: "<span id='unenroll_course_name'></span>",
+                  cert_name_long: "${cert_name_long | h}"
+               }, true);
                document.getElementById('refund-info').innerHTML = refund_info;
            }
 </script>
