@@ -16,10 +16,6 @@ class AssetIndexTest(StudioCourseTest):
     Tests for the Asset index page.
     """
     def setUp(self, is_staff=False):
-        # TODO: visit fails under phantom.
-        # Probably same root cause as the flakiness.
-        assert False, "Visiting the asset page fails in phantomjs"
-
         super(AssetIndexTest, self).setUp()
         self.asset_page = AssetIndexPage(
             self.browser,
@@ -40,7 +36,6 @@ class AssetIndexTest(StudioCourseTest):
         """
         self.asset_page.visit()
 
-    @flaky  # TODO fix this, see SOL-1160
     def test_type_filter_exists(self):
         """
         Make sure type filter is on the page.

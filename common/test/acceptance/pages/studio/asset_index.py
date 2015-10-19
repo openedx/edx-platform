@@ -12,11 +12,9 @@ from bok_choy.javascript import wait_for_js, requirejs
 
 @requirejs('js/factories/asset_index')
 class AssetIndexPage(CoursePage):
-
     """
     The Files and Uploads page for a course in Studio
     """
-
     url_path = "assets"
     type_filter_element = '#js-asset-type-col'
 
@@ -40,7 +38,7 @@ class AssetIndexPage(CoursePage):
     def is_browser_on_page(self):
         return all([
             self.q(css='body.view-uploads').present,
-            self.q(css='page-header').present,
+            self.q(css='.page-header').present,
             not self.q(css='div.ui-loading').visible,
         ])
 
