@@ -133,7 +133,11 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_marketing_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {
+            'ENABLE_MKTG_SITE': True,
+            'ENTRANCE_EXAMS': False,
+            'ENABLE_PREREQUISITE_COURSES': False
+        }):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Summary Page")
             self.assertNotContains(response, "Send a note to students via email")
@@ -280,6 +284,7 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Requirements")
 
 
+@ddt.ddt
 class CourseDetailsViewTest(CourseTestCase):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
@@ -409,6 +414,28 @@ class CourseDetailsViewTest(CourseTestCase):
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         response = self.client.ajax_post(url, course_detail_json)
         self.assertEqual(400, response.status_code)
+
+    @ddt.data(
+        (False, False, False),
+        (True, False, True),
+        (False, True, False),
+        (True, True, True),
+    )
+    def test_visibility_of_entrance_exam_section(self, feature_flags):
+        """
+        Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
+        feature is enabled or disabled i.e ENABLE_MKTG_SITE.
+        """
+        with patch.dict("django.conf.settings.FEATURES", {
+            'ENTRANCE_EXAMS': feature_flags[0],
+            'ENABLE_MKTG_SITE': feature_flags[1]
+        }):
+            course_details_url = get_url(self.course.id)
+            resp = self.client.get_html(course_details_url)
+            self.assertEqual(
+                feature_flags[2],
+                '<h3 id="heading-entrance-exam">' in resp.content
+            )
 
 
 @ddt.ddt

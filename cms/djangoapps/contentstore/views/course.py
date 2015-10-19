@@ -67,7 +67,8 @@ from contentstore.tasks import rerun_course
 from contentstore.views.entrance_exam import (
     create_entrance_exam,
     update_entrance_exam,
-    delete_entrance_exam
+    delete_entrance_exam,
+    is_entrance_exams_enabled
 )
 
 from .library import LIBRARIES_ENABLED
@@ -927,7 +928,8 @@ def settings_handler(request, course_key_string):
                 'is_credit_course': False,
                 'show_min_grade_warning': False,
                 'enrollment_end_editable': enrollment_end_editable,
-                'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled()
+                'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
+                'is_entrance_exams_enabled': is_entrance_exams_enabled()
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
