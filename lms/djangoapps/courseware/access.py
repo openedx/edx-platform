@@ -50,6 +50,7 @@ from student.roles import (
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
+    is_prerequisite_courses_enabled,
 )
 from ccx_keys.locator import CCXLocator
 
@@ -211,7 +212,7 @@ def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=in
         """
         Checks if prerequisites are disabled in the settings.
         """
-        return ACCESS_DENIED if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] else ACCESS_GRANTED
+        return ACCESS_DENIED if is_prerequisite_courses_enabled() else ACCESS_GRANTED
 
     return (
         _is_prerequisites_disabled()
