@@ -58,7 +58,8 @@ registry = TagRegistry()
 CorrectMap = correctmap.CorrectMap  # pylint: disable=invalid-name
 CORRECTMAP_PY = None
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 QUESTION_HINT_CORRECT_STYLE = 'feedback-hint-correct'

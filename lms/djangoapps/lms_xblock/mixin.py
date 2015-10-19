@@ -1,15 +1,13 @@
 """
 Namespace that defines fields common to all blocks used in the LMS
 """
+from django.utils.translation import ugettext_noop as _
 from lazy import lazy
 
 from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
 from xblock.validation import ValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class GroupAccessDict(Dict):

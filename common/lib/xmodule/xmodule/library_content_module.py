@@ -22,10 +22,9 @@ from xmodule.studio_editable import StudioEditableModule, StudioEditableDescript
 from .xml_module import XmlDescriptor
 from pkg_resources import resource_string  # pylint: disable=no-name-in-module
 
-
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
-
 
 ANY_CAPA_TYPE_VALUE = 'any'
 

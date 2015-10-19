@@ -1,13 +1,17 @@
+"""
+Definition of the Discussion module.
+"""
+import json
 from pkg_resources import resource_string
 
-import json
 from xblock.core import XBlock
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope, UNIQUE_ID
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
