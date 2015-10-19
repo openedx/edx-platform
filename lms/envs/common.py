@@ -1121,6 +1121,7 @@ MIDDLEWARE_CLASSES = (
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'waffle.middleware.WaffleMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -1795,6 +1796,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'djcelery',
     'south',
+
+    # Feature gating
+    'waffle',
 
     # History tables
     'simple_history',
@@ -2677,3 +2681,7 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+SOUTH_MIGRATION_MODULES = {
+    'waffle': 'waffle.south_migrations'
+}

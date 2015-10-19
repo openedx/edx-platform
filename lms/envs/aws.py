@@ -75,9 +75,7 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 CELERYD_PREFETCH_MULTIPLIER = 1
 
 # Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
-    'djcelery': 'ignore',
-}
+SOUTH_MIGRATION_MODULES['djcelery'] = 'ignore'
 
 # Rename the exchange and queues for each variant
 
