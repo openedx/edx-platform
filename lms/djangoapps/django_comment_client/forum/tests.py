@@ -450,7 +450,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         html = response.content
 
         # Verify that the group name is correctly included in the HTML
-        self.assertRegexpMatches(html, r'&quot;group_name&quot;: &quot;student_cohort&quot;')
+        self.assertRegexpMatches(html, r'&#34;group_name&#34;: &#34;student_cohort&#34;')
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
@@ -1152,10 +1152,10 @@ class UserProfileTestCase(ModuleStoreTestCase):
         self.assertRegexpMatches(html, r'data-num-pages="1"')
         self.assertRegexpMatches(html, r'<span>1</span> discussion started')
         self.assertRegexpMatches(html, r'<span>2</span> comments')
-        self.assertRegexpMatches(html, r'&quot;id&quot;: &quot;{}&quot;'.format(self.TEST_THREAD_ID))
-        self.assertRegexpMatches(html, r'&quot;title&quot;: &quot;{}&quot;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&quot;body&quot;: &quot;{}&quot;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&quot;username&quot;: &quot;{}&quot;'.format(self.student.username))
+        self.assertRegexpMatches(html, r'&#34;id&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_ID))
+        self.assertRegexpMatches(html, r'&#34;title&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, r'&#34;body&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, r'&#34;username&#34;: &#34;{}&#34;'.format(self.student.username))
 
     def check_ajax(self, mock_request, **params):
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
@@ -1324,6 +1324,56 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         response_data = json.loads(response.content)
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
+
+
+@ddt.ddt
+@patch('lms.lib.comment_client.utils.requests.request')
+class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(ForumDiscussionXSSTestCase, self).setUp()
+
+        username = "foo"
+        password = "bar"
+
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create(username=username, password=password)
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.assertTrue(self.client.login(username=username, password=password))
+
+    @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
+    @patch('student.models.cc.User.from_django_user')
+    def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):  # pylint: disable=unused-argument
+        """
+        Test that XSS attack is prevented
+        """
+        reverse_url = "%s%s" % (reverse(
+            "django_comment_client.forum.views.forum_form_discussion",
+            kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
+        # Test that malicious code does not appear in html
+        url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn(malicious_code, resp.content)
+
+    @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
+    @patch('student.models.cc.User.from_django_user')
+    @patch('student.models.cc.User.active_threads')
+    def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
+        """
+        Test that XSS attack is prevented
+        """
+        mock_threads.return_value = [], 1, 1
+        mock_from_django_user.return_value = Mock()
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
+
+        url = reverse('django_comment_client.forum.views.user_profile',
+                      kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)})
+        # Test that malicious code does not appear in html
+        url_string = "%s?%s=%s" % (url, 'page', malicious_code)
+        resp = self.client.get(url_string)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn(malicious_code, resp.content)
 
 
 class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
