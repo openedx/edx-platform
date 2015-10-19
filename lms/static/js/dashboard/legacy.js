@@ -128,6 +128,7 @@
         $(".action-unenroll").click(function(event) {
             $("#unenroll_course_id").val( $(event.target).data("course-id") );
             $("#unenroll_course_number").text( $(event.target).data("course-number") );
+            $("#unenroll_course_name").text( $(event.target).data("course-name") );
         });
 
         $('#unenroll_form').on('ajax:complete', function(event, xhr) {
@@ -190,6 +191,7 @@
         $("#unregister_block_course").click( function(event) {
             $("#unenroll_course_id").val($(event.target).data("course-id"));
             $("#unenroll_course_number").text($(event.target).data("course-number"));
+            $("#unenroll_course_name").text($(event.target).data("course-name"));
         });
     };
 
