@@ -1145,6 +1145,7 @@ class CreateTeamTest(TeamFormActions):
 
         self.verify_my_team_count(0)
 
+    @flaky(max_runs=20, min_passes=20)
     def test_page_viewed_event(self):
         """
         Scenario: Visiting the create team page should fire a page viewed event.
