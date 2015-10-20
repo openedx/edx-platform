@@ -9,7 +9,7 @@ class StudentViewTransformer(BlockStructureTransformer):
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
-    def __init__(self, requested_student_view_data = None):
+    def __init__(self, requested_student_view_data=None):
         self.requested_student_view_data = requested_student_view_data or []
 
     @classmethod

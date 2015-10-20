@@ -24,7 +24,7 @@ class TestBlockCountsTransformer(ModuleStoreTestCase):
         # block_counts
         chapter_x_key = self.course_key.make_usage_key('chapter', 'chapter_x')
         block_counts_for_chapter_x = self.block_structure.get_transformer_block_data(
-                chapter_x_key, BlockCountsTransformer,
+            chapter_x_key, BlockCountsTransformer,
         )
         block_counts_for_course = self.block_structure.get_transformer_block_data(
             self.course_usage_key, BlockCountsTransformer,
