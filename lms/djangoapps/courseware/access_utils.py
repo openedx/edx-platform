@@ -21,6 +21,9 @@ ACCESS_DENIED = AccessResponse(False)
 
 
 def debug(*args, **kwargs):
+    """
+    TODO
+    """
     # to avoid overly verbose output, this is off by default
     if DEBUG_ACCESS:
         log.debug(*args, **kwargs)
@@ -56,11 +59,7 @@ def check_start_date(user, days_early_for_beta, start, course_key):
         return ACCESS_GRANTED
     else:
         effective_start = adjust_start_date(user, days_early_for_beta, start, course_key)
-        if (
-            start is None
-            or now() > effective_start
-            or in_preview_mode()
-        ):
+        if start is None or now() > effective_start or in_preview_mode():
             return ACCESS_GRANTED
 
         return StartDateError(start)

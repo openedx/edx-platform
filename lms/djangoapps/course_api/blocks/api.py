@@ -2,7 +2,7 @@
 TODO
 """
 
-from transformers.blocks_api import BlocksAPITransformer
+from .transformers.blocks_api import BlocksAPITransformer
 from .serializers import BlockSerializer, BlockDictSerializer
 from lms.djangoapps.course_blocks.api import get_course_blocks, LMS_COURSE_TRANSFORMERS
 
@@ -16,8 +16,11 @@ def get_blocks(
     requested_fields=None,
     block_counts=None,
     student_view_data=None,
-    return_type='dict',
+    return_type='dict'
 ):
+    """
+    TODO
+    """
     # TODO support user=None by returning all blocks, not just user-specific ones
     if user is None:
         raise NotImplementedError

@@ -17,6 +17,9 @@ class CourseView(APIView):
     View class for the Course API
     """
     def get(self, request, course_key_string):
+        """
+        TODO
+        """
         course_key = CourseKey.from_string(course_key_string)
         course_usage_key = modulestore().make_course_usage_key(course_key)
 

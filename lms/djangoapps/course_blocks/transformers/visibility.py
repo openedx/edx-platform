@@ -14,6 +14,9 @@ class VisibilityTransformer(BlockStructureTransformer):
 
     @classmethod
     def get_visible_to_staff_only(cls, block_structure, block_key):
+        """
+        ...
+        """
         return block_structure.get_transformer_block_data(
             block_key, cls, cls.MERGED_VISIBLE_TO_STAFF_ONLY, False
         )
@@ -28,7 +31,7 @@ class VisibilityTransformer(BlockStructureTransformer):
 
             # compute merged value of visible_to_staff_only from all parents
             parents = block_structure.get_parents(block_key)
-            all_parents_visible_to_staff_only = all(
+            all_parents_visible_to_staff_only = all(  # pylint: disable=invalid-name
                 cls.get_visible_to_staff_only(block_structure, parent_key)
                 for parent_key in parents
             ) if parents else False

@@ -59,15 +59,15 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
             'user': self.student,
         }
 
-    def assert_raises_permission_denied(self):
+    def assert_raises_permission_denied(self):  # pylint: disable=missing-docstring
         with self.assertRaises(PermissionDenied):
             self.get_form(expected_valid=False)
 
-    def assert_raises_not_found(self):
+    def assert_raises_not_found(self):  # pylint: disable=missing-docstring
         with self.assertRaises(Http404):
             self.get_form(expected_valid=False)
 
-    def assert_equals_cleaned_data(self):
+    def assert_equals_cleaned_data(self):  # pylint: disable=missing-docstring
         form = self.get_form(expected_valid=True)
         self.assertDictEqual(form.cleaned_data, self.cleaned_data)
 

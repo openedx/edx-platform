@@ -1,9 +1,14 @@
-from itertools import chain
+"""
+TODO
+"""
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 from .block_depth import BlockDepthTransformer
 
 
 class DescendantList(object):
+    """
+    TODO
+    """
     def __init__(self):
         self.items = []
 
@@ -49,10 +54,11 @@ class BlockNavigationTransformer(BlockStructureTransformer):
                     parents_descendants_list |= parent_nav
 
             children_descendants_list = None
-            if (not block_structure.get_xblock_field(block_key, 'hide_from_toc', False) and (
-                not parents or
-                any(parent_desc_list is not None for parent_desc_list in parents_descendants_list)
-            )):
+            if (
+                not block_structure.get_xblock_field(block_key, 'hide_from_toc', False) and (
+                    not parents or
+                    any(parent_desc_list is not None for parent_desc_list in parents_descendants_list))
+            ):
                 # add self to parent's descendants
                 for parent_desc_list in parents_descendants_list:
                     if parent_desc_list is not None:

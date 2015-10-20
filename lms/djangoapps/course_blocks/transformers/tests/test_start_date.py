@@ -30,6 +30,9 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
 
         @classmethod
         def start(cls, enum_value):
+            """
+
+            """
             if enum_value == cls.released:
                 return cls.LAST_MONTH
             elif enum_value == cls.future:
@@ -56,8 +59,11 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
         ({0: StartDateType.released, 2: StartDateType.future, 4: StartDateType.released}, {0, 1, 3, 4, 6}, {}),
     )
     @ddt.unpack
+    # pylint: disable=invalid-name
     def test_block_start_date(
-        self, start_date_type_values, expected_student_visible_blocks, blocks_with_differing_student_access
+        self, start_date_type_values,
+        expected_student_visible_blocks,
+        blocks_with_differing_student_access
     ):
         for i, start_date_type in start_date_type_values.iteritems():
             block = self.get_block(i)

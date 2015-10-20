@@ -1,3 +1,6 @@
+"""
+Tests for BlockCountsTransformer.
+"""
 from openedx.core.lib.block_cache.block_structure import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
@@ -6,6 +9,7 @@ from ..block_counts import BlockCountsTransformer
 
 
 class TestBlockCountsTransformer(ModuleStoreTestCase):
+    # pylint: disable=missing-docstring
 
     def setUp(self):
         super(TestBlockCountsTransformer, self).setUp()

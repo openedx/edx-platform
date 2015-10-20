@@ -215,6 +215,7 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
         self.staff = UserFactory.create(is_staff=True, password=self.password)
         CourseEnrollmentFactory.create(is_active=True, mode='honor', user=self.student, course_id=self.course.id)
 
+    # pylint: disable=invalid-name
     def check_transformer_results(
         self, expected_student_accessible_blocks, blocks_with_differing_student_access, transformers=None
     ):

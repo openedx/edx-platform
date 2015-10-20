@@ -35,7 +35,7 @@ class ProctoredExamTransformer(BlockStructureTransformer):
             return
 
         for block_key in block_structure.topological_traversal(
-            predicate=lambda block_key: block_key.block_type == 'sequential'
+                predicate=lambda block_key: block_key.block_type == 'sequential'
         ):
             if (
                 block_structure.get_xblock_field(block_key, 'is_proctored_enabled') or

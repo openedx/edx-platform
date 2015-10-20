@@ -29,11 +29,14 @@ def _get_cache():
 
 
 def get_course_blocks(
-    user,
-    root_usage_key=None,
-    course_key=None,
-    transformers=None,
+        user,
+        root_usage_key=None,
+        course_key=None,
+        transformers=None
 ):
+    """
+    TODO
+    """
     store = modulestore()
 
     if transformers is None:

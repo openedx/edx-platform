@@ -4,14 +4,17 @@ Serializers for Course Blocks related return objects.
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from transformers import SUPPORTED_FIELDS
+from .transformers import SUPPORTED_FIELDS
 
 
-class BlockSerializer(serializers.Serializer):
+class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for single course block
     """
     def _get_field(self, block_key, transformer, field_name, default):
+        """
+        TODO
+        """
         if transformer:
             value = self.context['block_structure'].get_transformer_block_data(block_key, transformer, field_name)
         else:
@@ -22,6 +25,9 @@ class BlockSerializer(serializers.Serializer):
         return value if (value is not None) else default
 
     def to_representation(self, block_key):
+        """
+        TODO
+        """
         # create response data dict for basic fields
         data = {
             'id': unicode(block_key),
@@ -57,7 +63,7 @@ class BlockSerializer(serializers.Serializer):
         return data
 
 
-class BlockDictSerializer(serializers.Serializer):
+class BlockDictSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer that formats to a dictionary, rather than a list, of blocks
     """

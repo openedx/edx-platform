@@ -51,6 +51,7 @@ class MergedGroupAccess(object):
             block_group_ids = set(block_group_access.get(partition.id, [])) or None
             parents_group_ids = []
             for merged_parent_access in merged_parent_access_list:
+                # pylint: disable=protected-access
                 if partition.id in merged_parent_access._access:
                     parents_group_ids.append(merged_parent_access._access[partition.id])
                 else:
@@ -110,9 +111,8 @@ class MergedGroupAccess(object):
             else:
                 return False
 
-        # If the user has access for every partition, grant access.
-        else:
-            return True
+        # The user has access for every partition, grant access.
+        return True
 
 
 def get_user_partition_groups(course_key, user_partitions, user):

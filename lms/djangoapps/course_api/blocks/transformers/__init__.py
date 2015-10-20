@@ -2,12 +2,15 @@
 Course API Block Transformers
 """
 
-from student_view import StudentViewTransformer
-from block_counts import BlockCountsTransformer
-from navigation import BlockNavigationTransformer
+from .student_view import StudentViewTransformer
+from .block_counts import BlockCountsTransformer
+from .navigation import BlockNavigationTransformer
 
 
 class SupportedFieldType(object):
+    """
+    TODO
+    """
     def __init__(
             self,
             block_field_name,

@@ -603,7 +603,9 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
     def setup_modulestore(self, default_ms, num_finds, num_sends):
-        self.course_key = ToyCourseFactory.create().id
+        """
+        """
+        self.course_key = ToyCourseFactory.create().id  # pylint: disable=attribute-defined-outside-init
         self.chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
         factory = RequestFactory()
@@ -612,7 +614,7 @@ class TestTOC(ModuleStoreTestCase):
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
         with self.modulestore.bulk_operations(self.course_key):
             with check_mongo_calls(num_finds, num_sends):
-                self.toy_course = self.store.get_course(self.course_key, depth=2)
+                self.toy_course = self.store.get_course(self.course_key, depth=2)  # pylint: disable=attribute-defined-outside-init
                 self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                     self.course_key, self.request.user, self.toy_course, depth=2
                 )
