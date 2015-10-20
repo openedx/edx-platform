@@ -46,7 +46,7 @@ git+https://github.com/edx/lettuce.git@django1.8/upgrade#egg=lettuce==1.8
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 git+https://github.com/edx/i18n-tools.git@v0.1.3#egg=i18n-tools==v0.1.3
 git+https://github.com/edx/edx-oauth2-provider.git@0.5.7#egg=edx-oauth2-provider==0.5.7
-git+https://github.com/edx/edx-val.git@ammar/upgrade-django-1.8#egg=edxval==0.0.6
+git+https://github.com/edx/edx-val.git@ammar/upgrade-django-1.8#egg=edxval==0.0.7
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 -e git+https://github.com/edx/edx-search.git@ammar/upgrade-django-1.8#egg=edx-search
 -e git+https://github.com/edx/edx-milestones.git@django1.8-upgrade#egg=edx-milestones

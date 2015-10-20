@@ -48,13 +48,13 @@ else
     rm -rf $DB_CACHE_DIR && mkdir -p $DB_CACHE_DIR
 
     # Re-run migrations on the test database
-    ./manage.py lms --settings bok_choy syncdb --traceback --noinput
-    ./manage.py cms --settings bok_choy syncdb --traceback --noinput
+    ./manage.py lms --settings bok_choy makemigrations --traceback --noinput
+    ./manage.py cms --settings bok_choy makemigrations --traceback --noinput
     ./manage.py lms --settings bok_choy migrate --traceback --noinput
     ./manage.py cms --settings bok_choy migrate --traceback --noinput
 
     # Dump the schema and data to the cache
-    ./manage.py lms --settings bok_choy dumpdata > $DB_CACHE_DIR/bok_choy_data.json
-    mysqldump -u root --no-data --skip-comments --skip-dump-date edxtest > $DB_CACHE_DIR/bok_choy_schema.sql
+    # ./manage.py lms --settings bok_choy dumpdata > $DB_CACHE_DIR/bok_choy_data.json
+    # mysqldump -u root --no-data --skip-comments --skip-dump-date edxtest > $DB_CACHE_DIR/bok_choy_schema.sql
 fi
 
