@@ -71,7 +71,7 @@ def get_certificates_for_user(username):
             # In the future, we can update this to construct a URL to the webview certificate
             # for courses that have this feature enabled.
             "download_url": (
-                cert.download_url
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
