@@ -4,10 +4,13 @@ Django models related to course groups functionality.
 
 import json
 import logging
+import time
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.db import IntegrityError
+from django.db import transaction
+from django.core.exceptions import ValidationError
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -58,52 +61,69 @@ class CourseUserGroup(models.Model):
             name=name
         )
 
-class CourseUserGroupMembership(models.Model):
+class CohortMembership(models.Model):
     """Used internally to enforce our particular definition of uniqueness"""
 
     class Meta(object):  # pylint: disable=missing-docstring
-        #used to ensure only one version of a given membership exists
-        unique_together = (('user', 'course_user_group'), )
+        unique_together = (('user', 'course_id'), )
 
+    def clean(self):
+        if self.course_user_group.group_type != CourseGroup.COHORT:
+            raise ValidationError("CohortMembership cannot be used with CourseGroup types other than COHORT")
+        if self.course_id:
+            if self.course_user_group.course_id != self.course_id:
+                raise ValidationError("Non-matching course_ids provided")
+        else:
+            self.course_id = self.course_user_group.course_id
+
+    @transaction.autocommit
     def save(self, *args, **kwargs):
-        if self.course_user_group.group_type != CourseUserGroup.COHORT or self.version == 0:
+        self.full_clean() #needed to hit custom validation defined in clean()
+        print "Trying to add use to {}".format(self.course_user_group.name)
+        if self.version == 0:
             if 'get_previous' in kwargs:
                 del kwargs['get_previous']
-            super(CourseUserGroupMembership, self).save(*args, **kwargs)
+            super(CohortMembership, self).save(*args, **kwargs)
             return
+
         self.trying_to_save = True
         while(self.trying_to_save):
+            print "entering loop {}".format(self.course_user_group.name)
             try:
-                saved_membership = CourseUserGroupMembership.objects.exclude(
-                    id = self.id
-                ).get(
+                saved_membership = CohortMembership.objects.get(
                     user__id = self.user.id,
-                    course_user_group__course_id = self.course_user_group.course_id,
-                    course_user_group__group_type = CourseUserGroup.COHORT
+                    course_id = self.course_id,
                 )
-            except CourseUserGroupMembership.DoesNotExist:
-                new_membership = CourseUserGroupMembership(user=self.user, course_user_group=self.course_user_group)
+            except CohortMembership.DoesNotExist:
                 try:
+                    time.sleep(20)
+                    dummy_group, created  = CourseUserGroup.objects.get_or_create(
+                        name=CourseCohort.INTERNAL_NAME,
+                        course_id=self.course_user_group.course_id,
+                        group_type=CourseUserGroup.COHORT
+                    )
+                    new_membership = CohortMembership(
+                        user = self.user,
+                        course_user_group = dummy_group
+                    )
                     new_membership.save()
-                    return
-                except IntegrityError: #TODO: verify that this is the right error class to catch
-                    #this means we've hit a race condition. Try again!
-                    continue
+                except IntegrityError:
+                    print "Integrity Error saving new default membership! Take it from the top..."
+                    pass #we're going to continue either way
+                continue
 
+            print "saved membership found, id {id}, group {group}! proceeding...".format(id=saved_membership.id, group=saved_membership.course_user_group.id)
             if saved_membership.course_user_group == self.course_user_group:
                 raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
                     user_name=self.user.username,
                     cohort_name=self.course_user_group.name
                 ))
-            elif 'get_previous' in kwargs and kwargs['get_previous']:
+            elif 'get_previous' in kwargs and saved_membership.course_user_group.name != CourseCohort.INTERNAL_NAME:
                 self.previous_cohort = saved_membership.course_user_group
                 self.previous_cohort_name = saved_membership.course_user_group.name
                 self.previous_cohort_id = saved_membership.course_user_group.id
 
-            saved_membership.course_user_group = self.course_user_group
-
-            #this is the magic that defeats race conditions; it will be translated to a single UPDATE
-            updated = CourseUserGroupMembership.objects.filter(
+            updated = CohortMembership.objects.filter(
                 id = saved_membership.id,
                 version = saved_membership.version
             ).update(
@@ -111,15 +131,16 @@ class CourseUserGroupMembership(models.Model):
                 version = saved_membership.version + 1
             )
             if not updated:
-                #race condition, try again!
                 continue
+
+            print "{count}: We did it! User {user} is now in group {cohort} in the {course} course. The membership is at version {version}".format(user=self.user, cohort=self.course_user_group.name, course=self.course_user_group.course_id, version=saved_membership.version+1, count=updated)
 
             self.trying_to_save = False
 
-    id = models.AutoField(primary_key=True)
     course_user_group = models.ForeignKey(CourseUserGroup)
     user = models.ForeignKey(User)
     version = models.IntegerField(default=0)
+    course_id = CourseKeyField(max_length=255)
 
     previous_cohort = None
     previous_cohort_name = None
@@ -175,6 +196,8 @@ class CourseCohort(models.Model):
     This model represents cohort related info.
     """
     course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort')
+
+    INTERNAL_NAME = '_db_internal_'
 
     RANDOM = 'random'
     MANUAL = 'manual'

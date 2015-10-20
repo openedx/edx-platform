@@ -16,7 +16,7 @@ from eventtracking import tracker
 from request_cache.middleware import RequestCache
 from student.models import get_user_by_username_or_email
 
-from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup, CourseUserGroupMembership
+from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup, CohortMembership
 
 
 log = logging.getLogger(__name__)
@@ -200,7 +200,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             assignment_type=CourseCohort.RANDOM
         ).course_user_group
 
-    membership = CourseUserGroupMembership(course_user_group=cohort, user=user)
+    membership = CourseUserGroupMembership(course_user_group=cohort, user=user, version=-1)
     membership.save()
 
     return request_cache.data.setdefault(cache_key, cohort)
@@ -252,7 +252,9 @@ def get_course_cohorts(course, assignment_type=None):
     # Migrate cohort settings for this course
     migrate_cohort_settings(course)
 
-    query_set = CourseUserGroup.objects.filter(
+    query_set = CourseUserGroup.objects.exclude(
+        name=CourseCohort.INTERNAL_NAME
+    ).filter(
         course_id=course.location.course_key,
         group_type=CourseUserGroup.COHORT
     )
