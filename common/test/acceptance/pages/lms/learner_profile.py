@@ -43,7 +43,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Check if browser is showing correct page.
         """
-        return 'Learner Profile' in self.browser.title
+        return self.q(css='body.view-profile').present
 
     @property
     def privacy(self):

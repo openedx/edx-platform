@@ -51,7 +51,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
     def visit_profile_page(self, username, privacy=None):
         """
-        Visits a user's profile page.
+        Visit a user's profile page and if a privacy is specified and
+        is different from the displayed value, then set the privacy to that value.
         """
         profile_page = LearnerProfilePage(self.browser, username)
 
@@ -59,8 +60,15 @@ class LearnerProfileTestMixin(EventsTestMixin):
         # changing the drop down
         if privacy is not None:
             profile_page.visit()
-            profile_page.wait_for_page()
+
+            # Change the privacy setting if it is not the desired one already
             profile_page.privacy = privacy
+
+            # Verify the current setting is as expected
+            if privacy == self.PRIVACY_PUBLIC:
+                self.assertEqual(profile_page.privacy, 'all_users')
+            else:
+                self.assertEqual(profile_page.privacy, 'private')
 
             if privacy == self.PRIVACY_PUBLIC:
                 self.set_public_profile_fields_data(profile_page)
@@ -71,7 +79,6 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
         # Load the page
         profile_page.visit()
-        profile_page.wait_for_page()
 
         return profile_page
 
