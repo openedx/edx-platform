@@ -14,6 +14,7 @@ from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
 import analytics
+from monkey_patch import third_party_auth
 
 
 log = logging.getLogger(__name__)
@@ -23,6 +24,8 @@ def run():
     """
     Executed during django startup
     """
+    third_party_auth.patch()
+
     # To override the settings before executing the autostartup() for python-social-auth
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
