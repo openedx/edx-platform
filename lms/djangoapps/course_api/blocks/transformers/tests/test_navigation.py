@@ -12,6 +12,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
 from xmodule.modulestore import ModuleStoreEnum
 
+
 @ddt.ddt
 class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
     """
@@ -56,7 +57,8 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
                         BlockNavigationTransformer,
                         BlockNavigationTransformer.BLOCK_NAVIGATION,
                         []
-                )),
+                    )
+                ),
             )
 
 

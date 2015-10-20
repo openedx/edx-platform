@@ -36,7 +36,7 @@ class TestBlocksViewMixin(object):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
 
     def verify_response(self, expected_status_code=200, params=None, url=None):
-        query_params = {'user': self.user.username, 'depth': 'all',}
+        query_params = {'user': self.user.username, 'depth': 'all'}
         if params:
             query_params.update(params)
         response = self.client.get(url or self.url, query_params)

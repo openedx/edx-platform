@@ -6,6 +6,7 @@ from student_view import StudentViewTransformer
 from block_counts import BlockCountsTransformer
 from navigation import BlockNavigationTransformer
 
+
 class SupportedFieldType(object):
     def __init__(
             self,

@@ -25,8 +25,8 @@ class TestGetBlocks(ModuleStoreTestCase):
         blocks = get_blocks(self.request, self.course.location, self.user)
         self.assertEquals(blocks['root'], unicode(self.course.location))
         # add 1 for the orphaned course about block
-        self.assertEquals(len(blocks['blocks'])+1, len(self.store.get_items(self.course.id)))
+        self.assertEquals(len(blocks['blocks']) + 1, len(self.store.get_items(self.course.id)))
 
     def test_no_user(self):
         with self.assertRaises(NotImplementedError):
-             get_blocks(self.request, self.course.location)
+            get_blocks(self.request, self.course.location)

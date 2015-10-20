@@ -103,7 +103,6 @@ class ContentLibraryTransformer(BlockStructureTransformer):
                 event_data.update(kwargs)
                 tracker.emit("edx.librarycontentblock.content.{}".format(event_name), event_data)
 
-
             if block_keys['invalid']:
                 # reason "invalid" means deleted from library or a different library is now being used.
                 publish_event(
@@ -127,7 +126,6 @@ class ContentLibraryTransformer(BlockStructureTransformer):
                     result=format_block_keys(block_keys['selected']),
                     added=format_block_keys(block_keys['added'])
                 )
-
 
         def check_child_removal(block_key):
             """
