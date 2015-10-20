@@ -169,17 +169,16 @@ class AuthEntryError(AuthException):
     """
 
 
-class EmailAlreadyInUseException(AuthException):
-    """ Raised when new user account is created with an email already used by another account """
+class NotActivatedException(AuthException):
+    """ Raised when a user tries to login to an unverified account """
     def __init__(self, backend, email):
         self.email = email
-        super(EmailAlreadyInUseException, self).__init__(backend, email)
+        super(NotActivatedException, self).__init__(backend, email)
 
     def __str__(self):
         return (
-            _('Email {email_address} is already used in our system. To link your accounts, '
-              'sign in now using your {platform_name} password.')
-            .format(email_address=self.email, platform_name=settings.PLATFORM_NAME)
+            _('This account has not yet been activated. An activation email has been re-sent to {email_address}.')
+            .format(email_address=self.email)
         )
 
 
@@ -596,17 +595,12 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         return current_provider and current_provider.skip_email_verification
 
     if not user:
-        if should_autoprovision_account():
-            # User has authenticated with the third party provider and provider is configured
-            # to automatically provision edX account, which is done via strategy.create_user in next pipeline step
-            return {'autoprovision': True}
-
         if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
             return HttpResponseBadRequest()
         elif auth_entry == AUTH_ENTRY_LOGIN:
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
-            if autosubmit_registration_form():
+            if should_force_account_creation():
                 return dispatch_to_register()
             return dispatch_to_login()
         elif auth_entry == AUTH_ENTRY_REGISTER:
@@ -648,22 +642,6 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
                 'User "%s" is using third_party_auth to login but has not yet activated their account. ',
                 user.username
             )
-
-
-@partial.partial
-def create_user(strategy, details, user=None, *args, **kwargs):
-    """
-    Substitution method for stock social create_user that catches email validation error and redirects to login
-    """
-    from student.views import AccountEmailAlreadyExistsValidationError
-    try:
-        return social_create_user(strategy, details, user, *args, **kwargs)
-    except AccountEmailAlreadyExistsValidationError as exc:
-        logger.exception(exc.message)
-        # We're raising an exception that inherits from AuthException. Such exceptions are properly handled
-        # by social auth pipeline: their string representation (see __str__ method) is displayed to user on the page
-        # we're redirecting to.
-        raise EmailAlreadyInUseException(exc.message, details['email'])
 
 
 @partial.partial

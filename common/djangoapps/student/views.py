@@ -1662,16 +1662,6 @@ class AccountValidationError(Exception):
         self.field = field
 
 
-class AccountUserNameValidationError(AccountValidationError):
-    """ Exception thrown if attempted to create account with username already taken """
-    pass
-
-
-class AccountEmailAlreadyExistsValidationError(AccountValidationError):
-    """ Exception thrown if attempted to create account with email already used by other account """
-    pass
-
-
 @receiver(post_save, sender=User)
 def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
@@ -1730,12 +1720,12 @@ def _do_create_account(form, custom_form=None):
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=user.username)) > 0:
-            raise AccountUserNameValidationError(
+            raise AccountValidationError(
                 _("An account with the Public Username '{username}' already exists.").format(username=user.username),
                 field="username"
             )
         elif len(User.objects.filter(email=user.email)) > 0:
-            raise AccountEmailAlreadyExistsValidationError(
+            raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
             )
@@ -1999,12 +1989,11 @@ def create_account_with_params(request, params, skip_email=False):
     # the other for *new* systems. we need to be careful about
     # changing settings on a running system to make sure no users are
     # left in an inconsistent state (or doing a migration if they are).
-    send_email = not (
-        skip_email or
-        settings.FEATURES.get('SKIP_EMAIL_VALIDATION', False) or
-        settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING', False) or
-        (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) or
-        (
+    send_email = (
+        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
+        not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
+        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
+        not (
             third_party_provider and third_party_provider.skip_email_verification and
             user.email == running_pipeline['kwargs'].get('details', {}).get('email')
         )
