@@ -91,7 +91,7 @@ Test Locations
    -  Lettuce Tests: located in ``features`` subpackage within a Django
       app. For example: ``lms/djangoapps/courseware/features``
    -  Bok Choy Acceptance Tests: located under ``common/test/acceptance/tests``
-   -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/accessibility``
+   -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/tests`` and tagged with ``@attr("a11y")``
    -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
 
 Factories
@@ -290,13 +290,13 @@ To run JavaScript tests in a browser:
     paver test_js_dev -s xmodule
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
-    
+
 To debug these tests on devstack in a local browser:
 
  * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
  * open the same URL in your browser but change the IP address to 192.168.33.10, e.g.
     http://192.168.33.10:TEST_PORT/suite/cms
- * this will run all the tests and show you the results including details of any failures 
+ * this will run all the tests and show you the results including details of any failures
  * you can click on an individually failing test and/or suite to re-run it by itself
  * you can now use the browser's developer tools to debug as you would any other JavaScript code
 
@@ -389,9 +389,10 @@ Bok Choy, a UI-level acceptance test framework for writing robust
 `Selenium <http://docs.seleniumhq.org/>`__
 tests in `Python <https://www.python.org/>`__, includes the ability to perform
 accessibility audits on web pages using `Google Accessibility Developer Tools
-<https://github.com/GoogleChrome/accessibility-developer-tools/>`__.  For more
-details about how to write accessibility tests, please read the `Bok
-Choy documentation <http://bok-choy.readthedocs.org/en/latest/accessibility.html>`__
+<https://github.com/GoogleChrome/accessibility-developer-tools/>`__ or
+`Deque's aXe Core <https://github.com/dequelabs/axe-core/>`__.
+For more details about how to write accessibility tests, please read
+the `Bok Choy documentation <http://bok-choy.readthedocs.org/en/latest/accessibility.html>`__
 and the Automated Accessibility Tests `openedx Confluence page
 <https://openedx.atlassian.net/wiki/display/TE/Automated+Accessibility+Tests>`__.
 
@@ -399,8 +400,6 @@ and the Automated Accessibility Tests `openedx Confluence page
 
 These prerequisites are all automatically installed and available in `Devstack
 <https://github.com/edx/configuration/wiki/edX-Developer-Stack>`__ (since the Cypress release), the supported development enviornment for the edX Platform.
-
-* PhantomJS
 
 * Mongo
 
@@ -410,12 +409,12 @@ These prerequisites are all automatically installed and available in `Devstack
 
 To run all the bok choy accessibility tests::
 
-    SELENIUM_BROWSER=phantomjs paver test_bokchoy -d accessibility
+    paver test_bokchoy --extra_args="-a 'a11y'"
 
 To run specific tests, use the ``-t`` flag to specify a nose-style test spec
-relative to the ``common/test/acceptance/accessibility`` directory::
+relative to the ``common/test/acceptance/tests`` directory::
 
-    SELENIUM_BROWSER=phantomjs paver test_bokchoy -d accessibility -t test_lms_dashboard_axs.py:LmsDashboardAxsTest.test_dashboard_course_listings_axs
+    paver test_bokchoy --extra_args="-a 'a11y'" -t test_lms_dashboard.py:LmsDashboardA11yTest.test_dashboard_course_listings_a11y
 
 Running Lettuce Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
