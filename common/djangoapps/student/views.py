@@ -1657,20 +1657,9 @@ def change_setting(request):
 
 
 class AccountValidationError(Exception):
-    """ Exception thrown if some account validation error happened """
     def __init__(self, message, field):
         super(AccountValidationError, self).__init__(message)
         self.field = field
-
-
-class AccountUserNameValidationError(AccountValidationError):
-    """ Exception thrown if attempted to create account with username already taken """
-    pass
-
-
-class AccountEmailAlreadyExistsValidationError(AccountValidationError):
-    """ Exception thrown if attempted to create account with email already used by other account """
-    pass
 
 
 @receiver(post_save, sender=User)
