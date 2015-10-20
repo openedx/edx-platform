@@ -59,6 +59,11 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 
 ############################ FEATURE CONFIGURATION #############################
+
+
+# Dummy secret key for dev/test
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
 FEATURES = {
@@ -782,7 +787,7 @@ INSTALLED_APPS = (
 
     # User preferences
     'openedx.core.djangoapps.user_api',
-    'django_openid_auth',
+    # 'django_openid_auth',
 
     'embargo',
 
