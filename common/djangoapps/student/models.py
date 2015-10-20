@@ -213,6 +213,8 @@ class UserProfile(models.Model):
     Some of the fields are legacy ones that were captured during the initial
     MITx fall prototype.
     """
+    # cache key format e.g user.<user_id>.profile.country = 'SG'
+    PROFILE_COUNTRY_CACHE_KEY = u"user.{user_id}.profile.country"
 
     class Meta(object):  # pylint: disable=missing-docstring
         db_table = "auth_userprofile"
@@ -367,6 +369,29 @@ class UserProfile(models.Model):
     def __enumerable_to_display(self, enumerables, enum_value):
         """ Get the human readable value from an enumerable list of key-value pairs. """
         return dict(enumerables)[enum_value]
+
+    @classmethod
+    def country_cache_key_name(cls, user_id):
+        """Return cache key name to be used to cache current country.
+        Args:
+            user_id(int): Id of user.
+
+        Returns:
+            Unicode cache key
+        """
+        return cls.PROFILE_COUNTRY_CACHE_KEY.format(user_id=user_id)
+
+
+@receiver(models.signals.post_save, sender=UserProfile)
+def invalidate_user_profile_country_cache(sender, instance, **kwargs):  # pylint:   disable=unused-argument, invalid-name
+    """Invalidate the cache of country in UserProfile model. """
+
+    changed_fields = getattr(instance, '_changed_fields', {})
+
+    if 'country' in changed_fields:
+        cache_key = UserProfile.country_cache_key_name(instance.user_id)
+        cache.delete(cache_key)
+        log.info("Country changed in UserProfile for %s, cache deleted", instance.user_id)
 
 
 @receiver(pre_save, sender=UserProfile)
