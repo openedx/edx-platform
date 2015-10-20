@@ -61,6 +61,9 @@ class CourseTab(object):
     # If there is a single view associated with this tab, this is the name of it
     view_name = None
 
+    # True if this tab can be displaed to sneak peek users
+    is_visible_to_sneak_peek = False
+
     def __init__(self, tab_dict):
         """
         Initializes class members with values passed in by subclasses.
@@ -232,6 +235,7 @@ class StaticTab(CourseTab):
     type = 'static_tab'
     is_default = False  # A static tab is never added to a course by default
     allow_multiple = True
+    is_visible_to_sneak_peek = True
 
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
@@ -383,18 +387,16 @@ class CourseTabList(List):
         is_user_staff=True,
         is_user_enrolled=False,
         is_user_sneakpeek=False,
-        sneakpeek_tab_types=None,
     ):
         """
         Generator method for iterating through all tabs that can be displayed for the given course and
         the given user with the provided access settings.
         """
-        sneakpeek_tab_types = sneakpeek_tab_types or []
         for tab in course.tabs:
             if (
                 tab.is_enabled(course, user=user) and
-                (not tab.is_hideable or not tab.is_hidden) and
-                (not is_user_sneakpeek or any([isinstance(tab, t) for t in sneakpeek_tab_types]))
+                (not (user and tab.is_hidden)) and
+                (not is_user_sneakpeek or tab.is_visible_to_sneak_peek)
             ):
                 if tab.is_collection:
                     # If rendering inline that add each item in the collection,

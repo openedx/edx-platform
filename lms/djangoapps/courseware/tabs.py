@@ -35,6 +35,7 @@ class CoursewareTab(EnrolledTab):
     view_name = 'courseware'
     is_movable = False
     is_default = False
+    is_visible_to_sneak_peek = True
 
 
 class CourseInfoTab(CourseTab):
@@ -48,6 +49,7 @@ class CourseInfoTab(CourseTab):
     tab_id = 'info'
     is_movable = False
     is_default = False
+    is_visible_to_sneak_peek = True
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -64,6 +66,7 @@ class SyllabusTab(EnrolledTab):
     view_name = 'syllabus'
     allow_multiple = True
     is_default = False
+    is_visible_to_sneak_peek = True
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -299,7 +302,6 @@ def get_course_tab_list(request, course):
         is_user_staff=has_access(user, 'staff', course, course.id),
         is_user_enrolled=is_user_enrolled,
         is_user_sneakpeek=not UserProfile.has_registered(user),
-        sneakpeek_tab_types=SNEAKPEEK_TAB_TYPES,
     )
 
     # Now that we've loaded the tabs for this course, perform the Entrance Exam work.
@@ -335,11 +337,3 @@ def _get_dynamic_tabs(course, user):
                 dynamic_tabs.append(tab)
     dynamic_tabs.sort(key=lambda dynamic_tab: dynamic_tab.name)
     return dynamic_tabs
-
-
-SNEAKPEEK_TAB_TYPES = [
-    CoursewareTab,
-    CourseInfoTab,
-    StaticTab,
-    SyllabusTab,
-]
