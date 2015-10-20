@@ -44,7 +44,7 @@ class Command(BaseCommand):
                     metavar='USER',
                     dest='user',
                     default=False,
-                    help="List of users to move in the course"),
+                    help="Comma-separated list of users to move in the course"),
         make_option('-c', '--course',
                     metavar='COURSE_ID',
                     dest='course_id',
