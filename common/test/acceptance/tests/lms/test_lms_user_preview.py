@@ -71,11 +71,31 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
             </problem>
         """)
 
+        vertical_data = dedent("""
+            <vertical display_name="Unit">
+              <problem url_name="I:haveacolon"/>
+            </vertical>
+        """)
+
+        problem_colon_data = dedent("""
+            <problem url_name="I:haveacolon" markdown="Simple Problem" max_attempts="" weight="">
+              <p>Choose Yes.</p>
+              <choiceresponse>
+                <checkboxgroup>
+                  <choice correct="true">Yes</choice>
+                </checkboxgroup>
+              </choiceresponse>
+            </problem>
+        """)
+
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 1', data=problem_data),
-                    XBlockFixtureDesc('problem', 'Test Problem 2', data=problem_data)
+                    XBlockFixtureDesc('problem', 'Test Problem 2', data=problem_data),
+                    XBlockFixtureDesc('vertical', 'Test Vertical 1', data=vertical_data).add_children(
+                        XBlockFixtureDesc('problem', 'haveacolon', data=problem_colon_data)
+                    )
                 )
             )
         )
@@ -101,6 +121,12 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
     """
+    def test_colon_problem(self):
+        self.maxDiff = None
+        staff_debug_page = self._goto_staff_page()
+        msg = staff_debug_page.problem_id
+        self.assertEqual(u'Staff Debug Info', msg)
+
     def test_reset_attempts_empty(self):
         """
         Test that we reset even when there is no student state
