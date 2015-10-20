@@ -84,6 +84,52 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('Authentication with TestShib is currently unavailable.', response.content)
 
+    def test_register(self):
+        self._configure_testshib_provider()
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+        # The user goes to the register page, and sees a button to register with TestShib:
+        self._check_register_page()
+        # The user clicks on the TestShib button:
+        try_login_response = self.client.get(TPA_TESTSHIB_REGISTER_URL)
+        # The user should be redirected to TestShib:
+        self.assertEqual(try_login_response.status_code, 302)
+        self.assertTrue(try_login_response['Location'].startswith(TESTSHIB_SSO_URL))
+        # Now the user will authenticate with the SAML provider
+        testshib_response = self._fake_testshib_login_and_return()
+        # We should be redirected to the register screen since this account is not linked to an edX account:
+        self.assertEqual(testshib_response.status_code, 302)
+        self.assertEqual(testshib_response['Location'], self.url_prefix + self.register_page_url)
+        register_response = self.client.get(self.register_page_url)
+        # We'd now like to see if the "You've successfully signed into TestShib" message is
+        # shown, but it's managed by a JavaScript runtime template, and we can't run JS in this
+        # type of test, so we just check for the variable that triggers that message.
+        self.assertIn('&#34;currentProvider&#34;: &#34;TestShib&#34;', register_response.content)
+        self.assertIn('&#34;errorMessage&#34;: null', register_response.content)
+        # Now do a crude check that the data (e.g. email) from the provider is displayed in the form:
+        self.assertIn('&#34;defaultValue&#34;: &#34;myself@testshib.org&#34;', register_response.content)
+        self.assertIn('&#34;defaultValue&#34;: &#34;Me Myself And I&#34;', register_response.content)
+        # Now complete the form:
+        ajax_register_response = self.client.post(
+            reverse('user_api_registration'),
+            {
+                'email': 'myself@testshib.org',
+                'name': 'Myself',
+                'username': 'myself',
+                'honor_code': True,
+            }
+        )
+        self.assertEqual(ajax_register_response.status_code, 200)
+        # Then the AJAX will finish the third party auth:
+        continue_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
+        # And we should be redirected to the dashboard:
+        self.assertEqual(continue_response.status_code, 302)
+        self.assertEqual(continue_response['Location'], self.url_prefix + self.dashboard_page_url)
+
+        # Now check that we can login again:
+        self.client.logout()
+        self._verify_user_email('myself@testshib.org')
+        self._test_return_login()
+
     def test_login(self):
         """ Configure TestShib before running the login test """
         self._configure_testshib_provider()
@@ -94,32 +140,8 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self._configure_testshib_provider()
         super(TestShibIntegrationTest, self).test_register()
 
-    def test_autoprovision_from_login(self):
-        self._configure_testshib_provider(autoprovision_account=True)
-        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
-
-        # check that we don't have a user we're autoprovisioning account for
-        self._assert_user_does_not_exist('myself')
-
-        # The user goes to the register page, and sees a button to register with TestShib:
-        self._check_login_page()
-
-        self._test_autoprovision(TPA_TESTSHIB_LOGIN_URL)
-
-    def test_autoprovision_from_register(self):
-        self._configure_testshib_provider(autoprovision_account=True)
-        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
-
-        # check that we don't have a user we're autoprovisioning account for
-        self._assert_user_does_not_exist('myself')
-
-        # The user goes to the register page, and sees a button to register with TestShib:
-        self._check_register_page()
-
-        self._test_autoprovision(TPA_TESTSHIB_REGISTER_URL)
-
     def test_custom_form_does_not_link_by_email(self):
-        self._configure_testshib_provider(autoprovision_account=False)
+        self._configure_testshib_provider()
         self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
 
         email = 'myself@testshib.org'
@@ -138,7 +160,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self.assertEqual(testshib_response['Location'], self.url_prefix + '/auth/custom_auth_entry')
 
     def test_custom_form_links_by_email(self):
-        self._configure_testshib_provider(autoprovision_account=False)
+        self._configure_testshib_provider()
         self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
 
         email = 'myself@testshib.org'
@@ -166,35 +188,10 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self.client.logout()
         self._test_return_login()
 
-    def _test_autoprovision(self, entry_point):
-        """ Actual autoprovision code """
-        # The user clicks on the TestShib button:
-        try_entry_response = self.client.get(entry_point)
-        # The user should be redirected to TestShib:
-        self.assertEqual(try_entry_response.status_code, 302)
-        self.assertTrue(try_entry_response['Location'].startswith(TESTSHIB_SSO_URL))
-
-        # Now the user will authenticate with the SAML provider
-        self._fake_testshib_login_and_return()
-
-        # Then there's one more redirect to set logged_in cookie
-        continue_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
-
-        # We should be redirected to the dashboard screen since profile should be created and logged in
-        self.assertEqual(continue_response.status_code, 302)
-        self.assertEqual(continue_response['Location'], self.url_prefix + self.dashboard_page_url)
-
-        # assert account is created and activated
-        self._assert_account_created(username='myself', email='myself@testshib.org', full_name='Me Myself And I')
-
-        # Now check that we can login again:
-        self.client.logout()
-        self._test_return_login()
-
     def _test_return_login(self):
         """ Test logging in to an account that is already linked. """
         # Make sure we're not logged in:
-        dashboard_response = self.client.get(reverse('dashboard'))
+        dashboard_response = self.client.get(self.dashboard_page_url)
         self.assertEqual(dashboard_response.status_code, 302)
         # The user goes to the login page, and sees a button to login with TestShib:
         self._check_login_page()
@@ -213,7 +210,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self.assertEqual(login_response.status_code, 302)
         self.assertEqual(login_response['Location'], self.url_prefix + reverse('dashboard'))
         # Now we are logged in:
-        dashboard_response = self.client.get(reverse('dashboard'))
+        dashboard_response = self.client.get(self.dashboard_page_url)
         self.assertEqual(dashboard_response.status_code, 200)
 
     def _freeze_time(self, timestamp):
@@ -232,7 +229,6 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
-        kwargs.setdefault('autoprovision_account', False)
         self.configure_saml_provider(**kwargs)
 
         if fetch_metadata:

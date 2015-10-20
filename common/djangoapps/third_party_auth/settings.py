@@ -9,6 +9,7 @@ If true, it:
     a) loads this module.
     b) calls apply_settings(), passing in the Django settings
 """
+
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
@@ -46,7 +47,7 @@ def apply_settings(django_settings):
         'social.pipeline.user.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
-        'third_party_auth.pipeline.create_user',
+        'social.pipeline.user.create_user',
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',

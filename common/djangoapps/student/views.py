@@ -1448,20 +1448,9 @@ def change_setting(request):
 
 
 class AccountValidationError(Exception):
-    """ Exception thrown if some account validation error happened """
     def __init__(self, message, field):
         super(AccountValidationError, self).__init__(message)
         self.field = field
-
-
-class AccountUserNameValidationError(AccountValidationError):
-    """ Exception thrown if attempted to create account with username already taken """
-    pass
-
-
-class AccountEmailAlreadyExistsValidationError(AccountValidationError):
-    """ Exception thrown if attempted to create account with email already used by other account """
-    pass
 
 
 @receiver(post_save, sender=User)
@@ -1515,12 +1504,12 @@ def _do_create_account(form, custom_form=None):
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=user.username)) > 0:
-            raise AccountUserNameValidationError(
+            raise AccountValidationError(
                 _("An account with the Public Username '{username}' already exists.").format(username=user.username),
                 field="username"
             )
         elif len(User.objects.filter(email=user.email)) > 0:
-            raise AccountEmailAlreadyExistsValidationError(
+            raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
             )
@@ -1555,7 +1544,7 @@ def _do_create_account(form, custom_form=None):
 
 
 # pylint: disable=too-many-statements
-def create_account_with_params(request, params, skip_email=False):
+def create_account_with_params(request, params):
     """
     Given a request and a dict of parameters (which may or may not have come
     from the request), create an account for the requesting user, including
@@ -1654,8 +1643,7 @@ def create_account_with_params(request, params, skip_email=False):
         (user, profile, registration) = _do_create_account(form, custom_form)
 
         # next, link the account with social auth, if provided via the API.
-        # (If the user is using the normal register page or account is automatically provisioned,
-        # the social auth pipeline does the linking, not this code)
+        # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
         if should_link_with_social_auth:
             backend_name = params['provider']
             request.social_strategy = social_utils.load_strategy(request)
@@ -1763,12 +1751,11 @@ def create_account_with_params(request, params, skip_email=False):
     # the other for *new* systems. we need to be careful about
     # changing settings on a running system to make sure no users are
     # left in an inconsistent state (or doing a migration if they are).
-    send_email = not (
-        skip_email or
-        settings.FEATURES.get('SKIP_EMAIL_VALIDATION', False) or
-        settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING', False) or
-        (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) or
-        (
+    send_email = (
+        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
+        not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
+        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
+        not (
             third_party_provider and third_party_provider.skip_email_verification and
             user.email == running_pipeline['kwargs'].get('details', {}).get('email')
         )

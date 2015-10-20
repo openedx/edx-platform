@@ -1,13 +1,11 @@
 """Unit tests for third_party_auth/pipeline.py."""
 
 import random
-import mock
 
 from third_party_auth import pipeline
 from third_party_auth.tests import testutil
 import unittest
 
-from student.views import AccountEmailAlreadyExistsValidationError
 
 # Allow tests access to protected methods (or module-protected methods) under test.
 # pylint: disable=protected-access
@@ -45,38 +43,3 @@ class ProviderUserStateTestCase(testutil.TestCase):
         google_provider = self.configure_google_provider(enabled=True)
         state = pipeline.ProviderUserState(google_provider, object(), None)
         self.assertEqual(google_provider.provider_id + '_unlink_form', state.get_unlink_form_name())
-
-
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
-class TestCreateUser(testutil.TestCase):
-    """
-    Tests for custom create_user step
-    """
-    def _raise_email_in_use_exception(self, *unused_args, **unused_kwargs):
-        """ Helper to raise AccountEmailAlreadyExistsValidationError """
-        raise AccountEmailAlreadyExistsValidationError(mock.Mock(), mock.Mock())
-
-    def test_create_user_normal_scenario(self):
-        """  Tests happy path - user is created and results are returned intact """
-        retval = mock.Mock()
-        with mock.patch("third_party_auth.pipeline.social_create_user") as patched_social_create_user:
-            patched_social_create_user.return_value = retval
-            strategy, details, user, idx = mock.Mock(), {'email': 'qwe@asd.com'}, mock.Mock(), 1
-
-            # pylint: disable=redundant-keyword-arg
-            result = pipeline.create_user(strategy, idx, details=details, user=user)
-
-            self.assertEqual(result, retval)
-
-    def test_create_user_exception_scenario(self):
-        """
-        Tests sad path - expected exception is thrown, captured and transformed into AuthException subclass instance
-        """
-        with mock.patch("third_party_auth.pipeline.social_create_user") as patched_social_create_user:
-            patched_social_create_user.side_effect = self._raise_email_in_use_exception
-
-            strategy, details, user = mock.Mock(), {'email': 'qwe@asd.com'}, mock.Mock()
-
-            with self.assertRaises(pipeline.EmailAlreadyInUseException):
-                # pylint: disable=redundant-keyword-arg
-                pipeline.create_user(strategy, 1, details=details, user=user)
