@@ -17,7 +17,11 @@ class Command(BaseCommand):
 
         Change enrollment for user joe from audit to honor:
 
-          $ ... change_enrollment -u joe -c some/course/id --from audit --to honor
+          $ ... change_enrollment -u joe,frank,bill -c some/course/id --from audit --to honor
+
+        Or
+
+          $ ... change_enrollment -u "joe@example.com,frank@example.com,bill@example.com" -c some/course/id --from audit --to honor
 
         Change enrollment for all users in some/course/id from audit to honor
 
@@ -40,7 +44,8 @@ class Command(BaseCommand):
                     metavar='USER',
                     dest='user',
                     default=False,
-                    help="User to move, if not specified will move all users in the course"),
+                    action="append",
+                    help="List of users to move in the course"),
         make_option('-c', '--course',
                     metavar='COURSE_ID',
                     dest='course_id',
