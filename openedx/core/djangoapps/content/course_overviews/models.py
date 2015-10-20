@@ -226,7 +226,7 @@ class CourseOverview(TimeStampedModel):
         """
         try:
             course_overview = cls.objects.get(id=course_id)
-            if course_overview.version != cls.VERSION:
+            if course_overview.version < cls.VERSION:
                 # Throw away old versions of CourseOverview, as they might contain stale data.
                 course_overview.delete()
                 course_overview = None
