@@ -112,7 +112,7 @@ from django.utils.http import urlquote_plus
                         ${_("{a_start}Go to your dashboard{a_end} to purchase course credit.").format(
 		             a_start=u"<a href={url}>".format(url=reverse('dashboard')),
 			     a_end="</a>"
-		      ) | h}
+		      )}
                     </span>
                 %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
                     <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name) | h}</span>
