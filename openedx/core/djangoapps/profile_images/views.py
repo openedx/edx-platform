@@ -3,6 +3,7 @@ This module implements the upload and remove endpoints of the profile image api.
 """
 from contextlib import closing
 import datetime
+import itertools
 import logging
 
 from django.utils.translation import ugettext as _
@@ -17,9 +18,13 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser,
 )
+from openedx.core.lib.api.parsers import TypedFileUploadParser
 from openedx.core.lib.api.permissions import IsUserInUrl, IsUserInUrlOrStaff
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
-from .images import validate_uploaded_image, create_profile_images, remove_profile_images, ImageValidationError
+from .images import (
+    IMAGE_TYPES, validate_uploaded_image, create_profile_images, remove_profile_images, ImageValidationError
+)
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +40,7 @@ def _make_upload_dt():
     return datetime.datetime.utcnow().replace(tzinfo=utc)
 
 
-class ProfileImageView(APIView):
+class ProfileImageView(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
 
@@ -105,9 +110,11 @@ class ProfileImageView(APIView):
           the user exists or not.
     """
 
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
+
+    upload_media_types = set(itertools.chain(*(image_type.mimetypes for image_type in IMAGE_TYPES.values())))
 
     def post(self, request, username):
         """
