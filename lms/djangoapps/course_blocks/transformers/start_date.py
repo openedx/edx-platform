@@ -17,6 +17,9 @@ class StartDateTransformer(BlockStructureTransformer):
 
     @classmethod
     def get_merged_start_date(cls, block_structure, block_key):
+        """
+        ...
+        """
         return block_structure.get_transformer_block_data(
             block_key, cls, cls.MERGED_START_DATE, False
         )

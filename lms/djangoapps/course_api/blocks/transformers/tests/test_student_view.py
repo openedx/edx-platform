@@ -1,3 +1,6 @@
+"""
+Tests for StudentViewTransformer.
+"""
 from openedx.core.lib.block_cache.block_structure import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -5,7 +8,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from ..student_view import StudentViewTransformer
 
 
-class TestStudentViewTransformer(ModuleStoreTestCase):
+class TestStudentViewTransformer(ModuleStoreTestCase):  # pylint: disable=missing-docstring
 
     def setUp(self):
         super(TestStudentViewTransformer, self).setUp()

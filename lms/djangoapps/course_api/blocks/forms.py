@@ -1,5 +1,5 @@
 """
-
+TODO
 """
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -32,12 +32,18 @@ class BlockListGetForm(Form):
     )
 
     def clean_requested_fields(self):
+        """
+        TODO
+        """
         requested_fields = self.cleaned_data['requested_fields']
 
         # add default requested_fields
         return (requested_fields or set()) | {'type', 'display_name'}
 
     def clean_depth(self):
+        """
+        TODO
+        """
         value = self.cleaned_data['depth']
         if not value:
             return 0
@@ -49,6 +55,9 @@ class BlockListGetForm(Form):
             raise ValidationError("'{}' is not a valid depth value.".format(value))
 
     def clean_usage_key(self):
+        """
+        TODO
+        """
         usage_key = self.cleaned_data['usage_key']
 
         try:
@@ -86,7 +95,7 @@ class BlockListGetForm(Form):
             # update requested user object
             try:
                 requested_user = User.objects.get(username=requested_username)
-            except (User.DoesNotExist):
+            except User.DoesNotExist:
                 raise Http404("Requested user '{username}' does not exist.".format(username=requested_username))
 
         # verify whether the requested user's blocks can be accessed

@@ -1,3 +1,6 @@
+"""
+TODO
+"""
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 
 
@@ -13,6 +16,9 @@ class BlockDepthTransformer(BlockStructureTransformer):
 
     @classmethod
     def get_block_depth(cls, block_structure, block_key):
+        """
+        ...
+        """
         return block_structure.get_transformer_block_data(
             block_key,
             cls,

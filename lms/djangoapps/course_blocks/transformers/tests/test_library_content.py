@@ -129,7 +129,9 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
 
         # Should dynamically assign a block to student
         trans_keys = set(trans_block_structure.get_block_keys())
-        block_key_set = self.get_block_key_set(self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1')
+        block_key_set = self.get_block_key_set(
+            self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1'
+        )
         for key in block_key_set:
             self.assertIn(key, trans_keys)
 

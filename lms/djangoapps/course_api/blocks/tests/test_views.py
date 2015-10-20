@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from .test_utils import deserialize_usage_key
 
 
-class TestBlocksViewMixin(object):
+class TestBlocksViewMixin(object):  # pylint: disable=missing-docstring
     """
     Mixin class for test helpers for BlocksView related classes
     """
@@ -88,7 +88,7 @@ class TestBlocksViewMixin(object):
             self.assertFalse(expression)
 
 
-class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):
+class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):  # pylint: disable=missing-docstring
     """
     Test class for BlocksView
     """
@@ -172,7 +172,7 @@ class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
 
-class TestBlocksInCourseView(TestBlocksViewMixin, SharedModuleStoreTestCase):
+class TestBlocksInCourseView(TestBlocksViewMixin, SharedModuleStoreTestCase):  # pylint: disable=missing-docstring
     """
     Test class for BlocksInCourseView
     """

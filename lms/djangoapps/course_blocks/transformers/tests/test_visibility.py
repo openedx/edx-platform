@@ -27,8 +27,9 @@ class VisibilityTransformerTestCase(BlockParentsMapTestCase):
         ({1, 2, 3, 4, 5, 6}, {0}, {}),
     )
     @ddt.unpack
+    # pylint: disable=invalid-name
     def test_block_visibility(
-        self, staff_only_blocks, expected_student_visible_blocks, blocks_with_differing_student_access
+            self, staff_only_blocks, expected_student_visible_blocks, blocks_with_differing_student_access
     ):
         for i, _ in enumerate(self.parents_map):
             block = self.get_block(i)
