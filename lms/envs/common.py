@@ -524,6 +524,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.open_source_footer_context_processor',
 
+    # Allows the to check in django templates custom theme
+    'edxmako.shortcuts.using_custom_theme_context_processor',
+
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
 

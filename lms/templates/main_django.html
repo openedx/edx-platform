@@ -20,8 +20,10 @@
   {% endblock %}
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
-    {% if settings.USE_CUSTOM_THEME %}
-    {% include "theme-head-extra.html" %}
+    {% if  USE_CUSTOM_THEME %}
+        {% with "theme-head-extra.html" as theme %}
+            {% include theme %}
+        {% endwith %}
     {% endif %}
   {% microsite_css_overrides_file %}
 
@@ -35,7 +37,14 @@
       {% if IS_EDX_DOMAIN %}
         {% include "navigation-edx.html" %}
       {% else %}
-        {% include "theme-header.html" %}
+        {% if USE_CUSTOM_THEME %}
+            {% with "theme-header.html" as theme %}
+                {% include theme %}
+            {% endwith %}
+        {% else %}
+            {% include "navigation.html" %}
+        {% endif %}
+
       {% endif %}
     {% endwith %}
     <div class="content-wrapper" id="content">
@@ -47,11 +56,17 @@
     {% elif IS_EDX_DOMAIN %}
       {% include "footer-edx-v3.html" %}
     {% else %}
-      {% include "theme-footer.html" %}
+      {% if  USE_CUSTOM_THEME %}
+        {% with "theme-footer.html" as theme %}
+            {% include theme %}
+        {% endwith %}
+      {% else %}
+            {% include "footer.html" %}
+      {% endif %}
+
     {% endif %}
 
   </div>
-
     {% javascript 'application' %}
     {% javascript 'module-js' %}
 

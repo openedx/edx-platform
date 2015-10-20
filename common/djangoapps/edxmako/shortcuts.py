@@ -88,6 +88,17 @@ def open_source_footer_context_processor(request):
     )
 
 
+def using_custom_theme_context_processor(request):
+    """
+    Checks using custom theme in templates
+    """
+    return dict(
+        [
+            ("USE_CUSTOM_THEME", settings.FEATURES.get('USE_CUSTOM_THEME', False))
+        ]
+    )
+
+
 def microsite_footer_context_processor(request):
     """
     Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
