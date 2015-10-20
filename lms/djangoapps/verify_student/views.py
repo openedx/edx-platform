@@ -33,7 +33,7 @@ from commerce import ecommerce_api_client
 from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
-from ecommerce_api_client.exceptions import SlumberBaseException
+from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
 from embargo import api as embargo_api
 from microsite_configuration import microsite

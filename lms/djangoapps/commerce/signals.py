@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
-from ecommerce_api_client.exceptions import HttpClientError
+from edx_rest_api_client.exceptions import HttpClientError
 import requests
 
 from microsite_configuration import microsite

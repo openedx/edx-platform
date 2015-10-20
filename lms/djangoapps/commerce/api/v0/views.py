@@ -1,7 +1,7 @@
 """ API v0 views. """
 import logging
 
-from ecommerce_api_client import exceptions
+from edx_rest_api_client import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.authentication import SessionAuthentication
