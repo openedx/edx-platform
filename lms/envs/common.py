@@ -1230,10 +1230,26 @@ courseware_js = (
 )
 
 proctoring_js = (
-    ['proctoring/js/models/*.js'] +
-    ['proctoring/js/collections/*.js'] +
-    ['proctoring/js/views/*.js'] +
-    ['proctoring/js/*.js']
+    [
+        'proctoring/js/models/proctored_exam_allowance_model.js',
+        'proctoring/js/models/proctored_exam_attempt_model.js',
+        'proctoring/js/models/proctored_exam_model.js'
+    ] +
+    [
+        'proctoring/js/collections/proctored_exam_allowance_collection.js',
+        'proctoring/js/collections/proctored_exam_attempt_collection.js',
+        'proctoring/js/collections/proctored_exam_collection.js'
+    ] +
+    [
+        'proctoring/js/views/Backbone.ModalDialog.js',
+        'proctoring/js/views/proctored_exam_add_allowance_view.js',
+        'proctoring/js/views/proctored_exam_allowance_view.js',
+        'proctoring/js/views/proctored_exam_attempt_view.js',
+        'proctoring/js/views/proctored_exam_view.js'
+    ] +
+    [
+        'proctoring/js/proctored_app.js'
+    ]
 )
 
 # Before a student accesses courseware, we do not
