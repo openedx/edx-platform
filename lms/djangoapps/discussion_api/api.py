@@ -8,6 +8,7 @@ from urlparse import urlunparse
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
+import itertools
 
 from rest_framework.exceptions import PermissionDenied
 
@@ -378,7 +379,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read
         request,
         thread_id,
         retrieve_kwargs={
-            "recursive": True,
+            "recursive": False,
             "user_id": request.user.id,
             "mark_as_read": mark_as_read,
             "response_skip": response_skip,
@@ -415,7 +416,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read
         raise Http404
     num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
 
-    results = [CommentSerializer(response, remove_fields=["children"], context=context).data for response in responses]
+    results = [CommentSerializer(response, context=context).data for response in responses]
     return get_paginated_data(request, results, page, num_pages)
 
 
@@ -740,9 +741,15 @@ def get_response_comments(request, comment_id, page, page_size):
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
-        cc_thread, context = _get_thread_and_context(request, cc_comment["thread_id"])
+        cc_thread, context = _get_thread_and_context(
+            request,
+            cc_comment["thread_id"],
+            retrieve_kwargs={
+                "recursive": True,
+            }
+        )
         if cc_thread["thread_type"] == "question":
-            thread_responses = cc_thread["endorsed_responses"] + cc_thread["non_endorsed_responses"]
+            thread_responses = itertools.chain(cc_thread["endorsed_responses"], cc_thread["non_endorsed_responses"])
         else:
             thread_responses = cc_thread["children"]
         response_comments = []
