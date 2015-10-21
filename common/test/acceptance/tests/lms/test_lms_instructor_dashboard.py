@@ -240,8 +240,11 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self._login_as_a_verified_user()
         self.courseware_page.visit()
 
-        # Start the proctored exam.
+        # Start the timed exam.
         self.courseware_page.start_timed_exam()
+
+        # Stop the timed exam.
+        self.courseware_page.stop_timed_exam()
 
     @flaky  # TODO fix this SOL-1183
     def test_can_add_remove_allowance(self):
