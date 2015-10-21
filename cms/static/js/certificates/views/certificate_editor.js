@@ -12,7 +12,6 @@ define([ // jshint ignore:line
 function($, _, Backbone, gettext,
          ListItemEditorView, SignatoryModel, SignatoryEditorView) {
     'use strict';
-    var MAX_SIGNATORIES_LIMIT = 4;
     var CertificateEditorView = ListItemEditorView.extend({
         tagName: 'div',
         events: {
@@ -72,7 +71,6 @@ function($, _, Backbone, gettext,
                 });
                 self.$('div.signatory-edit-list').append($(signatory_view.render()));
             });
-            this.disableAddSignatoryButton();
             return this;
         },
 
@@ -80,13 +78,6 @@ function($, _, Backbone, gettext,
             // Append a new signatory to the certificate model's signatories collection
             var signatory = new SignatoryModel({certificate: this.getSaveableModel()}); // jshint ignore:line
             this.render();
-        },
-
-        disableAddSignatoryButton: function() {
-            // Disable the 'Add Signatory' link if the constraint has been met.
-            if(this.$(".signatory-edit-list > div.signatory-edit").length >= MAX_SIGNATORIES_LIMIT) {
-                this.$(".action-add-signatory").addClass("disableClick");
-            }
         },
 
         getTemplateOptions: function() {
