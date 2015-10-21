@@ -408,9 +408,6 @@ FEATURES = {
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
-
-    # Enable self-paced courses.
-    'ENABLE_SELF_PACED_COURSES': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1966,6 +1963,9 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
 )
 
 ######################### CSRF #########################################

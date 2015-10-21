@@ -182,9 +182,6 @@ FEATURES = {
 
     # Timed or Proctored Exams
     'ENABLE_PROCTORED_EXAMS': False,
-
-    # Enable self-paced courses.
-    'ENABLE_SELF_PACED_COURSES': False,
 }
 
 ENABLE_JASMINE = False
@@ -790,6 +787,9 @@ INSTALLED_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
 )
 
 

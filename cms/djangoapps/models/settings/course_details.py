@@ -10,6 +10,7 @@ from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.utils import course_image_url, has_active_web_certificate
 from models.settings import course_grading
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
 
@@ -54,8 +55,7 @@ class CourseDetails(object):
             '50'
         )  # minimum passing score for entrance exam content module/tree,
         self.has_cert_config = None  # course has active certificate configuration
-        if settings.FEATURES.get('ENABLE_SELF_PACED_COURSES'):
-            self.self_paced = None
+        self.self_paced = None
 
     @classmethod
     def _fetch_about_attribute(cls, course_key, attribute):
@@ -88,8 +88,7 @@ class CourseDetails(object):
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(descriptor, "license", "all-rights-reserved")
         course_details.has_cert_config = has_active_web_certificate(descriptor)
-        if settings.FEATURES.get('ENABLE_SELF_PACED_COURSES'):
-            course_details.self_paced = descriptor.self_paced
+        course_details.self_paced = descriptor.self_paced
 
         for attribute in ABOUT_ATTRIBUTES:
             value = cls._fetch_about_attribute(course_key, attribute)
@@ -192,7 +191,7 @@ class CourseDetails(object):
             descriptor.language = jsondict['language']
             dirty = True
 
-        if (settings.FEATURES.get('ENABLE_SELF_PACED_COURSES')
+        if (SelfPacedConfiguration.current().enabled
                 and 'self_paced' in jsondict
                 and jsondict['self_paced'] != descriptor.self_paced):
             descriptor.self_paced = jsondict['self_paced']

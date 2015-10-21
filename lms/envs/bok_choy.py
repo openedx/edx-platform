@@ -131,9 +131,6 @@ FEATURES['LICENSING'] = True
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
-# Enable self-paced courses
-FEATURES['ENABLE_SELF_PACED_COURSES'] = True
-
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
