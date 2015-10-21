@@ -6,7 +6,6 @@ forums, and to the cohort admin views.
 import logging
 import random
 
-from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.http import Http404
@@ -17,7 +16,13 @@ from eventtracking import tracker
 from request_cache.middleware import RequestCache
 from student.models import get_user_by_username_or_email
 
-from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup
+from .models import (
+    CourseUserGroup,
+    CourseCohort,
+    CourseCohortsSettings,
+    CourseUserGroupPartitionGroup,
+    CohortMembership
+)
 
 
 log = logging.getLogger(__name__)
@@ -140,7 +145,6 @@ def get_cohorted_commentables(course_key):
     return ans
 
 
-@transaction.commit_on_success
 def get_cohort(user, course_key, assign=True, use_cached=False):
     """Returns the user's cohort for the specified course.
 
@@ -202,7 +206,8 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             assignment_type=CourseCohort.RANDOM
         ).course_user_group
 
-    user.course_groups.add(cohort)
+    membership = CohortMembership(course_user_group=cohort, user=user)
+    membership.save()
 
     return request_cache.data.setdefault(cache_key, cohort)
 
@@ -343,25 +348,9 @@ def add_user_to_cohort(cohort, username_or_email):
         ValueError if user already present in this cohort.
     """
     user = get_user_by_username_or_email(username_or_email)
-    previous_cohort_name = None
-    previous_cohort_id = None
 
-    course_cohorts = CourseUserGroup.objects.filter(
-        course_id=cohort.course_id,
-        users__id=user.id,
-        group_type=CourseUserGroup.COHORT
-    )
-    if course_cohorts.exists():
-        if course_cohorts[0] == cohort:
-            raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                user_name=user.username,
-                cohort_name=cohort.name
-            ))
-        else:
-            previous_cohort = course_cohorts[0]
-            previous_cohort.users.remove(user)
-            previous_cohort_name = previous_cohort.name
-            previous_cohort_id = previous_cohort.id
+    membership = CohortMembership(course_user_group=cohort, user=user)
+    membership.save()
 
     tracker.emit(
         "edx.cohort.user_add_requested",
@@ -369,12 +358,11 @@ def add_user_to_cohort(cohort, username_or_email):
             "user_id": user.id,
             "cohort_id": cohort.id,
             "cohort_name": cohort.name,
-            "previous_cohort_id": previous_cohort_id,
-            "previous_cohort_name": previous_cohort_name,
+            "previous_cohort_id": membership.previous_cohort_id,
+            "previous_cohort_name": membership.previous_cohort_name,
         }
     )
-    cohort.users.add(user)
-    return (user, previous_cohort_name)
+    return (user, membership.previous_cohort_name)
 
 
 def get_group_info_for_cohort(cohort, use_cached=False):
