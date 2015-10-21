@@ -16,9 +16,9 @@ def patch():
         def _w(*args, **kwargs):
             # The entire reason for this monkey-patch is to wrap the create_social_auth call
             # in an atomic transaction. The call can sometime raise an IntegrityError, which is
-            # properly caught and dealt with by python_social_auth. However, in Django 1.8, unless
-            # the error is raised in an atomic transaction, the transaction becomes unusable
-            # after the IntegrityError exception is raised.
+            # caught and dealt with by python_social_auth - but not inside of an atomic transaction.
+            # In Django 1.8, unless the exception is raised in an atomic transaction, the transaction
+            # becomes unusable after the IntegrityError exception is raised.
             with transaction.atomic():
                 return wrapped_func(*args, **kwargs)
         return classmethod(_w)
