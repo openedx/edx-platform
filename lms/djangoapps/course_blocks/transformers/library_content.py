@@ -63,9 +63,7 @@ class ContentLibraryTransformer(BlockStructureTransformer):
         # If library_content add children array to content_library_children field
         for block_key in block_structure.topological_traversal():
             xblock = block_structure.get_xblock(block_key)
-            block_structure.set_transformer_block_data(block_key, cls, 'content_library_children', [])
             if getattr(xblock, 'category', None) == 'library_content':
-                block_structure.set_transformer_block_data(block_key, cls, 'content_library_children', xblock.children)
                 for child_key in xblock.children:
                     summary = summarize_block(child_key)
                     block_structure.set_transformer_block_data(child_key, cls, 'block_analytics_summary', summary)
@@ -135,15 +133,16 @@ class ContentLibraryTransformer(BlockStructureTransformer):
             """
             if block_key not in children:
                 return False
-            if block_key in children and block_key in selected_children:
+            if block_key in selected_children:
                 return False
             return True
 
         children = []
         selected_children = []
         for block_key in block_structure.get_block_keys():
-            library_children = block_structure.get_transformer_block_data(block_key, self, 'content_library_children')
-            if library_children:
+            xblock = block_structure.get_xblock(block_key)
+            if getattr(xblock, 'category', None) == 'library_content':
+                library_children = block_structure.get_children(block_key)
                 children.extend(library_children)
                 selected = []
                 mode = block_structure.get_xblock_field(block_key, 'mode')

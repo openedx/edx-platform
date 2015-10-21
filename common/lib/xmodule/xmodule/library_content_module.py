@@ -154,7 +154,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
             'added' (set) of newly added (block_type, block_id) tuples
         """
-        last_event_result_count = len(selected)
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
