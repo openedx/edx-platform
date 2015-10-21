@@ -258,9 +258,7 @@ def get_course_cohorts(course, assignment_type=None):
     # Migrate cohort settings for this course
     migrate_cohort_settings(course)
 
-    query_set = CourseUserGroup.objects.exclude(
-        name=CourseUserGroup.INTERNAL_NAME
-    ).filter(
+    query_set = CourseUserGroup.objects.filter(
         course_id=course.location.course_key,
         group_type=CourseUserGroup.COHORT
     )
@@ -352,7 +350,7 @@ def add_user_to_cohort(cohort, username_or_email):
     user = get_user_by_username_or_email(username_or_email)
 
     membership = CohortMembership(course_user_group=cohort, user=user)
-    membership.save(get_previous=True)
+    membership.save()
 
     """
     TODO: with the new setup, we cannot emit a "requested" event containing
@@ -362,7 +360,7 @@ def add_user_to_cohort(cohort, username_or_email):
         -remove previous info from "requested" event
         -wait until after save so previous information is available
         -add another event type and emit both before and after
-    """
+    """  # pylint: disable=W0105
 
     tracker.emit(
         "edx.cohort.user_add_requested",

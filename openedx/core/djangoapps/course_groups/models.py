@@ -27,8 +27,6 @@ class CourseUserGroup(models.Model):
     name = models.CharField(max_length=255,
                             help_text=("What is the name of this group?  "
                                        "Must be unique within a course."))
-    INTERNAL_NAME = '_db_internal_'
-
     users = models.ManyToManyField(User, db_index=True, related_name='course_groups',
                                    help_text="Who is in this group?")
 
@@ -94,10 +92,6 @@ class CohortMembership(models.Model):
 
         print "Trying to add user to {}".format(self.course_user_group.name)
 
-        if self.course_user_group.name == CourseUserGroup.INTERNAL_NAME:
-            super(CohortMembership, self).save(*args, **kwargs)
-            return
-
         trying_to_save = True
         while trying_to_save:
             print "entering loop, trying to get membership for user {user}, course {course}".format(
@@ -105,6 +99,7 @@ class CohortMembership(models.Model):
                 course=self.course_id
             )
 
+            saved_membership = None
             try:
                 #the following 2 "transaction" lines force a fresh read, they can be removed once we're on django 1.8
                 #http://stackoverflow.com/questions/3346124/how-do-i-force-django-to-ignore-any-caches-and-reload-data
@@ -113,74 +108,50 @@ class CohortMembership(models.Model):
 
                 saved_membership = CohortMembership.objects.get(
                     user__id=self.user.id,  # pylint: disable=E1101
-                    course_id=self.course_id,
+                    course_id=self.course_id
                 )
             except CohortMembership.DoesNotExist:
-                print "No membership found! Trying to create a default..."
+                print "No saved_membership!"
 
-                try:
-                    time.sleep(5)
-
-                    dummy_group, _ = CourseUserGroup.objects.get_or_create(
-                        name=CourseUserGroup.INTERNAL_NAME,
-                        course_id=self.course_user_group.course_id,
-                        group_type=CourseUserGroup.COHORT
-                    )
-                    new_membership = CohortMembership(
-                        user=self.user,
-                        course_user_group=dummy_group,
-                        version=1
-                    )
-                    new_membership.save()
-                except IntegrityError:
-                    print "Integrity Error saving new default membership! Take it from the top..."
-
-                continue
-
-            time.sleep(5)
-            print "saved membership found, id {id}, group {group}! proceeding...".format(
-                id=saved_membership.id,
-                group=saved_membership.course_user_group.id
-            )
-
-            if saved_membership.course_user_group == self.course_user_group:
-                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                    user_name=self.user.username,  # pylint: disable=E1101
-                    cohort_name=self.course_user_group.name
-                ))
-            self.previous_cohort = saved_membership.course_user_group
-            if self.previous_cohort.name != CourseUserGroup.INTERNAL_NAME:
+            if saved_membership is not None:
+                if saved_membership.course_user_group == self.course_user_group:
+                    raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                        user_name=self.user.username,  # pylint: disable=E1101
+                        cohort_name=self.course_user_group.name
+                    ))
+                self.previous_cohort = saved_membership.course_user_group
                 self.previous_cohort_name = saved_membership.course_user_group.name
                 self.previous_cohort_id = saved_membership.course_user_group.id
 
+            time.sleep(10)
+
             try:
                 with transaction.commit_on_success():
-                    self.previous_cohort.users.remove(self.user)
                     self.course_user_group.users.add(self.user)  # pylint: disable=E1101
-                    self.user.course_groups.remove(self.previous_cohort)
                     self.user.course_groups.add(self.course_user_group)
-                    updated = CohortMembership.objects.filter(
-                        id=saved_membership.id,
-                        version=saved_membership.version
-                    ).update(
-                        course_user_group=self.course_user_group,
-                        version=saved_membership.version + 1
-                    )
-                    time.sleep(5)
-
-                    if not updated:
-                        raise IntegrityError("value of saved_membership has changed since read")
+                    if saved_membership is not None:
+                        self.previous_cohort.users.remove(self.user)
+                        self.user.course_groups.remove(self.previous_cohort)
+                        updated = CohortMembership.objects.filter(
+                            id=saved_membership.id,
+                            version=saved_membership.version
+                        ).update(
+                            course_user_group=self.course_user_group,
+                            version=saved_membership.version + 1
+                        )
+                        if not updated:
+                            raise IntegrityError("value of saved_membership has changed since read")
+                    else:
+                        super(CohortMembership, self).save(*args, **kwargs)
             except IntegrityError:
                 print "could not save membership, trying again"
 
                 continue
 
-            print "{cnt}: User {usr} now in group {chrt} in course {crs}. Now at version {v}".format(
+            print "User {usr} now in group {chrt} in course {crs}. Now at version".format(
                 usr=self.user,
                 chrt=self.course_user_group.name,
                 crs=self.course_user_group.course_id,
-                v=saved_membership.version + 1,
-                cnt=updated
             )
 
             trying_to_save = False
