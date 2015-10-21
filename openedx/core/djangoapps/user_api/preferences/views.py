@@ -118,7 +118,7 @@ class PreferencesView(APIView):
             )
         try:
             with transaction.commit_on_success():
-                update_user_preferences(request.user, request.data, username=username)
+                update_user_preferences(request.user, request.data, user=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:

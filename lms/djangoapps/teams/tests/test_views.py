@@ -129,7 +129,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         team.add_user(self.user)
 
         # Check the query count on the dashboard again
-        with self.assertNumQueries(19):
+        with self.assertNumQueries(20):
             self.client.get(self.teams_url)
 
     def test_bad_course_id(self):
