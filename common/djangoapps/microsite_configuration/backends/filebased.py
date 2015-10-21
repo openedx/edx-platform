@@ -77,7 +77,7 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
         configuration = self.get_configuration()
         return configuration.get(val_name, default)
 
-    def get_dict(self, dict_name, default={}, **kwargs):
+    def get_dict(self, dict_name, default=None, **kwargs):
         """
         Returns a dictionary product of merging the request's microsite and
         the default value.
@@ -87,6 +87,7 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
         if cached_dict:
             return cached_dict
 
+        default = default or {}
         output = default.copy()
         output.update(self.get_value(dict_name, {}))
 
@@ -128,7 +129,7 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
             return default
 
         # Filter at the setting file
-        for key, value in settings.MICROSITE_CONFIGURATION.iteritems():
+        for value in settings.MICROSITE_CONFIGURATION.itervalues():
             org_filter = value.get('course_org_filter', None)
             if org_filter == org:
                 return value.get(val_name, default)
@@ -147,7 +148,7 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
             return org_filter_set
 
         # Get the orgs in the db
-        for key, microsite in settings.MICROSITE_CONFIGURATION.iteritems():
+        for microsite in settings.MICROSITE_CONFIGURATION.itervalues():
             org_filter = microsite.get('course_org_filter')
             if org_filter:
                 org_filter_set.add(org_filter)
