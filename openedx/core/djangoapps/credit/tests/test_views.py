@@ -336,6 +336,51 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         request = CreditRequest.objects.get(uuid=uuid)
         self.assertEqual(request.status, expected_status)
 
+    def test_get_providers_detail(self):
+        """Verify that the method 'get_provider_detail' returns provider with
+        the given provide in 'provider_ids'.
+        """
+        url = reverse("credit:providers_detail") + "?provider_ids=hogwarts"
+        response = self.client.get(url)
+        expected = [
+            {
+                'enable_integration': True,
+                'description': '',
+                'url': 'https://credit.example.com/request',
+                'status_url': '',
+                'thumbnail_url': '',
+                'fulfillment_instructions': None,
+                'display_name': '',
+                'id': 'hogwarts'
+            }
+        ]
+
+        self.assertListEqual(json.loads(response.content), expected)
+
+    def test_get_providers_with_multiple_provider_ids(self):
+        """Test that the method 'get_provider_detail' returns multiple
+         providers with given 'provider_ids' or when no provider in
+         'provider_ids' is given.
+         """
+        # Add another credit provider for the course
+        CreditProvider.objects.create(
+            provider_id='dummy_id',
+            enable_integration=True,
+            provider_url='https://example.com',
+        )
+
+        # verify that all the matching providers are returned when provider ids
+        # are given in parameter 'provider_ids'
+        url = reverse("credit:providers_detail") + "?provider_ids=hogwarts,dummy_id"
+        response = self.client.get(url)
+        self.assertEquals(len(json.loads(response.content)), 2)
+
+        # verify that all providers are returned when no provider id in
+        # parameter 'provider_ids' is provided
+        url = reverse("credit:providers_detail")
+        response = self.client.get(url)
+        self.assertEquals(len(json.loads(response.content)), 2)
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditCourseViewSetTests(TestCase):
