@@ -184,7 +184,6 @@ class AdvancedSettingsPage(CoursePage):
             'no_grade',
             'display_coursenumber',
             'display_organization',
-            'end_of_course_survey_url',
             'catalog_visibility',
             'chrome',
             'days_early_for_beta',

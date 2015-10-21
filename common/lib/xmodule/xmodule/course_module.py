@@ -280,7 +280,8 @@ class CourseFields(object):
     end_of_course_survey_url = String(
         display_name=_("Course Survey URL"),
         help=_("Enter the URL for the end-of-course survey. If your course does not have a survey, enter null."),
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=True  # We wish to remove this entirely, TNL-3399
     )
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
