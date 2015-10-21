@@ -294,8 +294,9 @@ def get_course_tab_list(request, course):
     # If the user has to take an entrance exam, we'll need to hide away all but the
     # "Courseware" tab. The tab is then renamed as "Entrance Exam".
     course_tab_list = []
+    must_complete_ee = user_must_complete_entrance_exam(request, user, course)
     for tab in xmodule_tab_list:
-        if user_must_complete_entrance_exam(request, user, course):
+        if must_complete_ee:
             # Hide all of the tabs except for 'Courseware'
             # Rename 'Courseware' tab to 'Entrance Exam'
             if tab.type is not 'courseware':

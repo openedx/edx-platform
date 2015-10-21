@@ -128,6 +128,33 @@ class CoursewarePage(CoursePage):
         # elf.wait_for_element_presence(".proctored-exam-code", "unique exam code")
 
     @property
+    def entrance_exam_message_selector(self):
+        """
+        Return the entrance exam status message selector on the top of courseware page.
+        """
+        return self.q(css='#content .container section.course-content .sequential-status-message')
+
+    def has_entrance_exam_message(self):
+        """
+        Returns boolean indicating presence entrance exam status message container div.
+        """
+        return self.entrance_exam_message_selector.is_present()
+
+    def has_passed_message(self):
+        """
+        Returns boolean indicating presence of passed message.
+        """
+        return self.entrance_exam_message_selector.is_present() \
+            and "You have passed the entrance exam" in self.entrance_exam_message_selector.text[0]
+
+    @property
+    def chapter_count_in_navigation(self):
+        """
+        Returns count of chapters available on LHS navigation.
+        """
+        return len(self.q(css='nav.course-navigation a.chapter'))
+
+    @property
     def is_timer_bar_present(self):
         """
         Returns True if the timed/proctored exam timer bar is visible on the courseware.

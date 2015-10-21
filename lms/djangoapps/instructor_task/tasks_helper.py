@@ -62,6 +62,7 @@ from openedx.core.djangoapps.content.course_structures.models import CourseStruc
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment, CourseAccessRole
+from teams.models import CourseTeamMembership
 from verify_student.models import SoftwareSecurePhotoVerification
 
 # define different loggers for use within tasks and on client side
@@ -681,7 +682,9 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     course = get_course_by_id(course_id)
     course_is_cohorted = is_course_cohorted(course.id)
+    teams_enabled = course.teams_enabled
     cohorts_header = ['Cohort Name'] if course_is_cohorted else []
+    teams_header = ['Team Name'] if teams_enabled else []
 
     experiment_partitions = get_split_user_partitions(course.user_partitions)
     group_configs_header = [u'Experiment Group ({})'.format(partition.name) for partition in experiment_partitions]
@@ -703,6 +706,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
         task_info_string,
         action_name,
         current_step,
+
         total_enrolled_students
     )
     for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
@@ -730,7 +734,8 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
                 header = [section['label'] for section in gradeset[u'section_breakdown']]
                 rows.append(
                     ["id", "email", "username", "grade"] + header + cohorts_header +
-                    group_configs_header + ['Enrollment Track', 'Verification Status'] + certificate_info_header
+                    group_configs_header + teams_header +
+                    ['Enrollment Track', 'Verification Status'] + certificate_info_header
                 )
 
             percents = {
@@ -748,6 +753,14 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             for partition in experiment_partitions:
                 group = LmsPartitionService(student, course_id).get_group(partition, assign=False)
                 group_configs_group_names.append(group.name if group else '')
+
+            team_name = []
+            if teams_enabled:
+                try:
+                    membership = CourseTeamMembership.objects.get(user=student, team__course_id=course_id)
+                    team_name.append(membership.team.name)
+                except CourseTeamMembership.DoesNotExist:
+                    team_name.append('')
 
             enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)[0]
             verification_status = SoftwareSecurePhotoVerification.verification_status_for_user(
@@ -771,7 +784,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             row_percents = [percents.get(label, 0.0) for label in header]
             rows.append(
                 [student.id, student.email, student.username, gradeset['percent']] +
-                row_percents + cohorts_group_name + group_configs_group_names +
+                row_percents + cohorts_group_name + group_configs_group_names + team_name +
                 [enrollment_mode] + [verification_status] + certificate_info
             )
         else:

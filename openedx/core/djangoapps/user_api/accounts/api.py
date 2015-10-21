@@ -1,3 +1,6 @@
+"""
+Programmatic integration point for User API Accounts sub-application
+"""
 from django.utils.translation import ugettext as _
 from django.db import transaction, IntegrityError
 import datetime

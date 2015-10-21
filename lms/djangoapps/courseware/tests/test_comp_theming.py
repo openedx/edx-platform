@@ -5,7 +5,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from path import path           # pylint: disable=no-name-in-module
-import staticfiles
+from django.contrib import staticfiles
 
 from openedx.core.djangoapps.theming.test_util import with_comp_theme
 from openedx.core.lib.tempdir import mkdtemp_clean

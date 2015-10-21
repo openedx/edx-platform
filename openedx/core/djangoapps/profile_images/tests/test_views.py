@@ -8,6 +8,8 @@ import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+
 import mock
 from mock import patch
 from PIL import Image
@@ -64,7 +66,7 @@ class PatchedClient(APIClient):
         return super(PatchedClient, self).request(*args, **kwargs)
 
 
-class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
+class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     """
     Base class / shared infrastructure for tests of profile_image "upload" and
     "remove" endpoints.
@@ -72,9 +74,10 @@ class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
     # subclasses should override this with the name of the view under test, as
     # per the urls.py configuration.
     _view_name = None
+    client_class = PatchedClient
 
     def setUp(self):
-        super(ProfileImageEndpointTestCase, self).setUp()
+        super(ProfileImageEndpointMixin, self).setUp()
         self.user = UserFactory.create(password=TEST_PASSWORD)
         # Ensure that parental controls don't apply to this user
         self.user.profile.year_of_birth = 1980
@@ -92,7 +95,7 @@ class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
         self.reset_tracker()
 
     def tearDown(self):
-        super(ProfileImageEndpointTestCase, self).tearDown()
+        super(ProfileImageEndpointMixin, self).tearDown()
         for name in get_profile_image_names(self.user.username).values():
             self.storage.delete(name)
 
@@ -136,18 +139,46 @@ class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
         profile = self.user.profile.__class__.objects.get(user=self.user)
         self.assertEqual(profile.has_profile_image, has_profile_image)
 
+    def check_anonymous_request_rejected(self, method):
+        """
+        Make sure that the specified method rejects access by unauthorized users.
+        """
+        anonymous_client = APIClient()
+        request_method = getattr(anonymous_client, method)
+        response = request_method(self.url)
+        self.check_response(response, 401)
+        self.assert_no_events_were_emitted()
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
-class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
+class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
     """
-    Tests for the profile_image upload endpoint.
+    Tests for the profile image endpoint
     """
-    _view_name = "profile_image_upload"
+    _view_name = "accounts_profile_image_api"
+
+    def test_unsupported_methods(self, mock_log):
+        """
+        Test that GET, PUT, and PATCH are not supported.
+        """
+        self.assertEqual(405, self.client.get(self.url).status_code)
+        self.assertEqual(405, self.client.put(self.url).status_code)
+        self.assertEqual(405, self.client.patch(self.url).status_code)  # pylint: disable=no-member
+        self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@mock.patch('openedx.core.djangoapps.profile_images.views.log')
+class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
+    """
+    Tests for the POST method of the profile_image api endpoint.
+    """
+    _view_name = "accounts_profile_image_api"
 
     # Use the patched version of the API client to workaround a unicode issue
     # with DRF 3.1 and Django 1.4.  Remove this after we upgrade Django past 1.4!
-    client_class = PatchedClient
 
     def check_upload_event_emitted(self, old=None, new=TEST_UPLOAD_DT):
         """
@@ -158,28 +189,17 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             setting='profile_image_uploaded_at', old=old, new=new
         )
 
-    def test_unsupported_methods(self, mock_log):
-        """
-        Test that GET, PUT, PATCH, and DELETE are not supported.
-        """
-        self.assertEqual(405, self.client.get(self.url).status_code)
-        self.assertEqual(405, self.client.put(self.url).status_code)
-        self.assertEqual(405, self.client.patch(self.url).status_code)
-        self.assertEqual(405, self.client.delete(self.url).status_code)
-        self.assertFalse(mock_log.info.called)
-        self.assert_no_events_were_emitted()
-
     def test_anonymous_access(self, mock_log):
         """
-        Test that an anonymous client (not logged in) cannot POST.
+        Test that an anonymous client (not logged in) cannot call POST.
         """
-        anonymous_client = APIClient()
-        response = anonymous_client.post(self.url)
-        self.assertEqual(401, response.status_code)
+        self.check_anonymous_request_rejected('post')
         self.assertFalse(mock_log.info.called)
-        self.assert_no_events_were_emitted()
 
-    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2])
+    @patch(
+        'openedx.core.djangoapps.profile_images.views._make_upload_dt',
+        side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2]
+    )
     def test_upload_self(self, mock_make_image_version, mock_log):  # pylint: disable=unused-argument
         """
         Test that an authenticated user can POST to their own upload endpoint.
@@ -204,7 +224,8 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
 
     def test_upload_other(self, mock_log):
         """
-        Test that an authenticated user cannot POST to another user's upload endpoint.
+        Test that an authenticated user cannot POST to another user's upload
+        endpoint.
         """
         different_user = UserFactory.create(password=TEST_PASSWORD)
         # Ignore UserProfileFactory creation events.
@@ -221,7 +242,8 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
 
     def test_upload_staff(self, mock_log):
         """
-        Test that an authenticated staff cannot POST to another user's upload endpoint.
+        Test that an authenticated staff cannot POST to another user's upload
+        endpoint.
         """
         staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
         # Ignore UserProfileFactory creation events.
@@ -306,14 +328,14 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
-class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
+class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
     """
-    Tests for the profile_image remove endpoint.
+    Tests for the DELETE method of the profile_image endpoint.
     """
-    _view_name = "profile_image_remove"
+    _view_name = "accounts_profile_image_api"
 
     def setUp(self):
-        super(ProfileImageRemoveTestCase, self).setUp()
+        super(ProfileImageViewDeleteTestCase, self).setUp()
         with make_image_file() as image_file:
             create_profile_images(image_file, get_profile_image_names(self.user.username))
             self.check_images()
@@ -330,34 +352,19 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
             setting='profile_image_uploaded_at', old=TEST_UPLOAD_DT, new=None
         )
 
-    def test_unsupported_methods(self, mock_log):
-        """
-        Test that GET, PUT, PATCH, and DELETE are not supported.
-        """
-        self.assertEqual(405, self.client.get(self.url).status_code)
-        self.assertEqual(405, self.client.put(self.url).status_code)
-        self.assertEqual(405, self.client.patch(self.url).status_code)
-        self.assertEqual(405, self.client.delete(self.url).status_code)
-        self.assertFalse(mock_log.info.called)
-        self.assert_no_events_were_emitted()
-
     def test_anonymous_access(self, mock_log):
         """
-        Test that an anonymous client (not logged in) cannot call GET or POST.
+        Test that an anonymous client (not logged in) cannot call DELETE.
         """
-        anonymous_client = APIClient()
-        for request in (anonymous_client.get, anonymous_client.post):
-            response = request(self.url)
-            self.assertEqual(401, response.status_code)
+        self.check_anonymous_request_rejected('delete')
         self.assertFalse(mock_log.info.called)
-        self.assert_no_events_were_emitted()
 
     def test_remove_self(self, mock_log):
         """
-        Test that an authenticated user can POST to remove their own profile
+        Test that an authenticated user can DELETE to remove their own profile
         images.
         """
-        response = self.client.post(self.url)
+        response = self.client.delete(self.url)
         self.check_response(response, 204)
         self.check_images(False)
         self.check_has_profile_image(False)
@@ -369,7 +376,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
 
     def test_remove_other(self, mock_log):
         """
-        Test that an authenticated user cannot POST to remove another user's
+        Test that an authenticated user cannot DELETE to remove another user's
         profile images.
         """
         different_user = UserFactory.create(password=TEST_PASSWORD)
@@ -377,7 +384,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.reset_tracker()
         different_client = APIClient()
         different_client.login(username=different_user.username, password=TEST_PASSWORD)
-        response = different_client.post(self.url)
+        response = different_client.delete(self.url)
         self.check_response(response, 404)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
@@ -386,13 +393,13 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
 
     def test_remove_staff(self, mock_log):
         """
-        Test that an authenticated staff user can POST to remove another user's
+        Test that an authenticated staff user can DELETE to remove another user's
         profile images.
         """
         staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
         staff_client = APIClient()
         staff_client.login(username=staff_user.username, password=TEST_PASSWORD)
-        response = self.client.post(self.url)
+        response = self.client.delete(self.url)
         self.check_response(response, 204)
         self.check_images(False)
         self.check_has_profile_image(False)
@@ -405,13 +412,69 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
     @patch('student.models.UserProfile.save')
     def test_remove_failure(self, user_profile_save, mock_log):
         """
-        Test that when upload validation fails, the proper HTTP response and
+        Test that when remove validation fails, the proper HTTP response and
         messages are returned.
         """
         user_profile_save.side_effect = [Exception(u"whoops"), None]
         with self.assertRaises(Exception):
-            self.client.post(self.url)
+            self.client.delete(self.url)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
         self.assertFalse(mock_log.info.called)
         self.assert_no_events_were_emitted()
+
+
+class DeprecatedProfileImageTestMixin(ProfileImageEndpointMixin):
+    """
+    Actual tests for DeprecatedProfileImage.*TestCase classes defined here.
+
+    Requires:
+        self._view_name
+        self._replacement_method
+    """
+
+    def test_unsupported_methods(self, mock_log):
+        """
+        Test that GET, PUT, PATCH, and DELETE are not supported.
+        """
+        self.assertEqual(405, self.client.get(self.url).status_code)
+        self.assertEqual(405, self.client.put(self.url).status_code)
+        self.assertEqual(405, self.client.patch(self.url).status_code)
+        self.assertEqual(405, self.client.delete(self.url).status_code)
+        self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
+
+    def test_post_calls_replacement_view_method(self, mock_log):
+        """
+        Test that calls to this view pass through the the new view.
+        """
+        with patch(self._replacement_method) as mock_method:
+            mock_method.return_value = HttpResponse()
+            self.client.post(self.url)
+            assert mock_method.called
+        self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@mock.patch('openedx.core.djangoapps.profile_images.views.log')
+class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APITestCase):
+    """
+    Tests for the deprecated profile_image upload endpoint.
+
+    Actual tests defined on DeprecatedProfileImageTestMixin
+    """
+    _view_name = 'profile_image_upload'
+    _replacement_method = 'openedx.core.djangoapps.profile_images.views.ProfileImageView.post'
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@mock.patch('openedx.core.djangoapps.profile_images.views.log')
+class DeprecatedProfileImageRemoveTestCase(DeprecatedProfileImageTestMixin, APITestCase):
+    """
+    Tests for the deprecated profile_image remove endpoint.
+
+    Actual tests defined on DeprecatedProfileImageTestMixin
+    """
+    _view_name = "profile_image_remove"
+    _replacement_method = 'openedx.core.djangoapps.profile_images.views.ProfileImageView.delete'

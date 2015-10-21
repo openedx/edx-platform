@@ -36,8 +36,11 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
         }],
 
         initialize: function(attributes, options) {
+            this.on('remove:groups', this.groupRemoved);
+
             this.canBeEmpty = options && options.canBeEmpty;
             this.setOriginalAttributes();
+
             return this;
         },
 
@@ -120,6 +123,10 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                     };
                 }
             }
+        },
+
+        groupRemoved: function () {
+            this.setOriginalAttributes();
         }
     });
 

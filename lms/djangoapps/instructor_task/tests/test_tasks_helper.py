@@ -43,11 +43,31 @@ from instructor_task.tasks_helper import (
     upload_exec_summary_report,
     generate_students_certificates,
 )
+from instructor_analytics.basic import UNAVAILABLE
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+
+
+class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
+    """ Base class for grade report tests. """
+
+    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content):
+        """
+        Verify cell data in the grades CSV for a particular user.
+        """
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, course_id, None, 'graded')
+            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+            report_csv_filename = report_store.links_for(course_id)[0][0]
+            with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
+                for row in unicodecsv.DictReader(csv_file):
+                    if row.get('username') == username:
+                        self.assertEqual(row[column_header], expected_cell_content)
 
 
 @ddt.ddt
-class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
+class TestInstructorGradeReport(InstructorGradeReportTestCase):
     """
     Tests that CSV grade report generation works.
     """
@@ -87,20 +107,6 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
-
-    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content):
-        """
-        Verify cell data in the grades CSV for a particular user.
-        """
-        with patch('instructor_task.tasks_helper._get_current_task'):
-            result = upload_grades_csv(None, None, course_id, None, 'graded')
-            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
-            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-            report_csv_filename = report_store.links_for(course_id)[0][0]
-            with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
-                for row in unicodecsv.DictReader(csv_file):
-                    if row.get('username') == username:
-                        self.assertEqual(row[column_header], expected_cell_content)
 
     def test_cohort_data_in_grading(self):
         """
@@ -279,6 +285,43 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
 
+class TestTeamGradeReport(InstructorGradeReportTestCase):
+    """ Test that teams appear correctly in the grade report when it is enabled for the course. """
+
+    def setUp(self):
+        super(TestTeamGradeReport, self).setUp()
+        self.course = CourseFactory.create(teams_configuration={
+            'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
+        })
+        self.student1 = UserFactory.create()
+        CourseEnrollment.enroll(self.student1, self.course.id)
+        self.student2 = UserFactory.create()
+        CourseEnrollment.enroll(self.student2, self.course.id)
+
+    def test_team_in_grade_report(self):
+        self._verify_cell_data_for_user(self.student1.username, self.course.id, 'Team Name', '')
+
+    def test_correct_team_name_in_grade_report(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+        self._verify_cell_data_for_user(self.student1.username, self.course.id, 'Team Name', team1.name)
+        self._verify_cell_data_for_user(self.student2.username, self.course.id, 'Team Name', team2.name)
+
+    def test_team_deleted(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        membership1 = CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+
+        team1.delete()
+        membership1.delete()
+
+        self._verify_cell_data_for_user(self.student1.username, self.course.id, 'Team Name', '')
+        self._verify_cell_data_for_user(self.student2.username, self.course.id, 'Team Name', team2.name)
+
+
 class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that generation of CSV files listing student answers to a
@@ -371,8 +414,8 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         with patch('instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
 
-        enrollment_source = u'manually enrolled by user_id {user_id}, enrollment state transition: {transition}'.format(
-            user_id=self.instructor.id, transition=ALLOWEDTOENROLL_TO_ENROLLED)  # pylint: disable=no-member
+        enrollment_source = u'manually enrolled by {username} - reason: manually enrolling unenrolled user'.format(
+            username=self.instructor.username)  # pylint: disable=no-member
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
         self._verify_cell_data_in_csv(student.username, 'Enrollment Source', enrollment_source)
         self._verify_cell_data_in_csv(student.username, 'Payment Status', 'TBD')
@@ -954,6 +997,66 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         # This assertion simply confirms that the generation completed with no errors
         num_students = len(students)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
+
+
+class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
+    "Test the student report when including teams information. "
+
+    def setUp(self):
+        super(TestTeamStudentReport, self).setUp()
+        self.course = CourseFactory.create(teams_configuration={
+            'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
+        })
+        self.student1 = UserFactory.create()
+        CourseEnrollment.enroll(self.student1, self.course.id)
+        self.student2 = UserFactory.create()
+        CourseEnrollment.enroll(self.student2, self.course.id)
+
+    def _generate_and_verify_teams_column(self, username, expected_team):
+        """ Run the upload_students_csv task and verify that the correct team was added to the CSV. """
+        current_task = Mock()
+        current_task.update_state = Mock()
+        task_input = {
+            'features': [
+                'id', 'username', 'name', 'email', 'language', 'location',
+                'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+                'goals', 'team'
+            ]
+        }
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
+            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+            report_csv_filename = report_store.links_for(self.course.id)[0][0]
+            with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+                for row in unicodecsv.DictReader(csv_file):
+                    if row.get('username') == username:
+                        self.assertEqual(row['team'], expected_team)
+
+    def test_team_column_no_teams(self):
+        self._generate_and_verify_teams_column(self.student1.username, UNAVAILABLE)
+        self._generate_and_verify_teams_column(self.student2.username, UNAVAILABLE)
+
+    def test_team_column_with_teams(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+        self._generate_and_verify_teams_column(self.student1.username, team1.name)
+        self._generate_and_verify_teams_column(self.student2.username, team2.name)
+
+    def test_team_column_with_deleted_team(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        membership1 = CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+
+        team1.delete()
+        membership1.delete()
+
+        self._generate_and_verify_teams_column(self.student1.username, UNAVAILABLE)
+        self._generate_and_verify_teams_column(self.student2.username, team2.name)
 
 
 @ddt.ddt

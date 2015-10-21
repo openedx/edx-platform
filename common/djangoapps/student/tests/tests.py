@@ -537,6 +537,32 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertNotContains(response, "How it Works")
         self.assertNotContains(response, "Schools & Partners")
 
+    def test_course_mode_info_with_honor_enrollment(self):
+        """It will be true only if enrollment mode is honor and course has verified mode."""
+        course_mode_info = self._enrollment_with_complete_course('honor')
+        self.assertTrue(course_mode_info['show_upsell'])
+        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+
+    @ddt.data('verified', 'credit')
+    def test_course_mode_info_with_different_enrollments(self, enrollment_mode):
+        """If user enrollment mode is either verified or credit then show_upsell
+        will be always false.
+        """
+        course_mode_info = self._enrollment_with_complete_course(enrollment_mode)
+        self.assertFalse(course_mode_info['show_upsell'])
+        self.assertIsNone(course_mode_info['days_for_upsell'])
+
+    def _enrollment_with_complete_course(self, enrollment_mode):
+        """"Dry method for course enrollment."""
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode=enrollment_mode)
+        return complete_course_mode_info(self.course.id, enrollment)
+
 
 class UserSettingsEventTestMixin(EventTestMixin):
     """

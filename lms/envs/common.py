@@ -64,8 +64,6 @@ DISCUSSION_SETTINGS = {
 
 # Features
 FEATURES = {
-    'USE_DJANGO_PIPELINE': True,
-
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
@@ -374,19 +372,6 @@ FEATURES = {
 
     # Batch-Generated Certificates from Instructor Dashboard
     'CERTIFICATES_INSTRUCTOR_GENERATION': False,
-
-    # Social Media Sharing on Student Dashboard
-    'SOCIAL_SHARING_SETTINGS': {
-        # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
-        'CUSTOM_COURSE_URLS': False,
-        'DASHBOARD_FACEBOOK': False,
-        'CERTIFICATE_FACEBOOK': False,
-        'CERTIFICATE_FACEBOOK_TEXT': None,
-        'CERTIFICATE_TWITTER': False,
-        'CERTIFICATE_TWITTER_TEXT': None,
-        'DASHBOARD_TWITTER': False,
-        'DASHBOARD_TWITTER_TEXT': None
-    },
 
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
@@ -1208,20 +1193,21 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 ############################### PIPELINE #######################################
 
+PIPELINE_ENABLED = True
+
 # Process static files using RequireJS Optimizer
 STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 ]
 
-# Don't use compression by default
 PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
@@ -1825,7 +1811,7 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'staticfiles',
+    'django.contrib.staticfiles',
     'static_replace',
 
     # Theming
@@ -2014,6 +2000,20 @@ MKTG_URL_LINK_MAP = {
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
+}
+
+############################# SOCIAL MEDIA SHARING #############################
+# Social Media Sharing on Student Dashboard
+SOCIAL_SHARING_SETTINGS = {
+    # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
+    'CUSTOM_COURSE_URLS': False,
+    'DASHBOARD_FACEBOOK': False,
+    'CERTIFICATE_FACEBOOK': False,
+    'CERTIFICATE_FACEBOOK_TEXT': None,
+    'CERTIFICATE_TWITTER': False,
+    'CERTIFICATE_TWITTER_TEXT': None,
+    'DASHBOARD_TWITTER': False,
+    'DASHBOARD_TWITTER_TEXT': None
 }
 
 ################# Social Media Footer Links #######################

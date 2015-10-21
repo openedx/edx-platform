@@ -11,16 +11,16 @@
             <legend class="sr"><%= gettext("Certificate Signatory Configuration") %></legend>
             <div class="input-wrap field text add-signatory-name <% if(error && error.name) { print('error'); } %>">
                 <label for="signatory-name-<%= signatory_number %>"><%= gettext("Name ") %></label>
-                <input id="signatory-name-<%= signatory_number %>" class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("Name of the signatory") %>" value="<%= name %>"  aria-describedby="signatory-name-<%= signatory_number %>-tip" maxlength="40" />
-                <span id="signatory-name-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("The name of this signatory as it should appear on certificates. Maximum 40 characters.") %></span>
+                <input id="signatory-name-<%= signatory_number %>" class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("Name of the signatory") %>" value="<%= name %>"  aria-describedby="signatory-name-<%= signatory_number %>-tip" />
+                <span id="signatory-name-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("The name of this signatory as it should appear on certificates.") %></span>
                 <% if(error && error.name) { %>
                   <span class="message-error"><%= error.name %></span>
                 <% } %>
             </div>
             <div class="input-wrap field text add-signatory-title <% if(error && error.title) { print('error'); } %>">
                 <label for="signatory-title-<%= signatory_number %>"><%= gettext("Title ") %></label>
-                <textarea id="signatory-title-<%= signatory_number %>" class="collection-name-input text input-text signatory-title-input" name="signatory-title" cols="40" rows="2" placeholder="<%= gettext("Title of the signatory") %>"  aria-describedby="signatory-title-<%= signatory_number %>-tip" maxlength="106"><%= title %></textarea>
-                <span id="signatory-title-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("The title of this signatory as it should appear on certificates.  Maximum of 106 characters.") %></span>
+                <textarea id="signatory-title-<%= signatory_number %>" class="collection-name-input text input-text signatory-title-input" name="signatory-title" placeholder="<%= gettext("Title of the signatory") %>"  aria-describedby="signatory-title-<%= signatory_number %>-tip" ><%= title %></textarea>
+                <span id="signatory-title-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Titles more than 100 characters may prevent students from printing their certificate on a single page.") %></span>
                 <% if(error && error.title) { %>
                   <span class="message-error"><%= error.title %></span>
                 <% } %>
@@ -41,7 +41,7 @@
                 <div class="signature-upload-wrapper">
                   <div class="signature-upload-input-wrapper">
                     <input id="signatory-signature-<%= signatory_number %>" class="collection-name-input input-text signatory-signature-input" name="signatory-signature-url" type="text" placeholder="<%= gettext("Path to Signature Image") %>" value="<%= signature_image_path %>"  aria-describedby="signatory-signature-<%= signatory_number %>-tip" readonly />
-                    <span id="signatory-signature-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Image must be 450px X 150px transparent PNG") %></span>
+                    <span id="signatory-signature-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Image must be in PNG format") %></span>
                   </div>
                   <button type="button" class="action action-upload-signature">Upload Signature Image</button>
                 </div>

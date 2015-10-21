@@ -70,7 +70,6 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
         echo "Finding jshint violations and storing report..."
-        PATH=$PATH:node_modules/.bin
         paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
@@ -173,7 +172,7 @@ END
                 ;;
 
             "7")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False --with-flaky"
+                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,a11y=False --with-flaky"
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

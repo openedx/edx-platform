@@ -4,6 +4,10 @@ define(['jquery', 'js/utils/navigation'], function($) {
     describe('Course Navigation Accordion', function() {
         var accordion, button, heading, chapterContent, chapterMenu;
 
+        function keyPressEvent(key) {
+            return $.Event('keydown', { which: key });
+        }
+
         beforeEach(function() {
             loadFixtures('js/fixtures/accordion.html');
 
@@ -13,6 +17,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
             chapterContent = accordion.children('.chapter-content-container');
             chapterMenu = chapterContent.children('.chapter-menu');
 
+            this.KEY = $.ui.keyCode;
             spyOn($.fn, 'focus').andCallThrough();
             edx.util.navigation.init();
         });
@@ -26,35 +31,37 @@ define(['jquery', 'js/utils/navigation'], function($) {
                 });
 
                 it('ensures aria attributes are present', function() {
-                    expect(chapterContent).toHaveAttr({
+                    expect(accordion.find('.chapter-content-container').first()).toHaveAttr({
                         'aria-expanded': 'true'
+                    });
+
+                    expect(accordion.find('.chapter-content-container').last()).toHaveAttr({
+                        'aria-expanded': 'false'
                     });
                 });
 
                 it('ensures only one active item', function() {
-                    expect(chapterMenu.find('.active').length).toBe(1);
+                    expect($(chapterMenu).find('.active').length).toBe(1);
                 });
             });
 
             describe('open section with mouse click', function() {
 
                 it('ensures new section is opened and previous section is closed', function() {
-                    button:eq(1).click();
+                    accordion.find('.button-chapter').last().trigger('click');
 
-                    expect(chapterContent:eq(0)).not.toHaveClass('is-open');
-                    expect(chapterContent:eq(1)).toHaveClass('is-open');
+                    expect(accordion.find('.chapter-content-container').first()).not.toHaveClass('is-open');
+                    expect(accordion.find('.chapter-content-container').last()).toHaveClass('is-open');
 
-                    expect(button:eq(0)).not.toHaveClass('is-open');
-                    expect(button:eq(1)).toHaveClass('is-open');
-
-                    expect(chapterContent:eq(1).focus).toHaveBeenCalled();
+                    expect(accordion.find('.button-chapter').first()).not.toHaveClass('is-open');
+                    expect(accordion.find('.button-chapter').last()).toHaveClass('is-open');
                 });
 
                 it('ensure proper aria and attrs', function() {
-                    expect(chapterContent:eq(1)).toHaveAttr({
+                    expect(accordion.find('.chapter-content-container').first()).toHaveAttr({
                         'aria-expanded': 'false'
                     });
-                    expect(chapterContent:eq(0)).toHaveAttr({
+                    expect(accordion.find('.chapter-content-container').last()).toHaveAttr({
                         'aria-expanded': 'true'
                     });
                 });
@@ -62,28 +69,21 @@ define(['jquery', 'js/utils/navigation'], function($) {
 
             describe('open section with spacebar', function() {
 
-                function keyPressEvent(key) {
-                    return $.Event('keydown', { keyCode: key });
-                }
-
                 it('ensures new section is opened and previous section is closed', function() {
-                    button:eq(1).focus();
-                    button.trigger(keyPressEvent(32)); // Spacebar
+                    accordion.find('.button-chapter').last().focus().trigger(keyPressEvent(this.KEY.SPACE)); // Spacebar
 
-                    expect(chapterContent:eq(0)).not.toHaveClass('is-open');
-                    expect(chapterContent:eq(1)).toHaveClass('is-open');
+                    expect(accordion.find('.chapter-content-container').first()).not.toHaveClass('is-open');
+                    expect(accordion.find('.chapter-content-container').last()).toHaveClass('is-open');
 
-                    expect(button:eq(0)).not.toHaveClass('is-open');
-                    expect(button:eq(1)).toHaveClass('is-open');
-
-                    expect(chapterContent:eq(1).focus).toHaveBeenCalled();
+                    expect(accordion.find('.button-chapter').first()).not.toHaveClass('is-open');
+                    expect(accordion.find('.button-chapter').last()).toHaveClass('is-open');
                 });
 
                 it('ensure proper aria and attrs', function() {
-                    expect(chapterContent:eq(1)).toHaveAttr({
+                    expect(accordion.find('.chapter-content-container').first()).toHaveAttr({
                         'aria-expanded': 'false'
                     });
-                    expect(chapterContent:eq(0)).toHaveAttr({
+                    expect(accordion.find('.chapter-content-container').last()).toHaveAttr({
                         'aria-expanded': 'true'
                     });
                 });

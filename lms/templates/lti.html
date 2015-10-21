@@ -45,6 +45,9 @@ from django.utils.translation import ugettext as _
             class="ltiLaunchFrame"
             name="ltiFrame-${element_id}"
             src="${form_url}"
+            allowfullscreen="true"
+            webkitallowfullscreen="true"
+            mozallowfullscreen="true"
         ></iframe>
     % endif
 % elif not hide_launch:

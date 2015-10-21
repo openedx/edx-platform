@@ -263,5 +263,5 @@ def check_settings(args):
         django_shell_cmd = django_cmd(system, settings, 'shell', '--plain', '--pythonpath=.')
         sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
 
-    except:
+    except:  # pylint: disable=bare-except
         print("Failed to import settings", file=sys.stderr)

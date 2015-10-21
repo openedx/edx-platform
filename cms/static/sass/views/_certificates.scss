@@ -50,6 +50,15 @@
   .content-supplementary {
     width: flex-grid(3, 12);
   }
+
+  .certificate-info-section{
+      overflow: auto;
+
+    .course-title-section, .course-number-section{
+      min-width: 47%;
+      @include margin-right(2%);
+    }
+  }
 }
 
 // * +Main - Collection
@@ -531,6 +540,10 @@
 
       .signatory-image {
         margin-top: 20px;
+      }
+
+      .signature-image {
+        max-width: 450px;
       }
     }
 

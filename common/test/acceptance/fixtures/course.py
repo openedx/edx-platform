@@ -223,6 +223,27 @@ class CourseFixture(XBlockContainerFixture):
         self._configure_course()
 
     @property
+    def course_outline(self):
+        """
+        Retrieves course outline in JSON format.
+        """
+        url = STUDIO_BASE_URL + '/course/' + self._course_key + "?format=json"
+        response = self.session.get(url, headers=self.headers)
+
+        if not response.ok:
+            raise FixtureError(
+                "Could not retrieve course outline json.  Status was {0}".format(
+                    response.status_code))
+
+        try:
+            course_outline_json = response.json()
+        except ValueError:
+            raise FixtureError(
+                "Could not decode course outline as JSON: '{0}'".format(response)
+            )
+        return course_outline_json
+
+    @property
     def _course_location(self):
         """
         Return the locator string for the course.

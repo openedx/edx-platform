@@ -754,6 +754,10 @@ class DraftModuleStore(MongoModuleStore):
         NOTE: unlike publish, this gives an error if called above the draftable level as it's intended
         to remove things from the published version
         """
+        # ensure we are not creating a DRAFT of an item that is direct-only
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(location)
+
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         self._convert_to_draft(location, user_id, delete_published=True)
 

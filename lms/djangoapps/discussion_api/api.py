@@ -13,8 +13,8 @@ from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
-
 from courseware.courses import get_course_with_access
+
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
@@ -55,7 +55,7 @@ def _get_course_or_404(course_key, user):
     disabled for the course.
     """
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
-    if not any([tab.type == 'discussion' for tab in course.tabs]):
+    if not any([tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs]):
         raise Http404
     return course
 
@@ -291,7 +291,7 @@ def get_thread_list(
     if exclusive_param_count > 1:  # pragma: no cover
         raise ValueError("More than one mutually exclusive param passed to get_thread_list")
 
-    cc_map = {"last_activity_at": "date", "comment_count": "comments", "vote_count": "votes"}
+    cc_map = {"last_activity_at": "activity", "comment_count": "comments", "vote_count": "votes"}
     if order_by not in cc_map:
         raise ValidationError({
             "order_by":

@@ -14,7 +14,7 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum, SortedAssetList, IncorrectlySortedList
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS,
     XmlModulestoreBuilder, MixedModulestoreBuilder
 )

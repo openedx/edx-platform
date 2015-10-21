@@ -50,10 +50,16 @@ ROLE_LIST_URI = "/user_api/v1/forum_roles/Moderator/users/"
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class ApiTestCase(TestCase):
+    """
+    Parent test case for API workflow coverage
+    """
 
     LIST_URI = USER_LIST_URI
 
     def basic_auth(self, username, password):
+        """
+        Returns a dictionary containing the http auth header with encoded username+password
+        """
         return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
 
     def request_with_auth(self, method, *args, **kwargs):
@@ -107,6 +113,9 @@ class ApiTestCase(TestCase):
         self.assertSelfReferential(user)
 
     def assertPrefIsValid(self, pref):
+        """
+        Assert that the given preference is acknowledged by the system
+        """
         self.assertItemsEqual(pref.keys(), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
@@ -142,6 +151,9 @@ class ApiTestCase(TestCase):
 
 
 class EmptyUserTestCase(ApiTestCase):
+    """
+    Test that the endpoint supports empty user result sets
+    """
     def test_get_list_empty(self):
         result = self.get_json(self.LIST_URI)
         self.assertEqual(result["count"], 0)
@@ -165,6 +177,9 @@ class EmptyRoleTestCase(ApiTestCase):
 
 
 class UserApiTestCase(ApiTestCase):
+    """
+    Generalized test case class for specific implementations below
+    """
     def setUp(self):
         super(UserApiTestCase, self).setUp()
         self.users = [
@@ -182,6 +197,9 @@ class UserApiTestCase(ApiTestCase):
 
 
 class RoleTestCase(UserApiTestCase):
+    """
+    Test cases covering Role-related views and their behaviors
+    """
     course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
     LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
 
@@ -268,6 +286,9 @@ class RoleTestCase(UserApiTestCase):
 
 
 class UserViewSetTest(UserApiTestCase):
+    """
+    Test cases covering the User DRF view set class and its various behaviors
+    """
     LIST_URI = USER_LIST_URI
 
     def setUp(self):
@@ -382,6 +403,9 @@ class UserViewSetTest(UserApiTestCase):
 
 
 class UserPreferenceViewSetTest(UserApiTestCase):
+    """
+    Test cases covering the User Preference DRF view class and its various behaviors
+    """
     LIST_URI = USER_PREFERENCE_LIST_URI
 
     def setUp(self):
@@ -522,6 +546,9 @@ class UserPreferenceViewSetTest(UserApiTestCase):
 
 
 class PreferenceUsersListViewTest(UserApiTestCase):
+    """
+    Test cases covering the list viewing behavior for user preferences
+    """
     LIST_URI = "/user_api/v1/preferences/key0/users/"
 
     def test_options(self):
@@ -880,7 +907,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 u"required": True,
                 u"label": u"Public username",
                 u"placeholder": u"JaneDoe",
-                u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",
+                u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",  # pylint: disable=line-too-long
                 u"restrictions": {
                     "min_length": USERNAME_MIN_LENGTH,
                     "max_length": USERNAME_MAX_LENGTH
@@ -968,7 +995,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     u"required": True,
                     u"label": u"Public username",
                     u"placeholder": u"JaneDoe",
-                    u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",
+                    u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",  # pylint: disable=line-too-long
                     u"restrictions": {
                         "min_length": USERNAME_MIN_LENGTH,
                         "max_length": USERNAME_MAX_LENGTH
@@ -1097,19 +1124,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     )
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
+        link_html = '<a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>'
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>.".format(
-                    platform_name=settings.PLATFORM_NAME
+                "label": "I agree to the {platform_name} {link_html}.".format(
+                    platform_name=settings.PLATFORM_NAME,
+                    link_html=link_html
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>.".format(
-                        platform_name=settings.PLATFORM_NAME
+                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                        platform_name=settings.PLATFORM_NAME,
+                        link_html=link_html
                     )
                 }
             }
@@ -1118,19 +1148,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_honor_code_mktg_site_disabled(self):
+        link_html = '<a href=\"/honor\">Terms of Service and Honor Code</a>'
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} <a href=\"/honor\">Terms of Service and Honor Code</a>.".format(
-                    platform_name=settings.PLATFORM_NAME
+                "label": "I agree to the {platform_name} {link_html}.".format(
+                    platform_name=settings.PLATFORM_NAME,
+                    link_html=link_html
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} <a href=\"/honor\">Terms of Service and Honor Code</a>.".format(
-                        platform_name=settings.PLATFORM_NAME
+                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                        platform_name=settings.PLATFORM_NAME,
+                        link_html=link_html
                     )
                 }
             }
@@ -1145,38 +1178,44 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     def test_registration_separate_terms_of_service_mktg_site_enabled(self):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
+        link_html = '<a href=\"https://www.test.com/honor\">Honor Code</a>'
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} <a href=\"https://www.test.com/honor\">Honor Code</a>.".format(
-                    platform_name=settings.PLATFORM_NAME
+                "label": "I agree to the {platform_name} {link_html}.".format(
+                    platform_name=settings.PLATFORM_NAME,
+                    link_html=link_html
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} <a href=\"https://www.test.com/honor\">Honor Code</a>.".format(
-                        platform_name=settings.PLATFORM_NAME
+                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                        platform_name=settings.PLATFORM_NAME,
+                        link_html=link_html
                     )
                 }
             }
         )
 
         # Terms of service field should also be present
+        link_html = '<a href=\"https://www.test.com/tos\">Terms of Service</a>'
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} <a href=\"https://www.test.com/tos\">Terms of Service</a>.".format(
-                    platform_name=settings.PLATFORM_NAME
+                "label": "I agree to the {platform_name} {link_html}.".format(
+                    platform_name=settings.PLATFORM_NAME,
+                    link_html=link_html
                 ),
                 "name": "terms_of_service",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} <a href=\"https://www.test.com/tos\">Terms of Service</a>.".format(
-                        platform_name=settings.PLATFORM_NAME
+                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                        platform_name=settings.PLATFORM_NAME,
+                        link_html=link_html
                     )
                 }
             }

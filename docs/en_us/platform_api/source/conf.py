@@ -84,9 +84,9 @@ MOCK_MODULES = [
     'ratelimitbackend',
     'analytics',
     'courseware.courses',
-    'staticfiles',
+    'django.contrib.staticfiles',
     'storage',
-    'staticfiles.storage',
+    'django.contrib.staticfiles.storage',
     'content',
     'xmodule.contentstore',
     'xmodule.contentstore.content',
@@ -193,7 +193,8 @@ MOCK_MODULES = [
     'student.auth',
     'ccx_keys',
     'ccx_keys.locator',
-    'user_api.preferences.api'
+    'user_api.preferences.api',
+    'rest_framework_oauth.authentication'
 ]
 
 for mod_name in MOCK_MODULES:

@@ -469,9 +469,9 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
         modes = CourseMode.modes_for_course_dict(course_id)
 
     mode_info = {'show_upsell': False, 'days_for_upsell': None}
-    # we want to know if the user is already verified and if verified is an
-    # option
-    if 'verified' in modes and enrollment.mode != 'verified':
+    # we want to know if the user is already enrolled as verified or credit and
+    # if verified is an option.
+    if CourseMode.VERIFIED in modes and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES:
         mode_info['show_upsell'] = True
         # if there is an expiration date, find out how long from now it is
         if modes['verified'].expiration_datetime:
@@ -1179,6 +1179,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
                 'provider': None
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1635,6 +1636,7 @@ def create_account_with_params(request, params):
                 'provider': third_party_provider.name if third_party_provider else None
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }

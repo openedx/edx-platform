@@ -17,7 +17,7 @@ django-babel-underscore==0.3.0
 django-celery==3.1.16
 django-countries==3.3
 django-extensions==1.5.5
-django-filter==0.6.0
+django-filter==0.11.0
 django-ipware==1.1.0
 django-mako==0.1.5pre
 django-model-utils==2.3.1
@@ -106,7 +106,7 @@ sphinx_rtd_theme==0.1.5
 
 # Used for Internationalization and localization
 Babel==1.3
-transifex-client==0.10
+transifex-client==0.11b3
 
 # Ip network support for Embargo feature
 ipaddr==2.1.11
@@ -119,7 +119,7 @@ django_debug_toolbar==1.3.2
 
 # Used for testing
 astroid==1.3.8
-bok-choy==0.4.3
+bok-choy==0.4.6
 chrono==1.0.2
 coverage==4.0
 ddt==0.8.0

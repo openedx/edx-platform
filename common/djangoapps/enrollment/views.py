@@ -457,15 +457,18 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         """Gets a list of all course enrollments for a user.
 
         Returns a list for the currently logged in user, or for the user named by the 'user' GET
-        parameter.  If the username does not match the currently logged in user, only courses the
-        requesting user has staff permissions for are listed.
+        parameter. If the username does not match that of the currently logged in user, only
+        courses for which the currently logged in user has the Staff or Admin role are listed.
+        As a result, a course team member can find out which of his or her own courses a particular
+        learner is enrolled in.
 
-        Only staff or instructor permissions on individual courses are taken into account when
-        deciding whether the requesting user is permitted to see a particular enrollment, i.e.
-        organizational staff access doesn't grant permission to see the enrollments in all courses
-        of the organization.  This may change in the future.
+        Only the Staff or Admin role (granted on the Django administrative console as the staff
+        or instructor permission) in individual courses gives the requesting user access to
+        enrollment data. Permissions granted at the organizational level do not give a user
+        access to enrollment data for all of that organization's courses.
 
-        However, users with global staff access can see all enrollments of all students.
+        Users who have the global staff permission can access all enrollment data for all
+        courses.
         """
         username = request.GET.get('user', request.user.username)
         try:
@@ -497,8 +500,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         """
         # Get the User, Course ID, and Mode from the request.
 
-        username = request.DATA.get('user', request.user.username)
-        course_id = request.DATA.get('course_details', {}).get('course_id')
+        username = request.data.get('user', request.user.username)
+        course_id = request.data.get('course_details', {}).get('course_id')
 
         if not course_id:
             return Response(
@@ -516,7 +519,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
 
-        mode = request.DATA.get('mode', CourseMode.HONOR)
+        mode = request.data.get('mode', CourseMode.HONOR)
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
@@ -555,7 +558,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return embargo_response
 
         try:
-            is_active = request.DATA.get('is_active')
+            is_active = request.data.get('is_active')
             # Check if the requested activation status is None or a Boolean
             if is_active is not None and not isinstance(is_active, bool):
                 return Response(
@@ -565,7 +568,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     }
                 )
 
-            enrollment_attributes = request.DATA.get('enrollment_attributes')
+            enrollment_attributes = request.data.get('enrollment_attributes')
             enrollment = api.get_enrollment(username, unicode(course_id))
             mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
             active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
@@ -605,7 +608,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 # Will reactivate inactive enrollments.
                 response = api.add_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
 
-            email_opt_in = request.DATA.get('email_opt_in', None)
+            email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)

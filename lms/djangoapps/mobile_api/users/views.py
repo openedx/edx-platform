@@ -60,7 +60,7 @@ class UserDetail(generics.RetrieveAPIView):
     """
     queryset = (
         User.objects.all()
-        .select_related('profile', 'course_enrollments')
+        .select_related('profile')
     )
     serializer_class = UserSerializer
     lookup_field = 'username'
@@ -182,8 +182,8 @@ class UserCourseStatus(views.APIView):
         """
         Update the ID of the module that the specified user last visited in the specified course.
         """
-        module_id = request.DATA.get("last_visited_module_id")
-        modification_date_string = request.DATA.get("modification_date")
+        module_id = request.data.get("last_visited_module_id")
+        modification_date_string = request.data.get("modification_date")
         modification_date = None
         if modification_date_string:
             modification_date = dateparse.parse_datetime(modification_date_string)
@@ -239,6 +239,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             the course.
           * video_outline: The URI to get the list of all videos that the user
             can access in the course.
+          * discussion_url: The URI to access data for course discussions if
+            it is enabled, otherwise null.
 
         * created: The date the course was created.
         * is_active: Whether the course is currently active. Possible values

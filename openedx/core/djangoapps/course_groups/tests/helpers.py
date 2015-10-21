@@ -101,6 +101,9 @@ def config_course_cohorts_legacy(
         Nothing -- modifies course in place.
     """
     def to_id(name):
+        """
+        Helper method to convert a discussion topic name to a database identifier
+        """
         return topic_name_to_id(course, name)
 
     topics = dict((name, {"sort_key": "A",

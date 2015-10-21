@@ -62,8 +62,6 @@ from xmodule.mixin import LicenseMixin
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
 FEATURES = {
-    'USE_DJANGO_PIPELINE': True,
-
     'GITHUB_PUSH': False,
 
     # for consistency in user-experience, keep the value of the following 3 settings
@@ -164,12 +162,6 @@ FEATURES = {
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
-    # Social Media Sharing on Student Dashboard
-    'SOCIAL_SHARING_SETTINGS': {
-        # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
-        'CUSTOM_COURSE_URLS': False
-    },
-
     # Teams feature
     'ENABLE_TEAMS': True,
 
@@ -194,6 +186,11 @@ FEATURES = {
 
 ENABLE_JASMINE = False
 
+############################# SOCIAL MEDIA SHARING #############################
+SOCIAL_SHARING_SETTINGS = {
+    # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
+    'CUSTOM_COURSE_URLS': False
+}
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
@@ -459,14 +456,16 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### PIPELINE #######################################
 
+PIPELINE_ENABLED = True
+
 # Process static files using RequireJS Optimizer
 STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 ]
 
@@ -741,7 +740,7 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'staticfiles',
+    'django.contrib.staticfiles',
     'static_replace',
     'require',
 
@@ -996,6 +995,9 @@ ADVANCED_COMPONENT_TYPES = [
     # embed public google drive documents and calendars within edX units
     'google-document',
     'google-calendar',
+
+    # Oppia block
+    'oppia',
 
     # In-course reverification checkpoint
     'edx-reverification-block',

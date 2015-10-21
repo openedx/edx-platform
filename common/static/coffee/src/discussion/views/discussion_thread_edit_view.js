@@ -73,11 +73,9 @@
                     url: DiscussionUtil.urlFor('update_thread', this.model.id),
                     type: 'POST',
                     dataType: 'json',
-                    async: false, // @TODO when the rest of the stuff below is made to work properly..
                     data: postData,
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function() {
-                        // @TODO: Move this out of the callback, this makes it feel sluggish
                         this.$('.edit-post-title').val('').attr('prev-text', '');
                         this.$('.edit-post-body textarea').val('').attr('prev-text', '');
                         this.$('.wmd-preview p').html('');

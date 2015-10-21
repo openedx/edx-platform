@@ -1,3 +1,6 @@
+"""
+Django REST Framework serializers for the User API Accounts sub-application
+"""
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.conf import settings

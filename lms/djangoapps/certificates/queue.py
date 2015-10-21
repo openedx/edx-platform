@@ -15,6 +15,7 @@ from courseware import grades
 from xmodule.modulestore.django import modulestore
 from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey
+from course_modes.models import CourseMode
 from student.models import UserProfile, CourseEnrollment
 from verify_student.models import SoftwareSecurePhotoVerification
 
@@ -256,9 +257,14 @@ class XQueueCertInterface(object):
             is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
             grade = grades.grade(student, self.request, course)
             enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
-            mode_is_verified = (enrollment_mode == GeneratedCertificate.MODES.verified)
+            mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
             user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
             cert_mode = enrollment_mode
+
+            # For credit mode generate verified certificate
+            if cert_mode == CourseMode.CREDIT_MODE:
+                cert_mode = CourseMode.VERIFIED
+
             if mode_is_verified and user_is_verified:
                 template_pdf = "certificate-template-{id.org}-{id.course}-verified.pdf".format(id=course_id)
             elif mode_is_verified and not user_is_verified:

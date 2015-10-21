@@ -57,19 +57,19 @@ def compute_fingerprint(path_list):
 
     hasher = hashlib.sha1()
 
-    for path in path_list:
+    for path_item in path_list:
 
         # For directories, create a hash based on the modification times
         # of first-level subdirectories
-        if os.path.isdir(path):
-            for dirname in sorted(os.listdir(path)):
-                p = os.path.join(path, dirname)
-                if os.path.isdir(p):
-                    hasher.update(str(os.stat(p).st_mtime))
+        if os.path.isdir(path_item):
+            for dirname in sorted(os.listdir(path_item)):
+                path_name = os.path.join(path_item, dirname)
+                if os.path.isdir(path_name):
+                    hasher.update(str(os.stat(path_name).st_mtime))
 
         # For files, hash the contents of the file
-        if os.path.isfile(path):
-            with open(path, "rb") as file_handle:
+        if os.path.isfile(path_item):
+            with open(path_item, "rb") as file_handle:
                 hasher.update(file_handle.read())
 
     return hasher.hexdigest()
@@ -113,7 +113,7 @@ def prereq_cache(cache_name, paths, install_func):
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash)
     else:
-        print('{cache} unchanged, skipping...'.format(cache=cache_name))
+        print '{cache} unchanged, skipping...'.format(cache=cache_name)
 
 
 def ruby_prereqs_installation():

@@ -281,7 +281,7 @@ console::
     paver test_js_run -s common
     paver test_js_run -s common-requirejs
 
-To run JavaScript tests in your default browser::
+To run JavaScript tests in a browser:
 
     paver test_js_dev -s lms
     paver test_js_dev -s lms-coffee
@@ -290,6 +290,17 @@ To run JavaScript tests in your default browser::
     paver test_js_dev -s xmodule
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
+    
+To debug these tests on devstack in a local browser:
+
+ * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
+ * open the same URL in your browser but change the IP address to 192.168.33.10, e.g.
+    http://192.168.33.10:TEST_PORT/suite/cms
+ * this will run all the tests and show you the results including details of any failures 
+ * you can click on an individually failing test and/or suite to re-run it by itself
+ * you can now use the browser's developer tools to debug as you would any other JavaScript code
+
+Note: the port is also output to the console that you ran the tests from if you find that easier.
 
 These paver commands call through to a custom test runner. For more
 info, see `js-test-tool <https://github.com/edx/js-test-tool>`__.

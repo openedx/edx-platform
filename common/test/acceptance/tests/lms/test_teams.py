@@ -7,6 +7,7 @@ import time
 
 from dateutil.parser import parse
 import ddt
+from flaky import flaky
 from nose.plugins.attrib import attr
 from selenium.common.exceptions import TimeoutException
 from uuid import uuid4
@@ -424,7 +425,7 @@ class BrowseTopicsTest(TeamsTabBase):
         browse_teams_page.click_create_team_link()
         create_team_page = TeamManagementPage(self.browser, self.course_id, topic)
         create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
-        create_team_page.value_for_textarea_field(
+        create_team_page.set_value_for_textarea_field(
             field_id='description',
             value='Team description.'
         )
@@ -812,6 +813,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
+    @flaky  # TODO: fix flaky test. See TNL-3489
     def test_search(self):
         """
         Scenario: User should be able to search for a team
@@ -958,7 +960,7 @@ class TeamFormActions(TeamsTabBase):
             value=self.TEAMS_NAME,
             press_enter=False
         )
-        self.team_management_page.value_for_textarea_field(
+        self.team_management_page.set_value_for_textarea_field(
             field_id='description',
             value=self.TEAM_DESCRIPTION
         )

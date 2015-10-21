@@ -1,7 +1,6 @@
 """
 Useful django models for implementing XBlock infrastructure in django.
 """
-
 import warnings
 
 from django.db import models

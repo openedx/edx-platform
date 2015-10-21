@@ -8,7 +8,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
-from student.roles import CourseBetaTesterRole, CourseStaffRole
+from student.roles import CourseBetaTesterRole, CourseStaffRole, CourseCcxCoachRole
 
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR)
@@ -67,6 +67,11 @@ class TestInstructorAccessAllow(SharedModuleStoreTestCase):
         allow_access(self.course, user, 'staff')
         allow_access(self.course, user, 'staff')
         self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
+
+    def test_allow_ccx_coach(self):
+        user = UserFactory()
+        allow_access(self.course, user, 'ccx_coach')
+        self.assertTrue(CourseCcxCoachRole(self.course.id).has_user(user))
 
     def test_allow_beta(self):
         """ Test allow beta against list beta. """

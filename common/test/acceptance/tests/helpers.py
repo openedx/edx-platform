@@ -290,6 +290,36 @@ def get_modal_alert(browser):
     return browser.switch_to.alert
 
 
+def get_element_padding(page, selector):
+    """
+    Get Padding of the element with given selector,
+
+    :returns a dict object with the following keys.
+            1 - padding-top
+            2 - padding-right
+            3 - padding-bottom
+            4 - padding-left
+
+    Example Use:
+        progress_page.get_element_padding('.wrapper-msg.wrapper-auto-cert')
+
+    """
+    js_script = """
+        var $element = $('%(selector)s');
+
+        element_padding = {
+            'padding-top': $element.css('padding-top').replace("px", ""),
+            'padding-right': $element.css('padding-right').replace("px", ""),
+            'padding-bottom': $element.css('padding-bottom').replace("px", ""),
+            'padding-left': $element.css('padding-left').replace("px", "")
+        };
+
+        return element_padding;
+    """ % {'selector': selector}
+
+    return page.browser.execute_script(js_script)
+
+
 class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted

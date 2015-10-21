@@ -83,7 +83,7 @@ import json
 
     % if len(course_enrollments) > 0:
       <ul class="listing-courses">
-      <% share_settings = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {}) %>
+      <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
       % for dashboard_index, enrollment in enumerate(course_enrollments):
         <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
         <% cert_status = cert_statuses.get(enrollment.course_id) %>
@@ -152,7 +152,7 @@ import json
 
   % if settings.FEATURES.get('IS_EDX_DOMAIN') and settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
     <div class="wrapper-find-courses">
-      <p class="copy">Check out our recently launched courses and what's new in your favorite subjects</p>
+      <p class="copy">${_("Check out our recently launched courses and what's new in your favorite subjects")}</p>
       <p><a class="btn-find-courses" href="${marketing_link('COURSES')}">${_("Find New Courses")}</a></p>
     </div>
   % endif

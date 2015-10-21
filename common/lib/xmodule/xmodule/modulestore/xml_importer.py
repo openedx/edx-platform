@@ -1090,7 +1090,7 @@ def perform_xlint(
     for err_log in module_store.errored_courses.itervalues():
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
-            print(msg)
+            print msg
             if msg.startswith('ERROR:'):
                 err_cnt += 1
             else:
@@ -1133,10 +1133,11 @@ def perform_xlint(
             )
             warn_cnt += 1
 
-    print("\n")
-    print("------------------------------------------")
-    print("VALIDATION SUMMARY: {err} Errors   {warn} Warnings".format(
-        err=err_cnt, warn=warn_cnt)
+    print "\n"
+    print "------------------------------------------"
+    print "VALIDATION SUMMARY: {err} Errors   {warn} Warnings".format(
+        err=err_cnt,
+        warn=warn_cnt
     )
 
     if err_cnt > 0:
@@ -1151,7 +1152,7 @@ def perform_xlint(
             "your courseware before importing"
         )
     else:
-        print("This course can be imported successfully.")
+        print "This course can be imported successfully."
 
     return err_cnt
 

@@ -39,5 +39,6 @@ Get and Update the User's Account Information
       "country": US, 
       "mailing_address": "123 Main Street, Anytown, MA 02144", 
       "email": "johndoe@company.com", 
-      "date_joined": "2015-03-18T13:42:40Z"
+      "date_joined": "2015-03-18T13:42:40Z",
+      "account_privacy": "all_users"
     } 

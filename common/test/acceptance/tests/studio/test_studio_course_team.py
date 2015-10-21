@@ -1,7 +1,6 @@
 """
 Acceptance tests for course in studio
 """
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from .base_studio_test import StudioCourseTest
@@ -11,7 +10,6 @@ from ...pages.studio.users import CourseTeamPage
 from ...pages.studio.index import DashboardPage
 
 
-@flaky  # TODO fix this, see TNL-2667
 @attr('shard_2')
 class CourseTeamPageTest(StudioCourseTest):
     """ As a course author, I want to be able to add others to my team """
@@ -75,9 +73,15 @@ class CourseTeamPageTest(StudioCourseTest):
     def _assert_user_present(self, user, present=True):
         """ Checks if specified user present on Course Team page """
         if present:
-            self.assertIn(user.get('username'), self.page.usernames)
+            self.page.wait_for(
+                lambda: user.get('username') in self.page.usernames,
+                description="Wait for user to be present"
+            )
         else:
-            self.assertNotIn(user.get('username'), self.page.usernames)
+            self.page.wait_for(
+                lambda: user.get('username') not in self.page.usernames,
+                description="Wait for user to be absent"
+            )
 
     def _should_see_dialog(self, dialog_type, dialog_message):
         """ Asserts dialog with specified message is shown """

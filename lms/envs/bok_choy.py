@@ -64,7 +64,7 @@ DEBUG = True
 # Note: optimized files for testing are generated with settings from test_static_optimized
 STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
 )
 STATICFILES_DIRS = (
     (TEST_ROOT / "staticfiles" / "lms").abspath(),
@@ -73,6 +73,9 @@ STATICFILES_DIRS = (
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
+
+# Don't use compression during tests
+PIPELINE_JS_COMPRESSOR = None
 
 ################################# CELERY ######################################
 

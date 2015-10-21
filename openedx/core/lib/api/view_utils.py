@@ -24,7 +24,6 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import IsUserInUrl
-from util.milestones_helpers import any_unfulfilled_milestones
 
 
 class DeveloperErrorViewMixin(object):
@@ -63,6 +62,10 @@ class DeveloperErrorViewMixin(object):
             return self.make_error_response(400, validation_error.messages[0])
 
     def handle_exception(self, exc):
+        """
+        Generalized helper method for managing specific API exception workflows
+        """
+
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404):
@@ -79,7 +82,7 @@ class ExpandableFieldViewMixin(object):
     def get_serializer_context(self):
         """Adds expand information from query parameters to the serializer context to support expandable fields."""
         result = super(ExpandableFieldViewMixin, self).get_serializer_context()
-        result['expand'] = [x for x in self.request.QUERY_PARAMS.get('expand', '').split(',') if x]
+        result['expand'] = [x for x in self.request.query_params.get('expand', '').split(',') if x]
         return result
 
 
@@ -173,7 +176,7 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
 
     def patch(self, request, *args, **kwargs):
         """Checks for validation errors, then updates the model using the UpdateModelMixin."""
-        field_errors = self._validate_patch(request.DATA)
+        field_errors = self._validate_patch(request.data)
         if field_errors:
             return Response({'field_errors': field_errors}, status=status.HTTP_400_BAD_REQUEST)
         return self.partial_update(request, *args, **kwargs)

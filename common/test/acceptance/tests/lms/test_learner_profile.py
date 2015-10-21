@@ -2,7 +2,6 @@
 """
 End-to-end tests for Student's Profile Page.
 """
-from flaky import flaky
 from contextlib import contextmanager
 
 from datetime import datetime
@@ -48,7 +47,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
-        profile_page.value_for_textarea_field('bio', 'Nothing Special')
+        profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
 
     def visit_profile_page(self, username, privacy=None):
         """
@@ -147,6 +146,26 @@ class LearnerProfileTestMixin(EventsTestMixin):
         }
         with self.assert_events_match_during(event_filter=event_filter, expected_events=[expected_event]):
             yield
+
+    def initialize_different_user(self, privacy=None, birth_year=None):
+        """
+        Initialize the profile page for a different test user
+        """
+        username, user_id = self.log_in_as_unique_user()
+
+        # Set the privacy for the new user
+        if privacy is None:
+            privacy = self.PRIVACY_PUBLIC
+        self.visit_profile_page(username, privacy=privacy)
+
+        # Set the user's year of birth
+        if birth_year:
+            self.set_birth_year(birth_year)
+
+        # Log the user out
+        LogoutPage(self.browser).visit()
+
+        return username, user_id
 
 
 @attr('shard_4')
@@ -306,7 +325,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         Test behaviour of a textarea field.
         """
-        profile_page.value_for_textarea_field(field_id, new_value)
+        profile_page.set_value_for_textarea_field(field_id, new_value)
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
@@ -376,10 +395,10 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Given that I am a registered user.
         And I visit my Profile page.
         And I set the profile visibility to public and set default values for public fields.
-        Then I set about me value to `Eat Sleep Code`.
-        Then displayed about me should be `Eat Sleep Code` and about me field mode should be `display`
+        Then I set about me value to `ThisIsIt`.
+        Then displayed about me should be `ThisIsIt` and about me field mode should be `display`
         And I reload the page.
-        Then displayed about me should be `Eat Sleep Code` and about me field mode should be `display`
+        Then displayed about me should be `ThisIsIt` and about me field mode should be `display`
         Then I set empty value for about me.
         Then displayed about me should be `Tell other edX learners a little about yourself: where you live,
         what your interests are, why you're taking courses on edX, or what you hope to learn.` and about me
@@ -473,7 +492,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
-    @flaky  # TODO fix this, see TNL-2704
     def test_user_can_upload_the_profile_image_with_success(self):
         """
         Scenario: Upload profile image works correctly.
@@ -679,7 +697,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then I shouldn't see the profile visibility selector dropdown.
         Then I see some of the profile fields are shown.
         """
-        different_username, different_user_id = self._initialize_different_user(privacy=self.PRIVACY_PRIVATE)
+        different_username, different_user_id = self.initialize_different_user(privacy=self.PRIVACY_PRIVATE)
         username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(different_username)
         self.verify_profile_page_is_private(profile_page, is_editable=False)
@@ -695,7 +713,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then I see that only the private fields are shown.
         """
         under_age_birth_year = datetime.now().year - 10
-        different_username, different_user_id = self._initialize_different_user(
+        different_username, different_user_id = self.initialize_different_user(
             privacy=self.PRIVACY_PUBLIC,
             birth_year=under_age_birth_year
         )
@@ -704,7 +722,6 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
-    @flaky  # TODO fix this, see TNL-2199
     def test_different_user_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's public profile.
@@ -716,29 +733,52 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then I shouldn't see the profile visibility selector dropdown.
         Also `location`, `language` and `about me` fields are not editable.
         """
-        different_username, different_user_id = self._initialize_different_user(privacy=self.PRIVACY_PUBLIC)
+        different_username, different_user_id = self.initialize_different_user(privacy=self.PRIVACY_PUBLIC)
         username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(different_username)
         profile_page.wait_for_public_fields()
         self.verify_profile_page_is_public(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
 
-    def _initialize_different_user(self, privacy=None, birth_year=None):
+
+@attr('a11y')
+class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
+    """
+    Class to test learner profile accessibility.
+    """
+
+    def test_editable_learner_profile_a11y(self):
         """
-        Initialize the profile page for a different test user
+        Test the accessibility of the editable version of the profile page
+        (user viewing her own public profile).
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, _ = self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(username)
 
-        # Set the privacy for the new user
-        if privacy is None:
-            privacy = self.PRIVACY_PUBLIC
-        self.visit_profile_page(username, privacy=privacy)
+        # TODO: There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": ['color-contrast'],
+        })
 
-        # Set the user's year of birth
-        if birth_year:
-            self.set_birth_year(birth_year)
+        profile_page.a11y_audit.check_for_accessibility_errors()
 
-        # Log the user out
-        LogoutPage(self.browser).visit()
+        profile_page.make_field_editable('language_proficiencies')
+        profile_page.a11y_audit.check_for_accessibility_errors()
 
-        return username, user_id
+        profile_page.make_field_editable('bio')
+        profile_page.a11y_audit.check_for_accessibility_errors()
+
+    def test_read_only_learner_profile_a11y(self):
+        """
+        Test the accessibility of the read-only version of a public profile page
+        (user viewing someone else's profile page).
+        """
+        # initialize_different_user should cause country, language, and bio to be filled out (since
+        # privacy is public). It doesn't appear that this is happening, although the method
+        # works in regular bokchoy tests. Perhaps a problem with phantomjs? So this test is currently
+        # only looking at a read-only profile page with a username.
+        different_username, _ = self.initialize_different_user(privacy=self.PRIVACY_PUBLIC)
+        self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(different_username)
+        profile_page.a11y_audit.check_for_accessibility_errors()

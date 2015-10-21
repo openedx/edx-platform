@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Test cases to cover Accounts-related behaviors of the User API application
+"""
 import datetime
 from copy import deepcopy
 import ddt
@@ -52,7 +55,7 @@ class UserAPITestCase(APITestCase):
         client.login(username=user.username, password=self.test_password)
         return client
 
-    def send_patch(self, client, json_data, content_type="application/merge-patch+json", expected_status=204):
+    def send_patch(self, client, json_data, content_type="application/merge-patch+json", expected_status=200):
         """
         Helper method for sending a patch to the server, defaulting to application/merge-patch+json content_type.
         Verifies the expected status and returns the response.
@@ -109,7 +112,9 @@ class UserAPITestCase(APITestCase):
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    {'full': 50, 'small': 10},
+    clear=True
 )
 class TestAccountAPI(UserAPITestCase):
     """
@@ -261,6 +266,9 @@ class TestAccountAPI(UserAPITestCase):
         Test the return from GET based on user visibility setting.
         """
         def verify_fields_visible_to_all_users(response):
+            """
+            Confirms that private fields are private, and public/shareable fields are public/shareable
+            """
             if preference_visibility == PRIVATE_VISIBILITY:
                 self._verify_private_account_response(response)
             else:
@@ -288,6 +296,9 @@ class TestAccountAPI(UserAPITestCase):
         as created by the test UserFactory).
         """
         def verify_get_own_information():
+            """
+            Internal helper to perform the actual assertions
+            """
             response = self.send_get(self.client)
             data = response.data
             self.assertEqual(15, len(data))
@@ -381,10 +392,8 @@ class TestAccountAPI(UserAPITestCase):
         Test the behavior of patch, when using the correct content_type.
         """
         client = self.login_client("client", "user")
-        self.send_patch(client, {field: value})
-
-        get_response = self.send_get(client)
-        self.assertEqual(value, get_response.data[field])
+        response = self.send_patch(client, {field: value})
+        self.assertEqual(value, response.data[field])
 
         if fails_validation_value:
             error_response = self.send_patch(client, {field: fails_validation_value}, expected_status=400)
@@ -400,19 +409,16 @@ class TestAccountAPI(UserAPITestCase):
             )
         else:
             # If there are no values that would fail validation, then empty string should be supported.
-            self.send_patch(client, {field: ""})
-
-            get_response = self.send_get(client)
-            self.assertEqual("", get_response.data[field])
+            response = self.send_patch(client, {field: ""})
+            self.assertEqual("", response.data[field])
 
     def test_patch_inactive_user(self):
         """ Verify that a user can patch her own account, even if inactive. """
         self.client.login(username=self.user.username, password=self.test_password)
         self.user.is_active = False
         self.user.save()
-        self.send_patch(self.client, {"goals": "to not activate account"})
-        get_response = self.send_get(self.client)
-        self.assertEqual("to not activate account", get_response.data["goals"])
+        response = self.send_patch(self.client, {"goals": "to not activate account"})
+        self.assertEqual("to not activate account", response.data["goals"])
 
     @ddt.unpack
     def test_patch_account_noneditable(self):
@@ -422,6 +428,9 @@ class TestAccountAPI(UserAPITestCase):
         client = self.login_client("client", "user")
 
         def verify_error_response(field_name, data):
+            """
+            Internal helper to check the error messages returned
+            """
             self.assertEqual(
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
@@ -458,15 +467,13 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.client.login(username=self.user.username, password=self.test_password)
         for field_name in ["gender", "level_of_education", "country"]:
-            self.send_patch(self.client, {field_name: ""})
-            response = self.send_get(self.client)
+            response = self.send_patch(self.client, {field_name: ""})
             # Although throwing a 400 might be reasonable, the default DRF behavior with ModelSerializer
             # is to convert to None, which also seems acceptable (and is difficult to override).
             self.assertIsNone(response.data[field_name])
 
             # Verify that the behavior is the same for sending None.
-            self.send_patch(self.client, {field_name: ""})
-            response = self.send_get(self.client)
+            response = self.send_patch(self.client, {field_name: ""})
             self.assertIsNone(response.data[field_name])
 
     def test_patch_name_metadata(self):
@@ -474,12 +481,18 @@ class TestAccountAPI(UserAPITestCase):
         Test the metadata stored when changing the name field.
         """
         def get_name_change_info(expected_entries):
+            """
+            Internal method to encapsulate the retrieval of old names used
+            """
             legacy_profile = UserProfile.objects.get(id=self.user.id)
             name_change_info = legacy_profile.get_meta()["old_names"]
             self.assertEqual(expected_entries, len(name_change_info))
             return name_change_info
 
         def verify_change_info(change_info, old_name, requester, new_name):
+            """
+            Internal method to validate name changes
+            """
             self.assertEqual(3, len(change_info))
             self.assertEqual(old_name, change_info[0])
             self.assertEqual("Name change requested through account API by {}".format(requester), change_info[1])
@@ -513,12 +526,11 @@ class TestAccountAPI(UserAPITestCase):
         client = self.login_client("client", "user")
         old_email = self.user.email
         new_email = "newemail@example.com"
-        self.send_patch(client, {"email": new_email, "goals": "change my email"})
+        response = self.send_patch(client, {"email": new_email, "goals": "change my email"})
 
         # Since request is multi-step, the email won't change on GET immediately (though goals will update).
-        get_response = self.send_get(client)
-        self.assertEqual(old_email, get_response.data["email"])
-        self.assertEqual("change my email", get_response.data["goals"])
+        self.assertEqual(old_email, response.data["email"])
+        self.assertEqual("change my email", response.data["goals"])
 
         # Now call the method that will be invoked with the user clicks the activation key in the received email.
         # First we must get the activation key that was sent.
@@ -566,8 +578,7 @@ class TestAccountAPI(UserAPITestCase):
         # identifies language proficiencies based on their language code rather
         # than django model id.
         for proficiencies in ([{"code": "en"}, {"code": "fr"}, {"code": "es"}], [{"code": "fr"}], [{"code": "aa"}], []):
-            self.send_patch(client, {"language_proficiencies": proficiencies})
-            response = self.send_get(client)
+            response = self.send_patch(client, {"language_proficiencies": proficiencies})
             self.assertItemsEqual(response.data["language_proficiencies"], proficiencies)
 
     @ddt.data(
@@ -575,7 +586,10 @@ class TestAccountAPI(UserAPITestCase):
         ([u"not_a_JSON_object"], [{u'non_field_errors': [u'Invalid data. Expected a dictionary, but got unicode.']}]),
         ([{}], [{"code": [u"This field is required."]}]),
         ([{u"code": u"invalid_language_code"}], [{'code': [u'"invalid_language_code" is not a valid choice.']}]),
-        ([{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}], [u'The language_proficiencies field must consist of unique languages']),
+        (
+            [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
+            [u'The language_proficiencies field must consist of unique languages']
+        ),
     )
     @ddt.unpack
     def test_patch_invalid_language_proficiencies(self, patch_value, expected_error_message):
@@ -587,7 +601,10 @@ class TestAccountAPI(UserAPITestCase):
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         self.assertEqual(
             response.data["field_errors"]["language_proficiencies"]["developer_message"],
-            u"Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(patch_value=patch_value, error_message=expected_error_message)
+            u"Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(
+                patch_value=patch_value,
+                error_message=expected_error_message
+            )
         )
 
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')

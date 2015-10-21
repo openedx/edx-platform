@@ -11,7 +11,6 @@ The methods in these classes are organized into several conceptual buckets:
 import os
 
 from bok_choy.promise import EmptyPromise
-from ...tests.helpers import disable_animations
 from .course_page import CoursePage
 from common.test.acceptance.tests.helpers import disable_animations
 
@@ -57,6 +56,18 @@ class CertificatesPage(CoursePage):
         """
         return self.q(css='.signatory-title-value').first.html[0]
 
+    def get_course_number(self):
+        """
+        Return Course Number
+        """
+        return self.q(css='.actual-course-number .certificate-value').first.text[0]
+
+    def get_course_number_override(self):
+        """
+        Return Course Number Override
+        """
+        return self.q(css='.course-number-override .certificate-value').first.text[0]
+
     ################
     # Properties
     ################
@@ -82,6 +93,13 @@ class CertificatesPage(CoursePage):
         Returns text of .no-content container.
         """
         return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content').text[0]
+
+    @property
+    def new_certificate_link_text(self):
+        """
+        Returns text of new-button link .
+        """
+        return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content a.new-button').text[0]
 
     ################
     # Wait Actions

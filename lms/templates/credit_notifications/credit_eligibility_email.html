@@ -26,7 +26,11 @@
         <tr>
           <td class="cn-content">
             <p>
-              ${_(u"Hi {name},").format(name=full_name)}
+                % if full_name is not UNDEFINED and full_name is not None:
+                    ${_(u"Hi {name},").format(name=full_name)}
+                % else:
+                    ${_(u"Hi,")}
+                % endif
             </p>
 
             <p>
@@ -44,7 +48,7 @@
             </p>
 
             <p>
-              ${_(u'To get course credit, simply go to your {link_start}{platform_name} dashboard{link_end} and click the <b>Get Credit</b> button. No application, transcript, or grade report is required.').format(
+              ${_(u'To get course credit, simply go to your {link_start}{platform_name} dashboard{link_end} and click the <b>Get Credit</b> button. After you receive your credit, you will also have an official academic transcript at the institution that granted the credit.').format(
                 link_start=u'<a href="{dashboard_url}">'.format(
                     dashboard_url=dashboard_link
                 ),

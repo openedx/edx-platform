@@ -75,7 +75,9 @@ class CourseEmail(Email):
         return self.subject
 
     @classmethod
-    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None, template_name=None, from_addr=None):
+    def create(
+            cls, course_id, sender, to_option, subject, html_message,
+            text_message=None, template_name=None, from_addr=None):
         """
         Create an instance of CourseEmail.
 

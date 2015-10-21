@@ -7,7 +7,7 @@ import pymongo.message
 import threading
 import traceback
 from collections import defaultdict
-from decorator import contextmanager
+from contextlib import contextmanager
 from uuid import uuid4
 
 from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute

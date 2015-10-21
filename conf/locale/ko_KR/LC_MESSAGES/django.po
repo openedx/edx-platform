@@ -6,6 +6,7 @@
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
@@ -22,6 +23,7 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # mariana1201 <gogo3135@naver.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # Hongseob Lee <shevreg@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
@@ -37,6 +39,7 @@
 # Chul Park <parkchul@nate.com>, 2015
 # mariana1201 <gogo3135@naver.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # Hongseob Lee <shevreg@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
@@ -55,6 +58,7 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # KimKyudong <choemh@nate.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
@@ -79,6 +83,7 @@
 # David10000 <gameness@naver.com>, 2014
 # Gil <gedwarp@gmail.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # Nicole <dlruddk1112@gmail.com>, 2014
@@ -87,9 +92,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-18 13:23+0000\n"
-"PO-Revision-Date: 2015-09-18 03:12+0000\n"
-"Last-Translator: Hongseob Lee <shevious@gmail.com>\n"
+"POT-Creation-Date: 2015-10-16 13:05+0000\n"
+"PO-Revision-Date: 2015-09-25 11:11+0000\n"
+"Last-Translator: Hongseob Lee <shevious@yahoo.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -139,7 +144,7 @@ msgstr "소주제"
 #: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
 msgid "Unit"
-msgstr "학습 활동"
+msgstr "학습활동"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -228,7 +233,7 @@ msgstr ""
 "해당 시간이 지나면 학습자는 인증용 사진을 제출할 수 없습니다. 인증 요청은 선택사항이며, 사진은 인증의 목적으로만 사용됩니다."
 
 #: common/djangoapps/course_modes/models.py
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Course"
 msgstr "강좌"
 
@@ -248,7 +253,7 @@ msgstr "강좌"
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
-msgstr "메뉴명"
+msgstr "표시될 이름"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
@@ -285,7 +290,7 @@ msgstr "명예 과정 이수증"
 msgid ""
 "Professional education modes are not allowed to have expiration_datetime "
 "set."
-msgstr "전문 교육 과정 모드는 만기일 설정이 허용되지 않습니다."
+msgstr "전문 교육 과정 모드는 쿠폰 만기일 설정이 허용되지 않습니다."
 
 #: common/djangoapps/course_modes/models.py
 msgid "Your verification is pending"
@@ -311,7 +316,7 @@ msgstr "인증"
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
-msgstr "신분증 인증 리본/뱃지"
+msgstr "신분증 인증 리본/뱃지 "
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're enrolled as an honor code student"
@@ -694,7 +699,7 @@ msgstr "로그인 실패 허용 횟수 초과. 잠시 후에 다시 시도하세
 
 #: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
-msgstr "이메일 혹은 비밀번호가 틀립니다."
+msgstr "이메일 또는 비밀번호가 일치하지 않습니다. 다시 한번 확인하시고 로그인해 주세요. "
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -1226,7 +1231,7 @@ msgstr "{0} 자 이상의 숫자를 포함해야 합니다."
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more punctuation characters"
-msgstr "{0} 자 이상의 구두점을 포함해야 합니다."
+msgstr "{0} 자 이상의 특수기호를 포함해야 합니다."
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more non ascii characters"
@@ -1250,11 +1255,15 @@ msgstr "제출 파일로 문제를 채점할 수 없습니다."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
-msgstr "맞음"
+msgstr "정답"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incorrect"
-msgstr "틀림"
+msgstr "오답"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "partially correct"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
@@ -1277,6 +1286,10 @@ msgstr "맞습니다."
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "틀립니다."
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is partially correct."
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -1833,6 +1846,21 @@ msgid "Enable LaTeX templates?"
 msgstr " LaTeX 템플릿을 활성화 하시겠습니까?"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Matlab API key"
+msgstr "Matlab API Key"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use by this course for the "
+"specified duration. Please do not share the API key with other courses and "
+"notify MathWorks immediately if you believe the key is exposed or "
+"compromised. To obtain a key for your course, or to report an issue, please "
+"contact moocsupport@mathworks.com"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
 msgstr "확인"
 
@@ -1930,8 +1958,9 @@ msgstr "답안이 저장되었습니다."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
-"Your answers have been saved but not graded. Click 'Check' to grade them."
-msgstr "답안이 저장되었지만 평가되지 않았습니다. '확인'을 클릭하여 평가를 시작하세요."
+"Your answers have been saved but not graded. Click '{button_name}' to grade "
+"them."
+msgstr ""
 
 #. Translators: A student must "make an attempt" to solve the problem on the
 #. page before they can reset it.
@@ -2322,12 +2351,12 @@ msgid ""
 "Enter the URL for the official course Facebook group. If you provide a URL, "
 "the mobile app includes a button that students can tap to access the group."
 msgstr ""
-"강좌의 공식 페이스북 그룹에 연결하려면 URL을 입력해주십시오. URL을 입력하면, 학습자들이 페이스북 그룹에 접속할 수 있도록 모바일 "
-"앱에 버튼이 나타납니다."
+"강좌의 공식 Facebook 그룹에 연결하려면 URL을 입력해주십시오. URL을 입력하면, 학습자들이 Facebook 그룹에 접속할 수 "
+"있도록 모바일 앱에 버튼이 나타납니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Facebook URL"
-msgstr "페이스북 URL"
+msgstr "Facebook URL"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -2922,6 +2951,7 @@ msgstr "both"
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "소개"
 
@@ -3883,10 +3913,6 @@ msgstr ""
 "개별 문제에서 무제한 설정을 할 수 없습니다."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Matlab API key"
-msgstr "Matlab API Key"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use in this course for the "
@@ -4442,6 +4468,10 @@ msgstr ""
 "설정합니다."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Video Available on Web Only"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
@@ -4470,10 +4500,9 @@ msgstr ""
 "© {org_name}. All rights reserved except where noted. EdX, Open edX and the "
 "edX and Open EdX logos are registered trademarks or trademarks of edX Inc. "
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated.
 #. See http://openedx.org for more information.
-#: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
+#: lms/djangoapps/branding/api.py
 msgid "Powered by Open edX"
 msgstr "Powered by Open edX"
 
@@ -4490,16 +4519,18 @@ msgid "FAQs"
 msgstr "자주 묻는 질문"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Contact"
 msgstr "연락처"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/jobs.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
 msgstr "직업"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
 msgid "Donate"
-msgstr "기부"
+msgstr "기부하기"
 
 #: lms/djangoapps/branding/api.py
 msgid "Sitemap"
@@ -4515,6 +4546,7 @@ msgstr "서비스 및 명예 과정 규정 "
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Privacy Policy"
 msgstr "개인정보 보호 정책"
 
@@ -4527,6 +4559,7 @@ msgstr "접근성 정책"
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Terms of Service"
 msgstr "서비스 규정"
 
@@ -4557,6 +4590,14 @@ msgid ""
 msgstr ""
 "You cannot create a CCX from a course using a deprecated id. Please create a"
 " rerun of this course in the studio to allow this action."
+
+#: lms/djangoapps/ccx/views.py
+msgid "Could not find a user with name or email \"{email}\" "
+msgstr ""
+
+#: lms/djangoapps/ccx/views.py
+msgid "Please enter a valid username or email."
+msgstr ""
 
 #: lms/djangoapps/certificates/badge_handler.py
 msgid ""
@@ -4727,6 +4768,15 @@ msgid ""
 "program of study, and includes verification of the student's identity."
 msgstr "{cert_type} 이수증은 학습자의 프로그램 성취도가 상위에 있음을 증명하며, 학습자의 신분 확인까지 포함합니다. "
 
+#: lms/djangoapps/certificates/views/webview.py
+msgid "I completed the {course_title} course on {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"I completed a course on {platform_name}. Take a look at my certificate."
+msgstr ""
+
 #. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
 msgid "{month} {day}, {year}"
@@ -4826,7 +4876,7 @@ msgstr "{platform_name} 소개"
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Learn more about {platform_name}"
-msgstr "{platform_name} 더 알아보기"
+msgstr "{platform_name} 자세히 알아보기"
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Learn with {platform_name}"
@@ -5493,11 +5543,8 @@ msgid "Credit Card - Individual"
 msgstr "신용 카드 - 개인"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid ""
-"manually enrolled by user_id {user_id}, enrollment state transition: "
-"{transition}"
+msgid "manually enrolled by {username} - reason: {reason}"
 msgstr ""
-"user_id {user_id}, enrollment state transition: {transition} 로 수강등록 수작업"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Manually Enrolled"
@@ -5650,6 +5697,10 @@ msgid "Cohort"
 msgstr "학습 집단"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Team"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The enrolled learner profile report is being created. To view the status of "
 "the report, see Pending Instructor Tasks below."
@@ -5711,7 +5762,7 @@ msgstr "설명"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Expiration Date"
-msgstr "만기일"
+msgstr "쿠폰 만기일"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Is Active"
@@ -6568,7 +6619,7 @@ msgstr "이 구성 요소는 제거되거나 잘못된 콘텐츠 그룹을 조�
 
 #: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
-msgstr "나의 노트"
+msgstr "내 노트"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -6793,11 +6844,11 @@ msgstr "ID '{course_id}' 의 강좌를 찾을 수 없습니다."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Donation for {course}"
-msgstr "{course}에 기부"
+msgstr "{course}에 기부하기"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Donation for {platform_name}"
-msgstr "{platform_name}에 기부"
+msgstr "{platform_name}에 기부하기"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Page {page_number} of {page_count}"
@@ -6844,7 +6895,7 @@ msgstr ""
 msgid "Amount"
 msgstr "총액"
 
-#: lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
@@ -6905,7 +6956,7 @@ msgstr "주문번호"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
-msgstr "학습 활동 가격"
+msgstr "학습활동 가격"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Total Cost"
@@ -6951,7 +7002,7 @@ msgstr "Audit Enrollment"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Honor Code Enrollment"
-msgstr "명예 선서문 등록생"
+msgstr "학습자 서약 등록"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Verified Enrollment"
@@ -7804,6 +7855,10 @@ msgstr ""
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "제공된 주제 ID {topic_id}가 유효하지 않습니다."
 
+#: lms/djangoapps/teams/views.py
+msgid "Error connecting to elasticsearch"
+msgstr ""
+
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -8065,7 +8120,7 @@ msgstr "생략하고 메인으로 돌아가기"
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
-msgstr "암호 재설정이 완료되었습니다."
+msgstr "비밀번호 재설정이 완료되었습니다."
 
 #: lms/templates/registration/password_reset_complete.html
 #, python-format
@@ -8075,7 +8130,7 @@ msgid ""
 "      "
 msgstr ""
 "\n"
-"암호가 설정되었습니다. 지금 %(link_start)s 로그인 %(link_end)s 할 수 있습니다."
+"비밀번호가 설정되었습니다. 지금 %(link_start)s 로그인 %(link_end)s 할 수 있습니다."
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8085,7 +8140,7 @@ msgid ""
 "  "
 msgstr ""
 "\n"
-"%(platform_name)s 암호를 재설정하십시오."
+"%(platform_name)s 비밀번호를 재설정하세요."
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8095,21 +8150,18 @@ msgid ""
 "          "
 msgstr ""
 "\n"
-"%(platform_name)s 암호를 재설정하십시오."
+"%(platform_name)s 비밀번호를 재설정하세요."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Form"
-msgstr "암호 재설정 양식"
+msgstr "비밀번호 재설정 양식"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
-"                We're sorry, %(platform_name)s enrollment is not available in your region\n"
+"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
 "            "
 msgstr ""
-"\n"
-"죄송합니다. 당신이 계신 지역에서는 %(platform_name)s 등록이 가능하지 않습니다."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
@@ -8121,7 +8173,7 @@ msgstr "모든 항목을 입력해야 합니다."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
-msgstr "두 암호 필드가 일치하지 않습니다."
+msgstr "두 비밀번호가 일치하지 않습니다."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -8153,7 +8205,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"요쳥한 필드가 %(bold_start)s볼드체와 별표(*)%(bold_end)s로 입력되어야 합니다."
+"%(bold_start)s굵게 표시된 입력란과 별표(*)%(bold_end)s 표시된 입력란은 필수 입력사항입니다."
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
@@ -8172,15 +8224,15 @@ msgstr "새 비밀번호"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password Again"
-msgstr "새 암호 다시 입력"
+msgstr "새 비밀번호 다시 입력"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Change My Password"
-msgstr "암호 변경"
+msgstr "비밀번호 변경"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your Password Reset Was Unsuccessful"
-msgstr "암호 재설정 성공"
+msgstr "비밀번호 재설정 실패"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8194,11 +8246,10 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Help"
-msgstr "암호 재설정 도움말"
+msgstr "비밀번호 재설정 도움말"
 
 #: lms/templates/registration/password_reset_confirm.html
-#: cms/templates/login.html lms/templates/login-sidebar.html
-#: lms/templates/register-sidebar.html
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "도움이 필요하세요?"
 
@@ -8819,7 +8870,7 @@ msgstr "username@domain.com"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The email address you used to register with {platform_name}"
-msgstr "{platform_name}에 가입하기 위해 사용한 이메일 주소"
+msgstr "{platform_name} 회원 가입 시 입력한 이메일 주소"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
@@ -8841,13 +8892,13 @@ msgstr "로그인 상태 유지"
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
-msgstr "{email_address} 이미 가입된 계정에 있는 이메일입니다. 다른 이메일로 시도해 보십시오."
+msgstr "{email_address} 이미 사용중인 이메일입니다.  다른 이메일을 입력해 주세요."
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
 "different username."
-msgstr "{username} 은 이미 등록된 아이디입니다. 다른 아이디로 시도해보십시오."
+msgstr "{username} 은 이미 사용중인 아이디입니다. 다른 아이디를 입력해 주세요."
 
 #. Translators: This example name is used as a placeholder in
 #. a field on the registration form meant to hold the user's name.
@@ -8892,14 +8943,14 @@ msgstr "최종 학력"
 #. form used to select the user's year of birth.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
 msgid "Year of birth"
-msgstr "출생 연도"
+msgstr "출생연도"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's mailing address.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
 msgid "Mailing address"
-msgstr "우편 주소"
+msgstr "우편주소"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
@@ -9387,10 +9438,6 @@ msgstr "페이지를 찾을 수 없습니다."
 msgid "Loading"
 msgstr "불러오는 중"
 
-#: cms/templates/asset_index.html lms/templates/courseware/courseware.html
-msgid "close"
-msgstr "닫음"
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -9434,6 +9481,7 @@ msgstr "강좌 번호:"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "강좌"
 
@@ -9505,7 +9553,7 @@ msgstr "보기"
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Thanks for activating your account."
-msgstr "계정 활성화에 감사합니다."
+msgstr "계정을 활성화해 주셔서 감사합니다."
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -9516,10 +9564,6 @@ msgstr "계정이 이미 활성화되어 있습니다."
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr "강좌를 보기 위해  {link_start}대시보드{link_end}로 이동하세요. "
-
-#: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
-msgid "Course Navigation"
-msgstr "강좌 찾아보기"
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
@@ -9532,7 +9576,7 @@ msgid "Help"
 msgstr "도움말"
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "로그아웃"
 
@@ -9648,6 +9692,12 @@ msgid ""
 msgstr "{b_start}동기부여: {b_end} 강좌를 마치고 자신에게 추가 인센티브를 주세요."
 
 #: common/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
+"certificates to help fund free education for everyone globally"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "이 강좌 청강"
 
@@ -9702,8 +9752,8 @@ msgid "Dashboard"
 msgstr "대시보드"
 
 #: lms/templates/dashboard.html
-msgid "Current Courses"
-msgstr "수강중인 강좌 "
+msgid "My Courses"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
@@ -9726,8 +9776,14 @@ msgid "Clear search"
 msgstr "검색 초기화"
 
 #: lms/templates/dashboard.html
+msgid ""
+"Check out our recently launched courses and what's new in your favorite "
+"subjects"
+msgstr ""
+
+#: lms/templates/dashboard.html
 msgid "Find New Courses"
-msgstr "새로운 강좌 찾기"
+msgstr "신규 강좌 찾기"
 
 #: lms/templates/dashboard.html
 msgid "Account Status Info"
@@ -9865,18 +9921,19 @@ msgid "About edX"
 msgstr "edX 소개"
 
 #: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "법률적"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
-msgstr "암호 재설정"
+msgstr "비밀번호 재설정"
 
 #: lms/templates/forgot_password_modal.html
 msgid ""
 "Please enter your e-mail address below, and we will e-mail instructions for "
 "setting a new password."
-msgstr "아래에 이메일 주소를 입력 해주십시오, 새로운 암호를 설정하기 위한 안내를 이메일로 보내드립니다."
+msgstr "아래에 이메일 주소를 입력 해주십시오, 새로운 비밀번호를 설정하기 위한 안내를 이메일로 보내드립니다."
 
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
@@ -9888,7 +9945,7 @@ msgstr "{platform} 계정을 만들 때 입력한 이메일입니다"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Reset My Password"
-msgstr "암호 재설정"
+msgstr "비밀번호 재설정"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -10062,7 +10119,7 @@ msgstr "Open edX가 설치된 기본 홈페이지입니다. 정상 동작중입�
 
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
-msgstr "새로운 강좌 찾기"
+msgstr "강좌 찾기"
 
 #: lms/templates/index.html
 msgid "View all Courses"
@@ -10170,7 +10227,7 @@ msgstr "로그인 할 수 없습니다."
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
-msgstr "이메일 혹은 암호가 부정확합니다."
+msgstr "이메일 혹은 비밀번호가 부정확합니다."
 
 #: lms/templates/login.html
 msgid "An error occurred when signing you in to {platform_name}."
@@ -10305,22 +10362,26 @@ msgid "Home Page"
 msgstr "홈페이지"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "How it Works"
 msgstr "동작 원리"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
-msgstr "새로운 강좌 찾기"
+msgstr "강좌 찾기"
 
 #: lms/templates/navigation-edx.html
 msgid "Schools & Partners"
 msgstr "대학교 및 협력기관"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Dashboard for:"
 msgstr "대시보드:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "More options dropdown"
 msgstr "더 많은 평가 기준 드롭 다운"
 
@@ -10330,10 +10391,12 @@ msgstr "프로필"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/shoppingcart/shopping_cart.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Shopping Cart"
 msgstr "장바구니"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "로그인"
 
@@ -10343,6 +10406,7 @@ msgid "Register"
 msgstr "가입하기 "
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -10350,16 +10414,16 @@ msgstr ""
 "<strong>경고:</strong> 사용하고 있는 브라우저로는 제대로 작동하지 않을 수 있습니다.  {chrome_link} 이나 "
 "{ff_link} 사용을 권장합니다."
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "글로벌"
 
 #. Translators: This is short for "System administration".
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "시스템관리자"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
 msgstr "학교"
 
@@ -10423,8 +10487,9 @@ msgstr "환영합니다 {username}님! 아래에서 선호 분야를 설정하�
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid ""
-"We're sorry, {platform_name} enrollment is not available in your region"
-msgstr "죄송합니다.  {platform_name}에 등록이 당신이 계신 지역에서는 가능하지 않습니다."
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "The following errors occurred while processing your registration:"
@@ -10563,7 +10628,7 @@ msgstr " {selected_provider} 로그인 성공."
 msgid ""
 "We just need a little more information before you start learning with "
 "{platform_name}."
-msgstr "{platform_name}에서 학습을 시작하기 전에 정보가 조금더 필요합니다."
+msgstr "{platform_name}에서 본격적인 학습을 위해서는 아래의 정보가 필요합니다. "
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -11283,6 +11348,14 @@ msgid "Student List Management"
 msgstr "학습자 목록 관리"
 
 #: lms/templates/ccx/enrollment.html
+msgid "CCX student list management response message"
+msgstr ""
+
+#: lms/templates/ccx/enrollment.html
+msgid "Revoke access"
+msgstr ""
+
+#: lms/templates/ccx/enrollment.html
 msgid "Enter username or email"
 msgstr ""
 
@@ -11389,15 +11462,6 @@ msgid "Print or share your certificate:"
 msgstr "강좌 이수증을 인쇄하거나 공유하기"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "I completed the {course_title} course on {platform_name}."
-msgstr "{platform_name}에서 제공하는 {course_title} 강좌를 완료했습니다."
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid ""
-"I completed a course on {platform_name}. Take a look at my certificate."
-msgstr "{platform_name}의 한 강좌를 완료 했습니다. 제 강좌 이수증을 살펴보세요."
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Click the link to see my certificate."
 msgstr "저의 강좌 이수증을 보기 위해 링크를 클릭해 주세요."
 
@@ -11439,33 +11503,47 @@ msgid "Supported by the following organizations"
 msgstr "다음 기관에서 제공하는"
 
 #: lms/templates/certificates/invalid.html
-msgid "This is an invalid certificate number"
-msgstr "유효하지 않은 이수증 번호입니다. "
-
-#: lms/templates/certificates/invalid.html
-msgid "This Certificate Does Not Exist"
-msgstr "강좌 이수증이 존재하지 않습니다."
+msgid "Cannot Find Certificate"
+msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"We cannot find a certificate on file that matches this URL or ID number."
-msgstr "URL 혹은 ID번호와 일치하는 이수증을 찾을 수 없습니다."
+"We cannot find a certificate with this URL or ID number. If you are trying "
+"to validate a certificate, make sure that the URL or ID number is correct. "
+"If you are sure that the URL or ID number is correct, contact support."
+msgstr ""
 
-#: lms/templates/certificates/invalid.html
-msgid "Looking for a Particular Certificate?"
-msgstr "특정 강좌 이수증을 찾고 있습니까?"
+#: lms/templates/certificates/server-error.html
+msgid "Invalid Certificate Configuration."
+msgstr ""
 
-#: lms/templates/certificates/invalid.html
+#: lms/templates/certificates/server-error.html
+msgid "There is a problem with this certificate on {platform_name}"
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
 msgid ""
-"Ensure that the ID number is an exact match of the ID number on the PDF or "
-"print certificate you are referencing."
-msgstr "ID 번호가 PDF나 출력한 강좌 이수증의 ID 번호와 정확히 일치 하는지 확인하세요."
+"To resolve the problem, your partner manager should verify that the "
+"following information is correct."
+msgstr ""
 
-#: lms/templates/certificates/invalid.html
+#: lms/templates/certificates/server-error.html
+msgid "The institution&#39;s logo."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
+msgid "The institution that is linked to the course."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
+msgid "The course information in the Course Administration tool."
+msgstr ""
+
+#: lms/templates/certificates/server-error.html
 msgid ""
-"If you are trying to validate a certificate with this ID number, it may be a"
-" forgery."
-msgstr "ID 번호를 포함한 강좌 이수증이 유효한지 확인한다면 위조입니다. "
+"If all of the information is correct and the problem persists, contact "
+"technical support."
+msgstr ""
 
 #: lms/templates/chat/toggle_chat.html
 msgid "Open Chat"
@@ -11648,8 +11726,8 @@ msgid "Please wait while we retrieve your order details."
 msgstr "자세한 주문정보를 불러오는 동안 잠시만 기다려 주세요."
 
 #: lms/templates/courseware/accordion.html
-msgid "{chapter}, current chapter"
-msgstr "{chapter}, 현재 장"
+msgid "{chapter} current chapter"
+msgstr ""
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
@@ -11657,8 +11735,8 @@ msgid "due {date}"
 msgstr "마감일 {date}"
 
 #: lms/templates/courseware/accordion.html
-msgid "This section is graded."
-msgstr "이 주제는 채점되었습니다."
+msgid "This content is graded"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
@@ -11668,15 +11746,13 @@ msgstr "오류가 발생했습니다. 잠시 후에 다시 시도하세요."
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
-" register button again. Please visit the {start_help_tag}help page{end_tag} "
+" enroll button again. Please visit the {start_help_tag}help page{end_tag} "
 "for a possible solution."
 msgstr ""
-"현재 로그인된 사용자 게정은 본 강좌에 수강신청이 허용되지 않습니다.  {start_logout_tag}로그아웃{end_tag}후에 "
-"사용자 등록 버튼을 클릭해야 합니다.  해결방법으로 {start_help_tag}도움말{end_tag} 페이지를 방문하세요. "
 
 #: lms/templates/courseware/course_about.html
-msgid "You are registered for this course"
-msgstr "수강중입니다."
+msgid "You are enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -11703,8 +11779,8 @@ msgid "Add {course_name} to Cart <span>({price} USD)</span>"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Register for {course_name}"
-msgstr "{course_name} 수강"
+msgid "Enroll in {course_name}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -11723,28 +11799,28 @@ msgid "Share with friends and family!"
 msgstr "친구 및 가족과 공유"
 
 #: lms/templates/courseware/course_about.html
-msgid "Tweet that you've registered for this course"
-msgstr "본 강좌에 등록한 것을 트위터에 트윗하세요."
+msgid "Tweet that you've enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Email someone to say you've registered for this course"
-msgstr "이 강좌에 등록했음을 누군가에게 이메일하세요"
+msgid "Email someone to say you've enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "I just registered for {number} {title} through {account}: {url}"
-msgstr "{number} {title} through {account}: {url} 로 방금 등록 완료  "
+msgid "I just enrolled in {number} {title} through {account}: {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Take a course with {platform} online"
 msgstr "{platform} 온라인으로 수강하세요"
 
 #: lms/templates/courseware/course_about.html
-msgid "I just registered for {number} {title} through {platform} {url}"
-msgstr "{number} {title} through {platform}: {url} 로 방금 등록 완료"
+msgid "I just enrolled in {number} {title} through {platform} {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Post a Facebook message to say you've registered for this course"
-msgstr "당신이 본 강좌에 등록했음을 Facebook에 게시하세요."
+msgid "Post a Facebook message to say you've enrolled in this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -12263,6 +12339,14 @@ msgid "Verification Failed"
 msgstr "인증이 실패 했습니다."
 
 #: lms/templates/courseware/progress.html
+msgid "Verification Declined"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Completed"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Upcoming"
 msgstr "곧 생성됩니다. "
 
@@ -12303,6 +12387,10 @@ msgid "Hi {name},"
 msgstr "안녕하세요 {name}님, "
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid "Hi,"
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
 "completing your {platform_name} course! {link_start}Get your credit "
@@ -12321,8 +12409,9 @@ msgstr ""
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
 "To get course credit, simply go to your {link_start}{platform_name} "
-"dashboard{link_end} and click the <b>Get Credit</b> button. No application, "
-"transcript, or grade report is required."
+"dashboard{link_end} and click the <b>Get Credit</b> button. After you "
+"receive your credit, you will also have an official academic transcript at "
+"the institution that granted the credit."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -12619,65 +12708,51 @@ msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr "결제 처리과정에서 오류가 발생했습니다. {support_email}에게 문의하세요."
 
+#. Translators: provider_name is the name of a credit provider or university
+#. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "You are now eligible for credit. <b>Congratulations!</b>"
+msgid ""
+"You are now eligible to purchase course credit for this course. Click "
+"<strong>Get Credit</strong> to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Get credit"
-msgstr "학점 얻기"
+msgid "Get Credit"
+msgstr ""
+
+#. Translators: provider_name is the name of a credit provider or university
+#. (e.g. State University)
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"Thank you for your payment. To receive course credit, you must now request "
+"credit at the {provider_name} website."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Finalize Credit"
+msgstr ""
+
+#. Translators: provider_name is the name of a credit provider or university
+#. (e.g. State University)
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"<strong>Congratulations!</strong> {provider_name} has converted your course "
+"credit. To see your course credit, click <strong>Access Credit</strong>."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Access Credit"
+msgstr ""
 
 #. Translators: link_to_provider_site is a link to an external webpage. The
 #. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
+#. credit provider, such as 'State University' or 'Happy Fun Company'.
+#. provider_name is the name of credit provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you. Your credit is processing. Please see {link_to_provider_site} for"
-" more information."
+"{provider_name} did not approve your request for course credit. For more "
+"information, contact {link_to_provider_site} directly."
 msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Learn more"
-msgstr "더 살펴보기"
-
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Thank you for your purchase. Please proceed to {link_to_provider_site} to "
-"finalize your credit."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Finalize credit"
-msgstr "학점 완료하기"
-
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Your credit has been processed and approved. <b>Congratulations!</b>. Please"
-" see {link_to_provider_site} for more information."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Access credit"
-msgstr "credit 액세스"
-
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Your credit has been processed but denied. Please contact "
-"{link_to_provider_site} for more information."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Contact {provider}"
-msgstr "{provider}로 연락하세요."
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -12756,7 +12831,7 @@ msgstr "게시물 보기"
 
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
-msgstr "게시판을 보려면, 학습 활동 설정에서 미리 보기나 적용 결과 보기를 클릭하세요."
+msgstr "게시판을 보려면, 학습활동 설정에서 미리 보기나 적용 결과 보기를 클릭하세요."
 
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "Discussion ID: {discussion_id}"
@@ -12962,7 +13037,7 @@ msgstr "비밀번호: {password}"
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "It is recommended that you change your password."
-msgstr "암호를 변경해주세요. "
+msgstr "비밀번호를 변경해주세요. "
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "Sincerely yours,The {course_name} Team"
@@ -12970,7 +13045,7 @@ msgstr "감사합니다. {course_name} 운영팀"
 
 #: lms/templates/emails/activation_email.txt
 msgid "Thank you for signing up for {platform_name}."
-msgstr "{platform_name}에 가입해주세요."
+msgstr "{platform_name} 서비스 가입 신청을 환영합니다."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -13034,18 +13109,18 @@ msgstr "{platform_name} 계정을 활성화 하세요."
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid "Dear {full_name}"
-msgstr "친애하는 {full_name}"
+msgstr "안녕하세요 {full_name}님"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid ""
 "You have been invited to be a beta tester for {course_name} at {site_name} "
 "by a member of the course staff."
-msgstr "강좌 운영팀 멤버가 당신을  {site_name}의  {course_name}에 베타테스터로 초대하였습니다."
+msgstr "강좌 운영팀에서 회원님을  {site_name}의  '{course_name}' 강좌에 베타테스터로 초대하였습니다."
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid "To start accessing course materials, please visit {course_url}"
-msgstr "강좌 자료에 이용하기 위해 {course_url} 에 방문하세요"
+msgstr "해당 강좌로 이동하시려면 로그인을 하신 뒤에, {course_url} 을 클릭하세요."
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {course_about_url} to join the course and begin the beta test."
@@ -13275,7 +13350,7 @@ msgstr "친애하는 학습자에게,"
 msgid ""
 "You have been invited to join {course_name} at {site_name} by a member of "
 "the course staff."
-msgstr "강좌 운영팀이 귀하를 {site_name} {course_name}에 초대하였습니다."
+msgstr "강좌 운영팀이 회원님을 {site_name} '{course_name}' 강좌에 초대하였습니다."
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "To access the course visit {course_url} and login."
@@ -13722,7 +13797,7 @@ msgstr "할인 비율"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Add expiration date"
-msgstr "만기일 추가"
+msgstr "쿠폰 만기일 추가"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Example Certificates"
@@ -13815,7 +13890,7 @@ msgstr "강좌 기본 정보"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
-msgstr "기관별 강좌 번호"
+msgstr "강좌 이름"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Display Name:"
@@ -14186,7 +14261,7 @@ msgstr "청구서에 빈칸이 있어서는 안됩니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "No Expiration Date"
-msgstr "만기일이 없습니다."
+msgstr "쿠폰 만기일이 없습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter the company name."
@@ -14386,7 +14461,7 @@ msgid ""
 "to individual students. Please note that the latest date is always taken; "
 "you cannot use this tool to make an assignment due earlier for a particular "
 "student."
-msgstr "이 섹션에서, 개별 학습자에게 특정 학습활동의 과제 제출 마감일을 연장해줄 수 있습니다. "
+msgstr "이 주제에서, 개별 학습자에게 특정 학습활동의 과제 제출 마감일을 연장해줄 수 있습니다. "
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -14429,7 +14504,8 @@ msgstr "각 학습활동이나 학습 활동에 허가된 연장 목록을 볼 �
 msgid ""
 "Choose a graded unit and click the button to obtain a list of all students "
 "who have extensions for the given unit."
-msgstr "채점된 학습 활동에서 기한 연장을 허가받은 학습자들의 목록을 보시려면, 해당 학습 활동을 선택한 후, 버튼을 클릭하세요."
+msgstr ""
+"채점된 학습활동에서 추가 제출 기간에 제출을 허가받은 학습자들의 목록을 보시려면, 해당 학습활동을 선택한 후, 버튼을 클릭하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
@@ -15384,8 +15460,8 @@ msgid ""
 "account activation message to {email}. To activate your account and start "
 "enrolling in courses, click the link in the message."
 msgstr ""
-"{platform_name}에 계정을 만들었습니다. {email}로 활성화 메일을 보냈으니, 강좌에 등록하고 싶다면 메일에 링크를 "
-"클릭해주세요."
+"{platform_name} 에 가입되었습니다. 강좌를 수강하기 위해서는 계정을 활성화해야 합니다. {email} 로 계정 활성화를 위한"
+" 메일을 보냈으니 확인해 주시기 바랍니다. "
 
 #: lms/templates/registration/activation_complete.html
 msgid "Activation Complete!"
@@ -15418,13 +15494,13 @@ msgstr "혹은 {link_start}홈 페이지{link_end}로 되돌아 갈 수 있습�
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
-msgstr "암호 재설정 성공"
+msgstr "비밀번호 재설정 성공"
 
 #: lms/templates/registration/password_reset_done.html
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr "입력한 이메일 주소로 암호를 설정하기 위한 안내를 이메일로 보냈습니다.  곧 이메일을 받을 수 있을 것입니다."
+msgstr "입력한 이메일 주소로 비밀번호를 설정하기 위한 안내를 이메일로 보냈습니다.  곧 이메일을 받을 수 있을 것입니다."
 
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
@@ -15871,6 +15947,7 @@ msgstr ""
 "유감스럽지만, 이 경우  {platform_name}은 강좌 접근을 허용할 수 없습니다.  "
 
 #: lms/templates/static_templates/faq.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "FAQ"
 msgstr "자주하는 질문"
 
@@ -15911,6 +15988,7 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr "현재 {platform_name}  서버가 과부하 상태 입니다."
 
 #: lms/templates/student_account/account_settings.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Account Settings"
 msgstr "계정 설정"
 
@@ -16131,6 +16209,28 @@ msgstr "{span_start}활성화됨{span_end}"
 msgid "Add article"
 msgstr "글 쓰기"
 
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
+"trademarks of {link_start}edX Inc.{link_end}"
+msgstr ""
+
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
+"Code{honor_link_end}"
+msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid "My Profile"
+msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid "Register Now"
+msgstr ""
+
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
 msgstr "찾고 있는 페이지가 없습니다."
@@ -16192,7 +16292,7 @@ msgstr "계정 활성화가 완료되었습니다."
 msgid ""
 "Thank you for activating your account. You may now sign in and start using "
 "{studio_name} to author courses."
-msgstr "계정 활성화에 감사합니다. 로그인 후 {studio_name}를 사용해서 강좌를 만들어 보세요!"
+msgstr "계정을 활성화해주셔서 감사합니다. 로그인 후 {studio_name}를 사용해서 강좌를 만들어 보세요!"
 
 #: cms/templates/activation_invalid.html
 msgid "Your account activation is invalid"
@@ -16213,10 +16313,6 @@ msgid ""
 msgstr ""
 "그래도 문제가 있다면, {platform_name} 지원 센터에 문의하세요. {link_start}{studio_name} 홈페이지로 "
 "되돌아 올수 있습니다{link_end} "
-
-#: cms/templates/activation_invalid.html
-msgid "Contact {platform_name} Support"
-msgstr "{platform_name} 연락"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files &amp; Uploads"
@@ -16302,6 +16398,10 @@ msgid "Learn more about managing files"
 msgstr "파일 관리 방법에 대해 자세히 알아보기"
 
 #: cms/templates/asset_index.html
+msgid "close"
+msgstr ""
+
+#: cms/templates/asset_index.html
 msgid "Max per-file size: {max_filesize}MB"
 msgstr "최대 파일 크기: {max_filesize}MB"
 
@@ -16374,7 +16474,7 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"
-msgstr "이수증에 대해 더 알아보기"
+msgstr "이수증에 대해 자세히 알아보기"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -16523,7 +16623,7 @@ msgstr "구성 요소 컨테이너에 대해 자세히 알아보기"
 
 #: cms/templates/container.html
 msgid "Unit Location"
-msgstr "학습 활동 위치"
+msgstr "학습활동 위치"
 
 #: cms/templates/container.html
 msgid "Location ID"
@@ -16592,7 +16692,7 @@ msgstr "예. KoreaX  혹은 PusanX"
 msgid ""
 "The name of the organization sponsoring the new course. (This name is often "
 "the same as the original organization name.)"
-msgstr "새 강좌를 지원하는 기관명. (최초 기관과 대부분 동일)"
+msgstr "새 강좌를 지원하는 기관의 이름 (최초 기관과 대부분 동일)"
 
 #: cms/templates/course-create-rerun.html
 msgid "Note: No spaces or special characters are allowed."
@@ -16937,11 +17037,6 @@ msgstr "모달 닫기"
 msgid "Internal Server Error"
 msgstr "내부 서버 오류"
 
-#: cms/templates/error.html cms/templates/widgets/footer.html
-#: cms/templates/widgets/sock.html
-msgid "Use our feedback tool, Tender, to share your feedback"
-msgstr "피드백을 공유하기 위해 피드백 도구인 Tender 를 사용하십시요."
-
 #: cms/templates/error.html
 msgid "The Page You Requested Page Cannot be Found"
 msgstr "요청한 페이지를 찾을 수 없습니다."
@@ -17052,7 +17147,7 @@ msgstr "MATLAB의 API 키와 LTI passports을 포함한 고급 설정 값"
 
 #: cms/templates/export.html
 msgid "Course Content (all Sections, Sub-sections, and Units)"
-msgstr "강좌 콘텐츠 (주제, 소주제, 학습 활동 전체)"
+msgstr "강좌 콘텐츠 (주제, 소주제, 학습활동 전체)"
 
 #: cms/templates/export.html
 msgid "Course Structure"
@@ -17251,12 +17346,12 @@ msgid ""
 "delete icon."
 msgstr ""
 "신규 콘텐츠 그룹을 추가하려면 {em_start}첫 번째 콘텐츠 그룹을 추가하세요{em_end}를 클릭합니다. 콘텐츠 그룹의 이름을 "
-"변경하려면, 박스 상단의 {em_start}편집{em_end}을 클릭하세요. 추후 학습 활동에서 활용하지 않는다면 콘텐츠 그룹을 삭제할 "
-"수 있습니다. 삭제는 박스 상단의 삭제 아이콘을 클릭하면 됩니다."
+"변경하려면, 박스 상단의 {em_start}편집{em_end}을 클릭하세요. 추후 학습활동에서 활용하지 않는다면 콘텐츠 그룹을 삭제할 수"
+" 있습니다. 삭제는 박스 상단의 삭제 아이콘을 클릭하면 됩니다."
 
 #: cms/templates/group_configurations.html
 msgid "Learn More"
-msgstr "더 알아보기"
+msgstr "자세히 알아보기"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -18049,14 +18144,6 @@ msgid "Getting Started with {studio_name}"
 msgstr "{studio_name} 도움말 보기"
 
 #: cms/templates/index.html
-msgid "Use our feedback tool, Tender, to request help"
-msgstr "도움을 요청하려면 피드백 도구인 Tender을 사용하세요"
-
-#: cms/templates/index.html cms/templates/widgets/sock.html
-msgid "Request help with {studio_name}"
-msgstr "{studio_name}에 대한 도움 요청"
-
-#: cms/templates/index.html
 msgid "Can I create courses in {studio_name}?"
 msgstr "{studio_name}에서 강좌를 개설할 수 있나요?"
 
@@ -18112,10 +18199,6 @@ msgid ""
 msgstr ""
 "이메일을 받지 못한 경우에는 스팸 메일함을 확인하시기 바랍니다. 그래도 인증 메일을 확인할 수 없다면 아래 링크를 통해 도움을 받으세요."
 
-#: cms/templates/index.html
-msgid "Request help with your {studio_name} account"
-msgstr "{studio_name} 계정에 도움이 필요합니다."
-
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "콘텐츠 보관함"
@@ -18162,7 +18245,7 @@ msgstr ""
 
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
-msgstr "콘텐츠 보관함에 대해 더 알아보기"
+msgstr "콘텐츠 보관함에 대해 자세히 알아보기"
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
@@ -18179,19 +18262,6 @@ msgstr "{studio_name}에 지금 가입하세요!"
 #: cms/templates/login.html
 msgid "Required Information to Sign In to {studio_name}"
 msgstr "{studio_name}에 로그인하기 위한 필요 정보"
-
-#: cms/templates/login.html
-msgid "{studio_name} Support"
-msgstr "{studio_name} 지원"
-
-#: cms/templates/login.html
-msgid ""
-"Having trouble with your account? Use {link_start}our support "
-"center{link_end} to look over self help steps, find solutions others have "
-"found to the same problem, or let us know of your issue."
-msgstr ""
-"귀하의 계정에 문제가 있습니까?   스스로 문제 해결 단계들을 살펴보거나, 같은 문제에 대해 다른 사람들이 찾은 해결책을 찾거나, 문제를"
-" {link_start} 고객 지원 센터{link_end}에 알려주십시요."
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
@@ -18559,8 +18629,12 @@ msgid "Enrollment End Date"
 msgstr "등록 종료일"
 
 #: cms/templates/settings.html
-msgid "Last day students can enroll"
-msgstr "수강신청 마감일"
+msgid "Last day students can enroll."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Contact your edX Partner Manager to update these settings."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
@@ -18943,7 +19017,7 @@ msgstr ""
 
 #: cms/templates/textbooks.html
 msgid "Learn more about textbooks"
-msgstr "더 알아보기"
+msgstr "자세히 알아보기"
 
 #: cms/templates/videos_index.html cms/templates/widgets/header.html
 msgid "Video Uploads"
@@ -18964,6 +19038,16 @@ msgstr ""
 "또는 .mov로 업로드하시면 됩니다. 그후 다른 형식의 파일들이 생성된 후 저장까지 자동으로 진행됩니다."
 
 #: cms/templates/videos_index.html
+msgid "Maximum Video File Size"
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid ""
+"The maximum size for each video file that you upload is 5 GB. The upload "
+"process fails for larger files."
+msgstr ""
+
+#: cms/templates/videos_index.html
 msgid "Monitoring files as they upload"
 msgstr "업로드된 파일 모니터링"
 
@@ -18982,16 +19066,12 @@ msgstr "업로드 파일 관리"
 
 #: cms/templates/videos_index.html
 msgid ""
-"After a file uploads successfully, automated processing begins. After "
-"automated processing begins for a file it is listed under Previous Uploads "
-"as {em_start}In Progress{em_end}. You can add the video to your course as "
-"soon as it has a unique video ID and the status is {em_start}Ready{em_end}. "
-"Allow 24 hours for file processing at the external video hosting sites to "
-"complete."
+"After a file uploads successfully, automated processing begins. The file is "
+"then listed under Previous Uploads as {em_start}In Progress{em_end}. You can"
+" add the video to your course as soon as it has a unique video ID and the "
+"status is {em_start}Ready{em_end}. Allow 24 hours for file processing at the"
+" external video hosting sites to complete."
 msgstr ""
-"파일이 성공적으로 업로드되면, 자동화된 프로세스가 시작됩니다. 파일의 자동화된 프로세스가 시작된 후,  {em_start} "
-"진행중{em_end} 상태일 때 파일은 이전 업로드 목록에 놓이게 됩니다. 고유 동영상 ID를 갖고 {em_start}준비{em_end}"
-" 상태일 때, 귀하는 동영상을 강좌에 추가할 수 있습니다. 외부 동영상 호스팅 사이트의 처리 완료에는 24시간이 걸립니다."
 
 #: cms/templates/videos_index.html
 msgid ""
@@ -19007,18 +19087,14 @@ msgstr "내 강좌에서 동영상을 얻으려면 어떻게 해야하나요?"
 
 #: cms/templates/videos_index.html
 msgid ""
-"As soon as the status for a file is {em_start}Ready{em_end}, you can add "
-"that video to a component in your course. Copy the unique video ID. In "
-"another browser window, on the Course Outline page, create or locate a video"
-" component to play this video. Edit the video component to paste the ID into"
-" the Advanced {em_start}Video ID{em_end} field. The video can play in the "
-"LMS as soon as its status is {em_start}Ready{em_end}, although processing "
-"may not be complete for all encodings and all video hosting sites."
+"When status for a file is {em_start}Ready{em_end}, you can add that video to"
+" a component in your course. Copy the unique video ID. In another browser "
+"window, on the Course Outline page, create or locate a video component to "
+"play this video. Edit the video component to paste the ID into the Advanced "
+"{em_start}Video ID{em_end} field. The video can play in the LMS as soon as "
+"its status is {em_start}Ready{em_end}, although processing may not be "
+"complete for all encodings and all video hosting sites."
 msgstr ""
-"파일의 상태가 {em_start}준비{em_end}가 되자마자, 동영상을 강좌의 구성요소에 추가할 수 있습니다. 동영상 고유 ID를 "
-"복사하세요.  새 창에서 강좌 개요 페이지를 연 다음, 동영상 구성요소를 생성해 동영상을 재생할 수 있도록 합니다. ID를 고급 "
-"{em_start} 동영상 ID {em_end} 필드에 넣기 위해 동영상 구성요소를 수정하세요. 인코딩과 모든 동영상 호스팅 사이트가 "
-"마무리되지 않았더라도, {em_start}준비{em_end} 상태가 되자마자  동영상은 LMS에서 재생될 수 있습니다.  "
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
@@ -19151,10 +19227,6 @@ msgid ""
 "activating your account."
 msgstr "당신 계정을 활성화 시킬수 있는 링크를 설명과 함께 {email},로 보냈습니다. "
 
-#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
-msgid "Contact Us"
-msgstr "연락처"
-
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
 #: cms/templates/widgets/footer.html
@@ -19168,6 +19240,10 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
 msgstr "수강중인 강좌"
+
+#: cms/templates/widgets/header.html
+msgid "Course Navigation"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
@@ -19246,34 +19322,54 @@ msgid "{studio_name} Documentation"
 msgstr "{studio_name} 도움말"
 
 #: cms/templates/widgets/sock.html
-msgid ""
-"You can click Help in the upper right corner of any page to get more "
-"information about the page you're on. You can also use the links below to "
-"download the Building and Running an {platform_name} Course PDF file, to go "
-"to the {platform_name} Author Support site, or to enroll in edX101."
+msgid "Access documentation on http://docs.edx.org"
 msgstr ""
-"궁금한 점이 있으시다면 오른쪽 상단의 도움말을 클릭하세요. 아래의 링크를 클릭해서 {platform_name} 도움말 PDF 파일을 "
-"다운로드 하거나, {platform_name} 개설자 사이트를 방문하셔도 됩니다."
 
 #: cms/templates/widgets/sock.html
-msgid "Building and Running an {platform_name} Course PDF"
-msgstr "{platform_name} 도움말 PDF"
+msgid "edX Documentation"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "{studio_name} Author Support"
-msgstr "{studio_name}저작자 지원"
+msgid ""
+"Access Course Staff Support on the Partner Portal to submit or review "
+"support tickets"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "edX Partner Portal"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Access the Open edX Portal"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Open edX Portal"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Enroll in edX101: Overview of Creating an edX Course"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
 msgstr "edX101 에 등록"
 
 #: cms/templates/widgets/sock.html
-msgid "How to use {studio_name} to build your course"
-msgstr "강좌를 개설하기 위한 {studio_name}사용법"
+msgid "Enroll in StudioX: Creating a Course with edX Studio"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Have problems, questions, or suggestions about {studio_name}?"
-msgstr "{studio_name} 대해 문제, 질문, 제안이 있습니까?"
+msgid "Enroll in StudioX"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Send an email to {email}"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Contact Us"
+msgstr "연락처"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"

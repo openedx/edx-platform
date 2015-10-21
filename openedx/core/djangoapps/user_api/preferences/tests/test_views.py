@@ -133,14 +133,21 @@ class TestPreferencesAPI(UserAPITestCase):
         self._do_create_preferences_test(False)
 
     def _do_create_preferences_test(self, is_active):
+        """
+        Internal helper to generalize the creation of a set of preferences
+        """
         self.client.login(username=self.user.username, password=self.test_password)
         if not is_active:
             self.user.is_active = False
             self.user.save()
-        self.send_patch(self.client, {
-            "dict_pref": {"int_key": 10},
-            "string_pref": "value",
-        })
+        self.send_patch(
+            self.client,
+            {
+                "dict_pref": {"int_key": 10},
+                "string_pref": "value",
+            },
+            expected_status=204
+        )
         response = self.send_get(self.client)
         self.assertEqual({u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}, response.data)
 
@@ -174,11 +181,15 @@ class TestPreferencesAPI(UserAPITestCase):
 
         # Send the patch request
         self.client.login(username=self.user.username, password=self.test_password)
-        self.send_patch(self.client, {
-            "string_pref": "updated_value",
-            "new_pref": "new_value",
-            "extra_pref": None,
-        })
+        self.send_patch(
+            self.client,
+            {
+                "string_pref": "updated_value",
+                "new_pref": "new_value",
+                "extra_pref": None,
+            },
+            expected_status=204
+        )
 
         # Verify that GET returns the updated preferences
         response = self.send_get(self.client)
@@ -353,6 +364,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._set_url(self.test_pref_key)
 
     def _set_url(self, preference_key):
+        """
+        Sets the url attribute including the username and provided preference key
+        """
         self.url = reverse(
             self.url_endpoint_name,
             kwargs={'username': self.user.username, 'preference_key': preference_key}
@@ -440,6 +454,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._do_create_preference_test(False)
 
     def _do_create_preference_test(self, is_active):
+        """
+        Generalization of the actual test workflow
+        """
         self.client.login(username=self.user.username, password=self.test_password)
         if not is_active:
             self.user.is_active = False

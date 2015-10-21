@@ -228,10 +228,10 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 }
             );
 
-            it('signatories should not save when fields have too many characters per line', function() {
+            it('signatories should save when fields have too many characters per line', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 setValuesToInputs(this.view, {
-                    inputCertificateName: 'New Certificate Name'
+                    inputCertificateName: 'New Certificate Name that has too many characters without any limit'
                 });
 
                 setValuesToInputs(this.view, {
@@ -243,7 +243,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 this.view.$(SELECTORS.saveCertificateButton).click();
-                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+                expect(this.view.$('.certificate-edit-error')).not.toHaveClass('is-shown');
             });
 
             it('signatories should not save when title span on more than 2 lines', function() {

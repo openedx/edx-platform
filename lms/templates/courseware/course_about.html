@@ -66,7 +66,7 @@ from edxmako.shortcuts import marketing_link
     %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
       <%
         perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
-                        'You may need to {start_logout_tag}log out{end_tag} then try the register button again. '
+                        'You may need to {start_logout_tag}log out{end_tag} then try the enroll button again. '
                         'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
                           start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
                           start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
@@ -135,7 +135,7 @@ from edxmako.shortcuts import marketing_link
             <a href="${course_target}">
           %endif
 
-          <span class="register disabled">${_("You are registered for this course")}</span>
+          <span class="register disabled">${_("You are enrolled in this course")}</span>
 
           %if show_courseware_link:
             <strong>${_("View Courseware")}</strong>
@@ -174,7 +174,7 @@ from edxmako.shortcuts import marketing_link
           <div id="register_error"></div>
         %else:
           <a href="#" class="register">
-            ${_("Register for {course_name}").format(course_name=course.display_number_with_default) | h}
+            ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h}
           </a>
           <div id="register_error"></div>
         %endif
@@ -231,11 +231,11 @@ from edxmako.shortcuts import marketing_link
             ##       or something allowing themes to do whatever they
             ##       want here (and on this whole page, really).
             % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
+              <a href="http://twitter.com/intent/tweet?text=I+just+enrolled+in+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
+                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
               </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
+              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20enrolled%20in%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
+                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
               </a>
             % else:
               <%
@@ -244,7 +244,7 @@ from edxmako.shortcuts import marketing_link
 
                 ## Translators: This text will be automatically posted to the student's
                 ## Twitter account. {url} should appear at the end of the text.
-                tweet_text = _("I just registered for {number} {title} through {account}: {url}").format(
+                tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
                     number=course.number,
                     title=get_course_about_section(course, 'title'),
                     account=microsite.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
@@ -259,7 +259,7 @@ from edxmako.shortcuts import marketing_link
 
                 email_subject = u"mailto:?subject={subject}&body={body}".format(
                     subject=_("Take a course with {platform} online").format(platform=platform_name),
-                    body=_("I just registered for {number} {title} through {platform} {url}").format(
+                    body=_("I just enrolled in {number} {title} through {platform} {url}").format(
                         number=course.number,
                         title=get_course_about_section(course, 'title'),
                         platform=platform_name,
@@ -271,13 +271,13 @@ from edxmako.shortcuts import marketing_link
                 ).replace(u" ", u"%20")
               %>
               <a href="${tweet_action}" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
+                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
               </a>
               <a href="${facebook_link}" class="share">
-                <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've registered for this course")}</span>
+                <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
               </a>
               <a href="${email_subject}" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
+                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
               </a>
             % endif
           </div>

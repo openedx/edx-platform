@@ -134,8 +134,7 @@ class AccountView(APIView):
             "Bad Request" error is returned. The JSON collection contains
             specific errors.
 
-            If the update is successful, an HTTP 204 "No Content" response is
-            returned with no additional content.
+            If the update is successful, updated user account data is returned.
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated,)
@@ -146,7 +145,7 @@ class AccountView(APIView):
         GET /api/user/v1/accounts/{username}/
         """
         try:
-            account_settings = get_account_settings(request, username, view=request.QUERY_PARAMS.get('view'))
+            account_settings = get_account_settings(request, username, view=request.query_params.get('view'))
         except UserNotFound:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
 
@@ -162,7 +161,8 @@ class AccountView(APIView):
         """
         try:
             with transaction.commit_on_success():
-                update_account_settings(request.user, request.DATA, username=username)
+                update_account_settings(request.user, request.data, username=username)
+                account_settings = get_account_settings(request, username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
         except UserNotFound:
@@ -178,4 +178,4 @@ class AccountView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(account_settings)

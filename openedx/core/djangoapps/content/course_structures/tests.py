@@ -1,3 +1,6 @@
+"""
+Course Structure Content sub-application test cases
+"""
 import json
 
 from xmodule_django.models import UsageKey
@@ -20,6 +23,9 @@ class SignalDisconnectTestMixin(object):
 
 
 class CourseStructureTaskTests(ModuleStoreTestCase):
+    """
+    Test cases covering Course Structure task-related workflows
+    """
     def setUp(self, **kwargs):
         super(CourseStructureTaskTests, self).setUp()
         self.course = CourseFactory.create(org='TestX', course='TS101', run='T1')
@@ -40,6 +46,9 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         blocks = {}
 
         def add_block(block):
+            """
+            Inserts new child XBlocks into the existing course tree
+            """
             children = block.get_children() if block.has_children else []
 
             blocks[unicode(block.location)] = {

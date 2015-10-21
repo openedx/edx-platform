@@ -6,6 +6,7 @@
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
@@ -20,6 +21,7 @@
 # SEUNGWON <baeksw0620@gmail.com>, 2014
 # bossnm11 <bossnm11@gmail.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
@@ -33,6 +35,7 @@
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # jeon <bluerespect@nate.com>, 2014
 # Jong-Dae Park <jdpark7@gmail.com>, 2015
 # Kevin Min <gr326887@graded.br>, 2015
@@ -45,6 +48,7 @@
 # 
 # Translators:
 # Hongseob Lee <shevious@gmail.com>, 2015
+# Hongseob Lee <shevious@yahoo.com>, 2015
 # jeon <bluerespect@nate.com>, 2014-2015
 # Kevin Min <gr326887@graded.br>, 2015
 # Kunwoo Kim <crazyabtmath@naver.com>, 2015
@@ -53,8 +57,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-09-18 13:22+0000\n"
-"PO-Revision-Date: 2015-09-11 12:17+0000\n"
+"POT-Creation-Date: 2015-10-16 13:04+0000\n"
+"PO-Revision-Date: 2015-10-14 15:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
@@ -2190,7 +2194,7 @@ msgstr "더보기"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "My Notes"
-msgstr "나의 노트"
+msgstr "내 노트"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Instructor"
@@ -2455,7 +2459,7 @@ msgid "All teams"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "teams"
+msgid "Topics"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -3373,7 +3377,7 @@ msgstr "모든 소주제"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All units"
-msgstr "모든 학습활동"
+msgstr "전체 학습활동"
 
 #: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
 #: lms/templates/ccx/schedule.underscore
@@ -3563,7 +3567,7 @@ msgstr "설정된 학습 집단이 현재 없습니다."
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "Add Cohort"
-msgstr "학습 집단 추가하기"
+msgstr "학습집단 추가하기"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
@@ -3694,7 +3698,7 @@ msgstr "계정 기본  정보 (필수)"
 msgid ""
 "The name that identifies you throughout {platform_name}. You cannot change "
 "your username."
-msgstr "{platform_name}에서 귀하를 나타낼 이름입니다. 아이디는 변경할 수 없습니다. "
+msgstr "{platform_name}에서 쓰게 되는 이름입니다. 변경할 수 없습니다. "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Full Name"
@@ -3760,7 +3764,7 @@ msgstr "성 "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Year of Birth"
-msgstr "출생 연도"
+msgstr "출생연도"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -3814,7 +3818,7 @@ msgstr "{platform_name} 학습자가 나에 대해 볼 수 있는 것은 :"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Limited Profile"
-msgstr "짧은 프로필"
+msgstr "제한적 프로필"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Full Profile"
@@ -3855,8 +3859,8 @@ msgid ""
 "You must be over 13 to share a full profile. If you are over 13, make sure "
 "that you have specified a birth year on the {account_settings_page_link}"
 msgstr ""
-"전체 프로필을 공유하려면 13세 이상이어야 합니다. 13세 이상이라면,  {account_settings_page_link}에서 출생 "
-"연도를 입력하세요."
+"전체 프로필을 공유하려면 13세 이상이어야 합니다. 13세 이상이라면,  {account_settings_page_link}에서 "
+"출생연도를 입력하세요."
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Profile Image"
@@ -4121,19 +4125,7 @@ msgid "Signatory field(s) has invalid data."
 msgstr ""
 
 #: cms/static/js/certificates/models/signatory.js
-msgid "Signatory name should not be more than 40 characters long."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
 msgid "Signatory title should span over maximum of 2 lines."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory title should have maximum of 40 characters per line."
-msgstr ""
-
-#: cms/static/js/certificates/models/signatory.js
-msgid "Signatory organization should not be more than 40 characters long."
 msgstr ""
 
 #: cms/static/js/certificates/views/certificate_details.js
@@ -4157,6 +4149,10 @@ msgstr ""
 msgid "certificate"
 msgstr ""
 
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "Set up your certificate"
+msgstr ""
+
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
@@ -4177,7 +4173,7 @@ msgid "Upload signature image."
 msgstr "서명 이미지 업로드하기"
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Image must be 450px X 150px transparent PNG."
+msgid "Image must be in PNG format."
 msgstr ""
 
 #: cms/static/js/collections/group.js
@@ -4541,6 +4537,10 @@ msgid "content group"
 msgstr ""
 
 #: cms/static/js/views/content_group_list.js
+msgid "Add your first content group"
+msgstr ""
+
+#: cms/static/js/views/content_group_list.js
 msgid "You have not created any content groups yet."
 msgstr ""
 
@@ -4583,6 +4583,10 @@ msgstr ""
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
+msgstr ""
+
+#: cms/static/js/views/group_configurations_list.js
+msgid "Add your first group configuration"
 msgstr ""
 
 #: cms/static/js/views/group_configurations_list.js
@@ -5159,10 +5163,8 @@ msgid "DISCUSSION HOME:"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-#: lms/templates/commerce/provider.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/discovery/course_card.underscore
-msgid "gettext("
+#, python-format
+msgid "How to use %(platform_name)s discussions"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
@@ -5433,15 +5435,6 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
 msgstr ""
 
@@ -5452,6 +5445,15 @@ msgstr ""
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
@@ -5644,7 +5646,7 @@ msgstr ""
 #: lms/static/js/fixtures/donation.underscore
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
-msgstr "기부"
+msgstr "기부하기"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
@@ -5688,6 +5690,20 @@ msgstr ""
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
+msgid ""
+"You still need to visit the %(display_name)s website to complete the credit "
+"process."
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
+msgid ""
+"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"learners to submit a credit request."
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
 msgid "<img src='%s' alt='%s'></image>"
 msgstr ""
 
@@ -5696,6 +5712,15 @@ msgstr ""
 msgid ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid "Get Credit"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#, python-format
+msgid "Thank you! We have received your payment for %(course_name)s."
 msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
@@ -5784,6 +5809,11 @@ msgid "LEARN MORE"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
+#, python-format
+msgid "Starts: %(start_date)s"
+msgstr ""
+
+#: lms/templates/discovery/course_card.underscore
 msgid "Starts"
 msgstr "개강일"
 
@@ -5869,7 +5899,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add students to this cohort"
-msgstr "학습 집단에 학습자 추가하기"
+msgstr "학습집단에 학습자 추가하기"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
@@ -5954,6 +5984,20 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
 msgstr "컨텐츠 그룹 삭제"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
+" content group was deleted. Select another content group."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#, python-format
+msgid ""
+"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
+"exist."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
@@ -6788,6 +6832,14 @@ msgid "Course Title Override"
 msgstr ""
 
 #: cms/templates/js/certificate-details.underscore
+msgid "Course Number"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Course Number Override"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Signatories"
 msgstr ""
@@ -7220,7 +7272,7 @@ msgstr ""
 
 #: cms/templates/js/list.underscore
 #, python-format
-msgid "Add your first %(item_type)s"
+msgid "%(new_item_message)s"
 msgstr ""
 
 #: cms/templates/js/list.underscore
@@ -7396,9 +7448,7 @@ msgid "Name of the signatory"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid ""
-"The name of this signatory as it should appear on certificates. Maximum 40 "
-"characters."
+msgid "The name of this signatory as it should appear on certificates."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7407,8 +7457,8 @@ msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
-"The title of this signatory as it should appear on certificates. Maximum 2 "
-"lines, 40 characters each."
+"Titles more than 100 characters may prevent students from printing their "
+"certificate on a single page."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7418,7 +7468,7 @@ msgstr ""
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
 "The organization that this signatory belongs to, as it should appear on "
-"certificates. Maximum 40 characters."
+"certificates."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -7430,7 +7480,7 @@ msgid "Path to Signature Image"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Image must be 450px X 150px transparent PNG"
+msgid "Image must be in PNG format"
 msgstr ""
 
 #: cms/templates/js/staff-lock-editor.underscore

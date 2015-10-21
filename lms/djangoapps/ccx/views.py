@@ -36,12 +36,12 @@ from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
-from instructor.offline_gradecalc import student_grades  # pylint: disable=import-error
-from instructor.views.api import _split_input_list  # pylint: disable=import-error
-from instructor.views.tools import get_student_from_identifier  # pylint: disable=import-error
+from instructor.offline_gradecalc import student_grades
+from instructor.views.api import _split_input_list
+from instructor.views.tools import get_student_from_identifier
 from instructor.enrollment import (
     enroll_email,
     unenroll_email,
@@ -50,7 +50,6 @@ from instructor.enrollment import (
 
 from .models import CustomCourseForEdX
 from .overrides import (
-    clear_override_for_ccx,
     get_override_for_ccx,
     override_field_for_ccx,
     clear_ccx_field_info_from_ccx_map,
@@ -254,7 +253,7 @@ def save_ccx(request, course, ccx=None):
     grader = policy['GRADER']
     for section in grader:
         count = graded.get(section.get('type'), 0)
-        if count < section['min_count']:
+        if count < section.get('min_count', 0):
             changed = True
             section['min_count'] = count
     if changed:
@@ -347,8 +346,13 @@ def get_ccx_schedule(course, ccx):
         Recursive generator function which yields CCX schedule nodes.
         We convert dates to string to get them ready for use by the js date
         widgets, which use text inputs.
+        Visits students visible nodes only; nodes children of hidden ones
+        are skipped as well.
         """
         for child in node.get_children():
+            # in case the children are visible to staff only, skip them
+            if child.visible_to_staff_only:
+                continue
             start = get_override_for_ccx(ccx, child, 'start', None)
             if start:
                 start = str(start)[:-9]

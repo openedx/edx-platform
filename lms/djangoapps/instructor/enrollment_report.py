@@ -57,6 +57,7 @@ class BaseAbstractEnrollmentReportProvider(AbstractEnrollmentReportProvider):
         user_data = collections.OrderedDict()
         user_data['User ID'] = user_info.id
         user_data['Username'] = user_info.username
+        user_data['Email'] = user_info.email
         user_data['Full Name'] = user_info.profile.name
         user_data['First Name'] = meta.get('first-name', '')
         user_data['Last Name'] = meta.get('last-name', '')

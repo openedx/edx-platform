@@ -954,6 +954,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
                 },
 
                 context={
+                    'ip': '127.0.0.1',
                     'Google Analytics':
                     {'clientId': None}
                 }

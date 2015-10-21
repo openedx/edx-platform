@@ -11,7 +11,7 @@ import ddt
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MixedModulestoreBuilder, VersioningModulestoreBuilder,
     MongoModulestoreBuilder, TEST_DATA_DIR
 )
