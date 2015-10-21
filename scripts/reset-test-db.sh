@@ -51,7 +51,6 @@ else
     ./manage.py lms --settings bok_choy makemigrations --traceback --noinput
     ./manage.py cms --settings bok_choy makemigrations --traceback --noinput
     ./manage.py lms --settings bok_choy migrate --traceback --noinput
-    ./manage.py lms --settings bok_choy migrate --traceback --noinput
     ./manage.py cms --settings bok_choy migrate --traceback --noinput
 
     # Dump the schema and data to the cache
