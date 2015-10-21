@@ -291,9 +291,6 @@ class CreditRequirement(TimeStampedModel):
     active = models.BooleanField(default=True)
 
     class Meta(object):
-        """
-        Model metadata.
-        """
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
 
@@ -428,7 +425,7 @@ class CreditRequirementStatus(TimeStampedModel):
     # Maintain a history of requirement status updates for auditing purposes
     history = HistoricalRecords()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('username', 'requirement')
 
     @classmethod
@@ -518,7 +515,7 @@ class CreditEligibility(TimeStampedModel):
         help_text=ugettext_lazy("Deadline for purchasing and requesting credit.")
     )
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('username', 'course')
         verbose_name_plural = "Credit eligibilities"
 
@@ -640,7 +637,7 @@ class CreditRequest(TimeStampedModel):
 
     history = HistoricalRecords()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         # Enforce the constraint that each user can have exactly one outstanding
         # request to a given provider.  Multiple requests use the same UUID.
         unique_together = ('username', 'course', 'provider')

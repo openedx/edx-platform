@@ -117,9 +117,6 @@ class GradedAssignment(models.Model):
     version_number = models.IntegerField(default=0)
 
     class Meta(object):
-        """
-        Uniqueness constraints.
-        """
         unique_together = ('outcome_service', 'lis_result_sourcedid')
 
 
@@ -135,7 +132,4 @@ class LtiUser(models.Model):
     edx_user = models.OneToOneField(User)
 
     class Meta(object):
-        """
-        Uniqueness constraints.
-        """
         unique_together = ('lti_consumer', 'lti_user_id')

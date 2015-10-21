@@ -106,7 +106,7 @@ class CcxFieldOverride(models.Model):
     location = LocationKeyField(max_length=255, db_index=True)
     field = models.CharField(max_length=255)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         app_label = 'ccx'
         unique_together = (('ccx', 'location', 'field'),)
 

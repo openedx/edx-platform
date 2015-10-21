@@ -157,7 +157,6 @@ class CourseTeamMembership(models.Model):
     """This model represents the membership of a single user in a single team."""
 
     class Meta(object):
-        """Stores meta information for the model."""
         app_label = "teams"
         unique_together = (('user', 'team'),)
 

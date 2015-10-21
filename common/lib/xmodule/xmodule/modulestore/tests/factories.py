@@ -74,7 +74,7 @@ class XModuleFactory(Factory):
     # We have to give a model for Factory.
     # However, the class that we create is actually determined by the category
     # specified in the factory
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = Dummy
 
     @lazy_attribute

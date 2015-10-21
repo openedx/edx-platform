@@ -29,6 +29,6 @@ class CreditCourseSerializer(serializers.ModelSerializer):
 
     course_key = CourseKeyField()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CreditCourse
         exclude = ('id',)

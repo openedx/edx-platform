@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 
 
 class ExternalAuthMap(models.Model):
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         app_label = "external_auth"
         unique_together = (('external_id', 'external_domain'), )
 

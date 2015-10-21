@@ -36,8 +36,4 @@ class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):
         self.fields['url'].lookup_url_kwarg = lookup_field
 
     class Meta(object):
-        """Defines meta information for the ModelSerializer.
-
-        model is set dynamically in __init__.
-        """
         fields = ("url",)

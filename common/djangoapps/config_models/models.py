@@ -67,7 +67,7 @@ class ConfigurationModel(models.Model):
             should be cached
     """
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         abstract = True
         ordering = ("-change_date", )
 

@@ -31,7 +31,7 @@ from lms.djangoapps.verify_student import models as verification_models
 
 class CourseModeForm(forms.ModelForm):
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseMode
         fields = '__all__'
 

@@ -10,8 +10,9 @@ from . import EDXNOTES_STUB_URL
 
 
 class Range(factory.Factory):
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = dict
+
     start = "/div[1]/p[1]"
     end = "/div[1]/p[1]"
     startOffset = 0
@@ -19,8 +20,9 @@ class Range(factory.Factory):
 
 
 class Note(factory.Factory):
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = dict
+
     user = "dummy-user"
     usage_id = "dummy-usage-id"
     course_id = "dummy-course-id"

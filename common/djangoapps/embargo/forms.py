@@ -25,7 +25,7 @@ class RestrictedCourseForm(forms.ModelForm):
     error message instead.
 
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = RestrictedCourse
         fields = '__all__'
 
@@ -59,7 +59,7 @@ class RestrictedCourseForm(forms.ModelForm):
 class IPFilterForm(forms.ModelForm):
     """Form validating entry of IP addresses"""
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = IPFilter
         fields = '__all__'
 

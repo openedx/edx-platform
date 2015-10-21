@@ -136,7 +136,7 @@ class GeneratedCertificate(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('user', 'course_id'),)
         app_label = "certificates"
 
@@ -253,7 +253,7 @@ class ExampleCertificateSet(TimeStampedModel):
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = 'created'
         app_label = "certificates"
 
@@ -514,7 +514,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = 'created'
         app_label = "certificates"
 
@@ -635,9 +635,6 @@ class BadgeAssertion(models.Model):
         return self.data['json']['id']
 
     class Meta(object):
-        """
-        Meta information for Django's construction of the model.
-        """
         unique_together = (('course_id', 'user', 'mode'),)
         app_label = "certificates"
 
@@ -751,7 +748,7 @@ class CertificateTemplate(TimeStampedModel):
     def __unicode__(self):
         return u'%s' % (self.name, )
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = 'created'
         unique_together = (('organization_id', 'course_key', 'mode'),)
         app_label = "certificates"
@@ -804,7 +801,7 @@ class CertificateTemplateAsset(TimeStampedModel):
     def __unicode__(self):
         return u'%s' % (self.asset.url, )  # pylint: disable=no-member
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = 'created'
         app_label = "certificates"
 

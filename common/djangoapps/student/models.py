@@ -213,7 +213,7 @@ class UserProfile(models.Model):
     MITx fall prototype.
     """
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         db_table = "auth_userprofile"
 
     # CRITICAL TODO/SECURITY
@@ -461,7 +461,8 @@ class Registration(models.Model):
         registration profile is created when the user creates an
         account, but that account is inactive. Once the user clicks
         on the activation key, it becomes active. '''
-    class Meta(object):  # pylint: disable=missing-docstring
+
+    class Meta(object):
         db_table = "auth_registration"
 
     user = models.OneToOneField(User)
@@ -877,7 +878,7 @@ class CourseEnrollment(models.Model):
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
     COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('user', 'course_id'),)
         ordering = ('user', 'course_id')
 
@@ -1475,7 +1476,7 @@ class CourseEnrollmentAllowed(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('email', 'course_id'),)
 
     def __unicode__(self):
@@ -1512,7 +1513,7 @@ class CourseAccessRole(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
     role = models.CharField(max_length=64, db_index=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('user', 'org', 'course_id', 'role')
 
     @property
@@ -1841,9 +1842,6 @@ class EntranceExamConfiguration(models.Model):
     skip_entrance_exam = models.BooleanField(default=True)
 
     class Meta(object):
-        """
-        Meta class to make user and course_id unique in the table
-        """
         unique_together = (('user', 'course_id'), )
 
     def __unicode__(self):
@@ -1900,7 +1898,7 @@ class LanguageProficiency(models.Model):
     /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
     (update_account_settings) so that the events are emitted.
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('code', 'user_profile'),)
 
     user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')
