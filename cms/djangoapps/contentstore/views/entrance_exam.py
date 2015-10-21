@@ -54,6 +54,13 @@ def check_feature_enabled(feature_name):
     return _check_feature_enabled
 
 
+def is_entrance_exams_enabled():
+    """
+    Returns a boolean indicating entrance exam feature is enable or not.
+    """
+    return settings.FEATURES.get('ENTRANCE_EXAMS', False)
+
+
 @login_required
 @ensure_csrf_cookie
 @check_feature_enabled(feature_name='ENTRANCE_EXAMS')
