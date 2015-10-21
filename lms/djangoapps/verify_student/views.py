@@ -52,6 +52,7 @@ from verify_student.models import (
     SoftwareSecurePhotoVerification,
     VerificationCheckpoint,
     VerificationStatus,
+    IcrvStatusEmailsConfiguration,
 )
 from verify_student.image import decode_image_data, InvalidImageData
 from util.json_request import JsonResponse
@@ -1312,8 +1313,9 @@ def results_callback(request):
     checkpoints = VerificationCheckpoint.objects.filter(photo_verification=attempt).all()
     VerificationStatus.add_status_from_checkpoints(checkpoints=checkpoints, user=attempt.user, status=status)
 
-    # If this is re-verification then send the update email
-    if checkpoints:
+    # Trigger ICRV email only if ICRV status emails config is enabled
+    icrv_status_emails = IcrvStatusEmailsConfiguration.current()
+    if icrv_status_emails.enabled and checkpoints:
         user_id = attempt.user.id
         course_key = checkpoints[0].course_id
         related_assessment_location = checkpoints[0].checkpoint_location

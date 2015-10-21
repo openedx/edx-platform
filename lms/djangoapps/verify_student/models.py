@@ -1308,6 +1308,15 @@ class InCourseReverificationConfiguration(ConfigurationModel):
     pass
 
 
+class IcrvStatusEmailsConfiguration(ConfigurationModel):
+    """Toggle in-course reverification (ICRV) status emails
+
+    Disabled by default. When disabled, ICRV status emails will not be sent.
+    When enabled, ICRV status emails are sent.
+    """
+    pass
+
+
 class SkippedReverification(models.Model):
     """Model for tracking skipped Reverification of a user against a specific
     course.

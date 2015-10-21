@@ -48,7 +48,8 @@ from verify_student.views import (
 )
 from verify_student.models import (
     VerificationDeadline, SoftwareSecurePhotoVerification,
-    VerificationCheckpoint, VerificationStatus
+    VerificationCheckpoint, VerificationStatus,
+    IcrvStatusEmailsConfiguration,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -1716,6 +1717,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
+        # Verify that ICRV status email was sent when config is enabled
+        IcrvStatusEmailsConfiguration.objects.create(enabled=True)
         self.create_reverification_xblock()
 
         data = {
@@ -1737,9 +1740,38 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
 
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
-        # Verify that photo re-verification status email was sent
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("Re-verification Status", mail.outbox[0].subject)
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_icrv_status_email_with_disable_config(self):
+        """
+        Verify that photo re-verification status email was not sent when config is disable
+        """
+        IcrvStatusEmailsConfiguration.objects.create(enabled=False)
+
+        self.create_reverification_xblock()
+
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+
+        json_data = json.dumps(data)
+
+        response = self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+
+        self.assertEqual(attempt.status, u'approved')
+        self.assertEquals(response.content, 'OK!')
+        self.assertEqual(len(mail.outbox), 0)
 
     @mock.patch('verify_student.views._send_email')
     @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
@@ -1747,6 +1779,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test software secure callback flow for re-verification.
         """
+        IcrvStatusEmailsConfiguration.objects.create(enabled=True)
+
         # Create the 'edx-reverification-block' in course tree
         self.create_reverification_xblock()
 
