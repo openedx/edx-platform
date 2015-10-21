@@ -42,7 +42,7 @@ requirejs.config({
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
 
-        "mathjax": "//cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+        "mathjax": "//cdn.mathjax.org/mathjax/2.5-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
 
         "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix"
