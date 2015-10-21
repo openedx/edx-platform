@@ -822,6 +822,9 @@ class SubmitPhotosView(View):
     """
 
     @method_decorator(transaction.non_atomic_requests)
+    def dispatch(self, *args, **kwargs):
+        return super(SubmitPhotosView, self).dispatch(*args, **kwargs)
+
     @method_decorator(login_required)
     @method_decorator(outer_atomic(read_committed=True))
     def post(self, request):
