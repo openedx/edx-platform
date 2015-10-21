@@ -647,20 +647,19 @@ class TestCohorts(ModuleStoreTestCase):
         first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
         second_cohort = CohortFactory(course_id=course.id, name="SecondCohort")
 
-        t1 = threading.Thread(target=cohorts.add_user_to_cohort, args=[first_cohort, "Username"])
-        t2 = threading.Thread(target=cohorts.add_user_to_cohort, args=[second_cohort, "Username"])
+        thread_a = threading.Thread(target=cohorts.add_user_to_cohort, args=[first_cohort, "Username"])
+        thread_b = threading.Thread(target=cohorts.add_user_to_cohort, args=[second_cohort, "Username"])
 
-        for thread in [t1, t2]:
+        for thread in [thread_a, thread_b]:
             thread.start()
 
-        for thread in [t1, t2]:
+        for thread in [thread_a, thread_b]:
             thread.join()
 
         try:
             cohorts.get_cohort(course_user, course.id)
-        except MultipleObjectsReturned:
-            self.fail("User was added to more than one cohort!");
-
+        except CourseUserGroup.MultipleObjectsReturned:
+            self.fail("User was added to more than one cohort!")
 
     def test_get_course_cohort_settings(self):
         """

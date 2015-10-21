@@ -16,7 +16,13 @@ from eventtracking import tracker
 from request_cache.middleware import RequestCache
 from student.models import get_user_by_username_or_email
 
-from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup, CohortMembership
+from .models import (
+    CourseUserGroup,
+    CourseCohort,
+    CourseCohortsSettings,
+    CourseUserGroupPartitionGroup,
+    CohortMembership
+)
 
 
 log = logging.getLogger(__name__)
