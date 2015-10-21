@@ -11,7 +11,7 @@ from courseware.views import progress  # pylint: disable=import-error
 from courseware.field_overrides import OverrideFieldData
 from datetime import datetime
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edxmako.middleware import MakoMiddleware  # pylint: disable=import-error
@@ -161,7 +161,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         with self.settings(MODULESTORE_BRANCH='published-only'):
             # Clear all caches before measuring
             for cache in settings.CACHES:
-                get_cache(cache).clear()
+                caches[cache].clear()
 
             # Refill the metadata inheritance cache
             modulestore().get_course(self.course.id, depth=None)

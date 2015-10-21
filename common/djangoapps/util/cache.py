@@ -17,7 +17,7 @@ from django.core import cache
 from django.utils.translation import get_language
 
 try:
-    cache = cache.get_cache('general')
+    cache = cache.caches['general']
 except Exception:
     cache = cache.cache
 
