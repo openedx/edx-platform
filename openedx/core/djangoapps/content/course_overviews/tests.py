@@ -374,3 +374,36 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 # including after an IntegrityError exception the 2nd time
                 for _ in range(2):
                     self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
+
+    def test_course_overview_version_update(self):
+        """
+        Test that when we are running in a partially deployed state (where both
+        old and new CourseOverview.VERSION values are active), that we behave
+        properly. This assumes that all updates are backwards compatible, or
+        at least are backwards compatible between version N and N-1.
+        """
+        course = CourseFactory.create()
+        with mock.patch('openedx.core.djangoapps.content.course_overviews.models.CourseOverview.VERSION', new=10):
+            # This will create a version 10 CourseOverview
+            overview_v10 = CourseOverview.get_from_id(course.id)
+            self.assertEqual(overview_v10.version, 10)
+
+            # Now we're going to muck with the values and manually save it as v09
+            overview_v10.version = 9
+            overview_v10.save()
+
+            # Now we're going to ask for it again. Because 9 < 10, we expect
+            # that this entry will be deleted() and that we'll get back a new
+            # entry with version = 10 again.
+            updated_overview = CourseOverview.get_from_id(course.id)
+            self.assertEqual(updated_overview.version, 10)
+
+            # Now we're going to muck with this and set it a version higher in
+            # the database.
+            updated_overview.version = 11
+            updated_overview.save()
+
+            # Because CourseOverview is encountering a version *higher* than it
+            # knows how to write, it's not going to overwrite what's there.
+            unmodified_overview = CourseOverview.get_from_id(course.id)
+            self.assertEqual(unmodified_overview.version, 11)
