@@ -4,6 +4,7 @@ dates for each block in the course.
 """
 
 from .field_overrides import FieldOverrideProvider
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 
 class SelfPacedDateOverrideProvider(FieldOverrideProvider):
@@ -20,4 +21,4 @@ class SelfPacedDateOverrideProvider(FieldOverrideProvider):
     @classmethod
     def enabled_for(cls, course):
         """This provider is enabled for self-paced courses only."""
-        return course.self_paced
+        return SelfPacedConfiguration.current().enabled and course.self_paced

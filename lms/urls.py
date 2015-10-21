@@ -11,6 +11,9 @@ import django.contrib.auth.views
 from microsite_configuration import microsite
 import auth_exchange.views
 
+from config_models.views import ConfigurationModelCurrentAPIView
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
@@ -738,6 +741,10 @@ if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
     urlpatterns += (
         url(r'^lti_provider/', include('lti_provider.urls')),
     )
+
+urlpatterns += (
+    url(r'config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
+)
 
 urlpatterns = patterns(*urlpatterns)
 

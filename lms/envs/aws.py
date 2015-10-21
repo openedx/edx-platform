@@ -677,10 +677,9 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     )
 
 ##### Self-Paced Course Due Dates #####
-if FEATURES.get('ENABLE_SELF_PACED_COURSES'):
-    FIELD_OVERRIDE_PROVIDERS += (
-        'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
-    )
+FIELD_OVERRIDE_PROVIDERS += (
+    'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
+)
 
 # PROFILE IMAGE CONFIG
 PROFILE_IMAGE_BACKEND = ENV_TOKENS.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BACKEND)

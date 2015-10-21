@@ -14,6 +14,7 @@ from ...pages.studio.utils import add_discussion, drag, verify_ordering
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.staff_view import StaffPage
+from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
@@ -1766,6 +1767,7 @@ class SelfPacedOutlineTest(CourseOutlineTest):
             ),
         )
         self.course_fixture.add_course_details({'self_paced': True})
+        ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
 
     def test_release_dates_not_shown(self):
         """

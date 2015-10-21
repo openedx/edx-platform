@@ -4,6 +4,7 @@ Acceptance tests for Studio's Settings Details pages
 from unittest import skip
 
 from .base_studio_test import StudioCourseTest
+from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import CourseFixture
 from ...pages.studio.settings import SettingsPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -201,6 +202,9 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
 
 class CoursePacingTest(StudioSettingsDetailsTest):
     """Tests for setting a course to self-paced."""
+
+    def populate_course_fixture(self, __):
+        ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
 
     def test_default_instructor_led(self):
         """
