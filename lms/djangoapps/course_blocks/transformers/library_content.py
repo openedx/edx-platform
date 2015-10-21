@@ -47,6 +47,7 @@ class ContentLibraryTransformer(BlockStructureTransformer):
         """
         block_structure.request_xblock_fields('mode')
         block_structure.request_xblock_fields('max_count')
+        block_structure.request_xblock_fields('category')
         store = modulestore()
 
         # needed for analytics purposes
@@ -140,8 +141,7 @@ class ContentLibraryTransformer(BlockStructureTransformer):
         children = []
         selected_children = []
         for block_key in block_structure.get_block_keys():
-            xblock = block_structure.get_xblock(block_key)
-            if getattr(xblock, 'category', None) == 'library_content':
+            if block_structure.get_xblock_field(block_key, 'category') == 'library_content':
                 library_children = block_structure.get_children(block_key)
                 children.extend(library_children)
                 selected = []
