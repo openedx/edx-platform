@@ -63,7 +63,7 @@ class NotifierUserSerializer(serializers.ModelSerializer):
                     pass
         return ret
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = User
         fields = ("id", "email", "name", "preferences", "course_info")
         read_only_fields = ("id", "email")

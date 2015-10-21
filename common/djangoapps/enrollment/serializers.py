@@ -76,7 +76,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """Retrieves the username from the associated model."""
         return model.username
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course_details', 'user')
         lookup_field = 'username'

@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 
 class CourseSoftwareFactory(DjangoModelFactory):
     '''Factory for generating CourseSoftware objects in database'''
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseSoftware
 
     name = SOFTWARE_1
@@ -48,7 +48,7 @@ class UserLicenseFactory(DjangoModelFactory):
     By default, the user assigned is null, indicating that the
     serial number has not yet been assigned.
     '''
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = UserLicense
 
     user = None
