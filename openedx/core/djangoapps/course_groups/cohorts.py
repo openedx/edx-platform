@@ -348,6 +348,16 @@ def add_user_to_cohort(cohort, username_or_email):
     membership = CohortMembership(course_user_group=cohort, user=user)
     membership.save(get_previous=True)
 
+    """
+    TODO: with the new setup, we cannot emit a "requested" event containing
+    information about the previous cohort before calling save().
+
+    Decide how to best handle this
+        -remove previous info from "requested" event
+        -wait until after save so previous information is available
+        -add another event type and emit both before and after
+    """
+
     tracker.emit(
         "edx.cohort.user_add_requested",
         {

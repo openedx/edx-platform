@@ -5,6 +5,8 @@ Django models related to course groups functionality.
 import json
 import logging
 
+import time
+
 from django.contrib.auth.models import User
 from django.db import models, transaction, IntegrityError
 from django.core.exceptions import ValidationError
@@ -88,12 +90,17 @@ class CohortMembership(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean(validate_unique=False)
+
+        print "Trying to add user to {}".format(self.course_user_group.name)
+
         if self.course_user_group.name == CourseUserGroup.INTERNAL_NAME:
             super(CohortMembership, self).save(*args, **kwargs)
             return
 
         self.trying_to_save = True
         while(self.trying_to_save):
+            print "entering loop, trying to get membership for user {user}, course {course}".format(user=self.user.id, course=self.course_id)
+
             try:
                 #the following 2 "transaction" lines force a fresh read, they can be removed once we're on django 1.8
                 #see http://stackoverflow.com/questions/3346124/how-do-i-force-django-to-ignore-any-caches-and-reload-data
@@ -105,7 +112,11 @@ class CohortMembership(models.Model):
                     course_id = self.course_id,
                 )
             except CohortMembership.DoesNotExist:
+                print "No membership found! Trying to create a default..."
+
                 try:
+                    time.sleep(5)
+
                     dummy_group, created  = CourseUserGroup.objects.get_or_create(
                         name=CourseUserGroup.INTERNAL_NAME,
                         course_id=self.course_user_group.course_id,
@@ -118,8 +129,13 @@ class CohortMembership(models.Model):
                     )
                     new_membership.save()
                 except IntegrityError:
+                    print "Integrity Error saving new default membership! Take it from the top..."
+
                     pass
                 continue
+
+            time.sleep(5)
+            print "saved membership found, id {id}, group {group}! proceeding...".format(id=saved_membership.id, group=saved_membership.course_user_group.id)
 
             if saved_membership.course_user_group == self.course_user_group:
                 raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
@@ -144,10 +160,16 @@ class CohortMembership(models.Model):
                         course_user_group = self.course_user_group,
                         version = saved_membership.version + 1
                     )
+                    time.sleep(5)
+
                     if not updated:
                         raise IntegrityError("value of saved_membership has changed since read")
             except IntegrityError:
+                print "could not save membership, trying again"
+
                 continue
+
+            print "{count}: We did it! User {user} is now in group {cohort} in the {course} course. The membership is at version {version}".format(user=self.user, cohort=self.course_user_group.name, course=self.course_user_group.course_id, version=saved_membership.version+1, count=updated)
 
             self.trying_to_save = False
 
