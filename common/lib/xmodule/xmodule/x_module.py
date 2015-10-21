@@ -1216,7 +1216,6 @@ def descriptor_global_handler_url(block, handler_name, suffix='', query='', thir
     """
     raise NotImplementedError("Applications must monkey-patch this function before using handler_url for studio_view")
 
-
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
 # the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
