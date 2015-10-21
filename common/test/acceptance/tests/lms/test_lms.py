@@ -847,7 +847,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertEqual(3, len(self.course_nav.sections['Test Section']))
 
-        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
+        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")  # TODO: fails under phantom
         self.assertEqual(["Html Child in locked unit", "Html Child in unlocked unit"], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
@@ -869,7 +869,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertEqual(2, len(self.course_nav.sections['Test Section']))
 
-        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
+        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")  # TODO: fails under phantom
         self.assertEqual(["Html Child in unlocked unit"], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")

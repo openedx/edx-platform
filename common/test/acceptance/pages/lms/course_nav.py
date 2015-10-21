@@ -69,7 +69,7 @@ class CourseNavPage(PageObject):
         Example:
             go_to_section("Week 1", "Lesson 1")
         """
-
+        assert False, "Go to section fails in phantomjs"
         # For test stability, disable JQuery animations (opening / closing menus)
         self.browser.execute_script("jQuery.fx.off = true;")
 

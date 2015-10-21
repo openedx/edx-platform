@@ -16,17 +16,24 @@ class FieldsMixin(object):
         """
         Return field with field_id.
         """
+        assert False, "Why am I here?"
         query = self.q(css='.u-field-{}'.format(field_id))
         return query.text[0] if query.present else None
 
     def wait_for_field(self, field_id):
+        """Wait for a field to appear in DOM.
+
+        Args:
+            field_id (str): The ID of the field, used in locating it via css
+
+        Returns:
+            None
+
+        Raises:
+            BrokenPromise: If the field is not present in the DOM before the default timeout
         """
-        Wait for a field to appear in DOM.
-        """
-        EmptyPromise(
-            lambda: self.field(field_id) is not None,
-            "Field with id \"{0}\" is in DOM.".format(field_id)
-        ).fulfill()
+        field_css = '.u-field-{}'.format(field_id)
+        self.wait_for_element_presence(field_css, 'Field {} is present in the DOM'.format(field_id))
 
     def mode_for_field(self, field_id):
         """
@@ -39,8 +46,8 @@ class FieldsMixin(object):
 
         query = self.q(css='.u-field-{}'.format(field_id))
 
-        if not query.present:
-            return None
+        # if not query.present:
+        #     return None
 
         field_classes = query.attrs('class')[0].split()
 
@@ -124,18 +131,17 @@ class FieldsMixin(object):
         """
         Make a field editable.
         """
-        query = self.q(css='.u-field-{}'.format(field_id))
+        self.wait_for_field(field_id)
+        field_mode = self.mode_for_field(field_id)
 
-        if not query.present:
-            return None
-
-        field_classes = query.attrs('class')[0].split()
-
-        if 'mode-placeholder' in field_classes or 'mode-display' in field_classes:
+        if field_mode in ['placeholder', 'display']:
             if field_id == 'bio':
                 self.q(css='.u-field-bio > .wrapper-u-field').first.click()
             else:
                 self.q(css='.u-field-{}'.format(field_id)).first.click()
+
+        # Verify that the class changed to mode-edit
+        self.wait_for(lambda: self.mode_for_field(field_id) == 'edit', 'Field {} is editable'.format(field_id))
 
     def value_for_readonly_field(self, field_id):
         """
@@ -155,10 +161,8 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} input'.format(field_id))
-        if not query.present:
-            return None
-
+        field_css = '.u-field-{} input'.format(field_id)
+        query = self.q(css=field_css)
         if value is not None:
             current_value = query.attrs('value')[0]
             query.results[0].send_keys(u'\ue003' * len(current_value))  # Delete existing value.
@@ -171,13 +175,15 @@ class FieldsMixin(object):
         """
         Set the value of a textarea field.
         """
+        assert False, "Cannot set value for textarea"
         self.wait_for_field(field_id)
         self.make_field_editable(field_id)
 
         field_selector = '.u-field-{} textarea'.format(field_id)
         self.wait_for_element_presence(field_selector, 'Editable textarea is present.')
 
-        query = self.q(css=field_selector)
+        query = self.q(css=field_selector).first
+        query.click()
         query.fill(value)
         query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
 
@@ -186,21 +192,19 @@ class FieldsMixin(object):
         Return value of field in `display` or `placeholder` mode.
         """
         self.wait_for_field(field_id)
-        self.wait_for_ajax()
-
         return self.q(css='.u-field-{} .u-field-value .u-field-value-readonly'.format(field_id)).text[0]
 
     def value_for_dropdown_field(self, field_id, value=None):
         """
         Get or set the value in a dropdown field.
         """
-        self.wait_for_field(field_id)
+        assert False, "This test uses value_for_dropdown_field"
 
+        self.wait_for_field(field_id)
         self.make_field_editable(field_id)
 
-        query = self.q(css='.u-field-{} select'.format(field_id))
-        if not query.present:
-            return None
+        field_css = '.u-field-{} select'.format(field_id)
+        query = self.q(css=field_css)
 
         if value is not None:
             select_option_by_text(query, value)

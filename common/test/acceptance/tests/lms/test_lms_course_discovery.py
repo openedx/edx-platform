@@ -75,6 +75,7 @@ class CourseDiscoveryTest(WebAppTest):
         Make sure you can search for courses.
         """
         self.page.visit()
+        assert False, "Needed to visit the page"
         self.assertEqual(len(self.page.result_items), 12)
 
         self.page.search("grass")

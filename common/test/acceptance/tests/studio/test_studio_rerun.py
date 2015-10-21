@@ -1,9 +1,9 @@
 """
 Acceptance tests for Studio related to course reruns.
 """
-
 import random
 from bok_choy.promise import EmptyPromise
+from nose.plugins.attrib import attr
 from nose.tools import assert_in
 
 from ...pages.studio.index import DashboardPage
@@ -72,7 +72,8 @@ class CourseRerunTest(StudioCourseTest):
         self.dashboard_page.create_rerun(self.course_info['display_name'])
 
         rerun_page = CourseRerunPage(self.browser, *course_info)
-        rerun_page.wait_for_page()
+        assert False, "Wait for page fails under phantomjs"
+        rerun_page.wait_for_page()  # TODO this fails under phantom
         course_run = 'test_rerun_' + str(random.randrange(1000000, 9999999))
         rerun_page.course_run = course_run
         rerun_page.create_rerun()

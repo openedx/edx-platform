@@ -1,8 +1,8 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
-
 from flaky import flaky
+from nose.plugins.attrib import attr
 
 from ...pages.studio.asset_index import AssetIndexPage
 
@@ -15,7 +15,6 @@ class AssetIndexTest(StudioCourseTest):
     """
     Tests for the Asset index page.
     """
-
     def setUp(self, is_staff=False):
         super(AssetIndexTest, self).setUp()
         self.asset_page = AssetIndexPage(
@@ -37,7 +36,6 @@ class AssetIndexTest(StudioCourseTest):
         """
         self.asset_page.visit()
 
-    @flaky  # TODO fix this, see SOL-1160
     def test_type_filter_exists(self):
         """
         Make sure type filter is on the page.

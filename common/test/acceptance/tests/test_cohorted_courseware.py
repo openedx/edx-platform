@@ -98,6 +98,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
             self.course_info['number'],
             self.course_info['run']
         )
+        assert False, "This test needs to visit the group configurations page"
         group_configurations_page.visit()
 
         group_configurations_page.create_first_content_group()

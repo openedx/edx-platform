@@ -167,6 +167,21 @@ class CourseTeamPage(CoursePage, UsersPageMixin):
 
     url_path = "course_team"
 
+    @property
+    def _usernames(self):
+        """
+        Returns a list of user names for users listed on this page
+        """
+        return [user.name for user in self._users]
+
+    @property
+    def _users(self):
+        """
+        Return a list of users listed on this page.
+        """
+        return self.q(css='.user-list .user-item').map(
+            lambda el: UserWrapper(self.browser, el.get_attribute('data-email'))
+        ).results
 
 class UserWrapper(PageObject):
     """
