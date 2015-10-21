@@ -29,7 +29,7 @@ class CourseUserGroup(models.Model):
                             help_text=("What is the name of this group?  "
                                        "Must be unique within a course."))
     users = models.ManyToManyField(User, db_index=True, related_name='course_groups',
-                                   help_text="Who is in this group?", through='CourseUserGroupMembership')
+                                   help_text="Who is in this group?")
 
     # Note: groups associated with particular runs of a course.  E.g. Fall 2012 and Spring
     # 2013 versions of 6.00x will have separate groups.
