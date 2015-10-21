@@ -13,6 +13,7 @@ from microsite_configuration.models import (
     MicrositeOrgMapping,
     MicrositeTemplate
 )
+from microsite_configuration.microsite import get_value as microsite_get_value
 
 
 class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
@@ -135,8 +136,6 @@ class DatabaseMicrositeTemplateBackend(BaseMicrositeTemplateBackend):
         database tables for a template definition, if we can't find
         one we'll return None which means "use default means" (aka filesystem)
         """
-        from microsite_configuration.microsite import get_value as microsite_get_value
-
         template_text = MicrositeTemplate.get_template_for_microsite(microsite_get_value('microsite_config_key'), uri)
         if not template_text:
             return None

@@ -54,7 +54,7 @@ class Microsite(models.Model):
         """
         Helper method to return a list of ORGs associated with our particular Microsite
         """
-        return MicrositeOrgMapping.get_orgs_for_microsite_by_pk(self.id)
+        return MicrositeOrgMapping.get_orgs_for_microsite_by_pk(self.id)  # pylint: disable=no-member
 
     @classmethod
     def get_microsite_for_domain(cls, domain):
@@ -82,7 +82,7 @@ class MicrositeHistory(TimeStampedModel):
     def __unicode__(self):
         return self.key
 
-    class Meta:
+    class Meta(object):
         """ Meta class for this Django model """
         verbose_name_plural = "Microsite histories"
 
@@ -171,7 +171,7 @@ class MicrositeTemplate(models.Model):
     # for archiving
     history = HistoricalRecords()
 
-    class Meta:
+    class Meta(object):
         """ Meta class for this Django model """
         unique_together = (('microsite', 'template_uri'),)
 

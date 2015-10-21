@@ -2,16 +2,9 @@
 """
 Test Microsite backends.
 """
-
-import logging
-from mock import patch
 from django.test import TestCase
 
-from microsite_configuration.backends.database import DatabaseMicrositeBackend
 from microsite_configuration.backends.base import BaseMicrositeBackend
-from microsite_configuration.backends.filebased import SettingsFileMicrositeBackend
-
-log = logging.getLogger(__name__)
 
 
 class NullBackend(BaseMicrositeBackend):
@@ -38,7 +31,7 @@ class NullBackend(BaseMicrositeBackend):
         """
         return super(NullBackend, self).get_value(val_name, default, **kwargs)
 
-    def get_dict(self, dict_name, default={}, **kwargs):
+    def get_dict(self, dict_name, default=None, **kwargs):
         """
         Returns a dictionary product of merging the request's microsite and
         the default value.
@@ -106,7 +99,7 @@ class BaseBackendTests(TestCase):
         """
 
         with self.assertRaises(TypeError):
-            BaseMicrositeBackend()
+            BaseMicrositeBackend()  # pylint: disable=abstract-class-instantiated
 
     def test_not_yet_implemented(self):
         """
