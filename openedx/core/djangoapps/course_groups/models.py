@@ -138,21 +138,25 @@ class CohortMembership(models.Model):
                 self.previous_cohort_name = saved_membership.course_user_group.name
                 self.previous_cohort_id = saved_membership.course_user_group.id
 
-            with transaction.commit_on_success():
-                self.previous_cohort.users.remove(self.user)
-                self.course_user_group.users.add(self.user)
-                self.user.course_groups.remove(self.previous_cohort)
-                self.user.course_groups.add(self.course_user_group)
-                updated = CohortMembership.objects.filter(
-                    id = saved_membership.id,
-                    version = saved_membership.version
-                ).update(
-                    course_user_group = self.course_user_group,
-                    version = saved_membership.version + 1
-                )
-                time.sleep(10)
-                if not updated:
-                    raise IntegrityError("value of saved_membership has changed since read")
+            try:
+                with transaction.commit_on_success():
+                    self.previous_cohort.users.remove(self.user)
+                    self.course_user_group.users.add(self.user)
+                    self.user.course_groups.remove(self.previous_cohort)
+                    self.user.course_groups.add(self.course_user_group)
+                    updated = CohortMembership.objects.filter(
+                        id = saved_membership.id,
+                        version = saved_membership.version
+                    ).update(
+                        course_user_group = self.course_user_group,
+                        version = saved_membership.version + 1
+                    )
+                    time.sleep(10)
+                    if not updated:
+                        raise IntegrityError("value of saved_membership has changed since read")
+            except IntegrityError:
+                print "could not save membership, trying again"
+                continue
 
             print "{count}: We did it! User {user} is now in group {cohort} in the {course} course. The membership is at version {version}".format(user=self.user, cohort=self.course_user_group.name, course=self.course_user_group.course_id, version=saved_membership.version+1, count=updated)
             self.trying_to_save = False
