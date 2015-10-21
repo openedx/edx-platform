@@ -18,7 +18,6 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
-    var MAX_SIGNATORIES = 4;
     var SELECTORS = {
         detailsView: '.certificate-details',
         editView: '.certificate-edit',
@@ -198,12 +197,12 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(this.collection.length).toBe(1);
             });
 
-            it('user can only add signatories up to max 4', function() {
-                for(var i = 1; i < MAX_SIGNATORIES ; i++) {
+            it('users can add signatories as many as they want', function() {
+                // currently checking for 10 signatories as a test.
+                for(var i = 1; i <= 10 ; i++) {
                     this.view.$(SELECTORS.addSignatoryButton).click();
                 }
-                expect(this.view.$(SELECTORS.addSignatoryButton)).toHaveClass('disableClick');
-
+                expect(this.view.$(SELECTORS.addSignatoryButton)).not.toHaveClass('disableClick');
             });
 
             it('user can add signatories if not reached the upper limit', function() {
@@ -212,21 +211,6 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect('click').not.toHaveBeenPreventedOn(SELECTORS.addSignatoryButton);
                 expect(this.view.$(SELECTORS.addSignatoryButton)).not.toHaveClass('disableClick');
             });
-
-            it('user can add signatories when signatory reached the upper limit But after deleting a signatory',
-                function() {
-                    for(var i = 1; i < MAX_SIGNATORIES ; i++) {
-                        this.view.$(SELECTORS.addSignatoryButton).click();
-                    }
-                    expect(this.view.$(SELECTORS.addSignatoryButton)).toHaveClass('disableClick');
-
-                    // now delete anyone of the signatory, Add signatory should be enabled.
-                    var signatory = this.model.get('signatories').at(0);
-                    var text = 'Delete "'+ signatory.get('name') +'" from the list of signatories?';
-                    clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first');
-                    expect(this.view.$(SELECTORS.addSignatoryButton)).not.toHaveClass('disableClick');
-                }
-            );
 
             it('signatories should save when fields have too many characters per line', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
