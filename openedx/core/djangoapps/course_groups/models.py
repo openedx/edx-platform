@@ -67,6 +67,15 @@ class CohortMembership(models.Model):
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'), )
 
+    #the sole purpose of overriding this method is to get the django 1.6 behavior of allowing 'validate_unique'
+    #for django 1.8 upgrade, just remove this method and allow the base method to be called instead.
+    #reference: https://docs.djangoproject.com/en/1.6/ref/models/instances/, under "Validating Objects"
+    def full_clean(self, *args, **kwargs):
+        self.clean_fields()
+        self.clean()
+        if not 'validate_unique' in kwargs or kwargs['validate_unique'] == True:
+            self.validate_unique()
+
     def clean_fields(self, *args, **kwargs):
         if self.course_id == None:
             self.course_id = self.course_user_group.course_id
@@ -79,7 +88,7 @@ class CohortMembership(models.Model):
             raise ValidationError("Non-matching course_ids provided")
 
     def save(self, *args, **kwargs):
-        self.full_clean() #needed to hit custom validation defined in clean()
+        self.full_clean(validate_unique=False) #needed to hit custom validation defined in clean()
         print "Trying to add user to {}".format(self.course_user_group.name)
         if self.course_user_group.name == CourseCohort.INTERNAL_NAME:
             super(CohortMembership, self).save(*args, **kwargs)
@@ -89,7 +98,7 @@ class CohortMembership(models.Model):
         while(self.trying_to_save):
             print "entering loop, trying to get membership for user {user}, course {course}".format(user=self.user.id, course=self.course_id)
             try:
-                #the following 2 "transaction" lines force a fresh read, they can be removed once on django 1.8
+                #the following 2 "transaction" lines force a fresh read, they can be removed once we're on django 1.8
                 #see http://stackoverflow.com/questions/3346124/how-do-i-force-django-to-ignore-any-caches-and-reload-data
                 with transaction.commit_manually():
                     transaction.commit()
@@ -125,8 +134,9 @@ class CohortMembership(models.Model):
                     cohort_name=self.course_user_group.name
                 ))
             self.previous_cohort = saved_membership.course_user_group
-            self.previous_cohort_name = saved_membership.course_user_group.name
-            self.previous_cohort_id = saved_membership.course_user_group.id
+            if self.previous_cohort.name != CourseCohort.INTERNAL_NAME:
+                self.previous_cohort_name = saved_membership.course_user_group.name
+                self.previous_cohort_id = saved_membership.course_user_group.id
 
             with transaction.commit_on_success():
                 self.previous_cohort.users.remove(self.user)
