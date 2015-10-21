@@ -43,7 +43,6 @@ $incorrect: $red;
 
   &:after {
     @extend %use-font-awesome;
-    @include margin-left(17px);
     color: $color;
     font-size: 1.2em;
     content: $fontAwesomeIcon;
@@ -184,7 +183,7 @@ div.problem {
         @include status-icon($partiallycorrect, "\f069");
         border: 2px solid $partiallycorrect;
 
-        // keep green for correct answers on hover. 
+        // keep green for correct answers on hover.
         &:hover {
           border-color: $partiallycorrect;
         }
