@@ -752,7 +752,7 @@ INSTALLED_APPS = (
 
     # Tracking
     'track',
-    'eventtracking.django',
+    'eventtracking.django.apps.EventTrackingConfig',
 
     # Monitoring
     'datadog',
