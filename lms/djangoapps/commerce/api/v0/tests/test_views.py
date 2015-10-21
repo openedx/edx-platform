@@ -18,7 +18,7 @@ from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA,
 from commerce.tests.mocks import mock_basket_order, mock_create_basket
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
-from ecommerce_api_client import exceptions
+from edx_rest_api_client import exceptions
 from embargo.test_utils import restrict_course
 from enrollment.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url

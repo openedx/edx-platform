@@ -11,7 +11,7 @@ import httpretty
 import jwt
 import mock
 
-from ecommerce_api_client import auth
+from edx_rest_api_client import auth
 from commerce import ecommerce_api_client
 from student.tests.factories import UserFactory
 
@@ -29,14 +29,14 @@ TEST_PAYMENT_DATA = {
 
 
 @override_settings(ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
-class EcommerceApiClientTest(TestCase):
+class EdxRestApiClientTest(TestCase):
     """ Tests to ensure the client is initialized properly. """
 
     TEST_USER_EMAIL = 'test@example.com'
     TEST_CLIENT_ID = 'test-client-id'
 
     def setUp(self):
-        super(EcommerceApiClientTest, self).setUp()
+        super(EdxRestApiClientTest, self).setUp()
 
         self.user = UserFactory()
         self.user.email = self.TEST_USER_EMAIL
