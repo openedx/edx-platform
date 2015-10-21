@@ -202,6 +202,33 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         self.runtime.publish(self, "edx.librarycontentblock.content.{}".format(event_name), event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
+    @classmethod
+    def publish_selected_children_events(self, block_keys, format_block_keys, publish_event):
+        if block_keys['invalid']:
+            # reason "invalid" means deleted from library or a different library is now being used.
+            publish_event(
+                "removed",
+                result=format_block_keys(block_keys['selected']),
+                removed=format_block_keys(block_keys['invalid']),
+                reason="invalid"
+            )
+
+        if block_keys['overlimit']:
+            publish_event(
+                "removed",
+                result=format_block_keys(block_keys['selected']),
+                removed=format_block_keys(block_keys['overlimit']),
+                reason="overlimit"
+            )
+
+        if block_keys['added']:
+            publish_event(
+                "assigned",
+                result=format_block_keys(block_keys['selected']),
+                added=format_block_keys(block_keys['added'])
+            )
+
+
     def selected_children(self):
         """
         Returns a set() of block_ids indicating which of the possible children
@@ -218,37 +245,18 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             return self._selected_set  # pylint: disable=access-member-before-definition
 
         block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")
-        selected = block_keys['selected']
 
         # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
-
-        if block_keys['invalid']:
-            # reason "invalid" means deleted from library or a different library is now being used.
-            self._publish_event(
-                "removed",
-                result=format_block_keys(selected),
-                removed=format_block_keys(block_keys['invalid']),
-                reason="invalid"
-            )
-
-        if block_keys['overlimit']:
-            self._publish_event(
-                "removed",
-                result=format_block_keys(selected),
-                removed=format_block_keys(block_keys['overlimit']),
-                reason="overlimit"
-            )
-
-        if block_keys['added']:
-            self._publish_event(
-                "assigned",
-                result=format_block_keys(selected),
-                added=format_block_keys(block_keys['added'])
-            )
+        self.publish_selected_children_events(
+            block_keys,
+            format_block_keys,
+            self._publish_event,
+        )
 
         # Save our selections to the user state, to ensure consistency:
+        selected = block_keys['selected']
         self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
         # Cache the results
         self._selected_set = selected  # pylint: disable=attribute-defined-outside-init

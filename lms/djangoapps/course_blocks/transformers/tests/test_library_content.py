@@ -72,7 +72,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                                             '#ref': 'library_content1',
                                             '#children': [
                                                 {
-                                                    'metadata': {'display_name': "CL Vertical 1"},
+                                                    'metadata': {'display_name': "CL Vertical 2"},
                                                     '#type': 'vertical',
                                                     '#ref': 'vertical2',
                                                     '#children': [
@@ -84,7 +84,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                                                     ]
                                                 },
                                                 {
-                                                    'metadata': {'display_name': "CL Vertical 2"},
+                                                    'metadata': {'display_name': "CL Vertical 3"},
                                                     '#type': 'vertical',
                                                     '#ref': 'vertical3',
                                                     '#children': [
