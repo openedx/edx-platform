@@ -27,8 +27,12 @@ from xmodule_django.models import CourseKeyField
 from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException
-from teams.utils import emit_team_event
-from teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.utils import emit_team_event
+from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+
+with open("/tmp/foo.txt", "a") as f:
+    print >>f, "-----", __name__
+    import inspect;print >>f, ("\n".join("%30s : %s @%d" % (t[3], t[1], t[2]) for t in inspect.stack()[:0:-1]))
 
 
 @receiver(thread_voted)

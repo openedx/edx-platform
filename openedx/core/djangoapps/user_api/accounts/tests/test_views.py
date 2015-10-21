@@ -592,7 +592,7 @@ class TestAccountAPI(UserAPITestCase):
         ),
         (
             [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
-            [u'The language_proficiencies field must consist of unique languages']
+            ['The language_proficiencies field must consist of unique languages']
         ),
     )
     @ddt.unpack
@@ -720,4 +720,4 @@ class TestAccountAPITransactions(TransactionTestCase):
         response = self.client.get(self.url)
         data = response.data
         self.assertEqual(old_email, data["email"])
-        self.assertEqual(u"m", data["gender"])
+        self.assertEqual(u"o", data["gender"])
