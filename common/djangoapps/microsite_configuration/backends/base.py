@@ -41,7 +41,7 @@ class BaseMicrositeBackend(object):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_dict(self, dict_name, default={}, **kwargs):
+    def get_dict(self, dict_name, default=None, **kwargs):
         """
         Returns a dictionary product of merging the request's microsite and
         the default value.
