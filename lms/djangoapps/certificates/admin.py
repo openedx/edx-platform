@@ -28,7 +28,6 @@ class CertificateTemplateForm(forms.ModelForm):
         )
 
     class Meta(object):
-        """ Meta definitions for CertificateTemplateForm  """
         model = CertificateTemplate
 
 

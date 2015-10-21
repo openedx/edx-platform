@@ -73,7 +73,7 @@ class-attribute-rgx = ([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$
 inlinevar-rgx = [A-Za-z_][A-Za-z0-9_]*$
 good-names = f,i,j,k,db,ex,Run,_,__
 bad-names = foo,bar,baz,toto,tutu,tata
-no-docstring-rgx = __.*__|test_.+|setUp|tearDown
+no-docstring-rgx = __.*__$|test_.+|setUp$|setUpClass$|tearDown$|tearDownClass$|Meta$
 docstring-min-length = -1
 
 [FORMAT]
@@ -152,4 +152,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 6a610602e4c093047ed189c9a0d4ba796c7d1622
+# 503c3db797ee662a18237a57f00cb1e6e553be34

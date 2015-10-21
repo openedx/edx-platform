@@ -104,7 +104,7 @@ class ModuleSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_system`, so
     arguments for that function are valid factory attributes.
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = ModuleSystem
 
     @classmethod
@@ -120,7 +120,7 @@ class DescriptorSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_descriptor_system`, so
     arguments for that function are valid factory attributes.
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = DescriptorSystem
 
     @classmethod

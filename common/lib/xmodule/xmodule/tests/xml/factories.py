@@ -64,7 +64,7 @@ class XmlImportFactory(Factory):
     Factory for generating XmlImportData's, which can hold all the data needed
     to run an XModule XML import
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = XmlImportData
 
     filesystem = MemoryFS()

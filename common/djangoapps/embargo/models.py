@@ -646,7 +646,7 @@ class CourseAccessRuleHistory(models.Model):
             else:
                 CourseAccessRuleHistory.save_snapshot(restricted_course)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = 'timestamp'
 
 

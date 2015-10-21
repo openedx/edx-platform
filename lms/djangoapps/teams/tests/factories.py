@@ -18,7 +18,7 @@ class CourseTeamFactory(DjangoModelFactory):
 
     Note that team_id is not auto-generated from name when using the factory.
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseTeam
         django_get_or_create = ('team_id',)
 
@@ -31,8 +31,9 @@ class CourseTeamFactory(DjangoModelFactory):
 
 class CourseTeamMembershipFactory(DjangoModelFactory):
     """Factory for CourseTeamMemberships."""
-    class Meta(object):    # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseTeamMembership
+
     last_activity_at = LAST_ACTIVITY_AT
 
     @classmethod
