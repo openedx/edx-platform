@@ -6,7 +6,8 @@ import json
 import logging
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction, IntegrityError
+from django.core.exceptions import ValidationError
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -24,6 +25,8 @@ class CourseUserGroup(models.Model):
     name = models.CharField(max_length=255,
                             help_text=("What is the name of this group?  "
                                        "Must be unique within a course."))
+    INTERNAL_NAME = '_db_internal_'
+
     users = models.ManyToManyField(User, db_index=True, related_name='course_groups',
                                    help_text="Who is in this group?")
 
@@ -56,6 +59,106 @@ class CourseUserGroup(models.Model):
             group_type=group_type,
             name=name
         )
+
+class CohortMembership(models.Model):
+    """Used internally to enforce our particular definition of uniqueness"""
+
+    class Meta(object):
+        unique_together = (('user', 'course_id'), )
+
+    #the sole purpose of overriding this method is to get the django 1.6 behavior of allowing 'validate_unique'
+    #for django 1.8 upgrade, just remove this method and allow the base method to be called instead.
+    #reference: https://docs.djangoproject.com/en/1.6/ref/models/instances/, under "Validating Objects"
+    def full_clean(self, *args, **kwargs):
+        self.clean_fields()
+        self.clean()
+        if not 'validate_unique' in kwargs or kwargs['validate_unique'] == True:
+            self.validate_unique()
+
+    def clean_fields(self, *args, **kwargs):
+        if self.course_id == None:
+            self.course_id = self.course_user_group.course_id
+        super(CohortMembership, self).clean_fields(*args, **kwargs)
+
+    def clean(self):
+        if self.course_user_group.group_type != CourseUserGroup.COHORT:
+            raise ValidationError("CohortMembership cannot be used with CourseGroup types other than COHORT")
+        if self.course_user_group.course_id != self.course_id:
+            raise ValidationError("Non-matching course_ids provided")
+
+    def save(self, *args, **kwargs):
+        self.full_clean(validate_unique=False)
+        if self.course_user_group.name == CourseUserGroup.INTERNAL_NAME:
+            super(CohortMembership, self).save(*args, **kwargs)
+            return
+
+        self.trying_to_save = True
+        while(self.trying_to_save):
+            try:
+                #the following 2 "transaction" lines force a fresh read, they can be removed once we're on django 1.8
+                #see http://stackoverflow.com/questions/3346124/how-do-i-force-django-to-ignore-any-caches-and-reload-data
+                with transaction.commit_manually():
+                    transaction.commit()
+
+                saved_membership = CohortMembership.objects.get(
+                    user__id = self.user.id,
+                    course_id = self.course_id,
+                )
+            except CohortMembership.DoesNotExist:
+                try:
+                    dummy_group, created  = CourseUserGroup.objects.get_or_create(
+                        name=CourseUserGroup.INTERNAL_NAME,
+                        course_id=self.course_user_group.course_id,
+                        group_type=CourseUserGroup.COHORT
+                    )
+                    new_membership = CohortMembership(
+                        user = self.user,
+                        course_user_group = dummy_group,
+                        version = 1
+                    )
+                    new_membership.save()
+                except IntegrityError:
+                    pass
+                continue
+
+            if saved_membership.course_user_group == self.course_user_group:
+                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                    user_name=self.user.username,
+                    cohort_name=self.course_user_group.name
+                ))
+            self.previous_cohort = saved_membership.course_user_group
+            if self.previous_cohort.name != CourseUserGroup.INTERNAL_NAME:
+                self.previous_cohort_name = saved_membership.course_user_group.name
+                self.previous_cohort_id = saved_membership.course_user_group.id
+
+            try:
+                with transaction.commit_on_success():
+                    self.previous_cohort.users.remove(self.user)
+                    self.course_user_group.users.add(self.user)
+                    self.user.course_groups.remove(self.previous_cohort)
+                    self.user.course_groups.add(self.course_user_group)
+                    updated = CohortMembership.objects.filter(
+                        id = saved_membership.id,
+                        version = saved_membership.version
+                    ).update(
+                        course_user_group = self.course_user_group,
+                        version = saved_membership.version + 1
+                    )
+                    if not updated:
+                        raise IntegrityError("value of saved_membership has changed since read")
+            except IntegrityError:
+                continue
+
+            self.trying_to_save = False
+
+    course_user_group = models.ForeignKey(CourseUserGroup)
+    user = models.ForeignKey(User)
+    version = models.IntegerField(default=0)
+    course_id = CourseKeyField(max_length=255)
+
+    previous_cohort = None
+    previous_cohort_name = None
+    previous_cohort_id = None
 
 
 class CourseUserGroupPartitionGroup(models.Model):
