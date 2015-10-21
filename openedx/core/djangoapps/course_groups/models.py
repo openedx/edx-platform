@@ -110,7 +110,7 @@ class CohortMembership(models.Model):
             except CohortMembership.DoesNotExist:
                 print "No membership found! Trying to create a default..."
                 try:
-                    time.sleep(10)
+                    time.sleep(5)
                     dummy_group, created  = CourseUserGroup.objects.get_or_create(
                         name=CourseCohort.INTERNAL_NAME,
                         course_id=self.course_user_group.course_id,
@@ -127,6 +127,7 @@ class CohortMembership(models.Model):
                     pass #we're going to continue either way
                 continue
 
+            time.sleep(5)
             print "saved membership found, id {id}, group {group}! proceeding...".format(id=saved_membership.id, group=saved_membership.course_user_group.id)
             if saved_membership.course_user_group == self.course_user_group:
                 raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
@@ -151,7 +152,7 @@ class CohortMembership(models.Model):
                         course_user_group = self.course_user_group,
                         version = saved_membership.version + 1
                     )
-                    time.sleep(10)
+                    time.sleep(5)
                     if not updated:
                         raise IntegrityError("value of saved_membership has changed since read")
             except IntegrityError:
