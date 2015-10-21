@@ -200,7 +200,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             assignment_type=CourseCohort.RANDOM
         ).course_user_group
 
-    membership = CourseUserGroupMembership(course_user_group=cohort, user=user, version=-1)
+    membership = CohortMembership(course_user_group=cohort, user=user)
     membership.save()
 
     return request_cache.data.setdefault(cache_key, cohort)
@@ -345,7 +345,7 @@ def add_user_to_cohort(cohort, username_or_email):
     """
     user = get_user_by_username_or_email(username_or_email)
 
-    membership = CourseUserGroupMembership(course_user_group=cohort, user=user, version=-1)
+    membership = CohortMembership(course_user_group=cohort, user=user)
     membership.save(get_previous=True)
 
     """
