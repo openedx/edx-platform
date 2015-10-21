@@ -1409,14 +1409,12 @@ PIPELINE_CSS = {
     'style-course': {
         'source_filenames': [
             'css/lms-course.css',
-            'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-course.css',
     },
     'style-course-rtl': {
         'source_filenames': [
             'css/lms-course-rtl.css',
-            'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-course-rtl.css',
     },
