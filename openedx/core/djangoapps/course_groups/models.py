@@ -28,6 +28,8 @@ class CourseUserGroup(models.Model):
     name = models.CharField(max_length=255,
                             help_text=("What is the name of this group?  "
                                        "Must be unique within a course."))
+    INTERNAL_NAME = '_db_internal_'
+
     users = models.ManyToManyField(User, db_index=True, related_name='course_groups',
                                    help_text="Who is in this group?")
 
@@ -90,7 +92,7 @@ class CohortMembership(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean(validate_unique=False) #needed to hit custom validation defined in clean()
         print "Trying to add user to {}".format(self.course_user_group.name)
-        if self.course_user_group.name == CourseCohort.INTERNAL_NAME:
+        if self.course_user_group.name == CourseUserGroup.INTERNAL_NAME:
             super(CohortMembership, self).save(*args, **kwargs)
             return
 
@@ -112,7 +114,7 @@ class CohortMembership(models.Model):
                 try:
                     time.sleep(5)
                     dummy_group, created  = CourseUserGroup.objects.get_or_create(
-                        name=CourseCohort.INTERNAL_NAME,
+                        name=CourseUserGroup.INTERNAL_NAME,
                         course_id=self.course_user_group.course_id,
                         group_type=CourseUserGroup.COHORT
                     )
@@ -135,7 +137,7 @@ class CohortMembership(models.Model):
                     cohort_name=self.course_user_group.name
                 ))
             self.previous_cohort = saved_membership.course_user_group
-            if self.previous_cohort.name != CourseCohort.INTERNAL_NAME:
+            if self.previous_cohort.name != CourseUserGroup.INTERNAL_NAME:
                 self.previous_cohort_name = saved_membership.course_user_group.name
                 self.previous_cohort_id = saved_membership.course_user_group.id
 
@@ -221,8 +223,6 @@ class CourseCohort(models.Model):
     This model represents cohort related info.
     """
     course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort')
-
-    INTERNAL_NAME = '_db_internal_'
 
     RANDOM = 'random'
     MANUAL = 'manual'

@@ -253,7 +253,7 @@ def get_course_cohorts(course, assignment_type=None):
     migrate_cohort_settings(course)
 
     query_set = CourseUserGroup.objects.exclude(
-        name=CourseCohort.INTERNAL_NAME
+        name=CourseUserGroup.INTERNAL_NAME
     ).filter(
         course_id=course.location.course_key,
         group_type=CourseUserGroup.COHORT
