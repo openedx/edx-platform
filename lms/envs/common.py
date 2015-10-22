@@ -1794,6 +1794,9 @@ INSTALLED_APPS = (
     'djcelery',
     'south',
 
+    # Common views
+    'openedx.core.djangoapps.common_views',
+
     # History tables
     'simple_history',
 
