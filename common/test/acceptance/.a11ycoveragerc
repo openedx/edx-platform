@@ -1,5 +1,5 @@
 [run]
-data_file = reports/bok_choy/.coverage
+data_file = reports/a11y/.coverage
 source =
     lms
     cms
@@ -24,10 +24,13 @@ parallel = True
 
 [report]
 ignore_errors = True
+include =
+    **/views/*.py
+    **/views.py
 
 [html]
-title = Bok Choy Test Coverage Report
-directory = reports/bok_choy/cover
+title = Bok Choy A11y Test Coverage Report
+directory = reports/a11y/cover
 
 [xml]
-output = reports/bok_choy/acceptance_coverage.xml
+output = reports/a11y/coverage.xml

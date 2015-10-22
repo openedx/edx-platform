@@ -456,14 +456,26 @@ To run all the bok choy accessibility tests use this command.
 
 ::
 
-    paver test_bokchoy --extra_args="-a 'a11y'"
+    paver test_a11y
 
 To run specific tests, use the ``-t`` flag to specify a nose-style test spec
 relative to the ``common/test/acceptance/tests`` directory. This is an example for it.
 
 ::
 
-    paver test_bokchoy --extra_args="-a 'a11y'" -t test_lms_dashboard.py:LmsDashboardA11yTest.test_dashboard_course_listings_a11y
+    paver test_a11y -t test_lms_dashboard.py:LmsDashboardA11yTest.test_dashboard_course_listings_a11y
+
+**Coverage**:
+
+To generate the coverage report for the views run during accessibility tests::
+
+    paver a11y_coverage
+
+Note that this coverage report is just a guideline to find areas that
+are missing tests.  If the view isn't 'covered', there definitely
+isn't a test for it.  If it is 'covered', we are loading that page
+during the tests but not necessarily calling ``page.a11y_audit.check_for_accessibility_errors`` on it.
+
 
 Options for Faster Development Cycles in Bok-Choy Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

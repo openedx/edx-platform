@@ -29,7 +29,9 @@ class Env(object):
     BOK_CHOY_DIR = REPO_ROOT / "common" / "test" / "acceptance"
     BOK_CHOY_LOG_DIR = REPO_ROOT / "test_root" / "log"
     BOK_CHOY_REPORT_DIR = REPORT_DIR / "bok_choy"
+    BOK_CHOY_A11Y_REPORT_DIR = REPORT_DIR / "a11y"
     BOK_CHOY_COVERAGERC = BOK_CHOY_DIR / ".coveragerc"
+    BOK_CHOY_A11Y_COVERAGERC = BOK_CHOY_DIR / ".a11ycoveragerc"
 
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
