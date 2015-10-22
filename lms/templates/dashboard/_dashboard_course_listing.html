@@ -42,7 +42,7 @@ from student.helpers import (
   % else:
     <% mode_class = '' %>
   % endif
-
+<div class="course-container">
 <article class="course${mode_class}">
   <% course_target = reverse('info', args=[unicode(course_overview.id)]) %>
   <section class="details">
@@ -319,26 +319,22 @@ from student.helpers import (
 
         % if course_mode_info['show_upsell'] and not is_course_blocked:
           <div class="message message-upsell has-actions is-shown">
-            <div class="wrapper-tip">
-              <h4 class="message-title">
-                <span class="value">${_("Challenge Yourself!")}</span>
-              </h4>
-              <p class="message-copy">${_("Take this course as an ID-verified student.")}</p>
-            </div>
 
             <div class="wrapper-extended">
-                <p class="message-copy">${_("You can still sign up for an ID verified {cert_name_long} for this course. If you plan to complete the whole course, it is a great way to recognize your achievement. {link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), link_end="</a>", cert_name_long=cert_name_long)}</p>
-
-              <ul class="actions message-actions">
-                <li class="action-item">
+                <p class="message-copy" align="justify">
+                  <b class="message-copy-bold">
+                    ${_("Pursue a {cert_name_long} to highlight the knowledge and skills you gain in this course.").format(cert_name_long=cert_name_long)}
+                  </b><br>
+                    ${_("It's official. It's easily shareable. It's a proven motivator to complete the course. <br>{link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), link_end="</a>", cert_name_long=cert_name_long)}
+                </p>
+                <div class="action-upgrade-container">
                   <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
-                    <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="${_("ID Verified Ribbon/Badge")}">
+                      <i class="action-upgrade-icon"></i>
                     <span class="wrapper-copy">
-                      <span class="copy" id="upgrade-to-verified">${_("Upgrade to Verified Track")}</span>
+                      <span class="copy" id="upgrade-to-verified">${_("Upgrade to Verified")}</span>
                     </span>
                   </a>
-                </li>
-              </ul>
+                </div>
             </div>
           </div>
         %endif
@@ -383,6 +379,7 @@ from student.helpers import (
     </ul>
   </footer>
 </article>
+</div>
 </li>
 <script>
            $( document ).ready(function() {

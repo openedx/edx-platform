@@ -251,6 +251,10 @@
         border-bottom: 4px solid $border-color-l4;
         padding-bottom: $baseline;
 
+        .course-container{
+          border: 1px solid $border-color-l4;
+          border-radius: 3px;
+        }
         &:last-child {
           margin-bottom: 0;
           border-bottom: none;
@@ -528,7 +532,7 @@
       }
 
       .enter-course {
-        @extend %btn-pl-primary-base;
+        @extend %btn-pl-white-base;
         @include float(right);
 
         &.archived {
@@ -672,20 +676,43 @@
           }
 
           .wrapper-extended {
-            padding: ($baseline/2) 0;
+            padding: ($baseline/4) 0;
 
             .message-copy {
-              margin-bottom: $baseline;
+              width: flex-grid(9, 12);
+              display: inline-block;
+
+              .message-copy-bold{
+                font-weight: 600;
+              }
             }
           }
 
+          .action-upgrade-container{
+            @include float(right);
+            display: inline-block;
+            margin-top: ($baseline/2);
+          }
           .action-upgrade {
             @extend %btn-primary-green;
             @include clearfix();
             position: relative;
             left: ($baseline/2);
-            padding: 8px $baseline 8px ($baseline*2);
+            padding: ($baseline * 0.4) 0 ($baseline * 0.4) ($baseline * 0.75);
 
+            .action-upgrade-icon{
+              @include float(left);
+              display: inline;
+
+              @include margin-right($baseline*0.4);
+              margin-top: ($baseline/4);
+              background: url('#{$static-path}/images/icon-sm-verified.png') no-repeat;
+              background-position: -($baseline*0.3);
+              background-color: white;
+
+              width: ($baseline*0.8);
+              height: ($baseline*0.7);
+            }
             .deco-graphic {
               position: absolute;
               top: -($baseline/4);
