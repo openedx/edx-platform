@@ -1,3 +1,6 @@
+"""
+API view to allow manipulation of configuration models.
+"""
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.authentication import SessionAuthentication
@@ -5,6 +8,7 @@ from rest_framework.serializers import ModelSerializer
 
 
 class ReadableOnlyByAuthors(DjangoModelPermissions):
+    """Only allow access by users with `add` permissions on the model."""
     perms_map = DjangoModelPermissions.perms_map.copy()
     perms_map['GET'] = perms_map['OPTIONS'] = perms_map['HEAD'] = perms_map['POST']
 
@@ -32,7 +36,9 @@ class ConfigurationModelCurrentAPIView(CreateAPIView, RetrieveAPIView):
     def get_serializer_class(self):
         if self.serializer_class is None:
             class AutoConfigModelSerializer(ModelSerializer):
-                class Meta:
+                """Serializer class for configuration models."""
+                class Meta(object):
+                    """Meta information for AutoConfigModelSerializer."""
                     model = self.model
 
             self.serializer_class = AutoConfigModelSerializer
@@ -41,4 +47,4 @@ class ConfigurationModelCurrentAPIView(CreateAPIView, RetrieveAPIView):
 
     def perform_create(self, serializer):
         # Set the requesting user as the one who is updating the configuration
-        serializer.save(changed_by = self.request.user)
+        serializer.save(changed_by=self.request.user)
