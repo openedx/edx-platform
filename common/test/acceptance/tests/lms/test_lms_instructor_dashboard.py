@@ -246,7 +246,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
 
-    @flaky  # TODO fix this SOL-1183
+    @flaky(max_runs=20, min_passes=20)
     def test_can_add_remove_allowance(self):
         """
         Make sure that allowances can be added and removed.
@@ -264,6 +264,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then I can add Allowance to that exam for a student
         self.assertTrue(allowance_section.is_add_allowance_button_visible)
 
+    @flaky(max_runs=20, min_passes=20)
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
