@@ -95,7 +95,7 @@ class ConfigurationModelTests(TestCase):
         self.assertEqual(rows[1].string_field, 'first')
         self.assertEqual(rows[1].is_active, False)
 
-    def test_always_insert(self, mock_cache):
+    def test_always_insert(self, __):
         config = ExampleConfig(changed_by=self.user, string_field='first')
         config.save()
         config.string_field = 'second'
@@ -297,7 +297,11 @@ class KeyedConfigurationModelTests(TestCase):
 
 @ddt.ddt
 class ConfigurationModelAPITests(TestCase):
+    """
+    Tests for the configuration model API.
+    """
     def setUp(self):
+        super(ConfigurationModelAPITests, self).setUp()
         self.factory = APIRequestFactory()
         self.user = User.objects.create_user(
             username='test_user',
@@ -319,7 +323,7 @@ class ConfigurationModelAPITests(TestCase):
 
         request = self.factory.post('/config/ExampleConfig', {"string_field": "string_value"})
         request.user = self.user
-        response = self.current_view(request)
+        __ = self.current_view(request)
 
         self.assertEquals("string_value", ExampleConfig.current().string_field)
         self.assertEquals(self.user, ExampleConfig.current().changed_by)
@@ -333,13 +337,14 @@ class ConfigurationModelAPITests(TestCase):
             response = self.current_view(request)
             self.assertEquals(201, response.status_code)
 
-            self.assertEquals(i+1, ExampleConfig.objects.all().count())
+            self.assertEquals(i + 1, ExampleConfig.objects.all().count())
             self.assertEquals(str(i), ExampleConfig.current().string_field)
 
     def test_get_current(self):
         request = self.factory.get('/config/ExampleConfig')
         request.user = self.user
         response = self.current_view(request)
+        # pylint: disable=no-member
         self.assertEquals('', response.data['string_field'])
         self.assertEquals(10, response.data['int_field'])
         self.assertEquals(None, response.data['changed_by'])
