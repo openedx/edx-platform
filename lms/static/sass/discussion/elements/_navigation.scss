@@ -172,11 +172,19 @@
 }
 
 .forum-nav-thread {
-  border-bottom: 1px solid $gray-l3;
-  background-color: $gray-l5;
+  border-bottom: 1px solid $gray-l4;
+  background-color: $gray-l6;
 
   &.is-unread {
-    background-color: $white;
+
+    .forum-nav-thread-comments-count {
+      background-color: $blue-d1;
+      color: $white;
+
+      &:after {
+        border-right-color: $blue-d1;
+      }
+    }
   }
 }
 
@@ -184,8 +192,23 @@
   display: block;
   padding: ($baseline/4) ($baseline/2);
 
-  &.is-active, &:hover, &:focus {
+  &.is-active,
+  &:hover,
+  &:focus {
     background-color: $forum-color-active-thread;
+  }
+
+  &.is-active {
+    color: $base-font-color;
+
+    .forum-nav-thread-comments-count {
+      background-color: $gray-l4;
+      color: $base-font-color;
+
+      &:after {
+        border-right-color: $gray-l4;
+      }
+    }
   }
 }
 
@@ -263,7 +286,7 @@
   border-radius: 2px;
   padding: ($baseline/10) ($baseline/5);
   min-width: 2em; // Fit most comment counts but allow expansion if necessary
-  background-color: $gray-l3;
+  background-color: $gray-l4;
 
   // Speech bubble tail
   &:after {
@@ -276,24 +299,7 @@
     height: 0;
     border-style: solid;
     @include border-width(0, ($baseline/4), ($baseline/4), 0);
-    @include border-color(transparent, $gray-l3, transparent, transparent);
-  }
-
-  &.is-unread {
-    background-color: $white;
-
-    &:after {
-      border-right-color: $white
-    }
-  }
-}
-
-.forum-nav-thread.is-unread .forum-nav-thread-comments-count {
-  background-color: $blue;
-  color: $white;
-
-  &:after {
-    border-right-color: $blue;
+    @include border-color(transparent, $gray-l4, transparent, transparent);
   }
 }
 
@@ -312,7 +318,8 @@
   @extend %forum-nav-load-more-content;
   color: $link-color;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: $link-color;
     background-color: $forum-color-active-thread;
   }
