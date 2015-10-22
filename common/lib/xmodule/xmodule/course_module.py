@@ -792,7 +792,8 @@ class CourseFields(object):
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),
-        scope=Scope.settings
+        scope=Scope.settings,
+        default=""
     )
 
     max_student_enrollments_allowed = Integer(
