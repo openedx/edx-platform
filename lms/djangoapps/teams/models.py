@@ -177,10 +177,17 @@ class CourseTeamMembership(models.Model):
             # to set the value. Otherwise, we're trying to overwrite
             # an immutable field.
             current_value = getattr(self, name, None)
-            if current_value is not None:
-                raise ImmutableMembershipFieldException(
-                    "Field %r shouldn't change from %r to %r" % (name, current_value, value)
-                )
+            if value == current_value:
+                # This is an attempt to set an immutable value to the same value
+                # to which it's already set. Don't complain - just ignore the attempt.
+                return
+            else:
+                # This is an attempt to set an immutable value to a different value.
+                # Allow it *only* if the current value is None.
+                if current_value is not None:
+                    raise ImmutableMembershipFieldException(
+                        "Field %r shouldn't change from %r to %r" % (name, current_value, value)
+                    )
         super(CourseTeamMembership, self).__setattr__(name, value)
 
     def save(self, *args, **kwargs):
