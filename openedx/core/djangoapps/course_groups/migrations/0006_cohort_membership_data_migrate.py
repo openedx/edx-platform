@@ -8,9 +8,32 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        pass
+        #note that we're using all() instead of filtering on CourseUserGroup.COHORT, due to South freezing the ORM.
+        #the overriden clean() method in CohortMembership will keep these invalid entries from saving.
+        for cohort_group in orm.CourseUserGroup.objects.all():
+            for user in cohort_group.users:
+                current_course_groups = orm.CourseUserGroup.objects.filter(
+                    course_id=cohort.course_id,
+                    users__id=user.id,
+                )
+                current_user_groups = user.course_groups.filter(
+                    course_id=cohort.course_id
+                )
+
+                unioned_set = set(current_course_groups).union(set(current_user_groups))
+
+                #per product guidance, fix problem users by arbitrarily choosing a single membership to use
+                cohort = unioned_set[0]
+
+                #and remove them from any other groups
+                for i in range(1, len(unioned_set)):
+                    unioned_set[i].users.remove(user)
+                    user.course_groups.remove(unioned_set[i])
+                membership = orm.CohortMembership(course_user_group=cohort, user=user)
+                membership.save()
 
     def backwards(self, orm):
+        #A backwards migration just means dropping the table, which 0005 handles in its backwards() method
         pass
 
     models = {
