@@ -63,6 +63,7 @@
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
+            'js/inline_analytics': 'js/inline_analytics',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -294,6 +295,10 @@
             'js/shoppingcart/shoppingcart.js': {
                 exports: 'js/shoppingcart/shoppingcart',
                 deps: ['jquery', 'underscore', 'gettext']
+            },
+            'js/inline_analytics': {
+            	exports: 'js/inline_analytics',
+            	deps: ['gettext']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -576,6 +581,7 @@
         // Run the LMS tests
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
+        'lms/include/js/spec/inline_analytics_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/views/file_uploader_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
@@ -626,7 +632,7 @@
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
-        'lms/include/js/spec/search/search_spec.js'
+        'lms/include/js/spec/search/search_spec.js',
     ]);
 
 }).call(this, requirejs, define);

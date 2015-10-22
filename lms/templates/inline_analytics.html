@@ -24,14 +24,17 @@ ${block_content}
       <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct-response="${correct_response}" data-question-type="${question_type}" data-choice-name-list="${choice_name_list}">
         <section aria-hidden="true" >
           <div class="grid-wrapper radio">
-            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
-            <p>Last updated: <strong class="last-update"></strong></p>
+            <p>
+              ${_('Answer distribution of the {num_students} students who answered this question.').format(num_students='<strong class="num-students"></strong>')}
+            </p>
+            <p>${_('Last updated:')} <strong class="last-update"></strong></p>
             <div class="grid-block table">
               <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
                 <tr>
-                  <td width="65px">Choice</td>
+                  <td width="65px">${_('Choice')}</td>
                   <td width="50px"></td>
-                  <td width="125px" colspan="2">Last Attempt</td>
+                  <td width="125px" colspan="2">${_('First Attempt')}</td>
+                  <td width="125px" colspan="2">${_('Last Attempt')}</td>
                 </tr>
               </table>
             </div>
@@ -42,12 +45,14 @@ ${block_content}
       <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct-response="${correct_response}" data-question-type="${question_type}">
         <section aria-hidden="true" >
           <div class="grid-wrapper checkbox">
-            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
-            <p>Last updated: <strong class="last-update"></strong></p>
+            <p>
+              ${_('Answer distribution of the {num_students} students who answered this question.').format(num_students='<strong class="num-students"></strong>')}
+            </p>
+            <p>${_('Last updated:')} <strong class="last-update"></strong></p>
             <div class="grid-block table">
               <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
                 <tr class="checkbox_header_row">
-                  <td width="65px">Choice</td>
+                  <td width="65px">${_('Choice')}</td>
                 </tr>
               </table>
             </div>
@@ -59,10 +64,10 @@ ${block_content}
         <section aria-hidden="true" >
           <div class="grid-wrapper">
             <p>
-              <strong class="num-students"></strong> students answered this question: <br/>
+              <strong class="num-students"></strong> ${_('students answered this question:')}<br/>
               <strong class="num-students-extra"></strong>
             </p>
-            <p>Last updated: <strong class="last-update"></strong></p>
+            <p>${_('Last updated:')} <strong class="last-update"></strong></p>
           </div>
         </section>
       </div>

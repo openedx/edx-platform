@@ -2279,7 +2279,6 @@ INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configurati
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
 
 ####################### In-line Analytics ######################
-ANALYTICS_ANSWER_DIST_URL = None
 INLINE_ANALYTICS_SUPPORTED_TYPES = {
     'MultipleChoiceResponse': 'radio',
     'ChoiceResponse': 'checkbox',
