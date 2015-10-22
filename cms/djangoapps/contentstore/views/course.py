@@ -67,8 +67,7 @@ from contentstore.tasks import rerun_course
 from contentstore.views.entrance_exam import (
     create_entrance_exam,
     update_entrance_exam,
-    delete_entrance_exam,
-    is_entrance_exams_enabled
+    delete_entrance_exam
 )
 
 from .library import LIBRARIES_ENABLED
@@ -89,7 +88,8 @@ from student.auth import has_course_author_access
 from util.milestones_helpers import (
     set_prerequisite_courses,
     is_valid_course_key,
-    is_prerequisite_courses_enabled
+    is_prerequisite_courses_enabled,
+    is_entrance_exams_enabled
 )
 
 log = logging.getLogger(__name__)
@@ -983,7 +983,7 @@ def settings_handler(request, course_key_string):
                 # feature-specific settings and handle them accordingly
                 # We have to be careful that we're only executing the following logic if we actually
                 # need to create or delete an entrance exam from the specified course
-                if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+                if is_entrance_exams_enabled():
                     course_entrance_exam_present = course_module.entrance_exam_enabled
                     entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)

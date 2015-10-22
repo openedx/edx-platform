@@ -8,24 +8,16 @@ from courseware.model_data import FieldDataCache, ScoresClient
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from student.models import EntranceExamConfiguration
-from util.milestones_helpers import get_required_content
+from util.milestones_helpers import get_required_content, is_entrance_exams_enabled
 from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule.modulestore.django import modulestore
-
-
-def feature_is_enabled():
-    """
-    Checks to see if the Entrance Exams feature is enabled
-    Use this operation instead of checking the feature flag all over the place
-    """
-    return settings.FEATURES.get('ENTRANCE_EXAMS', False)
 
 
 def course_has_entrance_exam(course):
     """
     Checks to see if a course is properly configured for an entrance exam
     """
-    if not feature_is_enabled():
+    if not is_entrance_exams_enabled():
         return False
     if not course.entrance_exam_enabled:
         return False

@@ -52,6 +52,7 @@ import lms.lib.comment_client as cc
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
+from util.milestones_helpers import is_entrance_exams_enabled
 
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
@@ -1896,7 +1897,7 @@ class EntranceExamConfiguration(models.Model):
         Return True if given user can skip entrance exam for given course otherwise False.
         """
         can_skip = False
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+        if is_entrance_exams_enabled():
             try:
                 record = EntranceExamConfiguration.objects.get(user=user, course_id=course_key)
                 can_skip = record.skip_entrance_exam

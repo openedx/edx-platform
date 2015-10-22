@@ -470,7 +470,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         # Fulfillment Use Case: Entrance Exam
         # If this module is part of an entrance exam, we'll need to see if the student
         # has reached the point at which they can collect the associated milestone
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+        if milestones_helpers.is_entrance_exams_enabled():
             course = modulestore().get_course(course_key)
             content = modulestore().get_item(content_key)
             entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)

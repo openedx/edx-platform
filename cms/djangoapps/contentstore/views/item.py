@@ -38,6 +38,7 @@ from django.contrib.auth.models import User
 from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
+from util.milestones_helpers import is_entrance_exams_enabled
 
 from student.auth import has_studio_write_access, has_studio_read_access
 from contentstore.utils import (
@@ -89,7 +90,7 @@ def _filter_entrance_exam_grader(graders):
     views/controls like the 'Grade as' dropdown that allows a course author to select
     the grader type for a given section of a course
     """
-    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+    if is_entrance_exams_enabled():
         graders = [grader for grader in graders if grader.get('type') != u'Entrance Exam']
     return graders
 
