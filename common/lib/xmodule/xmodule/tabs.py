@@ -434,13 +434,6 @@ class CourseTabList(List):
             raise InvalidTabsException(
                 "Expected second tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
 
-        # the following tabs should appear only once
-        # TODO: don't import openedx capabilities from common
-        from openedx.core.lib.course_tabs import CourseTabPluginManager
-        for tab_type in CourseTabPluginManager.get_tab_types():
-            if not tab_type.allow_multiple:
-                cls._validate_num_tabs_of_type(tabs, tab_type.type, 1)
-
     @staticmethod
     def _validate_num_tabs_of_type(tabs, tab_type, max_num):
         """
