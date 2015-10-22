@@ -5,6 +5,7 @@ Bok choy acceptance tests for problems in the LMS
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
+from flaky import flaky
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -319,6 +320,7 @@ class ProblemPartialCredit(ProblemsTest):
         """)
         return XBlockFixtureDesc('problem', 'PARTIAL CREDIT TEST PROBLEM', data=xml)
 
+    @flaky(max_runs=15, min_passes=15)
     def test_partial_credit(self):
         """
         Test that we can see the partial credit value and feedback.
