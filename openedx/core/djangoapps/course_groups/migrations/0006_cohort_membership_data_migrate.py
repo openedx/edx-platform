@@ -7,8 +7,25 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    no_dry_run = True
+
     def forwards(self, orm):
-        pass
+        for cohort_group in orm.CourseUserGroup.objects.filter(group_type=CourseUserGroup.COHORT):
+            for user in cohort_group.users:
+                current_course_groups = orm.CourseUserGroup.objects.filter(
+                    course_id=cohort.course_id,
+                    users__id=user.id,
+                )
+                current_user_groups = user.course_groups.filter(
+                    course_id=cohort.course_id
+                )
+                if current_course_groups.count() == 1 and current_user_groups.count() == 1:
+                    #this is the "happy case", no fixing needed. Just add a membership and move on
+                    membership = CohortMembership(course_user_group=cohort, user=user)
+                    membership.save()
+                else:
+                    #TODO: determine how we're going to "fix" users in an invalid state
+                    pass
 
     def backwards(self, orm):
         pass
