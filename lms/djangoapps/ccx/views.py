@@ -615,4 +615,7 @@ def ccx_grades_csv(request, course, ccx=None):
         for row in rows:
             writer.writerow(row)
 
-        return HttpResponse(buf.getvalue(), content_type='text/plain')
+        response = HttpResponse(buf.getvalue(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment'
+
+        return response

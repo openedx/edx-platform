@@ -733,6 +733,12 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        # Are the grades downloaded as an attachment?
+        self.assertEqual(
+            response['content-disposition'],
+            'attachment'
+        )
+
         headers, row = (
             row.strip().split(',') for row in
             response.content.strip().split('\n')
