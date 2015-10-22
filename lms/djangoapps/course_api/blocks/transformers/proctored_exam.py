@@ -14,6 +14,7 @@ class ProctoredExamTransformer(BlockStructureTransformer):
     Proctored Exam Transformer Class
     """
     VERSION = 1
+    BLOCK_HAS_PROCTORED_EXAM = 'has_proctored_exam'
 
     @classmethod
     def collect(cls, block_structure):
@@ -34,20 +35,20 @@ class ProctoredExamTransformer(BlockStructureTransformer):
         if not settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False):
             return
 
-        for block_key in block_structure.topological_traversal(
-                predicate=lambda block_key: block_key.block_type == 'sequential'
-        ):
+        def is_proctored_exam_for_user(block_key):
             if (
-                block_structure.get_xblock_field(block_key, 'is_proctored_enabled') or
-                block_structure.get_xblock_field(block_key, 'is_practice_exam')
+                block_key.block_type == 'sequential' and (
+                    block_structure.get_xblock_field(block_key, 'is_proctored_enabled') or
+                    block_structure.get_xblock_field(block_key, 'is_practice_exam')
+                )
             ):
-                # This section is an exam.  All of its sub-blocks should be excluded
-                # unless the user is not a verified student or has declined taking the exam.
+                # This section is an exam.  It should be excluded unless the
+                # user is not a verified student or has declined taking the exam.
                 user_exam_summary = get_attempt_status_summary(
                     user_info.user.id,
                     unicode(block_key.course_key),
                     unicode(block_key),
                 )
-                if user_exam_summary and user_exam_summary['status'] != ProctoredExamStudentAttemptStatus.declined:
-                    for child_key in block_structure.get_children(block_key):
-                        block_structure.remove_block(child_key, keep_descendants=False)
+                return user_exam_summary and user_exam_summary['status'] != ProctoredExamStudentAttemptStatus.declined
+
+        block_structure.remove_block_if(is_proctored_exam_for_user)

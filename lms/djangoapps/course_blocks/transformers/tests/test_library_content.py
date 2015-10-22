@@ -106,9 +106,9 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             ]
         }]
 
-    def test_course_structure_with_user_course_library(self):
+    def test_content_library(self):
         """
-        Test course structure integrity if course has content library section.
+        Test when course has content library section.
         First test user can't see any content library section,
         and after that mock response from MySQL db.
         Check user can see mocked sections in content library.

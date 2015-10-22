@@ -7,19 +7,21 @@ from openedx.core.lib.block_cache.block_cache import get_blocks, clear_block_cac
 from xmodule.modulestore.django import modulestore
 
 from .transformers import (
+    library_content,
+    split_test,
     start_date,
     user_partitions,
     visibility,
-    library_content,
 )
 from .user_info import CourseUserInfo
 
 
 LMS_COURSE_TRANSFORMERS = [
-    visibility.VisibilityTransformer(),
+    library_content.ContentLibraryTransformer(),
+    split_test.SplitTestTransformer(),
     start_date.StartDateTransformer(),
     user_partitions.UserPartitionTransformer(),
-    library_content.ContentLibraryTransformer(),
+    visibility.VisibilityTransformer(),
 ]
 
 

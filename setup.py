@@ -49,11 +49,13 @@ setup(
             "verification = openedx.core.djangoapps.credit.partition_schemes:VerificationPartitionScheme",
         ],
         "openedx.block_structure_transformer": [
-            "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
+            "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
+            "proctored_exam = lms.djangoapps.course_api.blocks.transformers.proctored_exam:ProctoredExamTransformer",
+            "split_test = lms.djangoapps.course_blocks.transformers.split_test:SplitTestTransformer",
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
-            "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
-            "blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
+            "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
         ],
     }
 )
