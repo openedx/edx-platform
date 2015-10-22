@@ -73,11 +73,10 @@ def apply_settings(django_settings):
     django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
     # Allow users to login using social auth even if their account is not verified yet
-    # The 'ensure_user_information' step controls this and only allows brand new users
-    # to login without verification. Repeat logins are not permitted until the account
-    # gets verified.
-    django_settings.INACTIVE_USER_LOGIN = True
-    django_settings.INACTIVE_USER_URL = '/auth/inactive'
+    # Otherwise users who use social auth to register with an invalid email address
+    # can become "stuck". We control this in a more fine-grained manner in pipeline.py
+    django_settings.SOCIAL_AUTH_INACTIVE_USER_LOGIN = True
+    django_settings.SOCIAL_AUTH_INACTIVE_USER_URL = '/auth/inactive'
 
     # Context processors required under Django.
     django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
