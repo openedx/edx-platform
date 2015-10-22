@@ -500,6 +500,7 @@ class LTIProviderConfig(ProviderConfig):
     )
 
     lti_hostname = models.CharField(
+        default='localhost',
         max_length=255,
         help_text=(
             'The domain that  will be acting as the LTI consumer.'
