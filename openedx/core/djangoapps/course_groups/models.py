@@ -90,14 +90,14 @@ class CohortMembership(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean(validate_unique=False)
 
-        print "Trying to add user to {}".format(self.course_user_group.name)
+        #print "Trying to add user to {}".format(self.course_user_group.name)
 
         trying_to_save = True
         while trying_to_save:
-            print "entering loop, trying to get membership for user {user}, course {course}".format(
+            """print "entering loop, trying to get membership for user {user}, course {course}".format(
                 user=self.user.id,  # pylint: disable=E1101
                 course=self.course_id
-            )
+            )"""  # pylint: disable=W0105
 
             saved_membership = None
             try:
@@ -111,7 +111,8 @@ class CohortMembership(models.Model):
                     course_id=self.course_id
                 )
             except CohortMembership.DoesNotExist:
-                print "No saved_membership!"
+                #print "No saved_membership!"
+                pass
 
             if saved_membership is not None:
                 if saved_membership.course_user_group == self.course_user_group:
@@ -144,15 +145,15 @@ class CohortMembership(models.Model):
                     else:
                         super(CohortMembership, self).save(*args, **kwargs)
             except IntegrityError:
-                print "could not save membership, trying again"
+                #print "could not save membership, trying again"
 
                 continue
 
-            print "User {usr} now in group {chrt} in course {crs}. Now at version".format(
+            """print "User {usr} now in group {chrt} in course {crs}. Now at version".format(
                 usr=self.user,
                 chrt=self.course_user_group.name,
                 crs=self.course_user_group.course_id,
-            )
+            )"""  # pylint: disable=W0105
 
             trying_to_save = False
 
