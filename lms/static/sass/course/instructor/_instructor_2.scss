@@ -2119,3 +2119,84 @@ input[name="subject"] {
   @include left(2em);
   @include right(auto);
 }
+
+#certificate-white-list-editor{
+  .msg-success{
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+    color: $confirm-color;
+  }
+
+  .certificate-exception-inputs{
+    .student-username-or-email{
+      width: 300px;
+    }
+    .notes-field{
+      width: 400px;
+    }
+    p+p{
+      margin-top: 5px;
+    }
+    .message{
+      margin-top: 10px;
+    }
+  }
+}
+
+.white-listed-students {
+
+  table {
+    width: 100%;
+    word-wrap: break-word;
+
+    th {
+      @extend %t-copy-sub2;
+      background-color: $gray-l5;
+      padding: ($baseline*0.75) ($baseline/2) ($baseline*0.75) ($baseline/2);
+      vertical-align: middle;
+      text-align: left;
+      color: $gray;
+
+      &.date-column{
+        width: 230px;
+      }
+    }
+
+    td {
+      padding: ($baseline/2);
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    tbody {
+      box-shadow: 0 2px 2px $shadow-l1;
+      border: 1px solid $gray-l4;
+      background: $white;
+
+      tr {
+        @include transition(all $tmg-f2 ease-in-out 0s);
+        border-top: 1px solid $gray-l4;
+
+        &:first-child {
+          border-top: none;
+        }
+
+        &:nth-child(odd) {
+          background-color: $gray-l6;
+        }
+
+        a {
+          color: $gray-d1;
+
+          &:hover {
+            color: $blue;
+          }
+        }
+
+        &:hover {
+          background-color: $blue-l5;
+        }
+      }
+    }
+  }
+}

@@ -37,7 +37,7 @@ from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from certificates.models import CertificateGenerationConfiguration
+from certificates.models import CertificateGenerationConfiguration, CertificateWhitelist
 from certificates import api as certs_api
 from util.date_utils import get_default_time_display
 
@@ -161,13 +161,21 @@ def instructor_dashboard_2(request, course_id):
 
     disable_buttons = not _is_small_course(course_key)
 
+    certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
+    certificate_exception_url = reverse(
+        'create_certificate_exception',
+        kwargs={'course_id': unicode(course_key), 'white_list_student': ''}
+    )
+
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)}),
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
-        'analytics_dashboard_message': analytics_dashboard_message
+        'analytics_dashboard_message': analytics_dashboard_message,
+        'certificate_white_list': certificate_white_list,
+        'certificate_exception_url': certificate_exception_url
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)

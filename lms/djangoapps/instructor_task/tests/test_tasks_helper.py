@@ -9,6 +9,7 @@ Tests that CSV grade report generation works with unicode emails.
 import ddt
 from mock import Mock, patch
 import tempfile
+import json
 from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
 from django.core.urlresolvers import reverse
@@ -1510,12 +1511,18 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         current_task = Mock()
         current_task.update_state = Mock()
+        instructor_task = Mock()
+        instructor_task.task_input = json.dumps({'students': None})
         with self.assertNumQueries(125):
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
                     mock_queue.return_value = (0, "Successfully queued")
-                    result = generate_students_certificates(None, None, self.course.id, None, 'certificates generated')
+                    with patch('instructor_task.models.InstructorTask.objects.get') as instructor_task_object:
+                        instructor_task_object.return_value = instructor_task
+                        result = generate_students_certificates(
+                            None, None, self.course.id, {}, 'certificates generated'
+                        )
         self.assertDictContainsSubset(
             {
                 'action_name': 'certificates generated',

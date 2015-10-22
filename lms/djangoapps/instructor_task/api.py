@@ -476,3 +476,24 @@ def generate_certificates_for_all_students(request, course_key):   # pylint: dis
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def generate_certificates_for_students(request, course_key, students=None):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate certificates for given students enrolled in the course or
+    all students if argument 'students' is None
+
+    Raises AlreadyRunningError if certificates are currently being generated.
+    """
+    if students:
+        task_type = 'generate_certificates_certain_student'
+        students = [student.id for student in students]
+        task_input = {'students': students}
+    else:
+        task_type = 'generate_certificates_all_student'
+        task_input = {}
+
+    task_class = generate_certificates
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
