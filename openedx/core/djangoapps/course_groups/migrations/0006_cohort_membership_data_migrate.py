@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
 
-class Migration(SchemaMigration):
-
-    no_dry_run = True
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        for cohort_group in orm.CourseUserGroup.objects.filter(group_type=CourseUserGroup.COHORT):
+        for cohort_group in orm.CourseUserGroup.objects.filter(group_type=orm.CourseUserGroup.COHORT):
             for user in cohort_group.users:
                 current_course_groups = orm.CourseUserGroup.objects.filter(
                     course_id=cohort.course_id,
@@ -21,7 +19,7 @@ class Migration(SchemaMigration):
                 )
                 if current_course_groups.count() == 1 and current_user_groups.count() == 1:
                     #this is the "happy case", no fixing needed. Just add a membership and move on
-                    membership = CohortMembership(course_user_group=cohort, user=user)
+                    membership = orm.CohortMembership(course_user_group=cohort, user=user)
                     membership.save()
                 else:
                     #TODO: determine how we're going to "fix" users in an invalid state
