@@ -5,7 +5,7 @@
 -e git+https://github.com/open-craft/problem-builder.git@1cb40ca523502ca2a8a2abe5aef4d1b6735cb5c7#egg=xblock-problem-builder
 
 # Oppia XBlock
--e git+https://github.com/oppia/xblock.git@cd5479ee1138abfa278857d0113a45c2d05a983f#egg=oppia-xblock
+-e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
 
 # This repository contains schoolyourself-xblock, which is used in
 # edX's "AlgebraX" and "GeometryX" courses.
