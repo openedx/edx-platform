@@ -275,28 +275,18 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_name, "MATHJAX TEST PROBLEM")
 
-        # Verify MathJax has been rendered
-        problem_page.wait_for(
-            lambda: problem_page.mathjax_rendered_in_problem,
-            description="MathJax rendered in body"
-        )
+        problem_page.verify_mathjax_rendered_in_problem()
 
         # The hint button rotates through multiple hints
         problem_page.click_hint()
         self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.hint_text)
-        problem_page.wait_for(
-            lambda: problem_page.mathjax_rendered_in_hint,
-            description="MathJax rendered in hint"
-        )
+        problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
         problem_page.click_hint()
 
         self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.hint_text)
-        problem_page.wait_for(
-            lambda: problem_page.mathjax_rendered_in_hint,
-            description="MathJax rendered in hint"
-        )
+        problem_page.verify_mathjax_rendered_in_hint()
 
 
 class ProblemPartialCredit(ProblemsTest):

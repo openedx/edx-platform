@@ -231,14 +231,8 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         thread_fixture.push()
         self.setup_thread_page(thread_id)
         self.assertTrue(self.thread_page.is_discussion_body_visible())
-        self.thread_page.wait_for(
-            self.thread_page.is_mathjax_preview_available,
-            description="MathJax Preview is rendered"
-        )
-        self.thread_page.wait_for(
-            self.thread_page.is_mathjax_rendered,
-            description="MathJax is rendered"
-        )
+        self.thread_page.verify_mathjax_preview_available()
+        self.thread_page.verify_mathjax_rendered()
 
     def test_markdown_reference_link(self):
         """
