@@ -32,6 +32,10 @@ class Env(object):
     BOK_CHOY_A11Y_REPORT_DIR = REPORT_DIR / "a11y"
     BOK_CHOY_COVERAGERC = BOK_CHOY_DIR / ".coveragerc"
     BOK_CHOY_A11Y_COVERAGERC = BOK_CHOY_DIR / ".a11ycoveragerc"
+    BOK_CHOY_A11Y_CUSTOM_RULES_FILE = (
+        REPO_ROOT / "node_modules" / "edx-custom-a11y-rules" /
+        "lib" / "custom_a11y_rules.js"
+    )
 
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
