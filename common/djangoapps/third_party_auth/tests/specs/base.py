@@ -47,9 +47,6 @@ class IntegrationTestMixin(object):
         super(IntegrationTestMixin, self).setUp()
         self.login_page_url = reverse('signin_user')
         self.register_page_url = reverse('register_user')
-        # Set the server name:
-        self.client.defaults['SERVER_NAME'] = 'example.none'  # The SAML lib we use doesn't like testserver' as a domain
-        self.url_prefix = 'http://example.none'
         patcher = testutil.patch_mako_templates()
         patcher.start()
         self.addCleanup(patcher.stop)
@@ -104,9 +101,9 @@ class IntegrationTestMixin(object):
 
     def test_login(self):
         user = UserFactory.create()
-        # The user goes to the login page, and sees a button to login with TestShib:
+        # The user goes to the login page, and sees a button to login with this provider:
         provider_login_url = self._check_login_page()
-        # The user clicks on the TestShib button:
+        # The user clicks on the provider's button:
         try_login_response = self.client.get(provider_login_url)
         # The user should be redirected to the provider's login page:
         self.assertEqual(try_login_response.status_code, 302)
@@ -148,9 +145,9 @@ class IntegrationTestMixin(object):
         # Make sure we're not logged in:
         dashboard_response = self.client.get(reverse('dashboard'))
         self.assertEqual(dashboard_response.status_code, 302)
-        # The user goes to the login page, and sees a button to login with TestShib:
+        # The user goes to the login page, and sees a button to login with this provider:
         provider_login_url = self._check_login_page()
-        # The user clicks on the TestShib button:
+        # The user clicks on the provider's login button:
         try_login_response = self.client.get(provider_login_url)
         # The user should be redirected to the provider:
         self.assertEqual(try_login_response.status_code, 302)
@@ -164,7 +161,7 @@ class IntegrationTestMixin(object):
         if user_is_activated:
             url_expected = reverse('dashboard')
         else:
-            url_expected = '/auth/inactive?next=/dashboard'
+            url_expected = reverse('third_party_inactive_redirect') + '?next=' + reverse('dashboard')
         self.assertEqual(login_response['Location'], self.url_prefix + url_expected)
         # Now we are logged in:
         dashboard_response = self.client.get(reverse('dashboard'))
