@@ -1,0 +1,109 @@
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="pagetitle">${_("License")}</%block>
+<%block name="nav_skip">#ccx-coach-dashboard-content</%block>
+
+<%block name="headextra">
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-course'/>
+  <style>
+    table {
+      width: 100%;
+      font-size: 14px;
+      line-height: 20.72px;
+    }
+    thead {background-color: #ddd}
+    tr {border-bottom: 1px solid #ddd}
+    td {
+      vertical-align: middle;
+      padding: 10px 5px;
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      word-wrap: break-word;
+    }
+    .label {color: #646464}
+    .messages {margin: 10px 0 20px}
+    .messages .error {color: red}
+    #labster-license-dashboard-content .inline-label {display: inline}
+    #labster-license-dashboard-content .hint {
+      display: block;
+      color: #646464;
+      font-size: .75em;
+      margin-bottom: 10px;
+    }
+  </style>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='course_license'" />
+
+<section class="container">
+  <div class="instructor-dashboard-wrapper-2">
+    <section class="instructor-dashboard-content-2" id="labster-license-dashboard-content">
+      <h1>${_("License")}</h1>
+
+      % if messages:
+      <div class="messages">
+        % for message in messages:
+          % if message.tags:
+          <p class="${message.tags}">${message}</p>
+          % else:
+          <p>${message}</p>
+          % endif
+        % endfor
+      </div>
+      % endif
+
+      %if not ccx:
+        <p>
+          ${_("Please create a Custom Course for edX on {link}.").format(
+            link='<a href="{}">{}</a>'.format(ccx_coach_dashboard, _("CCX Coach Dashboard"))
+          )}
+        </p>
+      %else:
+      % if passports:
+        <div style="margin-bottom: 40px;">
+          <h2> ${_("LTI Passport List")}</h2>
+          <table>
+            <thead>
+              <tr>
+                <td class="label">LTI id</td>
+                <td class="label">Consumer key</td>
+                <td class="label">Secret Key</td>
+              </tr>
+            </thead>
+            <tbody>
+              % for passport in passports:
+              <tr>
+                <td>${passport['lti_id']}</td>
+                <td>${passport['consumer_key']}</td>
+                <td>${passport['secret_key']}</td>
+              </tr>
+              %endfor
+            </tbody>
+          </table>
+        </div>
+      % endif
+        <% license_code = license.license_code if license else '' %>
+        <form action="${labster_license_url}" method="POST">
+          <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+          <p>
+            <label for="labster-license">${_("License:")}</label>
+            <input type="text" id="labster-license" name="license" value="${license_code}" pattern="[a-zA-Z0-9]*"
+              placeholder="${_('Enter your license')}" style="width:50%" />
+          </p>
+          <p>
+            <label class="inline-label" for="labster-update">${_("Update Course:")}</label>
+            <input type="checkbox" id="labster-update" name="update" checked />
+            <span class="hint">${_("Hides all unlicensed simulations. If the section/subsection do not contain any licensed simulations, it hides the entire section/subsection.")}</span>
+          </p>
+          <p><button type="submit">${_("Apply")}</button></p>
+        </form>
+      %endif
+    </section>
+  </div>
+</section>

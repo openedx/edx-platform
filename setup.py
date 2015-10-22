@@ -38,6 +38,7 @@ setup(
             "textbooks = lms.djangoapps.courseware.tabs:TextbookTabs",
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
             "labster_wiki = lms.djangoapps.labster_wiki.tab:LabsterWikiTab",
+            "course_license = lms.djangoapps.labster_course_license.tabs:LicenseCourseTab",
 
             # ORA 1 tabs (deprecated)
             "peer_grading = lms.djangoapps.open_ended_grading.views:PeerGradingTab",

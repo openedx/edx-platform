@@ -720,6 +720,10 @@ urlpatterns += (
     url(r'^request_certificate$', 'certificates.views.request_certificate'),
 )
 
+urlpatterns += (
+    url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN), include('labster_course_license.urls')),
+)
+
 # XDomain proxy
 urlpatterns += (
     url(r'^xdomain_proxy.html$', 'cors_csrf.views.xdomain_proxy', name='xdomain_proxy'),

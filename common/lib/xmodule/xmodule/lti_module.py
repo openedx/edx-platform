@@ -70,6 +70,7 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
+from xmodule.modulestore.django import modulestore
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List, XBlock
 from xblock.fields import Boolean, Float
@@ -524,7 +525,10 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         """
         Return course by course id.
         """
-        return self.descriptor.runtime.modulestore.get_course(self.course_id)
+        course_descriptor = modulestore().get_course(self.course_id)
+        course_module = self.system.get_module(course_descriptor)
+        course_module._field_data_cache = {}  # pylint: disable=protected-access
+        return course_module
 
     @property
     def context_id(self):
