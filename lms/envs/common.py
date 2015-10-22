@@ -1158,7 +1158,7 @@ MIDDLEWARE_CLASSES = (
     'cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
-    # 'splash.middleware.SplashMiddleware',
+    'splash.middleware.SplashMiddleware',
 
 
     'geoinfo.middleware.CountryMiddleware',
@@ -1902,7 +1902,7 @@ INSTALLED_APPS = (
     'edxnotes',
 
     # Splash screen
-    # 'splash',
+    'splash',
 
     # Monitoring
     'datadog',
