@@ -1912,7 +1912,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.user_api',
 
     # Shopping cart
-    'shoppingcart',
+    # 'shoppingcart',
 
     # Notification preferences setting
     'notification_prefs',
