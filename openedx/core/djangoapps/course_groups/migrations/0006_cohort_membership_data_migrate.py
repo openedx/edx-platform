@@ -8,7 +8,9 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        for cohort_group in orm.CourseUserGroup.objects.filter(group_type=orm.CourseUserGroup.COHORT):
+        #note that we're using all() instead of filtering on CourseUserGroup.COHORT, due to South freezing the ORM.
+        #the overriden clean() method in CohortMembership will keep these invalid entries from saving.
+        for cohort_group in orm.CourseUserGroup.objects.all():
             for user in cohort_group.users:
                 current_course_groups = orm.CourseUserGroup.objects.filter(
                     course_id=cohort.course_id,
@@ -17,15 +19,21 @@ class Migration(DataMigration):
                 current_user_groups = user.course_groups.filter(
                     course_id=cohort.course_id
                 )
-                if current_course_groups.count() == 1 and current_user_groups.count() == 1:
-                    #this is the "happy case", no fixing needed. Just add a membership and move on
-                    membership = orm.CohortMembership(course_user_group=cohort, user=user)
-                    membership.save()
-                else:
-                    #TODO: determine how we're going to "fix" users in an invalid state
-                    pass
+
+                unioned_set = set(current_course_groups).union(set(current_user_groups))
+
+                #per product guidance, fix problem users by arbitrarily choosing a single membership to use
+                cohort = unioned_set[0]
+
+                #and remove them from any other groups
+                for i in range(1, len(unioned_set)):
+                    unioned_set[i].users.remove(user)
+                    user.course_groups.remove(unioned_set[i])
+                membership = orm.CohortMembership(course_user_group=cohort, user=user)
+                membership.save()
 
     def backwards(self, orm):
+        #A backwards migration just means dropping the table, which 0005 handles in its backwards() method
         pass
 
     models = {
