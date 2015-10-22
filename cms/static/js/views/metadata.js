@@ -20,7 +20,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
                 courseKey = self.$el.closest('[data-course-key]').data('course-key');
 
             this.template = this.loadTemplate('metadata-editor');
-            this.$el.html(this.template({numEntries: this.collection.length}));
+            this.$el.html(this.template({numEntries: this.collection.length, locator: locator}));
 
             this.collection.each(
                 function (model) {

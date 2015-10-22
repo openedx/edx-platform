@@ -599,7 +599,7 @@
       }
     }
 
-    .wrapper-comp-setting {
+    .wrapper-comp-setting, .wrapper-comp-setting-text {
       min-width: 300px;
       top: 0;
       vertical-align: top;
@@ -701,6 +701,11 @@
       font-color: $gray-l6;
       min-width: ($baseline*10);
       vertical-align: top;
+    }
+
+    .setting-text {
+      display: inline;
+      white-space: nowrap;
     }
 
 
