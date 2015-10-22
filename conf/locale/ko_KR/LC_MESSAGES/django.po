@@ -92,7 +92,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:05+0000\n"
+"POT-Creation-Date: 2015-10-22 18:35+0000\n"
 "PO-Revision-Date: 2015-09-25 11:11+0000\n"
 "Last-Translator: Hongseob Lee <shevious@yahoo.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -314,7 +314,6 @@ msgid "Verified"
 msgstr "인증"
 
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
 msgstr "신분증 인증 리본/뱃지 "
 
@@ -535,10 +534,9 @@ msgid "Female"
 msgstr "여성"
 
 #. Translators: 'Other' refers to the student's gender
-#. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other"
-msgstr "기타"
+msgid "Other/Prefer Not to Say"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
@@ -568,12 +566,15 @@ msgstr "중학교"
 msgid "Elementary/primary school"
 msgstr "초등학교"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "None"
-msgstr "없음"
+msgid "No Formal Education"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "Other Education"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -2954,6 +2955,10 @@ msgstr "both"
 #: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "소개"
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+msgid "None"
+msgstr "없음"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -5633,6 +5638,22 @@ msgstr "청구서가 이미 활성화 되었습니다. "
 #: lms/djangoapps/instructor/views/api.py
 msgid "The registration codes for invoice {0} have been re-activated."
 msgstr "청구서 {0} 에 필요한 가입 코드가 재활성화되었습니다. "
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "CourseID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate Type"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Certificates Issued"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Report Run"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
@@ -11518,7 +11539,7 @@ msgid "Invalid Certificate Configuration."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
-msgid "There is a problem with this certificate on {platform_name}"
+msgid "There is a problem with this certificate."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
@@ -12587,13 +12608,20 @@ msgstr "이용가능한 액션"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the purchased course "
-"%(course_number)s?"
-msgstr "구매하신 %(course_number)s? 강좌에서 수강 취소를 원하는 것이 분명합니까?"
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"($(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
 msgstr "결제한 금액을 환불해 드릴것입니다."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"(%(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
@@ -12601,15 +12629,16 @@ msgstr "결제한 금액을 환불해드리지 않을 것입니다. "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
-msgid "Are you sure you want to unenroll from %(course_number)s?"
-msgstr "%(course_number)s 수강을 취소하시겠습니까? "
+msgid ""
+"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of %(course_number)s?"
-msgstr "%(course_number)s의 인증 {cert_name_long} 트랙을 수강취소 하시겠습니까?"
+"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
+" of %(course_name)s (%(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -12670,27 +12699,21 @@ msgstr ""
 "재인증{end_link} 을 하세요. "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Challenge Yourself!"
-msgstr "자신에 도전하세요!"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Take this course as an ID-verified student."
-msgstr "ID인증 학습자로서 이 강좌를 수강합니다."
+msgid ""
+"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
+"this course."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified {cert_name_long} for this course. "
-"If you plan to complete the whole course, it is a great way to recognize "
-"your achievement. {link_start}Learn more about the verified "
+"It's official. It's easily shareable. It's a proven motivator to complete "
+"the course. <br>{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"지금도 이 강좌의 ID 인증 {cert_name_long}에 등록할 수 있습니다. 전체 차시를 다 수강할 계획이 있다면, 귀하의 성취를 "
-"인정받을 좋은 방법입니다. {link_start} 인증{cert_name_long}에 대해 더 알고 싶으면 여기를 "
-"클릭하세요.{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified Track"
-msgstr "인증 유형으로 업그레이드하기"
+msgid "Upgrade to Verified"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14020,6 +14043,18 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of problem responses"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to list certificates that are issued for this course:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "View Certificates Issued"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download CSV of Certificates Issued"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html

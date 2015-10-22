@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:12+0000\n"
-"PO-Revision-Date: 2015-10-16 13:12:16.444839\n"
+"POT-Creation-Date: 2015-10-22 18:44+0000\n"
+"PO-Revision-Date: 2015-10-22 18:44:09.818906\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -268,7 +268,6 @@ msgid "Verified"
 msgstr "دثقهبهثي"
 
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
 msgstr "هي دثقهبهثي قهززخر/زشيلث"
 
@@ -499,10 +498,9 @@ msgid "Female"
 msgstr "بثوشمث"
 
 #. Translators: 'Other' refers to the student's gender
-#. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other"
-msgstr "خفاثق"
+msgid "Other/Prefer Not to Say"
+msgstr "خفاثق/حقثبثق رخف فخ سشغ"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
@@ -532,12 +530,15 @@ msgstr "تعرهخق سثذخريشقغ/تعرهخق اهلا/وهييمث سذ�
 msgid "Elementary/primary school"
 msgstr "ثمثوثرفشقغ/حقهوشقغ سذاخخم"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "None"
-msgstr "رخرث"
+msgid "No Formal Education"
+msgstr "رخ بخقوشم ثيعذشفهخر"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "Other Education"
+msgstr "خفاثق ثيعذشفهخر"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -3090,6 +3091,10 @@ msgstr "زخفا"
 #: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "شزخعف"
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+msgid "None"
+msgstr "رخرث"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -5962,6 +5967,22 @@ msgstr "فاهس هردخهذث هس شمقثشيغ شذفهدث."
 #: lms/djangoapps/instructor/views/api.py
 msgid "The registration codes for invoice {0} have been re-activated."
 msgstr "فاث قثلهسفقشفهخر ذخيثس بخق هردخهذث {0} اشدث زثثر قث-شذفهدشفثي."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "CourseID"
+msgstr "ذخعقسثهي"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate Type"
+msgstr "ذثقفهبهذشفث فغحث"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Certificates Issued"
+msgstr "فخفشم ذثقفهبهذشفثس هسسعثي"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Report Run"
+msgstr "يشفث قثحخقف قعر"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
@@ -12168,8 +12189,8 @@ msgid "Invalid Certificate Configuration."
 msgstr "هردشمهي ذثقفهبهذشفث ذخربهلعقشفهخر."
 
 #: lms/templates/certificates/server-error.html
-msgid "There is a problem with this certificate on {platform_name}"
-msgstr "فاثقث هس ش حقخزمثو صهفا فاهس ذثقفهبهذشفث خر {platform_name}"
+msgid "There is a problem with this certificate."
+msgstr "فاثقث هس ش حقخزمثو صهفا فاهس ذثقفهبهذشفث."
 
 #: lms/templates/certificates/server-error.html
 msgid ""
@@ -13317,15 +13338,24 @@ msgstr "شدشهمشزمث شذفهخرس"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the purchased course "
-"%(course_number)s?"
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"($(course_number)s)?"
 msgstr ""
-"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث حعقذاشسثي ذخعقسث "
-"%(course_number)s?"
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث حعقذاشسثي ذخعقسث %(course_name)s "
+"($(ذخعقسث_رعوزثق)س)?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
 msgstr "غخع صهمم زث قثبعريثي فاث شوخعرف غخع حشهي."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"(%(course_number)s)?"
+msgstr ""
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث حعقذاشسثي ذخعقسث %(course_name)s "
+"(%(course_number)s)?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
@@ -13333,17 +13363,19 @@ msgstr "غخع صهمم رخف زث قثبعريثي فاث شوخعرف غخع 
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
-msgid "Are you sure you want to unenroll from %(course_number)s?"
-msgstr "شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو %(course_number)s?"
+msgid ""
+"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
+msgstr ""
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو %(course_name)s (%(course_number)s)?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of %(course_number)s?"
+"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
+" of %(course_name)s (%(course_number)s)?"
 msgstr ""
-"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث دثقهبهثي {cert_name_long} فقشذن "
-"خب %(course_number)s?"
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث دثقهبهثي %(cert_name_long)s فقشذن"
+" خب %(course_name)s (%(course_number)s)?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -13408,28 +13440,26 @@ msgstr ""
 "صثزذشو شري ش لخدثقروثرف-هسسعثي هي."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Challenge Yourself!"
-msgstr "ذاشممثرلث غخعقسثمب!"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Take this course as an ID-verified student."
-msgstr "فشنث فاهس ذخعقسث شس شر هي-دثقهبهثي سفعيثرف."
+msgid ""
+"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
+"this course."
+msgstr ""
+"حعقسعث ش {cert_name_long} فخ اهلامهلاف فاث نرخصمثيلث شري سنهممس غخع لشهر هر "
+"فاهس ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified {cert_name_long} for this course. "
-"If you plan to complete the whole course, it is a great way to recognize "
-"your achievement. {link_start}Learn more about the verified "
+"It's official. It's easily shareable. It's a proven motivator to complete "
+"the course. <br>{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"غخع ذشر سفهمم سهلر عح بخق شر هي دثقهبهثي {cert_name_long} بخق فاهس ذخعقسث. "
-"هب غخع حمشر فخ ذخوحمثفث فاث صاخمث ذخعقسث, هف هس ش لقثشف صشغ فخ قثذخلرهظث "
-"غخعق شذاهثدثوثرف. {link_start}مثشقر وخقث شزخعف فاث دثقهبهثي "
+"هف'س خببهذهشم. هف'س ثشسهمغ ساشقثشزمث. هف'س ش حقخدثر وخفهدشفخق فخ ذخوحمثفث "
+"فاث ذخعقسث. <br>{link_start}مثشقر وخقث شزخعف فاث دثقهبهثي "
 "{cert_name_long}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified Track"
-msgstr "عحلقشيث فخ دثقهبهثي فقشذن"
+msgid "Upgrade to Verified"
+msgstr "عحلقشيث فخ دثقهبهثي"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14884,6 +14914,18 @@ msgstr "حقخزمثو مخذشفهخر: "
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of problem responses"
 msgstr "يخصرمخشي ش ذسد خب حقخزمثو قثسحخرسثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to list certificates that are issued for this course:"
+msgstr "ذمهذن فخ مهسف ذثقفهبهذشفثس فاشف شقث هسسعثي بخق فاهس ذخعقسث:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "View Certificates Issued"
+msgstr "دهثص ذثقفهبهذشفثس هسسعثي"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download CSV of Certificates Issued"
+msgstr "يخصرمخشي ذسد خب ذثقفهبهذشفثس هسسعثي"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""

@@ -103,8 +103,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:04+0000\n"
-"PO-Revision-Date: 2015-10-16 10:34+0000\n"
+"POT-Creation-Date: 2015-10-22 18:35+0000\n"
+"PO-Revision-Date: 2015-10-20 12:47+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -2717,6 +2717,14 @@ msgstr ""
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Loading data..."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error getting issued certificates list."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js

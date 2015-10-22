@@ -226,7 +226,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:05+0000\n"
+"POT-Creation-Date: 2015-10-22 18:35+0000\n"
 "PO-Revision-Date: 2015-07-20 00:15+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -439,7 +439,6 @@ msgid "Verified"
 msgstr "Verificado"
 
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
 msgstr ""
 
@@ -658,10 +657,9 @@ msgid "Female"
 msgstr "Feminino"
 
 #. Translators: 'Other' refers to the student's gender
-#. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other"
-msgstr "Outro"
+msgid "Other/Prefer Not to Say"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
@@ -693,9 +691,13 @@ msgstr "Escola primária"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "None"
-msgstr "Nenhum"
+msgid "No Formal Education"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "Other Education"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -3130,6 +3132,10 @@ msgstr ""
 #: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "Sobre"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "None"
+msgstr "Nenhum"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -5845,6 +5851,22 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The registration codes for invoice {0} have been re-activated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "CourseID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate Type"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Certificates Issued"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Report Run"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -11725,7 +11747,7 @@ msgid "Invalid Certificate Configuration."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
-msgid "There is a problem with this certificate on {platform_name}"
+msgid "There is a problem with this certificate."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
@@ -12822,12 +12844,19 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the purchased course "
-"%(course_number)s?"
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"($(course_number)s)?"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"(%(course_number)s)?"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -12836,14 +12865,15 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
-msgid "Are you sure you want to unenroll from %(course_number)s?"
+msgid ""
+"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of %(course_number)s?"
+"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
+" of %(course_name)s (%(course_number)s)?"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -12904,28 +12934,21 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Challenge Yourself!"
-msgstr "Desafie a você mesmo!"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Take this course as an ID-verified student."
-msgstr "Faça este curso como um aluno com identidade verificada."
+msgid ""
+"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
+"this course."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified {cert_name_long} for this course. "
-"If you plan to complete the whole course, it is a great way to recognize "
-"your achievement. {link_start}Learn more about the verified "
+"It's official. It's easily shareable. It's a proven motivator to complete "
+"the course. <br>{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"Você ainda pode se inscrever para receber um {cert_name_long} com identidade"
-" verificada para este curso. Caso pretenda concluir o curso, esta é uma "
-"ótima maneira de ter reconhecimento pelo seu trabalho. {link_start}Saiba "
-"mais sobre o {cert_name_long} verificado{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified Track"
-msgstr "Atualizar para a linha de cursos verificada"
+msgid "Upgrade to Verified"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14289,6 +14312,18 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of problem responses"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to list certificates that are issued for this course:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "View Certificates Issued"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download CSV of Certificates Issued"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html

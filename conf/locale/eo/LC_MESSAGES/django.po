@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:12+0000\n"
-"PO-Revision-Date: 2015-10-16 13:12:16.444839\n"
+"POT-Creation-Date: 2015-10-22 18:44+0000\n"
+"PO-Revision-Date: 2015-10-22 18:44:09.818906\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -289,7 +289,6 @@ msgid "Verified"
 msgstr "Vérïfïéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
 msgstr "ÌD Vérïfïéd Rïßßön/Bädgé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
@@ -563,10 +562,9 @@ msgid "Female"
 msgstr "Fémälé Ⱡ'σяєм ιρѕυ#"
 
 #. Translators: 'Other' refers to the student's gender
-#. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other"
-msgstr "Öthér Ⱡ'σяєм ιρѕ#"
+msgid "Other/Prefer Not to Say"
+msgstr "Öthér/Préfér Nöt tö Säý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
@@ -598,12 +596,15 @@ msgstr ""
 msgid "Elementary/primary school"
 msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "None"
-msgstr "Nöné Ⱡ'σяєм ι#"
+msgid "No Formal Education"
+msgstr "Nö Förmäl Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "Other Education"
+msgstr "Öthér Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -3560,6 +3561,10 @@ msgstr "Böth Ⱡ'σяєм ι#"
 #: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "Àßöüt Ⱡ'σяєм ιρѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+msgid "None"
+msgstr "Nöné Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -6930,6 +6935,22 @@ msgid "The registration codes for invoice {0} have been re-activated."
 msgstr ""
 "Thé régïsträtïön çödés för ïnvöïçé {0} hävé ßéén ré-äçtïvätéd. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "CourseID"
+msgstr "ÇöürséÌD Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate Type"
+msgstr "Çértïfïçäté Týpé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Certificates Issued"
+msgstr "Tötäl Çértïfïçätés Ìssüéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Report Run"
+msgstr "Däté Répört Rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
@@ -13945,10 +13966,10 @@ msgstr ""
 "Ìnvälïd Çértïfïçäté Çönfïgürätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/certificates/server-error.html
-msgid "There is a problem with this certificate on {platform_name}"
+msgid "There is a problem with this certificate."
 msgstr ""
-"Théré ïs ä prößlém wïth thïs çértïfïçäté ön {platform_name} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Théré ïs ä prößlém wïth thïs çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/templates/certificates/server-error.html
 msgid ""
@@ -15245,17 +15266,26 @@ msgstr "Àväïläßlé Àçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the purchased course "
-"%(course_number)s?"
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"($(course_number)s)?"
 msgstr ""
-"Àré ýöü süré ýöü wänt tö ünénröll fröm thé pürçhäséd çöürsé "
-"%(course_number)s? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Àré ýöü süré ýöü wänt tö ünénröll fröm thé pürçhäséd çöürsé %(course_name)s "
+"($(çöürsé_nümßér)s)? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
 msgstr ""
 "Ýöü wïll ßé réfündéd thé ämöünt ýöü päïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"(%(course_number)s)?"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö ünénröll fröm thé pürçhäséd çöürsé %(course_name)s "
+"(%(course_number)s)? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
@@ -15265,19 +15295,21 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
-msgid "Are you sure you want to unenroll from %(course_number)s?"
+msgid ""
+"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
 msgstr ""
-"Àré ýöü süré ýöü wänt tö ünénröll fröm %(course_number)s? Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Àré ýöü süré ýöü wänt tö ünénröll fröm %(course_name)s (%(course_number)s)? "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of %(course_number)s?"
+"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
+" of %(course_name)s (%(course_number)s)?"
 msgstr ""
-"Àré ýöü süré ýöü wänt tö ünénröll fröm thé vérïfïéd {cert_name_long} träçk "
-"öf %(course_number)s? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Àré ýöü süré ýöü wänt tö ünénröll fröm thé vérïfïéd %(cert_name_long)s träçk"
+" öf %(course_name)s (%(course_number)s)? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -15360,35 +15392,26 @@ msgstr ""
 "σƒƒι¢ια ∂#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Challenge Yourself!"
-msgstr "Çhälléngé Ýöürsélf! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Take this course as an ID-verified student."
+msgid ""
+"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
+"this course."
 msgstr ""
-"Täké thïs çöürsé äs än ÌD-vérïfïéd stüdént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"Pürsüé ä {cert_name_long} tö hïghlïght thé knöwlédgé änd skïlls ýöü gäïn ïn "
+"thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified {cert_name_long} for this course. "
-"If you plan to complete the whole course, it is a great way to recognize "
-"your achievement. {link_start}Learn more about the verified "
+"It's official. It's easily shareable. It's a proven motivator to complete "
+"the course. <br>{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"Ýöü çän stïll sïgn üp för än ÌD vérïfïéd {cert_name_long} för thïs çöürsé. "
-"Ìf ýöü plän tö çömplété thé whölé çöürsé, ït ïs ä gréät wäý tö réçögnïzé "
-"ýöür äçhïévémént. {link_start}Léärn möré äßöüt thé vérïfïéd "
-"{cert_name_long}{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт #"
+"Ìt's öffïçïäl. Ìt's éäsïlý shäréäßlé. Ìt's ä prövén mötïvätör tö çömplété "
+"thé çöürsé. <br>{link_start}Léärn möré äßöüt thé vérïfïéd "
+"{cert_name_long}{link_end}. Ⱡ'σ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified Track"
-msgstr "Ûpgrädé tö Vérïfïéd Träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "Upgrade to Verified"
+msgstr "Ûpgrädé tö Vérïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -17096,6 +17119,21 @@ msgstr "Prößlém löçätïön:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "Download a CSV of problem responses"
 msgstr ""
 "Döwnlöäd ä ÇSV öf prößlém réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to list certificates that are issued for this course:"
+msgstr ""
+"Çlïçk tö lïst çértïfïçätés thät äré ïssüéd för thïs çöürsé: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "View Certificates Issued"
+msgstr "Vïéw Çértïfïçätés Ìssüéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download CSV of Certificates Issued"
+msgstr ""
+"Döwnlöäd ÇSV öf Çértïfïçätés Ìssüéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""

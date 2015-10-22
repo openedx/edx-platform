@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:05+0000\n"
+"POT-Creation-Date: 2015-10-22 18:35+0000\n"
 "PO-Revision-Date: 2015-10-13 19:58+0000\n"
 "Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -362,7 +362,6 @@ msgid "Verified"
 msgstr "موثَّقة"
 
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
 msgstr "شارة الطالب الذي جرى التحقّق من هويّته"
 
@@ -589,10 +588,9 @@ msgid "Female"
 msgstr "أنثى"
 
 #. Translators: 'Other' refers to the student's gender
-#. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other"
-msgstr "غير ذلك"
+msgid "Other/Prefer Not to Say"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
@@ -622,12 +620,15 @@ msgstr "شهادة الثانوية الصغرى/الإعدادية/المتوس
 msgid "Elementary/primary school"
 msgstr "المدرسة الابتدائية"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "None"
-msgstr "لا شيء"
+msgid "No Formal Education"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "Other Education"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -2072,7 +2073,7 @@ msgid ""
 "remaining."
 msgstr ""
 "يجب أن تنتظر ما لا يقلّ عن {wait_secs} بين كل تقديم وآخر. بقِيَت "
-"{remaining_secs} ثوانٍ. "
+"{remaining_secs}. "
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2092,22 +2093,22 @@ msgstr[5] ""
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{num_minute} دقائق"
+msgstr[1] "{num_minute} دقيقة"
+msgstr[2] "{num_minute} دقيقة"
+msgstr[3] "{num_minute} دقائق"
+msgstr[4] "{num_minute} دقائق"
+msgstr[5] "{num_minute} دقائق"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{num_second} ثانية"
+msgstr[1] "{num_second} ثانية"
+msgstr[2] "{num_second} ثانية"
+msgstr[3] "{num_second} ثوانٍ"
+msgstr[4] "{num_second} ثوانٍ"
+msgstr[5] "{num_second} ثوانٍ"
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -3233,6 +3234,10 @@ msgstr "كلاهما"
 #: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "لمحة عن"
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+msgid "None"
+msgstr "لا شيء"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -6112,6 +6117,22 @@ msgstr "هذه الفاتورة مفعّلة مسبقًا."
 #: lms/djangoapps/instructor/views/api.py
 msgid "The registration codes for invoice {0} have been re-activated."
 msgstr "أُعيد تفعيل رموز التسجيل الخاصة بالفاتورة رقم {0}."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "CourseID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate Type"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Certificates Issued"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Report Run"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
@@ -12106,7 +12127,7 @@ msgstr "إلغاء صلاحيات الوصول"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Enter username or email"
-msgstr "أدخل اسم المستخدم أو البريد الإكتروني"
+msgstr "أدخل اسم المستخدم أو البريد الإلكتروني"
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -12268,7 +12289,7 @@ msgid "Invalid Certificate Configuration."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
-msgid "There is a problem with this certificate on {platform_name}"
+msgid "There is a problem with this certificate."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
@@ -13393,14 +13414,20 @@ msgstr "الإجراءات المتاحة"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the purchased course "
-"%(course_number)s?"
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"($(course_number)s)?"
 msgstr ""
-"هل أنت متأكد أنك تريد إلغاء تسجيلك في المساق الذي اشتريته %(course_number)s؟"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
 msgstr "سوف يعاد لك المبلغ الذي دفعته."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"(%(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
@@ -13408,17 +13435,16 @@ msgstr "لن يعاد لك المبلغ الذي دفعته."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
-msgid "Are you sure you want to unenroll from %(course_number)s?"
-msgstr "هل أنت متأكد من رغبتك بإلغاء تسجيلك في %(course_number)s؟"
+msgid ""
+"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of %(course_number)s?"
+"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
+" of %(course_name)s (%(course_number)s)?"
 msgstr ""
-"هل أنت متأكد من رغبتك بإلغاء تسجيلك من مسار {cert_name_long} الموثقة لـ "
-"%(course_number)s؟"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -13487,28 +13513,21 @@ msgstr ""
 "الحكومة."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Challenge Yourself!"
-msgstr "تحدَّ نفسك!"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Take this course as an ID-verified student."
-msgstr "التحق بهذا المساق كطالب جرى التحقّق من هويّته."
+msgid ""
+"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
+"this course."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified {cert_name_long} for this course. "
-"If you plan to complete the whole course, it is a great way to recognize "
-"your achievement. {link_start}Learn more about the verified "
+"It's official. It's easily shareable. It's a proven motivator to complete "
+"the course. <br>{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"ما يزال بإمكانك التسجيل للحصول على شهادة موثّقة {cert_name_long} لهذا "
-"المساق. وإذا كنت تعتزم إكمال المساق حتى نهايته، فإنّها لشهادة ممتازة من أجل "
-"توثيق إنجازك. {link_start}اعرف المزيد عن الشهادة الموثَّقة "
-"{cert_name_long}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified Track"
-msgstr "الترقية إلى مسار الشهادة الموثَّقة"
+msgid "Upgrade to Verified"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14958,6 +14977,18 @@ msgid "Download a CSV of problem responses"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to list certificates that are issued for this course:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "View Certificates Issued"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download CSV of Certificates Issued"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
@@ -15426,7 +15457,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
-msgstr "عنوان البريد الإلكتروني واسم المستخدم للطالب "
+msgstr "عنوان البريد الإلكتروني أو اسم المستخدم للطالب"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Choose the graded unit:"
@@ -16673,7 +16704,7 @@ msgstr[5] ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "The following receipt has been emailed to {receipient_emails}"
-msgstr "أُرسِل الإيصال التالي بالبريد الإكتروني إلى {receipient_emails}"
+msgstr "أُرسِل الإيصال التالي بالبريد الإلكتروني إلى {receipient_emails}"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid ""
@@ -19065,7 +19096,7 @@ msgstr "مساق جديد"
 
 #: cms/templates/index.html
 msgid "Email staff to create course"
-msgstr "مراسلة فريق العمل عبر البريد الإكتروني لإنشاء مساق"
+msgstr "مراسلة فريق العمل عبر البريد الإلكتروني لإنشاء مساق"
 
 #: cms/templates/index.html
 msgid "New Library"
