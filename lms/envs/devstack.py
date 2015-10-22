@@ -20,17 +20,24 @@ HTTPS = 'off'
 
 ################################ LOGGERS ######################################
 
-# Silence noisy logs
-import logging
-LOG_OVERRIDES = [
-    ('track.contexts', logging.CRITICAL),
-    ('track.middleware', logging.CRITICAL),
-    ('dd.dogapi', logging.CRITICAL),
-    ('django_comment_client.utils', logging.CRITICAL),
-]
-for log_name, log_level in LOG_OVERRIDES:
-    logging.getLogger(log_name).setLevel(log_level)
-
+#efischer local SQL inspection, don't merge me please!
+#reference: http://www.dabapps.com/blog/logging-sql-queries-django-13/
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler'
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handers': ['console']
+        }
+    }
+}
 
 ################################ EMAIL ########################################
 
