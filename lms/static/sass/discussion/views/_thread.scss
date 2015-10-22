@@ -144,7 +144,10 @@ body.discussion {
 }
 
 // +post - individual element styling
-body.discussion .discussion-post, body.discussion .discussion-article {
+body.discussion .discussion-post,
+body.discussion .discussion-article,
+body.view-in-course .discussion-post,
+body.view-in-course .discussion-article {
   // NOTE: discussion-article is used for inline discussion modules.
   @include clearfix();
 
