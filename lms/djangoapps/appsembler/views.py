@@ -29,6 +29,7 @@ import string
 
 
 logger = logging.getLogger(__name__)
+APPSEMBLER_EMAIL = 'support@appsembler.com'
 
 @csrf_exempt 
 def user_signup_endpoint(request):
@@ -36,12 +37,24 @@ def user_signup_endpoint(request):
         logger.warning('Non-POST request coming to url: /infusionsoft')
         raise Http404
 
-#     post_secret = request.POST.get('SecretKey','')
-#     server_secret = settings.APPSEMBLER_FEATURES.get('APPSEMBLER_SECRET_KEY','')
-#     if post_secret != server_secret:
-#         msg = "POST request to Appsembler Academy failed with secret key: {}".format(post_secret)
-#         logger.error(msg)
-#         return HttpResponse(status=403)
+    import pdb; pdb.set_trace()
+    post_secret = request.POST.get('SecretKey','')
+    try:
+        # TODO: this should be under APPSEMBLER_FEATURES
+        server_secret = settings.FEATURES.get('APPSEMBLER_SECRET_KEY','')
+    except AttributeError:
+        msg = '''
+No secret key.  Add this to your sever-vars and run update: \n
+EDXAPP_APPSEMBLER_FEATURES:
+    APPSEMBLER_SECRET_KEY: <our key>
+'''
+        logger.error(msg)
+        send_mail("No secret key!", msg, APPSEMBLER_EMAIL, [APPSEMBLER_EMAIL])
+        return HttpResponse(status=403)
+    if post_secret != server_secret:
+        msg = "POST request to Appsembler Academy failed with secret key: {}".format(post_secret)
+        logger.error(msg)
+        return HttpResponse(status=403)
 
     try:
         full_name = request.POST.get('FirstName') + ' ' + request.POST.get('LastName')
@@ -104,7 +117,7 @@ def user_signup_endpoint(request):
             message = '''
                 Account creation failed for the user with email: {}
             '''.format(user_email)
-            send_mail(subject, message, 'support@appsembler.com', ['support@appsembler.com'], fail_silently=False)
+            send_mail(subject, message, APPSEMBLER_EMAIL, [APPSEMBLER_EMAIL], fail_silently=False)
     
             return HttpResponse(status=400)
 
