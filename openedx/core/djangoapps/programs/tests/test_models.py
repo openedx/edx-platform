@@ -2,33 +2,19 @@
 Tests for models supporting Program-related functionality.
 """
 
-from django.test import TestCase
 from mock import patch
 
+from django.test import TestCase
+
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 
 @patch('config_models.models.cache.get', return_value=None)  # during tests, make every cache get a miss.
-class ProgramsApiConfigTest(TestCase):
+class ProgramsApiConfigTest(ProgramsApiConfigMixin, TestCase):
     """
     Tests for the ProgramsApiConfig model.
     """
-
-    INTERNAL_URL = "http://internal/"
-    PUBLIC_URL = "http://public/"
-
-    DEFAULTS = dict(
-        internal_service_url=INTERNAL_URL,
-        public_service_url=PUBLIC_URL,
-        api_version_number=1,
-    )
-
-    def create_config(self, **kwargs):
-        """
-        DRY helper.  Create a new ProgramsApiConfig with self.DEFAULTS, updated
-        with any kwarg overrides.
-        """
-        ProgramsApiConfig(**dict(self.DEFAULTS, **kwargs)).save()
 
     def test_default_state(self, _mock_cache):
         """
