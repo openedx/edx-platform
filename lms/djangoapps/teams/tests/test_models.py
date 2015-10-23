@@ -135,7 +135,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     def setUp(self):
         """Create a user with a team to test signals."""
-        super(TeamSignalsTest, self).setUp('teams.utils.tracker')
+        super(TeamSignalsTest, self).setUp('lms.djangoapps.teams.utils.tracker')
         self.user = UserFactory.create(username="user")
         self.moderator = UserFactory.create(username="moderator")
         self.team = CourseTeamFactory(discussion_topic_id=self.DISCUSSION_TOPIC_ID)
