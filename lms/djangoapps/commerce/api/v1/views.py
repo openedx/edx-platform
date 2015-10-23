@@ -9,11 +9,11 @@ from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from commerce import ecommerce_api_client
 from commerce.api.v1.models import Course
 from commerce.api.v1.permissions import ApiKeyOrModelPermission
 from commerce.api.v1.serializers import CourseSerializer
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from util.json_request import JsonResponse
 

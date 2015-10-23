@@ -15,7 +15,7 @@ import requests
 from microsite_configuration import microsite
 from request_cache.middleware import RequestCache
 from student.models import UNENROLL_DONE
-from commerce import ecommerce_api_client, is_commerce_service_configured
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 
 log = logging.getLogger(__name__)
 
