@@ -1112,8 +1112,13 @@ class VerificationCheckpoint(models.Model):
         Returns:
             VerificationCheckpoint object if exists otherwise None
         """
-        checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
-        return checkpoint
+        try:
+            with transaction.atomic():
+                checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
+                return checkpoint
+        except IntegrityError:
+            # Record already exists - just return it.
+            return cls.objects.get(course_id=course_id, checkpoint_location=checkpoint_location)
 
 
 class VerificationStatus(models.Model):
