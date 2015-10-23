@@ -12,7 +12,8 @@ class ExtendMarkdownPlugin(BasePlugin):
     """
 
     markdown_extensions = [
-                           mdx_mathjax.MathJaxExtension(configs={}),
-                           mdx_video.VideoExtension(configs={})]
+        mdx_mathjax.MathJaxExtension(configs={}),
+        mdx_video.VideoExtension(configs={}),
+    ]
 
 plugin_registry.register(ExtendMarkdownPlugin)
