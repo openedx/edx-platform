@@ -42,7 +42,7 @@ test:
     # to understand how multiple containers can be used to
     # run subsets of tests in parallel.
     - ./scripts/all-tests.sh:
-        parallel: true
+        parallel: false
 
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit
@@ -53,7 +53,7 @@ test:
     # Do this on each of the containers that were used in
     # the build so that all results are consolidated.
     - "if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. $CIRCLE_TEST_REPORTS/junit ; fi":
-        parallel: true
+        parallel: false
 
     # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
     # as an Environment Variable in the Project Settings on CircleCI, and coverage
