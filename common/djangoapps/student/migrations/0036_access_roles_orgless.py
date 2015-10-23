@@ -29,10 +29,10 @@ class Migration(DataMigration):
         if isinstance(store, MixedModuleStore):
             self.mongostore = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
             self.xmlstore = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
-        elif store.get_modulestore_type() == ModuleStoreEnum.Type.mongo:
+        elif store.get_modulestore_type(None) == ModuleStoreEnum.Type.mongo:
             self.mongostore = store
             self.xmlstore = None
-        elif store.get_modulestore_type() == ModuleStoreEnum.Type.xml:
+        elif store.get_modulestore_type(None) == ModuleStoreEnum.Type.xml:
             self.mongostore = None
             self.xmlstore = store
         else:
