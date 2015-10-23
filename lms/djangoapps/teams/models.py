@@ -30,6 +30,7 @@ from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, Immutable
 from lms.djangoapps.teams.utils import emit_team_event
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 
+
 @receiver(thread_voted)
 @receiver(thread_created)
 @receiver(comment_voted)

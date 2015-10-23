@@ -417,4 +417,3 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             # knows how to write, it's not going to overwrite what's there.
             unmodified_overview = CourseOverview.get_from_id(course.id)
             self.assertEqual(unmodified_overview.version, 11)
-

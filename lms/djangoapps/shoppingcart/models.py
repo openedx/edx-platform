@@ -1190,7 +1190,6 @@ class InvoiceHistory(models.Model):
         app_label = "shoppingcart"
 
 
-
 # Hook up Django signals to record changes in the history table.
 # We record any change to an invoice, invoice item, or transaction.
 # We also record any deletion of a transaction, since users can delete

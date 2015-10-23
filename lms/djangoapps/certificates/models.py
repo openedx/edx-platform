@@ -140,7 +140,6 @@ class GeneratedCertificate(models.Model):
         unique_together = (('user', 'course_id'),)
         app_label = "certificates"
 
-
     @classmethod
     def certificate_for_student(cls, student, course_id):
         """

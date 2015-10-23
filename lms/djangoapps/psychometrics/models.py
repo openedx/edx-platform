@@ -23,7 +23,7 @@ class PsychometricData(models.Model):
     class Meta(object):
         app_label = "psychometrics"
 
-    studentmodule = models.OneToOneField(StudentModule, db_index=True)   # contains student, module_state_key, course_id    
+    studentmodule = models.OneToOneField(StudentModule, db_index=True)   # contains student, module_state_key, course_id
 
     done = models.BooleanField(default=False)
     attempts = models.IntegerField(default=0)			# extracted from studentmodule.state
