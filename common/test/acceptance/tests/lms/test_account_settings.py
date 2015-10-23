@@ -14,7 +14,6 @@ from ...pages.lms.dashboard import DashboardPage
 from ..helpers import EventsTestMixin
 
 
-@attr('shard_5')
 class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     """
     Mixin with helper methods to test the account settings page.
