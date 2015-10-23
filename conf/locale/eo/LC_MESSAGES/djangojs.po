@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:11+0000\n"
-"PO-Revision-Date: 2015-10-16 13:12:16.769412\n"
+"POT-Creation-Date: 2015-10-22 18:43+0000\n"
+"PO-Revision-Date: 2015-10-22 18:44:10.142616\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2874,6 +2874,16 @@ msgstr "Çlösé Çälçülätör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
 msgstr "Pöst ßödý Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Loading data..."
+msgstr "Löädïng dätä... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error getting issued certificates list."
+msgstr ""
+"Érrör géttïng ïssüéd çértïfïçätés lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating proctored exam results. Please try again."

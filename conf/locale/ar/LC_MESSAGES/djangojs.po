@@ -81,7 +81,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:04+0000\n"
+"POT-Creation-Date: 2015-10-22 18:35+0000\n"
 "PO-Revision-Date: 2015-10-14 15:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -2833,6 +2833,14 @@ msgid "Post body"
 msgstr "محتوى المنشور"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Loading data..."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error getting issued certificates list."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
 
@@ -2903,7 +2911,7 @@ msgstr "إلغاء صلاحيات الوصول"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Enter username or email"
-msgstr "أدخل اسم المستخدم أو البريد الإكتروني"
+msgstr "أدخل اسم المستخدم أو البريد الإلكتروني"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
@@ -6393,7 +6401,7 @@ msgid ""
 "Enter email addresses and/or usernames, separated by new lines or commas, "
 "for the students you want to add. *"
 msgstr ""
-"يُرجى إدخال عناوين البريد الإكتروني و/أو أسماء المستخدمين، مفصولة بأسطر "
+"يُرجى إدخال عناوين البريد الإلكتروني و/أو أسماء المستخدمين، مفصولة بأسطر "
 "جديدة أو فواصل، للطلّاب الذين تودّ أن تضيفهم. *"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore

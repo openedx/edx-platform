@@ -34,6 +34,7 @@
 # laurentFUN <laurent.at.fun@gmail.com>, 2014-2015
 # Marco Morales, 2014
 # moocit-france <contact@moocit.fr>, 2014-2015
+# mtyaka <mtyaka@gmail.com>, 2015
 # Nikolaos Maris, 2013
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
@@ -181,7 +182,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-16 13:05+0000\n"
+"POT-Creation-Date: 2015-10-22 18:35+0000\n"
 "PO-Revision-Date: 2015-06-19 17:16+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -397,9 +398,9 @@ msgstr "Vous êtes inscrit comme étudiant vérifié"
 msgid "Verified"
 msgstr "Vérifié"
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: common/djangoapps/course_modes/models.py
 msgid "ID Verified Ribbon/Badge"
-msgstr "Badge/Ruban d'ID Vérifié"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're enrolled as an honor code student"
@@ -620,10 +621,9 @@ msgid "Female"
 msgstr "Femme"
 
 #. Translators: 'Other' refers to the student's gender
-#. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other"
-msgstr "Autre"
+msgid "Other/Prefer Not to Say"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
@@ -653,12 +653,15 @@ msgstr "Collège / enseignement secondaire inférieur"
 msgid "Elementary/primary school"
 msgstr "Enseignement primaire"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "None"
-msgstr "Aucun"
+msgid "No Formal Education"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "Other Education"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -3215,6 +3218,10 @@ msgstr "Les deux"
 #: themes/red-theme/lms/templates/footer.html
 msgid "About"
 msgstr "A propos"
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+msgid "None"
+msgstr "Aucun"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -5986,6 +5993,22 @@ msgstr "Cette facture est déjà active."
 #: lms/djangoapps/instructor/views/api.py
 msgid "The registration codes for invoice {0} have been re-activated."
 msgstr "Les codes d'enregistrement de la facture {0} ont été réactivés."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "CourseID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate Type"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Certificates Issued"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Report Run"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
@@ -9256,7 +9279,7 @@ msgid ""
 " a different email address."
 msgstr ""
 "Il semblerait que {email_address} appartient à un compte existant. Essayez à"
-" vouveau avec une adresse email différente."
+" nouveau avec une adresse email différente."
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
@@ -9264,7 +9287,7 @@ msgid ""
 "different username."
 msgstr ""
 "Il semblerait que {username} appartient à un compte existant. Essayez à "
-"vouveau avec un nom d'utilisateur différent."
+"nouveau avec un nom d'utilisateur différent."
 
 #. Translators: This example name is used as a placeholder in
 #. a field on the registration form meant to hold the user's name.
@@ -9334,7 +9357,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
-msgstr "J'acccepte les {terms_of_service} {platform_name}."
+msgstr "J'accepte les {terms_of_service} {platform_name}."
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
@@ -11987,7 +12010,7 @@ msgid "Invalid Certificate Configuration."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
-msgid "There is a problem with this certificate on {platform_name}"
+msgid "There is a problem with this certificate."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
@@ -13105,15 +13128,20 @@ msgstr "Actions disponibles"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the purchased course "
-"%(course_number)s?"
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"($(course_number)s)?"
 msgstr ""
-"Êtes-vous sûr de vouloir vous désinscrire du cours payant %(course_number)s "
-"?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
 msgstr "Le montant payé vous sera remboursé."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(course_name)s "
+"(%(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
@@ -13121,14 +13149,15 @@ msgstr "Le montant payé ne vous sera pas remboursé."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
-msgid "Are you sure you want to unenroll from %(course_number)s?"
-msgstr "Êtes-vous sûr de vouloir vous désinscrire de %(course_number)s ?"
+msgid ""
+"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
 msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of %(course_number)s?"
+"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
+" of %(course_name)s (%(course_number)s)?"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -13189,29 +13218,21 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Challenge Yourself!"
-msgstr "Fixez-vous un défi !"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Take this course as an ID-verified student."
-msgstr "Suivez ce cours en tant qu'étudiant vérifié."
+msgid ""
+"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
+"this course."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified {cert_name_long} for this course. "
-"If you plan to complete the whole course, it is a great way to recognize "
-"your achievement. {link_start}Learn more about the verified "
+"It's official. It's easily shareable. It's a proven motivator to complete "
+"the course. <br>{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"Vous pouvez toujours vous inscrire pour un certificat vérifié  "
-"{cert_name_long} pour ce cours. Si vous prévoyez de suivre le cours dans son"
-" intégralité, c'est un excellent moyen de faire reconnaître votre réussite. "
-"{link_start} En savoir plus sur le certificat vérifié "
-"{cert_name_long}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified Track"
-msgstr "Mettre à niveau vers un parcours vérifié"
+msgid "Upgrade to Verified"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14626,6 +14647,18 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of problem responses"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to list certificates that are issued for this course:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "View Certificates Issued"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download CSV of Certificates Issued"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
