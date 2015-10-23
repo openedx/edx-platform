@@ -12,7 +12,6 @@ class ExtendMarkdownPlugin(BasePlugin):
     """
 
     markdown_extensions = [mdx_circuit.CircuitExtension(configs={}),
-                           #mdx_image.ImageExtension() , #This one doesn't work. Tries to import simplewiki.settings
                            mdx_mathjax.MathJaxExtension(configs={}),
                            mdx_video.VideoExtension(configs={})]
 
