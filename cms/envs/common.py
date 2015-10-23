@@ -787,6 +787,9 @@ INSTALLED_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
 )
 
 

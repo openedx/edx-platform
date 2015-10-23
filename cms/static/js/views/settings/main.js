@@ -99,6 +99,13 @@ var DetailsView = ValidatingView.extend({
         }
         this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
 
+        if (this.model.get('self_paced')) {
+            this.$('#course-pace-self-paced').attr('checked', true);
+        }
+        else {
+            this.$('#course-pace-instructor-led').attr('checked', true);
+        }
+
         this.licenseView.render()
 
         return this;
@@ -235,6 +242,11 @@ var DetailsView = ValidatingView.extend({
                     this.$el.find('.remove-course-introduction-video').hide();
                 }
             }, this), 1000);
+            break;
+        case 'course-pace-self-paced':
+            // Fallthrough to handle both radio buttons
+        case 'course-pace-instructor-led':
+            this.model.set('self_paced', JSON.parse(event.currentTarget.value));
             break;
         default: // Everything else is handled by datepickers and CodeMirror.
             break;

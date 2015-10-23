@@ -1963,6 +1963,9 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
 )
 
 ######################### CSRF #########################################

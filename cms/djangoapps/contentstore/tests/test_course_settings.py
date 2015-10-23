@@ -30,6 +30,7 @@ from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
 import ddt
 from xmodule.modulestore import ModuleStoreEnum
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from util.milestones_helpers import seed_milestone_relationship_types
 
 
@@ -56,6 +57,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
         self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
         self.assertIsNone(details.has_cert_config)
+        self.assertFalse(details.self_paced)
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -86,6 +88,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
     def test_update_and_fetch(self):
+        SelfPacedConfiguration(enabled=True).save()
         jsondetails = CourseDetails.fetch(self.course.id)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -127,6 +130,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).language,
             jsondetails.language
+        )
+        jsondetails.self_paced = True
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
+            jsondetails.self_paced
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -309,6 +317,7 @@ class CourseDetailsViewTest(CourseTestCase):
         return Date().to_json(datetime_obj)
 
     def test_update_and_fetch(self):
+        SelfPacedConfiguration(enabled=True).save()
         details = CourseDetails.fetch(self.course.id)
 
         # resp s/b json from here on
@@ -329,6 +338,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'effort', "effort")
         self.alter_field(url, details, 'course_image_name', "course_image_name")
         self.alter_field(url, details, 'language', "en")
+        self.alter_field(url, details, 'self_paced', "true")
 
     def compare_details_with_encoding(self, encoded, details, context):
         """
