@@ -7,10 +7,6 @@ admin.autodiscover()
 
 # pylint: disable=bad-continuation
 
-# Pattern to match a course key or a library key
-COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
-    r'[^/]+/[^/]+/[^/]+', r'[^/:]+:[^/+]+\+[^/+]+(\+[^/]+)?'
-)
 # Pattern to match a library key only
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
@@ -74,7 +70,7 @@ urlpatterns += patterns(
     url(r'^signin$', 'login_page', name='login'),
     url(r'^request_course_creator$', 'request_course_creator'),
 
-    url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN), 'course_team_handler'),
+    url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(settings.COURSELIKE_KEY_PATTERN), 'course_team_handler'),
     url(r'^course_info/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_info_handler'),
     url(
         r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
@@ -94,9 +90,8 @@ urlpatterns += patterns(
     url(r'^checklists/{}/(?P<checklist_index>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'checklists_handler'),
     url(r'^orphan/{}$'.format(settings.COURSE_KEY_PATTERN), 'orphan_handler'),
     url(r'^assets/{}/{}?$'.format(settings.COURSE_KEY_PATTERN, settings.ASSET_KEY_PATTERN), 'assets_handler'),
-    url(r'^import/{}$'.format(COURSELIKE_KEY_PATTERN), 'import_handler'),
-    url(r'^import_status/{}/(?P<filename>.+)$'.format(COURSELIKE_KEY_PATTERN), 'import_status_handler'),
-    url(r'^export/{}$'.format(COURSELIKE_KEY_PATTERN), 'export_handler'),
+    url(r'^import/{}$'.format(settings.COURSELIKE_KEY_PATTERN), 'import_handler'),
+    url(r'^export/{}$'.format(settings.COURSELIKE_KEY_PATTERN), 'export_handler'),
     url(r'^xblock/outline/{}$'.format(settings.USAGE_KEY_PATTERN), 'xblock_outline_handler'),
     url(r'^xblock/container/{}$'.format(settings.USAGE_KEY_PATTERN), 'xblock_container_handler'),
     url(r'^xblock/{}/(?P<view_name>[^/]+)$'.format(settings.USAGE_KEY_PATTERN), 'xblock_view_handler'),
@@ -112,7 +107,11 @@ urlpatterns += patterns(
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)(/)?(?P<group_id>\d+)?$'.format(
         settings.COURSE_KEY_PATTERN), 'group_configurations_detail_handler'),
+
     url(r'^api/val/v0/', include('edxval.urls')),
+
+    # Import/Export API
+    url(r'^api/import_export/v1/', include('openedx.core.djangoapps.import_export.urls')),
 )
 
 JS_INFO_DICT = {
@@ -154,6 +153,12 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
     urlpatterns += (
         url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
         url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
+    )
+
+
+if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
+    urlpatterns += (
+        url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2')),
     )
 
 urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
