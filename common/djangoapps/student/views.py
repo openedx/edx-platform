@@ -106,7 +106,8 @@ import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
     check_verify_status_by_course,
-    auth_pipeline_urls, get_next_url_for_login_page
+    auth_pipeline_urls, get_next_url_for_login_page,
+    DISABLE_UNENROLL_CERT_STATES,
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user
@@ -1014,8 +1015,14 @@ def change_enrollment(request, check_access=True):
         # Otherwise, there is only one mode available (the default)
         return HttpResponse()
     elif action == "unenroll":
-        if not CourseEnrollment.is_enrolled(user, course_id):
+        enrollment = CourseEnrollment.get_enrollment(user, course_id)
+        if not enrollment:
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
+
+        certicifate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
+        if certicifate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
+            return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
+
         CourseEnrollment.unenroll(user, course_id)
         return HttpResponse()
     else:

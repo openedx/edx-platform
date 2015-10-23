@@ -14,7 +14,8 @@ from student.helpers import (
   VERIFY_STATUS_SUBMITTED,
   VERIFY_STATUS_APPROVED,
   VERIFY_STATUS_MISSED_DEADLINE,
-  VERIFY_STATUS_NEED_TO_REVERIFY
+  VERIFY_STATUS_NEED_TO_REVERIFY,
+  DISABLE_UNENROLL_CERT_STATES,
 )
 %>
 
@@ -171,7 +172,8 @@ from student.helpers import (
               </a>
               <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" aria-label="${_('Additional Actions Menu')}">
                 <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
-                  <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
+                  % if cert_status.get('status') not in DISABLE_UNENROLL_CERT_STATES:
+                    <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
                     % if is_paid_course and show_refund_option:
                       ## Translators: The course name will be added to the end of this sentence.
                       % if not is_course_blocked:
@@ -255,6 +257,7 @@ from student.helpers import (
                       % endif
                     % endif
                   </li>
+                  % endif
                   <li class="actions-item" id="actions-item-email-settings-${dashboard_index}">
                     % if show_email_settings:
                       % if not is_course_blocked:
