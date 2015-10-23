@@ -106,6 +106,7 @@ def patch_testcase():
 
     def enter_atomics_wrapper(wrapped_func):
         wrapped_func = wrapped_func.__func__
+
         def _w(*args, **kwargs):
             CommitOnSuccessManager.ENABLED = False
             OuterAtomic.ALLOW_NESTED = True
@@ -117,6 +118,7 @@ def patch_testcase():
 
     def rollback_atomics_wrapper(wrapped_func):
         wrapped_func = wrapped_func.__func__
+
         def _w(*args, **kwargs):
             CommitOnSuccessManager.ENABLED = True
             OuterAtomic.ALLOW_NESTED = False

@@ -13,6 +13,7 @@ def patch():
     """
     def create_social_auth_wrapper(wrapped_func):
         wrapped_func = wrapped_func.__func__
+
         def _w(*args, **kwargs):
             # The entire reason for this monkey-patch is to wrap the create_social_auth call
             # in an atomic transaction. The call can sometime raise an IntegrityError, which is

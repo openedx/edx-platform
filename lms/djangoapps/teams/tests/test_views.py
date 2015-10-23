@@ -646,7 +646,6 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestCreateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
-
     @ddt.data(
         (None, 401),
         ('student_inactive', 401),
@@ -858,7 +857,6 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
-
     @ddt.data(
         (None, 401),
         ('student_inactive', 401),
@@ -908,7 +906,6 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestUpdateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
-
 
     @ddt.data(
         (None, 401),

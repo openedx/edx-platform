@@ -146,7 +146,7 @@ def override_field_for_ccx(ccx, block, name, value):
             ccx=ccx,
             location=block.location,
             field=name,
-            defaults = {'value': serialized_value},
+            defaults={'value': serialized_value},
         )
         if created:
             _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name + "_id"] = override.id

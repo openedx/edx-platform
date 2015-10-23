@@ -53,8 +53,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
         Convenience function for testing command failures
         """
         with self.assertRaisesRegexp(CommandError, regex):
-            call_command('git_add_course', *args,
-                            stderr=StringIO.StringIO())
+            call_command('git_add_course', *args, stderr=StringIO.StringIO())
 
     def test_command_args(self):
         """
