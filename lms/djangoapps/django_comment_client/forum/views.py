@@ -61,6 +61,7 @@ class DiscussionTab(EnrolledTab):
     view_name = 'django_comment_client.forum.views.forum_form_discussion'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
     is_default = False
+    is_visible_to_sneak_peek = False
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -204,7 +205,7 @@ def inline_discussion(request, course_key, discussion_id):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
@@ -239,7 +240,7 @@ def forum_form_discussion(request, course_key):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, request.user)
 
     user = cc.User.from_django_user(request.user)
@@ -314,7 +315,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, request.user)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
@@ -426,7 +427,7 @@ def user_profile(request, course_key, user_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     try:
         query_params = {
             'page': request.GET.get('page', 1),
@@ -489,7 +490,7 @@ def followed_threads(request, course_key, user_id):
 
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     try:
         profiled_user = cc.User(id=user_id, course_id=course_key)
 

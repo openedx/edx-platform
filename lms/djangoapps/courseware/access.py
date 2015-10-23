@@ -324,6 +324,16 @@ def _has_access_course_desc(user, action, course):
         # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, 'load', course, course.id)
 
+    def can_load_forum():
+        """
+        Can this user access the forums in this course?
+        """
+        return (
+            can_load()
+            and
+            UserProfile.has_registered(user)
+        )
+
     def within_enrollment_period():
         """
         Just a time boundary check, handles if start or stop were set to None
@@ -396,6 +406,7 @@ def _has_access_course_desc(user, action, course):
 
     checkers = {
         'load': can_load,
+        'load_forum': can_load_forum,
         'view_courseware_with_prerequisites':
             lambda: _can_view_courseware_with_prerequisites(user, course),
         'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, course),
