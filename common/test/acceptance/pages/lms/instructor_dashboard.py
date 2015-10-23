@@ -70,7 +70,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the timed exam tab and returns the Timed Exam Section
         """
-        self.q(css='a[data-section=timed_exam]').first.click()
+        self.q(css='a[data-section=special_exams]').first.click()
         timed_exam_section = TimedExamPage(self.browser)
         timed_exam_section.wait_for_page()
         return timed_exam_section

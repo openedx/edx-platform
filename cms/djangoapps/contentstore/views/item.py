@@ -878,7 +878,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
         if xblock.category == 'course':
             xblock_info.update({
-                "enable_proctored_exams": xblock.enable_proctored_exams
+                "enable_proctored_exams": xblock.enable_proctored_exams,
+                "enable_timed_exams": xblock.enable_timed_exams
             })
         elif xblock.category == 'sequential':
             xblock_info.update({

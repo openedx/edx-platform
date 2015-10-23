@@ -18,6 +18,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     display_name: 'Mock Course',
                     category: 'course',
                     enable_proctored_exams: true,
+                    enable_timed_exams: true,
                     studio_url: '/course/slashes:MockCourse',
                     is_container: true,
                     has_changes: false,
