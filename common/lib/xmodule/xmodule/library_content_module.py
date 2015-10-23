@@ -228,7 +228,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 added=format_block_keys(block_keys['added'])
             )
 
-
     def selected_children(self):
         """
         Returns a set() of block_ids indicating which of the possible children
