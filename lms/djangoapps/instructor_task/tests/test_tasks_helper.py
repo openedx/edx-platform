@@ -20,7 +20,7 @@ from certificates.tests.factories import GeneratedCertificateFactory, Certificat
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -142,8 +142,10 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         magneto = u'MàgnëtÖ'
         cohort1 = CohortFactory(course_id=course.id, name=professor_x)
         cohort2 = CohortFactory(course_id=course.id, name=magneto)
-        cohort1.users.add(user1)
-        cohort2.users.add(user2)
+        membership1 = CohortMembership(course_user_group=cohort1, user=user1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=cohort2, user=user2)
+        membership2.save()
 
         self._verify_cell_data_for_user(user1.username, course.id, 'Cohort Name', professor_x)
         self._verify_cell_data_for_user(user2.username, course.id, 'Cohort Name', magneto)
@@ -1304,8 +1306,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
     def test_move_users_to_new_cohort(self):
-        self.cohort_1.users.add(self.student_1)
-        self.cohort_2.users.add(self.student_2)
+        membership1 = CohortMembership(course_user_group=self.cohort_1, user=self.student_1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=self.cohort_2, user=self.student_2)
+        membership2.save()
 
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'
@@ -1322,8 +1326,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
     def test_move_users_to_same_cohort(self):
-        self.cohort_1.users.add(self.student_1)
-        self.cohort_2.users.add(self.student_2)
+        membership1 = CohortMembership(course_user_group=self.cohort_1, user=self.student_1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=self.cohort_2, user=self.student_2)
+        membership2.save()
 
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'
