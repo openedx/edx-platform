@@ -192,6 +192,7 @@ class CourseDetails(object):
             dirty = True
 
         if (SelfPacedConfiguration.current().enabled
+                and descriptor.can_toggle_course_pacing
                 and 'self_paced' in jsondict
                 and jsondict['self_paced'] != descriptor.self_paced):
             descriptor.self_paced = jsondict['self_paced']

@@ -1,8 +1,9 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
     "js/views/uploads", "js/utils/change_on_enter", "js/views/license", "js/models/license",
-    "common/js/components/views/feedback_notification", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
-        FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, NotificationView) {
+    "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext"],
+       function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
+                FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, NotificationView,
+                timepicker, date, gettext) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -99,11 +100,19 @@ var DetailsView = ValidatingView.extend({
         }
         this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
 
-        if (this.model.get('self_paced')) {
-            this.$('#course-pace-self-paced').attr('checked', true);
+        var selfPacedButton = this.$('#course-pace-self-paced'),
+            instructorLedButton = this.$('#course-pace-instructor-led'),
+            paceToggleTip = this.$('#course-pace-toggle-tip');
+        (this.model.get('self_paced') ? selfPacedButton : instructorLedButton).attr('checked', true);
+        if (this.model.canTogglePace()) {
+            selfPacedButton.removeAttr('disabled');
+            instructorLedButton.removeAttr('disabled');
+            paceToggleTip.text('');
         }
         else {
-            this.$('#course-pace-instructor-led').attr('checked', true);
+            selfPacedButton.attr('disabled', true);
+            instructorLedButton.attr('disabled', true);
+            paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
         }
 
         this.licenseView.render()

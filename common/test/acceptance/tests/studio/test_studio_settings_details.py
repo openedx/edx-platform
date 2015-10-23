@@ -1,6 +1,7 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
+from datetime import datetime, timedelta
 from unittest import skip
 
 from .base_studio_test import StudioCourseTest
@@ -205,19 +206,23 @@ class CoursePacingTest(StudioSettingsDetailsTest):
 
     def populate_course_fixture(self, __):
         ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
+        # Set the course start date to tomorrow in order to allow setting pacing
+        self.course_fixture.add_course_details({'start_date': datetime.now() + timedelta(days=1)})
 
     def test_default_instructor_led(self):
         """
         Test that the 'instructor led' button is checked by default.
         """
-        self.assertEqual(self.settings_detail.course_pacing, 'Instructor Led')
+        self.assertEqual(self.settings_detail.course_pacing, 'Instructor-Led')
 
     def test_self_paced(self):
         """
         Test that the 'self-paced' button is checked for a self-paced
         course.
         """
-        self.course_fixture.add_course_details({'self_paced': True})
+        self.course_fixture.add_course_details({
+            'self_paced': True
+        })
         self.course_fixture.configure_course()
         self.settings_detail.refresh_page()
         self.assertEqual(self.settings_detail.course_pacing, 'Self-Paced')
@@ -230,3 +235,14 @@ class CoursePacingTest(StudioSettingsDetailsTest):
         self.settings_detail.save_changes()
         self.settings_detail.refresh_page()
         self.assertEqual(self.settings_detail.course_pacing, 'Self-Paced')
+
+    def test_toggle_pacing_after_course_start(self):
+        """
+        Test that course authors cannot toggle the pacing of their course
+        while the course is running.
+        """
+        self.course_fixture.add_course_details({'start_date': datetime.now()})
+        self.course_fixture.configure_course()
+        self.settings_detail.refresh_page()
+        self.assertTrue(self.settings_detail.course_pacing_disabled())
+        self.assertIn('Course pacing cannot be changed', self.settings_detail.course_pacing_disabled_text)

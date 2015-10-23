@@ -116,10 +116,20 @@ class CourseDetailsTestCase(CourseTestCase):
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).effort,
             jsondetails.effort, "After set effort"
         )
+        jsondetails.self_paced = True
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
+            jsondetails.self_paced
+        )
         jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).start_date,
             jsondetails.start_date
+        )
+        jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC())
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).end_date,
+            jsondetails.end_date
         )
         jsondetails.course_image_name = "an_image.jpg"
         self.assertEqual(
@@ -130,11 +140,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).language,
             jsondetails.language
-        )
-        jsondetails.self_paced = True
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
-            jsondetails.self_paced
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -290,6 +295,19 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
+
+    def test_toggle_pacing_during_course_run(self):
+        SelfPacedConfiguration(enabled=True).save()
+        self.course.start = datetime.datetime.now()
+        modulestore().update_item(self.course, self.user.id)
+
+        details = CourseDetails.fetch(self.course.id)
+        updated_details = CourseDetails.update_from_json(
+            self.course.id,
+            dict(details.__dict__, self_paced=True),
+            self.user
+        )
+        self.assertFalse(updated_details.self_paced)
 
 
 @ddt.ddt
