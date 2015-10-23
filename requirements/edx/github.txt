@@ -67,7 +67,7 @@ git+https://github.com/edx/edx-lint.git@8bf82a32ecb8598c415413df66f5232ab8d974e9
 git+https://github.com/edx/ecommerce-api-client.git@0.4.3#egg=ecommerce-api-client==0.4.3
 
 # Third Party XBlocks
--e git+https://github.com/mitodl/edx-sga@7e308cf676b6f41493d9cf7864296bc1c089b36b#egg=edx-sga
+-e git+https://github.com/Stanford-Online/edx-sga@0fb3a0e8887c6856f13c1c388661dcc255710b1d#egg=edx-sga
 -e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
 
 # OLI XBlocks
