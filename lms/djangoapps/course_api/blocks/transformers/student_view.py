@@ -9,6 +9,9 @@ class StudentViewTransformer(BlockStructureTransformer):
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
+    # For development of new assessment types. If false, allow all xblocks
+    CHECK_STUDENT_VIEW = False
+
     def __init__(self, requested_student_view_data = None):
         self.requested_student_view_data = requested_student_view_data or []
 
@@ -43,7 +46,7 @@ class StudentViewTransformer(BlockStructureTransformer):
             # example, I changed the name of HtmlFields to HtmlBlock and moved
             # student_view() from HtmlModuleMixin to HtmlBlock.
             student_view = getattr(block.__class__, 'student_view', None)
-            supports_multi_device = block.has_support(student_view, 'multi_device')
+            supports_multi_device = block.has_support(student_view, 'multi_device') if cls.CHECK_STUDENT_VIEW else True
 
             block_structure.set_transformer_block_data(
                 block_key,
