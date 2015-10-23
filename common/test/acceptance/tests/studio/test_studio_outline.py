@@ -1766,7 +1766,10 @@ class SelfPacedOutlineTest(CourseOutlineTest):
                 )
             ),
         )
-        self.course_fixture.add_course_details({'self_paced': True})
+        self.course_fixture.add_course_details({
+            'self_paced': True,
+            'start_date': datetime.now() + timedelta(days=1)
+        })
         ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
 
     def test_release_dates_not_shown(self):

@@ -70,6 +70,7 @@ var CourseDetails = Backbone.Model.extend({
     },
 
     _videokey_illegal_chars : /[^a-zA-Z0-9_-]/g,
+
     set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
@@ -81,9 +82,16 @@ var CourseDetails = Backbone.Model.extend({
 
         return this.videosourceSample();
     },
+
     videosourceSample : function() {
         if (this.has('intro_video')) return "//www.youtube.com/embed/" + this.get('intro_video');
         else return "";
+    },
+
+    // Whether or not the course pacing can be toggled. If the course
+    // has already started, returns false; otherwise, returns true.
+    canTogglePace: function () {
+        return new Date() <= new Date(this.get('start_date'));
     }
 });
 

@@ -14,7 +14,11 @@ class SelfPacedDateOverrideProvider(FieldOverrideProvider):
     due dates to be overridden for self-paced courses.
     """
     def get(self, block, name, default):
+        # Remove due dates
         if name == 'due':
+            return None
+        # Remove release dates for course content
+        if name == 'start' and block.category != 'course':
             return None
         return default
 

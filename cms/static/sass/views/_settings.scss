@@ -1039,4 +1039,29 @@
       }
     }
   }
+
+  // UI: course pacing options
+  .group-settings.pacing {
+    .list-input {
+      margin-top: $baseline/2;
+      background-color: $gray-l4;
+      border-radius: 3px;
+      padding: ($baseline/2);
+    }
+
+    .field {
+      @include margin(0, 0, $baseline, 0);
+
+      .field-radio {
+        display: inline-block;
+        @include margin-right($baseline/4);
+        width: auto;
+        height: auto;
+
+        & + .course-pace-label {
+          display: inline-block;
+        }
+      }
+    }
+  }
 }
