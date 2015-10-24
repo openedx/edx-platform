@@ -1,11 +1,9 @@
 """
 Reusable mixins for XBlocks and/or XModules
 """
+from django.utils.translation import ugettext_noop as _
 
 from xblock.fields import Scope, String, XBlockMixin
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class LicenseMixin(XBlockMixin):

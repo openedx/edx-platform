@@ -471,7 +471,7 @@ class ChoiceGroup(InputTypeBase):
 
     @classmethod
     def get_attributes(cls):
-        _ = lambda text: text
+        from django.utils.translation import ugettext_noop as _
         return [Attribute("show_correctness", "always"),
                 Attribute('label', ''),
                 Attribute("submitted_message", _("Answer received."))]
@@ -1707,7 +1707,7 @@ class ChoiceTextGroup(InputTypeBase):
         """
         Returns a list of `Attribute` for this problem type
         """
-        _ = lambda text: text
+        from django.utils.translation import ugettext_noop as _
         return [
             Attribute("show_correctness", "always"),
             Attribute("submitted_message", _("Answer received.")),

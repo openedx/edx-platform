@@ -24,12 +24,10 @@ from xblock.core import XBlock
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext_noop as _
 
 
 log = logging.getLogger(__name__)
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"

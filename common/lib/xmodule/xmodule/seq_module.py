@@ -6,9 +6,10 @@ xModule implementation of a learning sequence
 
 import json
 import logging
+from lxml import etree
 import warnings
 
-from lxml import etree
+from django.utils.translation import ugettext_noop as _
 
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
@@ -27,9 +28,6 @@ log = logging.getLogger(__name__)
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class SequenceFields(object):

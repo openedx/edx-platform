@@ -3,15 +3,14 @@ import logging
 from lxml import etree
 from pkg_resources import resource_string
 
+from django.utils.translation import ugettext_noop as _
+
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.fields import Scope, String
 import textwrap
 
 log = logging.getLogger(__name__)
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class AnnotatableFields(object):

@@ -33,6 +33,7 @@ from sys import float_info
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
+from django.utils.translation import ugettext_noop as _
 import dogstats_wrapper as dog_stats_api
 
 # specific library imports
@@ -57,10 +58,6 @@ registry = TagRegistry()
 
 CorrectMap = correctmap.CorrectMap  # pylint: disable=invalid-name
 CORRECTMAP_PY = None
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
-
 QUESTION_HINT_CORRECT_STYLE = 'feedback-hint-correct'
 QUESTION_HINT_INCORRECT_STYLE = 'feedback-hint-incorrect'
 QUESTION_HINT_LABEL_STYLE = 'hint-label'

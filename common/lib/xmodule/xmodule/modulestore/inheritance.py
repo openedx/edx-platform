@@ -4,16 +4,15 @@ Support for inheritance of fields down an XBlock hierarchy.
 from __future__ import absolute_import
 
 from datetime import datetime
+
+from django.conf import settings
+from django.utils.translation import ugettext_noop as _
 from pytz import UTC
+
 from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.fields import Date, Timedelta
-from django.conf import settings
-
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class UserPartitionList(List):

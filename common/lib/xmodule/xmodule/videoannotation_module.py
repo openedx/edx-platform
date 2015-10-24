@@ -4,6 +4,8 @@ Module for Video annotations using annotator.
 from lxml import etree
 from pkg_resources import resource_string
 
+from django.utils.translation import ugettext_noop as _
+
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
@@ -12,9 +14,6 @@ from xmodule.annotator_token import retrieve_token
 from xblock.fragment import Fragment
 
 import textwrap
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class AnnotatableFields(object):

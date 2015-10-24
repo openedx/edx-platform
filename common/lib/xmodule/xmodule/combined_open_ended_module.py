@@ -3,6 +3,7 @@ import logging
 from lxml import etree
 from pkg_resources import resource_string
 
+from django.utils.translation import ugettext_noop as _
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule, module_attr
 from xblock.fields import Integer, Scope, String, List, Float, Boolean
@@ -14,9 +15,6 @@ from .fields import Date, Timedelta
 import textwrap
 
 log = logging.getLogger("edx.courseware")
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",

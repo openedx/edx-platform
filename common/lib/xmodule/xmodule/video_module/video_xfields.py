@@ -3,12 +3,10 @@ XFields for video module.
 """
 import datetime
 
+from django.utils.translation import ugettext_noop as _
+
 from xblock.fields import Scope, String, Float, Boolean, List, Dict, DateTime
-
 from xmodule.fields import RelativeTime
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class VideoFields(object):
