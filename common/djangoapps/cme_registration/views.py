@@ -327,7 +327,7 @@ def validate_birth_date_format(post_vars):
         error['field'] = 'birth_date'
         return error
 
-    dummy_year = 2013
+    dummy_year = 2012 # Set to 2012 as it was a leap year, which allows people to be born on Feb 29
     try:
         dateobj = datetime.date(dummy_year, int(date_parts[0]), int(date_parts[1]))
     except ValueError, e:
