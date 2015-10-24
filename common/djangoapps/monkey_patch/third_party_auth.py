@@ -12,9 +12,10 @@ def patch():
     Monkey-patch the DjangoUserMixin class.
     """
     def create_social_auth_wrapper(wrapped_func):
+        # pylint: disable=missing-docstring
         wrapped_func = wrapped_func.__func__
 
-        def _w(*args, **kwargs):
+        def _create_social_auth(*args, **kwargs):
             # The entire reason for this monkey-patch is to wrap the create_social_auth call
             # in an atomic transaction. The call can sometime raise an IntegrityError, which is
             # caught and dealt with by python_social_auth - but not inside of an atomic transaction.
@@ -22,6 +23,6 @@ def patch():
             # becomes unusable after the IntegrityError exception is raised.
             with transaction.atomic():
                 return wrapped_func(*args, **kwargs)
-        return classmethod(_w)
+        return classmethod(_create_social_auth)
 
     DjangoUserMixin.create_social_auth = create_social_auth_wrapper(DjangoUserMixin.create_social_auth)

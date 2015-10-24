@@ -37,7 +37,7 @@ class ConfigurationModelManager(models.Manager):
         necessaryily mean enbled.
         """
         assert self.model.KEY_FIELDS != (), "Just use model.current() if there are no KEY_FIELDS"
-        return self.get_queryset().extra(
+        return self.get_queryset().extra(           # pylint: disable=no-member
             where=["id IN ({subquery})".format(subquery=self._current_ids_subquery())],
             select={'is_active': 1},  # This annotation is used by the admin changelist. sqlite requires '1', not 'True'
         )
@@ -49,11 +49,11 @@ class ConfigurationModelManager(models.Manager):
         """
         if self.model.KEY_FIELDS:
             subquery = self._current_ids_subquery()
-            return self.get_queryset().extra(
+            return self.get_queryset().extra(           # pylint: disable=no-member
                 select={'is_active': "id IN ({subquery})".format(subquery=subquery)}
             )
         else:
-            return self.get_queryset().extra(
+            return self.get_queryset().extra(           # pylint: disable=no-member
                 select={'is_active': "id = {pk}".format(pk=self.model.current().pk)}
             )
 

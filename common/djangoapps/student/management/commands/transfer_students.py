@@ -73,7 +73,7 @@ class Command(TrackedCommand):
 
         for user in source_students:
             with transaction.atomic():
-                print("Moving {}.".format(user.username))
+                print "Moving {}.".format(user.username)
                 # Find the old enrollment.
                 enrollment = CourseEnrollment.objects.get(
                     user=user,

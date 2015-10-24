@@ -2030,7 +2030,7 @@ def password_reset_confirm_wrapper(
         extra_context = {"platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)}
 
         # Support old password reset URLs that used base36 encoded user IDs.
-        # See https://github.com/django/django/commit/1184d077893ff1bc947e45b00a4d565f3df81776#diff-c571286052438b2e3190f8db8331a92bR231
+        # https://github.com/django/django/commit/1184d077893ff1bc947e45b00a4d565f3df81776#diff-c571286052438b2e3190f8db8331a92bR231
         try:
             uidb64 = force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36))))
         except ValueError:
