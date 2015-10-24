@@ -10,9 +10,13 @@ var edx = edx || {};
 
     edx.commerce.ReceiptView = Backbone.View.extend({
         useEcommerceApi: true,
+        ecommerceBasketId: null,
+        ecommerceOrderNumber: null,
 
         initialize: function () {
-            this.useEcommerceApi = !!($.url('?basket_id'));
+            this.ecommerceBasketId = $.url('?basket_id');
+            this.ecommerceOrderNumber = $.url('?orderNum');
+            this.useEcommerceApi = this.ecommerceBasketId || this.ecommerceOrderNumber;
             _.bindAll(this, 'renderReceipt', 'renderError', 'getProviderData', 'renderProvider', 'getCourseData');
 
             /* Mix non-conflicting functions from underscore.string (all but include, contains, and reverse) into
@@ -75,7 +79,7 @@ var edx = edx || {};
 
         render: function () {
             var self = this,
-                orderId = $.url('?basket_id') || $.url('?payment-order-num');
+                orderId = this.ecommerceOrderNumber || this.ecommerceBasketId || $.url('?payment-order-num');
 
             if (orderId && this.$el.data('is-payment-complete') === 'True') {
                 // Get the order details
@@ -106,14 +110,21 @@ var edx = edx || {};
 
         /**
          * Retrieve receipt data from Oscar (via LMS).
-         * @param  {int} basketId The basket that was purchased.
+         * @param  {string} orderId Identifier of the order that was purchased.
          * @return {object} JQuery Promise.
          */
-        getReceiptData: function (basketId) {
-            var urlFormat = this.useEcommerceApi ? '/api/commerce/v0/baskets/%s/order/' : '/shoppingcart/receipt/%s/';
+        getReceiptData: function (orderId) {
+            var urlFormat = '/shoppingcart/receipt/%s/';
+
+            if (this.ecommerceOrderNumber) {
+                urlFormat = '/api/commerce/v1/orders/%s/';
+            } else if (this.ecommerceBasketId){
+                urlFormat = '/api/commerce/v0/baskets/%s/order/';
+            }
+
 
             return $.ajax({
-                url: _.sprintf(urlFormat, basketId),
+                url: _.sprintf(urlFormat, orderId),
                 type: 'GET',
                 dataType: 'json'
             }).retry({times: 5, timeout: 2000, statusCodes: [404]});

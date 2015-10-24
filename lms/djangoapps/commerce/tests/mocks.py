@@ -103,3 +103,17 @@ class mock_create_refund(mock_ecommerce_api_endpoint):  # pylint: disable=invali
 
     def get_uri(self):
         return TEST_API_URL + '/refunds/'
+
+
+class mock_order_endpoint(mock_ecommerce_api_endpoint):  # pylint: disable=invalid-name
+    """ Mocks calls to E-Commerce API client basket order method. """
+
+    default_response = {'number': 'EDX-100001'}
+    method = httpretty.GET
+
+    def __init__(self, order_number, **kwargs):
+        super(mock_order_endpoint, self).__init__(**kwargs)
+        self.order_number = order_number
+
+    def get_uri(self):
+        return TEST_API_URL + '/orders/{}/'.format(self.order_number)
