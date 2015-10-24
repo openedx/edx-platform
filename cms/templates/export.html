@@ -33,30 +33,6 @@ else:
   require(["js/factories/export"], function(ExportFactory) {
       ExportFactory(hasUnit, editUnitUrl, courselikeHomeUrl, is_library, errMsg);
   });
-
-## Even though there isn't an export error, we should still show contextual
-## error popups if supplied.
-%elif raw_err_msg:
-  var errMsg = ${json.dumps(raw_err_msg)};
-
-  require(['gettext', 'js/views/feedback_prompt'], function(gettext, PromptView) {
-    dialog = new PromptView({
-      title: gettext('There has been an error.'),
-      message: errMsg,
-      intent: 'error',
-      actions: {
-        primary: {
-          text: gettext('Continue'),
-          click: function(view) {
-            view.hide();
-          }
-        }
-      }
-    });
-
-    $('body').addClass('js');
-    dialog.show();
-  });
 %endif
 </%block>
 
