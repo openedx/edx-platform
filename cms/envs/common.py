@@ -72,9 +72,6 @@ FEATURES = {
 
     'AUTH_USE_CERTIFICATES': False,
 
-    # Toggles OAuth2 authentication provider
-    'ENABLE_OAUTH2_PROVIDER': False,
-
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
 
@@ -212,29 +209,6 @@ sys.path.append(COMMON_ROOT / 'djangoapps')
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
-############################ OAUTH2 Provider ###################################
-
-# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
-
-OAUTH_OIDC_ISSUER_PATH = 'oauth2'
-OAUTH_OIDC_ISSUER = 'https:/example.com/oauth2'
-
-# OpenID Connect claim handlers
-
-OAUTH_OIDC_ID_TOKEN_HANDLERS = (
-    'oauth2_provider.oidc.handlers.BasicIDTokenHandler',
-    'oauth2_provider.oidc.handlers.ProfileHandler',
-    'oauth2_provider.oidc.handlers.EmailHandler',
-    'oauth2_handler.IDTokenHandler'
-)
-
-OAUTH_OIDC_USERINFO_HANDLERS = (
-    'oauth2_provider.oidc.handlers.BasicUserInfoHandler',
-    'oauth2_provider.oidc.handlers.ProfileHandler',
-    'oauth2_provider.oidc.handlers.EmailHandler',
-    'oauth2_handler.UserInfoHandler'
-)
-
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
 import tempfile
@@ -280,8 +254,7 @@ LMS_BASE = None
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
 from lms.envs.common import (
-    COURSE_KEY_PATTERN, COURSELIKE_KEY_PATTERN, COURSE_ID_PATTERN,
-    USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
+    COURSE_KEY_PATTERN, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
 )
 
 ######################### CSRF #########################################
@@ -777,11 +750,6 @@ INSTALLED_APPS = (
     # Theming
     'openedx.core.djangoapps.theming',
 
-    # OAuth2 Provider
-    'provider',
-    'provider.oauth2',
-    'oauth2_provider',
-
     # comment common
     'django_comment_common',
 
@@ -817,10 +785,6 @@ INSTALLED_APPS = (
 
     # Credit courses
     'openedx.core.djangoapps.credit',
-
-    # Import/Export API
-    'rest_framework',
-    'openedx.core.djangoapps.import_export',
 
     'xblock_django',
 
