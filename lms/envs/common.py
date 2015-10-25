@@ -1964,6 +1964,9 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # programs support
+    'openedx.core.djangoapps.programs',
 )
 
 ######################### CSRF #########################################

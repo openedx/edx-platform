@@ -790,6 +790,9 @@ INSTALLED_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # programs support
+    'openedx.core.djangoapps.programs',
 )
 
 
