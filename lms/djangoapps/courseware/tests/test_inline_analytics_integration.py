@@ -375,6 +375,49 @@ class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
         self.assertEquals(json.loads(return_json.content), processed_data)
 
+    def test_process_analytics_answer_dist_inconsistency(self):
+        """
+        Test with data having part_id that doesn't exist in the problem definition.
+        """
+        data = [
+            {
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': False,
+                'count': 7,
+                'value_id': 'null',
+                'answer_value_text': 8,
+                'answer_value_numeric': 'null',
+                'variant': None,
+                'created': '2014-10-15T101351',
+            },
+        ]
+        
+        question_types_by_part = {
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_2': 'option',
+        }
+
+        num_options_by_part = {
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_2': 0,
+        }
+
+        processed_data = {
+            'count_by_part': {
+            },
+            'data_by_part': {
+            },
+            'message_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': (
+                    'The analytics cannot be displayed as there is an inconsistency in the data.'
+                )
+            },
+            'last_update_date': 'Oct 15, 2014 at 10:13 UTC'
+        }
+
+        return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+        self.assertEquals(json.loads(return_json.content), processed_data)
+
 
 @override_settings(ANALYTICS_DATA_URL='dummy_url',
                    ZENDESK_URL=ZENDESK_URL)
