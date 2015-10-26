@@ -337,7 +337,7 @@ def coupon_codes_features(features, coupons_list, course_id):
         seats_purchased_using_coupon = 0
         total_discounted_amount = 0
         for coupon_redemption in coupon_redemptions:
-            cart_items = coupon_redemption.order.orderitem_set.select_subclasses()
+            cart_items = coupon_redemption.order.orderitem_set.all().select_subclasses()
             found_items = []
             for item in cart_items:
                 if getattr(item, 'course_id', None):
