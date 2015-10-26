@@ -121,7 +121,7 @@ class SpecialExamsPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=timed_exam].active-section').present
+        return self.q(css='a[data-section=special_exams].active-section').present
 
     def select_allowance_section(self):
         """
