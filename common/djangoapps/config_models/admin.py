@@ -5,14 +5,14 @@ Admin site models for managing :class:`.ConfigurationModel` subclasses
 from django.forms import models
 from django.contrib import admin
 from django.contrib.admin import ListFilter
-from django.core.cache import get_cache, InvalidCacheBackendError
+from django.core.cache import caches, InvalidCacheBackendError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 
 try:
-    cache = get_cache('configuration')  # pylint: disable=invalid-name
+    cache = caches['configuration']  # pylint: disable=invalid-name
 except InvalidCacheBackendError:
     from django.core.cache import cache
 

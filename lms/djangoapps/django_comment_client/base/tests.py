@@ -5,7 +5,7 @@ import json
 import ddt
 
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.test.client import Client, RequestFactory
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -360,7 +360,7 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
     def clear_caches(self):
         """Clears caches so that query count numbers are accurate."""
         for cache in settings.CACHES:
-            get_cache(cache).clear()
+            caches[cache].clear()
         RequestCache.clear_request_cache()
 
     def count_queries(func):  # pylint: disable=no-self-argument

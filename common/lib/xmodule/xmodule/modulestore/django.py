@@ -17,7 +17,7 @@ from django.conf import settings
 if not settings.configured:
     settings.configure()
 
-from django.core.cache import get_cache, InvalidCacheBackendError
+from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch
 import django.utils
 
@@ -152,9 +152,9 @@ def create_modulestore_instance(
         request_cache = None
 
     try:
-        metadata_inheritance_cache = get_cache('mongo_metadata_inheritance')
+        metadata_inheritance_cache = caches['mongo_metadata_inheritance']
     except InvalidCacheBackendError:
-        metadata_inheritance_cache = get_cache('default')
+        metadata_inheritance_cache = caches['default']
 
     if issubclass(class_, MixedModuleStore):
         _options['create_modulestore_instance'] = create_modulestore_instance

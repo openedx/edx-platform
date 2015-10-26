@@ -3,11 +3,11 @@ Django Model baseclass for database-backed configuration.
 """
 from django.db import connection, models
 from django.contrib.auth.models import User
-from django.core.cache import get_cache, InvalidCacheBackendError
+from django.core.cache import caches, InvalidCacheBackendError
 from django.utils.translation import ugettext_lazy as _
 
 try:
-    cache = get_cache('configuration')  # pylint: disable=invalid-name
+    cache = caches['configuration']  # pylint: disable=invalid-name
 except InvalidCacheBackendError:
     from django.core.cache import cache
 

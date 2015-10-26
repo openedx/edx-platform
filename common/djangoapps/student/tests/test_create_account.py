@@ -8,7 +8,7 @@ from django.test.client import RequestFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser
-from django.utils.importlib import import_module
+from importlib import import_module
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
