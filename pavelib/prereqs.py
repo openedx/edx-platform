@@ -255,3 +255,4 @@ def install_prereqs():
     install_node_prereqs()
     uninstall_python_packages()
     install_python_prereqs()
+    sh("pip uninstall -y --disable-pip-version-check south")
