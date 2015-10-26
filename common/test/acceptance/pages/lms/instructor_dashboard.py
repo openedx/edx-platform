@@ -66,12 +66,12 @@ class InstructorDashboardPage(CoursePage):
         certificates_section.wait_for_page()
         return certificates_section
 
-    def select_timed_exam(self):
+    def select_special_exams(self):
         """
-        Selects the timed exam tab and returns the Timed Exam Section
+        Selects the timed exam tab and returns the Special Exams Section
         """
         self.q(css='a[data-section=special_exams]').first.click()
-        timed_exam_section = TimedExamPage(self.browser)
+        timed_exam_section = SpecialExamsPage(self.browser)
         timed_exam_section.wait_for_page()
         return timed_exam_section
 
@@ -114,7 +114,7 @@ class MembershipPage(PageObject):
         return MembershipPageAutoEnrollSection(self.browser)
 
 
-class TimedExamPage(PageObject):
+class SpecialExamsPage(PageObject):
     """
     Timed exam section of the Instructor dashboard.
     """
@@ -127,7 +127,7 @@ class TimedExamPage(PageObject):
         """
         Expand the allowance section
         """
-        allowance_section = TimedExamPageAllowanceSection(self.browser)
+        allowance_section = SpecialExamsPageAllowanceSection(self.browser)
         if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]").present:
             self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0").click()
             self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]",
@@ -139,7 +139,7 @@ class TimedExamPage(PageObject):
         """
         Expand the Student Attempts Section
         """
-        exam_attempts_section = TimedExamPageAttemptsSection(self.browser)
+        exam_attempts_section = SpecialExamsPageAttemptsSection(self.browser)
         if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present:
             self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1").click()
             self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]",
@@ -751,9 +751,9 @@ class MembershipPageAutoEnrollSection(PageObject):
         self.click_upload_file_button()
 
 
-class TimedExamPageAllowanceSection(PageObject):
+class SpecialExamsPageAllowanceSection(PageObject):
     """
-    Allowance section of the Instructor dashboard's Timed Exam tab.
+    Allowance section of the Instructor dashboard's Special Exams tab.
     """
     url = None
 
@@ -768,9 +768,9 @@ class TimedExamPageAllowanceSection(PageObject):
         return self.q(css="a#add-allowance").present
 
 
-class TimedExamPageAttemptsSection(PageObject):
+class SpecialExamsPageAttemptsSection(PageObject):
     """
-    Exam Attempts section of the Instructor dashboard's Timed Exam tab.
+    Exam Attempts section of the Instructor dashboard's Special Exams tab.
     """
     url = None
 
