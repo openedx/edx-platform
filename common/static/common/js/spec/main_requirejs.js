@@ -1,4 +1,6 @@
+/* globals requirejs */
 (function(requirejs, define) {
+    'use strict';
     requirejs.config({
         paths: {
             'gettext': 'js/test/i18n',

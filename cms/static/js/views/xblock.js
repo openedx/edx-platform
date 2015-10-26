@@ -35,19 +35,19 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                     xblockElement,
                     successCallback = options ? options.success || options.done : null,
                     errorCallback = options ? options.error || options.done : null,
-                    xblock,
                     fragmentsRendered;
 
                 fragmentsRendered = this.renderXBlockFragment(fragment, wrapper);
                 fragmentsRendered.always(function() {
                     xblockElement = self.$('.xblock').first();
                     try {
-                        xblock = XBlock.initializeBlock(xblockElement);
-                        self.xblock = xblock;
-                        self.xblockReady(xblock);
-                        if (successCallback) {
-                            successCallback(xblock);
-                        }
+                        XBlock.initializeBlock(xblockElement).done(function(xblock) {
+                            self.xblock = xblock;
+                            self.xblockReady(xblock);
+                            if (successCallback) {
+                                successCallback(xblock);
+                            }
+                        });
                     } catch (e) {
                         console.error(e.stack);
                         // Add 'xblock-initialization-failed' class to every xblock

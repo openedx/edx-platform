@@ -1,3 +1,4 @@
+/* globals define, RequireJS */
 ;(function (define) {
     'use strict';
     define([
@@ -6,7 +7,8 @@
             'underscore.string',
             'gettext'
         ],
-        function($, _, _s, gettext) {
+        // gettext is used in template, but jshint can't see that
+        function($, _, _s, gettext) {  // jshint unused: false
         var utils;
 
         /* Mix non-conflicting functions from underscore.string
@@ -20,17 +22,22 @@
         }
         _.mixin( _s.exports() );
 
+        /* jshint maxlen: 150 */
+        var messages = {
+            email: '<li><%- gettext("The email address you\'ve provided isn\'t formatted correctly.") %></li>',
+            min: '<li><%- _.sprintf( gettext("%(field)s must have at least %(count)d characters."), context ) %></li>',
+            max: '<li><%- _.sprintf( gettext("%(field)s can only contain up to %(count)d characters."), context ) %></li>',
+            required: '<li><%- _.sprintf( gettext("Please enter your %(field)s."), context ) %></li>',
+            custom: '<li><%= content %></li>'
+        };
+        /* jshint maxlen: 120 */
+
         utils = (function(){
             var _fn = {
                 validate: {
 
-                    msg: {
-                        email: '<li><%- gettext("The email address you\'ve provided isn\'t formatted correctly.") %></li>',
-                        min: '<li><%- _.sprintf( gettext("%(field)s must have at least %(count)d characters."), context ) %></li>',
-                        max: '<li><%- _.sprintf( gettext("%(field)s can only contain up to %(count)d characters."), context ) %></li>',
-                        required: '<li><%- _.sprintf( gettext("Please enter your %(field)s."), context ) %></li>',
-                        custom: '<li><%= content %></li>'
-                    },
+
+                    msg: messages,
 
                     field: function( el ) {
                         var $el = $(el),
@@ -109,7 +116,10 @@
                         regex: new RegExp(
                             [
                                 '(^[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+(\\.[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+)*',
-                                '|^"([\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]|\\\\[\\001-\\011\\013\\014\\016-\\177])*"',
+                                '|^"(',
+                                    '[\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]',
+                                    '|\\\\[\\001-\\011\\013\\014\\016-\\177]',
+                                ')*"',
                                 ')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\\.)+[A-Z]{2,6}\\.?$)',
                                 '|\\[(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\]$'
                             ].join(''), 'i'

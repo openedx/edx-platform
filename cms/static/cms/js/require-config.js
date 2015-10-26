@@ -2,6 +2,7 @@ require.config({
     // NOTE: baseUrl has been previously set in cms/static/templates/base.html
     waitSeconds: 60,
     paths: {
+        "xblock_resource": "../../xblock/resource",
         "domReady": "js/vendor/domReady",
         "gettext": "/i18n",
         "mustache": "js/vendor/mustache",

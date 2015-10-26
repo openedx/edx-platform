@@ -1,4 +1,5 @@
-(function($, JSON) {
+/* globals require, RequireJS */
+(function($, require, JSON) {
 
     'use strict';
 
@@ -46,36 +47,55 @@
         var block;
         var $element = $(element);
         var runtime = elementRuntime(element);
+        var deferred = $.Deferred();
+        var initialized = $.Deferred();
+        var init = $element.data('init');
+        var useRequire = $element.data('use-require');
 
         block_args.unshift(element);
         block_args.unshift(runtime);
 
-
         if (runtime) {
-
-            block = (function() {
-                var initFn = window[$element.data('init')];
-
+            var createBlockInstance = function(initFunction) {
+                var block;
                 // This create a new constructor that can then apply() the block_args
                 // to the initFn.
                 function Block() {
-                    return initFn.apply(this, block_args);
+                    return initFunction.apply(this, block_args);
                 }
-                Block.prototype = initFn.prototype;
+                Block.prototype = initFunction.prototype;
+                block = new Block();
+                block.runtime = runtime;
+                deferred.resolve(block);
+            };
 
-                return new Block();
+            block = (function() {
+                if (useRequire === 'True') {
+                    require([init], function(initFunction) {
+                        createBlockInstance(initFunction);
+                    });
+                } else {
+                    createBlockInstance(window[init]);
+                }
             })();
-            block.runtime = runtime;
         } else {
             block = {};
+            deferred.resolve(block);
         }
-        block.element = element;
-        block.name = $element.data('name');
-        block.type = $element.data('block-type');
-        $element.trigger('xblock-initialized');
-        $element.data('initialized', true);
-        $element.addClass('xblock-initialized');
-        return block;
+        deferred.promise()
+            .done(function(block) {
+                block.element = element;
+                block.name = $element.data('name');
+                block.type = $element.data('block-type');
+                $element.trigger('xblock-initialized');
+                $element.data('initialized', true);
+                $element.addClass('xblock-initialized');
+                initialized.resolve(block);
+            })
+            .fail(function() {
+                initialized.reject();
+            });
+        return initialized.promise();
     }
 
     var XBlock = {
@@ -139,4 +159,4 @@
 
     this.XBlock = XBlock;
 
-}).call(this, $, JSON);
+}).call(this, $, require || RequireJS.require, JSON);

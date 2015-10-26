@@ -34,7 +34,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 -e git+https://github.com/gabrielfalcao/lettuce.git@b18b8fb711eb7a178c58574716032ad8de525912#egg=lettuce=1.8-support
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@32fca2a954745315be97b91ef0d5ad4eb38cf365#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@e5e8eea05a13688a63825c80ed743ed47340a2a4#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
