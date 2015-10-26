@@ -21,8 +21,8 @@ from django.utils.translation import ugettext as _
 from django.shortcuts import redirect
 
 from rest_framework import renderers
-from rest_framework.authentication import OAuth2Authentication, \
-    SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import renderer_classes \
     as renderer_classes_decorator
 from rest_framework.permissions import IsAuthenticated, BasePermission
