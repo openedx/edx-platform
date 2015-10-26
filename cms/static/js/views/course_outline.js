@@ -142,7 +142,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
             editXBlock: function() {
                 var enable_proctored_exams = false;
                 var enable_timed_exams = false;
-                if (this.model.get('category') === 'sequential' ) {
+                if (this.model.get('category') === 'sequential') {
                     if (this.parentView.parentView.model.has('enable_proctored_exams')) {
                         enable_proctored_exams = this.parentView.parentView.model.get('enable_proctored_exams');
                     }
