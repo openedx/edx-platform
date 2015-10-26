@@ -378,14 +378,21 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
                     mock_get_pk_value_on_save.return_value = None
 
-                    # verify the CourseOverview is loaded successfully both times,
-                    # including after an IntegrityError exception the 2nd time
-                    for _ in range(2):
-                        self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
-                # verify the CourseOverview is loaded successfully both times,
-                # including after an IntegrityError exception the 2nd time
-                for _ in range(2):
-                    self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
+                    # The CourseOverviewTab entries can't get properly created when the CourseOverview used as a
+                    # foreign key has a None 'id' - the bulk_create raises an IntegrityError. Mock out the
+                    # CourseOverviewTab creation, as those record creations aren't what is being tested in this test.
+                    # This mocking makes the first get_from_id() succeed with no IntegrityError - the 2nd one raises
+                    # an IntegrityError for the reason listed above.
+                    with mock.patch(
+                        'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewTab.objects.bulk_create'
+                    ) as mock_bulk_create:
+                        mock_bulk_create.return_value = None
+
+                        # Verify the CourseOverview is loaded successfully both times,
+                        # including after an IntegrityError exception the 2nd time.
+                        for _ in range(2):
+                            self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
+
 
     def test_course_overview_version_update(self):
         """

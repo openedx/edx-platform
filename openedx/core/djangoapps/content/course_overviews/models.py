@@ -2,7 +2,7 @@
 Declaration of CourseOverview model
 """
 import json
-from django.db import models
+from django.db import models, transaction
 
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
@@ -180,11 +180,12 @@ class CourseOverview(TimeStampedModel):
             if isinstance(course, CourseDescriptor):
                 course_overview = cls._create_from_course(course)
                 try:
-                    course_overview.save()
-                    CourseOverviewTab.objects.bulk_create([
-                        CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
-                        for tab in course.tabs
-                    ])
+                    with transaction.atomic():
+                        course_overview.save()
+                        CourseOverviewTab.objects.bulk_create([
+                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            for tab in course.tabs
+                        ])
                 except IntegrityError:
                     # There is a rare race condition that will occur if
                     # CourseOverview.get_from_id is called while a
