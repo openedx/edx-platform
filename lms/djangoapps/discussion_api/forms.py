@@ -6,26 +6,14 @@ from django.forms import (
     BooleanField,
     CharField,
     ChoiceField,
-    Field,
     Form,
     IntegerField,
-    MultipleHiddenInput,
     NullBooleanField,
 )
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
-
-
-class TopicIdField(Field):
-    """
-    Field for a list of topic_ids
-    """
-    widget = MultipleHiddenInput
-
-    def validate(self, value):
-        if value and "" in value:
-            raise ValidationError("This field cannot be empty.")
+from openedx.core.djangoapps.util.forms import MultiValueField
 
 
 class _PaginationForm(Form):
@@ -49,7 +37,7 @@ class ThreadListGetForm(_PaginationForm):
     EXCLUSIVE_PARAMS = ["topic_id", "text_search", "following"]
 
     course_id = CharField()
-    topic_id = TopicIdField(required=False)
+    topic_id = MultiValueField(required=False)
     text_search = CharField(required=False)
     following = NullBooleanField(required=False)
     view = ChoiceField(
