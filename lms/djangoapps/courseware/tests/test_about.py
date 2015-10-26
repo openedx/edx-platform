@@ -57,12 +57,76 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
             data="WITH ABOUT", display_name="overview"
         )
 
-        self.purchase_course = CourseFactory.create(org='MITx', number='buyme', display_name='Course To Buy')
-        self.course_mode = CourseMode(course_id=self.purchase_course.id,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=10)
-        self.course_mode.save()
+    def test_get_children(self):
+        from xmodule.modulestore import ModuleStoreEnum
+        from uuid import uuid4
+
+
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            course = CourseFactory.create()
+
+            with self.store.bulk_operations(course.id):
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                    for index in range(2):
+                        parent = self.store.get_item(course.location)
+                        user_id = ModuleStoreEnum.UserID.test
+                        display_name = uuid4().hex
+                        location = parent.location.course_key.make_usage_key(
+                            'html',
+                            display_name,
+                        )
+                        metadata = {'display_name': display_name}
+                        module = self.store.create_child(
+                            user_id,
+                            parent.location,
+                            location.block_type,
+                            block_id=location.block_id,
+                            metadata=metadata,
+                            definition_data={},
+                            runtime=parent.runtime,
+                            fields={},
+                        )
+
+                        parent.children.append(location)
+                        self.store.update_item(parent, user_id)
+                        published_parent = self.store.publish(parent.location, user_id)
+
+                    self.assertEqual(2, len(parent.children))
+                    self.assertEqual(2, len(parent.get_children()))
+                    self.assertEqual(2, len(published_parent.get_children()))
+
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+            with self.store.bulk_operations(course.id):
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                    for index in range(2):
+                        parent = self.store.get_item(course.location)
+                        user_id = ModuleStoreEnum.UserID.test
+                        display_name = uuid4().hex
+                        location = parent.location.course_key.make_usage_key(
+                            'html',
+                            display_name,
+                        )
+                        metadata = {'display_name': display_name}
+                        module = self.store.create_child(
+                            user_id,
+                            parent.location,
+                            location.block_type,
+                            block_id=location.block_id,
+                            metadata=metadata,
+                            definition_data={},
+                            runtime=parent.runtime,
+                            fields={},
+                        )
+
+                        parent.children.append(location)
+                        self.store.update_item(parent, user_id)
+                        published_parent = self.store.publish(parent.location, user_id)
+
+                    self.assertEqual(2, len(parent.children))
+                    self.assertEqual(2, len(parent.get_children()))
+                    self.assertEqual(0, len(published_parent.get_children()))
 
     def test_anonymous_user(self):
         """
