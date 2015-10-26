@@ -10,6 +10,7 @@ import re
 import unittest
 import uuid
 
+import ddt
 from contracts import contract
 from nose.plugins.attrib import attr
 from django.core.cache import get_cache, InvalidCacheBackendError
@@ -23,7 +24,8 @@ from xmodule.modulestore.exceptions import (
     DuplicateItemError, DuplicateCourseError,
     InsufficientSpecificationError
 )
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
+from opaque_keys.edx.locator import CourseKey, CourseLocator, BlockUsageLocator, VersionTree, LocalId
+from ccx_keys.locator import CCXBlockUsageLocator
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
@@ -596,6 +598,7 @@ class TestHasChildrenAtDepth(SplitModuleTest):
         self.assertFalse(ch3.has_children_at_depth(1))
 
 
+@ddt.ddt
 class SplitModuleCourseTests(SplitModuleTest):
     '''
     Course CRUD operation tests
@@ -907,6 +910,22 @@ class SplitModuleCourseTests(SplitModuleTest):
 
         version_history = modulestore().get_block_generations(second_problem.location)
         self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
+
+    @ddt.data(
+        ("course-v1:edx+test_course+test_run", BlockUsageLocator),
+        ("ccx-v1:edX+test_course+test_run+ccx@1", CCXBlockUsageLocator),
+    )
+    @ddt.unpack
+    def test_make_course_usage_key(self, course_id, root_block_cls):
+        """Test that we get back the appropriate usage key for the root of a course key.
+
+        In particular, we want to make sure that it properly handles CCX courses.
+        """
+        course_key = CourseKey.from_string(course_id)
+        root_block_key = modulestore().make_course_usage_key(course_key)
+        self.assertIsInstance(root_block_key, root_block_cls)
+        self.assertEqual(root_block_key.block_type, "course")
+        self.assertEqual(root_block_key.name, "course")
 
 
 class TestCourseStructureCache(SplitModuleTest):

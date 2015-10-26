@@ -97,6 +97,11 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_course_structure_mem_cache',
     },
+    'lms.course_blocks': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': 'lms_course_blocks_cache',
+    },
 }
 
 
