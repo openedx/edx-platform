@@ -495,7 +495,8 @@ if settings.COURSEWARE_ENABLED:
         # Teams endpoints
         urlpatterns += (
             url(r'^api/team/', include('lms.djangoapps.teams.api_urls')),
-            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('lms.djangoapps.teams.urls'), name="teams_endpoints"),
+            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN),
+                include('lms.djangoapps.teams.urls'), name="teams_endpoints"),
         )
 
     # allow course staff to change to student view of courseware

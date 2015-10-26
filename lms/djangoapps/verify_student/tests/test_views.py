@@ -1550,7 +1550,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('JSON should be dict', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_invalid_access_key(self):
         """
         Test for invalid access key.
@@ -1572,7 +1575,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('Access key invalid', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_wrong_edx_id(self):
         """
         Test for wrong id of Software secure verification attempt.
@@ -1594,7 +1600,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('edX ID Invalid-Id not found', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_pass_result(self):
         """
         Test for verification passed.
@@ -1616,7 +1625,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_fail_result(self):
         """
         Test for failed verification.
@@ -1641,7 +1653,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_msg, u'"Invalid photo"')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_system_fail_result(self):
         """
         Test for software secure result system failure.
@@ -1664,7 +1679,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_msg, u'"Memory overflow"')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_unknown_result(self):
         """
         test for unknown software secure result
@@ -1685,7 +1703,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         )
         self.assertIn('Result Unknown not understood', response.content)
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_in_course_reverify_disabled(self):
         """
         Test for verification passed.
@@ -1711,7 +1732,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         user_status = VerificationStatus.objects.filter(user=self.user).count()
         self.assertEqual(user_status, 0)
 
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_pass_in_course_reverify_result(self):
         """
         Test for verification passed.
@@ -1742,7 +1766,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual("Re-verification Status", mail.outbox[0].subject)
 
     @mock.patch('lms.djangoapps.verify_student.views._send_email')
-    @mock.patch('lms.djangoapps.verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_reverification_on_callback(self, mock_send_email):
         """
         Test software secure callback flow for re-verification.
