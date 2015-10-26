@@ -259,7 +259,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # And visit the Allowance Section of Instructor Dashboard's Timed Exam tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
-        allowance_section = instructor_dashboard_page.select_timed_exam().select_allowance_section()
+        allowance_section = instructor_dashboard_page.select_special_exams().select_allowance_section()
 
         # Then I can add Allowance to that exam for a student
         self.assertTrue(allowance_section.is_add_allowance_button_visible)
@@ -276,7 +276,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # And visit the Student Proctored Exam Attempts Section of Instructor Dashboard's Timed Exam tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
-        exam_attempts_section = instructor_dashboard_page.select_timed_exam().select_exam_attempts_section()
+        exam_attempts_section = instructor_dashboard_page.select_special_exams().select_exam_attempts_section()
 
         # Then I can see the search text field
         self.assertTrue(exam_attempts_section.is_search_text_field_visible)
