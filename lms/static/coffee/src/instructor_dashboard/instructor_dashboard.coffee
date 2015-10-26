@@ -187,10 +187,10 @@ setup_instructor_dashboard_sections = (idash_content) ->
   if edx.instructor_dashboard.proctoring != undefined
     sections_to_initialize = sections_to_initialize.concat [
       constructor: edx.instructor_dashboard.proctoring.ProctoredExamAllowanceView
-      $element: idash_content.find ".#{CSS_IDASH_SECTION}#timed_exam"
+      $element: idash_content.find ".#{CSS_IDASH_SECTION}#special_exams"
     ,
       constructor: edx.instructor_dashboard.proctoring.ProctoredExamAttemptView
-      $element: idash_content.find ".#{CSS_IDASH_SECTION}#timed_exam"
+      $element: idash_content.find ".#{CSS_IDASH_SECTION}#special_exams"
     ]
 
   sections_to_initialize.map ({constructor, $element}) ->
