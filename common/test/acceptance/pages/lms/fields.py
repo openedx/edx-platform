@@ -204,11 +204,14 @@ class FieldsMixin(object):
 
         if value is not None:
             select_option_by_text(query, value)
+            query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
 
         if self.mode_for_field(field_id) == 'edit':
             return get_selected_option_text(query)
         else:
             return self.get_non_editable_mode_value(field_id)
+
+        # blur the field to save the value
 
     def link_title_for_link_field(self, field_id):
         """
