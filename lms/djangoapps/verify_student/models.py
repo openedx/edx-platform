@@ -1109,6 +1109,9 @@ class VerificationCheckpoint(models.Model):
             course_id (CourseKey): CourseKey
             checkpoint_location (str): Verification checkpoint location
 
+        Raises:
+            IntegrityError if create fails due to concurrent create.
+
         Returns:
             VerificationCheckpoint object if exists otherwise None
         """
