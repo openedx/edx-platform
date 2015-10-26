@@ -449,11 +449,11 @@ window.InlineAnalytics = (function() {
         var correctLastPercent = Math.round(totalLastCorrectCount * 1000 / (totalLastAttemptCount * 10));
         var incorrectLastPercent = Math.round(totalLastIncorrectCount * 1000 / (totalLastAttemptCount * 10));
         
-        part.find('.num-students-extra-first').text(totalFirstCorrectCount + ' (' + correctFirstPercent + '%) correct and ' +
-        		totalFirstIncorrectCount + ' (' + incorrectFirstPercent + '%) incorrect (First Attempt).');
+        part.find('.num-students-extra-first-correct').text(totalFirstCorrectCount + ' (' + correctFirstPercent + '%) ');
+        part.find('.num-students-extra-first-incorrect').text(totalFirstIncorrectCount + ' (' + incorrectFirstPercent + '%) ');
         
-        part.find('.num-students-extra-last').text(totalLastCorrectCount + ' (' + correctLastPercent + '%) correct and ' +
-        		totalLastIncorrectCount + ' (' + incorrectLastPercent + '%) incorrect (Last Attempt).');
+        part.find('.num-students-extra-last-correct').text(totalLastCorrectCount + ' (' + correctLastPercent + '%) ');
+        part.find('.num-students-extra-last-incorrect').text(totalLastIncorrectCount + ' (' + incorrectLastPercent + '%) ');
     }
 
 

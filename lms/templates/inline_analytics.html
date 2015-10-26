@@ -65,7 +65,10 @@ ${block_content}
           <div class="grid-wrapper">
             <p>
               <strong class="num-students"></strong> ${_('students answered this question:')}<br/>
-              <strong class="num-students-extra"></strong>
+              <strong class="num-students-extra-first-correct"></strong>${_('correct and')}
+              <strong class="num-students-extra-first-incorrect"></strong>${_('incorrect (First Attempt).')}<br/>
+              <strong class="num-students-extra-last-correct"></strong>${_('correct and')}
+              <strong class="num-students-extra-last-incorrect"></strong>${_('incorrect (Last Attempt).')}<br/>
             </p>
             <p>${_('Last updated:')} <strong class="last-update"></strong></p>
           </div>
