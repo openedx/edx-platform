@@ -128,6 +128,10 @@ class PreferencesView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         except PreferenceUpdateError as error:
+            # This exception is caught here in order to send an error response.
+            # However, an update failure on any preference is expected to rollback
+            # the entire transaction. So set the transaction to rollback manually.
+            transaction.set_rollback(True)
             return Response(
                 {
                     "developer_message": error.developer_message,
