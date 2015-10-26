@@ -556,19 +556,18 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
             checkpoint_location=self.checkpoint_midterm,
         )
 
-        # Simulate that the get-or-create operation raises an IntegrityError
+        # Simulate that the get-or-create operation raises an IntegrityError.
         # This can happen when two processes both try to get-or-create at the same time
         # when the database is set to REPEATABLE READ.
+        # To avoid IntegrityError situations when calling this method, set the view to
+        # use a READ COMMITTED transaction instead.
         with patch.object(VerificationCheckpoint.objects, "get_or_create") as mock_get_or_create:
             mock_get_or_create.side_effect = IntegrityError
-            checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(
-                self.course.id,
-                self.checkpoint_midterm
-            )
-
-        # The checkpoint should be retrieved without error
-        self.assertEqual(checkpoint.course_id, self.course.id)
-        self.assertEqual(checkpoint.checkpoint_location, self.checkpoint_midterm)
+            with self.assertRaises(IntegrityError):
+                checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(
+                    self.course.id,
+                    self.checkpoint_midterm
+                )
 
     def test_unique_together_constraint(self):
         """
