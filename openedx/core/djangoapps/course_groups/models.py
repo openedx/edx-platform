@@ -4,9 +4,13 @@ Django models related to course groups functionality.
 
 import json
 import logging
+import time
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db import IntegrityError
+from django.db import transaction
+from django.core.exceptions import ValidationError
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -24,8 +28,10 @@ class CourseUserGroup(models.Model):
     name = models.CharField(max_length=255,
                             help_text=("What is the name of this group?  "
                                        "Must be unique within a course."))
+    INTERNAL_NAME = '_db_internal_'
+
     users = models.ManyToManyField(User, db_index=True, related_name='course_groups',
-                                   help_text="Who is in this group?")
+                                   help_text="Who is in this group?", through='CourseUserGroupMembership')
 
     # Note: groups associated with particular runs of a course.  E.g. Fall 2012 and Spring
     # 2013 versions of 6.00x will have separate groups.
@@ -56,6 +62,116 @@ class CourseUserGroup(models.Model):
             group_type=group_type,
             name=name
         )
+
+class CohortMembership(models.Model):
+    """Used internally to enforce our particular definition of uniqueness"""
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        unique_together = (('user', 'course_id'), )
+
+    #the sole purpose of overriding this method is to get the django 1.6 behavior of allowing 'validate_unique'
+    #for django 1.8 upgrade, just remove this method and allow the base method to be called instead.
+    #reference: https://docs.djangoproject.com/en/1.6/ref/models/instances/, under "Validating Objects"
+    def full_clean(self, *args, **kwargs):
+        self.clean_fields()
+        self.clean()
+        if not 'validate_unique' in kwargs or kwargs['validate_unique'] == True:
+            self.validate_unique()
+
+    def clean_fields(self, *args, **kwargs):
+        if self.course_id == None:
+            self.course_id = self.course_user_group.course_id
+        super(CohortMembership, self).clean_fields(*args, **kwargs)
+
+    def clean(self):
+        if self.course_user_group.group_type != CourseUserGroup.COHORT:
+            raise ValidationError("CohortMembership cannot be used with CourseGroup types other than COHORT")
+        if self.course_user_group.course_id != self.course_id:
+            raise ValidationError("Non-matching course_ids provided")
+
+    def save(self, *args, **kwargs):
+        self.full_clean(validate_unique=False) #needed to hit custom validation defined in clean()
+        print "Trying to add user to {}".format(self.course_user_group.name)
+        if self.course_user_group.name == CourseUserGroup.INTERNAL_NAME:
+            super(CohortMembership, self).save(*args, **kwargs)
+            return
+
+        self.trying_to_save = True
+        while(self.trying_to_save):
+            print "entering loop, trying to get membership for user {user}, course {course}".format(user=self.user.id, course=self.course_id)
+            try:
+                #the following 2 "transaction" lines force a fresh read, they can be removed once we're on django 1.8
+                #see http://stackoverflow.com/questions/3346124/how-do-i-force-django-to-ignore-any-caches-and-reload-data
+                with transaction.commit_manually():
+                    transaction.commit()
+
+                saved_membership = CohortMembership.objects.get(
+                    user__id = self.user.id,
+                    course_id = self.course_id,
+                )
+            except CohortMembership.DoesNotExist:
+                print "No membership found! Trying to create a default..."
+                try:
+                    time.sleep(5)
+                    dummy_group, created  = CourseUserGroup.objects.get_or_create(
+                        name=CourseUserGroup.INTERNAL_NAME,
+                        course_id=self.course_user_group.course_id,
+                        group_type=CourseUserGroup.COHORT
+                    )
+                    new_membership = CohortMembership(
+                        user = self.user,
+                        course_user_group = dummy_group,
+                        version = 1
+                    )
+                    new_membership.save()
+                except IntegrityError:
+                    print "Integrity Error saving new default membership! Take it from the top..."
+                    pass #we're going to continue either way
+                continue
+
+            time.sleep(5)
+            print "saved membership found, id {id}, group {group}! proceeding...".format(id=saved_membership.id, group=saved_membership.course_user_group.id)
+            if saved_membership.course_user_group == self.course_user_group:
+                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                    user_name=self.user.username,
+                    cohort_name=self.course_user_group.name
+                ))
+            self.previous_cohort = saved_membership.course_user_group
+            if self.previous_cohort.name != CourseUserGroup.INTERNAL_NAME:
+                self.previous_cohort_name = saved_membership.course_user_group.name
+                self.previous_cohort_id = saved_membership.course_user_group.id
+
+            try:
+                with transaction.commit_on_success():
+                    self.previous_cohort.users.remove(self.user)
+                    self.course_user_group.users.add(self.user)
+                    self.user.course_groups.remove(self.previous_cohort)
+                    self.user.course_groups.add(self.course_user_group)
+                    updated = CohortMembership.objects.filter(
+                        id = saved_membership.id,
+                        version = saved_membership.version
+                    ).update(
+                        course_user_group = self.course_user_group,
+                        version = saved_membership.version + 1
+                    )
+                    time.sleep(5)
+                    if not updated:
+                        raise IntegrityError("value of saved_membership has changed since read")
+            except IntegrityError:
+                print "could not save membership, trying again"
+                continue
+
+            print "{count}: We did it! User {user} is now in group {cohort} in the {course} course. The membership is at version {version}".format(user=self.user, cohort=self.course_user_group.name, course=self.course_user_group.course_id, version=saved_membership.version+1, count=updated)
+            self.trying_to_save = False
+
+    course_user_group = models.ForeignKey(CourseUserGroup)
+    user = models.ForeignKey(User)
+    version = models.IntegerField(default=0)
+    course_id = CourseKeyField(max_length=255)
+
+    previous_cohort = None
+    previous_cohort_name = None
+    previous_cohort_id = None
 
 
 class CourseUserGroupPartitionGroup(models.Model):

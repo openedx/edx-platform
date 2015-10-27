@@ -3,6 +3,7 @@ Tests for cohorts
 """
 # pylint: disable=no-member
 import ddt
+import threading
 from mock import call, patch
 
 from django.contrib.auth.models import User
@@ -634,6 +635,32 @@ class TestCohorts(ModuleStoreTestCase):
             User.DoesNotExist,
             lambda: cohorts.add_user_to_cohort(first_cohort, "non_existent_username")
         )
+
+    def test_add_user_atomicity(self):
+        """
+        Test that a user can only be added to one cohort, even when operation
+        occurs on different threads at the same time.
+        """
+        course_user = UserFactory(username="Username", email="a@b.com")
+        course = modulestore().get_course(self.toy_course_key)
+        CourseEnrollment.enroll(course_user, self.toy_course_key)
+        first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
+        second_cohort = CohortFactory(course_id=course.id, name="SecondCohort")
+
+        t1 = threading.Thread(target=cohorts.add_user_to_cohort, args=[first_cohort, "Username"])
+        t2 = threading.Thread(target=cohorts.add_user_to_cohort, args=[second_cohort, "Username"])
+
+        for thread in [t1, t2]:
+            thread.start()
+
+        for thread in [t1, t2]:
+            thread.join()
+
+        try:
+            cohorts.get_cohort(course_user, course.id)
+        except MultipleObjectsReturned:
+            self.fail("User was added to more than one cohort!");
+
 
     def test_get_course_cohort_settings(self):
         """
