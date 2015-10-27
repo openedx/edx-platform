@@ -861,7 +861,7 @@ def _credit_statuses(user, course_enrollments):
     }
 
     provider_info_by_id = {
-        provider["id"]: provider
+        provider["provider_id"]: provider
         for provider in credit_api.get_credit_providers()
     }
 
@@ -898,7 +898,7 @@ def _credit_statuses(user, course_enrollments):
             else:
                 provider_info = provider_info_by_id.get(provider_id, {})
                 status["provider_name"] = provider_info.get("display_name")
-                status["provider_status_url"] = provider_info.get("status_url")
+                status["provider_status_url"] = provider_info.get("provider_status_url")
                 status["provider_id"] = provider_id
 
         statuses[course_key] = status
