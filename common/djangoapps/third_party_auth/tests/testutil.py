@@ -7,6 +7,8 @@ Used by Django and non-Django tests; must not have Django deps.
 from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
+from provider.oauth2.models import Client as OAuth2Client
+from provider import constants
 import django.test
 import mock
 import os.path
@@ -17,6 +19,7 @@ from third_party_auth.models import (
     SAMLConfiguration,
     LTIProviderConfig,
     cache as config_cache,
+    ProviderApiPermissions,
 )
 
 
@@ -112,6 +115,16 @@ class ThirdPartyAuthTestMixin(object):
         user = User.objects.get(email=email)
         user.is_active = True
         user.save()
+
+    @staticmethod
+    def configure_oauth_client():
+        """ Configure a oauth client for testing """
+        return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
+
+    @staticmethod
+    def configure_api_permission(client, provider_id):
+        """ Configure the client and provider_id pair. This will give the access to a client for that provider. """
+        return ProviderApiPermissions.objects.create(client=client, provider_id=provider_id)
 
     @staticmethod
     def read_data_file(filename):

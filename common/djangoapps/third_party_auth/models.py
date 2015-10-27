@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 import json
 import logging
 from provider.utils import long_token
+from provider.oauth2.models import Client
 from social.backends.base import BaseAuth
 from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
@@ -135,6 +136,14 @@ class ProviderConfig(ConfigurationModel):
         # This is generally the same thing as the UID, expect when one backend is used for multiple providers
         assert self.match_social_auth(social_auth)
         return social_auth.uid
+
+    def get_social_auth_uid(self, remote_id):
+        """
+        Return the uid in social auth.
+
+        This is default implementation. Subclass may override with a different one.
+        """
+        return remote_id
 
     @classmethod
     def get_register_form_data(cls, pipeline_kwargs):
@@ -304,6 +313,10 @@ class SAMLProviderConfig(ProviderConfig):
         assert self.match_social_auth(social_auth)
         # Remove the prefix from the UID
         return social_auth.uid[len(self.idp_slug) + 1:]
+
+    def get_social_auth_uid(self, remote_id):
+        """ Get social auth uid from remote id by prepending idp_slug to the remote id """
+        return '{}:{}'.format(self.idp_slug, remote_id)
 
     def get_config(self):
         """
@@ -554,3 +567,22 @@ class LTIProviderConfig(ProviderConfig):
     class Meta(object):
         verbose_name = "Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
+
+
+class ProviderApiPermissions(models.Model):
+    """
+    This model links OAuth2 client with provider Id.
+
+    It gives permission for a OAuth2 client to access the information under certain IdPs.
+    """
+    client = models.ForeignKey(Client)
+    provider_id = models.CharField(
+        max_length=255,
+        help_text=(
+            'Uniquely identify a provider. This is different from backend_name.'
+        )
+    )
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        verbose_name = "Provider API Permission"
+        verbose_name_plural = verbose_name + 's'
