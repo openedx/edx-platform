@@ -923,7 +923,7 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        enrollment, created = CourseEnrollment.objects.get_or_create(       # pylint: disable=no-member
+        enrollment, created = CourseEnrollment.objects.get_or_create(
             user=user,
             course_id=course_key,
         )

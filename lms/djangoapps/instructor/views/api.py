@@ -1131,6 +1131,7 @@ def get_issued_certificates(request, course_id):  # pylint: disable=invalid-name
         return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')

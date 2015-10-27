@@ -60,7 +60,7 @@ from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
-from util.db import outer_atomic, commit_on_success
+from util.db import outer_atomic
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -923,19 +923,14 @@ def course_about(request, course_id):
 @transaction.non_atomic_requests
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@commit_on_success
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
-    """
-    Wraps "_progress" with the commit_on_success context manager just in case
-    there are unanticipated errors.
-    """
+    """ Display the progress page. """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        with commit_on_success():
-            return _progress(request, course_key, student_id)
+        return _progress(request, course_key, student_id)
 
 
 def _progress(request, course_key, student_id):
@@ -974,8 +969,11 @@ def _progress(request, course_key, student_id):
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
-    field_data_cache = grades.field_data_cache_for_grading(course, student)
-    scores_client = ScoresClient.from_field_data_cache(field_data_cache)
+
+    with outer_atomic():
+        field_data_cache = grades.field_data_cache_for_grading(course, student)
+        scores_client = ScoresClient.from_field_data_cache(field_data_cache)
+
     courseware_summary = grades.progress_summary(
         student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
     )
@@ -1024,7 +1022,7 @@ def _progress(request, course_key, student_id):
                     'download_url': None
                 })
 
-    with commit_on_success():
+    with outer_atomic():
         response = render_to_response('courseware/progress.html', context)
 
     return response

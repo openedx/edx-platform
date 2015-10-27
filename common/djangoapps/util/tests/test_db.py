@@ -95,6 +95,12 @@ class TransactionManagersTestCase(TransactionTestCase):
 
         outer_atomic()(do_nothing)()
 
+        with atomic():
+            atomic()(do_nothing)()
+
+        with outer_atomic():
+            atomic()(do_nothing)()
+
         with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
                 outer_atomic()(do_nothing)()
