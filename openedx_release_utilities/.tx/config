@@ -1,0 +1,62 @@
+[main]
+host = https://www.transifex.com
+
+[cypress-release.django-partial]
+file_filter = conf/locale/<lang>/LC_MESSAGES/django-partial.po
+source_file = conf/locale/en/LC_MESSAGES/django-partial.po
+source_lang = en
+type = PO
+
+[cypress-release.django-studio]
+file_filter = conf/locale/<lang>/LC_MESSAGES/django-studio.po
+source_file = conf/locale/en/LC_MESSAGES/django-studio.po
+source_lang = en
+type = PO
+
+[cypress-release.djangojs-partial]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-partial.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs-partial.po
+source_lang = en
+type = PO
+
+[cypress-release.djangojs-studio]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-studio.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs-studio.po
+source_lang = en
+type = PO
+
+[cypress-release.mako]
+file_filter = conf/locale/<lang>/LC_MESSAGES/mako.po
+source_file = conf/locale/en/LC_MESSAGES/mako.po
+source_lang = en
+type = PO
+
+[cypress-release.mako-studio]
+file_filter = conf/locale/<lang>/LC_MESSAGES/mako-studio.po
+source_file = conf/locale/en/LC_MESSAGES/mako-studio.po
+source_lang = en
+type = PO
+
+[cypress-release.messages]
+file_filter = conf/locale/<lang>/LC_MESSAGES/messages.po
+source_file = conf/locale/en/LC_MESSAGES/messages.po
+source_lang = en
+type = PO
+
+[cypress-release.underscore]
+file_filter = conf/locale/<lang>/LC_MESSAGES/underscore.po
+source_file = conf/locale/en/LC_MESSAGES/underscore.po
+source_lang = en
+type = PO
+
+[cypress-release.underscore-studio]
+file_filter = conf/locale/<lang>/LC_MESSAGES/underscore-studio.po
+source_file = conf/locale/en/LC_MESSAGES/underscore-studio.po
+source_lang = en
+type = PO
+
+[cypress-release.wiki]
+file_filter = conf/locale/<lang>/LC_MESSAGES/wiki.po
+source_file = conf/locale/en/LC_MESSAGES/wiki.po
+source_lang = en
+type = PO
