@@ -50,6 +50,19 @@ define('video/09_events_plugin.js', [], function() {
                 'destroy': this.destroy
             };
             this.bindHandlers();
+            this.illegalEventSequence = {
+                load_video: ['load_video', 'pause_video', 'stop_video'],
+                play_video: ['play_video', 'load_video', 'stop_video'],
+                pause_video:['pause_video', 'load_video'],
+                stop_video: ['stop_video', 'load_video', 'pause_video'],
+                skip_video: [],
+                seek_video: ['load_video', 'stop_video'],
+                speed_change_video: ['load_video', 'stop_video'],
+                video_show_cc_menu: ['load_video', 'stop_video'],
+                video_hide_cc_menu: ['load_video', 'stop_video'],
+                show_transcript: ['load_video', 'stop_video'],
+                hide_transcript: ['load_video', 'stop_video']
+            };
         },
 
         bindHandlers: function() {
@@ -115,12 +128,34 @@ define('video/09_events_plugin.js', [], function() {
             return player ? player.currentTime : 0;
         },
 
+        getRecentEvent: function(){
+            return this.state.videoPlayer.recentEvent;
+        },
+        setRecentEvent: function(eventName){
+            this.state.videoPlayer.recentEvent = eventName;
+        },
+        isIllegalEvent: function(eventName){
+            var illegalEvents = this.illegalEventSequence[this.getRecentEvent()];
+            return $.inArray(eventName, illegalEvents) >= 0
+        },
+
         log: function (eventName, data) {
             var logInfo = _.extend({
                 id: this.state.id,
                 code: this.state.isYoutubeType() ? this.state.youtubeId() : 'html5'
             }, data, this.options.data);
             Logger.log(eventName, logInfo);
+
+            if (this.isIllegalEvent(eventName)) {
+                alert('[VIDEO INFO]: Illegal event sequence found, check browser console');
+                console.log(
+                    "[VIDEO INFO]: Illegal Event Sequence found: Current: " + eventName + ", Previous: " + this.getRecentEvent()
+                );
+                console.log("[VIDEO INFO]: " + JSON.stringify(logInfo));
+            }
+            else {
+                this.setRecentEvent(eventName);
+            }
         }
     };
 
