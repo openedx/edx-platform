@@ -20,6 +20,7 @@ from django.http import (
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
@@ -529,6 +530,8 @@ def prep_course_for_grading(course, request):
     course.set_grading_policy(course.grading_policy)
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_gradebook(request, course, ccx=None):
@@ -568,6 +571,8 @@ def ccx_gradebook(request, course, ccx=None):
         })
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_grades_csv(request, course, ccx=None):
