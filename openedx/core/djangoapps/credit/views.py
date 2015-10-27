@@ -74,8 +74,8 @@ def get_providers_detail(request):
         * 404 Not Found: The provider does not exist.
 
     """
-    provider_id = request.GET.get("provider_id", None)
-    providers_list = provider_id.split(",") if provider_id else None
+    provider_ids = request.GET.get("provider_ids", None)
+    providers_list = provider_ids.split(",") if provider_ids else None
     providers = api.get_credit_providers(providers_list)
     return JsonResponse(providers)
 

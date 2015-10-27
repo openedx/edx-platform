@@ -213,8 +213,10 @@ class UserProfile(models.Model):
     Some of the fields are legacy ones that were captured during the initial
     MITx fall prototype.
     """
+    # cache key format e.g user.<user_id>.profile.country = 'SG'
+    PROFILE_COUNTRY_CACHE_KEY = u"user.{user_id}.profile.country"
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         db_table = "auth_userprofile"
 
     # CRITICAL TODO/SECURITY
@@ -239,7 +241,7 @@ class UserProfile(models.Model):
         ('m', ugettext_noop('Male')),
         ('f', ugettext_noop('Female')),
         # Translators: 'Other' refers to the student's gender
-        ('o', ugettext_noop('Other'))
+        ('o', ugettext_noop('Other/Prefer Not to Say'))
     )
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
@@ -258,9 +260,9 @@ class UserProfile(models.Model):
         ('jhs', ugettext_noop("Junior secondary/junior high/middle school")),
         ('el', ugettext_noop("Elementary/primary school")),
         # Translators: 'None' refers to the student's level of education
-        ('none', ugettext_noop("None")),
+        ('none', ugettext_noop("No Formal Education")),
         # Translators: 'Other' refers to the student's level of education
-        ('other', ugettext_noop("Other"))
+        ('other', ugettext_noop("Other Education"))
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
@@ -368,6 +370,29 @@ class UserProfile(models.Model):
         """ Get the human readable value from an enumerable list of key-value pairs. """
         return dict(enumerables)[enum_value]
 
+    @classmethod
+    def country_cache_key_name(cls, user_id):
+        """Return cache key name to be used to cache current country.
+        Args:
+            user_id(int): Id of user.
+
+        Returns:
+            Unicode cache key
+        """
+        return cls.PROFILE_COUNTRY_CACHE_KEY.format(user_id=user_id)
+
+
+@receiver(models.signals.post_save, sender=UserProfile)
+def invalidate_user_profile_country_cache(sender, instance, **kwargs):  # pylint:   disable=unused-argument, invalid-name
+    """Invalidate the cache of country in UserProfile model. """
+
+    changed_fields = getattr(instance, '_changed_fields', {})
+
+    if 'country' in changed_fields:
+        cache_key = UserProfile.country_cache_key_name(instance.user_id)
+        cache.delete(cache_key)
+        log.info("Country changed in UserProfile for %s, cache deleted", instance.user_id)
+
 
 @receiver(pre_save, sender=UserProfile)
 def user_profile_pre_save_callback(sender, **kwargs):
@@ -462,7 +487,8 @@ class Registration(models.Model):
         registration profile is created when the user creates an
         account, but that account is inactive. Once the user clicks
         on the activation key, it becomes active. '''
-    class Meta(object):  # pylint: disable=missing-docstring
+
+    class Meta(object):
         db_table = "auth_registration"
 
     user = models.ForeignKey(User, unique=True)
@@ -878,7 +904,7 @@ class CourseEnrollment(models.Model):
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
     COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('user', 'course_id'),)
         ordering = ('user', 'course_id')
 
@@ -1491,7 +1517,7 @@ class CourseEnrollmentAllowed(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('email', 'course_id'),)
 
     def __unicode__(self):
@@ -1528,7 +1554,7 @@ class CourseAccessRole(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
     role = models.CharField(max_length=64, db_index=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('user', 'org', 'course_id', 'role')
 
     @property
@@ -1857,9 +1883,6 @@ class EntranceExamConfiguration(models.Model):
     skip_entrance_exam = models.BooleanField(default=True)
 
     class Meta(object):
-        """
-        Meta class to make user and course_id unique in the table
-        """
         unique_together = (('user', 'course_id'), )
 
     def __unicode__(self):
@@ -1919,7 +1942,7 @@ class LanguageProficiency(models.Model):
     /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
     (update_account_settings) so that the events are emitted.
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('code', 'user_profile'),)
 
     user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')

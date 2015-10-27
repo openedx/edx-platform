@@ -406,9 +406,9 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(outbox), 1)
-        self.assertTrue(student.email in outbox[0].recipients())  # pylint: disable=no-member
+        self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
         # a CcxMembership exists for this student
         self.assertTrue(
             CourseEnrollment.objects.filter(course_id=self.course.id, user=student).exists()
@@ -438,9 +438,9 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(outbox), 1)
-        self.assertTrue(student.email in outbox[0].recipients())  # pylint: disable=no-member
+        self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
 
     def test_enroll_non_user_student(self):
         """enroll a list of students who are not users yet
@@ -465,9 +465,9 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(outbox), 1)
-        self.assertTrue(test_email in outbox[0].recipients())
+        self.assertIn(test_email, outbox[0].recipients())
         self.assertTrue(
             CourseEnrollmentAllowed.objects.filter(
                 course_id=course_key, email=test_email
@@ -499,7 +499,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertIn(302, response.redirect_chain[0])
         self.assertFalse(
             CourseEnrollmentAllowed.objects.filter(
                 course_id=course_key, email=test_email
@@ -559,7 +559,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(outbox, [])
         # a CcxMembership exists for this student
         self.assertTrue(
@@ -590,7 +590,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(outbox, [])
 
 
@@ -733,12 +733,18 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        # Are the grades downloaded as an attachment?
+        self.assertEqual(
+            response['content-disposition'],
+            'attachment'
+        )
+
         headers, row = (
             row.strip().split(',') for row in
             response.content.strip().split('\n')
         )
         data = dict(zip(headers, row))
-        self.assertTrue('HW 04' not in data)
+        self.assertNotIn('HW 04', data)
         self.assertEqual(data['HW 01'], '0.75')
         self.assertEqual(data['HW 02'], '0.5')
         self.assertEqual(data['HW 03'], '0.25')

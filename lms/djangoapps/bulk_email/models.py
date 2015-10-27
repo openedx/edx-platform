@@ -44,7 +44,7 @@ class Email(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         abstract = True
 
 
@@ -144,7 +144,7 @@ class Optout(models.Model):
     user = models.ForeignKey(User, db_index=True, null=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('user', 'course_id')
 
 

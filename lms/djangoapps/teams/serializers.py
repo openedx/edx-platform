@@ -62,7 +62,6 @@ class UserMembershipSerializer(serializers.ModelSerializer):
     )
 
     class Meta(object):
-        """Defines meta information for the ModelSerializer."""
         model = CourseTeamMembership
         fields = ("user", "date_joined", "last_activity_at")
         read_only_fields = ("date_joined", "last_activity_at")
@@ -75,7 +74,6 @@ class CourseTeamSerializer(serializers.ModelSerializer):
     country = CountryField()
 
     class Meta(object):
-        """Defines meta information for the ModelSerializer."""
         model = CourseTeam
         fields = (
             "id",
@@ -99,7 +97,6 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
     country = CountryField(required=False)
 
     class Meta(object):
-        """Defines meta information for the ModelSerializer."""
         model = CourseTeam
         fields = (
             "name",
@@ -161,7 +158,6 @@ class MembershipSerializer(serializers.ModelSerializer):
     )
 
     class Meta(object):
-        """Defines meta information for the ModelSerializer."""
         model = CourseTeamMembership
         fields = ("user", "team", "date_joined", "last_activity_at")
         read_only_fields = ("date_joined", "last_activity_at")
@@ -209,7 +205,7 @@ class BulkTeamCountTopicSerializer(BaseTopicSerializer):  # pylint: disable=abst
     Serializes a set of topics, adding the team_count field to each topic as a bulk operation.
     Requires that `context` is provided with a valid course_id in order to filter teams within the course.
     """
-    class Meta:  # pylint: disable=missing-docstring,old-style-class
+    class Meta(object):
         list_serializer_class = BulkTeamCountTopicListSerializer
 
 

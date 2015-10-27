@@ -181,6 +181,34 @@ class TestPreferenceAPI(TestCase):
             "new_value"
         )
 
+    def test_update_user_preferences_with_username(self):
+        """
+        Verifies the basic behavior of update_user_preferences when passed
+        username string.
+        """
+        update_data = {
+            self.test_preference_key: "new_value"
+        }
+        update_user_preferences(self.user, update_data, user=self.user.username)
+        self.assertEqual(
+            get_user_preference(self.user, self.test_preference_key),
+            "new_value"
+        )
+
+    def test_update_user_preferences_with_user(self):
+        """
+        Verifies the basic behavior of update_user_preferences when passed
+        user object.
+        """
+        update_data = {
+            self.test_preference_key: "new_value"
+        }
+        update_user_preferences(self.user, update_data, user=self.user)
+        self.assertEqual(
+            get_user_preference(self.user, self.test_preference_key),
+            "new_value"
+        )
+
     @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete')
     @patch('openedx.core.djangoapps.user_api.models.UserPreference.save')
     def test_update_user_preferences_errors(self, user_preference_save, user_preference_delete):
@@ -191,16 +219,16 @@ class TestPreferenceAPI(TestCase):
             self.test_preference_key: "new_value"
         }
         with self.assertRaises(UserNotFound):
-            update_user_preferences(self.user, update_data, username="no_such_user")
+            update_user_preferences(self.user, update_data, user="no_such_user")
 
         with self.assertRaises(UserNotFound):
             update_user_preferences(self.no_such_user, update_data)
 
         with self.assertRaises(UserNotAuthorized):
-            update_user_preferences(self.staff_user, update_data, username=self.user.username)
+            update_user_preferences(self.staff_user, update_data, user=self.user.username)
 
         with self.assertRaises(UserNotAuthorized):
-            update_user_preferences(self.different_user, update_data, username=self.user.username)
+            update_user_preferences(self.different_user, update_data, user=self.user.username)
 
         too_long_key = "x" * 256
         with self.assertRaises(PreferenceValidationError) as context_manager:

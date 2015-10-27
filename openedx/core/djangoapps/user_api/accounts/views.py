@@ -96,6 +96,8 @@ class AccountView(APIView):
               requiring parental consent.
             * username: The username associated with the account.
             * year_of_birth: The year the user was born, as an integer, or null.
+            * account_privacy: The user's setting for sharing her personal
+              profile. Possible values are "all_users" or "private".
 
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape

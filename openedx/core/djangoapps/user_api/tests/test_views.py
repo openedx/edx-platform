@@ -1020,8 +1020,34 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     {"value": "hs", "name": "Secondary/high school"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
                     {"value": "el", "name": "Elementary/primary school"},
-                    {"value": "none", "name": "None"},
-                    {"value": "other", "name": "Other"},
+                    {"value": "none", "name": "No Formal Education"},
+                    {"value": "other", "name": "Other Education"},
+                ],
+            }
+        )
+
+    @mock.patch('openedx.core.djangoapps.user_api.views._')
+    def test_register_form_level_of_education_translations(self, fake_gettext):
+        fake_gettext.side_effect = lambda text: text + ' TRANSLATED'
+
+        self._assert_reg_field(
+            {"level_of_education": "optional"},
+            {
+                "name": "level_of_education",
+                "type": "select",
+                "required": False,
+                "label": "Highest level of education completed TRANSLATED",
+                "options": [
+                    {"value": "", "name": "--", "default": True},
+                    {"value": "p", "name": "Doctorate TRANSLATED"},
+                    {"value": "m", "name": "Master's or professional degree TRANSLATED"},
+                    {"value": "b", "name": "Bachelor's degree TRANSLATED"},
+                    {"value": "a", "name": "Associate degree TRANSLATED"},
+                    {"value": "hs", "name": "Secondary/high school TRANSLATED"},
+                    {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED"},
+                    {"value": "el", "name": "Elementary/primary school TRANSLATED"},
+                    {"value": "none", "name": "No Formal Education TRANSLATED"},
+                    {"value": "other", "name": "Other Education TRANSLATED"},
                 ],
             }
         )
@@ -1038,7 +1064,27 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     {"value": "", "name": "--", "default": True},
                     {"value": "m", "name": "Male"},
                     {"value": "f", "name": "Female"},
-                    {"value": "o", "name": "Other"},
+                    {"value": "o", "name": "Other/Prefer Not to Say"},
+                ],
+            }
+        )
+
+    @mock.patch('openedx.core.djangoapps.user_api.views._')
+    def test_register_form_gender_translations(self, fake_gettext):
+        fake_gettext.side_effect = lambda text: text + ' TRANSLATED'
+
+        self._assert_reg_field(
+            {"gender": "optional"},
+            {
+                "name": "gender",
+                "type": "select",
+                "required": False,
+                "label": "Gender TRANSLATED",
+                "options": [
+                    {"value": "", "name": "--", "default": True},
+                    {"value": "m", "name": "Male TRANSLATED"},
+                    {"value": "f", "name": "Female TRANSLATED"},
+                    {"value": "o", "name": "Other/Prefer Not to Say TRANSLATED"},
                 ],
             }
         )

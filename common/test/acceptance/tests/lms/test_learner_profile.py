@@ -3,6 +3,7 @@
 End-to-end tests for Student's Profile Page.
 """
 from contextlib import contextmanager
+from flaky import flaky
 
 from datetime import datetime
 from bok_choy.web_app_test import WebAppTest
@@ -51,7 +52,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
     def visit_profile_page(self, username, privacy=None):
         """
-        Visits a user's profile page.
+        Visit a user's profile page and if a privacy is specified and
+        is different from the displayed value, then set the privacy to that value.
         """
         profile_page = LearnerProfilePage(self.browser, username)
 
@@ -59,8 +61,15 @@ class LearnerProfileTestMixin(EventsTestMixin):
         # changing the drop down
         if privacy is not None:
             profile_page.visit()
-            profile_page.wait_for_page()
+
+            # Change the privacy setting if it is not the desired one already
             profile_page.privacy = privacy
+
+            # Verify the current setting is as expected
+            if privacy == self.PRIVACY_PUBLIC:
+                self.assertEqual(profile_page.privacy, 'all_users')
+            else:
+                self.assertEqual(profile_page.privacy, 'private')
 
             if privacy == self.PRIVACY_PUBLIC:
                 self.set_public_profile_fields_data(profile_page)
@@ -71,7 +80,6 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
         # Load the page
         profile_page.visit()
-        profile_page.wait_for_page()
 
         return profile_page
 
@@ -722,6 +730,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
+    @flaky  # TODO fix this TNL-3679
     def test_different_user_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's public profile.

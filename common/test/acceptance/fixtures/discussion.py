@@ -12,8 +12,9 @@ from . import COMMENTS_STUB_URL
 
 
 class ContentFactory(factory.Factory):
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = dict
+
     id = None
     user_id = "1234"
     username = "dummy-username"
@@ -64,8 +65,9 @@ class Response(Comment):
 
 
 class SearchResult(factory.Factory):
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = dict
+
     discussion_data = []
     annotated_content_info = {}
     num_pages = 1

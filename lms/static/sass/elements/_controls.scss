@@ -314,6 +314,12 @@
   color: $action-primary-fg;
 }
 
+%btn-pl-white-base{
+  @extend %btn-pl-default-base;
+  background-color: $action-primary-fg;
+  color: $action-primary-bg;
+}
+
 %btn-pl-green-base {
   @extend %btn-pl-default-base;
   background-color: darken($green-d1,10%);

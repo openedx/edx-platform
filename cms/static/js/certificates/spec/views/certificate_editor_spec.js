@@ -18,7 +18,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
-    var MAX_SIGNATORIES = 4;
+    var MAX_SIGNATORIES = 100;
     var SELECTORS = {
         detailsView: '.certificate-details',
         editView: '.certificate-edit',
@@ -198,7 +198,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(this.collection.length).toBe(1);
             });
 
-            it('user can only add signatories up to max 4', function() {
+            it('user can only add signatories up to max 100', function() {
                 for(var i = 1; i < MAX_SIGNATORIES ; i++) {
                     this.view.$(SELECTORS.addSignatoryButton).click();
                 }

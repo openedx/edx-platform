@@ -24,7 +24,7 @@ class LanguageProficiencySerializer(serializers.ModelSerializer):
     Class that serializes the LanguageProficiency model for account
     information.
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = LanguageProficiency
         fields = ("code",)
 
@@ -91,6 +91,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
             "requires_parental_consent": profile.requires_parental_consent(),
+            "account_privacy": UserPreference.get_value(user, 'account_privacy'),
         }
 
         return self._filter_fields(
@@ -143,7 +144,7 @@ class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFiel
     """
     Class that serializes the portion of User model needed for account information.
     """
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = User
         fields = ("username", "email", "date_joined", "is_active")
         read_only_fields = ("username", "email", "date_joined", "is_active")
@@ -158,7 +159,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     requires_parental_consent = serializers.SerializerMethodField()
     language_proficiencies = LanguageProficiencySerializer(many=True, required=False)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = UserProfile
         fields = (
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country",

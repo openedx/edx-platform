@@ -110,7 +110,6 @@ class CourseMode(models.Model):
     UPSELL_TO_VERIFIED_MODES = [HONOR]
 
     class Meta(object):
-        """ meta attributes of this model """
         unique_together = ('course_id', 'mode_slug', 'currency')
 
     def clean(self):

@@ -6,7 +6,6 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
-from flaky import flaky
 
 from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
@@ -218,7 +217,6 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
-    @flaky  # TODO fix this, see TNL-2419
     def test_mathjax_rendering(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
 
@@ -233,8 +231,8 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         thread_fixture.push()
         self.setup_thread_page(thread_id)
         self.assertTrue(self.thread_page.is_discussion_body_visible())
-        self.assertTrue(self.thread_page.is_mathjax_preview_available())
-        self.assertTrue(self.thread_page.is_mathjax_rendered())
+        self.thread_page.verify_mathjax_preview_available()
+        self.thread_page.verify_mathjax_rendered()
 
     def test_markdown_reference_link(self):
         """

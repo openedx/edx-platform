@@ -43,7 +43,6 @@ $incorrect: $red;
 
   &:after {
     @extend %use-font-awesome;
-    @include margin-left(17px);
     color: $color;
     font-size: 1.2em;
     content: $fontAwesomeIcon;
@@ -174,6 +173,10 @@ div.problem {
         @include status-icon($correct, "\f00c");
         border: 2px solid $correct;
 
+        &:after {
+          @include margin-left($baseline*.75);
+        }
+
         // keep green for correct answers on hover.
         &:hover {
           border-color: $correct;
@@ -184,7 +187,11 @@ div.problem {
         @include status-icon($partiallycorrect, "\f069");
         border: 2px solid $partiallycorrect;
 
-        // keep green for correct answers on hover. 
+        &:after {
+          @include margin-left($baseline*.75);
+        }
+
+        // keep green for correct answers on hover.
         &:hover {
           border-color: $partiallycorrect;
         }
@@ -193,6 +200,10 @@ div.problem {
       &.choicegroup_incorrect {
         @include status-icon($incorrect, "\f00d");
         border: 2px solid $incorrect;
+
+        &:after {
+          @include margin-left($baseline*.75);
+        }
 
         // keep red for incorrect answers on hover.
         &:hover {
@@ -233,6 +244,7 @@ div.problem {
 div.problem {
 
   .indicator-container {
+      @include margin-left($baseline*.75);
 
     .status {
       width: $baseline;
@@ -754,6 +766,7 @@ div.problem {
     .status {
       display: inline-block;
       margin-top: ($baseline/2);
+      @include margin-left($baseline*.75);
       background: none;
     }
 
@@ -814,10 +827,6 @@ div.problem {
   .inputtype.option-input {
     margin: (-$baseline/2) 0 $baseline;
     padding-bottom: $baseline;
-
-    select {
-      @include margin-right($baseline/2);
-    }
 
     .indicator-container {
       display: inline-block;

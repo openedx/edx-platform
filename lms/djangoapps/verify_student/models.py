@@ -188,7 +188,7 @@ class PhotoVerification(StatusModel):
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         abstract = True
         ordering = ['-created_at']
 
@@ -1043,7 +1043,7 @@ class VerificationCheckpoint(models.Model):
     checkpoint_location = models.CharField(max_length=255)
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('course_id', 'checkpoint_location')
 
     def __unicode__(self):
@@ -1152,7 +1152,7 @@ class VerificationStatus(models.Model):
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = "timestamp"
         verbose_name = "Verification Status"
         verbose_name_plural = "Verification Statuses"
@@ -1308,6 +1308,15 @@ class InCourseReverificationConfiguration(ConfigurationModel):
     pass
 
 
+class IcrvStatusEmailsConfiguration(ConfigurationModel):
+    """Toggle in-course reverification (ICRV) status emails
+
+    Disabled by default. When disabled, ICRV status emails will not be sent.
+    When enabled, ICRV status emails are sent.
+    """
+    pass
+
+
 class SkippedReverification(models.Model):
     """Model for tracking skipped Reverification of a user against a specific
     course.
@@ -1320,7 +1329,7 @@ class SkippedReverification(models.Model):
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('user', 'course_id'),)
 
     @classmethod

@@ -8,8 +8,9 @@ from ccx.models import CustomCourseForEdX  # pylint: disable=import-error
 
 
 class CcxFactory(DjangoModelFactory):  # pylint: disable=missing-docstring
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CustomCourseForEdX
+
     display_name = "Test CCX"
     id = None  # pylint: disable=redefined-builtin, invalid-name
     coach = SubFactory(UserFactory)

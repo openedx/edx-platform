@@ -28,7 +28,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         """
         return dict([(pref.key, pref.value) for pref in user.preferences.all()])
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = User
         # This list is the minimal set required by the notification service
         fields = ("id", "url", "email", "name", "username", "preferences")
@@ -41,7 +41,7 @@ class UserPreferenceSerializer(serializers.HyperlinkedModelSerializer):
     """
     user = UserSerializer()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = UserPreference
         depth = 1
 
@@ -52,7 +52,7 @@ class RawUserPreferenceSerializer(serializers.ModelSerializer):
     """
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = UserPreference
         depth = 1
 

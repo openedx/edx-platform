@@ -361,7 +361,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </ol>
             </section>
 
-          % if about_page_editable:
+          % if about_page_editable or is_prerequisite_courses_enabled or is_entrance_exams_enabled:
             <hr class="divide" />
 
             <section class="group-settings requirements">
@@ -371,11 +371,13 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </header>
 
               <ol class="list-input">
+                % if about_page_editable:
                 <li class="field text" id="field-course-effort">
                   <label for="course-effort">${_("Hours of Effort per Week")}</label>
                   <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
                   <span class="tip tip-inline">${_("Time spent on all course work")}</span>
                 </li>
+                % endif
                 % if is_prerequisite_courses_enabled:
                 <li class="field field-select" id="field-pre-requisite-course">
                     <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
@@ -389,7 +391,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     <button type="submit" class="sr" name="submit" value="submit">${_("set pre-requisite course")}</button>
                 </li>
                 % endif
-                % if settings.FEATURES.get('ENTRANCE_EXAMS'):
+                % if is_entrance_exams_enabled:
                 <li>
                     <h3 id="heading-entrance-exam">${_("Entrance Exam")}</h3>
                     <div class="show-data">

@@ -5,7 +5,6 @@ Module rendering
 import hashlib
 import json
 import logging
-import mimetypes
 
 import static_replace
 
@@ -944,23 +943,6 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
             raise Http404("invalid location")
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
-
-
-def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argument
-    """
-    Return a package resource for the specified XBlock.
-    """
-    try:
-        xblock_class = XBlock.load_class(block_type, select=settings.XBLOCK_SELECT_FUNCTION)
-        content = xblock_class.open_local_resource(uri)
-    except IOError:
-        log.info('Failed to load xblock resource', exc_info=True)
-        raise Http404
-    except Exception:  # pylint: disable=broad-except
-        log.error('Failed to load xblock resource', exc_info=True)
-        raise Http404
-    mimetype, _ = mimetypes.guess_type(uri)
-    return HttpResponse(content, mimetype=mimetype)
 
 
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
