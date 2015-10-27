@@ -102,7 +102,7 @@ urlpatterns = (
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
 
     # appsembler management console endpoint for student enrollment
-    url(r'^appsembler', include('appsembler.urls')),
+    url(r'^appsembler/', include('appsembler.urls')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:

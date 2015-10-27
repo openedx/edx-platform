@@ -34,10 +34,9 @@ APPSEMBLER_EMAIL = 'support@appsembler.com'
 @csrf_exempt 
 def user_signup_endpoint(request):
     if request.method != 'POST':
-        logger.warning('Non-POST request coming to url: /infusionsoft')
+        logger.warning('Non-POST request coming to url: /appsembler/user')
         raise Http404
 
-    import pdb; pdb.set_trace()
     post_secret = request.POST.get('SecretKey','')
     try:
         # TODO: this should be under APPSEMBLER_FEATURES
@@ -57,7 +56,9 @@ EDXAPP_APPSEMBLER_FEATURES:
         return HttpResponse(status=403)
 
     try:
-        full_name = request.POST.get('FirstName') + ' ' + request.POST.get('LastName')
+        first_name = request.POST.get('FirstName')
+        last_name = request.POST.get('LastName')
+        full_name = first_name + ' ' + last_name
     except TypeError:
         logger.error('Could not extract first & last names form POST request')
         return HttpResponse(status=400)
@@ -99,6 +100,8 @@ EDXAPP_APPSEMBLER_FEATURES:
                     'username': username,
                     'email': user_email,
                     'password': password,
+                    'first_name': first_name,
+                    'last_name': last_name,
                     'name': full_name
                 },
                 tos_required=False
