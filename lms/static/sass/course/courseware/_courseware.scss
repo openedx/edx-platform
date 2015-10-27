@@ -163,76 +163,20 @@ html.video-fullscreen {
     }
   }
   // ----------------------------
-  // #PRIMARY
+  // Primary button style definition used by proctored/timed exams
   // ----------------------------
-  .btn-primary {
-    border-color: rgb(0, 121, 188);
-    background: rgb(0, 121, 188);
-    color: $white;
+  .btn-pl-primary {
+    @extend %btn-pl-primary-base;
+
+    background-image: none;
     box-shadow: none;
     text-shadow: none;
 
-    // STATE: hover and focus
-    &:hover,
-    &.is-hovered,
-    &:focus,
-    &.is-focused {
-      border-color: $m-blue-d5;
-      background: $m-blue-d5;
-      box-shadow: none;
-      text-shadow: none;
-    }
-
-    // STATE: is pressed or active
-    &:active,
-    &.is-pressed,
-    &.is-active {
-      border-color: rgb(0, 121, 188);
-      background: rgb(0, 121, 188);
-      box-shadow: none;
-      text-shadow: none;
-    }
-
-    // STATE: is disabled
-    &:disabled,
-    &.is-disabled {
-      border-color: $m-gray-d1;
-      background: $white-t1;
-      color: $m-gray-d3;
-    }
-  }
-
-  // ----------------------------
-  // #SECONDARY
-  // ----------------------------
-  .btn-secondary {
-    border-color: $transparent;
-    background: $transparent;
-    color: rgb(0, 121, 188);
-    box-shadow: none;
-    text-shadow: none;
-
-    // STATE: hover and focus
-    &:hover,
-    &.is-hovered,
-    &:focus,
-    &.is-focused {
-        border-color: $gray-l4;
-    }
-
-    // STATE: is pressed or active
-    &:active,
-    &.is-pressed,
-    &.is-active {
-        border-color: rgb(0, 121, 188);
-        color: rgb(0, 121, 188);
-    }
-
-    // STATE: is disabled
-    &:disabled,
-    &.is-disabled {
-        border-color: $gray-l1;
-        color: $gray-d1;
+    // overrides for the timer bar because it is
+    // a bit more narrow
+    &.exam-button-turn-in-exam {
+      padding: 4px 20px;
+      font-size: 12px;
     }
   }
 }
