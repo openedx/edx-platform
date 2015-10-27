@@ -100,7 +100,12 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(3):
+        # One outer SAVEPOINT/RELEASE SAVEPOINT pair around everything caused by the
+        # transaction.atomic decorator wrapping override_field_for_ccx.
+        # One SELECT and one INSERT.
+        # One inner SAVEPOINT/RELEASE SAVEPOINT pair around the INSERT caused by the
+        # transaction.atomic down in Django's get_or_create()/_create_object_from_params().
+        with self.assertNumQueries(6):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
 
     def test_override_num_queries_update_existing_field(self):
@@ -130,7 +135,12 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(3):
+        # One outer SAVEPOINT/RELEASE SAVEPOINT pair around everything caused by the
+        # transaction.atomic decorator wrapping override_field_for_ccx.
+        # One SELECT and one INSERT.
+        # One inner SAVEPOINT/RELEASE SAVEPOINT pair around the INSERT caused by the
+        # transaction.atomic down in Django's get_or_create()/_create_object_from_params().
+        with self.assertNumQueries(6):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
 
     def test_override_is_inherited(self):
