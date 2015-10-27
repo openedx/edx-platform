@@ -345,6 +345,33 @@
   }
 }
 
+%btn-pl-black-border {
+  @extend %btn-pl-default-base;
+  border: 1px solid $m-gray-d4;
+  background-color: transparent;
+  color: $base-font-color;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($m-gray-d4,10%);
+    background-color: $m-gray-d4;
+  }
+}
+
+%btn-pl-black-base {
+  @extend %btn-pl-default-base;
+  border: 1px solid transparent;
+  background-color: $m-gray-d4;
+  color: $very-light-text;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($m-gray-d4,10%);
+    background-color: transparent;
+    color: $base-font-color;
+  }
+}
+
 %btn-pl-secondary-base {
   @extend %btn-pl-default-base;
   @include transition(border $tmg-f2 ease-in-out);

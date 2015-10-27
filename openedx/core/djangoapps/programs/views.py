@@ -60,9 +60,12 @@ def get_course_programs_for_dashboard(user, course_keys):   # pylint: disable=in
     #  to
     # course run -> program, ignoring course runs not present in the dashboard enrollments
     for program in programs:
-        for course_code in program['course_codes']:
-            for run in course_code['run_modes']:
-                if run['course_key'] in course_keys:
-                    course_programs[run['course_key']] = program
+        try:
+            for course_code in program['course_codes']:
+                for run in course_code['run_modes']:
+                    if run['course_key'] in course_keys:
+                        course_programs[run['course_key']] = program
+        except KeyError:
+            log.exception('Unable to parse Programs API response: %r', program)
 
     return course_programs

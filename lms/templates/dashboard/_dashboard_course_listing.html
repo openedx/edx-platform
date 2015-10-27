@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, show_courseware_link, cert_status, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings" />
+<%page args="course_overview, enrollment, show_courseware_link, cert_status, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, course_program_info" />
 
 <%!
 import urllib
@@ -44,6 +44,12 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 <div class="course-container">
+ % if course_program_info and course_program_info['category']=='xseries':
+  <div class="label-xseries-association">
+    <i class="xseries-icon"></i>
+    <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['display_category'])}</p>
+  </div>
+ % endif
 <article class="course${mode_class}">
   <% course_target = reverse('info', args=[unicode(course_overview.id)]) %>
   <section class="details">
@@ -341,6 +347,10 @@ from student.helpers import (
             </div>
           </div>
         %endif
+
+        % if course_program_info and course_program_info['category']=='xseries':
+            <%include file = "_dashboard_xseries_info.html" args="course_program_info=course_program_info, enrollment_mode=enrollment.mode" />
+        % endif
 
         % if is_course_blocked:
           <p id="block-course-msg" class="course-block">

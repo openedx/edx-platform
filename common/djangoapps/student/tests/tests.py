@@ -2,19 +2,21 @@
 """
 Miscellaneous tests for the student app.
 """
-from datetime import datetime, timedelta
-import ddt
 import logging
-import pytz
 import unittest
+import ddt
+from datetime import datetime, timedelta
+from urlparse import urljoin
+
+import pytz
+from mock import Mock, patch
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
-from mock import Mock, patch
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
@@ -24,6 +26,7 @@ from student.views import (
     process_survey_link,
     _cert_info,
     complete_course_mode_info,
+    _get_course_programs
 )
 from student.tests.factories import UserFactory, CourseModeFactory
 from util.testing import EventTestMixin
@@ -38,9 +41,11 @@ from certificates.models import CertificateStatuses  # pylint: disable=import-er
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
+
 
 log = logging.getLogger(__name__)
 
@@ -873,3 +878,237 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@ddt.ddt
+class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
+    """
+    Tests for dashboard for xseries program courses. Enroll student into
+    programs and then try different combinations to see xseries upsell
+    messages are appearing.
+    """
+    def setUp(self):
+        super(DashboardTestXSeriesPrograms, self).setUp()
+
+        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
+        self.course_1 = CourseFactory.create()
+        self.course_2 = CourseFactory.create()
+        self.course_3 = CourseFactory.create()
+        self.program_name = 'Testing Program'
+        self.category = 'xseries'
+
+        CourseModeFactory.create(
+            course_id=self.course_1.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+        )
+        self.client = Client()
+        cache.clear()
+
+    def _create_program_data(self, data):
+        """Dry method to create testing programs data."""
+        programs = {}
+        for course, program_status in data:
+            programs[unicode(course)] = {
+                'category': self.category,
+                'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
+                'marketing_slug': 'fake-marketing-slug-xseries-1',
+                'status': program_status,
+                'course_codes': [
+                    {
+                        'display_name': 'Demo XSeries Program 1',
+                        'key': unicode(course),
+                        'run_modes': [{'sku': '', 'mode_slug': 'ABC', 'course_key': unicode(course)}]
+                    },
+                    {
+                        'display_name': 'Demo XSeries Program 2',
+                        'key': 'edx/demo/course_2',
+                        'run_modes': [{'sku': '', 'mode_slug': 'ABC', 'course_key': 'edx/demo/course_2'}]
+                    },
+                    {
+                        'display_name': 'Demo XSeries Program 3',
+                        'key': 'edx/demo/course_3',
+                        'run_modes': [{'sku': '', 'mode_slug': 'ABC', 'course_key': 'edx/demo/course_3'}]
+                    }
+                ],
+                'subtitle': 'sub',
+                'name': self.program_name
+            }
+
+        return programs
+
+    @ddt.data(
+        ('active', [{'sku': ''}, {'sku': ''}, {'sku': ''}, {'sku': ''}], 'marketing-slug-1'),
+        ('active', [{'sku': ''}, {'sku': ''}, {'sku': ''}], 'marketing-slug-2'),
+        ('active', [], ''),
+        ('unpublished', [{'sku': ''}, {'sku': ''}, {'sku': ''}, {'sku': ''}], 'marketing-slug-3'),
+    )
+    @ddt.unpack
+    def test_get_xseries_programs_method(self, program_status, course_codes, marketing_slug):
+        """Verify that program data is parsed correctly for a given course"""
+        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+            mock_data.return_value = {
+                u'edx/demox/Run_1': {
+                    'category': self.category,
+                    'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
+                    'marketing_slug': marketing_slug,
+                    'status': program_status,
+                    'course_codes': course_codes,
+                    'subtitle': 'sub',
+                    'name': self.program_name
+                }
+            }
+            parse_data = _get_course_programs(
+                self.user, [
+                    u'edx/demox/Run_1', u'valid/edX/Course'
+                ]
+            )
+
+            if program_status == 'unpublished':
+                self.assertEqual({}, parse_data)
+            else:
+                self.assertEqual(
+                    {
+                        u'edx/demox/Run_1': {
+                            'category': 'xseries',
+                            'course_count': len(course_codes),
+                            'display_name': self.program_name,
+                            'program_marketing_url': urljoin(
+                                settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
+                            ).format(marketing_slug),
+                            'display_category': 'XSeries'
+                        }
+                    },
+                    parse_data
+                )
+
+    def test_program_courses_on_dashboard_without_configuration(self):
+        """If programs configuration is disabled then the xseries upsell messages
+        will not appear on student dashboard.
+        """
+        CourseEnrollment.enroll(self.user, self.course_1.id)
+        self.client.login(username="jack", password="test")
+        with patch('student.views.get_course_programs_for_dashboard') as mock_method:
+            mock_method.return_value = self._create_program_data(
+                [(self.course_1.id, 'active')]
+            )
+            response = self.client.get(reverse('dashboard'))
+
+            # Verify that without the programs configuration the method
+            # 'get_course_programs_for_dashboard' should not be called
+            self.assertFalse(mock_method.called)
+            self.assertEquals(response.status_code, 200)
+            self.assertIn('Pursue a Certificate of Achievement to highlight', response.content)
+            self._assert_responses(response, 0)
+
+    @ddt.data('verified', 'honor')
+    def test_modes_program_courses_on_dashboard_with_configuration(self, course_mode):
+        """Test that if program configuration is enabled than student can only
+        see those courses with xseries upsell messages which are active in
+        xseries programs.
+        """
+        CourseEnrollment.enroll(self.user, self.course_1.id, mode=course_mode)
+        CourseEnrollment.enroll(self.user, self.course_2.id, mode=course_mode)
+
+        self.client.login(username="jack", password="test")
+        self.create_config(enabled=True, enable_student_dashboard=True)
+
+        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+            mock_data.return_value = self._create_program_data(
+                [(self.course_1.id, 'active'), (self.course_2.id, 'unpublished')]
+            )
+            response = self.client.get(reverse('dashboard'))
+            # count total courses appearing on student dashboard
+            self.assertContains(response, 'course-container', 2)
+            self._assert_responses(response, 1)
+
+            # for verified enrollment view the program detail button will have
+            # the class 'base-btn'
+            # for other modes view the program detail button will have have the
+            # class border-btn
+            if course_mode == 'verified':
+                self.assertIn('xseries-base-btn', response.content)
+            else:
+                self.assertIn('xseries-border-btn', response.content)
+
+    @ddt.data(
+        ('unpublished', 'unpublished', 'unpublished', 0),
+        ('active', 'unpublished', 'unpublished', 1),
+        ('active', 'active', 'unpublished', 2),
+        ('active', 'active', 'active', 3),
+    )
+    @ddt.unpack
+    def test_different_programs_on_dashboard(self, status_1, status_2, status_3, program_count):
+        """Test the upsell on student dashboard with different programs
+        statuses.
+        """
+
+        CourseEnrollment.enroll(self.user, self.course_1.id, mode='verified')
+        CourseEnrollment.enroll(self.user, self.course_2.id, mode='honor')
+        CourseEnrollment.enroll(self.user, self.course_3.id, mode='honor')
+
+        self.client.login(username="jack", password="test")
+        self.create_config(enabled=True, enable_student_dashboard=True)
+
+        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+            mock_data.return_value = self._create_program_data(
+                [(self.course_1.id, status_1),
+                 (self.course_2.id, status_2),
+                 (self.course_3.id, status_3)]
+            )
+
+            response = self.client.get(reverse('dashboard'))
+            # count total courses appearing on student dashboard
+            self.assertContains(response, 'course-container', 3)
+            self._assert_responses(response, program_count)
+
+    @patch('student.views.log.warning')
+    @ddt.data('', 'course_codes', 'marketing_slug', 'name')
+    def test_program_courses_with_invalid_data(self, key_remove, log_warn):
+        """Test programs with invalid responses."""
+
+        CourseEnrollment.enroll(self.user, self.course_1.id)
+        self.client.login(username="jack", password="test")
+        self.create_config(enabled=True, enable_student_dashboard=True)
+
+        program_data = self._create_program_data([(self.course_1.id, 'active')])
+        if key_remove and key_remove in program_data[unicode(self.course_1.id)]:
+            del program_data[unicode(self.course_1.id)][key_remove]
+
+        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+            mock_data.return_value = program_data
+
+            response = self.client.get(reverse('dashboard'))
+
+            # if data is invalid then warning log will be recorded.
+            if key_remove:
+                log_warn.assert_called_with(
+                    'Program structure is invalid, skipping display: %r', program_data[
+                        unicode(self.course_1.id)
+                    ]
+                )
+                # verify that no programs related upsell messages appear on the
+                # student dashboard.
+                self._assert_responses(response, 0)
+            else:
+                # in case of valid data all upsell messages will appear on dashboard.
+                self._assert_responses(response, 1)
+
+            # verify that only normal courses (non-programs courses) appear on
+            # the student dashboard.
+            self.assertContains(response, 'course-container', 1)
+            self.assertIn('Pursue a Certificate of Achievement to highlight', response.content)
+
+    def _assert_responses(self, response, count):
+        """Dry method to compare different programs related upsell messages,
+        classes.
+        """
+        self.assertContains(response, 'label-xseries-association', count)
+        self.assertContains(response, 'btn xseries-', count)
+        self.assertContains(response, 'XSeries Program Course', count)
+        self.assertContains(response, 'XSeries Program: Interested in more courses in this subject?', count)
+        self.assertContains(response, 'This course is 1 of 3 courses in the', count)
+        self.assertContains(response, self.program_name, count)
+        self.assertContains(response, 'View XSeries Details', count)
