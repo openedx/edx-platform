@@ -144,8 +144,7 @@ def add_repo(repo, rdir_in, branch=None):
     if not os.path.isdir(GIT_REPO_DIR):
         raise GitImportError(GitImportError.NO_DIR)
     # pull from git
-    if not (repo.endswith('.git') or
-            repo.startswith(('http:', 'https:', 'git:', 'file:'))):
+    if not (repo.startswith(('http:', 'https:', 'file:')) or ('@' in repo)):
         raise GitImportError(GitImportError.URL_BAD)
 
     if rdir_in:

@@ -43,6 +43,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
     """
 
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_REPO_WITHOUT_DOT_GIT = 'https://github.com/mitocw/edx4edx_lite'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = SlashSeparatedCourseKey('MITx', 'edx4edx_branch', 'edx4edx')
@@ -80,6 +81,10 @@ class TestGitAddCourse(ModuleStoreTestCase):
             os.mkdir(self.GIT_REPO_DIR / 'edx4edx')
 
         call_command('git_add_course', self.TEST_REPO,
+                     self.GIT_REPO_DIR / 'edx4edx_lite')
+
+        # Test command using a URL that doesn't end with '.git'
+        call_command('git_add_course', self.TEST_REPO_WITHOUT_DOT_GIT,
                      self.GIT_REPO_DIR / 'edx4edx_lite')
 
         # Test with all three args (branch)
