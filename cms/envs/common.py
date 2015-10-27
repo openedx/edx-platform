@@ -787,7 +787,7 @@ INSTALLED_APPS = (
 
     # User preferences
     'openedx.core.djangoapps.user_api',
-    # 'django_openid_auth',
+    'django_openid_auth',
 
     'embargo',
 
