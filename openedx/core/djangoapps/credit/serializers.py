@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider, CreditEligibility
 
 
 class CourseKeyField(serializers.Field):
@@ -29,6 +29,24 @@ class CreditCourseSerializer(serializers.ModelSerializer):
 
     course_key = CourseKeyField()
 
-    class Meta(object):
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CreditCourse
         exclude = ('id',)
+
+
+class CreditProviderSerializer(serializers.ModelSerializer):
+    """ CreditProvider Serializer """
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CreditProvider
+        exclude = ('id', 'eligibility_email_message', 'receipt_email_message')
+
+
+class CreditEligibilitySerializer(serializers.ModelSerializer):
+    """ CreditEligibility Serializer """
+
+    course_key = serializers.CharField(source='course.course_key')
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = CreditEligibility
+        fields = ('course_key', 'deadline')

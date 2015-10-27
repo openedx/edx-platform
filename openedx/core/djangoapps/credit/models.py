@@ -159,30 +159,18 @@ class CreditProvider(TimeStampedModel):
         # This doesn't happen very often, so we would expect a *very* high
         # cache hit rate.
 
+        # Import internally to avoid the circular import.
+        from openedx.core.djangoapps.credit.serializers import CreditProviderSerializer
         credit_providers = cache.get(cls.CREDIT_PROVIDERS_CACHE_KEY)
         if credit_providers is None:
             # Cache miss: construct the provider list and save it in the cache
-
             credit_providers = CreditProvider.objects.filter(active=True)
-
-            credit_providers = [
-                {
-                    "id": provider.provider_id,
-                    "display_name": provider.display_name,
-                    "url": provider.provider_url,
-                    "status_url": provider.provider_status_url,
-                    "description": provider.provider_description,
-                    "enable_integration": provider.enable_integration,
-                    "fulfillment_instructions": provider.fulfillment_instructions,
-                    "thumbnail_url": provider.thumbnail_url,
-                }
-                for provider in credit_providers
-            ]
+            credit_providers = CreditProviderSerializer(credit_providers, many=True).data
 
             cache.set(cls.CREDIT_PROVIDERS_CACHE_KEY, credit_providers)
 
         if providers_list:
-            credit_providers = [provider for provider in credit_providers if provider['id'] in providers_list]
+            credit_providers = [provider for provider in credit_providers if provider['provider_id'] in providers_list]
 
         return credit_providers
 
@@ -191,10 +179,32 @@ class CreditProvider(TimeStampedModel):
         """
         Retrieve a credit provider with provided 'provider_id'.
         """
+
+        # Import internally to avoid the circular import.
+        from openedx.core.djangoapps.credit.serializers import CreditProviderSerializer
         try:
-            return CreditProvider.objects.get(active=True, provider_id=provider_id)
+            # Attempt to retrieve the credit provider list from the cache if provider_list is None
+            # The cache key is invalidated when the provider list is updated
+            # (a post-save signal handler on the CreditProvider model)
+            # This doesn't happen very often, so we would expect a *very* high
+            # cache hit rate.
+            credit_providers = cache.get(cls.CREDIT_PROVIDERS_CACHE_KEY)
+            if credit_providers is None:
+                # Cache miss: construct the provider list and save it in the cache
+                credit_providers = CreditProvider.objects.filter(active=True)
+                credit_providers = CreditProviderSerializer(credit_providers, many=True).data
+
+                cache.set(cls.CREDIT_PROVIDERS_CACHE_KEY, credit_providers)
+
+            credit_provider = {}
+            for provider in credit_providers:
+                if provider['provider_id'] == provider_id:
+                    credit_provider = provider
+                    break
+
+            return credit_provider
         except cls.DoesNotExist:
-            return None
+            return {}
 
     def __unicode__(self):
         """Unicode representation of the credit provider. """
@@ -291,6 +301,9 @@ class CreditRequirement(TimeStampedModel):
     active = models.BooleanField(default=True)
 
     class Meta(object):
+        """
+        Model metadata.
+        """
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
 
@@ -425,7 +438,7 @@ class CreditRequirementStatus(TimeStampedModel):
     # Maintain a history of requirement status updates for auditing purposes
     history = HistoricalRecords()
 
-    class Meta(object):
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('username', 'requirement')
 
     @classmethod
@@ -512,7 +525,7 @@ class CreditEligibility(TimeStampedModel):
         help_text=ugettext_lazy("Deadline for purchasing and requesting credit.")
     )
 
-    class Meta(object):
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('username', 'course')
         verbose_name_plural = "Credit eligibilities"
 
@@ -634,7 +647,7 @@ class CreditRequest(TimeStampedModel):
 
     history = HistoricalRecords()
 
-    class Meta(object):
+    class Meta(object):  # pylint: disable=missing-docstring
         # Enforce the constraint that each user can have exactly one outstanding
         # request to a given provider.  Multiple requests use the same UUID.
         unique_together = ('username', 'course', 'provider')

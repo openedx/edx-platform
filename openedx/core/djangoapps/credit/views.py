@@ -21,11 +21,12 @@ import pytz
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
-
+from rest_framework.response import Response
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.exceptions import CreditApiBadRequest, CreditRequestNotFound
-from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.serializers import CreditCourseSerializer
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider, CreditEligibility
+from openedx.core.djangoapps.credit.serializers import CreditCourseSerializer, CreditProviderSerializer, \
+    CreditEligibilitySerializer
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from util.date_utils import from_timestamp
@@ -405,3 +406,60 @@ class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.Re
             self.kwargs[self.lookup_field] = CourseKey.from_string(course_key)
 
         return super(CreditCourseViewSet, self).get_object()
+
+
+class CreditProviderViewSet(viewsets.ReadOnlyModelViewSet):
+    """ CreditProvider endpoints. """
+
+    lookup_field = 'provider_id'
+    lookup_url_kwarg = 'provider_id'
+    queryset = CreditProvider.objects.all()
+    serializer_class = CreditProviderSerializer
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+    pagination_class = None
+
+    # This CSRF exemption only applies when authenticating without SessionAuthentication.
+    # SessionAuthentication will enforce CSRF protection.
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CreditProviderViewSet, self).dispatch(request, *args, **kwargs)
+
+    def list(self, request):
+        provider_id = request.GET.get("provider_id", None)
+        providers_list = provider_id.split(",") if provider_id else None
+        providers = CreditProvider.get_credit_providers(providers_list)
+
+        return Response(providers)
+
+    def retrieve(self, request, provider_id=None):
+        provider = CreditProvider.get_credit_provider(provider_id)
+
+        return Response(provider)
+
+
+class CreditEligibilityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """CreditEligibility endpoints. """
+
+    queryset = CreditEligibility.objects.all()
+    serializer_class = CreditEligibilitySerializer
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+    pagination_class = None
+
+    # This CSRF exemption only applies when authenticating without SessionAuthentication.
+    # SessionAuthentication will enforce CSRF protection.
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CreditEligibilityViewSet, self).dispatch(request, *args, **kwargs)
+
+    def list(self, request):
+        username = request.GET.get("username", None)
+        course_key = request.GET.get("course_key", None)
+        eligibilities = CreditEligibility.get_user_eligibilities(username)
+        if course_key:
+            course_key = CourseKey.from_string(unicode(course_key))
+            eligibilities = eligibilities.filter(course__course_key=course_key)
+
+        self.queryset = eligibilities
+        return super(CreditEligibilityViewSet, self).list(request)

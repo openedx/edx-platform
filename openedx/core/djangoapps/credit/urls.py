@@ -11,17 +11,17 @@ PROVIDER_ID_PATTERN = r'(?P<provider_id>[^/]+)'
 V1_URLS = patterns(
     '',
 
-    url(
-        r'^providers/$',
-        views.get_providers_detail,
-        name='providers_detail'
-    ),
-
-    url(
-        r'^providers/{provider_id}/$'.format(provider_id=PROVIDER_ID_PATTERN),
-        get_credit_provider_info,
-        name='get_provider_info'
-    ),
+    # url(
+    #     r'^providers/$',
+    #     views.get_providers_detail,
+    #     name='providers_detail'
+    # ),
+    #
+    # url(
+    #     r'^providers/{provider_id}/$'.format(provider_id=PROVIDER_ID_PATTERN),
+    #     get_credit_provider_info,
+    #     name='get_provider_info'
+    # ),
 
     url(
         r'^providers/{provider_id}/request/$'.format(provider_id=PROVIDER_ID_PATTERN),
@@ -35,15 +35,17 @@ V1_URLS = patterns(
         name='provider_callback'
     ),
 
-    url(
-        r'^eligibility/$',
-        views.get_eligibility_for_user,
-        name='eligibility_details'
-    ),
+    # url(
+    #     r'^eligibility/$',
+    #     views.get_eligibility_for_user,
+    #     name='eligibility_details'
+    # ),
 )
 
 router = routers.SimpleRouter()  # pylint: disable=invalid-name
 router.register(r'courses', views.CreditCourseViewSet)
+router.register(r'providers', views.CreditProviderViewSet)
+router.register(r'eligibility', views.CreditEligibilityViewSet)
 V1_URLS += router.urls
 
 urlpatterns = patterns(
