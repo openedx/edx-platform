@@ -1109,11 +1109,15 @@ class VerificationCheckpoint(models.Model):
             course_id (CourseKey): CourseKey
             checkpoint_location (str): Verification checkpoint location
 
+        Raises:
+            IntegrityError if create fails due to concurrent create.
+
         Returns:
             VerificationCheckpoint object if exists otherwise None
         """
-        checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
-        return checkpoint
+        with transaction.atomic():
+            checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
+            return checkpoint
 
 
 class VerificationStatus(models.Model):
