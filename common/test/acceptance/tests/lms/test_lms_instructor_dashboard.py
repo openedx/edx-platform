@@ -257,7 +257,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # When I log in as an instructor,
         __, __ = self.log_in_as_instructor()
 
-        # And visit the Allowance Section of Instructor Dashboard's Timed Exam tab
+        # And visit the Allowance Section of Instructor Dashboard's Special Exams tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
         allowance_section = instructor_dashboard_page.select_special_exams().select_allowance_section()
 
@@ -274,7 +274,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # When I log in as an instructor,
         __, __ = self.log_in_as_instructor()
 
-        # And visit the Student Proctored Exam Attempts Section of Instructor Dashboard's Timed Exam tab
+        # And visit the Student Proctored Exam Attempts Section of Instructor Dashboard's Special Exams tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
         exam_attempts_section = instructor_dashboard_page.select_special_exams().select_exam_attempts_section()
 

@@ -63,7 +63,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
     def test_no_tab_flag_unset(self):
         """
-        Proctoring Tab will not be visible if
+        Special Exams tab will not be visible if
         the user is not a staff member.
         """
         self.instructor.is_staff = False
