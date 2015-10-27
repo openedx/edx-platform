@@ -51,7 +51,7 @@ git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 -e git+https://github.com/edx/edx-milestones.git@release-2015-06-17#egg=edx-milestones
 git+https://github.com/edx/edx-lint.git@ed8c8d2a0267d4d42f43642d193e25f8bd575d9b#egg=edx_lint==0.2.3
 # Note for the next rebase: custom.txt or one of XBlocks installed there might require a newer version of xblock-utils - please check versions
--e git+https://github.com/edx/xblock-utils.git@3b58c757f06943072b170654d676e95b9adb37b0#egg=xblock-utils
+-e git+https://github.com/edx/xblock-utils.git@588f7fd3ee88847c57cf09d10e81caa6b267ec51#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@a286e89c73e1b788e35ac5b08a54b71a9fa63cfd#egg=edx-reverification-block
 git+https://github.com/edx/ecommerce-api-client.git@1.0.0#egg=ecommerce-api-client==1.0.0

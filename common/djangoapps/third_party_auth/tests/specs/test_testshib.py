@@ -8,14 +8,22 @@ from mock import patch
 from student.tests.factories import UserFactory
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
+from third_party_auth import pipeline
 import unittest
 
 TESTSHIB_ENTITY_ID = 'https://idp.testshib.org/idp/shibboleth'
 TESTSHIB_METADATA_URL = 'https://mock.testshib.org/metadata/testshib-providers.xml'
 TESTSHIB_SSO_URL = 'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO'
 
-TPA_TESTSHIB_LOGIN_URL = '/auth/login/tpa-saml/?auth_entry=login&next=%2Fdashboard&idp=testshib'
-TPA_TESTSHIB_REGISTER_URL = '/auth/login/tpa-saml/?auth_entry=register&next=%2Fdashboard&idp=testshib'
+
+def _make_entrypoint_url(auth_entry):
+    """
+    Builds TPA saml entrypoint with specified auth_entry value
+    """
+    return '/auth/login/tpa-saml/?auth_entry={auth_entry}&next=%2Fdashboard&idp=testshib'.format(auth_entry=auth_entry)
+
+TPA_TESTSHIB_LOGIN_URL = _make_entrypoint_url('login')
+TPA_TESTSHIB_REGISTER_URL = _make_entrypoint_url('register')
 TPA_TESTSHIB_COMPLETE_URL = '/auth/complete/tpa-saml/'
 
 
@@ -173,6 +181,54 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
 
         self._test_autoprovision(TPA_TESTSHIB_REGISTER_URL)
 
+    def test_custom_form_does_not_link_by_email(self):
+        self._configure_testshib_provider(autoprovision_account=False)
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+
+        email = 'myself@testshib.org'
+        UserFactory(username='myself', email=email, password='irrelevant')
+        self._verify_user_email(email)
+        self._assert_user_exists('myself', have_social=False)
+
+        custom_url = pipeline.get_login_url('saml-testshib', 'custom1')
+        self.client.get(custom_url)
+
+        testshib_response = self._fake_testshib_login_and_return()
+
+        # We should be redirected to the custom form since this account is not linked to an edX account, and
+        # automatic linking is not enabled for custom1 entrypoint:
+        self.assertEqual(testshib_response.status_code, 302)
+        self.assertEqual(testshib_response['Location'], self.url_prefix + '/auth/custom_auth_entry')
+
+    def test_custom_form_links_by_email(self):
+        self._configure_testshib_provider(autoprovision_account=False)
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+
+        email = 'myself@testshib.org'
+        UserFactory(username='myself', email=email, password='irrelevant')
+        self._verify_user_email(email)
+        self._assert_user_exists('myself', have_social=False)
+
+        custom_url = pipeline.get_login_url('saml-testshib', 'custom2')
+        self.client.get(custom_url)
+
+        testshib_response = self._fake_testshib_login_and_return()
+        # We should be redirected to TPA-complete endpoint
+        self.assertEqual(testshib_response.status_code, 302)
+        self.assertEqual(testshib_response['Location'], self.url_prefix + TPA_TESTSHIB_COMPLETE_URL)
+
+        complete_response = self.client.get(testshib_response['Location'])
+        # And we should be redirected to the dashboard
+        self.assertEqual(complete_response.status_code, 302)
+        self.assertEqual(complete_response['Location'], self.url_prefix + self.dashboard_page_url)
+
+        # And account should now be linked to social
+        self._assert_user_exists('myself', have_social=True)
+
+        # Now check that we can login again:
+        self.client.logout()
+        self._test_return_login()
+
     def _test_autoprovision(self, entry_point):
         """ Actual autoprovision code """
         # The user clicks on the TestShib button:
@@ -279,6 +335,20 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         user = User.objects.get(email=email)
         user.is_active = True
         user.save()
+
+    def _assert_user_exists(self, username, have_social=False, is_active=True):
+        """
+        Asserts user exists, checks activation status and social_auth links
+        """
+        user = User.objects.get(username=username)
+        self.assertEqual(user.is_active, is_active)
+        social_auths = user.social_auth.all()
+
+        if have_social:
+            self.assertEqual(1, len(social_auths))
+            self.assertEqual('tpa-saml', social_auths[0].provider)
+        else:
+            self.assertEqual(0, len(social_auths))
 
     def _assert_user_does_not_exist(self, username):
         """ Asserts that user with specified username does not exist """

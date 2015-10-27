@@ -34,7 +34,8 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_name,
     add_cohort,
     add_user_to_cohort,
-    remove_user_from_cohort
+    remove_user_from_cohort,
+    AlreadyAddedToCohortException
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
@@ -769,7 +770,18 @@ class UsersCoursesList(SecureAPIView):
             default_cohort = get_cohort_by_name(course_key, CourseUserGroup.default_cohort_name)
         except CourseUserGroup.DoesNotExist:
             default_cohort = add_cohort(course_key, CourseUserGroup.default_cohort_name, CourseCohort.RANDOM)
-        add_user_to_cohort(default_cohort, user.username)
+        try:
+            add_user_to_cohort(default_cohort, user.username)
+        except AlreadyAddedToCohortException:
+            msg_tpl = _('Student {student} already added to cohort {cohort_name} for course {course}')
+            # pylint reports msg_tpl to not have `format` member, which is obviously a type resolution issue
+            # related - http://stackoverflow.com/questions/10025710/pylint-reports-as-not-callable
+            # pylint: disable=no-member
+            response_data = {
+                'message': msg_tpl.format(student=user.username, cohort_name=default_cohort.name, course=course_key)
+            }
+            return Response(response_data, status=status.HTTP_409_CONFLICT)
+
         log.debug('User "{}" has been automatically added in cohort "{}" for course "{}"'.format(
             user.username, default_cohort.name, course_descriptor.display_name)
         )
