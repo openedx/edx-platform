@@ -35,7 +35,7 @@
         <div class="signatory-edit-list"> </div>
         <span>
            <button class="action action-add-signatory" type="button"><%= gettext("Add Additional Signatory") %></button>
-           <span class="tip tip-stacked"><%= gettext("(Up to 4 signatories are allowed for a certificate)") %></span>
+           <span class="tip tip-stacked"><%= gettext("(Add signatories for a certificate)") %></span>
         </span>
     </div>
     <div class="actions">
