@@ -97,7 +97,7 @@ from django.core.urlresolvers import reverse
         <p>${_("Course team members with the Staff role are course co-authors. They have full writing and editing privileges on all course content.")}</p>
         ## Note that the "Admin" role below is identified as "Instructor" in the Django admin panel.
         <p>${_("Admins are course team members who can add and remove other course team members.")}</p>
-        <p>${_("All course team members are automatically enrolled in the course and can access content in Studio, the LMS, and Insights.")}</p>
+        <p>${_("All course team members can access content in Studio, the LMS, and Insights, but are not automatically enrolled in the course.")}</p>
       </div>
 
       % if show_transfer_ownership_hint:
