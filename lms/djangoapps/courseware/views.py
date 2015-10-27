@@ -1378,6 +1378,11 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
     # Count rows returned for each part for integrity check
     num_rows_by_part = {}
 
+    # List of part_ids to check for inconsistencies.
+    part_id_set = set([])
+    for data_dict in data:
+        part_id_set.add(data_dict['part_id'])
+
     for item in data:
         part_id = item['part_id']
 
@@ -1389,7 +1394,8 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
                             message_by_part,
                             question_types_by_part,
                             num_options_by_part,
-                            num_rows_by_part):
+                            num_rows_by_part,
+                            part_id_set):
             continue
 
         # Add count to appropriate aggregates
@@ -1463,7 +1469,7 @@ def course_survey(request, course_id):
     )
 
 
-def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part):
+def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part, part_id_set):
     """
     A function where issues with the data returned by the analytics API are detected
     and an appropriate message formulated.
@@ -1475,11 +1481,21 @@ def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num
         question_types_by_part: dict of question types
         num_options_by_part: dict of number of options by question
         num_rows_by_part: dict of count of rows returned by API
+        part_id_set: set of part_ids 
 
     Returns:
         True: if an error was detected
         False: if no error was detected
     """
+
+    # Data sanity check: if there is a part_id that is not a key in question_types_by_part
+    # then there's an inconsistency between the problem definition and the analytics data.
+    for part in part_id_set:
+        if part not in question_types_by_part:
+            message = _('The analytics cannot be displayed as there is an inconsistency in the data.')
+            message_by_part[part_id] = message
+            return True
+
     # Check variant (randomization) and if set, generate an error message
     if item['variant']:
         message = _('The analytics cannot be displayed for this question as randomization was set at one time.')
