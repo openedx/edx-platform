@@ -5,6 +5,7 @@ import json
 import logging
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -27,6 +28,8 @@ from certificates.models import (
 log = logging.getLogger(__name__)
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @csrf_exempt
 def request_certificate(request):
     """Request the on-demand creation of a certificate for some user, course.

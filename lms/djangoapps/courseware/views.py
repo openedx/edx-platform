@@ -1315,6 +1315,8 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     return success_cutoff and grade_summary['percent'] >= success_cutoff
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @require_POST
 def generate_user_cert(request, course_id):
     """Start generating a new certificate for the user.

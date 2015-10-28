@@ -2617,6 +2617,8 @@ def enable_certificate_generation(request, course_id=None):
 
 
 #---- Gradebook (shown to small courses only) ----
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def spoc_gradebook(request, course_id):
