@@ -102,6 +102,13 @@ div.course-wrapper {
     @extend .content;
     padding: ($baseline*2);
     line-height: 1.6;
+
+    .xblock {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
+
     h1 {
       margin: 0 0 lh();
     }
