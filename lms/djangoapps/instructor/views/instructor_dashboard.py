@@ -169,7 +169,6 @@ def instructor_dashboard_2(request, course_id):
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message
     }
-
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
@@ -516,6 +515,8 @@ def _section_data_download(course, access):
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
         'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': unicode(course_key)}),
+        'course_has_survey': True if course.course_survey_name else False,
+        'course_survey_results_url': reverse('get_course_survey_results', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
