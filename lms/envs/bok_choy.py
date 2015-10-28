@@ -132,7 +132,7 @@ FEATURES['LICENSING'] = True
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
 
-FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080

@@ -104,7 +104,7 @@ FEATURES['PARTNER_SUPPORT_EMAIL'] = 'partner-support@example.com'
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
-FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080

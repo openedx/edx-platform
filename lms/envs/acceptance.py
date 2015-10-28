@@ -122,7 +122,7 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 
-FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Don't actually send any requests to Software Secure for student identity
 # verification.

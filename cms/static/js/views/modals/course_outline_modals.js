@@ -267,9 +267,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-settings-timed-examination',
         events : {
             'change #id_not_timed': 'notTimedExam',
-            'change #id_timed_exam': 'timedExam',
-            'change #id_practice_exam': 'practiceExam',
-            'change #id_proctored_exam': 'proctoredExam',
+            'change #id_timed_exam': 'showTimeLimit',
+            'change #id_practice_exam': 'showTimeLimit',
+            'change #id_proctored_exam': 'showTimeLimit',
             'focusout #id_time_limit': 'timeLimitFocusout'
         },
         notTimedExam: function (event) {
@@ -277,17 +277,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('#id_time_limit_div').hide();
             this.$('#id_time_limit').val('00:00');
         },
-        timedExam: function (event) {
-            event.preventDefault();
-            this.$('#id_time_limit_div').show();
-            this.$('#id_time_limit').val("00:30");
-        },
-        practiceExam: function (event) {
-            event.preventDefault();
-            this.$('#id_time_limit_div').show();
-            this.$('#id_time_limit').val("00:30");
-        },
-        proctoredExam: function (event) {
+        showTimeLimit: function (event) {
             event.preventDefault();
             this.$('#id_time_limit_div').show();
             this.$('#id_time_limit').val("00:30");
@@ -308,11 +298,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 'forceRoundTime': false
             });
 
-            this.setExamType(this.model.get('is_time_limited'), this.model.get('is_proctored_enabled'),
+            this.setExamType(this.model.get('is_time_limited'), this.model.get('is_proctored_exam'),
                             this.model.get('is_practice_exam'));
             this.setExamTime(this.model.get('default_time_limit_minutes'));
         },
-        setExamType: function(is_time_limited, is_proctored_enabled, is_practice_exam) {
+        setExamType: function(is_time_limited, is_proctored_exam, is_practice_exam) {
             if (!is_time_limited) {
                 this.$("#id_not_timed").prop('checked', true);
                 return;
@@ -321,7 +311,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (this.options.enable_proctored_exams) {
                 this.$('#id_time_limit_div').show();
 
-                if (is_proctored_enabled) {
+                if (is_proctored_exam) {
                     if (is_practice_exam) {
                         this.$('#id_practice_exam').prop('checked', true);
                     } else {
@@ -362,32 +352,37 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getRequestData: function () {
             var is_time_limited;
             var is_practice_exam;
-            var is_proctored_enabled;
+            var is_proctored_exam;
             var time_limit = this.getExamTimeLimit();
 
             if (this.$("#id_not_timed").is(':checked')){
                 is_time_limited = false;
                 is_practice_exam = false;
-                is_proctored_enabled = false;
+                is_proctored_exam = false;
             } else if (this.$("#id_timed_exam").is(':checked')){
                 is_time_limited = true;
                 is_practice_exam = false;
-                is_proctored_enabled = false;
+                is_proctored_exam = false;
             } else if (this.$("#id_proctored_exam").is(':checked')){
                 is_time_limited = true;
                 is_practice_exam = false;
-                is_proctored_enabled = true;
+                is_proctored_exam = true;
             } else if (this.$("#id_practice_exam").is(':checked')){
                 is_time_limited = true;
                 is_practice_exam = true;
-                is_proctored_enabled = true;
+                is_proctored_exam = true;
             }
 
             return {
                 metadata: {
                     'is_practice_exam': is_practice_exam,
                     'is_time_limited': is_time_limited,
-                    'is_proctored_enabled': is_proctored_enabled,
+                    // We have to use the legacy field name
+                    // as the Ajax handler directly populates
+                    // the xBlocks fields. We will have to
+                    // update this call site when we migrate
+                    // seq_module.py to use 'is_proctored_exam'
+                    'is_proctored_enabled': is_proctored_exam,
                     'default_time_limit_minutes': this.convertTimeLimitToMinutes(time_limit)
                 }
             };

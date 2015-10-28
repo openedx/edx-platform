@@ -120,7 +120,7 @@ class CoursewarePage(CoursePage):
 
     def stop_timed_exam(self):
         """
-        clicks the start this timed exam link
+        clicks the stop this timed exam link
         """
         self.q(css=".proctored_exam_status button.exam-button-turn-in-exam").first.click()
         self.wait_for_element_absence(".proctored_exam_status .exam-button-turn-in-exam", "End Exam Button gone")

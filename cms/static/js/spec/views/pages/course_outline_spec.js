@@ -597,7 +597,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     id_timed_exam,
                     time_limit,
                     is_practice_exam,
-                    is_proctored_enabled,
+                    is_proctored_exam,
                     enable_proctored_exams
                 ){
                     if (!is_time_limited) {
@@ -607,7 +607,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     if (enable_proctored_exams) {
                         $("#id_time_limit").val(time_limit);
                         this.$('#id_time_limit_div').show();
-                        if (is_proctored_enabled) {
+                        if (is_proctored_exam) {
                             if (is_practice_exam) {
                                 this.$('#id_practice_exam').prop('checked', true);
                             } else {
@@ -639,7 +639,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                             staff_only_message: true,
                             "is_time_limited": true,
                             "is_practice_exam": false,
-                            "is_proctored_enabled": true,
+                            "is_proctored_exam": true,
                             "default_time_limit_minutes": 150
                         }, [
                             createMockVerticalJSON({
