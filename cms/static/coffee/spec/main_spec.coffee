@@ -1,4 +1,4 @@
-require ["jquery", "backbone", "coffee/src/main", "js/common_helpers/ajax_helpers", "jasmine-stealth", "jquery.cookie"],
+require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_helpers", "jasmine-stealth", "jquery.cookie"],
 ($, Backbone, main, AjaxHelpers) ->
     describe "CMS", ->
         it "should initialize URL", ->
@@ -28,7 +28,7 @@ require ["jquery", "backbone", "coffee/src/main", "js/common_helpers/ajax_helper
             appendSetFixtures(sandbox({id: "page-notification"}))
 
         it "successful AJAX request does not pop an error notification", ->
-            server = AjaxHelpers['server'](200, this)
+            server = AjaxHelpers.server(this, [200, {}, ''])
 
             expect($("#page-notification")).toBeEmpty()
             $.ajax("/test")
@@ -37,7 +37,7 @@ require ["jquery", "backbone", "coffee/src/main", "js/common_helpers/ajax_helper
             expect($("#page-notification")).toBeEmpty()
 
         it "AJAX request with error should pop an error notification", ->
-            server = AjaxHelpers['server'](500, this)
+            server = AjaxHelpers.server(this, [500, {}, ''])
 
             $.ajax("/test")
             server.respond()
@@ -45,7 +45,7 @@ require ["jquery", "backbone", "coffee/src/main", "js/common_helpers/ajax_helper
             expect($("#page-notification")).toContain('div.wrapper-notification-error')
 
         it "can override AJAX request with error so it does not pop an error notification", ->
-            server = AjaxHelpers['server'](500, this)
+            server = AjaxHelpers.server(this, [500, {}, ''])
 
             $.ajax
                 url: "/test"

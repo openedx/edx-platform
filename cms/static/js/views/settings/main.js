@@ -1,6 +1,9 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "js/views/utils/view_utils", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter, ViewUtils) {
+    "js/views/uploads", "js/utils/change_on_enter", "js/views/license", "js/models/license",
+    "js/views/utils/view_utils",
+    "js/views/feedback_notification", "jquery.timepicker", "date"],
+    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
+        FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, ViewUtils, NotificationView) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -28,9 +31,11 @@ var DetailsView = ValidatingView.extend({
         'click .action-upload-image': "uploadImage",
     },
 
-    initialize : function() {
+    initialize : function(options) {
+        options = options || {};
         this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
+        this.$el.find("#course-language").val(this.model.get('language'));
         this.$el.find("#course-organization").val(this.model.get('org'));
         this.$el.find("#course-number").val(this.model.get('course_id'));
         this.$el.find("#course-name").val(this.model.get('run'));
@@ -66,6 +71,23 @@ var DetailsView = ValidatingView.extend({
 
         this.default_pre_template = this.$el.find('#default_pre_enrollment_email_template');
         this.default_post_template = this.$el.find('#default_post_enrollment_email_template');
+
+        // handle license separately, to avoid reimplementing view logic
+        this.licenseModel = new LicenseModel({"asString": this.model.get('license')});
+        this.licenseView = new LicenseView({
+            model: this.licenseModel,
+            el: this.$("#course-license-selector").get(),
+            showPreview: true
+        });
+        this.listenTo(this.licenseModel, 'change', this.handleLicenseChange);
+
+        if (options.showMinGradeWarning || false) {
+            new NotificationView.Warning({
+                title: gettext("Course Credit Requirements"),
+                message: gettext("The minimum grade for course credit is not set."),
+                closeIcon: true
+            }).show();
+        }
     },
 
     render: function() {
@@ -126,9 +148,12 @@ var DetailsView = ValidatingView.extend({
         }
         this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
 
+        this.licenseView.render()
+
         return this;
     },
     fieldToSelectorMap : {
+        'language' : 'course-language',
         'start_date' : "course-start",
         'end_date' : 'course-end',
         'enrollment_start' : 'enrollment-start',
@@ -165,8 +190,8 @@ var DetailsView = ValidatingView.extend({
     setupDatePicker: function (fieldName) {
         var cacheModel = this.model;
         var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
-        var datefield = $(div).find("input:.date");
-        var timefield = $(div).find("input:.time");
+        var datefield = $(div).find("input.date");
+        var timefield = $(div).find("input.time");
         var cachethis = this;
         var setfield = function () {
             var newVal = DateUtils.getDate(datefield, timefield),
@@ -209,6 +234,9 @@ var DetailsView = ValidatingView.extend({
 
     updateModel: function(event) {
         switch (event.currentTarget.id) {
+        case 'course-language':
+            this.setField(event);
+            break;
         case 'course-image-url':
             this.setField(event);
             var url = $(event.currentTarget).val();
@@ -342,12 +370,13 @@ var DetailsView = ValidatingView.extend({
         this.model.fetch({
             success: function() {
                 self.render();
-                _.each(self.codeMirrors,
-                       function(mirror) {
-                           var ele = mirror.getTextArea();
-                           var field = self.selectorToField[ele.id];
-                           mirror.setValue(self.model.get(field));
-                       });
+                _.each(self.codeMirrors, function(mirror) {
+                    var ele = mirror.getTextArea();
+                    var field = self.selectorToField[ele.id];
+                    mirror.setValue(self.model.get(field));
+                });
+                self.licenseModel.setFromString(self.model.get("license"), {silent: true});
+                self.licenseView.render()
             },
             reset: true,
             silent: true});
@@ -451,6 +480,11 @@ var DetailsView = ValidatingView.extend({
             if (!confirmed) return;
         }
         codeMirrorItem.setValue(content);
+    },
+
+    handleLicenseChange: function() {
+        this.showNotificationBar()
+        this.model.set("license", this.licenseModel.toString())
     }
 });
 

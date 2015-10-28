@@ -1,7 +1,7 @@
 // ------------------------------
 // LMS: Shared Build Compile
 
-// About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the main-*.scss files.
+// About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-main-*.scss files.
 
 // base - assets
 @import 'base/font_face';
@@ -16,11 +16,13 @@
 @import 'elements/typography';
 @import 'elements/controls';
 @import 'elements/system-feedback';
+@import 'elements/creative-commons';
 
 // shared - course
 @import 'shared/fields';
 @import 'shared/forms';
 @import 'shared/footer';
+@import 'shared/footer-edx';
 @import 'shared/header';
 @import 'shared/course_object';
 @import 'shared/course_filter';
@@ -52,6 +54,7 @@
 @import 'views/decoupled-verification';
 @import 'views/shoppingcart';
 @import 'views/homepage';
+@import 'views/support';
 @import 'course/auto-cert';
 
 // applications
@@ -69,7 +72,7 @@
 @import 'discussion/utilities/shame';
 
 // search
-@import 'search/_search';
+@import 'search/search';
 
 // news
 @import 'news';

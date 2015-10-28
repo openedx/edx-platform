@@ -8,7 +8,6 @@ from bok_choy.promise import EmptyPromise
 
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 
 from .course_page import CoursePage
 from .container import ContainerPage
@@ -405,7 +404,7 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         self.add_child()
 
 
-class ExpandCollapseLinkState:
+class ExpandCollapseLinkState(object):
     """
     Represents the three states that the expand/collapse link can be in
     """
@@ -514,6 +513,60 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.reindex_button.click()
 
+    def open_exam_settings_dialog(self):
+        """
+        clicks on the settings button of subsection.
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+
+    def change_problem_release_date_in_studio(self):
+        """
+        Sets a new start date
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+        self.q(css="#start_date").fill("01/01/2030")
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_proctored(self):
+        """
+        Makes a Proctored exam.
+        """
+        self.q(css="#id_timed_examination").first.click()
+        self.q(css="#id_exam_proctoring").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_timed(self):
+        """
+        Makes a timed exam.
+        """
+        self.q(css="#id_timed_examination").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def proctoring_items_are_displayed(self):
+        """
+        Returns True if all the items are found.
+        """
+        # The Timed exam checkbox
+        if not self.q(css="#id_timed_examination").present:
+            return False
+
+        # The time limit field
+        if not self.q(css="#id_time_limit").present:
+            return False
+
+        # The Practice exam checkbox
+        if not self.q(css="#id_practice_exam").present:
+            return False
+
+        # The Proctored exam checkbox
+        if not self.q(css="#id_exam_proctoring").present:
+            return False
+
+        return True
+
     @property
     def bottom_add_section_button(self):
         """
@@ -578,6 +631,69 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Return a list of xblocks loaded on the outline page.
         """
         return self.children(CourseOutlineChild)
+
+    @property
+    def license(self):
+        """
+        Returns the course license text, if present. Else returns None.
+        """
+        return self.q(css=".license-value").first.text[0]
+
+    @property
+    def deprecated_warning_visible(self):
+        """
+        Returns true if the deprecated warning is visible.
+        """
+        return self.q(css='.wrapper-alert-error.is-shown').is_present()
+
+    @property
+    def warning_heading_text(self):
+        """
+        Returns deprecated warning heading text.
+        """
+        return self.q(css='.warning-heading-text').text[0]
+
+    @property
+    def components_list_heading(self):
+        """
+        Returns deprecated warning component list heading text.
+        """
+        return self.q(css='.components-list-heading-text').text[0]
+
+    @property
+    def modules_remove_text_shown(self):
+        """
+        Returns True if deprecated warning advance modules remove text is visible.
+        """
+        return self.q(css='.advance-modules-remove-text').visible
+
+    @property
+    def modules_remove_text(self):
+        """
+        Returns deprecated warning advance modules remove text.
+        """
+        return self.q(css='.advance-modules-remove-text').text[0]
+
+    @property
+    def components_visible(self):
+        """
+        Returns True if components list visible.
+        """
+        return self.q(css='.components-list').visible
+
+    @property
+    def components_display_names(self):
+        """
+        Returns deprecated warning components display name list.
+        """
+        return self.q(css='.components-list li>a').text
+
+    @property
+    def deprecated_advance_modules(self):
+        """
+        Returns deprecated advance modules list.
+        """
+        return self.q(css='.advance-modules-list li').text
 
 
 class CourseOutlineModal(object):

@@ -20,6 +20,8 @@ if not settings.configured:
 from django.core.cache import get_cache, InvalidCacheBackendError
 import django.dispatch
 import django.utils
+
+from pymongo import ReadPreference
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -43,6 +45,11 @@ try:
     HAS_USER_SERVICE = True
 except ImportError:
     HAS_USER_SERVICE = False
+
+try:
+    from xblock_django.models import XBlockDisableConfig
+except ImportError:
+    XBlockDisableConfig = None
 
 log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
@@ -73,18 +80,20 @@ class SignalHandler(object):
 
     1. We receive using the Django Signals mechanism.
     2. The sender is going to be the class of the modulestore sending it.
-    3. Always have **kwargs in your signal handler, as new things may be added.
-    4. The thing that listens for the signal lives in process, but should do
+    3. The names of your handler function's parameters *must* be "sender" and "course_key".
+    4. Always have **kwargs in your signal handler, as new things may be added.
+    5. The thing that listens for the signal lives in process, but should do
        almost no work. Its main job is to kick off the celery task that will
        do the actual work.
-
     """
     course_published = django.dispatch.Signal(providing_args=["course_key"])
+    course_deleted = django.dispatch.Signal(providing_args=["course_key"])
     library_updated = django.dispatch.Signal(providing_args=["library_key"])
 
     _mapping = {
         "course_published": course_published,
-        "library_updated": library_updated
+        "course_deleted": course_deleted,
+        "library_updated": library_updated,
     }
 
     def __init__(self, modulestore_class):
@@ -156,12 +165,21 @@ def create_modulestore_instance(
     else:
         xb_user_service = None
 
+    if 'read_preference' in doc_store_config:
+        doc_store_config['read_preference'] = getattr(ReadPreference, doc_store_config['read_preference'])
+
+    if XBlockDisableConfig and settings.FEATURES.get('ENABLE_DISABLING_XBLOCK_TYPES', False):
+        disabled_xblock_types = XBlockDisableConfig.disabled_block_types()
+    else:
+        disabled_xblock_types = ()
+
     return class_(
         contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
         xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
+        disabled_xblock_types=disabled_xblock_types,
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService(),
         fs_service=fs_service or xblock.reference.plugins.FSService(),
@@ -187,6 +205,15 @@ def modulestore():
             settings.MODULESTORE['default'].get('DOC_STORE_CONFIG', {}),
             settings.MODULESTORE['default'].get('OPTIONS', {})
         )
+
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
+            # TODO: This import prevents a circular import issue, but is
+            # symptomatic of a lib having a dependency on code in lms.  This
+            # should be updated to have a setting that enumerates modulestore
+            # wrappers and then uses that setting to wrap the modulestore in
+            # appropriate wrappers depending on enabled features.
+            from ccx.modulestore import CCXModulestoreWrapper  # pylint: disable=import-error
+            _MIXED_MODULESTORE = CCXModulestoreWrapper(_MIXED_MODULESTORE)
 
     return _MIXED_MODULESTORE
 

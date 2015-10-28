@@ -266,7 +266,7 @@ def generate_plots_for_problem(problem):
                 yset['fitx'] = fitx
                 yset['fity'] = func_2pl(np.array(fitx), *cfp[0])
             except Exception as err:
-                log.debug('Error in psychoanalyze curve fitting: %s' % err)
+                log.debug('Error in psychoanalyze curve fitting: %s', err)
 
         dataset['grade_%d' % grade] = yset
 
@@ -339,14 +339,14 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
             state = json.loads(sm.state)
             done = state['done']
         except:
-            log.exception("Oops, failed to eval state for %s (state=%s)" % (sm, sm.state))
+            log.exception("Oops, failed to eval state for %s (state=%s)", sm, sm.state)
             return
 
         pmd.done = done
         try:
             pmd.attempts = state.get('attempts', 0)
         except:
-            log.exception("no attempts for %s (state=%s)" % (sm, sm.state))
+            log.exception("no attempts for %s (state=%s)", sm, sm.state)
 
         try:
             checktimes = eval(pmd.checktimes)  # update log of attempt timestamps
@@ -357,6 +357,6 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
         try:
             pmd.save()
         except:
-            log.exception("Error in updating psychometrics data for %s" % sm)
+            log.exception("Error in updating psychometrics data for %s", sm)
 
     return psychometrics_data_update_handler

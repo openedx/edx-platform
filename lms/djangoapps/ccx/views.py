@@ -8,6 +8,7 @@ import json
 import logging
 import pytz
 
+from contextlib import contextmanager
 from copy import deepcopy
 from cStringIO import StringIO
 
@@ -15,43 +16,44 @@ from django.core.urlresolvers import reverse
 from django.http import (
     HttpResponse,
     HttpResponseForbidden,
-    HttpResponseRedirect,
 )
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
-from django_future.csrf import ensure_csrf_cookie  # pylint: disable=import-error
-from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 
-from courseware.courses import get_course_by_id  # pylint: disable=import-error
+from courseware.courses import get_course_by_id
 
-from courseware.field_overrides import disable_overrides  # pylint: disable=import-error
-from courseware.grades import iterate_grades_for  # pylint: disable=import-error
-from courseware.model_data import FieldDataCache  # pylint: disable=import-error
-from courseware.module_render import get_module_for_descriptor  # pylint: disable=import-error
-from edxmako.shortcuts import render_to_response  # pylint: disable=import-error
+from courseware.field_overrides import disable_overrides
+from courseware.grades import iterate_grades_for
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
+from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
+from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.models import CourseEnrollment
 
 from instructor.offline_gradecalc import student_grades  # pylint: disable=import-error
 from instructor.views.api import _split_input_list  # pylint: disable=import-error
 from instructor.views.tools import get_student_from_identifier  # pylint: disable=import-error
+from instructor.enrollment import (
+    enroll_email,
+    unenroll_email,
+    get_email_params,
+)
 
-from .models import CustomCourseForEdX, CcxMembership
+from .models import CustomCourseForEdX
 from .overrides import (
     clear_override_for_ccx,
     get_override_for_ccx,
     override_field_for_ccx,
-    ccx_context,
 )
-from .utils import (
-    enroll_email,
-    unenroll_email,
-)
-from ccx import ACTIVE_CCX_KEY  # pylint: disable=import-error
 
 
 log = logging.getLogger(__name__)
@@ -71,43 +73,70 @@ def coach_dashboard(view):
         and modifying the view's call signature.
         """
         course_key = CourseKey.from_string(course_id)
+        ccx = None
+        if isinstance(course_key, CCXLocator):
+            ccx_id = course_key.ccx
+            ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
+            course_key = ccx.course_id
+
         role = CourseCcxCoachRole(course_key)
         if not role.has_user(request.user):
             return HttpResponseForbidden(
                 _('You must be a CCX Coach to access this view.'))
+
         course = get_course_by_id(course_key, depth=None)
-        return view(request, course)
+
+        # if there is a ccx, we must validate that it is the ccx for this coach
+        if ccx is not None:
+            coach_ccx = get_ccx_for_coach(course, request.user)
+            if coach_ccx is None or coach_ccx.id != ccx.id:
+                return HttpResponseForbidden(
+                    _('You must be the coach for this ccx to access this view')
+                )
+
+        return view(request, course, ccx)
     return wrapper
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def dashboard(request, course):
+def dashboard(request, course, ccx=None):
     """
     Display the CCX Coach Dashboard.
     """
-    ccx = get_ccx_for_coach(course, request.user)
+    # right now, we can only have one ccx per user and course
+    # so, if no ccx is passed in, we can sefely redirect to that
+    if ccx is None:
+        ccx = get_ccx_for_coach(course, request.user)
+        if ccx:
+            url = reverse(
+                'ccx_coach_dashboard',
+                kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
+            )
+            return redirect(url)
+
     context = {
         'course': course,
         'ccx': ccx,
     }
 
     if ccx:
+        ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
             ccx, course, 'grading_policy', course.grading_policy)
         context['schedule'] = json.dumps(schedule, indent=4)
         context['save_url'] = reverse(
-            'save_ccx', kwargs={'course_id': course.id})
-        context['ccx_members'] = CcxMembership.objects.filter(ccx=ccx)
+            'save_ccx', kwargs={'course_id': ccx_locator})
+        context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator)
         context['gradebook_url'] = reverse(
-            'ccx_gradebook', kwargs={'course_id': course.id})
+            'ccx_gradebook', kwargs={'course_id': ccx_locator})
         context['grades_csv_url'] = reverse(
-            'ccx_grades_csv', kwargs={'course_id': course.id})
+            'ccx_grades_csv', kwargs={'course_id': ccx_locator})
         context['grading_policy'] = json.dumps(grading_policy, indent=4)
         context['grading_policy_url'] = reverse(
-            'ccx_set_grading_policy', kwargs={'course_id': course.id})
+            'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
@@ -117,11 +146,21 @@ def dashboard(request, course):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def create_ccx(request, course):
+def create_ccx(request, course, ccx=None):
     """
     Create a new CCX
     """
     name = request.POST.get('name')
+
+    # prevent CCX objects from being created for deprecated course ids.
+    if course.id.deprecated:
+        messages.error(request, _(
+            "You cannot create a CCX from a course using a deprecated id. "
+            "Please create a rerun of this course in the studio to allow "
+            "this action."))
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
+        return redirect(url)
+
     ccx = CustomCourseForEdX(
         course_id=course.id,
         coach=request.user,
@@ -142,18 +181,20 @@ def create_ccx(request, course):
             for vertical in sequential.get_children():
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
-    url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
+    ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)  # pylint: disable=no-member
+    url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
     return redirect(url)
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def save_ccx(request, course):
+def save_ccx(request, course, ccx=None):
     """
     Save changes to CCX.
     """
-    ccx = get_ccx_for_coach(course, request.user)
+    if not ccx:
+        raise Http404
 
     def override_fields(parent, data, graded, earliest=None):
         """
@@ -220,15 +261,20 @@ def save_ccx(request, course):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def set_grading_policy(request, course):
+def set_grading_policy(request, course, ccx=None):
     """
     Set grading policy for the CCX.
     """
-    ccx = get_ccx_for_coach(course, request.user)
+    if not ccx:
+        raise Http404
+
     override_field_for_ccx(
         ccx, course, 'grading_policy', json.loads(request.POST['policy']))
 
-    url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
+    url = reverse(
+        'ccx_coach_dashboard',
+        kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
+    )
     return redirect(url)
 
 
@@ -271,12 +317,15 @@ def get_ccx_for_coach(course, coach):
     Looks to see if user is coach of a CCX for this course.  Returns the CCX or
     None.
     """
-    try:
-        return CustomCourseForEdX.objects.get(
-            course_id=course.id,
-            coach=coach)
-    except CustomCourseForEdX.DoesNotExist:
-        return None
+    ccxs = CustomCourseForEdX.objects.filter(
+        course_id=course.id,
+        coach=coach
+    )
+    # XXX: In the future, it would be nice to support more than one ccx per
+    # coach per course.  This is a place where that might happen.
+    if ccxs.exists():
+        return ccxs[0]
+    return None
 
 
 def get_ccx_schedule(course, ccx):
@@ -322,11 +371,13 @@ def get_ccx_schedule(course, ccx):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_schedule(request, course):
+def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
     """
     get json representation of ccx schedule
     """
-    ccx = get_ccx_for_coach(course, request.user)
+    if not ccx:
+        raise Http404
+
     schedule = get_ccx_schedule(course, ccx)
     json_schedule = json.dumps(schedule, indent=4)
     return HttpResponse(json_schedule, mimetype='application/json')
@@ -335,11 +386,13 @@ def ccx_schedule(request, course):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_invite(request, course):
+def ccx_invite(request, course, ccx=None):
     """
     Invite users to new ccx
     """
-    ccx = get_ccx_for_coach(course, request.user)
+    if not ccx:
+        raise Http404
+
     action = request.POST.get('enrollment-button')
     identifiers_raw = request.POST.get('student-ids')
     identifiers = _split_input_list(identifiers_raw)
@@ -356,28 +409,36 @@ def ccx_invite(request, course):
             email = user.email
         try:
             validate_email(email)
+            course_key = CCXLocator.from_course_locator(course.id, ccx.id)
+            email_params = get_email_params(course, auto_enroll)
             if action == 'Enroll':
                 enroll_email(
-                    ccx,
+                    course_key,
                     email,
                     auto_enroll=auto_enroll,
-                    email_students=email_students
+                    email_students=email_students,
+                    email_params=email_params
                 )
             if action == "Unenroll":
-                unenroll_email(ccx, email, email_students=email_students)
+                unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
         except ValidationError:
             log.info('Invalid user name or email when trying to invite students: %s', email)
-    url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
+    url = reverse(
+        'ccx_coach_dashboard',
+        kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
+    )
     return redirect(url)
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_student_management(request, course):
+def ccx_student_management(request, course, ccx=None):
     """Manage the enrollment of individual students in a CCX
     """
-    ccx = get_ccx_for_coach(course, request.user)
+    if not ccx:
+        raise Http404
+
     action = request.POST.get('student-action', None)
     student_id = request.POST.get('student-id', '')
     user = email = None
@@ -388,43 +449,61 @@ def ccx_student_management(request, course):
     else:
         email = user.email
 
+    course_key = CCXLocator.from_course_locator(course.id, ccx.id)
     try:
         validate_email(email)
         if action == 'add':
             # by decree, no emails sent to students added this way
             # by decree, any students added this way are auto_enrolled
-            enroll_email(ccx, email, auto_enroll=True, email_students=False)
+            enroll_email(course_key, email, auto_enroll=True, email_students=False)
         elif action == 'revoke':
-            unenroll_email(ccx, email, email_students=False)
+            unenroll_email(course_key, email, email_students=False)
     except ValidationError:
         log.info('Invalid user name or email when trying to enroll student: %s', email)
 
-    url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
+    url = reverse(
+        'ccx_coach_dashboard',
+        kwargs={'course_id': course_key}
+    )
     return redirect(url)
+
+
+@contextmanager
+def ccx_course(ccx_locator):
+    """Create a context in which the course identified by course_locator exists
+    """
+    course = get_course_by_id(ccx_locator)
+    yield course
+
+
+def prep_course_for_grading(course, request):
+    """Set up course module for overrides to function properly"""
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2)
+    course = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
+
+    course._field_data_cache = {}  # pylint: disable=protected-access
+    course.set_grading_policy(course.grading_policy)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_gradebook(request, course):
+def ccx_gradebook(request, course, ccx=None):
     """
     Show the gradebook for this CCX.
     """
-    # Need course module for overrides to function properly
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, course, depth=2)
-    course = get_module_for_descriptor(
-        request.user, request, course, field_data_cache, course.id)
+    if not ccx:
+        raise Http404
 
-    ccx = get_ccx_for_coach(course, request.user)
-    with ccx_context(ccx):
-        # The grading policy for the MOOC is probably already cached.  We need
-        # to make sure we have the CCX grading policy loaded.
-        course._field_data_cache = {}  # pylint: disable=protected-access
-        course.set_grading_policy(course.grading_policy)
+    ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    with ccx_course(ccx_key) as course:
+        prep_course_for_grading(course, request)
 
         enrolled_students = User.objects.filter(
-            ccxmembership__ccx=ccx,
-            ccxmembership__active=1
+            courseenrollment__course_id=ccx_key,
+            courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
 
         student_info = [
@@ -450,25 +529,20 @@ def ccx_gradebook(request, course):
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_grades_csv(request, course):
+def ccx_grades_csv(request, course, ccx=None):
     """
     Download grades as CSV.
     """
-    # Need course module for overrides to function properly
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, course, depth=2)
-    course = get_module_for_descriptor(
-        request.user, request, course, field_data_cache, course.id)
-    ccx = get_ccx_for_coach(course, request.user)
-    with ccx_context(ccx):
-        # The grading policy for the MOOC is probably already cached.  We need
-        # to make sure we have the CCX grading policy loaded.
-        course._field_data_cache = {}  # pylint: disable=protected-access
-        course.set_grading_policy(course.grading_policy)
+    if not ccx:
+        raise Http404
+
+    ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    with ccx_course(ccx_key) as course:
+        prep_course_for_grading(course, request)
 
         enrolled_students = User.objects.filter(
-            ccxmembership__ccx=ccx,
-            ccxmembership__active=1
+            courseenrollment__course_id=ccx_key,
+            courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
         grades = iterate_grades_for(course, enrolled_students)
 
@@ -501,33 +575,3 @@ def ccx_grades_csv(request, course):
             writer.writerow(row)
 
         return HttpResponse(buf.getvalue(), content_type='text/plain')
-
-
-@login_required
-def switch_active_ccx(request, course_id, ccx_id=None):
-    """set the active CCX for the logged-in user
-    """
-    course_key = CourseKey.from_string(course_id)
-    # will raise Http404 if course_id is bad
-    course = get_course_by_id(course_key)
-    course_url = reverse(
-        'course_root', args=[course.id.to_deprecated_string()]
-    )
-    if ccx_id is not None:
-        try:
-            requested_ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
-            assert unicode(requested_ccx.course_id) == course_id
-            if not CcxMembership.objects.filter(
-                    ccx=requested_ccx, student=request.user, active=True
-            ).exists():
-                ccx_id = None
-        except CustomCourseForEdX.DoesNotExist:
-            # what to do here?  Log the failure?  Do we care?
-            ccx_id = None
-        except AssertionError:
-            # what to do here?  Log the failure?  Do we care?
-            ccx_id = None
-
-    request.session[ACTIVE_CCX_KEY] = ccx_id
-
-    return HttpResponseRedirect(course_url)

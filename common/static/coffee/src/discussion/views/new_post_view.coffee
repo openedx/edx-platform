@@ -87,7 +87,6 @@ if Backbone?
               url: url
               type: "POST"
               dataType: 'json'
-              async: false # TODO when the rest of the stuff below is made to work properly..
               data:
                   thread_type: thread_type
                   title: title

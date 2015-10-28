@@ -9,7 +9,7 @@ $(document).ajaxError(function (event, jXHR) {
 
         if (window.confirm(message)) {
             var currentLocation = window.location.href;
-            window.location.href = '/accounts/login?next=' + currentLocation;
+            window.location.href = '/login?next=' + currentLocation;
         };
     }
 });

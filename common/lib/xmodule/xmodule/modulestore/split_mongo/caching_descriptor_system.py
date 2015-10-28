@@ -72,6 +72,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         )
         self.modulestore = modulestore
         self.course_entry = course_entry
+        # set course_id attribute to avoid problems with subsystems that expect
+        # it here. (grading, for example)
+        self.course_id = course_entry.course_key
         self.lazy = lazy
         self.module_data = module_data
         self.default_class = default_class
@@ -224,6 +227,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),
                 field_data,
+                for_parent=kwargs.get('for_parent')
             )
         except Exception:  # pylint: disable=broad-except
             log.warning("Failed to load descriptor", exc_info=True)

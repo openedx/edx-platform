@@ -2,7 +2,7 @@
 #
 # If you open a pull request that adds a new dependency, you should notify:
 #   * @mollydb - to check licensing
-#   * One of @e0d, @jarv, or @feanil - to check system requirements
+#   * support@edx.org - to check system requirements
 
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
@@ -13,7 +13,6 @@ celery==3.1.18
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
-distribute>=0.6.28, <0.7
 django-babel-underscore==0.1.0
 django-celery==3.1.16
 django-countries==3.3
@@ -30,11 +29,12 @@ django-openid-auth==0.4
 django-robots==0.9.1
 django-sekizai==0.6.1
 django-ses==0.4.1
+django-simple-history==1.6.1
 django-storages==1.1.5
 django-threaded-multihost==1.4-1
 django-method-override==0.1.0
 djangorestframework==2.3.14
-django==1.4.20
+django==1.4.21
 elasticsearch==0.4.5
 facebook-sdk==0.4.0
 feedparser==5.1.3
@@ -44,16 +44,15 @@ glob2==0.3
 gunicorn==0.17.4
 httpretty==0.8.3
 lazy==1.1
-lxml==3.3.6
 mako==0.9.1
 Markdown==2.2.1
 --allow-external meliae
 --allow-unverified meliae
 meliae==0.4.0
-mongoengine==0.7.10
+mongoengine==0.10.0
+MySQL-python==1.2.5
 networkx==1.7
-nltk==2.0.5
-nose==1.3.3
+nose==1.3.7
 oauthlib==0.7.2
 paramiko==1.9.0
 path.py==7.2
@@ -68,13 +67,12 @@ pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
-python-social-auth==0.1.23
+python-social-auth==0.2.11
 pytz==2015.2
 pysrt==0.4.7
 PyYAML==3.10
 requests==2.3.0
 requests-oauthlib==0.4.1
-rfc6266==0.0.4
 scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
@@ -89,6 +87,9 @@ django-ratelimit-backend==0.6
 unicodecsv==0.9.4
 django-require==1.0.6
 pyuca==1.1
+
+# This needs to be installed *after* Cython, which is in pre.txt
+lxml==3.4.4
 
 # Used for shopping cart's pdf invoice/receipt generation
 reportlab==3.1.44
@@ -121,7 +122,8 @@ django-cors-headers==0.13
 django_debug_toolbar==1.2.2
 
 # Used for testing
-astroid==1.3.4
+astroid==1.3.8
+bok-choy==0.4.3
 chrono==1.0.2
 coverage==3.7
 ddt==0.8.0
@@ -134,16 +136,17 @@ freezegun==0.1.11
 lettuce==0.2.20
 mock-django==0.6.6
 mock==1.0.1
+moto==0.3.1
 nose-exclude
 nose-ignore-docstring
 nosexcover==1.0.7
 pep8==1.5.7
 PyContracts==1.7.1
-pylint==1.4.2
+pylint==1.4.4
 python-subunit==0.0.16
 pyquery==1.2.9
 radon==1.2
-rednose==0.4.1
+rednose==0.4.3
 selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
@@ -158,3 +161,7 @@ xblock-image-modal >=0.1.2, <1.0.0
 
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2
+jsonfield==1.0.3
+
+# Inlines CSS styles into HTML for email notifications.
+pynliner==0.5.2

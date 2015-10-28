@@ -1,6 +1,6 @@
 define([
-    'jquery', 'underscore', 'js/common_helpers/ajax_helpers',
-    'js/common_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
+    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
     'js/edxnotes/models/note', 'js/edxnotes/views/note_item',
     'js/spec/edxnotes/custom_matchers'
 ], function(
@@ -23,7 +23,7 @@ define([
                 }
             }));
 
-            return new NoteItemView({model: model, scrollToTag: scrollToTag}).render();
+            return new NoteItemView({model: model, scrollToTag: scrollToTag, view: "Test View"}).render();
         };
 
         beforeEach(function() {
@@ -82,16 +82,17 @@ define([
             expect(scrollToTagSpy.scrollToTag).toHaveBeenCalledWith("only");
         });
 
-        it('should log the edx.student_notes.used_unit_link event properly', function () {
+        it('should log the edx.course.student_notes.used_unit_link event properly', function () {
             var requests = AjaxHelpers.requests(this),
                 view = getView();
             spyOn(view, 'redirectTo');
             view.$('.reference-unit-link').click();
             expect(Logger.log).toHaveBeenCalledWith(
-                'edx.student_notes.used_unit_link',
+                'edx.course.student_notes.used_unit_link',
                 {
                     'note_id': 'id-123',
-                    'component_usage_id': 'usage_id-123'
+                    'component_usage_id': 'usage_id-123',
+                    'view': 'Test View'
                 },
                 null,
                 {

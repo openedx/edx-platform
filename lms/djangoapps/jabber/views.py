@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from courseware.courses import get_course_with_access
 from courseware.courses import registered_for_course

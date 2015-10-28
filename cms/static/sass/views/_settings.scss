@@ -1,6 +1,11 @@
 // studio - views - course settings
 // ====================
+// Table of Contents
+// * +Settings - Base / All
+// * +Settings - Licenses
 
+// +Settings - Base / All
+// ====================
 .view-settings {
   @include text-align(left);
   @include direction();
@@ -92,6 +97,10 @@
     }
 
     // in form  -UI hints/tips/messages
+    .header-help {
+      margin: 0 0 $baseline 0;
+    }
+
     .instructions {
       @extend %t-copy-sub1;
       margin: 0 0 $baseline 0;
@@ -104,10 +113,11 @@
       margin-top: ($baseline/4);
       color: $gray-d1;
     }
-    .tip-inline{
-    display: inline;
-    margin-left: 5px;
-  }
+
+    .tip-inline {
+      display: inline;
+      @include margin-left($baseline/4);
+    }
 
     .message-error {
       @extend %t-copy-sub1;
@@ -160,6 +170,7 @@
            }
          }
       }
+
       #heading-entrance-exam{
         font-weight: 600;
       }
@@ -167,6 +178,7 @@
       label[for="entrance-exam-enabled"] {
         font-size: 14px;
       }
+
       .field {
         margin: 0 0 ($baseline*2) 0;
 
@@ -228,6 +240,16 @@
               color: $gray;
             }
           }
+        }
+        
+        .input-minimum-grade {
+          @include float(left);
+          @include size(92%,100%);
+        }
+
+        .minimum-grade-percentage-sign {
+          @include line-height(30);
+          padding-left: ($baseline/4);;
         }
 
         textarea.long {
@@ -349,6 +371,24 @@
       #field-course-name {
         float: left;
         width: flex-grid(5, 9);
+      }
+
+      // Credit eligibility requirements
+      #credit-minimum-passing-grade {
+        float: left;
+        width: flex-grid(3, 9);
+        margin-right: flex-gutter();
+      }
+
+      #credit-proctoring-requirements {
+        float: left;
+        width: flex-grid(3, 9);
+        margin-right: flex-gutter();
+      }
+
+      #credit-reverification-requirements {
+        float: left;
+        width: flex-grid(3, 9);
       }
 
       // course link note
@@ -782,6 +822,11 @@
       #field-course-grading-graceperiod {
         width: flex-grid(3, 9);
       }
+
+      #field-course-minimum_grade_credit {
+        width: flex-grid(4, 9);
+      }
+
     }
 
     &.assignment-types {

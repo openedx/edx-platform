@@ -12,6 +12,8 @@ Change Log
 
    * - Date
      - Change
+   * - 10 June 2015
+     - Added the section :ref:`Profile Images API Version 1.0`.
    * - 11 May 2015
      - Updated the :ref:`User API <edX Platform User API Version 1.0>` to
        Version 1.0.

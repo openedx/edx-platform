@@ -13,7 +13,7 @@ from pavelib.utils.process import run_background_process
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
+    colorize = lambda color, text: text  # pylint: disable=invalid-name
 
 __test__ = False  # do not collect
 
@@ -80,7 +80,7 @@ def wait_for_server(server, port):
             if int(response.status) == 200:
                 server_ok = True
                 break
-        except:  # pylint: disable-msg=bare-except
+        except:  # pylint: disable=bare-except
             pass
 
         attempts += 1

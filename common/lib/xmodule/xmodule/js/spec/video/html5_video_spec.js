@@ -10,8 +10,8 @@
 
         afterEach(function () {
             state.storage.clear();
+            state.videoPlayer.destroy();
             $.fn.scrollTo.reset();
-            $('.subtitles').remove();
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
         });
@@ -51,14 +51,14 @@
                             });
                         });
 
-                        it('callback was called', function () {
+                        it('callback was not called', function () {
                             waitsFor(function () {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                             }, 'Player state should be changed', WAIT_TIMEOUT);
 
                             runs(function () {
                                 expect(state.videoPlayer.player.callStateChangeCallback)
-                                    .toHaveBeenCalled();
+                                    .not.toHaveBeenCalled();
                             });
                         });
                     });
@@ -85,14 +85,14 @@
                             });
                         });
 
-                        it('callback was called', function () {
+                        it('callback was not called', function () {
                             waitsFor(function () {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                             }, 'Player state should be changed', WAIT_TIMEOUT);
 
                             runs(function () {
                                 expect(state.videoPlayer.player.callStateChangeCallback)
-                                    .toHaveBeenCalled();
+                                    .not.toHaveBeenCalled();
                             });
                         });
                     });

@@ -6,7 +6,6 @@ Test the partitions and partitions service
 import json
 from django.conf import settings
 import django.test
-from django.test.utils import override_settings
 from mock import patch
 from unittest import skipUnless
 
@@ -14,8 +13,8 @@ from courseware.masquerade import handle_ajax, setup_masquerade
 from courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config, TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -362,7 +361,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
 
         # Now setup the masquerade for the test user
         setup_masquerade(request, self.test_user, True)
-        scheme = self.user_partition.scheme    # pylint: disable=no-member
+        scheme = self.user_partition.scheme
         self.assertEqual(
             scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
             group

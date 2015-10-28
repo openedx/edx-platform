@@ -10,7 +10,11 @@ import pygeoip
 
 from django.core.cache import cache
 from django.conf import settings
+from rest_framework.response import Response
+from rest_framework import status
+from ipware.ip import get_ip
 
+from student.auth import has_course_author_access
 from embargo.models import CountryAccessRule, RestrictedCourse
 
 
@@ -65,6 +69,10 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
     course_is_restricted = RestrictedCourse.is_restricted_course(course_key)
 
     if not course_is_restricted:
+        return True
+
+    # Always give global and course staff access, regardless of embargo settings.
+    if user is not None and has_course_author_access(user, course_key):
         return True
 
     if ip_address is not None:
@@ -166,3 +174,30 @@ def _country_code_from_ip(ip_addr):
         return pygeoip.GeoIP(settings.GEOIPV6_PATH).country_code_by_addr(ip_addr)
     else:
         return pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
+
+
+def get_embargo_response(request, course_id, user):
+    """
+    Check whether any country access rules block the user from enrollment.
+
+    Args:
+        request (HttpRequest): The request object
+        course_id (str): The requested course ID
+        user (str): The current user object
+
+    Returns:
+        HttpResponse: Response of the embargo page if embargoed, None if not
+
+    """
+    redirect_url = redirect_if_blocked(
+        course_id, user=user, ip_address=get_ip(request), url=request.path)
+    if redirect_url:
+        return Response(
+            status=status.HTTP_403_FORBIDDEN,
+            data={
+                "message": (
+                    u"Users from this location cannot access the course '{course_id}'."
+                ).format(course_id=course_id),
+                "user_message_url": request.build_absolute_uri(redirect_url)
+            }
+        )

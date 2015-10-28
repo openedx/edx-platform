@@ -1,8 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 
 <%block name="pagetitle">${_("CCX Coach Dashboard")}</%block>
 <%block name="nav_skip">#ccx-coach-dashboard-content</%block>
@@ -21,16 +22,29 @@
     <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content">
       <h1>${_("CCX Coach Dashboard")}</h1>
 
+      % if messages:
+      <ul class="messages">
+        % for message in messages:
+          % if message.tags:
+          <li class="${message.tags}">${message}</li>
+          % else:
+          <li>${message}</li>
+          % endif
+        % endfor
+        </ul>
+      % endif
+
       %if not ccx:
       <section>
         <form action="${create_ccx_url}" method="POST">
           <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-          <input name="name" placeholder="Name your CCX"/><br/>
+          <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
+          <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}"/><br/>
           <button id="create-ccx">Coach a new Custom Course for EdX</button>
         </form>
       </section>
       %endif
-      
+
       %if ccx:
       <ul class="instructor-nav">
         <li class="nav-item">
@@ -78,7 +92,7 @@
     var url = document.URL,
         hashbang = url.indexOf('#!');
     if (hashbang != -1) {
-      var selector = '.instructor-nav a[data-section=' + 
+      var selector = '.instructor-nav a[data-section=' +
         url.substr(hashbang + 2) + ']';
       $(selector).click();
     }

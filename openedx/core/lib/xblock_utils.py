@@ -108,6 +108,9 @@ def wrap_xblock(
             # The block is acting as an XModuleDescriptor
             css_classes.append('xmodule_edit')
 
+        if getattr(block, 'HIDDEN', False):
+            css_classes.append('is-hidden')
+
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
         data['type'] = block.js_module_name
         shim_xmodule_js(block, frag)
@@ -211,7 +214,7 @@ def grade_histogram(module_id):
 
 
 @contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
-def add_staff_markup(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
+def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
@@ -242,7 +245,7 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
         else:
             return frag
 
-    if isinstance(block, SequenceModule):
+    if isinstance(block, SequenceModule) or getattr(block, 'HIDDEN', False):
         return frag
 
     block_id = block.location
@@ -301,12 +304,13 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
         'element_id': block.location.html_id().replace('-', '_'),
         'edit_link': edit_link,
         'user': user,
-        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
         'histogram': json.dumps(histogram),
         'render_histogram': render_histogram,
         'block_content': frag.content,
         'is_released': is_released,
         'has_instructor_access': has_instructor_access,
+        'disable_staff_debug_info': disable_staff_debug_info,
     }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 

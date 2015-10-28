@@ -60,12 +60,12 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
 
-CONTAINER_TEMPATES = [
+CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
-    "editor-mode-button", "upload-dialog", "image-modal",
+    "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message"
+    "unit-outline", "container-message", "license-selector",
 ]
 
 
@@ -220,7 +220,7 @@ def container_handler(request, usage_key_string):
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
                 'keywords_supported': get_keywords_supported(),
-                'templates': CONTAINER_TEMPATES
+                'templates': CONTAINER_TEMPLATES
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
@@ -230,7 +230,7 @@ def get_component_templates(courselike, library=False):
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
-    def create_template_dict(name, cat, boilerplate_name=None, tab="common"):
+    def create_template_dict(name, cat, boilerplate_name=None, tab="common", hinted=False):
         """
         Creates a component template dict.
 
@@ -238,13 +238,15 @@ def get_component_templates(courselike, library=False):
             display_name: the user-visible name of the component
             category: the type of component (problem, html, etc.)
             boilerplate_name: name of boilerplate for filling in default values. May be None.
-            tab: common(default)/advanced/hint, which tab it goes in
+            hinted: True if hinted problem else False
+            tab: common(default)/advanced, which tab it goes in
 
         """
         return {
             "display_name": name,
             "category": cat,
             "boilerplate_name": boilerplate_name,
+            "hinted": hinted,
             "tab": tab
         }
 
@@ -280,20 +282,20 @@ def get_component_templates(courselike, library=False):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
                 if not filter_templates or filter_templates(template, courselike):
-                    # Tab can be 'common' 'advanced' 'hint'
+                    # Tab can be 'common' 'advanced'
                     # Default setting is common/advanced depending on the presence of markdown
                     tab = 'common'
                     if template['metadata'].get('markdown') is None:
                         tab = 'advanced'
-                    # Then the problem can override that with a tab: attribute (note: not nested in metadata)
-                    tab = template.get('tab', tab)
+                    hinted = template.get('hinted', False)
 
                     templates_for_category.append(
                         create_template_dict(
                             _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
                             category,
                             template.get('template_id'),
-                            tab
+                            tab,
+                            hinted,
                         )
                     )
 

@@ -113,13 +113,13 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     @ddt.data((0, 'split_test_cond0'), (1, 'split_test_cond1'))
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):
-        self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]    # pylint: disable=no-member
+        self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]
         self.assertEquals(self.split_test_module.child_descriptor.url_name, child_url_name)
 
     @ddt.data((0, 'HTML FOR GROUP 0'), (1, 'HTML FOR GROUP 1'))
     @ddt.unpack
     def test_get_html(self, user_tag, child_content):
-        self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]    # pylint: disable=no-member
+        self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]
         self.assertIn(
             child_content,
             self.module_system.render(self.split_test_module, STUDENT_VIEW).content

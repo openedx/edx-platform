@@ -9,7 +9,7 @@ from courseware.models import StudentModule
 from opaque_keys.edx.keys import UsageKey
 from student.models import EntranceExamConfiguration
 from util.milestones_helpers import get_required_content
-from util.module_utils import yield_dynamic_descriptor_descendents
+from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule.modulestore.django import modulestore
 
 
@@ -144,11 +144,13 @@ def get_entrance_exam_score(request, course):
             request,
             descriptor,
             field_data_cache,
-            course.id
+            course.id,
+            course=course
         )
 
-    exam_module_generators = yield_dynamic_descriptor_descendents(
+    exam_module_generators = yield_dynamic_descriptor_descendants(
         exam_descriptor,
+        request.user.id,
         inner_get_module
     )
     exam_modules = [module for module in exam_module_generators]

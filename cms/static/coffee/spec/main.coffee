@@ -23,11 +23,13 @@ requirejs.config({
         "jquery.simulate": "xmodule_js/common_static/js/vendor/jquery.simulate",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
+        "text": "xmodule_js/common_static/js/vendor/requirejs/text",
         "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
         "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
+        "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational.min",
         "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
@@ -137,6 +139,9 @@ requirejs.config({
             deps: ["backbone"],
             exports: "Backbone.Paginator"
         },
+        "backbone-relational": {
+            deps: ["backbone"],
+        },
         "youtube": {
             exports: "YT"
         },
@@ -227,6 +232,7 @@ define([
     "js/spec/models/explicit_url_spec",
     "js/spec/models/xblock_info_spec",
     "js/spec/models/xblock_validation_spec",
+    "js/spec/models/license_spec",
 
     "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
@@ -235,18 +241,18 @@ define([
     "js/spec/views/active_video_upload_list_spec",
     "js/spec/views/previous_video_upload_spec",
     "js/spec/views/previous_video_upload_list_spec",
-    "js/spec/views/paging_spec",
     "js/spec/views/assets_spec",
     "js/spec/views/baseview_spec",
     "js/spec/views/container_spec",
     "js/spec/views/paged_container_spec",
     "js/spec/views/group_configuration_spec",
-    "js/spec/views/paging_spec",
     "js/spec/views/unit_outline_spec",
     "js/spec/views/xblock_spec",
     "js/spec/views/xblock_editor_spec",
     "js/spec/views/xblock_string_field_editor_spec",
     "js/spec/views/xblock_validation_spec",
+    "js/spec/views/license_spec",
+    "js/spec/views/paging_spec",
 
     "js/spec/views/utils/view_utils_spec",
 
@@ -268,8 +274,14 @@ define([
 
     "js/spec/xblock/cms.runtime.v1_spec",
 
+    # Certificates application test suite mappings
+    "js/certificates/spec/models/certificate_spec",
+    "js/certificates/spec/views/certificate_details_spec",
+    "js/certificates/spec/views/certificate_editor_spec",
+    "js/certificates/spec/views/certificates_list_spec",
+    "js/certificates/spec/views/certificate_preview_spec",
+
     # these tests are run separately in the cms-squire suite, due to process
     # isolation issues with Squire.js
     # "coffee/spec/views/assets_spec"
     ])
-

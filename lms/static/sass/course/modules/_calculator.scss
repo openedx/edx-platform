@@ -2,6 +2,8 @@
 // ====================
 
 div.calc-main {
+  @extend %ui-print-excluded;
+
   bottom: -126px;
   left: 0;
   position: fixed;
@@ -35,14 +37,20 @@ div.calc-main {
       background-color: $black;
       top: -36px;
     }
+
+    .utility-control-label {
+      background: $black;
+      color: $white;
+    }
   }
 
   div#calculator_wrapper {
-    background: $black;
     clear: both;
-    max-height: 90px;
     position: relative;
     top: -36px;
+    max-height: 90px;
+    background: $black;
+    color: $white;
 
     // UI: input help table
     .calculator-input-help-table {
@@ -60,7 +68,11 @@ div.calc-main {
       @include box-sizing(border-box);
       padding: lh();
 
-      input#calculator_button {
+      .calc-output-label {
+        color: $white;
+      }
+
+      button#calculator_button {
         background: #111;
         border: 1px solid $black;
         border-radius: 0;
@@ -79,6 +91,11 @@ div.calc-main {
 
         &:hover, &:focus {
           color: #333;
+        }
+
+        .calc-button-label {
+          background: $black;
+          color: $white;
         }
       }
 
@@ -123,15 +140,28 @@ div.calc-main {
           right: 0;
           top: 0;
 
+          #hint-instructions {
+            color: $white;
+          }
+
           #calculator_hint {
-            background: url("../images/info-icon.png") center center no-repeat;
-            height: 35px;
             @include hide-text;
-            width: 35px;
             display: block;
+            height: 35px;
+            width: 35px;
+            border: none;
+            background: url("../images/info-icon.png") center center no-repeat;
+            color: $white;
 
             &:focus {
               outline: 5px auto #5b9dd9;
+              box-shadow: none;
+              border: none;
+            }
+
+            .calc-hint {
+              background: $black;
+              color: $white;
             }
           }
 

@@ -1,30 +1,16 @@
 // lms - course - base
 // ====================
 
-body {
-  min-width: 980px;
-  min-height: 100%;
-  background-color: $course-bg-color;
+// Table of Contents
+// * +Containers
+// * +Resets - Old, Body
+// * +Resets - Old, Forms
+// * +Resets - Old, Images
+// * +Resets - Old, Misc
 
-  //for background texture:
-  //background-image: $course-bg-image;
-}
 
-body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
-  @include text-align(left);
-  font-family: $sans-serif;
-}
-
-table {
-  table-layout: fixed;
-}
-
-a {
-  &:hover, &:focus {
-    color: $pink;
-    text-decoration: none !important;
-  }
-}
+// +Containers
+// ====================
 
 .content-wrapper {
   background: none;
@@ -41,10 +27,44 @@ a {
     border-radius: 3px;
     border: 1px solid $outer-border-color;
     background: $container-bg;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px $shadow-l2;
   }
 }
 
+
+// +Resets - Old, Body
+// ====================
+
+body {
+  min-height: 100%;
+  background-color: $course-bg-color;
+
+  //for background texture:
+  //background-image: $course-bg-image;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, label {
+  @include text-align(left);
+  font-family: $sans-serif;
+}
+
+table {
+  table-layout: fixed;
+}
+
+.xblock table {
+  table-layout: auto
+}
+
+a {
+  &:hover, &:focus {
+    color: $pink;
+    text-decoration: none !important;
+  }
+}
+
+// +Resets - Old, Forms
+// ====================
 form {
   label {
     display: block;
@@ -107,6 +127,8 @@ button,
 }
 
 
+// +Resets - Old, Images
+// ====================
 img {
   max-width: 100%;
 }
@@ -139,6 +161,9 @@ img {
   }
 }
 
+
+// +Resets - Old, Misc
+// ====================
 .test-class {
   border: 1px solid #f00;
 }

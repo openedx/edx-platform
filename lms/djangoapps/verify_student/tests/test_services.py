@@ -31,89 +31,101 @@ class TestReverificationService(ModuleStoreTestCase):
             min_price=100,
         )
         self.item = ItemFactory.create(parent=course, category='chapter', display_name='Test Section')
+        self.final_checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/final_uuid'.format(
+            org=self.course_key.org, course=self.course_key.course
+        )
 
-    @ddt.data("final_term", "mid_term")
+    @ddt.data('final', 'midterm')
     def test_start_verification(self, checkpoint_name):
-        """
-        Test the 'start_verification' service method. If checkpoint exists for
-        a specific course then return the checkpoint otherwise create that
-        checkpoint.
+        """Test the 'start_verification' service method.
+
+        Check that if a reverification checkpoint exists for a specific course
+        then 'start_verification' method returns that checkpoint otherwise it
+        creates that checkpoint.
         """
         reverification_service = ReverificationService()
-        reverification_service.start_verification(unicode(self.course_key), checkpoint_name, self.item.location)
+        checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/{checkpoint}'.format(
+            org=self.course_key.org, course=self.course_key.course, checkpoint=checkpoint_name
+        )
         expected_url = (
             '/verify_student/reverify'
             '/{course_key}'
-            '/{checkpoint_name}'
-            '/{usage_id}/'
-        ).format(course_key=unicode(self.course_key), checkpoint_name=checkpoint_name, usage_id=self.item.location)
+            '/{checkpoint_location}/'
+        ).format(course_key=unicode(self.course_key), checkpoint_location=checkpoint_location)
 
         self.assertEqual(
-            expected_url,
-            reverification_service.start_verification(unicode(self.course_key), checkpoint_name, self.item.location)
+            reverification_service.start_verification(unicode(self.course_key), checkpoint_location),
+            expected_url
         )
 
     def test_get_status(self):
+        """Test the verification statuses of a user for a given 'checkpoint'
+        and 'course_id'.
         """
-        Test the verification statuses of a user for a given 'checkpoint' and
-        'course_id'.
-        """
-        checkpoint_name = 'final_term'
         reverification_service = ReverificationService()
-        self.assertIsNone(reverification_service.get_status(self.user.id, unicode(self.course_key), checkpoint_name))
+        self.assertIsNone(
+            reverification_service.get_status(self.user.id, unicode(self.course_key), self.final_checkpoint_location)
+        )
 
         checkpoint_obj = VerificationCheckpoint.objects.create(
             course_id=unicode(self.course_key),
-            checkpoint_name=checkpoint_name
+            checkpoint_location=self.final_checkpoint_location
         )
-
         VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='submitted')
         self.assertEqual(
-            reverification_service.get_status(self.user.id, unicode(self.course_key), checkpoint_name),
+            reverification_service.get_status(self.user.id, unicode(self.course_key), self.final_checkpoint_location),
             'submitted'
         )
 
-        VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='submitted')
+        VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='approved')
         self.assertEqual(
-            reverification_service.get_status(self.user.id, unicode(self.course_key), checkpoint_name),
-            'submitted'
+            reverification_service.get_status(self.user.id, unicode(self.course_key), self.final_checkpoint_location),
+            'approved'
         )
 
     def test_skip_verification(self):
         """
-        Adding the test skip verification attempt for the user
+        Test adding skip attempt of a user for a reverification checkpoint.
         """
-        checkpoint_name = 'final_term'
         reverification_service = ReverificationService()
         VerificationCheckpoint.objects.create(
             course_id=unicode(self.course_key),
-            checkpoint_name=checkpoint_name
+            checkpoint_location=self.final_checkpoint_location
         )
 
-        reverification_service.skip_verification(checkpoint_name, self.user.id, unicode(self.course_key))
-        self.assertEqual(1, SkippedReverification.objects.filter(user=self.user, course_id=self.course_key).count())
+        reverification_service.skip_verification(self.user.id, unicode(self.course_key), self.final_checkpoint_location)
+        self.assertEqual(
+            SkippedReverification.objects.filter(user=self.user, course_id=self.course_key).count(),
+            1
+        )
 
-        reverification_service.skip_verification(checkpoint_name, self.user.id, unicode(self.course_key))
-        self.assertEqual(1, SkippedReverification.objects.filter(user=self.user, course_id=self.course_key).count())
+        # now test that a user can have only one entry for a skipped
+        # reverification for a course
+        reverification_service.skip_verification(self.user.id, unicode(self.course_key), self.final_checkpoint_location)
+        self.assertEqual(
+            SkippedReverification.objects.filter(user=self.user, course_id=self.course_key).count(),
+            1
+        )
 
     def test_get_attempts(self):
-        """
-        Check verification attempts count against a user for a given
+        """Check verification attempts count against a user for a given
         'checkpoint' and 'course_id'.
         """
-        checkpoint_name = 'final_term'
         reverification_service = ReverificationService()
         course_id = unicode(self.course_key)
         self.assertEqual(
-            reverification_service.get_attempts(self.user.id, course_id, checkpoint_name, location_id=None),
+            reverification_service.get_attempts(self.user.id, course_id, self.final_checkpoint_location),
             0
         )
 
         # now create a checkpoint and add user's entry against it then test
-        # that the 'get_attempts' service method returns count accordingly
-        checkpoint_obj = VerificationCheckpoint.objects.create(course_id=course_id, checkpoint_name=checkpoint_name)
+        # that the 'get_attempts' service method returns correct count
+        checkpoint_obj = VerificationCheckpoint.objects.create(
+            course_id=course_id,
+            checkpoint_location=self.final_checkpoint_location
+        )
         VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='submitted')
         self.assertEqual(
-            reverification_service.get_attempts(self.user.id, course_id, checkpoint_name, location_id=None),
+            reverification_service.get_attempts(self.user.id, course_id, self.final_checkpoint_location),
             1
         )

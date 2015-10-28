@@ -52,3 +52,8 @@ if not hasattr(RequestFactory, 'patch'):
 
 if not hasattr(Client, 'patch'):
     setattr(Client, 'patch', client_patch)
+
+
+def get_absolute_url(path):
+    """ Generate an absolute URL for a resource on the test server. """
+    return u'http://testserver/{}'.format(path.lstrip('/'))

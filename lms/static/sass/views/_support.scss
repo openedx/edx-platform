@@ -1,0 +1,32 @@
+// lms - views - support
+// These styles are included on admin pages used by the support team.
+// ===================================================================
+
+.certificates-search {
+    margin: 40px 0;
+
+    input[name="query"] {
+        width: 476px;
+    }
+}
+
+
+.certificates-results {
+    table {
+        margin: 0 auto;
+    }
+
+    th {
+        text-align: center;
+        text-decoration: underline;
+    }
+
+    th, td {
+        padding: 10px 10px;
+        vertical-align: middle;
+    }
+}
+
+.btn-cert-regenerate {
+    font-size: 12px;
+}

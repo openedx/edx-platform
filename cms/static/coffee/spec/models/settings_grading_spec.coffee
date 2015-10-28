@@ -1,4 +1,4 @@
-define ["js/models/settings/course_grading_policy"], (CourseGradingPolicy) ->
+define ["underscore", "js/models/settings/course_grading_policy"], (_, CourseGradingPolicy) ->
     describe "CourseGradingPolicy", ->
         beforeEach ->
             @model = new CourseGradingPolicy()
@@ -23,3 +23,14 @@ define ["js/models/settings/course_grading_policy"], (CourseGradingPolicy) ->
                 expect(@model.parseGracePeriod("asdf")).toBe(null)
                 expect(@model.parseGracePeriod("7:19")).toBe(null)
                 expect(@model.parseGracePeriod("1000:00")).toBe(null)
+
+        describe "validate", ->
+            it "enforces that the passing grade is <= the minimum grade to receive credit if credit is enabled", ->
+                @model.set({minimum_grade_credit: 0.8, grace_period: '01:00', is_credit_course: true})
+                @model.set('grade_cutoffs', [0.9], validate: true)
+                expect(_.keys(@model.validationError)).toContain('minimum_grade_credit')
+
+            it "does not enforce the passing grade limit in non-credit courses", ->
+                @model.set({minimum_grade_credit: 0.8, grace_period: '01:00', is_credit_course: false})
+                @model.set({grade_cutoffs: [0.9]}, validate: true)
+                expect(@model.validationError).toBe(null)

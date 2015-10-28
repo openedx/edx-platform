@@ -9,19 +9,18 @@ metadata:
         When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
 
         You can use the following example problems as models.
-        _____________________________________________________________________________
 
         >>How many miles away from Earth is the sun? Use scientific notation to answer.<<
 
-        = 9.3*10^6 
-        or= 9.296*10^6 
+        = 9.3*10^7 
+        or= 9.296*10^7 
 
         >>The square of what number is -100?<<
 
         = 10*i 
 
         [explanation]
-        The sun is 93,000,000, or 9.3*10^6, miles away from Earth.
+        The sun is 93,000,000, or 9.3*10^7, miles away from Earth.
         -100 is the square of 10 times the imaginary number, i.
         [explanation]
 data: |
@@ -42,25 +41,19 @@ data: |
     to specify a <strong>Display Name</strong> and other values that apply.</p>
 
     <p>You can use the following example problems as models.</p>
-    <p>_____________________________________________________________________________</p>
-
-    <fieldset>
-      <legend>How many miles away from Earth is the sun? Use scientific notation to answer.</legend>
-      <numericalresponse answer="9.3*10^6">
+      <p>How many miles away from Earth is the sun? Use scientific notation to answer.</p>
+      <numericalresponse answer="9.3*10^7">
         <formulaequationinput label="How many million miles are between Earth and the sun? Use scientific notation to answer." />
       </numericalresponse>
-    </fieldset>
 
-    <fieldset>
-      <legend>The square of what number is -100?</legend>
+      <p>The square of what number is -100?</p>
       <numericalresponse answer="10*i">
         <formulaequationinput label="The square of what number is -100?" />
       </numericalresponse>
-    </fieldset>
     <solution>
       <div class="detailed-solution">
         <p>Explanation</p>
-        <p>The sun is 93,000,000, or 9.3*10^6, miles away from Earth.</p>
+        <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
         <p>-100 is the square of 10 times the imaginary number, i.</p>
       </div>
     </solution>

@@ -2,6 +2,7 @@
 Helper classes and methods for running modulestore tests without Django.
 """
 from importlib import import_module
+from markupsafe import escape
 from opaque_keys.edx.keys import UsageKey
 from unittest import TestCase
 from xblock.fields import XBlockMixin
@@ -52,6 +53,14 @@ def create_modulestore_instance(
         signal_handler=signal_handler,
         **options
     )
+
+
+def mock_tab_from_json(tab_dict):
+    """
+    Mocks out the CourseTab.from_json to just return the tab_dict itself so that we don't have to deal
+    with plugin errors.
+    """
+    return tab_dict
 
 
 class LocationMixin(XBlockMixin):
@@ -135,3 +144,56 @@ class MixedSplitTestCase(TestCase):
             modulestore=self.store,
             **extra
         )
+
+
+class ProceduralCourseTestMixin(object):
+    """
+    Contains methods for testing courses generated procedurally
+    """
+    def populate_course(self, branching=2, emit_signals=False):
+        """
+        Add k chapters, k^2 sections, k^3 verticals, k^4 problems to self.course (where k = branching)
+        """
+        user_id = self.user.id
+        self.populated_usage_keys = {}  # pylint: disable=attribute-defined-outside-init
+
+        def descend(parent, stack):  # pylint: disable=missing-docstring
+            if not stack:
+                return
+
+            xblock_type = stack[0]
+            for _ in range(branching):
+                child = ItemFactory.create(
+                    category=xblock_type,
+                    parent_location=parent.location,
+                    user_id=user_id
+                )
+                self.populated_usage_keys.setdefault(xblock_type, []).append(
+                    child.location
+                )
+                descend(child, stack[1:])
+
+        with self.store.bulk_operations(self.course.id, emit_signals=emit_signals):
+            descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
+
+
+class XssTestMixin(object):
+    """
+    Mixin for testing XSS vulnerabilities.
+    """
+
+    def assert_xss(self, response, xss_content):
+        """Assert that `xss_content` is not present in the content of
+        `response`, and that its escaped version is present. Uses the
+        same `markupsafe.escape` function as Mako templates.
+
+        Args:
+          response (Response): The HTTP response
+          xss_content (str): The Javascript code to check for.
+
+        Returns:
+          None
+
+        """
+        self.assertContains(response, escape(xss_content))
+        self.assertNotContains(response, xss_content)

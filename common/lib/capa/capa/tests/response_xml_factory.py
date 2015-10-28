@@ -73,14 +73,14 @@ class ResponseXMLFactory(object):
         question.text = question_text
 
         # Add the response(s)
-        for i in range(0, int(num_responses)):
+        for __ in range(int(num_responses)):
             response_element = self.create_response_element(**kwargs)
             root.append(response_element)
 
             # Add input elements
-            for j in range(0, int(num_inputs)):
+            for __ in range(int(num_inputs)):
                 input_element = self.create_input_element(**kwargs)
-                if not (None == input_element):
+                if not None == input_element:
                     response_element.append(input_element)
 
             # The problem has an explanation of the solution
@@ -146,7 +146,7 @@ class ResponseXMLFactory(object):
         choice_names = kwargs.get('choice_names', [None] * len(choices))
 
         # Create the <choicegroup>, <checkboxgroup>, or <radiogroup> element
-        assert(choice_type in group_element_names)
+        assert choice_type in group_element_names
         group_element = etree.Element(group_element_names[choice_type])
 
         # Create the <choice> elements
@@ -412,8 +412,8 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         answer = kwargs.get("answer", None)
         hint_list = kwargs.get("hints", None)
 
-        assert(answer)
-        assert(sample_dict and num_samples)
+        assert answer
+        assert sample_dict and num_samples
 
         # Create the <formularesponse> element
         response_element = etree.Element("formularesponse")
@@ -518,7 +518,7 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
         rectangle = kwargs.get('rectangle', None)
         regions = kwargs.get('regions', None)
 
-        assert(rectangle or regions)
+        assert rectangle or regions
 
         # Create the <imageinput> element
         input_element = etree.Element("imageinput")
@@ -635,9 +635,9 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
         options_list = kwargs.get('options', None)
         correct_option = kwargs.get('correct_option', None)
 
-        assert(options_list and correct_option)
-        assert(len(options_list) > 1)
-        assert(correct_option in options_list)
+        assert options_list and correct_option
+        assert len(options_list) > 1
+        assert correct_option in options_list
 
         # Create the <optioninput> element
         optioninput_element = etree.Element("optioninput")

@@ -2,14 +2,15 @@ import json
 import logging
 
 import ddt
-from django.core import cache
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from edxmako.tests import mako_middleware_process_request
 
+from django_comment_common.utils import ThreadContext
 from django_comment_client.forum import views
+from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
     NonCohortedTopicGroupIdTestMixin
@@ -33,6 +34,8 @@ from nose.tools import assert_true  # pylint: disable=E0611
 from mock import patch, Mock, ANY, call
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+
+from teams.tests.factories import CourseTeamFactory
 
 log = logging.getLogger(__name__)
 
@@ -105,19 +108,31 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
 
-def make_mock_thread_data(course, text, thread_id, num_children, group_id=None, group_name=None, commentable_id=None):
+def make_mock_thread_data(
+        course,
+        text,
+        thread_id,
+        num_children,
+        group_id=None,
+        group_name=None,
+        commentable_id=None,
+):
+    data_commentable_id = (
+        commentable_id or course.discussion_topics.get('General', {}).get('id') or "dummy_commentable_id"
+    )
     thread_data = {
         "id": thread_id,
         "type": "thread",
         "title": text,
         "body": text,
-        "commentable_id": (
-            commentable_id or course.discussion_topics.get('General', {}).get('id') or "dummy_commentable_id"
-        ),
+        "commentable_id": data_commentable_id,
         "resp_total": 42,
         "resp_skip": 25,
         "resp_limit": 5,
-        "group_id": group_id
+        "group_id": group_id,
+        "context": (
+            ThreadContext.COURSE if get_team(data_commentable_id) is None else ThreadContext.STANDALONE
+        )
     }
     if group_id is not None:
         thread_data['group_name'] = group_name
@@ -136,7 +151,7 @@ def make_mock_request_impl(
         thread_id="dummy_thread_id",
         group_id=None,
         commentable_id=None,
-        num_thread_responses=1
+        num_thread_responses=1,
 ):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
@@ -150,13 +165,18 @@ def make_mock_request_impl(
                         thread_id=thread_id,
                         num_children=None,
                         group_id=group_id,
-                        commentable_id=commentable_id
+                        commentable_id=commentable_id,
                     )
                 ]
             }
         elif thread_id and url.endswith(thread_id):
             data = make_mock_thread_data(
-                course=course, text=text, thread_id=thread_id, num_children=num_thread_responses, group_id=group_id
+                course=course,
+                text=text,
+                thread_id=thread_id,
+                num_children=num_thread_responses,
+                group_id=group_id,
+                commentable_id=commentable_id
             )
         elif "/users/" in url:
             data = {
@@ -316,12 +336,12 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @ddt.data(
-        # old mongo with cache: 15
-        (ModuleStoreEnum.Type.mongo, 1, 21, 15, 41, 27),
-        (ModuleStoreEnum.Type.mongo, 50, 315, 15, 629, 27),
+        # old mongo with cache
+        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 14, 8),
+        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 14, 8),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 41, 27),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 629, 27),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 14, 8),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 14, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -363,27 +383,15 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
             self.assertEquals(response.status_code, 200)
             self.assertEquals(len(json.loads(response.content)["content"]["children"]), num_thread_responses)
 
-        # TODO: update this once django cache is disabled in tests
-        # Test with and without cache, clearing before and after use.
-        single_thread_local_cache = cache.get_cache(
-            backend='default',
-            LOCATION='single_thread_local_cache'
-        )
-        single_thread_dummy_cache = cache.get_cache(
-            backend='django.core.cache.backends.dummy.DummyCache',
-            LOCATION='single_thread_local_cache'
-        )
+        # Test uncached first, then cached now that the cache is warm.
         cached_calls = [
-            [single_thread_dummy_cache, num_uncached_mongo_calls, num_uncached_sql_queries],
-            [single_thread_local_cache, num_cached_mongo_calls, num_cached_sql_queries]
+            [num_uncached_mongo_calls, num_uncached_sql_queries],
+            [num_cached_mongo_calls, num_cached_sql_queries],
         ]
-        for single_thread_cache, expected_mongo_calls, expected_sql_queries in cached_calls:
-            single_thread_cache.clear()
-            with patch("django_comment_client.permissions.CACHE", single_thread_cache):
-                with self.assertNumQueries(expected_sql_queries):
-                    with check_mongo_calls(expected_mongo_calls):
-                        call_single_thread()
-            single_thread_cache.clear()
+        for expected_mongo_calls, expected_sql_queries in cached_calls:
+            with self.assertNumQueries(expected_sql_queries):
+                with check_mongo_calls(expected_mongo_calls):
+                    call_single_thread()
 
 
 @patch('requests.request')
@@ -660,6 +668,75 @@ class SingleThreadContentGroupTestCase(ContentGroupTestCase):
         self.assert_can_access(self.non_cohorted_user, self.alpha_module.discussion_id, thread_id, False)
 
         self.assert_can_access(self.non_cohorted_user, self.beta_module.discussion_id, thread_id, False)
+
+    def test_course_context_respected(self, mock_request):
+        """
+        Verify that course threads go through discussion_category_id_access method.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id
+        )
+
+        # Beta user does not have access to alpha_module.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
+
+    def test_standalone_context_respected(self, mock_request):
+        """
+        Verify that standalone threads don't go through discussion_category_id_access method.
+        """
+        # For this rather pathological test, we are assigning the alpha module discussion_id (commentable_id)
+        # to a team so that we can verify that standalone threads don't go through discussion_category_id_access.
+        thread_id = "test_thread_id"
+        CourseTeamFactory(
+            name="A team",
+            course_id=self.course.id,
+            topic_id='topic_id',
+            discussion_topic_id=self.alpha_module.discussion_id
+        )
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id,
+            commentable_id=self.alpha_module.discussion_id
+        )
+
+        # If a thread returns context other than "course", the access check is not done, and the beta user
+        # can see the alpha discussion module.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class InlineDiscussionContextTestCase(ModuleStoreTestCase):
+    def setUp(self):
+        super(InlineDiscussionContextTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        self.discussion_topic_id = "dummy_topic"
+        self.team = CourseTeamFactory(
+            name="A team",
+            course_id=self.course.id,
+            topic_id='topic_id',
+            discussion_topic_id=self.discussion_topic_id
+        )
+        self.team.add_user(self.user)  # pylint: disable=no-member
+
+    def test_context_can_be_standalone(self, mock_request):
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course,
+            text="dummy text",
+            commentable_id=self.discussion_topic_id
+        )
+
+        request = RequestFactory().get("dummy_url")
+        request.user = self.user
+
+        response = views.inline_discussion(
+            request,
+            unicode(self.course.id),
+            self.discussion_topic_id,
+        )
+
+        json_response = json.loads(response.content)
+        self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
@@ -966,6 +1043,7 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
+@patch('lms.lib.comment_client.utils.requests.request')
 class InlineDiscussionTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
@@ -982,23 +1060,43 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
             discussion_target="Discussion1"
         )
 
-    @patch('lms.lib.comment_client.utils.requests.request')
-    def test_courseware_data(self, mock_request):
-        request = RequestFactory().get("dummy_url")
+    def send_request(self, mock_request, params=None):
+        """
+        Creates and returns a request with params set, and configures
+        mock_request to return appropriate values.
+        """
+        request = RequestFactory().get("dummy_url", params if params else {})
         request.user = self.student
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text="dummy content", commentable_id=self.discussion1.discussion_id
         )
-
-        response = views.inline_discussion(
+        return views.inline_discussion(
             request, self.course.id.to_deprecated_string(), self.discussion1.discussion_id
         )
+
+    def verify_response(self, response):
+        """Verifies that the response contains the appropriate courseware_url and courseware_title"""
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
         expected_courseware_title = 'Chapter / Discussion1'
         self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
         self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
+
+    def test_courseware_data(self, mock_request):
+        self.verify_response(self.send_request(mock_request))
+
+    def test_context(self, mock_request):
+        team = CourseTeamFactory(
+            name='Team Name',
+            topic_id='A topic',
+            course_id=self.course.id,
+            discussion_topic_id=self.discussion1.discussion_id
+        )
+        team.add_user(self.student)  # pylint: disable=no-member
+        response = self.send_request(mock_request)
+        self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
+        self.verify_response(response)
 
 
 @patch('requests.request')

@@ -1,8 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
-<%! from courseware.courses import get_studio_url %>
-<%! from microsite_configuration import microsite %>
-<%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_studio_url
+from microsite_configuration import microsite
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+%>
 
 <script type="text/template" id="member-list-widget-template">
   <div class="member-list-widget">
@@ -37,7 +39,16 @@
       ${_("You will not get notification for emails that bounce, so please double-check spelling.")} </label>
     <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
   </p>
-
+  <input type="hidden" id="is_course_white_label" value="${section_data['is_white_label']}">
+  % if section_data['is_white_label']:
+  <p>
+    <label for="reason-field-id">
+      ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
+      ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
+      ${_("Therefore, please give enough detail to account for this action.")} </label>
+    <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+  </p>
+  %endif
   <div class="enroll-option">
     <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
     <label for="auto-enroll">${_("Auto Enroll")}</label>
@@ -103,7 +114,7 @@
   <p>
     <label for="student-ids-for-beta">
       ${_("Enter email addresses and/or usernames separated by new lines or commas.")}<br/>
-      ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as a beta tester.").format(platform_name=settings.PLATFORM_NAME)}
+      ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as beta testers.").format(platform_name=settings.PLATFORM_NAME)}
     </label>
 
   <textarea rows="6" cols="50" name="student-ids-for-beta" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
@@ -145,13 +156,13 @@
 
 <div class="member-lists-management membership-section">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
-  <h2> ${_("Administration List Management")} </h2>
+  <h2> ${_("Course Team Management")} </h2>
 
   <div class="request-response-error"></div>
 
   <div class="wrapper-member-select">
     ## Translators: an "Administrator Group" is a group, such as Course Staff, that users can be added to.
-    <label for="member-lists-selector">${_("Select an Administrator Group:")}</label>
+    <label for="member-lists-selector">${_("Select a course team role:")}</label>
     <select id="member-lists-selector" class="member-lists-selector">
       <option> ${_("Getting available lists...")} </option>
     </select>
@@ -161,21 +172,21 @@
 
   %if not section_data['access']['instructor']:
     <p>
-      ${_("Staff cannot modify staff or beta tester lists. To modify these lists, "
-      "contact your instructor and ask them to add you as an instructor for staff "
-      "and beta lists, or a discussion admin for discussion management.")}
+      ${_("Staff cannot modify these lists. To manage course team membership, "
+      "a course Admin must give you the Admin role to add Staff or Beta Testers, "
+      "or the Discussion Admin role to add discussion moderators and TAs.")}
     </p>
   %endif
 
   %if section_data['access']['instructor']:
     <div class="auth-list-container"
       data-rolename="staff"
-      data-display-name="${_("Course Staff")}"
+      data-display-name="${_("Staff")}"
       data-info-text="
-        ${_("Course staff can help you manage limited aspects of your course. Staff "
-        "can enroll and unenroll students, as well as modify their grades and "
-        "see all course data. Course staff are not automatically given access "
-        "to Studio and will not be able to edit your course.")}"
+        ${_("Course team members with the Staff role help you manage your course. "
+        "Staff can enroll and unenroll learners, as well as modify their grades and "
+        "access all course data. Staff also have access to your course in Studio and "
+        "Insights. You can only give course team roles to enrolled users.")}"
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="${_("Add Staff")}"
@@ -183,22 +194,25 @@
 
     <div class="auth-list-container"
       data-rolename="instructor"
-      data-display-name="${_("Instructors")}"
+      data-display-name="${_("Admin")}"
       data-info-text="
-        ${_("Instructors are the core administration of your course. Instructors can "
-        "add and remove course staff, as well as administer discussion access.")}"
+        ${_("Course team members with the Admin role help you manage your course. "
+          "They can do all of the tasks that Staff can do, and can also add and "
+          "remove the Staff and Admin roles, discussion moderation roles, and the "
+          "beta tester role to manage course team membership. You can only give "
+          "course team roles to enrolled users.")}"
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
-      data-add-button-label="${_("Add Instructor")}"
+      data-add-button-label="${_("Add Admin")}"
     ></div>
 
     <div class="auth-list-container"
       data-rolename="beta"
       data-display-name="${_("Beta Testers")}"
       data-info-text="
-        ${_("Beta testers can see course content before the rest of the students. "
+        ${_("Beta Testers can see course content before other learners. "
         "They can make sure that the content works, but have no additional "
-        "privileges.")}"
+        "privileges. You can only give course team roles to enrolled users.")}"
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="${_("Add Beta Tester")}"
@@ -208,9 +222,11 @@
       data-rolename="Administrator"
       data-display-name="${_("Discussion Admins")}"
       data-info-text="
-        ${_("Discussion admins can edit or delete any post, clear misuse flags, close "
+        ${_("Discussion Admins can edit or delete any post, clear misuse flags, close "
          "and re-open threads, endorse responses, and see posts from all cohorts. "
-         "They CAN add/delete other moderators and their posts are marked as 'staff'.")}"
+         "Their posts are marked as 'staff'. They can also add and remove the "
+         "discussion moderation roles to manage course team membership. You can "
+         "only give course team roles to enrolled users.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Discussion Admin")}"
@@ -222,9 +238,11 @@
       data-rolename="Moderator"
       data-display-name="${_("Discussion Moderators")}"
       data-info-text="
-        ${_("Discussion moderators can edit or delete any post, clear misuse flags, close "
+        ${_("Discussion Moderators can edit or delete any post, clear misuse flags, close "
          "and re-open threads, endorse responses, and see posts from all cohorts. "
-         "They CANNOT add/delete other moderators and their posts are marked as 'staff'.")}"
+         "Their posts are marked as 'staff'. They cannot manage course team membership by "
+         "adding or removing discussion moderation roles. You can only give course team "
+         "roles to enrolled users.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Moderator")}"
@@ -235,16 +253,17 @@
       data-display-name="${_("Discussion Community TAs")}"
       data-info-text="
         ${_("Community TA's are members of the community whom you deem particularly "
-        "helpful on the discussion boards. They can edit or delete any post, clear misuse flags, "
-        "close and re-open threads, endorse responses, and see posts from all cohorts. "
-        "Their posts are marked 'Community TA'.")}"
+        "helpful on the discussion boards. They can edit or delete any post, clear "
+        "misuse flags, close and re-open threads, endorse responses, and see posts from "
+        "all cohorts. Their posts are marked as 'Community TA'. You can only give course "
+        "team roles to enrolled users.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
-  
-  %if section_data['access']['instructor'] and settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+
+  %if section_data['access']['instructor'] and section_data['ccx_is_enabled']:
     <div class="auth-list-container"
       data-rolename="ccx_coach"
       data-display-name="${_("CCX Coaches")}"

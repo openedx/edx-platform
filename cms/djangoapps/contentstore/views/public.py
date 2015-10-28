@@ -1,7 +1,7 @@
 """
 Public views
 """
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect

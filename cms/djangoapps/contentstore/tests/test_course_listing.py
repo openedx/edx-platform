@@ -225,17 +225,6 @@ class TestCourseListing(ModuleStoreTestCase):
         self._create_course_with_access_groups(course_location, self.user)
         store.delete_course(course_location, self.user.id)
 
-        course_location = self.store.make_course_key('testOrg', 'erroredCourse', 'RunBabyRun')
-        course = self._create_course_with_access_groups(course_location, self.user)
-        course_db_record = store._find_one(course.location)
-        course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki"})
-        store.collection.update(
-            {'_id': course.location.to_deprecated_son()},
-            {'$set': {
-                'metadata.tabs': course_db_record['metadata']['tabs'],
-            }},
-        )
-
         courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), 1, courses_list)
 
@@ -273,11 +262,11 @@ class TestCourseListing(ModuleStoreTestCase):
         num_courses_to_create = 3
         courses = [
             self._create_course_with_access_groups(CourseLocator('Org', 'CreatedCourse' + str(num), 'Run'), self.user)
-            for num in range(0, num_courses_to_create)
+            for num in range(num_courses_to_create)
         ]
         courses_in_progress = [
             self._create_course_with_access_groups(CourseLocator('Org', 'InProgressCourse' + str(num), 'Run'), self.user)
-            for num in range(0, num_courses_to_create)
+            for num in range(num_courses_to_create)
         ]
 
         # simulate initiation of course actions

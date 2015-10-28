@@ -182,7 +182,16 @@ MOCK_MODULES = [
     'get_account_settings',
     'update_account_settings',
     'serializers',
-    'PROFILE_IMAGE_KEY_PREFIX'
+    'profile_images.images',
+    'xmodule.course_module',
+    'user_api.accounts.api',
+    'user_api.accounts.serializers',
+    'ecommerce_api_client',
+    'client',
+    'ecommerce_api_client.client',
+    'ecommerce_api_client.exceptions'
+
+
 ]
 
 for mod_name in MOCK_MODULES:

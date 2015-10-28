@@ -30,7 +30,6 @@ FEATURES['SUBDOMAIN_BRANDING'] = True
 FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
-FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
@@ -93,6 +92,10 @@ CACHES = {
     'loc_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_location_mem_cache',
+    },
+    'course_structure_cache': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edx_course_structure_mem_cache',
     },
 }
 
@@ -186,7 +189,7 @@ OPEN_ENDED_GRADING_INTERFACE = {
 ############################## LMS Migration ##################################
 FEATURES['ENABLE_LMS_MIGRATION'] = True
 FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
-FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.edX.mit.edu/xqa'
+FEATURES['XQA_SERVER'] = 'http://xqa:server@content-qa.edX.mit.edu/xqa'
 
 INSTALLED_APPS += ('lms_migration',)
 

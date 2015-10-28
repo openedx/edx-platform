@@ -1,0 +1,10 @@
+<% if (username) { %>
+<a href="<%- user_url %>" class="username"><%- username %></a>
+    <% if (is_community_ta) { %>
+    <span class="user-label-community-ta"><%- gettext("Community TA") %></span>
+    <% } else if (is_staff) { %>
+    <span class="user-label-staff"><%- gettext("Staff") %></span>
+    <% } %>
+<% } else { %>
+    <%- gettext('anonymous') %>
+<% } %>

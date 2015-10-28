@@ -5,7 +5,8 @@ var CourseGradingPolicy = Backbone.Model.extend({
     defaults : {
         graders : null,  // CourseGraderCollection
         grade_cutoffs : null,  // CourseGradeCutoff model
-        grace_period : null // either null or { hours: n, minutes: m, ...}
+        grace_period : null, // either null or { hours: n, minutes: m, ...}
+        minimum_grade_credit : null // either null or percentage
     },
     parse: function(attributes) {
         if (attributes['graders']) {
@@ -27,6 +28,11 @@ var CourseGradingPolicy = Backbone.Model.extend({
                 hours: 0,
                 minutes: 0
             }
+        }
+        // If minimum_grade_credit is unset or equal to 0 on the server,
+        // it's received as 0
+        if (attributes.minimum_grade_credit === null) {
+            attributes.minimum_grade_credit = 0;
         }
         return attributes;
     },
@@ -55,12 +61,32 @@ var CourseGradingPolicy = Backbone.Model.extend({
             minutes: parseInt(pieces[1], 10)
         }
     },
+    parseMinimumGradeCredit : function(minimum_grade_credit) {
+        // get the value of minimum grade credit value in percentage
+        if (isNaN(minimum_grade_credit)) {
+            return 0;
+        }
+        return parseInt(minimum_grade_credit);
+    },
     validate : function(attrs) {
         if(_.has(attrs, 'grace_period')) {
             if(attrs['grace_period'] === null) {
                 return {
                     'grace_period': gettext('Grace period must be specified in HH:MM format.')
                 }
+            }
+        }
+        if(this.get('is_credit_course') && _.has(attrs, 'minimum_grade_credit')) {
+            // Getting minimum grade cutoff value
+            var minimum_grade_cutoff = _.min(_.values(attrs.grade_cutoffs));
+            if(isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null || attrs.minimum_grade_credit < minimum_grade_cutoff) {
+                return {
+                    'minimum_grade_credit': interpolate(
+                        gettext('Not able to set passing grade to less than %(minimum_grade_cutoff)s%.'),
+                        {minimum_grade_cutoff: minimum_grade_cutoff * 100},
+                        true
+                    )
+                };
             }
         }
     }

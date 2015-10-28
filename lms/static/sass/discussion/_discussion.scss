@@ -673,6 +673,7 @@ body.discussion {
 // inline discussion module and profile thread styling
 .discussion-module {
   @extend .discussion-body;
+
   position: relative;
   margin: $baseline 0;
   padding: $baseline;
@@ -752,10 +753,10 @@ body.discussion {
   }
 
   section.discussion {
-    margin-top: ($baseline*1.5);
+    clear: both;
+    padding-top: $baseline;
 
     .threads {
-      margin-top: $baseline;
     }
 
     .discussion-thread {
@@ -935,7 +936,7 @@ body.discussion {
     color: $white;
   }
 
-  section.pagination {
+  section.discussion-pagination {
     margin-top: ($baseline*1.5);
 
     nav.discussion-paginator {
@@ -1015,6 +1016,10 @@ body.discussion {
   .discussion-post {
     padding-bottom: $baseline !important;
   }
+}
+
+.xblock-student_view-discussion {
+  @extend %ui-print-excluded;
 }
 
 // ====================

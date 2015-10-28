@@ -49,7 +49,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
         self._descriptors[descriptor.location.to_deprecated_string()] = descriptor
         return descriptor
 
-    def load_item(self, location):  # pylint: disable=method-hidden
+    def load_item(self, location, for_parent=None):  # pylint: disable=method-hidden, unused-argument
         """Return the descriptor loaded for `location`"""
         return self._descriptors[location.to_deprecated_string()]
 

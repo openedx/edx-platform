@@ -5,7 +5,7 @@ well-formed and not-well-formed XML.
 import os.path
 import unittest
 from glob import glob
-from mock import patch
+from mock import patch, Mock
 
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import ModuleStoreEnum
@@ -35,6 +35,7 @@ class TestXMLModuleStore(unittest.TestCase):
         store = XMLModuleStore(DATA_DIR, source_dirs=[])
         self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)
 
+    @patch('xmodule.tabs.CourseTabList.initialize_default', Mock())
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during
         # uniquification of names, would raise a UnicodeError. It no longer does.

@@ -2,7 +2,6 @@
 """
 Tests for video outline API
 """
-# pylint: disable=no-member
 import ddt
 import itertools
 from uuid import uuid4
@@ -18,7 +17,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 
-from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin
+from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 
 
 class TestVideoAPITestCase(MobileAPITestCase):
@@ -144,12 +143,12 @@ class TestVideoAPIMixin(object):
         """
         path = course_outline[outline_index]['path']
         self.assertEqual(len(path), len(path_list))
-        for i in range(0, len(path_list)):
+        for i in range(len(path_list)):
             self.assertEqual(path_list[i], path[i]['name'])
         #named_path will be deprecated eventually
         named_path = course_outline[outline_index]['named_path']
         self.assertEqual(len(named_path), len(path_list))
-        for i in range(0, len(path_list)):
+        for i in range(len(path_list)):
             self.assertEqual(path_list[i], named_path[i])
 
     def _setup_course_partitions(self, scheme_id='random', is_cohorted=False):
@@ -407,7 +406,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin):
 
 @ddt.ddt
 class TestVideoSummaryList(
-    TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
+    TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
 ):
     """
     Tests for /api/mobile/v0.5/video_outlines/courses/{course_id}..
@@ -863,7 +862,7 @@ class TestVideoSummaryList(
 
 
 class TestTranscriptsDetail(
-    TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
+    TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
 ):
     """
     Tests for /api/mobile/v0.5/video_outlines/transcripts/{course_id}..

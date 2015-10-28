@@ -7,7 +7,7 @@ import json
 from mock import patch
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
-from contentstore.views.course import GroupConfiguration
+from contentstore.course_group_config import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -124,7 +124,7 @@ class HelperMethods(object):
                 i, 'Name ' + str(i), 'Description ' + str(i),
                 [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')],
                 scheme=None, scheme_id=scheme_id
-            ) for i in xrange(0, count)
+            ) for i in xrange(count)
         ]
         self.course.user_partitions = partitions
         self.save_course()
@@ -203,7 +203,6 @@ class GroupConfigurationsBaseTestCase(object):
         self.assertIn("error", content)
 
 
-# pylint: disable=no-member
 class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_list_handler.
@@ -296,7 +295,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(len(self.course.user_partitions), 0)
 
 
-# pylint: disable=no-member
 class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_detail_handler.
@@ -588,7 +586,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(user_partititons[0].name, 'Name 0')
 
 
-# pylint: disable=no-member
 class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.

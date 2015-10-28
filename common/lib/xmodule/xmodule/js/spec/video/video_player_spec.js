@@ -1,5 +1,4 @@
 (function (requirejs, require, define, undefined) {
-
 'use strict';
 
 require(
@@ -20,6 +19,9 @@ function (VideoPlayer) {
             window.Video.previousState = null;
             if (state.storage) {
                 state.storage.clear();
+            }
+            if (state.videoPlayer) {
+                _.result(state.videoPlayer, 'destroy');
             }
         });
 
@@ -47,7 +49,7 @@ function (VideoPlayer) {
                     expect(state.videoCaption).toBeDefined();
                     expect(state.speed).toEqual('1.50');
                     expect(state.config.transcriptTranslationUrl)
-                        .toEqual('/transcript/translation');
+                        .toEqual('/transcript/translation/__lang__');
                 });
 
                 it('create video speed control', function () {
@@ -71,18 +73,15 @@ function (VideoPlayer) {
                 var events;
 
                 jasmine.stubRequests();
-
                 spyOn(window.YT, 'Player').andCallThrough();
-
                 state = jasmine.initializePlayerYouTube();
-
                 state.videoEl = $('video, iframe');
 
                 events = {
                     onReady:                 state.videoPlayer.onReady,
                     onStateChange:           state.videoPlayer.onStateChange,
-                    onPlaybackQualityChange: state.videoPlayer
-                        .onPlaybackQualityChange
+                    onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange,
+                    onError:                 state.videoPlayer.onError
                 };
 
                 expect(YT.Player).toHaveBeenCalledWith('id', {
@@ -156,7 +155,7 @@ function (VideoPlayer) {
                 });
 
                 it('controls are in paused state', function () {
-                    expect(state.videoControl.isPlaying).toBe(false);
+                    expect(state.videoPlayer.isPlaying()).toBe(false);
                 });
             });
         });
@@ -166,14 +165,8 @@ function (VideoPlayer) {
                 state = jasmine.initializePlayer();
 
                 state.videoEl = $('video, iframe');
-
-                spyOn(state.videoPlayer, 'log').andCallThrough();
                 spyOn(state.videoPlayer, 'play').andCallThrough();
                 state.videoPlayer.onReady();
-            });
-
-            it('log the load_video event', function () {
-                expect(state.videoPlayer.log).toHaveBeenCalledWith('load_video');
             });
 
             it('autoplay the first video', function () {
@@ -197,11 +190,32 @@ function (VideoPlayer) {
                 var playbackRates = state.videoPlayer.player.getAvailablePlaybackRates();
 
                 state.currentPlayerMode = 'flash';
-
                 state.videoPlayer.onReady();
-
                 expect(playbackRates.length).toBe(4);
                 expect(state.currentPlayerMode).toBe('html5');
+            });
+        });
+
+        describe('onStateChange Youtube', function(){
+            describe('when the video is ended', function () {
+                beforeEach(function () {
+                    state = jasmine.initializePlayerYouTube();
+
+                    state.videoEl = $('video, iframe');
+                    spyOn($.fn, 'trigger').andCallThrough();
+                    state.videoPlayer.onStateChange({
+                        data: YT.PlayerState.ENDED
+                    });
+                });
+
+                it('pause the video control', function () {
+                    expect($('.video_control')).toHaveClass('play');
+                });
+
+                it('trigger pause and ended events', function () {
+                    expect($.fn.trigger).toHaveBeenCalledWith('pause', {});
+                    expect($.fn.trigger).toHaveBeenCalledWith('ended', {});
+                });
             });
         });
 
@@ -209,10 +223,7 @@ function (VideoPlayer) {
             describe('when the video is unstarted', function () {
                 beforeEach(function () {
                     state = jasmine.initializePlayer();
-
                     state.videoEl = $('video, iframe');
-
-                    spyOn(state.videoControl, 'pause').andCallThrough();
                     spyOn($.fn, 'trigger').andCallThrough();
 
                     state.videoPlayer.onStateChange({
@@ -221,7 +232,7 @@ function (VideoPlayer) {
                 });
 
                 it('pause the video control', function () {
-                    expect(state.videoControl.pause).toHaveBeenCalled();
+                    expect($('.video_control')).toHaveClass('play');
                 });
 
                 it('pause the video caption', function () {
@@ -244,31 +255,12 @@ function (VideoPlayer) {
 
                     state.videoEl = $('video, iframe');
 
-                    spyOn(state.videoPlayer, 'log').andCallThrough();
                     spyOn(window, 'setInterval').andReturn(100);
-                    spyOn(state.videoControl, 'play');
                     spyOn($.fn, 'trigger').andCallThrough();
 
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.PLAYING
                     });
-                });
-
-                it('speed_change_video event is not logged when speed not change', function () {
-                    expect(state.videoPlayer.log).not.toHaveBeenCalledWith(
-                        'speed_change_video',
-                        {
-                            current_time: state.videoPlayer.currentTime,
-                            old_speed: state.speed,
-                            new_speed: state.speed
-                        }
-                    );
-                });
-
-                it('log the play_video event', function () {
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'play_video', { currentTime: 0 }
-                    );
                 });
 
                 it('set update interval', function () {
@@ -279,7 +271,7 @@ function (VideoPlayer) {
                 });
 
                 it('play the video control', function () {
-                    expect(state.videoControl.play).toHaveBeenCalled();
+                    expect($('.video_control')).toHaveClass('pause');
                 });
 
                 it('play the video caption', function () {
@@ -295,10 +287,7 @@ function (VideoPlayer) {
 
                     state.videoEl = $('video, iframe');
 
-                    spyOn(state.videoPlayer, 'log').andCallThrough();
-                    spyOn(state.videoControl, 'pause').andCallThrough();
                     spyOn($.fn, 'trigger').andCallThrough();
-
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.PLAYING
                     });
@@ -310,18 +299,12 @@ function (VideoPlayer) {
                     });
                 });
 
-                it('log the pause_video event', function () {
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'pause_video', { currentTime: 0 }
-                    );
-                });
-
                 it('clear update interval', function () {
                     expect(state.videoPlayer.updateInterval).toBeUndefined();
                 });
 
                 it('pause the video control', function () {
-                    expect(state.videoControl.pause).toHaveBeenCalled();
+                    expect($('.video_control')).toHaveClass('play');
                 });
 
                 it('pause the video caption', function () {
@@ -334,33 +317,44 @@ function (VideoPlayer) {
                     state = jasmine.initializePlayer();
 
                     state.videoEl = $('video, iframe');
-
-                    spyOn(state.videoPlayer, 'log').andCallThrough();
-                    spyOn(state.videoControl, 'pause').andCallThrough();
                     spyOn($.fn, 'trigger').andCallThrough();
-
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.ENDED
                     });
                 });
 
                 it('pause the video control', function () {
-                    expect(state.videoControl.pause).toHaveBeenCalled();
+                    expect($('.video_control')).toHaveClass('play');
                 });
 
                 it('pause the video caption', function () {
                     expect($.fn.trigger).toHaveBeenCalledWith('ended', {});
                 });
-
-                it('log stop_video event', function () {
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'stop_video',
-                        {
-                            currentTime: state.videoPlayer.currentTime
-                        }
-                    );
-                });
             });
+        });
+
+        describe('onSeek Youtube', function(){
+            beforeEach(function () {
+                state = jasmine.initializePlayerYouTube();
+                state.videoEl = $('video, iframe');
+            });
+
+           describe('when the video is playing', function () {
+               beforeEach(function(){
+                  state.videoPlayer.onStateChange({
+                      data: YT.PlayerState.PLAYING
+                  });
+               });
+
+               it('Video has started playing', function () {
+                   expect($('.video_control')).toHaveClass('pause');
+               });
+
+               it('seek the player', function () {
+                   state.videoPlayer.seekTo(10);
+                   expect(state.videoPlayer.currentTime).toBe(10);
+               });
+           });
         });
 
         describe('onSeek', function () {
@@ -394,25 +388,6 @@ function (VideoPlayer) {
                         expect(state.videoPlayer.currentTime).toBe(10);
                         expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
                         expect(state.videoPlayer.runTimer).toHaveBeenCalled();
-                    });
-                });
-
-                it('slider event causes log update', function () {
-                    runs(function () {
-                        spyOn(state.videoPlayer, 'log');
-                        state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), { value: 2 }
-                        );
-                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
-                        // That's why we have to do this tick(300).
-                        jasmine.Clock.tick(300);
-                        expect(state.videoPlayer.currentTime).toBe(2);
-
-                        expect(state.videoPlayer.log).toHaveBeenCalledWith('seek_video', {
-                            old_time: jasmine.any(Number),
-                            new_time: 2,
-                            type: 'onSlideSeek'
-                        });
                     });
                 });
 
@@ -467,24 +442,6 @@ function (VideoPlayer) {
                 beforeEach(function () {
                     spyOn(state.videoPlayer, 'setPlaybackRate')
                         .andCallThrough();
-                });
-
-                it('slider event causes log update', function () {
-                    spyOn(state.videoPlayer, 'log');
-                    state.videoProgressSlider.onSlide(
-                        jQuery.Event('slide'), { value: 2 }
-                    );
-                    // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
-                    // That's why we have to do this tick(300).
-                    jasmine.Clock.tick(300);
-                    expect(state.videoPlayer.currentTime).toBe(2);
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'seek_video', {
-                            old_time: 0,
-                            new_time: 2,
-                            type: 'onSlideSeek'
-                        }
-                    );
                 });
 
                 it('video has a correct speed', function () {
@@ -785,7 +742,7 @@ function (VideoPlayer) {
                     state = jasmine.initializePlayer();
                     state.videoEl = $('video, iframe');
                     spyOn($.fn, 'trigger').andCallThrough();
-                    state.videoControl.toggleFullScreen(jQuery.Event('click'));
+                    $('.add-fullscreen').click();
                 });
 
                 it('replace the full screen button tooltip', function () {
@@ -810,11 +767,10 @@ function (VideoPlayer) {
                     state.videoEl = $('video, iframe');
                     spyOn($.fn, 'trigger').andCallThrough();
                     state.el.addClass('video-fullscreen');
-                    state.videoControl.fullScreenState = true;
-                    state.videoControl.isFullScreen = true;
-                    state.videoControl.fullScreenEl.attr('title', 'Exit-fullscreen');
-
-                    state.videoControl.toggleFullScreen(jQuery.Event('click'));
+                    state.videoFullScreen.fullScreenState = true;
+                    state.videoFullScreen.isFullScreen = true;
+                    state.videoFullScreen.fullScreenEl.attr('title', 'Exit-fullscreen');
+                    $('.add-fullscreen').click();
                 });
 
                 it('replace the full screen button tooltip', function () {
@@ -832,83 +788,6 @@ function (VideoPlayer) {
                         .toHaveBeenCalledWith('width');
                     expect(state.resizer.delta.reset).toHaveBeenCalled();
                 });
-            });
-        });
-
-        describe('play', function () {
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
-
-                state.videoEl = $('video, iframe');
-
-                spyOn(state.videoPlayer.player, 'playVideo').andCallThrough();
-            });
-
-            describe('when the player is not ready', function () {
-                beforeEach(function () {
-                    state.videoPlayer.player.playVideo = void 0;
-                    state.videoPlayer.play();
-                });
-
-                it('does nothing', function () {
-                    expect(state.videoPlayer.player.playVideo).toBeUndefined();
-                });
-            });
-
-            describe('when the player is ready', function () {
-                beforeEach(function () {
-                    state.videoPlayer.player.playVideo.andReturn(true);
-                    state.videoPlayer.play();
-                });
-
-                it('delegate to the player', function () {
-                    expect(state.videoPlayer.player.playVideo).toHaveBeenCalled();
-                });
-            });
-        });
-
-        describe('isPlaying', function () {
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
-
-                state.videoEl = $('video, iframe');
-
-                spyOn(state.videoPlayer.player, 'getPlayerState').andCallThrough();
-            });
-
-            describe('when the video is playing', function () {
-                beforeEach(function () {
-                    state.videoPlayer.player.getPlayerState.andReturn(YT.PlayerState.PLAYING);
-                });
-
-                it('return true', function () {
-                    expect(state.videoPlayer.isPlaying()).toBeTruthy();
-                });
-            });
-
-            describe('when the video is not playing', function () {
-                beforeEach(function () {
-                    state.videoPlayer.player.getPlayerState.andReturn(YT.PlayerState.PAUSED);
-                });
-
-                it('return false', function () {
-                    expect(state.videoPlayer.isPlaying()).toBeFalsy();
-                });
-            });
-        });
-
-        describe('pause', function () {
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
-
-                state.videoEl = $('video, iframe');
-
-                spyOn(state.videoPlayer.player, 'pauseVideo').andCallThrough();
-                state.videoPlayer.pause();
-            });
-
-            it('delegate to the player', function () {
-                expect(state.videoPlayer.player.pauseVideo).toHaveBeenCalled();
             });
         });
 
@@ -1016,9 +895,7 @@ function (VideoPlayer) {
 
                     runs(function () {
                         state = jasmine.initializePlayer();
-
                         state.videoEl = $('video, iframe');
-
                         controls = state.el.find('.video-controls');
                     });
 
@@ -1053,7 +930,6 @@ function (VideoPlayer) {
                     saveState: jasmine.createSpy(),
                     videoPlayer: {
                         currentTime: 60,
-                        log: jasmine.createSpy(),
                         updatePlayTime: jasmine.createSpy(),
                         setPlaybackRate: jasmine.createSpy(),
                         player: jasmine.createSpyObj('player', ['setPlaybackRate'])
@@ -1063,18 +939,6 @@ function (VideoPlayer) {
             });
 
             describe('always', function () {
-                it('check if speed_change_video is logged', function () {
-                    VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'speed_change_video',
-                        {
-                            current_time: state.videoPlayer.currentTime,
-                            old_speed: '1.50',
-                            new_speed: '0.75'
-                        }
-                    );
-                });
-
                 it('convert the current time to the new speed', function () {
                     state.isFlashMode.andReturn(true);
                     VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
@@ -1083,10 +947,7 @@ function (VideoPlayer) {
 
                 it('set video speed to the new speed', function () {
                     VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
-                    expect(state.setSpeed).toHaveBeenCalledWith('0.75', true);
-                    expect(state.saveState).toHaveBeenCalledWith(true, {
-                        speed: '0.75'
-                    });
+                    expect(state.setSpeed).toHaveBeenCalledWith('0.75');
                     expect(state.videoPlayer.setPlaybackRate)
                         .toHaveBeenCalledWith('0.75');
                 });

@@ -4,7 +4,7 @@ Class used for defining and running Bok Choy acceptance test suite
 from time import sleep
 
 from paver.easy import sh
-from pavelib.utils.test.suites import TestSuite
+from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test import bokchoy_utils
 from pavelib.utils.test import utils as test_utils
@@ -12,7 +12,7 @@ from pavelib.utils.test import utils as test_utils
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
+    colorize = lambda color, text: text  # pylint: disable=invalid-name
 
 __test__ = False  # do not collect
 
@@ -57,7 +57,7 @@ class BokChoyTestSuite(TestSuite):
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()
 
-        if not self.skip_clean:
+        if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
@@ -85,16 +85,13 @@ class BokChoyTestSuite(TestSuite):
 
     def prepare_bokchoy_run(self):
         """
-        Sets up and starts servers for bok-choy run. This includes any stubbed servers.
+        Sets up and starts servers for a Bok Choy run. If --fasttest is not
+        specified then static assets are collected
         """
         sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
 
         if not self.fasttest:
-            # Process assets and set up database for bok-choy tests
-            # Reset the database
-
-            # Collect static assets
-            sh("paver update_assets --settings=bok_choy")
+            self.generate_optimized_static_assets()
 
         # Clear any test data already in Mongo or MySQLand invalidate
         # the cache

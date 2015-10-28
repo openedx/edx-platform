@@ -1,7 +1,6 @@
 """
 Acceptance tests for Studio related to the acid xblock.
 """
-from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -10,7 +9,6 @@ from ...pages.xblock.acid import AcidView
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
-@skip('Jenkins builds are getting stuck on acid_block tests')
 class XBlockAcidBase(WebAppTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
@@ -117,7 +115,6 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
         self.user = course_fix.user
 
 
-@skip('Jenkins builds are getting stuck on acid_block tests')
 class XBlockAcidParentBase(XBlockAcidBase):
     """
     Base class for tests that verify that parent XBlock integration is working correctly
@@ -171,7 +168,6 @@ class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
         self.user = course_fix.user
 
 
-@skip('Jenkins builds are getting stuck on acid_block tests')
 class XBlockAcidChildTest(XBlockAcidParentBase):
     """
     Tests of an AcidBlock with children

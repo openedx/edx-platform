@@ -53,6 +53,7 @@ class CourseModeFactory(DjangoModelFactory):
     min_price = 0
     suggested_prices = ''
     currency = 'usd'
+    expiration_datetime = None
 
 
 class RegistrationFactory(DjangoModelFactory):

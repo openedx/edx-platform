@@ -33,31 +33,30 @@ class UserDetail(generics.RetrieveAPIView):
     """
     **Use Case**
 
-        Get information about the specified user and
-        access other resources the user has permissions for.
+        Get information about the specified user and access other resources
+        the user has permissions for.
 
-        Users are redirected to this endpoint after logging in.
+        Users are redirected to this endpoint after they sign in.
 
-        You can use the **course_enrollments** value in
-        the response to get a list of courses the user is enrolled in.
+        You can use the **course_enrollments** value in the response to get a
+        list of courses the user is enrolled in.
 
-    **Example request**:
+    **Example Request**
 
         GET /api/mobile/v0.5/users/{username}
 
-
     **Response Values**
 
-        * id: The ID of the user.
+        If the request is successful, the request returns an HTTP 200 "OK" response.
 
-        * username: The username of the currently logged in user.
+        The HTTP 200 response has the following values.
 
-        * email: The email address of the currently logged in user.
-
-        * name: The full name of the currently logged in user.
-
-        * course_enrollments: The URI to list the courses the currently logged
+        * course_enrollments: The URI to list the courses the currently signed
           in user is enrolled in.
+        * email: The email address of the currently signed in user.
+        * id: The ID of the user.
+        * name: The full name of the currently signed in user.
+        * username: The username of the currently signed in user.
     """
     queryset = (
         User.objects.all()
@@ -70,27 +69,36 @@ class UserDetail(generics.RetrieveAPIView):
 @mobile_view(is_user=True)
 class UserCourseStatus(views.APIView):
     """
-    **Use Case**
+    **Use Cases**
 
-        Get or update the ID of the module that the specified user last visited in the specified course.
+        Get or update the ID of the module that the specified user last
+        visited in the specified course.
 
-    **Example request**:
+    **Example Requests**
 
         GET /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
 
         PATCH /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
 
-            body:
-                last_visited_module_id={module_id}
-                modification_date={date}
+        **PATCH Parameters**
 
-            The modification_date is optional. If it is present, the update will only take effect
-            if the modification_date is later than the modification_date saved on the server.
+          The body of the PATCH request can include the following parameters.
+
+          * last_visited_module_id={module_id}
+          * modification_date={date}
+
+            The modification_date parameter is optional. If it is present, the
+            update will only take effect if the modification_date in the
+            request is later than the modification_date saved on the server.
 
     **Response Values**
 
-        * last_visited_module_id: The ID of the last module visited by the user in the course.
+        If the request is successful, the request returns an HTTP 200 "OK" response.
 
+        The HTTP 200 response has the following values.
+
+        * last_visited_module_id: The ID of the last module that the user
+          visited in the course.
         * last_visited_module_path: The ID of the modules in the path from the
           last visited module to the course module.
     """
@@ -106,7 +114,9 @@ class UserCourseStatus(views.APIView):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
 
-        course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course.id)
+        course_module = get_module_for_descriptor(
+            request.user, request, course, field_data_cache, course.id, course=course
+        )
 
         path = [course_module]
         chapter = get_current_child(course_module, min_depth=2)
@@ -140,23 +150,23 @@ class UserCourseStatus(views.APIView):
             module_descriptor = modulestore().get_item(module_key)
         except ItemNotFoundError:
             return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
-        module = get_module_for_descriptor(request.user, request, module_descriptor, field_data_cache, course.id)
+        module = get_module_for_descriptor(
+            request.user, request, module_descriptor, field_data_cache, course.id, course=course
+        )
 
         if modification_date:
             key = KeyValueStore.Key(
                 scope=Scope.user_state,
                 user_id=request.user.id,
                 block_scope_id=course.location,
-                field_name=None
+                field_name='position'
             )
-            student_module = field_data_cache.find(key)
-            if student_module:
-                original_store_date = student_module.modified
-                if modification_date < original_store_date:
-                    # old modification date so skip update
-                    return self._get_course_info(request, course)
+            original_store_date = field_data_cache.last_modified(key)
+            if original_store_date is not None and modification_date < original_store_date:
+                # old modification date so skip update
+                return self._get_course_info(request, course)
 
-        save_positions_recursively_up(request.user, request, field_data_cache, module)
+        save_positions_recursively_up(request.user, request, field_data_cache, module, course=course)
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)
@@ -197,37 +207,45 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     """
     **Use Case**
 
-        Get information about the courses the currently logged in user is
+        Get information about the courses that the currently signed in user is
         enrolled in.
 
-    **Example request**:
+    **Example Request**
 
         GET /api/mobile/v0.5/users/{username}/course_enrollments/
 
     **Response Values**
 
-        * created: The date the course was created.
-        * mode: The type of certificate registration for this course:  honor or
-          certified.
-        * is_active: Whether the course is currently active; true or false.
-        * certificate: Information about the user's earned certificate in the course.
-          * url: URL to the downloadable version of the certificate, if exists.
-        * course: A collection of data about the course:
+        If the request for information about the user is successful, the
+        request returns an HTTP 200 "OK" response.
 
-          * course_about: The URI to get the data for the course About page.
+        The HTTP 200 response has the following values.
+
+        * certificate: Information about the user's earned certificate in the
+          course.
+        * course: A collection of the following data about the course.
+
+          * course_handouts: The URI to get data for course handouts.
+          * course_image: The path to the course image.
           * course_updates: The URI to get data for course updates.
+          * end: The end date of the course.
+          * id: The unique ID of the course.
+          * latest_updates: Reserved for future use.
+          * name: The name of the course.
           * number: The course number.
           * org: The organization that created the course.
-          * video_outline: The URI to get the list of all vides the user can
-            access in the course.
-          * id: The unique ID of the course.
-          * subscription_id: A unique "clean" (alphanumeric with '_') ID of the course.
-          * latest_updates:  Reserved for future use.
-          * end: The end date of the course.
-          * name: The name of the course.
-          * course_handouts: The URI to get data for course handouts.
-          * start: The data and time the course starts.
-          * course_image: The path to the course image.
+          * start: The date and time when the course starts.
+          * subscription_id: A unique "clean" (alphanumeric with '_') ID of
+            the course.
+          * video_outline: The URI to get the list of all videos that the user
+            can access in the course.
+
+        * created: The date the course was created.
+        * is_active: Whether the course is currently active. Possible values
+          are true or false.
+        * mode: The type of certificate registration for this course (honor or
+          certified).
+        * url: URL to the downloadable version of the certificate, if exists.
     """
     queryset = CourseEnrollment.objects.all()
     serializer_class = CourseEnrollmentSerializer
@@ -240,7 +258,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         ).order_by('created').reverse()
         return [
             enrollment for enrollment in enrollments
-            if enrollment.course and is_mobile_available_for_user(self.request.user, enrollment.course)
+            if enrollment.course_overview and
+            is_mobile_available_for_user(self.request.user, enrollment.course_overview)
         ]
 
 

@@ -91,7 +91,7 @@ class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, TestCase
     """
     def create_report_store(self):
         """ Create and return a LocalFSReportStore. """
-        return LocalFSReportStore.from_config()
+        return LocalFSReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
 @mock.patch('instructor_task.models.S3Connection', new=MockS3Connection)
@@ -104,4 +104,4 @@ class S3ReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, TestCase):
     """
     def create_report_store(self):
         """ Create and return a S3ReportStore. """
-        return S3ReportStore.from_config()
+        return S3ReportStore.from_config(config_name='GRADES_DOWNLOAD')

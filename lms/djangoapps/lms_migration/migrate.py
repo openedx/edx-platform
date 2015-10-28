@@ -77,7 +77,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
         else:
             html += 'Permission denied'
             html += "</body></html>"
-            log.debug('request denied, ALLOWED_IPS=%s' % ALLOWED_IPS)
+            log.debug('request denied, ALLOWED_IPS=%s', ALLOWED_IPS)
             return HttpResponse(html, status=403)
 
     #----------------------------------------
@@ -90,8 +90,8 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
             # reloading based on commit_id is needed when running mutiple worker threads,
             # so that a given thread doesn't reload the same commit multiple times
             current_commit_id = get_commit_id(def_ms.courses[reload_dir])
-            log.debug('commit_id="%s"' % commit_id)
-            log.debug('current_commit_id="%s"' % current_commit_id)
+            log.debug('commit_id="%s"', commit_id)
+            log.debug('current_commit_id="%s"', current_commit_id)
 
             if (commit_id is not None) and (commit_id == current_commit_id):
                 html += "<h2>Already at commit id %s for %s</h2>" % (commit_id, reload_dir)
@@ -158,9 +158,9 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
 
     #----------------------------------------
 
-    log.debug('_MODULESTORES=%s' % ms)
-    log.debug('courses=%s' % courses)
-    log.debug('def_ms=%s' % unicode(def_ms))
+    log.debug('_MODULESTORES=%s', ms)
+    log.debug('courses=%s', courses)
+    log.debug('def_ms=%s', unicode(def_ms))
 
     html += "</body></html>"
     return HttpResponse(html)
@@ -189,7 +189,7 @@ def gitreload(request, reload_dir=None):
         else:
             html += 'Permission denied'
             html += "</body></html>"
-            log.debug('request denied from %s, ALLOWED_IPS=%s' % (ip, ALLOWED_IPS))
+            log.debug('request denied from %s, ALLOWED_IPS=%s', ip, ALLOWED_IPS)
             return HttpResponse(html)
 
     #----------------------------------------
@@ -197,14 +197,14 @@ def gitreload(request, reload_dir=None):
 
     if reload_dir is None and 'payload' in request.POST:
         payload = request.POST['payload']
-        log.debug("payload=%s" % payload)
+        log.debug("payload=%s", payload)
         gitargs = json.loads(payload)
-        log.debug("gitargs=%s" % gitargs)
+        log.debug("gitargs=%s", gitargs)
         reload_dir = gitargs['repository']['name']
-        log.debug("github reload_dir=%s" % reload_dir)
+        log.debug("github reload_dir=%s", reload_dir)
         gdir = settings.DATA_DIR / reload_dir
         if not os.path.exists(gdir):
-            log.debug("====> ERROR in gitreload - no such directory %s" % reload_dir)
+            log.debug("====> ERROR in gitreload - no such directory %s", reload_dir)
             return HttpResponse('Error')
         cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
         log.debug(os.popen(cmd).read())
@@ -213,7 +213,7 @@ def gitreload(request, reload_dir=None):
             if gh:
                 ghurl = '%s/%s' % (gh, reload_dir)
                 r = requests.get(ghurl)
-                log.debug("GITRELOAD_HOOK to %s: %s" % (ghurl, r.text))
+                log.debug("GITRELOAD_HOOK to %s: %s", ghurl, r.text)
 
     #----------------------------------------
     # reload course if specified

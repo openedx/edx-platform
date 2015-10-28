@@ -10,7 +10,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% for template_name in ["asset-library", "asset", "paging-header", "paging-footer"]:
+% for template_name in ["asset-library", "asset"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>

@@ -4,9 +4,12 @@ Tests for `field_overrides` module.
 import unittest
 from nose.plugins.attrib import attr
 
-from django.test import TestCase
 from django.test.utils import override_settings
 from xblock.field_data import DictFieldData
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+)
 
 from ..field_overrides import (
     disable_overrides,
@@ -22,13 +25,14 @@ TESTUSER = "testuser"
 @attr('shard_1')
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'courseware.tests.test_field_overrides.TestOverrideProvider',))
-class OverrideFieldDataTests(TestCase):
+class OverrideFieldDataTests(ModuleStoreTestCase):
     """
     Tests for `OverrideFieldData`.
     """
 
     def setUp(self):
         super(OverrideFieldDataTests, self).setUp()
+        self.course = CourseFactory.create(enable_ccx=True)
         OverrideFieldData.provider_classes = None
 
     def tearDown(self):
@@ -39,7 +43,7 @@ class OverrideFieldDataTests(TestCase):
         """
         Factory method.
         """
-        return OverrideFieldData.wrap(TESTUSER, DictFieldData({
+        return OverrideFieldData.wrap(TESTUSER, self.course, DictFieldData({
             'foo': 'bar',
             'bees': 'knees',
         }))
@@ -124,3 +128,7 @@ class TestOverrideProvider(FieldOverrideProvider):
         if name == 'oh':
             return 'man'
         return default
+
+    @classmethod
+    def enabled_for(cls, course):
+        return True

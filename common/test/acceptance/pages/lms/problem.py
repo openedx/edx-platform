@@ -42,6 +42,22 @@ class ProblemPage(PageObject):
         """
         return self.q(css="div.problem div.problem-hint").text[0]
 
+    @property
+    def mathjax_rendered_in_problem(self):
+        """
+        Check that MathJax have been rendered in problem hint
+        """
+        mathjax_container = self.q(css="div.problem p .MathJax .math")
+        return mathjax_container.visible and mathjax_container.present
+
+    @property
+    def mathjax_rendered_in_hint(self):
+        """
+        Check that MathJax have been rendered in problem hint
+        """
+        mathjax_container = self.q(css="div.problem div.problem-hint .MathJax .math")
+        return mathjax_container.visible and mathjax_container.present
+
     def fill_answer(self, text):
         """
         Fill in the answer to the problem.
@@ -66,7 +82,7 @@ class ProblemPage(PageObject):
         """
         Is there a "correct" status showing?
         """
-        return self.q(css="div.problem div.capa_inputtype.textline div.correct p.status").is_present()
+        return self.q(css="div.problem div.capa_inputtype.textline div.correct span.status").is_present()
 
     def click_clarification(self, index=0):
         """

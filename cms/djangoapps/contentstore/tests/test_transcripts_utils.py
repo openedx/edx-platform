@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.django import contentstore
 from xmodule.video_module import transcripts_utils
+from contentstore.tests.utils import mock_requests_get
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -267,6 +268,78 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
                 self.course.id, filename
             )
             self.assertTrue(contentstore().find(content_location))
+
+        self.clear_sub_content(good_youtube_sub)
+
+    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    def test_get_transcript_name_youtube_server_success(self, mock_get):
+        """
+        Get transcript name from transcript_list fetch from youtube server api
+        depends on language code, default language in YOUTUBE Text Api is "en"
+        """
+        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+        youtube_text_api['params']['v'] = 'dummy_video_id'
+        response_success = """
+        <transcript_list>
+            <track id="1" name="Custom" lang_code="en" />
+            <track id="0" name="Custom1" lang_code="en-GB"/>
+        </transcript_list>
+        """
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+
+        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
+        self.assertEqual(transcript_name, 'Custom')
+
+    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    def test_get_transcript_name_youtube_server_no_transcripts(self, mock_get):
+        """
+        When there are no transcripts of video transcript name will be None
+        """
+        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+        youtube_text_api['params']['v'] = 'dummy_video_id'
+        response_success = "<transcript_list></transcript_list>"
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+
+        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
+        self.assertIsNone(transcript_name)
+
+    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    def test_get_transcript_name_youtube_server_language_not_exist(self, mock_get):
+        """
+        When the language does not exist in transcript_list transcript name will be None
+        """
+        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+        youtube_text_api['params']['v'] = 'dummy_video_id'
+        youtube_text_api['params']['lang'] = 'abc'
+        response_success = """
+        <transcript_list>
+            <track id="1" name="Custom" lang_code="en" />
+            <track id="0" name="Custom1" lang_code="en-GB"/>
+        </transcript_list>
+        """
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+
+        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
+        self.assertIsNone(transcript_name)
+
+    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
+    def test_downloading_subs_using_transcript_name(self, mock_get):
+        """
+        Download transcript using transcript name in url
+        """
+        good_youtube_sub = 'good_id_2'
+        self.clear_sub_content(good_youtube_sub)
+
+        transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
+        mock_get.assert_any_call(
+            'http://video.google.com/timedtext',
+            params={'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}
+        )
+
+        # Check asset status after import of transcript.
+        filename = 'subs_{0}.srt.sjson'.format(good_youtube_sub)
+        content_location = StaticContent.compute_location(self.course.id, filename)
+        self.assertTrue(contentstore().find(content_location))
 
         self.clear_sub_content(good_youtube_sub)
 

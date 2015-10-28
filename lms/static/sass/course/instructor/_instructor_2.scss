@@ -120,19 +120,6 @@
       }
     }
   }
-
-  // UI: visual dividers
-  .divider-lv0 {
-    border-top: ($baseline/5) solid $gray-l4;
-  }
-
-  .divider-lv1 {
-    border-top: ($baseline/10) solid $gray-l4;
-  }
-
-  .divider-lv2 {
-    border-top: ($baseline/20) solid $gray-l4;
-  }
 }
 
 // instructor dashboard 2
@@ -1446,7 +1433,7 @@
 
 // view - data download
 // --------------------
-.instructor-dashboard-wrapper-2 section.idash-section#data_download {
+.instructor-dashboard-wrapper-2 section.idash-section#data_download{
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
@@ -1661,40 +1648,6 @@
   }
 }
 
-
-.profile-distribution-widget {
-  margin-bottom: ($baseline * 2);
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 250px;
-  }
-
-  .display-table {
-    .slickgrid {
-      height: 250px;
-    }
-  }
-}
-
-.grade-distributions-widget {
-  margin-bottom: $baseline * 2;
-
-  .last-updated {
-    line-height: 2.2em;
-    @include font-size(12);
-  }
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 200px;
-  }
-
-  .display-text {
-    line-height: 2em;
-  }
-}
-
 input[name="subject"] {
   width:600px;
 }
@@ -1715,7 +1668,6 @@ input[name="subject"] {
     }
   }
 }
-
 .ecommerce-wrapper{
   h2{
     height: 26px;
@@ -1754,9 +1706,27 @@ input[name="subject"] {
   input[name='list-order-sale-csv'] {
     @include margin-right(14px);
   }
+
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
+  }
+  .reports-download-container {
+    .data-display-table {
+      .slickgrid {
+        height: 400px;
+      }
+    }
+    .report-downloads-table {
+      .slickgrid {
+        height: 300px;
+        padding: ($baseline/4);
+      }
+      // Disable horizontal scroll bar when grid only has 1 column. Remove this CSS class when more columns added.
+      .slick-viewport {
+        overflow-x: hidden !important;
+      }
+    }
   }
   .error-msgs {
     background: #FFEEF5;
@@ -1822,7 +1792,7 @@ input[name="subject"] {
       th {
         text-align: left;
         border-bottom: 1px solid $border-color-1;
-        font-size: 16px;
+        font-size: 13px;
 
         &.c_code {
           width: 110px;
@@ -1913,7 +1883,8 @@ input[name="subject"] {
       width: 930px;
     }
   // coupon edit and add modals
-  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
+  #add-coupon-modal, #invalidate_registration_code_modal, #edit-coupon-modal,
+  #set-course-mode-price-modal, #registration_code_generation_modal{
     .inner-wrapper {
       background: $white;
     }
@@ -1923,12 +1894,12 @@ input[name="subject"] {
       font-size: 12px;
       color: #646464
     }
-    top:-95px !important;
+    top: 100px !important;
     width: 650px;
     @include margin-left(-325px);
     border-radius: 2px;
     input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
-    input[type="button"]#set_course_button {
+    input[type="button"]#set_course_button, input[type="button"]#lookup_regcode {
       @include button(simple, $blue);
       @extend .button-reset;
       display: block;
@@ -1976,6 +1947,25 @@ input[name="subject"] {
       }
       li:last-child{
         margin-bottom: 0px !important;
+      }
+    }
+    table.tb_registration_code_status{
+      margin-top: $baseline;
+      color: #555;
+      thead {
+        font-size: 14px;
+        tr th:last-child {
+          text-align: center;
+        }
+      }
+      tbody {
+        font-size: 14px;
+        tr td:last-child {
+          text-align: center;
+          a:first-child{
+            margin-right: 10px;
+          }
+        }
       }
     }
     form#generate_codes ol.list-input{
@@ -2052,7 +2042,7 @@ input[name="subject"] {
           height: 40px;
           border-radius: 3px;
         }
-    #coupon-content, #course-content, #registration-content {
+    #coupon-content, #course-content, #registration-content, #regcode-content {
       padding: $baseline;
       header {
         margin: 0;
@@ -2144,39 +2134,6 @@ input[name="subject"] {
 
 }
 
-.profile-distribution-widget {
-  margin-bottom: ($baseline * 2);
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 250px;
-  }
-
-  .display-table {
-    .slickgrid {
-      height: 250px;
-    }
-  }
-}
-
-.grade-distributions-widget {
-  margin-bottom: ($baseline * 2);
-
-  .last-updated {
-    line-height: 2.2em;
-    @include font-size(12);
-  }
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 200px;
-  }
-
-  .display-text {
-    line-height: 2em;
-  }
-}
-
 input[name="subject"] {
   width:600px;
 }
@@ -2190,7 +2147,7 @@ input[name="subject"] {
   }
 }
 
-.ecommerce-wrapper{
+.ecommerce-wrapper, .proctoring-wrapper{
   h2{
     height: 26px;
     line-height: 26px;
@@ -2221,7 +2178,13 @@ input[name="subject"] {
       @extend .button-reset;
       font-size: em(13);
       @include float(right);
+      line-height: 14px;
+      font-size: 0.7em;
     }
+  }
+  .content {
+    display: block;
+    width: 100%;
   }
   span.code_tip {
     display: block;
@@ -2258,6 +2221,190 @@ input[name="subject"] {
       font-size: em(13);
     }
   }
+}
+.special-allowance-container, .student-proctored-exam-container{
+  .allowance-table, .exam-attempts-table {
+    width: 100%;
+    tr:nth-child(even){
+        background-color: $gray-l6;
+        border-bottom: 1px solid #f3f3f3;
+      }
+    .allowance-headings, .exam-attempt-headings {
+      height: 40px;
+      border-bottom: 1px solid #BEBEBE;
+
+      th:nth-child(5){
+        text-align: center;
+        width: 120px;
+      }
+      th:first-child{
+        padding-left: $baseline;
+      }
+      th {
+        text-align: left;
+        border-bottom: 1px solid $border-color-1;
+        font-size: 16px;
+        &.attempt-allowed-time {
+            width: 140px;
+            word-wrap: break-word;
+        }
+        &.attempt-started-at {
+          width: 160px;
+        }
+        &.attempt-completed-at {
+          width: 160px;
+        }
+        &.attempt-status {
+          width: 100px;
+        }
+        &.exam-name {
+          width: 150px;
+        }
+        &.username {
+          width: 140px;
+        }
+        &.email {
+          width: 250px;
+          word-wrap: break-word;
+        }
+        &.allowance-name {
+          width: 140px;
+        }
+        &.allowance-value {
+          width: 150px;
+        }
+        &.c_action {
+          width: 60px;
+        }
+      }
+    }
+    // allowance-items style
+    .allowance-items {
+      td {
+        padding: ($baseline/2) 0;
+        position: relative;
+        line-height: normal;
+        font-size: 14px;
+      }
+      td:nth-child(5),td:first-child{
+        @include padding-left($baseline);
+      }
+      td:nth-child(2){
+        line-height: 22px;
+        @include padding-right(0px);
+        word-wrap: break-word;
+      }
+      td:nth-child(5){
+        @include padding-left(0);
+        text-align: center;
+      }
+      td{
+        a.remove_allowance{
+          @include margin-left(15px);
+        }
+      }
+    }
+  }
+  .top-header {
+    margin-top: -30px;
+    margin-bottom: 20px;
+    .search-attempts {
+      border: 1px solid #ccc;
+      display: inline-block;
+      border-radius: 5px;
+      float: left;
+      input {
+        border: none;
+        box-shadow: none;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 240px;
+      }
+      span:first-child {
+        margin-right: -5px;
+      }
+      span {
+        background-color: #ccc;
+        display: inline-block;
+        padding: 4px 12px;
+        cursor: pointer;
+      }
+    }
+  }
+  .pagination {
+      display: inline-block;
+      padding-left: 0;
+      float: right;
+      margin: 0;
+      border-radius: 4px;
+      > li {
+        display: inline; // Remove list-style and block-level defaults
+        > a,
+        > span {
+          padding: 6px 12px;
+          line-height: 1.41;
+          text-decoration: none;
+          color: #00095f;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          margin-left: -1px;
+        }
+        > a.active {
+          background-color: #ccc;
+        }
+        &:first-child {
+          > a,
+          > span {
+            margin-left: 0;
+            @include border-left-radius(4px);
+          }
+        }
+        &:last-child {
+          > a,
+          > span {
+            @include border-right-radius(4px);
+          }
+        }
+      }
+
+      > li > a,
+      > li > span {
+        &:hover,
+        &:focus {
+          z-index: 3;
+          color: darken(#003a7d, 15%);
+          background-color: lighten(#000, 93.5%);
+          border-color: #ddd;
+        }
+      }
+
+      > .active > a,
+      > .active > span {
+        &,
+        &:hover,
+        &:focus {
+          z-index: 2;
+          color: #fff;
+          background-color: darken(#428bca, 6.5%);
+          border-color: darken(#428bca, 6.5%);
+          cursor: default;
+        }
+      }
+
+      > .disabled {
+        > span,
+        > span:hover,
+        > span:focus,
+        > a,
+        > a:hover,
+        > a:focus {
+          color: lighten(#000, 46.7%);
+          background-color: #fff;
+          border-color: #ddd;
+          cursor: not-allowed;
+        }
+      }
+    }
 }
 
 .rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,

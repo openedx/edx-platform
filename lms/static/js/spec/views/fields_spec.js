@@ -1,6 +1,5 @@
-define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/views/fields',
-        'js/spec/views/fields_helpers',
+define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers', 'js/views/fields', 'js/spec/views/fields_helpers',
         'string_utils'],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers) {
         'use strict';
@@ -19,16 +18,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 FieldViews.DropdownFieldView,
                 FieldViews.LinkFieldView,
                 FieldViews.TextareaFieldView
-
             ];
 
             beforeEach(function () {
-                TemplateHelpers.installTemplate('templates/fields/field_readonly');
-                TemplateHelpers.installTemplate('templates/fields/field_dropdown');
-                TemplateHelpers.installTemplate('templates/fields/field_link');
-                TemplateHelpers.installTemplate('templates/fields/field_text');
-                TemplateHelpers.installTemplate('templates/fields/field_textarea');
-
                 timerCallback = jasmine.createSpy('timerCallback');
                 jasmine.Clock.useMock();
             });
@@ -72,7 +64,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                     title: 'Preferred Language',
                     valueAttribute: 'language',
-                    helpMessage: 'Your preferred language.'
+                    helpMessage: 'Your preferred language.',
+                    persistChanges: true
                 });
 
                 var view = new fieldViewClass(fieldData);
@@ -110,7 +103,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.TextFieldView, {
                     title: 'Full Name',
                     valueAttribute: 'name',
-                    helpMessage: 'How are you?'
+                    helpMessage: 'How are you?',
+                    persistChanges: true
                 });
                 var view = new FieldViews.TextFieldView(fieldData).render();
 
@@ -134,7 +128,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'Full Name',
                     valueAttribute: 'name',
                     helpMessage: 'edX full name',
-                    editable: 'never'
+                    editable: 'never',
+                    persistChanges: true
 
                 });
                 var view = new FieldViews.DropdownFieldView(fieldData).render();
@@ -154,7 +149,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.DropdownFieldView, {
                     title: 'Full Name',
                     valueAttribute: 'name',
-                    helpMessage: 'edX full name'
+                    helpMessage: 'edX full name',
+                    persistChanges: true
                 });
                 var view = new FieldViews.DropdownFieldView(fieldData).render();
 
@@ -178,7 +174,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'Full Name',
                     valueAttribute: 'name',
                     helpMessage: 'edX full name',
-                    editable: 'toggle'
+                    editable: 'toggle',
+                    persistChanges: true
                 });
                 var view = new FieldViews.DropdownFieldView(fieldData).render();
 
@@ -205,7 +202,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         valueAttribute: 'drop-down',
                         helpMessage: 'edX drop down',
                         editable: editable,
-                        required:true
+                        required:true,
+                        persistChanges: true
                     });
                     var view = new FieldViews.DropdownFieldView(fieldData).render();
 
@@ -230,7 +228,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     helpMessage: 'Wicked is good',
                     placeholderValue: "Tell other learners a little about yourself: where you live, " +
                         "what your interests are, why you’re taking courses, or what you hope to learn.",
-                    editable: 'never'
+                    editable: 'never',
+                    persistChanges: true,
+                    messagePosition: 'header'
                 });
 
                 // set bio to empty to see the placeholder.
@@ -259,8 +259,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     helpMessage: 'Wicked is good',
                     placeholderValue: "Tell other learners a little about yourself: where you live, " +
                         "what your interests are, why you’re taking courses, or what you hope to learn.",
-                    editable: 'toggle'
-
+                    editable: 'toggle',
+                    persistChanges: true,
+                    messagePosition: 'header'
                 });
                 fieldData.model.set({'bio': ''});
 
@@ -299,6 +300,31 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage, false);
                 expect(view.$('.u-field-value > a .u-field-link-title-' + view.options.valueAttribute).text().trim()).toBe(fieldData.linkTitle);
+            });
+
+            it("correctly renders LinkFieldView", function() {
+                var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.LinkFieldView, {
+                    title: 'Title',
+                    linkTitle: 'Link title',
+                    helpMessage: 'Click the link.',
+                    valueAttribute: 'password-reset'
+                });
+                var view = new FieldViews.LinkFieldView(fieldData).render();
+
+                FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage, false);
+                expect(view.$('.u-field-value > a .u-field-link-title-' + view.options.valueAttribute).text().trim()).toBe(fieldData.linkTitle);
+            });
+
+            it("can't persist changes if persistChanges is off", function() {
+                requests = AjaxHelpers.requests(this);
+                var fieldClasses = [
+                    FieldViews.TextFieldView,
+                    FieldViews.DropdownFieldView,
+                    FieldViews.TextareaFieldView
+                ];
+                for (var i = 0; i < fieldClasses.length; i++) {
+                    FieldViewsSpecHelpers.verifyPersistence(fieldClasses[i], requests);
+                }
             });
         });
     });

@@ -6,15 +6,15 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from student.models import UserProfile
 
+from microsite_configuration import microsite
+from microsite_configuration.templatetags.microsite import platform_name
+from ccx.overrides import get_current_ccx
+
 # App that handles subdomain specific branding
 import branding
 # app that handles site status messages
 from status.status import get_site_status_msg
 %>
-
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration.templatetags.microsite import platform_name %>
-<%! from ccx.overrides import get_current_ccx %>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
@@ -22,7 +22,7 @@ from status.status import get_site_status_msg
 <%block>
 <%
 try:
-    course_id = course.id.to_deprecated_string()
+    course_id = course.id
 except:
     # can't figure out a better way to get at a possibly-defined course var
     course_id = None
@@ -39,7 +39,7 @@ site_status_msg = get_site_status_msg(course_id)
 </%block>
 
   <header id="global-navigation" class="global ${"slim" if course else ""}" >
-    <nav aria-label="${_('Global')}">
+    <nav class="nav-wrapper" aria-label="${_('Global')}">
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
@@ -49,12 +49,12 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course:
-    <h2><span class="provider">${course.display_org_with_default | h}:</span>
+    <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span>
       ${course.display_number_with_default | h}
       <%
         display_name = course.display_name_with_default
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-          ccx = get_current_ccx()
+          ccx = get_current_ccx(course.id)
           if ccx:
             display_name = ccx.display_name
       %>
@@ -80,7 +80,6 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
-          <i class="icon fa fa-home" aria-hidden="true"></i>
           <span class="sr">${_("Dashboard for:")}</span>
           <div>
           ${user.username}
@@ -91,8 +90,9 @@ site_status_msg = get_site_status_msg(course_id)
         <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
-            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("My Profile")}</a></li>
+            <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
+            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
+            <li><a href="${reverse('account_settings')}">${_("Account")}</a></li>
           </%block>
           <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
         </ul>
@@ -124,6 +124,23 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
         % endif
       </%block>
+      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+          <li class="nav-global-05">
+            <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
+          </li>
+          %endif
+          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+          <li class="nav-global-04">
+            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+          </li>
+          % else:
+          <li class="nav-global-04">
+            <a class="cta cta-register" href="/register${login_query()}">${_("Register")}</a>
+          </li>
+          % endif
+
+      % endif
     </ol>
 
     <ol class="right nav-courseware">

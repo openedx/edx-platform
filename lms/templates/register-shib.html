@@ -1,16 +1,15 @@
-<%! from django.utils.translation import ugettext as _ %>
-
 <%inherit file="main.html" />
-
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
-
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils import html %>
-<%! from django_countries import countries %>
-<%! from student.models import UserProfile %>
-<%! from datetime import date %>
-<%! import calendar %>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.utils import html
+from django_countries import countries
+from student.models import UserProfile
+from datetime import date
+import calendar
+%>
 
 <%block name="pagetitle">${_("Preferences for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</%block>
 

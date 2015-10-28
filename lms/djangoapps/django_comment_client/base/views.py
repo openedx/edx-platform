@@ -18,24 +18,30 @@ from courseware.access import has_access
 from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
+from django_comment_common.utils import ThreadContext
 from django_comment_client.utils import (
     add_courseware_context,
     get_annotated_content_info,
     get_ability,
+    is_comment_too_deep,
     JsonError,
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_categories_ids,
-    get_discussion_id_map,
+    discussion_category_id_access,
+    get_cached_discussion_id_map,
 )
-from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from eventtracking import tracker
 import lms.lib.comment_client as cc
 
 log = logging.getLogger(__name__)
 
 TRACKING_MAX_FORUM_BODY = 2000
+
+THREAD_CREATED_EVENT_NAME = "edx.forum.thread.created"
+RESPONSE_CREATED_EVENT_NAME = 'edx.forum.response.created'
+COMMENT_CREATED_EVENT_NAME = 'edx.forum.comment.created'
 
 
 def permitted(fn):
@@ -46,6 +52,8 @@ def permitted(fn):
                 content = cc.Thread.find(kwargs["thread_id"]).to_dict()
             elif "comment_id" in kwargs:
                 content = cc.Comment.find(kwargs["comment_id"]).to_dict()
+            elif "commentable_id" in kwargs:
+                content = cc.Commentable.find(kwargs["commentable_id"]).to_dict()
             else:
                 content = None
             return content
@@ -73,10 +81,11 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     """
     user = request.user
     data['id'] = obj.id
-    if id_map is None:
-        id_map = get_discussion_id_map(course, user)
-
     commentable_id = data['commentable_id']
+
+    if id_map is None:
+        id_map = get_cached_discussion_id_map(course, [commentable_id], user)
+
     if commentable_id in id_map:
         data['category_name'] = id_map[commentable_id]["title"]
         data['category_id'] = commentable_id
@@ -95,6 +104,49 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     ]
 
     tracker.emit(event_name, data)
+
+
+def get_thread_created_event_data(thread, followed):
+    """
+    Get the event data payload for thread creation (excluding fields populated
+    by track_forum_event)
+    """
+    return {
+        'commentable_id': thread.commentable_id,
+        'group_id': thread.get("group_id"),
+        'thread_type': thread.thread_type,
+        'title': thread.title,
+        'anonymous': thread.anonymous,
+        'anonymous_to_peers': thread.anonymous_to_peers,
+        'options': {'followed': followed},
+        # There is a stated desire for an 'origin' property that will state
+        # whether this thread was created via courseware or the forum.
+        # However, the view does not contain that data, and including it will
+        # likely require changes elsewhere.
+    }
+
+
+def get_comment_created_event_name(comment):
+    """Get the appropriate event name for creating a response/comment"""
+    return COMMENT_CREATED_EVENT_NAME if comment.get("parent_id") else RESPONSE_CREATED_EVENT_NAME
+
+
+def get_comment_created_event_data(comment, commentable_id, followed):
+    """
+    Get the event data payload for comment creation (excluding fields populated
+    by track_forum_event)
+    """
+    event_data = {
+        'discussion': {'id': comment.thread_id},
+        'commentable_id': commentable_id,
+        'options': {'followed': followed},
+    }
+
+    parent_id = comment.get("parent_id")
+    if parent_id:
+        event_data['response'] = {'id': parent_id}
+
+    return event_data
 
 
 @require_POST
@@ -125,16 +177,24 @@ def create_thread(request, course_id, commentable_id):
     if 'body' not in post or not post['body'].strip():
         return JsonError(_("Body can't be empty"))
 
-    thread = cc.Thread(
-        anonymous=anonymous,
-        anonymous_to_peers=anonymous_to_peers,
-        commentable_id=commentable_id,
-        course_id=course_key.to_deprecated_string(),
-        user_id=request.user.id,
-        thread_type=post["thread_type"],
-        body=post["body"],
-        title=post["title"]
-    )
+    params = {
+        'anonymous': anonymous,
+        'anonymous_to_peers': anonymous_to_peers,
+        'commentable_id': commentable_id,
+        'course_id': course_key.to_deprecated_string(),
+        'user_id': request.user.id,
+        'thread_type': post["thread_type"],
+        'body': post["body"],
+        'title': post["title"],
+    }
+
+    # Check for whether this commentable belongs to a team, and add the right context
+    if get_team(commentable_id) is not None:
+        params['context'] = ThreadContext.STANDALONE
+    else:
+        params['context'] = ThreadContext.COURSE
+
+    thread = cc.Thread(**params)
 
     # Cohort the thread if required
     try:
@@ -156,29 +216,12 @@ def create_thread(request, course_id, commentable_id):
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
 
-    event_data = {
-        'title': thread.title,
-        'commentable_id': commentable_id,
-        'options': {'followed': follow},
-        'anonymous': anonymous,
-        'thread_type': thread.thread_type,
-        'group_id': group_id,
-        'anonymous_to_peers': anonymous_to_peers,
-        # There is a stated desire for an 'origin' property that will state
-        # whether this thread was created via courseware or the forum.
-        # However, the view does not contain that data, and including it will
-        # likely require changes elsewhere.
-    }
+    event_data = get_thread_created_event_data(thread, follow)
     data = thread.to_dict()
 
-    # Calls to id map are expensive, but we need this more than once.
-    # Prefetch it.
-    id_map = get_discussion_id_map(course, request.user)
+    add_courseware_context([data], course, request.user)
 
-    add_courseware_context([data], course, request.user, id_map=id_map)
-
-    track_forum_event(request, 'edx.forum.thread.created',
-                      course, thread, event_data, id_map=id_map)
+    track_forum_event(request, THREAD_CREATED_EVENT_NAME, course, thread, event_data)
 
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
@@ -200,6 +243,8 @@ def update_thread(request, course_id, thread_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
+    # Get thread context first in order to be safe from reseting the values of thread object later
+    thread_context = getattr(thread, "context", "course")
     thread.body = request.POST["body"]
     thread.title = request.POST["title"]
     # The following checks should avoid issues we've seen during deploys, where end users are hitting an updated server
@@ -207,12 +252,12 @@ def update_thread(request, course_id, thread_id):
     if "thread_type" in request.POST:
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
+        commentable_id = request.POST["commentable_id"]
         course = get_course_with_access(request.user, 'load', course_key)
-        commentable_ids = get_discussion_categories_ids(course, request.user)
-        if request.POST.get("commentable_id") in commentable_ids:
-            thread.commentable_id = request.POST["commentable_id"]
-        else:
+        if thread_context == "course" and not discussion_category_id_access(course, request.user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
+        else:
+            thread.commentable_id = commentable_id
 
     thread.save()
     if request.is_ajax():
@@ -260,16 +305,8 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
 
-    event_data = {'discussion': {'id': comment.thread_id}, 'options': {'followed': followed}}
-
-    if parent_id:
-        event_data['response'] = {'id': comment.parent_id}
-        event_name = 'edx.forum.comment.created'
-    else:
-        event_name = 'edx.forum.response.created'
-
-    event_data['commentable_id'] = comment.thread.commentable_id
-
+    event_name = get_comment_created_event_name(comment)
+    event_data = get_comment_created_event_data(comment, comment.thread.commentable_id, followed)
     track_forum_event(request, event_name, course, comment, event_data)
 
     if request.is_ajax():
@@ -286,9 +323,8 @@ def create_comment(request, course_id, thread_id):
     given a course_id and thread_id, test for comment depth. if not too deep,
     call _create_comment to create the actual comment.
     """
-    if cc_settings.MAX_COMMENT_DEPTH is not None:
-        if cc_settings.MAX_COMMENT_DEPTH < 0:
-            return JsonError(_("Comment level too deep"))
+    if is_comment_too_deep(parent=None):
+        return JsonError(_("Comment level too deep"))
     return _create_comment(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), thread_id=thread_id)
 
 
@@ -370,9 +406,8 @@ def create_sub_comment(request, course_id, comment_id):
     given a course_id and comment_id, create a response to a comment
     after checking the max depth allowed, if allowed
     """
-    if cc_settings.MAX_COMMENT_DEPTH is not None:
-        if cc_settings.MAX_COMMENT_DEPTH <= cc.Comment.find(comment_id).depth:
-            return JsonError(_("Comment level too deep"))
+    if is_comment_too_deep(parent=cc.Comment(comment_id)):
+        return JsonError(_("Comment level too deep"))
     return _create_comment(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), parent_id=comment_id)
 
 
@@ -463,7 +498,10 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
-    remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
+    remove_all = bool(
+        has_permission(request.user, 'openclose_thread', course_key) or
+        has_access(request.user, 'staff', course)
+    )
     thread.unFlagAbuse(user, thread, remove_all)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
@@ -495,7 +533,10 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
-    remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
+    remove_all = bool(
+        has_permission(request.user, 'openclose_thread', course_key) or
+        has_access(request.user, 'staff', course)
+    )
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, remove_all)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
@@ -576,16 +617,6 @@ def follow_commentable(request, course_id, commentable_id):
 @require_POST
 @login_required
 @permitted
-def follow_user(request, course_id, followed_user_id):
-    user = cc.User.from_django_user(request.user)
-    followed_user = cc.User.find(followed_user_id)
-    user.follow(followed_user)
-    return JsonResponse({})
-
-
-@require_POST
-@login_required
-@permitted
 def unfollow_thread(request, course_id, thread_id):
     """
     given a course id and thread id, stop following this thread
@@ -608,20 +639,6 @@ def unfollow_commentable(request, course_id, commentable_id):
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
     user.unfollow(commentable)
-    return JsonResponse({})
-
-
-@require_POST
-@login_required
-@permitted
-def unfollow_user(request, course_id, followed_user_id):
-    """
-    given a course id and user id, stop following this user
-    ajax only
-    """
-    user = cc.User.from_django_user(request.user)
-    followed_user = cc.User.find(followed_user_id)
-    user.unfollow(followed_user)
     return JsonResponse({})
 
 
@@ -693,7 +710,7 @@ def users(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        course = get_course_with_access(request.user, 'load_forum', course_key)
+        get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     except Http404:
         # course didn't exist, or requesting user does not have access to it.
         return JsonError(status=404)

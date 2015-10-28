@@ -1,50 +1,13 @@
 """Helpers for the student app. """
-import time
 from datetime import datetime
+import urllib
+
 from pytz import UTC
-from django.utils.http import cookie_date
-from django.conf import settings
-from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
+from django.core.urlresolvers import reverse, NoReverseMatch
+
+import third_party_auth
+from verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from course_modes.models import CourseMode
-from student_account.helpers import auth_pipeline_urls  # pylint: disable=unused-import,import-error
-
-
-def set_logged_in_cookie(request, response):
-    """Set a cookie indicating that the user is logged in.
-
-    Some installations have an external marketing site configured
-    that displays a different UI when the user is logged in
-    (e.g. a link to the student dashboard instead of to the login page)
-
-    Arguments:
-        request (HttpRequest): The request to the view, used to calculate
-            the cookie's expiration date based on the session expiration date.
-        response (HttpResponse): The response on which the cookie will be set.
-
-    Returns:
-        HttpResponse
-
-    """
-    if request.session.get_expire_at_browser_close():
-        max_age = None
-        expires = None
-    else:
-        max_age = request.session.get_expiry_age()
-        expires_time = time.time() + max_age
-        expires = cookie_date(expires_time)
-
-    response.set_cookie(
-        settings.EDXMKTG_COOKIE_NAME, 'true', max_age=max_age,
-        expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-        path='/', secure=None, httponly=None,
-    )
-
-    return response
-
-
-def is_logged_in_cookie_set(request):
-    """Check whether the request has the logged in cookie set. """
-    return settings.EDXMKTG_COOKIE_NAME in request.COOKIES
 
 
 # Enumeration of per-course verification statuses
@@ -56,8 +19,9 @@ VERIFY_STATUS_MISSED_DEADLINE = "verify_missed_deadline"
 VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
 
 
-def check_verify_status_by_course(user, course_enrollment_pairs, all_course_modes):
-    """Determine the per-course verification statuses for a given user.
+def check_verify_status_by_course(user, course_enrollments):
+    """
+    Determine the per-course verification statuses for a given user.
 
     The possible statuses are:
         * VERIFY_STATUS_NEED_TO_VERIFY: The student has not yet submitted photos for verification.
@@ -79,10 +43,7 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
 
     Arguments:
         user (User): The currently logged-in user.
-        course_enrollment_pairs (list): The courses the user is enrolled in.
-            The list should contain tuples of `(Course, CourseEnrollment)`.
-        all_course_modes (list): List of all course modes for the student's enrolled courses,
-            including modes that have expired.
+        course_enrollments (list[CourseEnrollment]): The courses the user is enrolled in.
 
     Returns:
         dict: Mapping of course keys verification status dictionaries.
@@ -106,24 +67,21 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
         user, queryset=verifications
     )
 
+    # Retrieve verification deadlines for the enrolled courses
+    enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
+    course_deadlines = VerificationDeadline.deadlines_for_courses(enrolled_course_keys)
+
     recent_verification_datetime = None
 
-    for course, enrollment in course_enrollment_pairs:
+    for enrollment in course_enrollments:
 
-        # Get the verified mode (if any) for this course
-        # We pass in the course modes we have already loaded to avoid
-        # another database hit, as well as to ensure that expired
-        # course modes are included in the search.
-        verified_mode = CourseMode.verified_mode_for_course(
-            course.id,
-            modes=all_course_modes[course.id]
-        )
+        # If the user hasn't enrolled as verified, then the course
+        # won't display state related to its verification status.
+        if enrollment.mode in CourseMode.VERIFIED_MODES:
 
-        # If no verified mode has ever been offered, or the user hasn't enrolled
-        # as verified, then the course won't display state related to its
-        # verification status.
-        if verified_mode is not None and enrollment.mode in CourseMode.VERIFIED_MODES:
-            deadline = verified_mode.expiration_datetime
+            # Retrieve the verification deadline associated with the course.
+            # This could be None if the course doesn't have a deadline.
+            deadline = course_deadlines.get(enrollment.course_id)
 
             relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
 
@@ -189,7 +147,7 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
                 if deadline is not None and deadline > now:
                     days_until_deadline = (deadline - now).days
 
-                status_by_course[course.id] = {
+                status_by_course[enrollment.course_id] = {
                     'status': status,
                     'days_until_deadline': days_until_deadline
                 }
@@ -199,3 +157,71 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
             status_by_course[key]['verification_good_until'] = recent_verification_datetime.strftime("%m/%d/%Y")
 
     return status_by_course
+
+
+def auth_pipeline_urls(auth_entry, redirect_url=None):
+    """Retrieve URLs for each enabled third-party auth provider.
+
+    These URLs are used on the "sign up" and "sign in" buttons
+    on the login/registration forms to allow users to begin
+    authentication with a third-party provider.
+
+    Optionally, we can redirect the user to an arbitrary
+    url after auth completes successfully.  We use this
+    to redirect the user to a page that required login,
+    or to send users to the payment flow when enrolling
+    in a course.
+
+    Args:
+        auth_entry (string): Either `pipeline.AUTH_ENTRY_LOGIN` or `pipeline.AUTH_ENTRY_REGISTER`
+
+    Keyword Args:
+        redirect_url (unicode): If provided, send users to this URL
+            after they successfully authenticate.
+
+    Returns:
+        dict mapping provider IDs to URLs
+
+    """
+    if not third_party_auth.is_enabled():
+        return {}
+
+    return {
+        provider.provider_id: third_party_auth.pipeline.get_login_url(
+            provider.provider_id, auth_entry, redirect_url=redirect_url
+        ) for provider in third_party_auth.provider.Registry.enabled()
+    }
+
+
+# Query string parameters that can be passed to the "finish_auth" view to manage
+# things like auto-enrollment.
+POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in')
+
+
+def get_next_url_for_login_page(request):
+    """
+    Determine the URL to redirect to following login/registration/third_party_auth
+
+    The user is currently on a login or reigration page.
+    If 'course_id' is set, or other POST_AUTH_PARAMS, we will need to send the user to the
+    /account/finish_auth/ view following login, which will take care of auto-enrollment in
+    the specified course.
+
+    Otherwise, we go to the ?next= query param or to the dashboard if nothing else is
+    specified.
+    """
+    redirect_to = request.GET.get('next', None)
+    if not redirect_to:
+        try:
+            redirect_to = reverse('dashboard')
+        except NoReverseMatch:
+            redirect_to = reverse('home')
+    if any(param in request.GET for param in POST_AUTH_PARAMS):
+        # Before we redirect to next/dashboard, we need to handle auto-enrollment:
+        params = [(param, request.GET[param]) for param in POST_AUTH_PARAMS if param in request.GET]
+        params.append(('next', redirect_to))  # After auto-enrollment, user will be sent to payment page or to this URL
+        redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.urlencode(params))
+        # Note: if we are resuming a third party auth pipeline, then the next URL will already
+        # be saved in the session as part of the pipeline state. That URL will take priority
+        # over this one.
+    return redirect_to

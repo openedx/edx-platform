@@ -40,6 +40,10 @@ $sequence--border-color: #C8C8C8;
   position: relative;
   border-bottom: none;
 
+  @media print {
+    display: none;
+  }
+
   .left-shadow {
     @extend %ui-depth4;
     @include linear-gradient(left, $shadow, $transparent);
@@ -277,6 +281,10 @@ nav.sequence-bottom {
   height: 1px;
   margin: lh(2) auto;
   text-align: center;
+
+  @media print {
+    display: none;
+  }
 }
 
 #seq_content {

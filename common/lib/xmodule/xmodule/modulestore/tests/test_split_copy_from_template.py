@@ -107,7 +107,7 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
 
         # We do the following twice because different methods get used inside
         # split modulestore on first vs. subsequent publish
-        for __ in range(0, 2):
+        for __ in range(2):
             # Publish:
             self.store.publish(problem_key_in_course, self.user_id)
             # Test that the defaults values are there.

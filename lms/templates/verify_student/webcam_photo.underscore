@@ -21,11 +21,13 @@
 
 <div class="controls photo-controls">
   <div class="control control-retake is-hidden" id="webcam_reset_button">
-    <a class="action action-redo"><%- gettext( "Retake Photo" ) %></a>
+    <button class="action action-redo"><%- gettext( "Retake Photo" ) %></button>
   </div>
   <div class="control control-do is-hidden" id="webcam_capture_button">
-    <a class="action action-do">
+    <button class="action action-do">
       <i class="icon fa fa-camera" aria-hidden="true"></i> <span class="sr"><%- gettext( "Take Photo" ) %></span>
-    </a>
+    </button>
   </div>
+  <audio id="webcam_capture_sound"></audio>
+
 </div>

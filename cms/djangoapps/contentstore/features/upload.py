@@ -74,7 +74,7 @@ def check_not_there(_step, file_name):
     # the only file that was uploaded, our success criteria
     # will be that there are no files.
     # In the future we can refactor if necessary.
-    assert(world.is_css_not_present(ASSET_NAMES_CSS))
+    assert world.is_css_not_present(ASSET_NAMES_CSS)
 
 
 @step(u'I should see the file "([^"]*)" was uploaded$')

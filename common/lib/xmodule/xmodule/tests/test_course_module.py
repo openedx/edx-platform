@@ -19,6 +19,10 @@ COURSE = 'test_course'
 
 NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
 
+_TODAY = datetime.now(UTC())
+_LAST_WEEK = _TODAY - timedelta(days=7)
+_NEXT_WEEK = _TODAY + timedelta(days=7)
+
 
 class CourseFieldsTestCase(unittest.TestCase):
     def test_default_start_date(self):
@@ -237,25 +241,25 @@ class IsNewCourseTestCase(unittest.TestCase):
 
     def test_is_newish(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=False)
-        assert(descriptor.is_newish is False)
+        assert descriptor.is_newish is False
 
         descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=True)
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2013-01-15T12:00')
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2013-03-01T12:00')
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2012-10-15T12:00')
-        assert(descriptor.is_newish is False)
+        assert descriptor.is_newish is False
 
         descriptor = get_dummy_course(start='2012-12-31T12:00')
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
     def test_end_date_text(self):
         # No end date set, returns empty string.
@@ -303,9 +307,9 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         """ Make a sample topic dictionary. """
         next_num = self.count.next()
         topic_id = "topic_id_{}".format(next_num)
-        display_name = "Display Name {}".format(next_num)
+        name = "Name {}".format(next_num)
         description = "Description {}".format(next_num)
-        return {"display_name": display_name, "description": description, "id": topic_id}
+        return {"name": name, "description": description, "id": topic_id}
 
     def test_teams_enabled_new_course(self):
         # Make sure we can detect when no teams exist.
@@ -348,3 +352,49 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.add_team_configuration(max_team_size=4, topics=topics)
         self.assertTrue(self.course.teams_enabled)
         self.assertEqual(self.course.teams_topics, topics)
+
+
+class CourseDescriptorTestCase(unittest.TestCase):
+    """
+    Tests for a select few functions from CourseDescriptor.
+
+    I wrote these test functions in order to satisfy the coverage checker for
+    PR #8484, which modified some code within CourseDescriptor. However, this
+    class definitely isn't a comprehensive test case for CourseDescriptor, as
+    writing a such a test case was out of the scope of the PR.
+    """
+
+    def setUp(self):
+        """
+        Initialize dummy testing course.
+        """
+        super(CourseDescriptorTestCase, self).setUp()
+        self.course = get_dummy_course(start=_TODAY)
+
+    def test_clean_id(self):
+        """
+        Test CourseDescriptor.clean_id.
+        """
+        self.assertEqual(
+            self.course.clean_id(),
+            "course_ORSXG5C7N5ZGOL3UMVZXIX3DN52XE43FF52GK43UL5ZHK3Q="
+        )
+        self.assertEqual(
+            self.course.clean_id(padding_char='$'),
+            "course_ORSXG5C7N5ZGOL3UMVZXIX3DN52XE43FF52GK43UL5ZHK3Q$"
+        )
+
+    def test_has_started(self):
+        """
+        Test CourseDescriptor.has_started.
+        """
+        self.course.start = _LAST_WEEK
+        self.assertTrue(self.course.has_started())
+        self.course.start = _NEXT_WEEK
+        self.assertFalse(self.course.has_started())
+
+    def test_number(self):
+        """
+        Test CourseDescriptor.number.
+        """
+        self.assertEqual(self.course.number, COURSE)

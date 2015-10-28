@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 from .test_studio_video_module import CMSVideoBaseTest
 
 
-@attr('shard_2')
+@attr('shard_6')
 class VideoEditorTest(CMSVideoBaseTest):
     """
     CMS Video Editor Test Class
@@ -464,7 +464,7 @@ class VideoEditorTest(CMSVideoBaseTest):
 
     def test_table_of_contents(self):
         """
-        Scenario: User can see table of content at the first position
+        Scenario: User can see Abkhazian (ab) language option at the first position
         Given I have created a Video component
         And I edit the component
         And I open tab "Advanced"
@@ -482,13 +482,13 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.edit_component()
         self.open_advanced_tab()
         self.video.upload_translation('uk_transcripts.srt', 'uk')
-        self.video.upload_translation('chinese_transcripts.srt', 'table')
+        self.video.upload_translation('chinese_transcripts.srt', 'ab')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), [u'table', u'uk'])
-        self.assertEqual(self.video.caption_languages.keys()[0], 'table')
+        self.assertEqual(self.video.caption_languages.keys(), [u'ab', u'uk'])
+        self.assertEqual(self.video.caption_languages.keys()[0], 'ab')
 
     def test_upload_transcript_with_BOM(self):
         """

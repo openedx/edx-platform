@@ -1,4 +1,4 @@
-define(["jquery", "js/common_helpers/ajax_helpers", "js/common_helpers/template_helpers",
+define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/template_helpers",
         "js/spec_helpers/view_helpers", "js/views/utils/view_utils", "js/views/unit_outline", "js/models/xblock_info"],
     function ($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils, UnitOutlineView, XBlockInfo) {
 

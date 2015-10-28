@@ -1,5 +1,6 @@
 import json
 import re
+from teams.tests.factories import CourseTeamFactory
 
 
 class GroupIdAssertionMixin(object):
@@ -144,4 +145,10 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
     def test_non_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
         self.call_view(mock_request, "non_cohorted_topic", self.moderator, invalid_id)
+        self._assert_comments_service_called_without_group_id(mock_request)
+
+    def test_team_discussion_id_not_cohorted(self, mock_request):
+        team = CourseTeamFactory(course_id=self.course.id)
+        team.add_user(self.student)  # pylint: disable=no-member
+        self.call_view(mock_request, team.discussion_topic_id, self.student, None)
         self._assert_comments_service_called_without_group_id(mock_request)

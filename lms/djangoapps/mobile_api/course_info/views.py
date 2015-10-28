@@ -5,7 +5,7 @@ from django.http import Http404
 from rest_framework import generics
 from rest_framework.response import Response
 
-from courseware.courses import get_course_about_section, get_course_info_section_module
+from courseware.courses import get_course_info_section_module
 from static_replace import make_static_urls_absolute, replace_static_urls
 from openedx.core.lib.xblock_utils import get_course_update_items
 
@@ -19,21 +19,20 @@ class CourseUpdatesList(generics.ListAPIView):
 
         Get the content for course updates.
 
-    **Example request**:
+    **Example Request**
 
         GET /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/updates
 
     **Response Values**
 
-        A array of course updates. Each course update contains:
-
-            * date: The date of the course update.
+        If the request is successful, the request returns an HTTP 200 "OK"
+        response along with an array of course updates. Each course update
+        contains the following values.
 
             * content: The content, as an HTML string, of the course update.
-
-            * status: Whether the update is visible or not.
-
+            * date: The date of the course update.
             * id: The unique identifier of the update.
+            * status: Whether the update is visible or not.
     """
 
     @mobile_course_access()
@@ -64,11 +63,14 @@ class CourseHandoutsList(generics.ListAPIView):
 
         Get the HTML for course handouts.
 
-    **Example request**:
+    **Example Request**
 
         GET /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/handouts
 
     **Response Values**
+
+        If the request is successful, the request returns an HTTP 200 "OK"
+        response along with the following value.
 
         * handouts_html: The HTML for course handouts.
     """
@@ -87,33 +89,3 @@ class CourseHandoutsList(generics.ListAPIView):
         else:
             # course_handouts_module could be None if there are no handouts
             raise Http404(u"No handouts for {}".format(unicode(course.id)))
-
-
-@mobile_view()
-class CourseAboutDetail(generics.RetrieveAPIView):
-    """
-    **Use Case**
-
-        Get the HTML for the course about page.
-
-    **Example request**:
-
-        GET /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/about
-
-    **Response Values**
-
-        * overview: The HTML for the course About page.
-    """
-
-    @mobile_course_access(verify_enrolled=False)
-    def get(self, request, course, *args, **kwargs):
-        # There are other fields, but they don't seem to be in use.
-        # see courses.py:get_course_about_section.
-        #
-        # This can also return None, so check for that before calling strip()
-        about_section_html = get_course_about_section(course, "overview")
-        about_section_html = make_static_urls_absolute(self.request, about_section_html)
-
-        return Response(
-            {"overview": about_section_html.strip() if about_section_html else ""}
-        )

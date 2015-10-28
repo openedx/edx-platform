@@ -1,21 +1,20 @@
 #lean_overlay {
     background: transparent;
-    @include background-image(radial-gradient(circle at 50% 30%, rgba(0,0,0, 0.3), rgba(0,0,0, 0.8)));
+    @include background-image(radial-gradient(circle at 50% 30%, $shadow-d1, $shadow-d2));
     display: none;
     height:100%;
     left: 0;
     position: fixed;
     top: 0;
     width:100%;
-    z-index:100;
+    z-index: 100;
 }
 
 .modal {
   @extend %ui-depth1;
-  background: $shadow-d2;
-  border: 1px solid rgba(0, 0, 0, 0.9);
-  border-radius: 0;
-  box-shadow: 0 15px 80px 15px rgba(0,0,0, 0.5);
+  background: $gray-d2;
+  border-radius: 3px;
+  box-shadow: 0 0px 5px 0 $shadow-d1;
   color: $white;
   display: none;
   left: 50%;

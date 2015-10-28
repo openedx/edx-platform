@@ -6,9 +6,8 @@ import json
 import os
 import time
 import requests
-from nose.tools import assert_less, assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true, assert_false
 from common import i_am_registered_for_the_course, visit_scenario_item
-from django.utils.translation import ugettext as _
 from django.conf import settings
 from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.content import StaticContent
@@ -432,7 +431,7 @@ def error_message_is_shown(_step):
 @step('error message has correct text$')
 def error_message_has_correct_text(_step):
     selector = '.video .video-player h3'
-    text = _('ERROR: No playable video sources found!')
+    text = 'ERROR: No playable video sources found!'
     assert world.css_has_text(selector, text)
 
 
@@ -471,14 +470,14 @@ def check_text_in_the_captions(_step, text):
     world.wait_for_present('.video.is-captions-rendered')
     world.wait_for(lambda _: world.css_text('.subtitles'))
     actual_text = world.css_text('.subtitles')
-    assert (text in actual_text)
+    assert text in actual_text
 
 
 @step('I see text in the captions:')
 def check_captions(_step):
     world.wait_for_present('.video.is-captions-rendered')
     for index, video in enumerate(_step.hashes):
-        assert (video.get('text') in world.css_text('.subtitles', index=index))
+        assert video.get('text') in world.css_text('.subtitles', index=index)
 
 
 @step('I select language with code "([^"]*)"$')
@@ -594,7 +593,7 @@ def i_can_download_transcript(_step, format, text):
     request = RequestHandlerWithSessionId()
     assert request.get(url).is_success()
     assert request.check_header('content-type', formats[format])
-    assert (text.encode('utf-8') in request.content)
+    assert text.encode('utf-8') in request.content
 
 
 @step('I select the transcript format "([^"]*)"$')

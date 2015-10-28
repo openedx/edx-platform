@@ -1,0 +1,17 @@
+
+<div class="certificates-search">
+    <form class="certificates-form">
+        <label class="sr" for="certificate-query-input"><%- gettext("Search") %></label>
+        <input
+            id="certificate-query-input"
+            type="text"
+            name="query"
+            value=""
+            placeholder="<%- gettext("username or email") %>">
+        </input>
+        <input type="submit" value="<%- gettext("Search") %>" class="btn-disable-on-submit"></input>
+    </form>
+</div>
+
+<div class="certificates-results">
+</div>

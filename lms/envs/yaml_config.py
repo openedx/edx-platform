@@ -307,7 +307,6 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS += ('ccx',)
-    MIDDLEWARE_CLASSES += ('ccx.overrides.CcxMiddleware',)
     FIELD_OVERRIDE_PROVIDERS += (
         'ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
@@ -317,3 +316,8 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
+
+##################### LTI Provider #####################
+if FEATURES.get('ENABLE_LTI_PROVIDER'):
+    INSTALLED_APPS += ('lti_provider',)
+    AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )

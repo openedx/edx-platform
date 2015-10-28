@@ -6,12 +6,15 @@ Replace this with more appropriate tests for your application.
 """
 
 from datetime import datetime, timedelta
-import pytz
-import ddt
+import itertools
 
+import ddt
+from django.core.exceptions import ValidationError
+from django.test import TestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from django.test import TestCase
+import pytz
+
 from course_modes.models import CourseMode, Mode
 
 
@@ -26,7 +29,15 @@ class CourseModeModelTest(TestCase):
         self.course_key = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
 
-    def create_mode(self, mode_slug, mode_name, min_price=0, suggested_prices='', currency='usd'):
+    def create_mode(
+            self,
+            mode_slug,
+            mode_name,
+            min_price=0,
+            suggested_prices='',
+            currency='usd',
+            expiration_datetime=None,
+    ):
         """
         Create a new course mode
         """
@@ -37,7 +48,17 @@ class CourseModeModelTest(TestCase):
             min_price=min_price,
             suggested_prices=suggested_prices,
             currency=currency,
+            expiration_datetime=expiration_datetime,
         )
+
+    def test_save(self):
+        """ Verify currency is always lowercase. """
+        cm, __ = self.create_mode('honor', 'honor', 0, '', 'USD')
+        self.assertEqual(cm.currency, 'usd')
+
+        cm.currency = 'GHS'
+        cm.save()
+        self.assertEqual(cm.currency, 'ghs')
 
     def test_modes_for_course_empty(self):
         """
@@ -254,6 +275,29 @@ class CourseModeModelTest(TestCase):
             self.assertTrue(CourseMode.is_verified_slug(mode_slug))
         else:
             self.assertFalse(CourseMode.is_verified_slug(mode_slug))
+
+    @ddt.data(*itertools.product(
+        (
+            CourseMode.HONOR,
+            CourseMode.AUDIT,
+            CourseMode.VERIFIED,
+            CourseMode.PROFESSIONAL,
+            CourseMode.NO_ID_PROFESSIONAL_MODE
+        ),
+        (datetime.now(), None),
+    ))
+    @ddt.unpack
+    def test_invalid_mode_expiration(self, mode_slug, exp_dt):
+        is_error_expected = CourseMode.is_professional_slug(mode_slug) and exp_dt is not None
+        try:
+            self.create_mode(mode_slug=mode_slug, mode_name=mode_slug.title(), expiration_datetime=exp_dt)
+            self.assertFalse(is_error_expected, "Expected a ValidationError to be thrown.")
+        except ValidationError, exc:
+            self.assertTrue(is_error_expected, "Did not expect a ValidationError to be thrown.")
+            self.assertEqual(
+                exc.messages,
+                [u"Professional education modes are not allowed to have expiration_datetime set."],
+            )
 
     @ddt.data(
         ("verified", "verify_need_to_verify"),

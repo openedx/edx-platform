@@ -35,7 +35,8 @@ from xmodule.video_module.transcripts_utils import (
     copy_or_rename_transcript,
     manage_video_subtitles_save,
     GetTranscriptsFromYouTubeException,
-    TranscriptsRequestValidationException
+    TranscriptsRequestValidationException,
+    youtube_video_transcript_name,
 )
 
 from student.auth import has_course_author_access
@@ -271,6 +272,9 @@ def get_transcripts_presence(videos, item):
         # youtube server
         youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
         youtube_text_api['params']['v'] = youtube_id
+        youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
+        if youtube_transcript_name:
+            youtube_text_api['params']['name'] = youtube_transcript_name
         youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
         if youtube_response.status_code == 200 and youtube_response.text:
