@@ -5,13 +5,11 @@ from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt                                          
 from django.contrib.auth.models import User
 
-# from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.utils import simplejson
 
-# # from opaque_keys.edx.locations import SlashSeparatedCourseKey # deprecated; use:
-# from opaque_keys.edx.locator import CourseLocator
-# from courseware.courses import get_course_by_id
+from rest_framework.decorators import api_view
+
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views.course import create_new_course_in_store
 from xmodule.modulestore.django import modulestore
@@ -21,7 +19,7 @@ logger = logging.getLogger(__name__)
 APPSEMBLER_EMAIL = 'support@appsembler.com'
 
 
-@csrf_exempt
+@api_view
 def create_course_endpoint(request):
     if request.method != 'POST':
         logger.warning('Non-POST request coming to url: /appsemblerstudio')
@@ -77,7 +75,6 @@ EDXAPP_APPSEMBLER_FEATURES:
                                                     number, run, fields)
 
         except:
-            import pdb; pdb.set_trace()
             message = "Unable to create new course."
             logger.error(message)
 
