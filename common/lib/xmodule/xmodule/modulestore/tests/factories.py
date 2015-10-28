@@ -2,8 +2,10 @@
 Factories for use in tests of XBlocks.
 """
 
+import datetime
 import functools
 import pymongo.message
+import pytz
 import threading
 import traceback
 from collections import defaultdict
@@ -20,6 +22,7 @@ from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
+from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
@@ -132,6 +135,110 @@ class CourseFactory(XModuleFactory):
 
                 last_course.loc = new_course.location
                 return new_course
+
+
+class SampleCourseFactory(CourseFactory):
+    """
+    Factory for sample courses using block_info_tree definitions.
+    """
+    # pylint: disable=unused-argument
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Create and return a new sample course. See CourseFactory for customization kwargs.
+        """
+        block_info_tree = kwargs.pop('block_info_tree', default_block_info_tree)
+        store = kwargs.get('modulestore')
+        user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
+            course = super(SampleCourseFactory, cls)._create(target_class, **kwargs)
+
+            def create_sub_tree(parent_loc, block_info):
+                """Recursively creates a sub_tree on this parent_loc with this block."""
+                block = store.create_child(
+                    user_id,
+                    parent_loc,
+                    block_info.category,
+                    block_id=block_info.block_id,
+                    fields=block_info.fields,
+                )
+                for tree in block_info.sub_tree:
+                    create_sub_tree(block.location, tree)
+
+            for tree in block_info_tree:
+                create_sub_tree(course.location, tree)
+
+            store.publish(course.location, user_id)
+        return course
+
+
+class ToyCourseFactory(SampleCourseFactory):
+    """
+    Factory for sample course that is equivalent to the toy xml course.
+    """
+    org = 'edX'
+    course = 'toy'
+    run = '2012_Fall'
+    display_name = 'Toy Course'
+
+    # pylint: disable=unused-argument
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Create and return a new toy course instance. See SampleCourseFactory for customization kwargs.
+        """
+        store = kwargs.get('modulestore')
+        user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
+        toy_course = super(ToyCourseFactory, cls)._create(
+            target_class,
+            block_info_tree=TOY_BLOCK_INFO_TREE,
+            textbooks=[["Textbook", "path/to/a/text_book"]],
+            wiki_slug="toy",
+            graded=True,
+            discussion_topics={"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
+            graceperiod=datetime.timedelta(days=2, seconds=21599),
+            start=datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
+            xml_attributes={"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
+            pdf_textbooks=[
+                {
+                    "tab_title": "Sample Multi Chapter Textbook",
+                    "id": "MyTextbook",
+                    "chapters": [
+                        {"url": "/static/Chapter1.pdf", "title": "Chapter 1"},
+                        {"url": "/static/Chapter2.pdf", "title": "Chapter 2"}
+                    ]
+                }
+            ],
+            course_image="just_a_test.jpg",
+            **kwargs
+        )
+        with store.bulk_operations(toy_course.id, emit_signals=False):
+            with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, toy_course.id):
+                store.create_item(
+                    user_id, toy_course.id, "about", block_id="short_description",
+                    fields={"data": "A course about toys."}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "about", block_id="effort",
+                    fields={"data": "6 hours"}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "about", block_id="end_date",
+                    fields={"data": "TBD"}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "course_info", "handouts",
+                    fields={"data": "<a href='/static/handouts/sample_handout.txt'>Sample</a>"}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "static_tab", "resources",
+                    fields={"display_name": "Resources"},
+                )
+                store.create_item(
+                    user_id, toy_course.id, "static_tab", "syllabus",
+                    fields={"display_name": "Syllabus"},
+                )
+        return toy_course
 
 
 class LibraryFactory(XModuleFactory):
