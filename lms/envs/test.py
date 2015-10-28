@@ -223,6 +223,10 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_location_block_cache',
     },
+    'lms.course_blocks': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edx_location_course_blocks',
+    },
 }
 
 # Dummy secret key for dev

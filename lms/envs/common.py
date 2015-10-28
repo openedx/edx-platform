@@ -1954,8 +1954,12 @@ INSTALLED_APPS = (
 
     'lms.djangoapps.lms_xblock',
 
+    # Course data caching
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
+    'lms.djangoapps.course_blocks',
+
+    # Old course structure API
     'course_structure_api',
 
     # Mailchimp Syncing
