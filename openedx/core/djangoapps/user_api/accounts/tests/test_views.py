@@ -720,4 +720,4 @@ class TestAccountAPITransactions(TransactionTestCase):
         response = self.client.get(self.url)
         data = response.data
         self.assertEqual(old_email, data["email"])
-        self.assertEqual(u"o", data["gender"])
+        self.assertEqual(u"m", data["gender"])
