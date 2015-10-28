@@ -1260,7 +1260,6 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/json2.js',
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
-    'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
 ]
 
