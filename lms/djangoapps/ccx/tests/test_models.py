@@ -200,3 +200,12 @@ class TestCCX(ModuleStoreTestCase):
         self.assertEqual(expected, actual)
         actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
+
+    def test_ccx_max_student_enrollment_correct(self):
+        """
+        Verify the override value for max_student_enrollments_allowed
+        """
+        expected = 200
+        self.set_ccx_override('max_student_enrollments_allowed', expected)
+        actual = self.ccx.max_student_enrollments_allowed  # pylint: disable=no-member
+        self.assertEqual(expected, actual)

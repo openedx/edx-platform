@@ -2705,3 +2705,10 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+#### Custom Courses for EDX (CCX) configuration
+
+# This is an arbitrary hard limit.
+# The reason we introcuced this number is because we do not want the CCX
+# to compete with the MOOC.
+CCX_MAX_STUDENTS_ALLOWED = 200
