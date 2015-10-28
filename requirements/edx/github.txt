@@ -36,6 +36,7 @@ git+https://github.com/edx/lettuce.git@django1.8/upgrade#egg=lettuce==1.8
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@django1.8-upgrade#egg=XBlock
+git+https://github.com/edx/xblock-sdk.git@ned/upgrade-django-18#egg=xblock-sdk==1.0
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@django1.8-upgrade#egg=event-tracking
