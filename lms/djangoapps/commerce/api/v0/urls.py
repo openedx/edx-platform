@@ -7,7 +7,7 @@ from commerce.api.v0 import views
 BASKET_URLS = patterns(
     '',
     url(r'^$', views.BasketsView.as_view(), name='create'),
-    url(r'^{}/order/$'.format(r'(?P<basket_id>[\w]+)'), views.BasketOrderView.as_view(), name='retrieve_order'),
+    url(r'^(?P<basket_id>[\w]+)/order/$', views.BasketOrderView.as_view(), name='retrieve_order'),
 )
 
 urlpatterns = patterns(
