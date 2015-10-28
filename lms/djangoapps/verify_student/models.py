@@ -647,6 +647,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
         if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            # fake photo id key is set only for initial verification
+            self.photo_id_key = 'fake-photo-id-key'
+            self.save()
             return
 
         aes_key = random_aes_key()

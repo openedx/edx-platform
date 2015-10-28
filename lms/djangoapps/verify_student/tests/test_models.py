@@ -2,6 +2,7 @@
 from datetime import timedelta, datetime
 import ddt
 import json
+import mock
 import requests.exceptions
 import pytz
 
@@ -235,6 +236,22 @@ class TestPhotoVerification(ModuleStoreTestCase):
         with patch('verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
+
+    @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_submission_while_testing_flag_is_true(self):
+        """ Test that a fake value is set for field 'photo_id_key' of user's
+        initial verification when the feature flag 'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'
+        is enabled.
+        """
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        user.profile.name = "test-user"
+
+        attempt.upload_photo_id_image("Image data")
+        attempt.mark_ready()
+        attempt.submit()
+
+        self.assertEqual(attempt.photo_id_key, "fake-photo-id-key")
 
     def test_active_for_user(self):
         """
