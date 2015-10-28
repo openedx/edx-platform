@@ -72,6 +72,8 @@ class ChunkingManager(models.Manager):
 class ChunkingCallStackManager(CallStackManager, ChunkingManager):
     """
     A derived class of ChunkingManager, and CallStackManager
+
+    Class is currently unused but remains as part of the CallStackManger work. To re-enable see comment in StudentModule
     """
     pass
 
@@ -80,7 +82,9 @@ class StudentModule(CallStackMixin, models.Model):
     """
     Keeps student state for a particular module in a particular course.
     """
-    objects = ChunkingCallStackManager()
+    # Changed back to ChunkingManager from ChunkingCallStackManger. To re-enable CallStack Management change the line
+    # back to: objects = ChunkingCallStackManager() Ticket: PLAT-881
+    objects = ChunkingManager()
     MODEL_TAGS = ['course_id', 'module_type']
 
     # For a homework problem, contains a JSON
