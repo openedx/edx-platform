@@ -21,6 +21,9 @@ class NoneToEmptyManager(models.Manager):
         super(NoneToEmptyManager, self).__init__()
 
     def get_queryset(self):
+        """
+        Returns the result of NoneToEmptyQuerySet instead of a regular QuerySet.
+        """
         return NoneToEmptyQuerySet(self.model, using=self._db)
 
 

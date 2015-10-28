@@ -43,6 +43,7 @@ def get_changed_fields_dict(instance, model_class):
     else:
         # We want to compare all of the scalar fields on the model, but none of
         # the relations.
+        # pylint: disable=protected-access
         field_names = [f.name for f in model_class._meta.get_fields() if not f.is_relation]
         changed_fields = {
             field_name: getattr(old_model, field_name) for field_name in field_names

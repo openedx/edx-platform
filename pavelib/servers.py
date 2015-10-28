@@ -68,14 +68,14 @@ def run_server(
     ("port=", "p", "Port"),
     ("fast", "f", "Skip updating assets"),
 ])
-def lms(options):
+def lms(opts):
     """
     Run the LMS server.
     """
-    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
-    asset_settings = getattr(options, 'asset-settings', settings)
-    port = getattr(options, 'port', None)
-    fast = getattr(options, 'fast', False)
+    settings = getattr(opts, 'settings', DEFAULT_SETTINGS)
+    asset_settings = getattr(opts, 'asset-settings', settings)
+    port = getattr(opts, 'port', None)
+    fast = getattr(opts, 'fast', False)
     run_server(
         'lms',
         fast=fast,
@@ -93,14 +93,14 @@ def lms(options):
     ("port=", "p", "Port"),
     ("fast", "f", "Skip updating assets"),
 ])
-def studio(options):
+def studio(opts):
     """
     Run the Studio server.
     """
-    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
-    asset_settings = getattr(options, 'asset-settings', settings)
-    port = getattr(options, 'port', None)
-    fast = getattr(options, 'fast', False)
+    settings = getattr(opts, 'settings', DEFAULT_SETTINGS)
+    asset_settings = getattr(opts, 'asset-settings', settings)
+    port = getattr(opts, 'port', None)
+    fast = getattr(opts, 'fast', False)
     run_server(
         'studio',
         fast=fast,
@@ -150,11 +150,11 @@ def devstack(args):
 @cmdopts([
     ("settings=", "s", "Django settings"),
 ])
-def celery(options):
+def celery(opts):
     """
     Runs Celery workers.
     """
-    settings = getattr(options, 'settings', 'dev_with_worker')
+    settings = getattr(opts, 'settings', 'dev_with_worker')
     run_process(django_cmd('lms', settings, 'celery', 'worker', '--beat', '--loglevel=INFO', '--pythonpath=.'))
 
 
@@ -171,24 +171,24 @@ def celery(options):
     ("settings_cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
     ("asset_settings_cms=", None, "Set Studio only, overriding the value from --asset_settings (if provided)"),
 ])
-def run_all_servers(options):
+def run_all_servers(opts):
     """
     Runs Celery workers, Studio, and LMS.
     """
-    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
-    asset_settings = getattr(options, 'asset_settings', settings)
-    worker_settings = getattr(options, 'worker_settings', 'dev_with_worker')
-    fast = getattr(options, 'fast', False)
-    optimized = getattr(options, 'optimized', False)
+    settings = getattr(opts, 'settings', DEFAULT_SETTINGS)
+    asset_settings = getattr(opts, 'asset_settings', settings)
+    worker_settings = getattr(opts, 'worker_settings', 'dev_with_worker')
+    fast = getattr(opts, 'fast', False)
+    optimized = getattr(opts, 'optimized', False)
 
     if optimized:
         settings = OPTIMIZED_SETTINGS
         asset_settings = OPTIMIZED_ASSETS_SETTINGS
 
-    settings_lms = getattr(options, 'settings_lms', settings)
-    settings_cms = getattr(options, 'settings_cms', settings)
-    asset_settings_lms = getattr(options, 'asset_settings_lms', asset_settings)
-    asset_settings_cms = getattr(options, 'asset_settings_cms', asset_settings)
+    settings_lms = getattr(opts, 'settings_lms', settings)
+    settings_cms = getattr(opts, 'settings_cms', settings)
+    asset_settings_lms = getattr(opts, 'asset_settings_lms', asset_settings)
+    asset_settings_cms = getattr(opts, 'asset_settings_cms', asset_settings)
 
     if not fast:
         # First update assets for both LMS and Studio but don't collect static yet
@@ -235,12 +235,12 @@ def run_all_servers(options):
     ("settings=", "s", "Django settings"),
     ("fake-initial", None, "Fake the initial migrations"),
 ])
-def update_db(options):
+def update_db(opts):
     """
     Runs syncdb and then migrate.
     """
-    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
-    fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
+    settings = getattr(opts, 'settings', DEFAULT_SETTINGS)
+    fake = "--fake-initial" if getattr(opts, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
         sh(django_cmd(system, settings, 'migrate', fake, '--traceback', '--pythonpath=.'))
 

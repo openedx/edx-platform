@@ -393,7 +393,6 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                         for _ in range(2):
                             self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
 
-
     def test_course_overview_version_update(self):
         """
         Test that when we are running in a partially deployed state (where both

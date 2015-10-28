@@ -105,26 +105,39 @@ def patch_testcase():
     """
 
     def enter_atomics_wrapper(wrapped_func):
+        """
+        Wrapper for TestCase._enter_atomics
+        """
         wrapped_func = wrapped_func.__func__
 
-        def _w(*args, **kwargs):
+        def _wrapper(*args, **kwargs):
+            """
+            Method that performs atomic-entering accounting.
+            """
             CommitOnSuccessManager.ENABLED = False
             OuterAtomic.ALLOW_NESTED = True
             if not hasattr(OuterAtomic, 'atomic_for_testcase_calls'):
                 OuterAtomic.atomic_for_testcase_calls = 0
             OuterAtomic.atomic_for_testcase_calls += 1
             return wrapped_func(*args, **kwargs)
-        return classmethod(_w)
+        return classmethod(_wrapper)
 
     def rollback_atomics_wrapper(wrapped_func):
+        """
+        Wrapper for TestCase._rollback_atomics
+        """
         wrapped_func = wrapped_func.__func__
 
-        def _w(*args, **kwargs):
+        def _wrapper(*args, **kwargs):
+            """
+            Method that performs atomic-rollback accounting.
+            """
             CommitOnSuccessManager.ENABLED = True
             OuterAtomic.ALLOW_NESTED = False
             OuterAtomic.atomic_for_testcase_calls -= 1
             return wrapped_func(*args, **kwargs)
-        return classmethod(_w)
+        return classmethod(_wrapper)
 
+    # pylint: disable=protected-access
     TestCase._enter_atomics = enter_atomics_wrapper(TestCase._enter_atomics)
     TestCase._rollback_atomics = rollback_atomics_wrapper(TestCase._rollback_atomics)

@@ -1304,7 +1304,7 @@ class RegistrationCodeRedemption(models.Model):
 
 class SoftDeleteCouponManager(models.Manager):
     """ Use this manager to get objects that have a is_active=True """
-
+    # pylint: disable=super-on-old-class
     def get_active_coupons_queryset(self):
         """
         filter the is_active = True Coupons only

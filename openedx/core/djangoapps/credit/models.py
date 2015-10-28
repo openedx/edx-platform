@@ -490,7 +490,7 @@ class CreditRequirementStatus(TimeStampedModel):
             return
 
 
-def default_deadline_for_credit_eligibility():
+def default_deadline_for_credit_eligibility():  # pylint: disable=invalid-name
     """ The default deadline to use when creating a new CreditEligibility model. """
     return datetime.datetime.now(pytz.UTC) + datetime.timedelta(
         days=getattr(settings, "CREDIT_ELIGIBILITY_EXPIRATION_DAYS", 365)
