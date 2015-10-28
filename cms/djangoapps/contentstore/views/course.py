@@ -529,6 +529,8 @@ def course_index(request, course_key):
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user, depth=None)
+        if not course_module:
+            raise Http404
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
@@ -812,9 +814,15 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    course_key = CourseKey.from_string(course_key_string)
+    try:
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError:
+        raise Http404
+
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
+        if not course_module:
+            raise Http404
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             return render_to_response(
                 'course_info.html',
