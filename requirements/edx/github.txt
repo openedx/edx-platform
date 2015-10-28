@@ -23,7 +23,7 @@ git+https://github.com/edx/django-pyfs.git@aefed1e258afc2899af239c3d1216a465ddbd
 git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
-# back to master when and if this fix is merged back.
+# back to master when and if this fix is mesrged back.
 # fs==0.4.0
 git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
@@ -39,7 +39,7 @@ git+https://github.com/edx/lettuce.git@django1.8/upgrade#egg=lettuce==1.8
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@django1.8-upgrade#egg=event-tracking
-git+https://github.com/edx/django-splash.git@ammar/upgrade-to-django1.8#egg=django-splash==0.2
+-e git+https://github.com/edx/django-splash.git@ammar/upgrade-to-django1.8#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@3fe9b164bf8dcd51ea89cacc37a00bd72f81fc91#egg=ora2==0.1
 -e git+https://github.com/edx/edx-submissions.git@muzaffar/upgrage-django-1.8#egg=edx-submissions
