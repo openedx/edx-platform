@@ -2648,6 +2648,11 @@ CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
 # to throttling.
 CREDIT_TASK_MAX_RETRIES = 5
 
+
+
+# Dummy secret key for dev/test
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 # Secret keys shared with credit providers.
 # Used to digitally sign credit requests (us --> provider)
 # and validate responses (provider --> us).
