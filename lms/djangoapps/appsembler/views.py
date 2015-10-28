@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.utils import simplejson
 
+from rest_framework.decorators import api_view
+
 # from opaque_keys.edx.locations import SlashSeparatedCourseKey # deprecated; use:
 from opaque_keys.edx.locator import CourseLocator
 from courseware.courses import get_course_by_id
@@ -31,8 +33,10 @@ import string
 logger = logging.getLogger(__name__)
 APPSEMBLER_EMAIL = 'support@appsembler.com'
 
-@csrf_exempt 
+
+@api_view(['POST'])
 def user_signup_endpoint(request):
+    import pdb; pdb.set_trace()
     if request.method != 'POST':
         logger.warning('Non-POST request coming to url: /appsembler/user')
         raise Http404
@@ -212,4 +216,5 @@ info@appsembler.com
 
     userdata = { 'userid': user.id, 'email': user.email, 'course': user_course }
     data = simplejson.dumps(userdata)
+    # return HttpResponse(data, status=200, content_type='application/json')
     return HttpResponse(data, status=200, content_type='application/json')
