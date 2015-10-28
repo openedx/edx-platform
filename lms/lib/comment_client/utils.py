@@ -82,7 +82,7 @@ def perform_request(method, url, data_or_params=None, raw=False,
             data=data,
             params=params,
             headers=headers,
-            timeout=5
+            timeout=20
         )
 
     metric_tags.append(u'status_code:{}'.format(response.status_code))
