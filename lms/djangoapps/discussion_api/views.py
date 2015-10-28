@@ -229,6 +229,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * has_endorsed: Boolean indicating whether this thread has been answered
 
+        * response_count: The number of direct responses for a thread
+
     **DELETE response values:
 
         No content is returned for a DELETE request
