@@ -776,11 +776,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         return edxval_api.get_video_info_for_course_and_profiles(unicode(course_id), video_profile_names)
 
-    def student_view_json(self, context):
+    def student_view_data(self, context=None):
         """
         Returns a JSON representation of the student_view of this XModule.
         The contract of the JSON content is between the caller and the particular XModule.
         """
+        context = context or {}
+
         # If the "only_on_web" field is set on this video, do not return the rest of the video's data
         # in this json view, since this video is to be accessed only through its web view."
         if self.only_on_web:
@@ -791,7 +793,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
-            video_profile_names = context.get("profiles", [])
+            video_profile_names = context.get("profiles", ["mobile_low"])
 
             # get and cache bulk VAL data for course
             val_course_data = self.get_cached_val_data_for_course(video_profile_names, self.location.course_key)

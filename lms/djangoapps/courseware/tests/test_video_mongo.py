@@ -869,7 +869,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 @ddt.ddt
 class TestVideoDescriptorStudentViewJson(TestCase):
     """
-    Tests for the student_view_json method on VideoDescriptor.
+    Tests for the student_view_data method on VideoDescriptor.
     """
     TEST_DURATION = 111.0
     TEST_PROFILE = "mobile"
@@ -914,15 +914,15 @@ class TestVideoDescriptorStudentViewJson(TestCase):
 
     def get_result(self, allow_cache_miss=True):
         """
-        Returns the result from calling the video's student_view_json method.
+        Returns the result from calling the video's student_view_data method.
         Arguments:
-            allow_cache_miss is passed in the context to the student_view_json method.
+            allow_cache_miss is passed in the context to the student_view_data method.
         """
         context = {
             "profiles": [self.TEST_PROFILE],
             "allow_cache_miss": "True" if allow_cache_miss else "False"
         }
-        return self.video.student_view_json(context)
+        return self.video.student_view_data(context)
 
     def verify_result_with_fallback_url(self, result):
         """
