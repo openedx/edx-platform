@@ -52,7 +52,7 @@ class SequenceFields(object):
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
         default=False,
-        scope=Scope.content,
+        scope=Scope.settings,
     )
 
 

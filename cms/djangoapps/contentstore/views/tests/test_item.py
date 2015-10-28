@@ -1459,7 +1459,7 @@ class TestXBlockInfo(ItemTest):
         self.validate_course_xblock_info(json_response, course_outline=True)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 5, 5),
+        (ModuleStoreEnum.Type.split, 4, 4),
         (ModuleStoreEnum.Type.mongo, 5, 7),
     )
     @ddt.unpack

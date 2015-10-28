@@ -37,6 +37,11 @@ from student.auth import has_course_author_access
 from openedx.core.lib.extract_tar import safetar_extractall
 from util.json_request import JsonResponse
 from util.views import ensure_valid_course_key
+from models.settings.course_metadata import CourseMetadata
+from contentstore.views.entrance_exam import (
+    add_entrance_exam_milestone,
+    remove_entrance_exam_milestone_reference
+)
 
 from contentstore.utils import reverse_course_url, reverse_usage_url, reverse_library_url
 
@@ -110,6 +115,17 @@ def _import_handler(request, courselike_key, root_name, successful_url, context_
                 session_status = request.session.setdefault("import_status", {})
                 courselike_string = unicode(courselike_key) + filename
                 _save_request_status(request, courselike_string, 0)
+
+                # If the course has an entrance exam then remove it and its corresponding milestone.
+                # current course state before import.
+                if root_name == COURSE_ROOT:
+                    if courselike_module.entrance_exam_enabled:
+                        remove_entrance_exam_milestone_reference(request, courselike_key)
+                        log.info(
+                            "entrance exam milestone content reference for course %s has been removed",
+                            courselike_module.id
+                        )
+
                 if not filename.endswith('.tar.gz'):
                     _save_request_status(request, courselike_string, -1)
                     return JsonResponse(
@@ -299,6 +315,22 @@ def _import_handler(request, courselike_key, root_name, successful_url, context_
                 # set failed stage number with negative sign in case of unsuccessful import
                 if session_status[courselike_string] != 4:
                     _save_request_status(request, courselike_string, -abs(session_status[courselike_string]))
+
+                # status == 4 represents that course has been imported successfully.
+                if session_status[courselike_string] == 4 and root_name == COURSE_ROOT:
+                    # Reload the course so we have the latest state
+                    course = modulestore().get_course(courselike_key)
+                    if course.entrance_exam_enabled:
+                        entrance_exam_chapter = modulestore().get_items(
+                            course.id,
+                            qualifiers={'category': 'chapter'},
+                            settings={'is_entrance_exam': True}
+                        )[0]
+
+                        metadata = {'entrance_exam_id': unicode(entrance_exam_chapter.location)}
+                        CourseMetadata.update_from_dict(metadata, course, request.user)
+                        add_entrance_exam_milestone(course.id, entrance_exam_chapter)
+                        log.info("Course %s Entrance exam imported", course.id)
 
             return JsonResponse({'Status': 'OK'})
     elif request.method == 'GET':  # assume html
