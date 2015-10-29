@@ -594,21 +594,21 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 };
 
                 selectDisableSpecialExams = function() {
-                    this.$("#id_not_timed").prop('checked', true);
+                    this.$("#id_not_timed").prop('checked', true).trigger('change');
                 };
 
                 selectTimedExam = function(time_limit) {
-                    this.$("#id_timed_exam").prop('checked', true);
+                    this.$("#id_timed_exam").prop('checked', true).trigger('change');
                     this.$("#id_time_limit").val(time_limit);
                 };
 
                 selectProctoredExam = function(time_limit) {
-                    this.$("#id_proctored_exam").prop('checked', true);
+                    this.$("#id_proctored_exam").prop('checked', true).trigger('change');
                     this.$("#id_time_limit").val(time_limit);
                 };
 
                 selectPracticeExam = function(time_limit) {
-                    this.$("#id_practice_exam").prop('checked', true);
+                    this.$("#id_practice_exam").prop('checked', true).trigger('change');
                     this.$("#id_time_limit").val(time_limit);
                 };
 
