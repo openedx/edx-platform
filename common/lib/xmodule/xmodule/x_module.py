@@ -36,7 +36,6 @@ from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
 from xmodule.exceptions import UndefinedContext
 import dogstats_wrapper as dog_stats_api
 
-
 log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
@@ -1207,7 +1206,10 @@ class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
 
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
-# the Runtime part of its interface. This function matches the Runtime.handler_url interface
+# the Runtime part of its interface. This function mostly matches the
+# Runtime.handler_url interface.
+#
+# The monkey-patching happens in (lms|cms)/startup.py
 def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=invalid-name, unused-argument
     """
     See :meth:`xblock.runtime.Runtime.handler_url`.
@@ -1218,6 +1220,8 @@ def descriptor_global_handler_url(block, handler_name, suffix='', query='', thir
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
 # the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
+#
+# The monkey-patching happens in (lms|cms)/startup.py
 def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid-name, unused-argument
     """
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
@@ -1821,6 +1825,7 @@ class CombinedSystem(object):
         DescriptorSystem, instead. This allows XModuleDescriptors that are bound as XModules
         to still function as XModuleDescriptors.
         """
+        # First we try a lookup in the module system...
         try:
             return getattr(self._module_system, name)
         except AttributeError:

@@ -51,7 +51,6 @@ from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primar
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
@@ -67,12 +66,6 @@ CREATE_IF_NOT_FOUND = ['course_info']
 # Useful constants for defining predicates
 NEVER = lambda x: False
 ALWAYS = lambda x: True
-
-# In order to allow descriptors to use a handler url, we need to
-# monkey-patch the x_module library.
-# TODO: Remove this code when Runtimes are no longer created by modulestores
-xmodule.x_module.descriptor_global_handler_url = handler_url
-xmodule.x_module.descriptor_global_local_resource_url = local_resource_url
 
 
 def hash_resource(resource):
