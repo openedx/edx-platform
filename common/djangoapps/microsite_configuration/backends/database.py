@@ -138,20 +138,23 @@ class DatabaseMicrositeTemplateBackend(BaseMicrositeTemplateBackend):
         one we'll return None which means "use default means" (aka filesystem)
         """
         cache_key = "template_cache." + microsite_get_value('microsite_config_key') + '.' + uri
-        template_text = cache.get(cache_key)
+        template_text = cache.get(cache_key)  # pylint: disable=maybe-no-member
 
         if not template_text:
             # Don't use the cache
-            template_obj = MicrositeTemplate.get_template_for_microsite(microsite_get_value('microsite_config_key'), uri)
+            template_obj = MicrositeTemplate.get_template_for_microsite(
+                microsite_get_value('microsite_config_key'),
+                uri
+            )
 
             if not template_obj:
                 # We need to set something in the cache to improve performance
                 # of the templates stored in the filesystem as well
-                cache.set(cache_key, '##none', 60 * 5)
+                cache.set(cache_key, '##none', 60 * 5)  # pylint: disable=maybe-no-member
                 return None
 
             template_text = template_obj.template
-            cache.set(cache_key, template_text, 60 * 3)
+            cache.set(cache_key, template_text, 60 * 3)  # pylint: disable=maybe-no-member
 
         if template_text == '##none':
             return None
