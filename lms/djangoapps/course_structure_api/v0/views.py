@@ -13,15 +13,14 @@ from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 
 from course_structure_api.v0 import serializers
-from courseware import courses
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from openedx.core.lib.api.view_utils import view_course_access, view_auth_classes
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from student.roles import CourseInstructorRole, CourseStaffRole
 from util.module_utils import get_dynamic_descriptor_children
@@ -44,13 +43,11 @@ class CourseViewMixin(object):
         Also checks to ensure the user has permissions to view the course
         """
         try:
-            course_id = self.kwargs.get('course_id')
-            course_key = CourseKey.from_string(course_id)
-            course = courses.get_course(course_key)
-            self.check_course_permissions(self.request.user, course_key)
-
+            course_key = CourseKey.from_string(self.kwargs.get('course_id'))
+            course = CourseOverview.get_from_id(course_key)
+            self.check_course_permissions(self.request.user, course.id)
             return course
-        except ValueError:
+        except CourseOverview.DoesNotExist:
             raise Http404
 
     @staticmethod
@@ -166,17 +163,12 @@ class CourseList(CourseViewMixin, ListAPIView):
         if course_ids:
             course_ids = course_ids.split(',')
             for course_id in course_ids:
-                course_key = CourseKey.from_string(course_id)
-                course_descriptor = courses.get_course(course_key)
-                results.append(course_descriptor)
+                results.append(CourseOverview.get_from_id(CourseKey.from_string(course_id)))
         else:
-            results = modulestore().get_courses()
-
-        # Ensure only course descriptors are returned.
-        results = (course for course in results if course.scope_ids.block_type == 'course')
+            results = CourseOverview.objects.all()
 
         # Ensure only courses accessible by the user are returned.
-        results = (course for course in results if self.user_can_access_course(self.request.user, course))
+        results = (course for course in results if self.user_can_access_course(self.request.user, course.id))
 
         # Sort the results in a predictable manner.
         return sorted(results, key=lambda course: unicode(course.id))
