@@ -1818,7 +1818,6 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.theming',
 
     # Our courseware
-    'circuit',
     'courseware',
     'student',
 

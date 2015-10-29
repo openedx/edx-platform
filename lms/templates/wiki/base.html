@@ -34,10 +34,6 @@
 
   {% addtoblock 'js' %}
     {% comment %} These scripts load at the bottom of the body {% endcomment %}
-    <script>
-      window.onload = add_schematic_handler(window.onload);
-    </script>
-
     <script src="{% static 'js/bootstrap-alert.js' %}"></script>
     <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
     <script src="{% static 'js/bootstrap-modal.js' %}"></script>
