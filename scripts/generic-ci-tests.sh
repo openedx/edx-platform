@@ -133,11 +133,11 @@ END
         ;;
 
     "lms-acceptance")
-        paver test_acceptance -s lms --extra_args="-v 3"
+        paver test_acceptance -s lms
         ;;
 
     "cms-acceptance")
-        paver test_acceptance -s cms --extra_args="-v 3"
+        paver test_acceptance -s cms
         ;;
 
     "bok-choy")
