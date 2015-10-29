@@ -594,17 +594,16 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 setModalTimedExaminationPreferenceValues = function(
                     is_time_limited,
-                    id_timed_exam,
                     time_limit,
                     is_practice_exam,
                     is_proctored_exam,
-                    enable_proctored_exams
+                    are_proctored_exams_enabled
                 ){
                     if (!is_time_limited) {
                         this.$("#id_not_timed").prop('checked', true);
                         return;
                     }
-                    if (enable_proctored_exams) {
+                    if (are_proctored_exams_enabled) {
                         $("#id_time_limit").val(time_limit);
                         this.$('#id_time_limit_div').show();
                         if (is_proctored_exam) {
@@ -617,10 +616,6 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                         } else {
                             this.$("#id_timed_exam").prop('checked', true);
                         }
-                    } else  {
-                        this.$("#id_timed_exam").prop('checked', true);
-                        $("#id_time_limit").val(time_limit);
-                        this.$('#id_time_limit_div').show();
                     }
                 };
 
@@ -715,7 +710,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
-                    setModalTimedExaminationPreferenceValues(true, true, "02:30", false, true, true);
+                    setModalTimedExaminationPreferenceValues(true, "02:30", false, true, true);
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
@@ -767,13 +762,22 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
-                    setModalTimedExaminationPreferenceValues(false, true, "00:30", false, false, true);
+                    setModalTimedExaminationPreferenceValues(false, "00:30", false, false, true);
 
                     // id_time_limit_div should be hidden when None is specified
                     expect($('#id_time_limit_div')).toHaveClass('is-hidden');
 
                     // id_time_limit_div should not be hidden when timed_exam is specified
-                    setModalTimedExaminationPreferenceValues(true, true, "00:30", false, false, true);
+                    setModalTimedExaminationPreferenceValues(true, "00:30", false, false, true);
+                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                });
+
+                it('can select the practice exam', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    // id_time_limit_div should not be hidden when practice exam is specified
+                    setModalTimedExaminationPreferenceValues(true, "00:30", true, false, true);
                     expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
                 });
 
