@@ -928,6 +928,17 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    self_paced = Boolean(
+        display_name=_("Self Paced"),
+        help=_(
+            "Set this to \"true\" to mark this course as self-paced. Self-paced courses do not have "
+            "due dates for assignments, and students can progress through the course at any rate before "
+            "the course ends."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
@@ -1573,3 +1584,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if p.scheme != scheme
         ]
         self.user_partitions = other_partitions + partitions  # pylint: disable=attribute-defined-outside-init
+
+    @property
+    def can_toggle_course_pacing(self):
+        """
+        Whether or not the course can be set to self-paced at this time.
+
+        Returns:
+          bool: False if the course has already started, True otherwise.
+        """
+        return datetime.now(UTC()) <= self.start

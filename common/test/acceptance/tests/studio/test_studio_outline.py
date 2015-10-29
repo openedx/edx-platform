@@ -14,6 +14,7 @@ from ...pages.studio.utils import add_discussion, drag, verify_ordering
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.staff_view import StaffPage
+from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
@@ -1752,3 +1753,57 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
             components_present=True,
             components_display_name_list=['Open', 'Peer']
         )
+
+
+class SelfPacedOutlineTest(CourseOutlineTest):
+    """Test the course outline for a self-paced course."""
+
+    def populate_course_fixture(self, course_fixture):
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', SECTION_NAME).add_children(
+                XBlockFixtureDesc('sequential', SUBSECTION_NAME).add_children(
+                    XBlockFixtureDesc('vertical', UNIT_NAME)
+                )
+            ),
+        )
+        self.course_fixture.add_course_details({
+            'self_paced': True,
+            'start_date': datetime.now() + timedelta(days=1)
+        })
+        ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
+
+    def test_release_dates_not_shown(self):
+        """
+        Scenario: Ensure that block release dates are not shown on the
+            course outline page of a self-paced course.
+
+        Given I am the author of a self-paced course
+        When I go to the course outline
+        Then I should not see release dates for course content
+        """
+        self.course_outline_page.visit()
+        section = self.course_outline_page.section(SECTION_NAME)
+        self.assertEqual(section.release_date, '')
+        subsection = section.subsection(SUBSECTION_NAME)
+        self.assertEqual(subsection.release_date, '')
+
+    def test_edit_section_and_subsection(self):
+        """
+        Scenario: Ensure that block release/due dates are not shown
+            in their settings modals.
+
+        Given I am the author of a self-paced course
+        When I go to the course outline
+        And I click on settings for a section or subsection
+        Then I should not see release or due date settings
+        """
+        self.course_outline_page.visit()
+        section = self.course_outline_page.section(SECTION_NAME)
+        modal = section.edit()
+        self.assertFalse(modal.has_release_date())
+        self.assertFalse(modal.has_due_date())
+        modal.cancel()
+        subsection = section.subsection(SUBSECTION_NAME)
+        modal = subsection.edit()
+        self.assertFalse(modal.has_release_date())
+        self.assertFalse(modal.has_due_date())

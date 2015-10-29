@@ -7,12 +7,13 @@ from urllib import urlencode
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from student.models import CourseEnrollment
 
 from .helpers import LoginEnrollmentTestCase
@@ -114,3 +115,34 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn(self.xml_data, resp.content)
+
+
+@attr('shard_1')
+@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
+class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
+    """
+    Tests for the info page of self-paced courses.
+    """
+
+    def setUp(self):
+        super(SelfPacedCourseInfoTestCase, self).setUp()
+        self.instructor_led_course = CourseFactory.create(self_paced=False)
+        self.self_paced_course = CourseFactory.create(self_paced=True)
+        self.setup_user()
+
+    def fetch_course_info_with_queries(self, course, sql_queries, mongo_queries):
+        """
+        Fetch the given course's info page, asserting the number of SQL
+        and Mongo queries.
+        """
+        url = reverse('info', args=[unicode(course.id)])
+        with self.assertNumQueries(sql_queries):
+            with check_mongo_calls(mongo_queries):
+                resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_num_queries_instructor_led(self):
+        self.fetch_course_info_with_queries(self.instructor_led_course, 14, 4)
+
+    def test_num_queries_self_paced(self):
+        self.fetch_course_info_with_queries(self.self_paced_course, 14, 4)

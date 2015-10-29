@@ -55,6 +55,13 @@ class RenderXBlockTestMixin(object):
         """
         self.client.login(username=self.user.username, password='test')
 
+    def course_options(self):
+        """
+        Options to configure the test course. Intended to be overridden by
+        subclasses.
+        """
+        return {}
+
     def setup_course(self, default_store=None):
         """
         Helper method to create the course.
@@ -62,7 +69,7 @@ class RenderXBlockTestMixin(object):
         if not default_store:
             default_store = self.store.default_modulestore.get_modulestore_type()
         with self.store.default_store(default_store):
-            self.course = CourseFactory.create()  # pylint: disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(**self.course_options())  # pylint: disable=attribute-defined-outside-init
             chapter = ItemFactory.create(parent=self.course, category='chapter')
             self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
                 parent=chapter,

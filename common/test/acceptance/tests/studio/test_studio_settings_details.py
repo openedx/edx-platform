@@ -1,9 +1,11 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
+from datetime import datetime, timedelta
 from unittest import skip
 
 from .base_studio_test import StudioCourseTest
+from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import CourseFixture
 from ...pages.studio.settings import SettingsPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -16,12 +18,11 @@ from ..helpers import (
 )
 
 
-class SettingsMilestonesTest(StudioCourseTest):
-    """
-    Tests for milestones feature in Studio's settings tab
-    """
+class StudioSettingsDetailsTest(StudioCourseTest):
+    """Base class for settings and details page tests."""
+
     def setUp(self, is_staff=True):
-        super(SettingsMilestonesTest, self).setUp(is_staff=is_staff)
+        super(StudioSettingsDetailsTest, self).setUp(is_staff=is_staff)
         self.settings_detail = SettingsPage(
             self.browser,
             self.course_info['org'],
@@ -33,6 +34,11 @@ class SettingsMilestonesTest(StudioCourseTest):
         self.settings_detail.visit()
         self.assertTrue(self.settings_detail.is_browser_on_page())
 
+
+class SettingsMilestonesTest(StudioSettingsDetailsTest):
+    """
+    Tests for milestones feature in Studio's settings tab
+    """
     def test_page_has_prerequisite_field(self):
         """
         Test to make sure page has pre-requisite course field if milestones app is enabled.
@@ -193,3 +199,50 @@ class SettingsMilestonesTest(StudioCourseTest):
             css_selector='.add-item a.button-new',
             text='New Subsection'
         ))
+
+
+class CoursePacingTest(StudioSettingsDetailsTest):
+    """Tests for setting a course to self-paced."""
+
+    def populate_course_fixture(self, __):
+        ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
+        # Set the course start date to tomorrow in order to allow setting pacing
+        self.course_fixture.add_course_details({'start_date': datetime.now() + timedelta(days=1)})
+
+    def test_default_instructor_led(self):
+        """
+        Test that the 'instructor led' button is checked by default.
+        """
+        self.assertEqual(self.settings_detail.course_pacing, 'Instructor-Led')
+
+    def test_self_paced(self):
+        """
+        Test that the 'self-paced' button is checked for a self-paced
+        course.
+        """
+        self.course_fixture.add_course_details({
+            'self_paced': True
+        })
+        self.course_fixture.configure_course()
+        self.settings_detail.refresh_page()
+        self.assertEqual(self.settings_detail.course_pacing, 'Self-Paced')
+
+    def test_set_self_paced(self):
+        """
+        Test that the self-paced option is persisted correctly.
+        """
+        self.settings_detail.course_pacing = 'Self-Paced'
+        self.settings_detail.save_changes()
+        self.settings_detail.refresh_page()
+        self.assertEqual(self.settings_detail.course_pacing, 'Self-Paced')
+
+    def test_toggle_pacing_after_course_start(self):
+        """
+        Test that course authors cannot toggle the pacing of their course
+        while the course is running.
+        """
+        self.course_fixture.add_course_details({'start_date': datetime.now()})
+        self.course_fixture.configure_course()
+        self.settings_detail.refresh_page()
+        self.assertTrue(self.settings_detail.course_pacing_disabled())
+        self.assertIn('Course pacing cannot be changed', self.settings_detail.course_pacing_disabled_text)

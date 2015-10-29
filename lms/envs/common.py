@@ -1966,6 +1966,9 @@ INSTALLED_APPS = (
 
     # programs support
     'openedx.core.djangoapps.programs',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
 )
 
 ######################### CSRF #########################################
