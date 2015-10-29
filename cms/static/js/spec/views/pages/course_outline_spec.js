@@ -823,7 +823,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                 }, [
                                 ]),
                             ])
-                        ]), modalWindow;
+                        ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#id_timed_exam").is(":checked")).toBe(false);
@@ -850,7 +850,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                 }, [
                                 ]),
                             ])
-                        ]), modalWindow;
+                        ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#id_timed_exam").is(":checked")).toBe(true);
@@ -877,7 +877,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                 }, [
                                 ]),
                             ])
-                        ]), modalWindow;
+                        ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#id_timed_exam").is(":checked")).toBe(false);
@@ -904,7 +904,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                 }, [
                                 ]),
                             ])
-                        ]), modalWindow;
+                        ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#id_timed_exam").is(":checked")).toBe(false);
@@ -931,7 +931,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                 }, [
                                 ]),
                             ])
-                        ]), modalWindow;
+                        ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#id_timed_exam").is(":checked")).toBe(true);
