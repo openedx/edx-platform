@@ -20,7 +20,7 @@
         var FieldViews = {};
 
         FieldViews.FieldView = Backbone.View.extend({
-                
+
             fieldType: 'generic',
 
             className: function () {
@@ -410,6 +410,8 @@
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();
                 }
+
+                this.$('.u-field-value select').blur();
             },
 
             saveValue: function () {

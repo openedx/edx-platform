@@ -179,7 +179,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expect(view.fieldValue()).not.toContain(data.validValue);
             }
 
-            view.$(data.valueInputSelector).val(data.validValue).change();
+            view.$(data.valueInputSelector).val(data.validValue).change().blur();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
             expectMessageContains(view, view.indicators.inProgress);
