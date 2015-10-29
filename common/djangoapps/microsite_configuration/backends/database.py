@@ -5,6 +5,7 @@ Microsite backend that reads the configuration from the database
 import json
 
 from mako.template import Template
+from util.cache import cache
 
 from microsite_configuration.backends.filebased import SettingsFileMicrositeBackend
 from microsite_configuration.backends.base import BaseMicrositeTemplateBackend
@@ -136,12 +137,25 @@ class DatabaseMicrositeTemplateBackend(BaseMicrositeTemplateBackend):
         database tables for a template definition, if we can't find
         one we'll return None which means "use default means" (aka filesystem)
         """
-        template_text = MicrositeTemplate.get_template_for_microsite(microsite_get_value('microsite_config_key'), uri)
+        cache_key = "template_cache." + microsite_get_value('microsite_config_key') + '.' + uri
+        template_text = cache.get(cache_key)
+
         if not template_text:
+            # Don't use the cache
+            template_obj = MicrositeTemplate.get_template_for_microsite(microsite_get_value('microsite_config_key'), uri)
+
+            if not template_obj:
+                # We need to set something in the cache to improve performance
+                # of the templates stored in the filesystem as well
+                cache.set(cache_key, '##none', 60 * 5)
+                return None
+
+            template_text = template_obj.template
+            cache.set(cache_key, template_text, 60 * 3)
+
+        if template_text == '##none':
             return None
 
-        # cdodge: this should be cacheable. It seems expensive to create a new instance of this every
-        # time...
         return Template(
-            text=template_text.template
+            text=template_text
         )
