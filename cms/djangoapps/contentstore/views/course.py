@@ -741,8 +741,11 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     Separated out b/c command line course creation uses this as well as the web interface.
     """
 
-    # Set default language from settings
-    fields.update({'language': getattr(settings, 'DEFAULT_COURSE_LANGUAGE', 'en')})
+    # Set default language from settings and enable web certs
+    fields.update({
+        'language': getattr(settings, 'DEFAULT_COURSE_LANGUAGE', 'en'),
+        'cert_html_view_enabled': True,
+    })
 
     with modulestore().default_store(store):
         # Creating the course raises DuplicateCourseError if an existing course with this org/name is found
