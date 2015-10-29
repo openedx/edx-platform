@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr('shard_1')
-@patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
+@patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringDashboardViews(SharedModuleStoreTestCase):
     """
     Check for Proctoring view on the new instructor dashboard
@@ -61,12 +61,13 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.assertFalse(self.proctoring_link in response.content)
         self.assertFalse('Allowance Section' in response.content)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
     def test_no_tab_flag_unset(self):
         """
         Special Exams tab will not be visible if
         the user is not a staff member.
         """
-        self.instructor.is_staff = False
+        self.instructor.is_staff = True
         self.instructor.save()
 
         response = self.client.get(self.url)

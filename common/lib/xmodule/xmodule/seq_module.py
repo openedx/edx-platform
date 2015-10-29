@@ -97,6 +97,16 @@ class ProctoringFields(object):
         scope=Scope.settings,
     )
 
+    @property
+    def is_proctored_exam(self):
+        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
+        return self.is_proctored_enabled
+
+    @is_proctored_exam.setter
+    def is_proctored_exam(self, value):
+        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
+        self.is_proctored_enabled = value
+
 
 @XBlock.wants('proctoring')
 @XBlock.wants('credit')

@@ -44,7 +44,7 @@ def run():
 
     # register any dependency injections that we need to support in edx_proctoring
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
-    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+    if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         # Import these here to avoid circular dependencies of the form:
         # edx-platform app --> DRF --> django translation --> edx-platform app
         from edx_proctoring.runtime import set_runtime_service

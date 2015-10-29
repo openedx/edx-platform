@@ -8,7 +8,7 @@ from django.conf import settings
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 %>
 <%
-  include_special_exams = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
+  include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
 %>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>

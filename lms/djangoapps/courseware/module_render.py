@@ -197,7 +197,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     # Add in rendering context if exam is a timed exam (which includes proctored)
                     #
 
-                    section_is_time_limited = getattr(section, 'is_time_limited', False)
+                    section_is_time_limited = (
+                        getattr(section, 'is_time_limited', False) and settings.FEATURES['ENABLE_SPECIAL_EXAMS']
+                    )
                     if section_is_time_limited:
                         # We need to import this here otherwise Lettuce test
                         # harness fails. When running in 'harvest' mode, the
