@@ -1,3 +1,3 @@
 [submodule "/edx/app/edxapp/edx-platform/lms/djangoapps/accredible_certificate"]
 	path = /edx/app/edxapp/edx-platform/lms/djangoapps/accredible_certificate
-	url = https://github.com/accredible/accredible_certificate
+	url = https://github.com/gymnasium/accredible_certificate
