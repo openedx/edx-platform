@@ -52,15 +52,15 @@
       <input type="button" name="list-problem-responses-csv" value="${_("Download a CSV of problem responses")}" data-endpoint="${ section_data['get_problem_responses_url'] }" data-csv="true">
     </p>
 
-  <div class="issued_certificates">
+    <div class="issued_certificates">
       <p>${_("Click to list certificates that are issued for this course:")}</p>
-      <span>
-          <input type="button" name="issued-certificates-list" value="${_("View Certificates Issued")}" data-csv="false" data-endpoint="${ section_data['get_issued_certificates_url'] }">
-          <input type="button" name="issued-certificates-csv" value="${_("Download CSV of Certificates Issued")}" data-csv="true" data-endpoint="${ section_data['get_issued_certificates_url'] }">
-      </span>
+      <p>
+        <input type="button" name="issued-certificates-list" value="${_("View Certificates Issued")}" data-csv="false" data-endpoint="${ section_data['get_issued_certificates_url'] }">
+        <input type="button" name="issued-certificates-csv" value="${_("Download CSV of Certificates Issued")}" data-csv="true" data-endpoint="${ section_data['get_issued_certificates_url'] }">
+      </p>
       <div class="data-display-table certificate-data-display-table" id="data-issued-certificates-table"></div>
       <div class="issued-certificates-error request-response-error msg msg-error copy"></div>
-  </div>
+    </div>
 
   % if not disable_buttons:
     <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
