@@ -564,7 +564,7 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
         with patch.object(VerificationCheckpoint.objects, "get_or_create") as mock_get_or_create:
             mock_get_or_create.side_effect = IntegrityError
             with self.assertRaises(IntegrityError):
-                checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(
+                _ = VerificationCheckpoint.get_or_create_verification_checkpoint(
                     self.course.id,
                     self.checkpoint_midterm
                 )

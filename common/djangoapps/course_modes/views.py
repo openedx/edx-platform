@@ -39,7 +39,7 @@ class ChooseModeView(View):
     """
 
     @method_decorator(transaction.non_atomic_requests)
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):        # pylint: disable=missing-docstring
         return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
     @method_decorator(login_required)

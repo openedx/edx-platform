@@ -2048,10 +2048,11 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date)
-        CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = \
-            ",1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,"
         self.assertIn(",".join(report.header()), response.content)
-        self.assertIn(CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE, response.content)
+        self.assertIn(
+            ",1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,",
+            response.content
+        )
 
     def test_report_csv_university_revenue_share(self):
         report_type = 'university_revenue_share'

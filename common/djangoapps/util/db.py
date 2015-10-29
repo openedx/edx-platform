@@ -112,7 +112,7 @@ class CommitOnSuccessManager(object):
 
     def __call__(self, func):
         @wraps(func)
-        def decorated(*args, **kwds):
+        def decorated(*args, **kwds):       # pylint: disable=missing-docstring
             with self:
                 return func(*args, **kwds)
         return decorated

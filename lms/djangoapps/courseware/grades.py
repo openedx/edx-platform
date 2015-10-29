@@ -352,7 +352,10 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
     from submissions import api as sub_api  # installed from the edx-submissions repository
 
     with outer_atomic():
-        submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
+        submissions_scores = sub_api.get_scores(
+            course.id.to_deprecated_string(),
+            anonymous_id_for_user(student, course.id)
+        )
         max_scores_cache = MaxScoresCache.create_for_course(course)
 
         # For the moment, we have to get scorable_locations from field_data_cache
@@ -414,7 +417,9 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
 
                     descendants = yield_dynamic_descriptor_descendants(section_descriptor, student.id, create_module)
                     for module_descriptor in descendants:
-                        user_access = has_access(student, 'load', module_descriptor, module_descriptor.location.course_key)
+                        user_access = has_access(
+                            student, 'load', module_descriptor, module_descriptor.location.course_key
+                        )
                         if not user_access:
                             continue
 
@@ -574,7 +579,9 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
     # Django translation --> ... --> courseware --> submissions
     from submissions import api as sub_api  # installed from the edx-submissions repository
     with outer_atomic():
-        submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
+        submissions_scores = sub_api.get_scores(
+            course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id)
+        )
 
         max_scores_cache = MaxScoresCache.create_for_course(course)
         # For the moment, we have to get scorable_locations from field_data_cache
