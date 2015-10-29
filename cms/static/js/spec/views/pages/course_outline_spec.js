@@ -771,6 +771,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     selectPracticeExam("00:30");
                     // id_time_limit_div should not be hidden when practice exam is specified
                     expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    $(".wrapper-modal-window .action-save").click();
                 });
 
                 it('can select the timed exam', function() {
@@ -780,6 +781,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     selectTimedExam("00:30");
                     // id_time_limit_div should not be hidden when timed exam is specified
                     expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    $(".wrapper-modal-window .action-save").click();
                 });
 
                 it('can select the Proctored exam option', function() {
@@ -789,6 +791,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     selectProctoredExam("00:30");
                     // id_time_limit_div should not be hidden when timed exam is specified
                     expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    $(".wrapper-modal-window .action-save").click();
+
                 });
 
                 it('entering invalid time format uses default value of 30 minutes.', function() {
