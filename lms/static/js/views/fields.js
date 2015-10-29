@@ -205,6 +205,7 @@
                 this.mode = 'display';
                 if (render) { this.render(); }
                 this.updateDisplayModeClass();
+                this.$el.find('.button-save').hide();
             },
 
             showEditMode: function(render) {
@@ -216,6 +217,7 @@
                 this.$el.removeClass('mode-display');
 
                 this.$el.addClass('mode-edit');
+                this.$el.find('.button-save').show();
             },
 
             startEditing: function () {
@@ -286,13 +288,14 @@
             fieldTemplate: field_text_template,
 
             events: {
-                'change input': 'saveValue'
+                'click': 'saveValue'
             },
 
             initialize: function (options) {
                 this._super(options);
                 _.bindAll(this, 'render', 'fieldValue', 'updateValueInField', 'saveValue');
                 this.listenTo(this.model, "change:" + this.options.valueAttribute, this.updateValueInField);
+                this.listenForSave();
             },
 
             render: function () {
@@ -304,6 +307,10 @@
                 }));
                 this.delegateEvents();
                 return this;
+            },
+
+            listenForSave: function() {
+                this.$el.on('click', '.button-save', this.saveValue);
             },
 
             fieldValue: function () {
@@ -329,8 +336,7 @@
             fieldTemplate: field_dropdown_template,
 
             events: {
-                'click': 'startEditing',
-                'focusout select': 'finishEditing'
+                'click': 'startEditing'
             },
 
             initialize: function (options) {
@@ -338,6 +344,7 @@
                 this._super(options);
 
                 this.listenTo(this.model, "change:" + this.options.valueAttribute, this.updateValueInField);
+                this.listenForSave();
             },
 
             render: function () {
@@ -360,6 +367,10 @@
                     this.showCanEditMessage(this.mode === 'display');
                 }
                 return this;
+            },
+
+            listenForSave: function() {
+                this.$el.on('click', '.button-save', this.saveValue);
             },
 
             modelValueIsSet: function() {
@@ -410,8 +421,6 @@
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();
                 }
-
-                this.$('.u-field-value select').blur();
             },
 
             saveValue: function () {
@@ -462,7 +471,6 @@
             events: {
                 'click .wrapper-u-field': 'startEditing',
                 'click .u-field-placeholder': 'startEditing',
-                'focusout textarea': 'finishEditing',
                 'change textarea': 'adjustTextareaHeight',
                 'keyup textarea': 'adjustTextareaHeight',
                 'keydown textarea': 'onKeyDown',
@@ -474,6 +482,7 @@
                 _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'fieldValue', 'saveValue', 'updateView');
                 this._super(options);
                 this.listenTo(this.model, "change:" + this.options.valueAttribute, this.updateView);
+                this.listenForSave();
             },
 
             render: function () {
@@ -498,6 +507,11 @@
                     this.showCanEditMessage(this.mode === 'display');
                 }
                 return this;
+            },
+
+            listenForSave: function() {
+                this.$el.on('click', '.button-save', this.saveValue);
+                this.showDisplayMode(true);
             },
 
             onKeyDown: function (event) {

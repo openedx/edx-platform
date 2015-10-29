@@ -179,7 +179,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expect(view.fieldValue()).not.toContain(data.validValue);
             }
 
-            view.$(data.valueInputSelector).val(data.validValue).change().blur();
+            view.$(data.valueInputSelector).val(data.validValue).change();
+            $(view.el).find('.button-save').click(); // save the updated values
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
             expectMessageContains(view, view.indicators.inProgress);
@@ -239,7 +240,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         var verifyTextField = function (view, data, requests) {
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
-                    valueInputSelector: '.u-field-value > input'
+                    valueInputSelector: '.u-field-value input'
                 }, data
             ), requests);
         };
@@ -247,7 +248,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         var verifyDropDownField = function (view, data, requests) {
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
-                    valueInputSelector: '.u-field-value > select'
+                    valueInputSelector: '.u-field-value select'
                 }, data
             ), requests);
         };

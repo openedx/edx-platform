@@ -4,6 +4,9 @@
 <span class="u-field-value">
     <input id="u-field-input-<%- id %>" aria-describedby="u-field-message-help-<%- id %>" type="text" name="input" value="<%- value %>">
 </span>
+<span class="u-field-save">
+    <button class="button-save"><%- gettext('Update') %></button>
+</span>
 <span class="u-field-message" id="u-field-message-<%- id %>">
     <span class="u-field-message-notification" aria-live="polite"></span>
     <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>

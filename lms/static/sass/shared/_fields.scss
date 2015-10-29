@@ -104,6 +104,27 @@
     }
 }
 
+.u-field-save {
+    display: inline-block;
+    width: flex-grid(1, 12);
+
+    .button-save {
+        display: none;
+        vertical-align: top;
+        margin-top: -($baseline / 4);
+    }
+}
+
+.editable-always {
+
+    .u-field-save {
+
+        .button-save {
+            display: block !important;
+        }
+    }
+}
+
 .u-field-message {
     @extend %t-copy-sub1;
     @include padding-left($baseline/2);
