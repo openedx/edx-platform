@@ -579,7 +579,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
             });
 
             describe("Subsection", function() {
-                var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson, setModalTimedExaminationPreferenceValues;
+                var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson,
+                    selectDisableSpecialExams, selectTimedExam, selectProctoredExam, selectPracticeExam;
 
                 getDisplayNameWrapper = function() {
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
@@ -592,36 +593,26 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     $("#staff_lock").prop('checked', is_locked);
                 };
 
-                setModalTimedExaminationPreferenceValues = function(
-                    is_time_limited,
-                    id_timed_exam,
-                    time_limit,
-                    is_practice_exam,
-                    is_proctored_exam,
-                    enable_proctored_exams
-                ){
-                    if (!is_time_limited) {
-                        this.$("#id_not_timed").prop('checked', true);
-                        return;
-                    }
-                    if (enable_proctored_exams) {
-                        $("#id_time_limit").val(time_limit);
-                        this.$('#id_time_limit_div').show();
-                        if (is_proctored_exam) {
-                            if (is_practice_exam) {
-                                this.$('#id_practice_exam').prop('checked', true);
-                            } else {
-                                this.$('#id_proctored_exam').prop('checked', true);
-                            }
+                selectDisableSpecialExams = function() {
+                    this.$("#id_not_timed").prop('checked', true).trigger('change');
+                };
 
-                        } else {
-                            this.$("#id_timed_exam").prop('checked', true);
-                        }
-                    } else  {
-                        this.$("#id_timed_exam").prop('checked', true);
-                        $("#id_time_limit").val(time_limit);
-                        this.$('#id_time_limit_div').show();
-                    }
+                selectTimedExam = function(time_limit) {
+                    this.$("#id_timed_exam").prop('checked', true).trigger('change');
+                    this.$("#id_time_limit").val(time_limit);
+                    this.$("#id_time_limit").trigger('focusout');
+                };
+
+                selectProctoredExam = function(time_limit) {
+                    this.$("#id_proctored_exam").prop('checked', true).trigger('change');
+                    this.$("#id_time_limit").val(time_limit);
+                    this.$("#id_time_limit").trigger('focusout');
+                };
+
+                selectPracticeExam = function(time_limit) {
+                    this.$("#id_practice_exam").prop('checked', true).trigger('change');
+                    this.$("#id_time_limit").val(time_limit);
+                    this.$("#id_time_limit").trigger('focusout');
                 };
 
                 // Contains hard-coded dates because dates are presented in different formats.
@@ -715,7 +706,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
-                    setModalTimedExaminationPreferenceValues(true, true, "02:30", false, true, true);
+                    selectProctoredExam("02:30");
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
@@ -767,14 +758,185 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
-                    setModalTimedExaminationPreferenceValues(false, true, "00:30", false, false, true);
+                    selectDisableSpecialExams();
 
                     // id_time_limit_div should be hidden when None is specified
                     expect($('#id_time_limit_div')).toHaveClass('is-hidden');
+                });
 
-                    // id_time_limit_div should not be hidden when timed_exam is specified
-                    setModalTimedExaminationPreferenceValues(true, true, "00:30", false, false, true);
+                it('can select the practice exam', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectPracticeExam("00:30");
+                    // id_time_limit_div should not be hidden when practice exam is specified
                     expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    $(".wrapper-modal-window .action-save").click();
+                });
+
+                it('can select the timed exam', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectTimedExam("00:30");
+                    // id_time_limit_div should not be hidden when timed exam is specified
+                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    $(".wrapper-modal-window .action-save").click();
+                });
+
+                it('can select the Proctored exam option', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectProctoredExam("00:30");
+                    // id_time_limit_div should not be hidden when timed exam is specified
+                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    $(".wrapper-modal-window .action-save").click();
+
+                });
+
+                it('entering invalid time format uses default value of 30 minutes.', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectProctoredExam("abcd");
+                    // id_time_limit_div should not be hidden when timed exam is specified
+                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    expect($('#id_time_limit')).toHaveValue('00:30');
+
+                });
+
+                it('can show a saved non-special exam correctly', function() {
+                    var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                            createMockSectionJSON({
+                                has_changes: true,
+                                enable_proctored_exams: true,
+                                enable_timed_exams: true
+
+                            }, [
+                                createMockSubsectionJSON({
+                                    has_changes: true,
+                                    "is_time_limited": false,
+                                    "is_practice_exam": false,
+                                    "is_proctored_exam": false,
+                                    "default_time_limit_minutes": 150
+                                }, [
+                                ]),
+                            ])
+                        ]);
+                    createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($("#id_timed_exam").is(":checked")).toBe(false);
+                    expect($("#id_proctored_exam").is(":checked")).toBe(false);
+                    expect($("#id_not_timed").is(":checked")).toBe(true);
+                    expect($("#id_practice_exam").is(":checked")).toBe(false);
+                    expect($("#id_time_limit").val()).toBe("02:30");
+                });
+
+                it('can show a saved timed exam correctly', function() {
+                    var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                            createMockSectionJSON({
+                                has_changes: true,
+                                enable_proctored_exams: true,
+                                enable_timed_exams: true
+
+                            }, [
+                                createMockSubsectionJSON({
+                                    has_changes: true,
+                                    "is_time_limited": true,
+                                    "is_practice_exam": false,
+                                    "is_proctored_exam": false,
+                                    "default_time_limit_minutes": 10
+                                }, [
+                                ]),
+                            ])
+                        ]);
+                    createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($("#id_timed_exam").is(":checked")).toBe(true);
+                    expect($("#id_proctored_exam").is(":checked")).toBe(false);
+                    expect($("#id_not_timed").is(":checked")).toBe(false);
+                    expect($("#id_practice_exam").is(":checked")).toBe(false);
+                    expect($("#id_time_limit").val()).toBe("00:10");
+                });
+
+                it('can show a saved practice exam correctly', function() {
+                    var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                            createMockSectionJSON({
+                                has_changes: true,
+                                enable_proctored_exams: true,
+                                enable_timed_exams: true
+
+                            }, [
+                                createMockSubsectionJSON({
+                                    has_changes: true,
+                                    "is_time_limited": true,
+                                    "is_practice_exam": true,
+                                    "is_proctored_exam": true,
+                                    "default_time_limit_minutes": 150
+                                }, [
+                                ]),
+                            ])
+                        ]);
+                    createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($("#id_timed_exam").is(":checked")).toBe(false);
+                    expect($("#id_proctored_exam").is(":checked")).toBe(false);
+                    expect($("#id_not_timed").is(":checked")).toBe(false);
+                    expect($("#id_practice_exam").is(":checked")).toBe(true);
+                    expect($("#id_time_limit").val()).toBe("02:30");
+                });
+
+                it('can show a saved proctored exam correctly', function() {
+                    var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                            createMockSectionJSON({
+                                has_changes: true,
+                                enable_proctored_exams: true,
+                                enable_timed_exams: true
+
+                            }, [
+                                createMockSubsectionJSON({
+                                    has_changes: true,
+                                    "is_time_limited": true,
+                                    "is_practice_exam": false,
+                                    "is_proctored_exam": true,
+                                    "default_time_limit_minutes": 150
+                                }, [
+                                ]),
+                            ])
+                        ]);
+                    createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($("#id_timed_exam").is(":checked")).toBe(false);
+                    expect($("#id_proctored_exam").is(":checked")).toBe(true);
+                    expect($("#id_not_timed").is(":checked")).toBe(false);
+                    expect($("#id_practice_exam").is(":checked")).toBe(false);
+                    expect($("#id_time_limit").val()).toBe("02:30");
+                });
+
+                it('does not show proctored settings if proctored exams not enabled', function() {
+                    var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                            createMockSectionJSON({
+                                has_changes: true,
+                                enable_proctored_exams: false,
+                                enable_timed_exams: true
+
+                            }, [
+                                createMockSubsectionJSON({
+                                    has_changes: true,
+                                    "is_time_limited": true,
+                                    "is_practice_exam": false,
+                                    "is_proctored_exam": false,
+                                    "default_time_limit_minutes": 150
+                                }, [
+                                ]),
+                            ])
+                        ]);
+                    createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($("#id_timed_exam").is(":checked")).toBe(true);
+                    expect($("#id_not_timed").is(":checked")).toBe(false);
+                    expect($("#id_time_limit").val()).toBe("02:30");
                 });
 
                 it('release date, due date, grading type, and staff lock can be cleared.', function() {
