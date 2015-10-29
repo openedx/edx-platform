@@ -759,10 +759,6 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                     // id_time_limit_div should be hidden when None is specified
                     expect($('#id_time_limit_div')).toHaveClass('is-hidden');
-
-                    // id_time_limit_div should not be hidden when timed_exam is specified
-                    setModalTimedExaminationPreferenceValues(true, "00:30", false, false, true);
-                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
                 });
 
                 it('can select the practice exam', function() {
