@@ -1361,6 +1361,29 @@ def get_exec_summary_report(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_course_survey_results(request, course_id):
+    """
+    get the survey results report for the particular course.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_course_survey_report(request, course_key)
+        status_response = _("The survey report is being created."
+                            " To view the status of the report, see Pending Instructor Tasks below.")
+    except AlreadyRunningError:
+        status_response = _(
+            "The survey report is currently being created."
+            " To view the status of the report, see Pending Instructor Tasks below."
+            " You will be able to download the report when it is complete."
+        )
+    return JsonResponse({
+        "status": status_response
+    })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_proctored_exam_results(request, course_id):
     """
     get the proctored exam resultsreport for the particular course.
