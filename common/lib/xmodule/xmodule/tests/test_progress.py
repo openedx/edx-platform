@@ -132,7 +132,7 @@ class ProgressTest(unittest.TestCase):
 
         # Check != while we're at it
         self.assertNotEqual(prg1, prg2)
-        self.assertEqual(prg1,  prg3)
+        self.assertEqual(prg1, prg3)
 
 
 class ModuleProgressTest(unittest.TestCase):
