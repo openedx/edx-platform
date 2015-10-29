@@ -168,7 +168,7 @@ if (is_proctored_exam) {
                         <% } %>
                     </p>
                 </div>
-            <% }  %>
+            <% } %>
         <% } %>
         <% if (statusMessage) { %>
         <div class="status-message">
