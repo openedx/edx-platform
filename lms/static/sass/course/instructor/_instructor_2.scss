@@ -1933,9 +1933,9 @@ input[name="subject"] {
         padding-left: $baseline;
       }
       th {
+        @extend %t-action2;
         text-align: left;
         border-bottom: 1px solid $border-color-1;
-        @extend %t-action2;
         &.attempt-allowed-time {
             width: 90px;
         }

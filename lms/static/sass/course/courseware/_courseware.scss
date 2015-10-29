@@ -106,8 +106,8 @@ html.video-fullscreen {
     // overrides for the timer bar because it is
     // a bit more narrow
     &.exam-button-turn-in-exam {
-      padding: ($baseline / 5) $baseline;
       @extend %t-action4;
+      padding: ($baseline / 5) $baseline;
     }
   }
 }
