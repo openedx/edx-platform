@@ -600,16 +600,19 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 selectTimedExam = function(time_limit) {
                     this.$("#id_timed_exam").prop('checked', true).trigger('change');
                     this.$("#id_time_limit").val(time_limit);
+                    this.$("#id_time_limit").trigger('focusout');
                 };
 
                 selectProctoredExam = function(time_limit) {
                     this.$("#id_proctored_exam").prop('checked', true).trigger('change');
                     this.$("#id_time_limit").val(time_limit);
+                    this.$("#id_time_limit").trigger('focusout');
                 };
 
                 selectPracticeExam = function(time_limit) {
                     this.$("#id_practice_exam").prop('checked', true).trigger('change');
                     this.$("#id_time_limit").val(time_limit);
+                    this.$("#id_time_limit").trigger('focusout');
                 };
 
                 // Contains hard-coded dates because dates are presented in different formats.
@@ -784,6 +787,15 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
                     selectProctoredExam("00:30");
+                    // id_time_limit_div should not be hidden when timed exam is specified
+                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                });
+
+                it('entering invalid time format uses default value of 30 minutes.', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectProctoredExam("abcd");
                     // id_time_limit_div should not be hidden when timed exam is specified
                     expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
                 });
