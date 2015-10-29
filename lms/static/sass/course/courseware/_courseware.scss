@@ -93,75 +93,6 @@ html.video-fullscreen {
     }
   }
 
-  .btn {
-    @extend %t-strong;
-    transition: color $tmg-f3 ease-in-out 0s,border-color
-    $tmg-f3 ease-in-out 0s,background
-    $tmg-f3 ease-in-out 0s,box-shadow
-    $tmg-f3 ease-in-out 0s;;
-
-    // Display: inline, side-by-side
-    display: inline-block;
-    border-style: solid;
-    border-radius: 3px;
-    border-width: 1px;
-
-    // Display: block, one button per line, full width
-    &.block {
-        display: block;
-        width: 100%;
-    }
-
-    // STATE: is disabled
-    &:disabled,
-    &.is-disabled {
-      pointer-events: none;
-      outline: none;
-      cursor: default;
-    }
-  }
-
-  .btn-base {
-    @extend %t-copy-base;
-    padding: $baseline/2 $baseline;
-  }
-  // ----------------------------
-  // #DEFAULT
-  // ----------------------------
-  .btn-default {
-    border-color: rgb(0, 121, 188);
-    background: $white-t1;
-    color: rgb(0, 121, 188);;
-
-    // STATE: hover and focus
-    &:hover,
-    &.is-hovered,
-    &:focus,
-    &.is-focused {
-      background: rgb(0, 121, 188);
-      color: $white;
-      box-shadow: none;
-      text-shadow: none;
-    }
-
-    // STATE: is pressed or active
-    &:active,
-    &.is-pressed,
-    &.is-active {
-      border-color: $m-blue-d5;
-      background: $m-blue-d5;
-      box-shadow: none;
-      text-shadow: none;
-    }
-
-    // STATE: is disabled
-    &:disabled,
-    &.is-disabled {
-      border-color: $m-gray-d1;
-      background: $white-t1;
-      color: $m-gray-d3;
-    }
-  }
   // ----------------------------
   // Primary button style definition used by proctored/timed exams
   // ----------------------------
@@ -224,11 +155,11 @@ div.course-wrapper {
       }
       button.gated-sequence {
         background: $transparent;
-        color: #126F9A;
+        color: $blue-d1;
         border: none;
         box-shadow: none;
         text-align: left;
-        font-size: 16px;
+        @extend %t-copy-base;
         width: 100%;
         &:hover {
           background-color: transparent;
@@ -293,7 +224,7 @@ div.course-wrapper {
         margin: 0 auto;
       }
       &.warning {
-        border-left: 4px solid #FAB95C !important;
+        border-left: 4px solid $warning-color !important;
         margin: 0 auto;
       }
     }
