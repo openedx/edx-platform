@@ -80,7 +80,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
 
         # With default configuration settings, email is not shared with other (non-staff) users.
         account_settings = get_account_settings(self.default_request, self.different_user.username)
-        self.assertFalse("email" in account_settings)
+        self.assertNotIn("email", account_settings)
 
         account_settings = get_account_settings(
             self.default_request,

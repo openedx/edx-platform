@@ -642,7 +642,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # Validate the timestamp
         self.assertIn('timestamp', parameters)
         parsed_date = from_timestamp(parameters['timestamp'])
-        self.assertTrue(parsed_date < datetime.datetime.now(pytz.UTC))
+        self.assertLess(parsed_date, datetime.datetime.now(pytz.UTC))
 
         # Validate course information
         self.assertEqual(parameters['course_org'], self.course_key.org)

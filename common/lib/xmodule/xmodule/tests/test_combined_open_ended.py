@@ -375,9 +375,9 @@ class OpenEndedModuleTest(unittest.TestCase):
     def test_latest_post_assessment(self):
         self.update_score_single()
         assessment = self.openendedmodule.latest_post_assessment(self.test_system)
-        self.assertFalse(assessment == '')
+        self.assertNotEqual(assessment, '')
         # check for errors
-        self.assertFalse('errors' in assessment)
+        self.assertNotIn('errors', assessment)
 
     def test_update_score_single(self):
         self.update_score_single()
