@@ -555,8 +555,8 @@ class MatlabTest(unittest.TestCase):
         response = self.the_input.handle_ajax("plot", data)
         self.assertFalse(response['success'])
         self.assertEqual(response['message'], error_message)
-        self.assertTrue('queuekey' not in self.the_input.input_state)
-        self.assertTrue('queuestate' not in self.the_input.input_state)
+        self.assertNotIn('queuekey', self.the_input.input_state)
+        self.assertNotIn('queuestate', self.the_input.input_state)
 
     @patch('capa.inputtypes.time.time', return_value=10)
     def test_ungraded_response_success(self, time):
@@ -594,7 +594,7 @@ class MatlabTest(unittest.TestCase):
         the_input.ungraded_response(queue_msg, 'abc')
         self.assertEqual(input_state['queuekey'], queuekey)
         self.assertEqual(input_state['queuestate'], 'queued')
-        self.assertFalse('queue_msg' in input_state)
+        self.assertNotIn('queue_msg', input_state)
 
     @patch('capa.inputtypes.time.time', return_value=20)
     def test_matlab_response_timeout_not_exceeded(self, time):
@@ -1076,7 +1076,7 @@ class ChemicalEquationTest(unittest.TestCase):
             )
 
         self.assertIn('error', response)
-        self.assertTrue("Couldn't parse formula" in response['error'])
+        self.assertIn("Couldn't parse formula", response['error'])
 
     @patch('capa.inputtypes.log')
     def test_ajax_other_err(self, mock_log):
