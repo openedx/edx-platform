@@ -78,7 +78,7 @@ class SelfAssessmentTest(unittest.TestCase):
 
     def test_get_html(self):
         html = self.module.get_html(self.module.system)
-        self.assertTrue("This is sample prompt text" in html)
+        self.assertIn("This is sample prompt text", html)
 
     def test_self_assessment_flow(self):
         responses = {'assessment': '0', 'score_list[]': ['0', '0']}

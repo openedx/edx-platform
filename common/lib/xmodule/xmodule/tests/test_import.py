@@ -225,18 +225,18 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(course_xml.attrib['unicorn'], unicorn_color)
 
         # the course and org tags should be _only_ in the pointer
-        self.assertTrue('course' not in course_xml.attrib)
-        self.assertTrue('org' not in course_xml.attrib)
+        self.assertNotIn('course', course_xml.attrib)
+        self.assertNotIn('org', course_xml.attrib)
 
         # did we successfully strip the url_name from the definition contents?
-        self.assertTrue('url_name' not in course_xml.attrib)
+        self.assertNotIn('url_name', course_xml.attrib)
 
         # Does the chapter tag now have a due attribute?
         # hardcoded path to child
         with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
-        self.assertFalse('due' in chapter_xml.attrib)
+        self.assertNotIn('due', chapter_xml.attrib)
 
     def test_metadata_import_export(self):
         """Two checks:
