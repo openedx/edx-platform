@@ -198,7 +198,8 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     #
 
                     section_is_time_limited = (
-                        getattr(section, 'is_time_limited', False) and settings.FEATURES['ENABLE_SPECIAL_EXAMS']
+                        getattr(section, 'is_time_limited', False) and
+                        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
                     )
                     if section_is_time_limited:
                         # We need to import this here otherwise Lettuce test

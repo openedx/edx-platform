@@ -144,9 +144,13 @@ def instructor_dashboard_2(request, course_id):
 
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
+
+    # NOTE: For now, if we only have prcotred exams, then only platform Staff
+    # (user.is_staff) will be able to view the special exams tab. This may
+    # change in the future
     can_see_special_exams = (
         ((course.enable_proctored_exams and request.user.is_staff) or course.enable_timed_exams) and
-        settings.FEATURES['ENABLE_SPECIAL_EXAMS']
+        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
     )
     if can_see_special_exams:
         sections.append(_section_special_exams(course, access))
