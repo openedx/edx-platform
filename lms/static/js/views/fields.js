@@ -288,7 +288,7 @@
             fieldTemplate: field_text_template,
 
             events: {
-                'click': 'saveValue'
+                // 'click': 'saveValue'
             },
 
             initialize: function (options) {

@@ -295,7 +295,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         username, user_id = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PRIVATE)
-        from nose.tools import set_trace; set_trace()
         self.verify_profile_page_is_private(profile_page)
         self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
 

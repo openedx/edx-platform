@@ -111,7 +111,16 @@
     .button-save {
         display: none;
         vertical-align: top;
-        margin-top: -($baseline / 4);
+    }
+}
+
+.u-field-dropdown {
+
+    .u-field-save {
+
+        .button-save {
+            margin-top: -($baseline / 4);
+        }
     }
 }
 
@@ -121,6 +130,16 @@
 
         .button-save {
             display: block !important;
+        }
+    }
+}
+
+.team-edit-fields {
+
+    .editable-always {
+
+        .u-field-save {
+            display: none;
         }
     }
 }
