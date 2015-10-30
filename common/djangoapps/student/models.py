@@ -49,6 +49,7 @@ from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
@@ -1374,13 +1375,32 @@ class CourseEnrollment(models.Model):
         if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
             return False
 
-        #TODO - When Course administrators to define a refund period for paid courses then refundable will be supported. # pylint: disable=fixme
+        # If it is after the refundable cutoff date they should not be refunded.
+        refund_cutoff_date = self.refund_cutoff_date()
+        if refund_cutoff_date and datetime.now() > refund_cutoff_date:
+            return False
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
         if course_mode is None:
             return False
         else:
             return True
+
+    def refund_cutoff_date(self):
+        """ Calculate and return the refund window end date. """
+        try:
+            attribute = self.attributes.get(namespace='order', name='order_number')  # pylint: disable=no-member
+        except ObjectDoesNotExist:
+            return None
+
+        order_number = attribute.value
+        order = ecommerce_api_client(self.user).orders(order_number).get()
+        refund_window_start_date = max(
+            datetime.strptime(order['date_placed'], ECOMMERCE_DATE_FORMAT),
+            self.course_overview.start.replace(tzinfo=None)
+        )
+
+        return refund_window_start_date + EnrollmentRefundConfiguration.current().refund_window
 
     @property
     def username(self):
@@ -2024,3 +2044,34 @@ class CourseEnrollmentAttribute(models.Model):
             }
             for attribute in cls.objects.filter(enrollment=enrollment)
         ]
+
+
+class EnrollmentRefundConfiguration(ConfigurationModel):
+    """
+    Configuration for course enrollment refunds.
+    """
+
+    # TODO: Django 1.8 introduces a DurationField
+    # (https://docs.djangoproject.com/en/1.8/ref/models/fields/#durationfield)
+    # for storing timedeltas which uses MySQL's bigint for backing
+    # storage. After we've completed the Django upgrade we should be
+    # able to replace this field with a DurationField named
+    # `refund_window` without having to run a migration or change
+    # other code.
+    refund_window_microseconds = models.BigIntegerField(
+        default=1209600000000,
+        help_text=_(
+            "The window of time after enrolling during which users can be granted"
+            " a refund, represented in microseconds. The default is 14 days."
+        )
+    )
+
+    @property
+    def refund_window(self):
+        """Return the configured refund window as a `datetime.timedelta`."""
+        return timedelta(microseconds=self.refund_window_microseconds)
+
+    @refund_window.setter
+    def refund_window(self, refund_window):
+        """Set the current refund window to the given timedelta."""
+        self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)

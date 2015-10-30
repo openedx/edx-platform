@@ -29,7 +29,6 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from commerce import ecommerce_api_client
 from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
@@ -37,6 +36,7 @@ from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
 from embargo import api as embargo_api
 from microsite_configuration import microsite
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError

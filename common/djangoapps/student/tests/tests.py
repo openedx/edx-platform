@@ -3,10 +3,10 @@
 Miscellaneous tests for the student app.
 """
 from datetime import datetime, timedelta
+import ddt
 import logging
 import pytz
 import unittest
-import ddt
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -17,7 +17,8 @@ from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import (
-    anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user, LinkedInAddToProfileConfiguration
+    anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
+    unique_id_for_user, LinkedInAddToProfileConfiguration
 )
 from student.views import (
     process_survey_link,
@@ -288,22 +289,6 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertIsNone(course_mode_info['days_for_upsell'])
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def test_refundable(self):
-        verified_mode = CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug='verified',
-            mode_display_name='Verified',
-            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
-        )
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
-
-        self.assertTrue(enrollment.refundable())
-
-        verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
-        verified_mode.save()
-        self.assertFalse(enrollment.refundable())
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch('courseware.views.log.warning')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_blocked_course_scenario(self, log_warning):
@@ -360,48 +345,6 @@ class DashboardTest(ModuleStoreTestCase):
 
         response = self.client.get(reverse('dashboard'))
         self.assertNotIn('You can no longer access this course because payment has not yet been received', response.content)
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def test_refundable_of_purchased_course(self):
-
-        self.client.login(username="jack", password="test")
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug='honor',
-            min_price=10,
-            currency='usd',
-            mode_display_name='honor',
-            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
-        )
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
-
-        # TODO: Until we can allow course administrators to define a refund period for paid for courses show_refund_option should be False. # pylint: disable=fixme
-        self.assertFalse(enrollment.refundable())
-
-        resp = self.client.post(reverse('student.views.dashboard', args=[]))
-        self.assertIn('You will not be refunded the amount you paid.', resp.content)
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def test_refundable_when_certificate_exists(self):
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug='verified',
-            mode_display_name='Verified',
-            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
-        )
-
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
-
-        self.assertTrue(enrollment.refundable())
-
-        GeneratedCertificateFactory.create(
-            user=self.user,
-            course_id=self.course.id,
-            status=CertificateStatuses.downloadable,
-            mode='verified'
-        )
-
-        self.assertFalse(enrollment.refundable())
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):
