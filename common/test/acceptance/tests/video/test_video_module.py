@@ -588,6 +588,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
+    @flaky  # TODO: fix this, ticket TNL-3725
     def test_video_component_stores_speed_correctly_for_multiple_videos(self):
         """
         Scenario: Video component stores speed correctly when each video is in separate sequential
