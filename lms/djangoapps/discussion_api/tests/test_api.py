@@ -1085,7 +1085,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
             {
-                "recursive": ["True"],
+                "recursive": ["False"],
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
                 "resp_skip": ["70"],
@@ -1146,8 +1146,8 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 4,
-                "children": [],
                 "editable_fields": ["abuse_flagged", "voted"],
+                "children": [],
             },
             {
                 "id": "test_comment_2",
@@ -1166,8 +1166,8 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "abuse_flagged": True,
                 "voted": False,
                 "vote_count": 7,
-                "children": [],
                 "editable_fields": ["abuse_flagged", "voted"],
+                "children": [],
             },
         ]
         actual_comments = self.get_comment_list(
