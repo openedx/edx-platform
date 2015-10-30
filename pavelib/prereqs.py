@@ -5,7 +5,6 @@ Install Python, Ruby, and Node prerequisites.
 from distutils import sysconfig
 import hashlib
 import os
-import sys
 
 from paver.easy import sh, task
 
