@@ -861,18 +861,19 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "user_partitions": get_user_partition_info(xblock, course=course),
     }
 
-    # update xblock_info with proctored_exam information if the feature flag is enabled
-    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+    # update xblock_info with special exam information if the feature flag is enabled
+    if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         if xblock.category == 'course':
             xblock_info.update({
-                "enable_proctored_exams": xblock.enable_proctored_exams
+                "enable_proctored_exams": xblock.enable_proctored_exams,
+                "enable_timed_exams": xblock.enable_timed_exams
             })
         elif xblock.category == 'sequential':
             xblock_info.update({
-                "is_proctored_enabled": xblock.is_proctored_enabled,
+                "is_proctored_exam": xblock.is_proctored_exam,
+                "is_practice_exam": xblock.is_practice_exam,
                 "is_time_limited": xblock.is_time_limited,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes,
-                "is_practice_exam": xblock.is_practice_exam
+                "default_time_limit_minutes": xblock.default_time_limit_minutes
             })
 
     # Entrance exam subsection should be hidden. in_entrance_exam is inherited metadata, all children will have it.

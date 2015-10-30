@@ -6,11 +6,13 @@
                 .replace(/>/g, '&gt;')
         }
     %>
-    <%= interpolate_text('You are taking "{exam_link}" as a {exam_type} exam. The timer on the right shows the time remaining in the exam.', {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('timed')}) %>
-    <span id="turn_in_exam_id" class="pull-right">
-        <span id="turn_in_exam_id">
+    <div class='exam-text'>
+        <%= interpolate_text('You are taking "{exam_link}" as a {exam_type} exam. The timer on the right shows the time remaining in the exam.', {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('timed')}) %>
+    </div>
+    <div id="turn_in_exam_id" class="pull-right turn_in_exam">
+        <span>
             <% if(attempt_status !== 'ready_to_submit') {%>
-                <button class="exam-button-turn-in-exam">
+                <button class="exam-button-turn-in-exam btn btn-pl-primary">
                     <%- gettext("End My Exam") %>
                 </button>
             <% } %>
@@ -20,6 +22,6 @@
             <b>
             </b>
         </span>
-    </span>
+    </div>
 </div>
 
