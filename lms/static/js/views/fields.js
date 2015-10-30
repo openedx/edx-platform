@@ -511,7 +511,7 @@
 
             listenForSave: function() {
                 this.$el.on('click', '.button-save', this.saveValue);
-                this.showDisplayMode(true);
+                this.finishEditing();
             },
 
             onKeyDown: function (event) {

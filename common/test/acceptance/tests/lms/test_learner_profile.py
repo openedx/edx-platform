@@ -118,7 +118,6 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
         Verifies that the correct view event was captured for the profile page.
         """
-
         actual_events = self.wait_for_events(
             event_filter={'event_type': 'edx.user.settings.viewed'}, number_of_matches=1)
         self.assert_events_match(
