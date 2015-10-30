@@ -1797,8 +1797,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEquals(response.content, 'OK!')
         self.assertEqual(len(mail.outbox), 0)
 
-    @mock.patch('verify_student.views._send_email')
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
     @mock.patch('lms.djangoapps.verify_student.views._send_email')
     @mock.patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
