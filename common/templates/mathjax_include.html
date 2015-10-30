@@ -9,14 +9,14 @@
 <%page args="disable_fast_preview=True"/>
 
 %if disable_fast_preview:
-// Fast Preview was introduced in 2.5. However, it
-// causes undesirable flashing/font size changes when
-// MathJax is used for interactive preview (equation editor).
-// Setting processSectionDelay to 0 (see below) fully eliminates
-// fast preview, but to reduce confusion, we are also setting
-// the option as displayed in the context menu to false.
-// When upgrading to 2.6, check if this variable name changed.
 <script type="text/javascript">
+    // Fast Preview was introduced in 2.5. However, it
+    // causes undesirable flashing/font size changes when
+    // MathJax is used for interactive preview (equation editor).
+    // Setting processSectionDelay to 0 (see below) fully eliminates
+    // fast preview, but to reduce confusion, we are also setting
+    // the option as displayed in the context menu to false.
+    // When upgrading to 2.6, check if this variable name changed.
     window.MathJax = {
       menuSettings: {CHTMLpreview: false}
     };
