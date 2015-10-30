@@ -25,10 +25,6 @@ from student.forms import AccountCreationForm
 from student.views import _do_create_account
 from student.models import create_comments_service_user
 
-#for password/username creation
-import random
-import string
-
 
 logger = logging.getLogger(__name__)
 APPSEMBLER_EMAIL = 'support@appsembler.com'
@@ -78,6 +74,12 @@ EDXAPP_APPSEMBLER_FEATURES:
         logger.info('No course id; user {0} will be created but not enrolled in any \
                     course.'.format(user_email))
 
+    import pdb; pdb.set_trace()
+    password = request.POST.get('Password','')
+    if not password:
+        logger.error('Could not extract Password from POST request.')
+        return HttpResponse(status=400)
+
     #auto create student if none exists
     user = None
     user_course = None
@@ -91,7 +93,7 @@ EDXAPP_APPSEMBLER_FEATURES:
     except User.DoesNotExist:
         try:
             #from common/djangoapps/student/view.py:create_account
-            password = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(15))
+            # password = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(15))
 
             #filter out any spaces and punctuation
             username = ''.join(ch for ch in full_name if ch.isalnum())

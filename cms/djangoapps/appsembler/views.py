@@ -46,21 +46,21 @@ EDXAPP_APPSEMBLER_FEATURES:
 
 
 
-        user_id = request.POST.get('UserId','')
-        if not user_id:
-            logger.error('Could not extract user id from POST request')
+        user_email = request.POST.get('Email','')
+        if not user_email:
+            logger.error('Could not extract user email from POST request')
             return HttpResponse(status=400)
 
         # get the user; if no user, return the error
         user = None
         new_course = None
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(email=user_email)
         except User.DoesNotExist:
             message = "User does not exist in academy.appsembler.com."
             send_back = {
                 message:message,
-                user_id:user_id
+                user_email:user_email
             }
             data = simplejson.dumps(send_back)
             return HttpResponse(data, status_code=403, content_type="application/json")
