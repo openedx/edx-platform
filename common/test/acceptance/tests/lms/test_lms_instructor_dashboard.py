@@ -117,17 +117,16 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
 
 
-@attr('shard_1')
-class ProctoredExamsTest(BaseInstructorDashboardTest):
+class BaseProctoredExamsTests(BaseInstructorDashboardTest):
     """
-    End-to-end tests for Proctoring Sections of the Instructor Dashboard.
+    Helper class to share between bokchoy and A11y tests
     """
 
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(ProctoredExamsTest, self).setUp()
+        super(BaseProctoredExamsTests, self).setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -140,13 +139,16 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         course_fixture = CourseFixture(**self.course_info)
         course_fixture.add_advanced_settings({
-            "enable_proctored_exams": {"value": "true"}
+            "enable_proctored_exams": {"value": "true"},
+            "enable_timed_exams": {"value": "true"}
         })
 
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem 1')
+                    XBlockFixtureDesc('vertical', 'Test Unit 1').add_children(
+                        XBlockFixtureDesc('problem', 'Test Problem 1')
+                    )
                 )
             )
         ).install()
@@ -197,10 +199,9 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-    def _create_a_proctored_exam_and_attempt(self):
+    def _create_a_proctored_exam(self):
         """
-        Creates a proctored exam and makes the student attempt it so that
-        the associated allowance and attempts are visible on the Instructor Dashboard.
+        Create a new proctored exam in the test course
         """
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
@@ -213,17 +214,25 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
+
+    def _create_a_proctored_exam_and_attempt(self):
+        """
+        Creates a proctored exam and makes the student attempt it so that
+        the associated allowance and attempts are visible on the Instructor Dashboard.
+        """
+        self._create_a_proctored_exam()
+
         self._login_as_a_verified_user()
         self.courseware_page.visit()
 
         # Start the proctored exam.
         self.courseware_page.start_proctored_exam()
 
-    def _create_a_timed_exam_and_attempt(self):
+    def _create_a_timed_exam(self):
         """
-        Creates a timed exam and makes the student attempt it so that
-        the associated allowance and attempts are visible on the Instructor Dashboard.
+        Simply create a new timed exam
         """
+
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -235,6 +244,14 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
+
+    def _create_a_timed_exam_and_attempt(self):
+        """
+        Creates a timed exam and makes the student attempt it so that
+        the associated allowance and attempts are visible on the Instructor Dashboard.
+        """
+        self._create_a_timed_exam()
+
         self._login_as_a_verified_user()
         self.courseware_page.visit()
 
@@ -243,6 +260,16 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
+
+
+class ProctoredExamsTest(BaseProctoredExamsTests):
+    """
+    End-to-end tests for Proctoring Sections of the Instructor Dashboard.
+    """
+
+    def setUp(self):
+        """Initialization"""
+        super(ProctoredExamsTest, self).setUp()
 
     @flaky  # TODO fix this SOL-1183
     def test_can_add_remove_allowance(self):
@@ -285,6 +312,56 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # And I can remove the attempt by clicking the "x" at the end of the row.
         exam_attempts_section.remove_student_attempt()
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
+
+
+@attr('shard_1')
+@attr('a11y')
+class SpecialExamsA11yTest(BaseProctoredExamsTests):
+    """
+    Accessibility tests for Proctored/Timed Exams
+    """
+
+    def setUp(self):
+        """Initialization"""
+        super(SpecialExamsA11yTest, self).setUp()
+
+    def test_timed_exam_entrance_page_a11y(self):
+        """
+        Test the accessibility of the Timed Exam entrance page
+        """
+
+        # Given that an exam has been configured to be a proctored exam.
+        self._create_a_timed_exam()
+
+        self._login_as_a_verified_user()
+        self.courseware_page.visit()
+
+        # There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        self.courseware_page.a11y_audit.config.set_rules({
+            "ignore": ['color-contrast'],
+        })
+
+        self.courseware_page.a11y_audit.check_for_accessibility_errors()
+
+    def test_proctored_exam_entrance_page_a11y(self):
+        """
+        Test the accessibility of the Timed Exam entrance page
+        """
+
+        # Given that an exam has been configured to be a proctored exam.
+        self._create_a_timed_exam()
+
+        self._login_as_a_verified_user()
+        self.courseware_page.visit()
+
+        # There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        self.courseware_page.a11y_audit.config.set_rules({
+            "ignore": ['color-contrast'],
+        })
+
+        self.courseware_page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_1')
