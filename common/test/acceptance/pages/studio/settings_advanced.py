@@ -209,7 +209,6 @@ class AdvancedSettingsPage(CoursePage):
             'annotation_token_secret',
             'showanswer',
             'show_calculator',
-            'show_chat',
             'show_reset_button',
             'static_asset_path',
             'text_customization',

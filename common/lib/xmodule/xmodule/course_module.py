@@ -270,12 +270,6 @@ class CourseFields(object):
         scope=Scope.settings,
         deprecated=True  # Deprecated because someone would not edit this value within Studio.
     )
-    show_chat = Boolean(
-        display_name=_("Show Chat Widget"),
-        help=_("Enter true or false. When true, students can see the chat widget in the course."),
-        default=False,
-        scope=Scope.settings
-    )
     tabs = CourseTabList(help="List of tabs to enable in this course", scope=Scope.settings, default=[])
     end_of_course_survey_url = String(
         display_name=_("Course Survey URL"),
