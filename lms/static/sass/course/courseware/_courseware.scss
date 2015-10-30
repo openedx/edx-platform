@@ -92,24 +92,6 @@ html.video-fullscreen {
       display: inline;
     }
   }
-
-  // ----------------------------
-  // Primary button style definition used by proctored/timed exams
-  // ----------------------------
-  .btn-pl-primary {
-    @extend %btn-pl-primary-base;
-
-    background-image: none;
-    box-shadow: none;
-    text-shadow: none;
-
-    // overrides for the timer bar because it is
-    // a bit more narrow
-    &.exam-button-turn-in-exam {
-      @extend %t-action4;
-      padding: ($baseline / 5) $baseline;
-    }
-  }
 }
 
 // TO-DO should this be content wrapper?
@@ -161,13 +143,13 @@ div.course-wrapper {
         @include text-align(left);
         @extend %t-copy-base;
         width: 100%;
+
         &:hover {
           background-color: transparent;
+          color: $link-hover;
         }
       }
-      button.gated-sequence > a {
-        color: #147ABA;
-      }
+
       span.proctored-exam-code {
         margin-top: 5px;
         font-size: 1.3em;
@@ -190,6 +172,25 @@ div.course-wrapper {
       .proctored-exam-select-code {
         margin-left: 30px;
       }
+
+      .exam-action-button {
+        @extend %t-weight4;
+        margin-right: $baseline;
+        background-image: none;
+        box-shadow: none;
+        text-shadow: none;
+
+        &.btn-pl-primary {
+          @extend %btn-pl-primary-base;
+          border: 0;
+
+          &:hover,
+          &:focus {
+            border: 0;
+          }
+        }
+      }
+
       background-color: #F2F4F5;
       padding: 30px;
       font-size: 16px;
