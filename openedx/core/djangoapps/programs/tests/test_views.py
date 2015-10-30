@@ -33,35 +33,37 @@ class TestGetXSeriesPrograms(ProgramsApiConfigMixin, TestCase):
                     'status': 'active',
                     'subtitle': 'Dummy program 1 for testing',
                     'name': 'First Program',
+                    'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                     'course_codes': [
                         {
                             'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                             'display_name': 'Demo XSeries Program 1',
                             'key': 'TEST_A',
-                            'marketing_slug': 'fake-marketing-slug-xseries-1',
                             'run_modes': [
                                 {'sku': '', 'mode_slug': 'ABC_1', 'course_key': 'edX/DemoX_1/Run_1'},
                                 {'sku': '', 'mode_slug': 'ABC_2', 'course_key': 'edX/DemoX_2/Run_2'},
                             ]
                         }
-                    ]
+                    ],
+                    'marketing_slug': 'fake-marketing-slug-xseries-1',
                 },
                 {
                     'category': 'xseries',
                     'status': 'active',
                     'subtitle': 'Dummy program 2 for testing',
                     'name': 'Second Program',
+                    'organization': {'display_name': 'Test Organization 2', 'key': 'edX'},
                     'course_codes': [
                         {
                             'organization': {'display_name': 'Test Organization 2', 'key': 'edX'},
                             'display_name': 'Demo XSeries Program 2',
                             'key': 'TEST_B',
-                            'marketing_slug': 'fake-marketing-slug-xseries-2',
                             'run_modes': [
                                 {'sku': '', 'mode_slug': 'XYZ_1', 'course_key': 'edX/Program/Program_Run'},
                             ]
                         }
-                    ]
+                    ],
+                    'marketing_slug': 'fake-marketing-slug-xseries-2',
                 }
             ]
         }
@@ -83,10 +85,11 @@ class TestGetXSeriesPrograms(ProgramsApiConfigMixin, TestCase):
                 'edX/DemoX_1/Run_1': {
                     'category': 'xseries',
                     'status': 'active',
+                    'subtitle': 'Dummy program 1 for testing',
+                    'name': 'First Program',
                     'course_codes': [
                         {
                             'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
-                            'marketing_slug': 'fake-marketing-slug-xseries-1',
                             'display_name': 'Demo XSeries Program 1',
                             'key': 'TEST_A',
                             'run_modes': [
@@ -95,16 +98,17 @@ class TestGetXSeriesPrograms(ProgramsApiConfigMixin, TestCase):
                             ]
                         }
                     ],
-                    'subtitle': 'Dummy program 1 for testing',
-                    'name': 'First Program'
+                    'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
+                    'marketing_slug': 'fake-marketing-slug-xseries-1',
                 },
                 'edX/DemoX_2/Run_2': {
                     'category': 'xseries',
                     'status': 'active',
+                    'subtitle': 'Dummy program 1 for testing',
+                    'name': 'First Program',
                     'course_codes': [
                         {
                             'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
-                            'marketing_slug': 'fake-marketing-slug-xseries-1',
                             'display_name': 'Demo XSeries Program 1',
                             'key': 'TEST_A',
                             'run_modes': [
@@ -113,8 +117,8 @@ class TestGetXSeriesPrograms(ProgramsApiConfigMixin, TestCase):
                             ]
                         }
                     ],
-                    'subtitle': 'Dummy program 1 for testing',
-                    'name': 'First Program'
+                    'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
+                    'marketing_slug': 'fake-marketing-slug-xseries-1',
                 },
             }
             self.assertTrue(mock_get.called)
@@ -131,10 +135,11 @@ class TestGetXSeriesPrograms(ProgramsApiConfigMixin, TestCase):
             expected_output['edX/Program/Program_Run'] = {
                 'category': 'xseries',
                 'status': 'active',
+                'subtitle': 'Dummy program 2 for testing',
+                'name': 'Second Program',
                 'course_codes': [
                     {
                         'organization': {'display_name': 'Test Organization 2', 'key': 'edX'},
-                        'marketing_slug': 'fake-marketing-slug-xseries-2',
                         'display_name': 'Demo XSeries Program 2',
                         'key': 'TEST_B',
                         'run_modes': [
@@ -142,8 +147,8 @@ class TestGetXSeriesPrograms(ProgramsApiConfigMixin, TestCase):
                         ]
                     }
                 ],
-                'subtitle': 'Dummy program 2 for testing',
-                'name': 'Second Program'
+                'organization': {'display_name': 'Test Organization 2', 'key': 'edX'},
+                'marketing_slug': 'fake-marketing-slug-xseries-2',
             }
             self.assertTrue(mock_get.called)
             self.assertEqual(expected_output, programs)
@@ -206,3 +211,37 @@ class TestGetXSeriesPrograms(ProgramsApiConfigMixin, TestCase):
                 get_course_programs_for_dashboard(self.user, ['edX/DemoX/Run']), {}
             )
             self.assertTrue(mock_get.called)
+
+    @patch('openedx.core.djangoapps.programs.views.log.exception')
+    def test_get_course_programs_with_invalid_response(self, log_exception):
+        """ Test that the method 'get_course_programs_for_dashboard' logs
+        the exception message if rest api client returns invalid data.
+        """
+        program = {
+            'category': 'xseries',
+            'status': 'active',
+            'subtitle': 'Dummy program 1 for testing',
+            'name': 'First Program',
+            'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
+            'course_codes': [
+                {
+                    'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
+                    'display_name': 'Demo XSeries Program 1',
+                    'key': 'TEST_A',
+                    'run_modes': [
+                        {'sku': '', 'mode_slug': 'ABC_2'},
+                    ]
+                }
+            ],
+            'marketing_slug': 'fake-marketing-slug-xseries-1',
+        }
+        invalid_programs_api_response = {"results": [program]}
+        # mock the request call
+        with patch('slumber.Resource.get') as mock_get:
+            mock_get.return_value = invalid_programs_api_response
+            programs = get_course_programs_for_dashboard(self.user, ['edX/DemoX/Run'])
+            log_exception.assert_called_with(
+                'Unable to parse Programs API response: %r',
+                program
+            )
+            self.assertEqual(programs, {})

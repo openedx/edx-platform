@@ -7,6 +7,8 @@ import uuid
 import json
 import warnings
 from collections import defaultdict
+from urlparse import urljoin
+
 from pytz import UTC
 from requests import HTTPError
 from ipware.ip import get_ip
@@ -579,7 +581,7 @@ def dashboard(request):
     # program-related information on the dashboard view.
     course_programs = {}
     if is_student_dashboard_programs_enabled():
-        course_programs = get_course_programs_for_dashboard(user, show_courseware_links_for)
+        course_programs = _get_course_programs(user, show_courseware_links_for)
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -2271,3 +2273,39 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+
+def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invalid-name
+    """ Returns a dictionary of programs courses data require for the student
+    dashboard.
+
+    Given a user and an iterable of course keys, find all
+    the programs relevant to the user and return them in a
+    dictionary keyed by the course_key.
+
+    Arguments:
+        user (user object): Currently logged-in User
+        user_enrolled_courses (list): List of course keys in which user is
+            enrolled
+
+    Returns:
+        Dictionary response containing programs or {}
+    """
+    course_programs = get_course_programs_for_dashboard(user, user_enrolled_courses)
+    programs_data = {}
+    for course_key, program in course_programs.viewitems():
+        if program.get('status') == 'active' and program.get('category') == 'xseries':
+            try:
+                programs_data[course_key] = {
+                    'course_count': len(program['course_codes']),
+                    'display_name': program['name'],
+                    'category': program.get('category'),
+                    'program_marketing_url': urljoin(
+                        settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
+                    ).format(program['marketing_slug']),
+                    'display_category': 'XSeries'
+                }
+            except KeyError:
+                log.warning('Program structure is invalid, skipping display: %r', program)
+
+    return programs_data
