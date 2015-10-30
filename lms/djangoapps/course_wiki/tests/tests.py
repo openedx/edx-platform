@@ -22,10 +22,10 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
-        self.create_account('u1', self.student, self.password)
-        self.create_account('u2', self.instructor, self.password)
-        self.activate_user(self.student)
-        self.activate_user(self.instructor)
+        for username, email in [('u1', self.student), ('u2', self.instructor)]:
+            self.create_account(username, email, self.password)
+            self.activate_user(email)
+            self.logout()
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
     def test_wiki_redirect(self):
@@ -133,6 +133,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.login(self.instructor, self.password)
         self.enroll(self.toy)
         self.create_course_page(self.toy)
+        self.logout()
 
         self.login(self.student, self.password)
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
