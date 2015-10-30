@@ -266,7 +266,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-22 18:35+0000\n"
+"POT-Creation-Date: 2015-10-30 14:33+0000\n"
 "PO-Revision-Date: 2015-06-18 03:04+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -773,6 +773,12 @@ msgstr ""
 msgid "Value of the enrollment attribute"
 msgstr ""
 
+#: common/djangoapps/student/models.py
+msgid ""
+"The window of time after enrolling during which users can be granted a "
+"refund, represented in microseconds. The default is 14 days."
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
@@ -796,6 +802,10 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
 msgstr "您还没有选修本课程"
+
+#: common/djangoapps/student/views.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
@@ -1524,7 +1534,7 @@ msgstr "不正确"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "在评价提示功能{hintfn}发生错误{err}。"
+msgstr "在对提示函数 {hintfn} 求值时发生错误 {err}。"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "(Source code line unavailable)"
@@ -1598,7 +1608,7 @@ msgstr "你可能在数学问题中无法使用变量({bad_variables})。"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
-msgstr "超出自动评价功能的有效范围：“{student_answer}”"
+msgstr "在阶乘函数的定义域之外对其求值：“{student_answer}”"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid math syntax: '{student_answer}'"
@@ -1716,7 +1726,7 @@ msgstr "无效输入：{bad_input}不允许出现在回答中。"
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
-msgstr "针对该问题的回答不在自动评价功能允许范围之内。提交的回答是：{bad_input}"
+msgstr "该问题的答案中不允许使用阶乘函数。提交的回答是：{bad_input}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
@@ -1992,11 +2002,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
-msgstr "提交"
+msgstr "检查答案"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Final Check"
-msgstr "最终检查"
+msgstr "最后一次检查答案"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Checking..."
@@ -2020,13 +2030,13 @@ msgstr "如果该问题依然存在，请联系课程工作人员。"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint: "
-msgstr ""
+msgstr "提示："
 
 #. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
 #. hints.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
-msgstr ""
+msgstr "提示(第 {hint_num} 个，共 {hints_count} 个)："
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -2036,7 +2046,7 @@ msgstr "问题已结束。"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be reset before it can be checked again."
-msgstr "在检查问题之前必须把它重新设置"
+msgstr "在重新检查问题之前必须把它重置。"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
@@ -3118,6 +3128,17 @@ msgstr ""
 msgid ""
 "The minimum grade that a learner must earn to receive credit in the course, "
 "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Self Paced"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Set this to \"true\" to mark this course as self-paced. Self-paced courses "
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5788,6 +5809,19 @@ msgid ""
 "The executive summary report is currently being created. To view the status "
 "of the report, see Pending Instructor Tasks below. You will be able to "
 "download the report when it is complete."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is being created. To view the status of the report, see "
+"Pending Instructor Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is currently being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -8705,6 +8739,22 @@ msgstr ""
 
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Internal Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Public Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -13765,6 +13815,14 @@ msgid "Generate Proctored Exam Results Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to generate a CSV file of survey results for this course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Survey Results Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "To generate a CSV file that lists all student answers to a given problem, "
 "enter the location of the problem (from its Staff Debug Info)."
@@ -17950,8 +18008,8 @@ msgstr "管理员是课程团队成员中可以添加和移除其它课程团队
 
 #: cms/templates/manage_users.html
 msgid ""
-"All course team members are automatically enrolled in the course and can "
-"access content in Studio, the LMS, and Insights."
+"All course team members can access content in Studio, the LMS, and Insights,"
+" but are not automatically enrolled in the course."
 msgstr ""
 
 #: cms/templates/manage_users.html
@@ -18408,6 +18466,28 @@ msgid ""
 "The score student must meet in order to successfully complete the entrance "
 "exam. "
 msgstr "学生要顺利完成入学考试所必须满足的分数。"
+
+#: cms/templates/settings.html
+msgid "Course Pacing"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-led courses progress at the pace that the course author sets. You"
+" can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Content License"

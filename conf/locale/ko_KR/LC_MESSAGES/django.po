@@ -92,7 +92,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-22 18:35+0000\n"
+"POT-Creation-Date: 2015-10-30 14:33+0000\n"
 "PO-Revision-Date: 2015-09-25 11:11+0000\n"
 "Last-Translator: Hongseob Lee <shevious@yahoo.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -625,6 +625,12 @@ msgstr "수강 속성의 이름"
 msgid "Value of the enrollment attribute"
 msgstr "수강 속성의 값"
 
+#: common/djangoapps/student/models.py
+msgid ""
+"The window of time after enrolling during which users can be granted a "
+"refund, represented in microseconds. The default is 14 days."
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
 msgstr "이 강좌는 {date}일부터 개강됩니다."
@@ -648,6 +654,10 @@ msgstr "등록할 수 없습니다."
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
 msgstr "이 강좌에 등록되지 않았습니다."
+
+#: common/djangoapps/student/views.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
@@ -1204,7 +1214,7 @@ msgstr "시스템에 정의된 마일스톤"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid Length ({0})"
-msgstr "유효하지 않은 길이 ({0})"
+msgstr "의 길이가 유효하지 않습니다. ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must be {0} characters or more"
@@ -1216,7 +1226,7 @@ msgstr "{0} 자 이하여야 합니다."
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Must be more complex ({0})"
-msgstr "더 복잡해야 합니다.({0}) "
+msgstr "가 더 복잡해야 합니다.({0}) "
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more uppercase characters"
@@ -1676,7 +1686,7 @@ msgstr "학습자들이 이 문제 풀기에 시도한 횟수 "
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
-msgstr "문제 풀기 최대 횟수"
+msgstr "문제 풀이 최대 횟수"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -1713,15 +1723,15 @@ msgstr "항상"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answered"
-msgstr "응답했습니다."
+msgstr "응답"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Attempted"
-msgstr "시도했습니다."
+msgstr "문제 풀이"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
-msgstr "닫혔습니다. "
+msgstr "닫힘"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Finished"
@@ -1729,15 +1739,15 @@ msgstr "종료되었습니다"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
-msgstr "올바르거나 지난 마감 기한"
+msgstr "정답 입력시 또는 기한 경과 후"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Past Due"
-msgstr "지난 마감 기한"
+msgstr "기한 경과 후"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Never"
-msgstr "절대 아님"
+msgstr "절대 표시하지 않음"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether to force the save button to appear on the page"
@@ -1745,14 +1755,14 @@ msgstr "페이지에 저장 버튼이 나타나도록 할 것인지 여부"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Reset Button"
-msgstr "재설정 버튼 보이기"
+msgstr "초기화 버튼 보이기"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
 msgstr ""
-"학습자가 답을 다시 입력할 수 있도록, '재설정' 버튼을 보이게 할 것인지 정해주십시오. 기본 값 설정은 고급 설정에서 가능합니다.  "
+"학습자가 답을 다시 입력할 수 있도록, '초기화' 버튼을 보이게 할 것인지 정해주십시오. 기본값 설정은 고급 설정에서 가능합니다.  "
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -1769,7 +1779,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "On Reset"
-msgstr "초기화 중"
+msgstr "초기화 가능"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Per Student"
@@ -1907,7 +1917,7 @@ msgstr "답변 제출 기한이 끝났습니다."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be reset before it can be checked again."
-msgstr "문제를 다시 확인하기 위해서는 문제가 재설정되어야 합니다."
+msgstr "문제에 대해 다시 확인받기 위해서는 문제가 초기화되어야 합니다."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
@@ -1967,7 +1977,7 @@ msgstr ""
 #. page before they can reset it.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Refresh the page and make an attempt before resetting."
-msgstr "재설정 전에, 페이지를 새로 고침하고 시도하세요."
+msgstr "초기화 전에, 페이지를 새로 고침하고 시도하세요."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2017,11 +2027,11 @@ msgstr "채점되었습니다."
 msgid ""
 "Defines whether the student gets credit for this problem. Credit is based on"
 " peer grades of this problem."
-msgstr "학습자가 이 문제에 대한 점수를 취득할 지 여부를 정해주십시오. 점수는 동료 채점을 기반으로 하여 매겨집니다."
+msgstr "학습자가 이 문제에 대한 점수를 취득할 지 여부를 정해주십시오. 점수는 상호 평가를 기반으로 하여 매겨집니다."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "If the problem is ready to be reset or not."
-msgstr "문제가 재설정될 수 있는지 없는지 "
+msgstr "초기화 가능 여부"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "The number of times the student can try to answer this problem."
@@ -2059,7 +2069,7 @@ msgstr "각 문제의 점수를 정해주십시오. 점수 값이 정해지지 �
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Minimum Peer Grading Calibrations"
-msgstr "예비 상호 채점 최소 인원수"
+msgstr "예비 상호 평가 최소 인원수"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
@@ -2069,17 +2079,17 @@ msgstr "상호 평가를 위해, 각 학습자가 완성해야 하는 최소 에
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Maximum Peer Grading Calibrations"
-msgstr "예비 상호 채점 최대 인원수"
+msgstr "예비 상호 평가 최대 인원수"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
 "The maximum number of calibration essays each student will need to complete "
 "for peer grading."
-msgstr "상호 채점을 위해, 각 학습자가 완성해야 하는 최대 에세이 수"
+msgstr "상호 평가를 위해, 각 학습자가 완성해야 하는 최대 에세이 수"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Peer Graders per Response"
-msgstr "답변별 상호 채점자"
+msgstr "답변별 상호 평가자"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "The number of peers who will grade each submission."
@@ -2087,7 +2097,7 @@ msgstr "상호 평가에서 각 제출물을 채점할 학습자의 수 "
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Required Peer Grading"
-msgstr "상호 채점이 필요합니다."
+msgstr "상호 평가가 필요합니다."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
@@ -2097,7 +2107,7 @@ msgstr "상호 평가에서, 한 학습자가 채점해야 할 다른 학습자�
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Allow \"overgrading\" of peer submissions"
-msgstr "상호 채점 시 기준 초과 점수 부여 허용"
+msgstr "상호 평가 시 기준 초과 점수 부여 허용"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
@@ -2107,7 +2117,7 @@ msgid ""
 " when settings for `Required Peer Grading` > `Peer Graders per Response`"
 msgstr ""
 "필요 채점자 인원이 충원되어도 채점자 추가를 허용합니다. 단, 학습자에 채점 권한이 있는  모든 제출에 이미 채점자가 충원된 경우에 "
-"한합니다. 이는 '필수 상호 채점' > '답변별 상호채점' 기능을 사용하기 위함입니다. "
+"한합니다. 이는 '필수 상호 평가' > '답변별 상호 평가' 기능을 사용하기 위함입니다. "
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
@@ -3048,6 +3058,17 @@ msgstr ""
 "0.75를 입력합니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Self Paced"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Set this to \"true\" to mark this course as self-paced. Self-paced courses "
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "일반"
 
@@ -3550,7 +3571,7 @@ msgstr "Amount of grace to give on the due date. "
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Student data for a given peer grading problem."
-msgstr "상호 채점을 위한 학습자 데이터"
+msgstr "상호 평가를 위한 학습자 데이터"
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Peer Grading Interface"
@@ -3974,7 +3995,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Reset Button for Problems"
-msgstr "문제 재설정 버튼 보이기"
+msgstr "문제 초기화 버튼 보이기"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -5834,6 +5855,19 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
+"The survey report is being created. To view the status of the report, see "
+"Pending Instructor Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is currently being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
 "The proctored exam results report is being created. To view the status of "
 "the report, see Pending Instructor Tasks below."
 msgstr ""
@@ -6289,7 +6323,7 @@ msgstr "재채점 되었습니다."
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "reset"
-msgstr "재설정"
+msgstr "초기화"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
@@ -8879,6 +8913,22 @@ msgstr "메가바이트"
 msgid "No file provided for profile image"
 msgstr "프로필 사진 파일이 제공되지 않음"
 
+#: openedx/core/djangoapps/programs/models.py
+msgid "Internal Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Public Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -9761,7 +9811,7 @@ msgstr "주석 감추기"
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
-msgstr "더 살펴보기"
+msgstr "자세히 알아보기"
 
 #: lms/templates/course.html
 msgid "Starts"
@@ -10018,7 +10068,7 @@ msgid ""
 "will do our best to address your inquiry in any language, our responses will"
 " be in English."
 msgstr ""
-"주의:  {platform_name}지원팀은 영어를 사용합니다. 귀하의 질의에 응답하기위해 최선을 다하겠습니다. 응답은 영어가 "
+"주의:  {platform_name}지원팀은 영어를 사용합니다. 귀하의 질의에 응답하기 위해 최선을 다하겠습니다. 응답은 영어가 "
 "사용됩니다."
 
 #: lms/templates/help_modal.html
@@ -10463,7 +10513,7 @@ msgstr "힌트"
 
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
-msgstr "재설정"
+msgstr "초기화"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
 #: lms/templates/combinedopenended/openended/open_ended.html
@@ -10665,7 +10715,7 @@ msgstr " {username} 님 안녕하세요!"
 
 #: lms/templates/register.html
 msgid "Enter a Public Display Name:"
-msgstr "공개 사용자명을 입력하세요:"
+msgstr "ID를 입력하세요."
 
 #: lms/templates/register.html
 msgid "Public Display Name"
@@ -10811,7 +10861,7 @@ msgstr "행동들"
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset Student Attempts"
-msgstr "학습자 시도 재설정"
+msgstr "문제 풀이 횟수 설정 초기화 "
 
 #: lms/templates/staff_problem_info.html
 msgid "Delete Student State"
@@ -10895,7 +10945,7 @@ msgstr "이메일 또는 아이디"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete user"
-msgstr "사용자명 삭제"
+msgstr "ID 삭제"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Create user"
@@ -14032,6 +14082,14 @@ msgid "Generate Proctored Exam Results Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to generate a CSV file of survey results for this course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Survey Results Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "To generate a CSV file that lists all student answers to a given problem, "
 "enter the location of the problem (from its Staff Debug Info)."
@@ -14074,7 +14132,7 @@ msgstr "현재 수강신청한 전체 학습자에 대한 CSV 성적 보고서 �
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Grade Report"
-msgstr "평가리포트 생성"
+msgstr "성적 보고서 생성"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Problem Grade Report"
@@ -14082,7 +14140,7 @@ msgstr "성적 보고서 생성 오류"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
-msgstr "보고서 다운로드"
+msgstr "다운로드 가능한 보고서"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -15184,7 +15242,7 @@ msgstr "학습자 사전 평가와 관련해서 선택해 주세요. 선택 결�
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset Number of Student Attempts"
-msgstr "학습자 응시 횟수 초기화"
+msgstr "문제 풀이 횟수 초기화"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
@@ -15355,9 +15413,9 @@ msgstr ""
 "\n"
 "{p_tag} 진행중인 상호 평가가 없습니다. 상호평가를 위해\n"
 "{ul_tag}\n"
-"{li_tag} 문제의 답안을 제출해야 합니다.{end_li_tag}\n"
-"{li_tag} 귀하가 채점 항목을 더욱 잘 이해하실 수 있도록,  강좌 운영팀이 에세이에 점수를 매겨야 합니다. {end_li_tag}\n"
-"{li_tag} 채점 대기 중인 제출이 있을 것입니다. {end_li_tag}\n"
+"{li_tag} 문제에 대한 응답을 제출해야 합니다.{end_li_tag}\n"
+"{li_tag} 귀하가 채점 항목을 더욱 잘 이해하실 수 있도록,  강좌 운영팀이 먼저 에세이에 점수를 매겨야 합니다. {end_li_tag}\n"
+"{li_tag} 채점 대기 중인 응답이 있을 것입니다. {end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
 
@@ -18064,7 +18122,7 @@ msgstr "첫 강좌를 만듭니다."
 
 #: cms/templates/index.html
 msgid "Your new course is just a click away!"
-msgstr "새 강좌를 클릭 하나로 만들 수 있습니다."
+msgstr "새 강좌를 클릭 한 번으로 만들 수 있습니다."
 
 #: cms/templates/index.html
 msgid "Becoming a Course Creator in {studio_name}"
@@ -18358,10 +18416,9 @@ msgstr "교수자는 강좌 운영팀의 다른 구성원을 추가하거나 삭
 
 #: cms/templates/manage_users.html
 msgid ""
-"All course team members are automatically enrolled in the course and can "
-"access content in Studio, the LMS, and Insights."
+"All course team members can access content in Studio, the LMS, and Insights,"
+" but are not automatically enrolled in the course."
 msgstr ""
-"전 강좌 운영팀 구성원들은 자동으로 강좌에 등록되며 스튜디오, 학습자 관리 시스템, Insights의 콘텐츠에 접근할 수 있습니다."
 
 #: cms/templates/manage_users.html
 msgid "Transferring Ownership"
@@ -18836,6 +18893,28 @@ msgid ""
 msgstr "사전 시험을 통과하기 위해 학습자가 받아야 할 점수입니다."
 
 #: cms/templates/settings.html
+msgid "Course Pacing"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-led courses progress at the pace that the course author sets. You"
+" can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
+
+#: cms/templates/settings.html
 msgid "Course Content License"
 msgstr "강좌 콘텐츠 라이센스"
 
@@ -18965,7 +19044,7 @@ msgstr "마감일이 지난 이후에, 학습자가 제출할 수 있는 기간�
 
 #: cms/templates/settings_graders.html
 msgid "Assignment Types"
-msgstr "과제명"
+msgstr "과제 유형"
 
 #: cms/templates/settings_graders.html
 msgid "Categories and labels for any exercises that are gradable"

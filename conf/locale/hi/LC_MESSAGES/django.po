@@ -75,7 +75,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-22 18:35+0000\n"
+"POT-Creation-Date: 2015-10-30 14:33+0000\n"
 "PO-Revision-Date: 2015-06-28 20:21+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -589,6 +589,12 @@ msgstr ""
 msgid "Value of the enrollment attribute"
 msgstr ""
 
+#: common/djangoapps/student/models.py
+msgid ""
+"The window of time after enrolling during which users can be granted a "
+"refund, represented in microseconds. The default is 14 days."
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
@@ -612,6 +618,10 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
 msgstr "आप इस पाठ्यक्रम में दाखिल नहीं हैं"
+
+#: common/djangoapps/student/views.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
@@ -2959,6 +2969,17 @@ msgstr ""
 msgid ""
 "The minimum grade that a learner must earn to receive credit in the course, "
 "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Self Paced"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Set this to \"true\" to mark this course as self-paced. Self-paced courses "
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5655,6 +5676,19 @@ msgid ""
 "The executive summary report is currently being created. To view the status "
 "of the report, see Pending Instructor Tasks below. You will be able to "
 "download the report when it is complete."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is being created. To view the status of the report, see "
+"Pending Instructor Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is currently being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -8634,6 +8668,22 @@ msgstr ""
 
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Internal Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Public Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -13765,6 +13815,14 @@ msgid "Generate Proctored Exam Results Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to generate a CSV file of survey results for this course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Survey Results Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "To generate a CSV file that lists all student answers to a given problem, "
 "enter the location of the problem (from its Staff Debug Info)."
@@ -17967,8 +18025,8 @@ msgstr ""
 
 #: cms/templates/manage_users.html
 msgid ""
-"All course team members are automatically enrolled in the course and can "
-"access content in Studio, the LMS, and Insights."
+"All course team members can access content in Studio, the LMS, and Insights,"
+" but are not automatically enrolled in the course."
 msgstr ""
 
 #: cms/templates/manage_users.html
@@ -18418,6 +18476,28 @@ msgstr ""
 msgid ""
 "The score student must meet in order to successfully complete the entrance "
 "exam. "
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Pacing"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-led courses progress at the pace that the course author sets. You"
+" can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
 msgstr ""
 
 #: cms/templates/settings.html
