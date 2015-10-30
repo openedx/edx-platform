@@ -10,6 +10,7 @@ import sys
 from paver.easy import sh, task
 
 from .utils.envs import Env
+import sys
 
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
