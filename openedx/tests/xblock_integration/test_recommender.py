@@ -120,6 +120,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             username = "u{}".format(idx)
             self.create_account(username, student['email'], student['password'])
             self.activate_user(student['email'])
+            self.logout()
 
         self.staff_user = GlobalStaffFactory()
 
