@@ -197,10 +197,9 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-    def _create_a_proctored_exam_and_attempt(self):
+    def _create_a_proctored_exam(self):
         """
-        Creates a proctored exam and makes the student attempt it so that
-        the associated allowance and attempts are visible on the Instructor Dashboard.
+        Create a new proctored exam in the test course
         """
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
@@ -213,17 +212,25 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
+
+    def _create_a_proctored_exam_and_attempt(self):
+        """
+        Creates a proctored exam and makes the student attempt it so that
+        the associated allowance and attempts are visible on the Instructor Dashboard.
+        """
+        self._create_a_proctored_exam()
+
         self._login_as_a_verified_user()
         self.courseware_page.visit()
 
         # Start the proctored exam.
         self.courseware_page.start_proctored_exam()
 
-    def _create_a_timed_exam_and_attempt(self):
+    def _create_a_timed_exam(self):
         """
-        Creates a timed exam and makes the student attempt it so that
-        the associated allowance and attempts are visible on the Instructor Dashboard.
+        Simply create a new timed exam
         """
+
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -235,6 +242,14 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
+
+    def _create_a_timed_exam_and_attempt(self):
+        """
+        Creates a timed exam and makes the student attempt it so that
+        the associated allowance and attempts are visible on the Instructor Dashboard.
+        """
+        self._create_a_timed_exam()
+
         self._login_as_a_verified_user()
         self.courseware_page.visit()
 
@@ -294,17 +309,43 @@ class SpecialExamsA11yTest(ProctoredExamsTest):
     Accessibility tests for Proctored/Timed Exams
     """
 
+    def setUp(self):
+        """Initialization"""
+        super(SpecialExamsA11yTest, self).setUp()
+
     def test_timed_exam_entrance_page_a11y(self):
         """
         Test the accessibility of the Timed Exam entrance page
         """
 
         # Given that an exam has been configured to be a proctored exam.
-        self._create_a_timed_exam_and_attempt()
+        self._create_a_timed_exam()
+
+        self._login_as_a_verified_user()
+        self.courseware_page.visit()
 
         # There are several existing color contrast errors on this page,
         # we will ignore this error in the test until we fix them.
-        self.dashboard_page.a11y_audit.config.set_rules({
+        self.courseware_page.a11y_audit.config.set_rules({
+            "ignore": ['color-contrast'],
+        })
+
+        self.courseware_page.a11y_audit.check_for_accessibility_errors()
+
+    def test_proctored_exam_entrance_page_a11y(self):
+        """
+        Test the accessibility of the Timed Exam entrance page
+        """
+
+        # Given that an exam has been configured to be a proctored exam.
+        self._create_a_timed_exam()
+
+        self._login_as_a_verified_user()
+        self.courseware_page.visit()
+
+        # There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        self.courseware_page.a11y_audit.config.set_rules({
             "ignore": ['color-contrast'],
         })
 
