@@ -32,7 +32,6 @@ APPSEMBLER_EMAIL = 'support@appsembler.com'
 
 @api_view(['POST'])
 def user_signup_endpoint(request):
-    import pdb; pdb.set_trace()
     if request.method != 'POST':
         logger.warning('Non-POST request coming to url: /appsembler/user')
         raise Http404
@@ -74,7 +73,6 @@ EDXAPP_APPSEMBLER_FEATURES:
         logger.info('No course id; user {0} will be created but not enrolled in any \
                     course.'.format(user_email))
 
-    import pdb; pdb.set_trace()
     password = request.POST.get('Password','')
     if not password:
         logger.error('Could not extract Password from POST request.')
@@ -216,7 +214,7 @@ info@appsembler.com
         logger.exception(exc)
         return HttpResponse(status=400)
 
-    userdata = { 'userid': user.id, 'email': user.email, 'course': user_course }
+    userdata = { 'username': user.username, 'email': user.email, 'course': user_course }
     data = simplejson.dumps(userdata)
     # return HttpResponse(data, status=200, content_type='application/json')
     return HttpResponse(data, status=200, content_type='application/json')
