@@ -117,17 +117,16 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
 
 
-@attr('shard_1')
-class ProctoredExamsTest(BaseInstructorDashboardTest):
+class BaseProctoredExamsTests(BaseInstructorDashboardTest):
     """
-    End-to-end tests for Proctoring Sections of the Instructor Dashboard.
+    Helper class to share between bokchoy and A11y tests
     """
 
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(ProctoredExamsTest, self).setUp()
+        super(BaseProctoredExamsTests, self).setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -259,6 +258,17 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
 
+
+@attr('shard_1')
+class ProctoredExamsTest(BaseProctoredExamsTests):
+    """
+    End-to-end tests for Proctoring Sections of the Instructor Dashboard.
+    """
+
+    def setUp(self):
+        """Initialization"""
+        super(ProctoredExamsTest, self).setUp()
+
     @flaky  # TODO fix this SOL-1183
     def test_can_add_remove_allowance(self):
         """
@@ -304,7 +314,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
 @attr('shard_1')
 @attr('a11y')
-class SpecialExamsA11yTest(ProctoredExamsTest):
+class SpecialExamsA11yTest(BaseProctoredExamsTests):
     """
     Accessibility tests for Proctored/Timed Exams
     """
