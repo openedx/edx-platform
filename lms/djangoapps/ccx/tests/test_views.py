@@ -286,6 +286,10 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         course_enrollments = get_override_for_ccx(ccx, self.course, 'max_student_enrollments_allowed')
         self.assertEqual(course_enrollments, settings.CCX_MAX_STUDENTS_ALLOWED)
 
+        # assert ccx creator has role=ccx_coach
+        role = CourseCcxCoachRole(course_key)
+        self.assertTrue(role.has_user(self.coach))
+
     @SharedModuleStoreTestCase.modifies_courseware
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('ccx.views.TODAY')
