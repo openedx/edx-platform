@@ -115,6 +115,7 @@ class TransactionManagersTestCase(TransactionTestCase):
         atomic or if the isolation level is changed when it is nested
         inside another commit_on_success.
         """
+        # pylint: disable=not-callable
 
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')

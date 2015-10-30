@@ -3,7 +3,9 @@ Run and manage servers for local development.
 """
 from __future__ import print_function
 import argparse
-from paver.easy import *
+import sys
+
+from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 
 from .assets import collect_assets
 from .utils.cmd import django_cmd

@@ -1,6 +1,8 @@
 """
 Utility functions related to databases.
 """
+# TransactionManagementError used below actually *does* derive from the standard "Exception" class.
+# pylint: disable=nonstandard-exception
 from functools import wraps
 import random
 
@@ -59,7 +61,7 @@ class CommitOnSuccessManager(object):
             # In such cases, start an explicit transaction instead, which has
             # the side-effect of disabling autocommit.
             if connection.features.autocommits_when_autocommit_is_off:
-                connection._start_transaction_under_autocommit()
+                connection._start_transaction_under_autocommit()  # pylint: disable=protected-access
                 connection.autocommit = False
             else:
                 connection.set_autocommit(False)
@@ -110,7 +112,7 @@ class CommitOnSuccessManager(object):
 
     def __call__(self, func):
         @wraps(func)
-        def decorated(*args, **kwds):
+        def decorated(*args, **kwds):       # pylint: disable=missing-docstring
             with self:
                 return func(*args, **kwds)
         return decorated
@@ -161,6 +163,8 @@ class OuterAtomic(transaction.Atomic):
         # The outermost atomic starts a transaction - so does not have a savepoint.
         # The inner atomic starts a savepoint around the test.
         # So, for tests only, there should be exactly one savepoint_id and two atomic_for_testcase_calls.
+        # atomic_for_testcase_calls below is added in a monkey-patch for tests only.
+        # pylint: disable=no-member
         if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:
             raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
 

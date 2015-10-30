@@ -25,7 +25,7 @@
 profile = no
 ignore = ,migrations
 persistent = yes
-load-plugins = edx_lint.pylint
+load-plugins = edx_lint.pylint,pylint_django
 
 [MESSAGES CONTROL]
 disable = 
@@ -152,4 +152,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 503c3db797ee662a18237a57f00cb1e6e553be34
+# e1ea95cb153c6479ac4bc970053b86b5c347fd7d

@@ -18,7 +18,7 @@ class EDXJSONEncoder(DjangoJSONEncoder):
         want and also this is different from Django 1.4, In Django 1.4 if Decimal object has zeros after the decimal
         point then object will be serialized as `int` else `float`, so we are keeping this behavior.
     """
-    def default(self, o):
+    def default(self, o):  # pylint: disable=method-hidden
         """
         Encode Decimal objects. If decimal object has zeros after the
         decimal point then object will be serialized as `int` else `float`
@@ -58,15 +58,15 @@ class JsonResponse(HttpResponse):
     """
     Django HttpResponse subclass that has sensible defaults for outputting JSON.
     """
-    def __init__(self, object=None, status=None, encoder=EDXJSONEncoder,
+    def __init__(self, resp_obj=None, status=None, encoder=EDXJSONEncoder,
                  *args, **kwargs):
-        if object in (None, ""):
+        if resp_obj in (None, ""):
             content = ""
             status = status or 204
-        elif isinstance(object, QuerySet):
-            content = serialize('json', object)
+        elif isinstance(resp_obj, QuerySet):
+            content = serialize('json', resp_obj)
         else:
-            content = json.dumps(object, cls=encoder, indent=2, ensure_ascii=False)
+            content = json.dumps(resp_obj, cls=encoder, indent=2, ensure_ascii=False)
         kwargs.setdefault("content_type", "application/json")
         if status:
             kwargs["status"] = status

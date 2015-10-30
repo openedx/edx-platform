@@ -2,10 +2,13 @@
 Install Python, Ruby, and Node prerequisites.
 """
 
-import os
-import hashlib
 from distutils import sysconfig
-from paver.easy import *
+import hashlib
+import os
+import sys
+
+from paver.easy import sh, task
+
 from .utils.envs import Env
 
 

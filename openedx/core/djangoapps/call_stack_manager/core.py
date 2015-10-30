@@ -136,7 +136,7 @@ class CallStackMixin(object):
         return super(CallStackMixin, self).delete(*args, **kwargs)
 
 
-class CallStackManager(Manager):
+class CallStackManager(Manager):  # pylint: disable=super-on-old-class
     """ Manager class which overrides the default Manager class for getting call stacks """
     def get_queryset(self):
         """ Override the default queryset API method """

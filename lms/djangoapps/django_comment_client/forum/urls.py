@@ -1,3 +1,6 @@
+"""
+Forum urls for the django_comment_client.
+"""
 from django.conf.urls import url, patterns
 
 urlpatterns = patterns(
