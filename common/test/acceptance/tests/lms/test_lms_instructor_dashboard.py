@@ -288,6 +288,30 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
 
 @attr('shard_1')
+@attr('a11y')
+class SpecialExamsA11yTest(ProctoredExamsTest):
+    """
+    Accessibility tests for Proctored/Timed Exams
+    """
+
+    def test_timed_exam_entrance_page_a11y(self):
+        """
+        Test the accessibility of the Timed Exam entrance page
+        """
+
+        # Given that an exam has been configured to be a proctored exam.
+        self._create_a_timed_exam_and_attempt()
+
+        # There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        self.dashboard_page.a11y_audit.config.set_rules({
+            "ignore": ['color-contrast'],
+        })
+
+        self.courseware_page.a11y_audit.check_for_accessibility_errors()
+
+
+@attr('shard_1')
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
     Tests for Entrance exam specific student grading tasks.
