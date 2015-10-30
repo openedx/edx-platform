@@ -308,22 +308,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return;
             }
 
-            if (this.options.enable_proctored_exams) {
-                this.$('#id_time_limit_div').show();
+            this.$('#id_time_limit_div').show();
 
-                if (is_proctored_exam) {
-                    if (is_practice_exam) {
-                        this.$('#id_practice_exam').prop('checked', true);
-                    } else {
-                        this.$('#id_proctored_exam').prop('checked', true);
-                    }
-
+            if (this.options.enable_proctored_exams && is_proctored_exam) {
+                if (is_practice_exam) {
+                    this.$('#id_practice_exam').prop('checked', true);
                 } else {
-                    this.$("#id_timed_exam").prop('checked', true);
+                    this.$('#id_proctored_exam').prop('checked', true);
                 }
-            } else  {
+            } else {
+                // Since we have an early exit at the top of the method
+                // if the subsection is not time limited, then
+                // here we rightfully assume that it just a timed exam
                 this.$("#id_timed_exam").prop('checked', true);
-                this.$('#id_time_limit_div').show();
             }
         },
         setExamTime: function(value) {
