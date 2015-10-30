@@ -1777,10 +1777,11 @@ def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=un
 @receiver(user_logged_out)
 def log_successful_logout(sender, request, user, **kwargs):  # pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
-    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
-    else:
-        AUDIT_LOG.info(u"Logout - {0}".format(request.user))
+    if hasattr(request, 'user'):
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))  # pylint: disable=logging-format-interpolation
+        else:
+            AUDIT_LOG.info(u"Logout - {0}".format(request.user))  # pylint: disable=logging-format-interpolation
 
 
 @receiver(user_logged_in)

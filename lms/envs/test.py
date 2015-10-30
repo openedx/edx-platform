@@ -26,10 +26,11 @@ from warnings import filterwarnings, simplefilter
 
 from openedx.core.lib.tempdir import mkdtemp_clean
 
-# This patch disabes the commit_on_success decorator during tests
+# This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
-from util.testing import patch_testcase
+from util.testing import patch_testcase, patch_sessions
 patch_testcase()
+patch_sessions()
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
 import logging
