@@ -85,3 +85,14 @@ class TestStudentDashboardUnenrollments(ModuleStoreTestCase):
                 course_enrollment.assert_called_with(self.user, self.course.id)
             else:
                 course_enrollment.assert_not_called()
+
+    def mock_cert_none(self, _user, _course_overview, _course_mode):  # pylint: disable=unused-argument
+        """ Return None. """
+        return None
+
+    def test_no_cert_status(self):
+        """ Assert that the dashboard loads when cert_status is None."""
+        with patch('student.views.cert_info', side_effect=self.mock_cert_none):
+            response = self.client.get(reverse('dashboard'))
+
+            self.assertEqual(response.status_code, 200)
