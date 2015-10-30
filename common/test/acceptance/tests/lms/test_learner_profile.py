@@ -3,7 +3,6 @@
 End-to-end tests for Student's Profile Page.
 """
 from contextlib import contextmanager
-from flaky import flaky
 
 from datetime import datetime
 from bok_choy.web_app_test import WebAppTest
@@ -730,7 +729,6 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
-    @flaky  # TODO fix this TNL-3679
     def test_different_user_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's public profile.
