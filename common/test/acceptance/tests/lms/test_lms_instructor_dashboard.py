@@ -139,13 +139,16 @@ class BaseProctoredExamsTests(BaseInstructorDashboardTest):
 
         course_fixture = CourseFixture(**self.course_info)
         course_fixture.add_advanced_settings({
-            "enable_proctored_exams": {"value": "true"}
+            "enable_proctored_exams": {"value": "true"},
+            "enable_timed_exams": {"value": "true"}
         })
 
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem 1')
+                    XBlockFixtureDesc('vertical', 'Test Unit 1').add_children(
+                        XBlockFixtureDesc('problem', 'Test Problem 1')
+                    )
                 )
             )
         ).install()
@@ -259,7 +262,6 @@ class BaseProctoredExamsTests(BaseInstructorDashboardTest):
         self.courseware_page.stop_timed_exam()
 
 
-@attr('shard_1')
 class ProctoredExamsTest(BaseProctoredExamsTests):
     """
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.

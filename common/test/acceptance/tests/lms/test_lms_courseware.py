@@ -133,7 +133,9 @@ class ProctoredExamTest(UniqueCourseTest):
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem 1')
+                    XBlockFixtureDesc('vertical', 'Test Unit 1').add_children(
+                        XBlockFixtureDesc('problem', 'Test Problem 1')
+                    )
                 )
             )
         ).install()
