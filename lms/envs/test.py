@@ -128,10 +128,6 @@ XQUEUE_INTERFACE = {
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
-# Don't rely on a real staff grading backend
-MOCK_STAFF_GRADING = True
-MOCK_PEER_GRADING = True
-
 ############################ STATIC FILES #############################
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
