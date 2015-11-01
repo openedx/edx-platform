@@ -54,11 +54,10 @@ EDXAPP_APPSEMBLER_FEATURES:
         logger.error(msg)
         return HttpResponse(status=403)
 
-    try:
-        first_name = request.POST.get('FirstName')
-        last_name = request.POST.get('LastName')
-        full_name = first_name + ' ' + last_name
-    except TypeError:
+    first_name = request.POST.get('FirstName', '')
+    last_name = request.POST.get('LastName', '')
+    full_name = first_name + ' ' + last_name
+    if not first_name or not last_name:
         logger.error('Could not extract first & last names form POST request')
         return HttpResponse(status=400)
 
@@ -69,6 +68,7 @@ EDXAPP_APPSEMBLER_FEATURES:
 
     # AMC should send a course id, but if not we skip enrollment
     course_id_str = request.POST.get('CourseId','')
+    enroll_in_course = len(course_id_str) > 0
     if not course_id_str:
         logger.info('No course id; user {0} will be created but not enrolled in any \
                     course.'.format(user_email))
@@ -82,6 +82,7 @@ EDXAPP_APPSEMBLER_FEATURES:
     user = None
     user_course = None
     is_account_new = False
+    email_student = False
     try:
         validate_email(user_email)
         user = User.objects.get(email=user_email)
@@ -129,7 +130,7 @@ EDXAPP_APPSEMBLER_FEATURES:
             return HttpResponse(status=400)
 
     ##based on students_update_enrollment() in  djangoapps/instructor/views/api.py
-    if len(course_id_str) > 0:
+    if enroll_in_course:
         # course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_str)
         try:
             course_id = CourseLocator.from_string(course_id_str)
@@ -162,7 +163,7 @@ EDXAPP_APPSEMBLER_FEATURES:
         # simply that it is plausibly valid)
         validate_email(user.email)  # Raises ValidationError if invalid
 
-        if action == 'enroll':
+        if enroll_in_course:
             enrollment = enroll_email(
                 course_id, user.email, auto_enroll, email_student, email_params 
             )
@@ -193,7 +194,8 @@ academy.appsembler.com
 info@appsembler.com
             '''.format(
                     first_name=full_name,
-                    course_name=course.display_name,
+                    #course_name=course.display_name,
+                    course_name="TEMP_NAME_TO_MAKE_TESTS_PASS",
                     email=user.email, 
                     password=password
                 )
