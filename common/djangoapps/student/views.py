@@ -202,6 +202,7 @@ def cert_info(user, course_overview, course_mode):
             'show_survey_button': bool
             'survey_url': url, only if show_survey_button is True
             'grade': if status is not 'processing'
+            'can_unenroll': if status allows for unenrollment
     """
     if not course_overview.may_certify():
         return {}
@@ -302,6 +303,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     'show_disabled_download_button': False,
                     'show_download_url': False,
                     'show_survey_button': False,
+                    'can_unenroll': True
                     }
 
     if cert_status is None:
@@ -319,7 +321,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         'show_download_url': status == 'ready',
         'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
-        'linked_in_url': None
+        'linked_in_url': None,
+        'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
