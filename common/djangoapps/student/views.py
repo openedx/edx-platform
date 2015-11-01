@@ -581,7 +581,7 @@ def dashboard(request):
     # program-related information on the dashboard view.
     course_programs = {}
     if is_student_dashboard_programs_enabled():
-        course_programs = _get_course_programs(user, show_courseware_links_for)
+        course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict

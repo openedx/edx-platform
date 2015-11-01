@@ -1033,6 +1033,32 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
             else:
                 self.assertIn('xseries-border-btn', response.content)
 
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @ddt.data((-2, -1), (-1, 1), (1, 2))
+    @ddt.unpack
+    def test_start_end_offsets(self, start_days_offset, end_days_offset):
+        """Test that the xseries upsell messaging displays whether the course
+        has not yet started, is in session, or has already ended.
+        """
+        self.course_1.start = datetime.now(pytz.UTC) + timedelta(days=start_days_offset)
+        self.course_1.end = datetime.now(pytz.UTC) + timedelta(days=end_days_offset)
+        self.update_course(self.course_1, self.user.id)
+        CourseEnrollment.enroll(self.user, self.course_1.id, mode='verified')
+
+        self.client.login(username="jack", password="test")
+        self.create_config(enabled=True, enable_student_dashboard=True)
+
+        with patch(
+            'student.views.get_course_programs_for_dashboard',
+            return_value=self._create_program_data([(self.course_1.id, 'active')])
+        ) as mock_get_programs:
+            response = self.client.get(reverse('dashboard'))
+            # ensure that our course id was included in the API call regardless of start/end dates
+            __, course_ids = mock_get_programs.call_args[0]
+            self.assertEqual(list(course_ids), [self.course_1.id])
+            # count total courses appearing on student dashboard
+            self._assert_responses(response, 1)
+
     @ddt.data(
         ('unpublished', 'unpublished', 'unpublished', 0),
         ('active', 'unpublished', 'unpublished', 1),
