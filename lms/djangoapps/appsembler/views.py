@@ -69,7 +69,10 @@ class UserSignupAPIView(GenericAPIView):
                 },
                 tos_required=False
             )
-            (user, profile, registration) = _do_create_account(form)
+            try:
+                (user, profile, registration) = _do_create_account(form)
+            except ValidationError as e:
+                return HttpResponse(status=status.HTTP_403_FORBIDDEN)
             # create_comments_service_user(user)  # TODO: do we need this? if so, fix it
 
             user.is_active = True
