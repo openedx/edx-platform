@@ -138,12 +138,6 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     list_filter = ('mode', 'is_active',)
     search_fields = ('course_id', 'mode', 'user__username',)
 
-    def get_readonly_fields(self, request, obj=None):
-        # The course_id, mode, and user fields should not be editable for an existing enrollment.
-        if obj:
-            return self.readonly_fields + ('course_id', 'mode', 'user',)
-        return self.readonly_fields
-
     class Meta(object):
         model = CourseEnrollment
 
