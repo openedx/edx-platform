@@ -374,6 +374,13 @@ class VideoPage(PageObject):
         speed_selector = self.get_element_selector('li[data-speed="{speed}"] a'.format(speed=speed))
         self.q(css=speed_selector).first.click()
 
+    def verify_speed_changed(self, expected_speed):
+        """
+        Wait for the video to change its speed to the expected value. If it does not change,
+        the wait call will fail the test.
+        """
+        self.wait_for(lambda: self.speed == expected_speed, "Video speed changed")
+
     def click_player_button(self, button):
         """
         Click on `button`.

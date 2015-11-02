@@ -588,7 +588,6 @@ class YouTubeVideoTest(VideoBaseTest):
         self.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
-    @flaky  # TODO: fix this, ticket TNL-3725
     def test_video_component_stores_speed_correctly_for_multiple_videos(self):
         """
         Scenario: Video component stores speed correctly when each video is in separate sequential
@@ -614,13 +613,15 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "0.75"
-        self.assertEqual(self.video.speed, '0.75x')
+        # Since the playback speed was set to .5 in "B", this video will also be impacted
+        # because a playback speed has never explicitly been set for it. However, this video
+        # does not have a .5 playback option, so the closest possible (.75) should be selected.
+        self.video.verify_speed_changed('0.75x')
 
         # open video "A"
         self.course_nav.go_to_sequential('A')
 
-        # check if video "A" should start playing at speed "2.0"
+        # Video "A" should still play at speed 2.0 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '2.0x')
 
         # reload the page
@@ -638,14 +639,15 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "B"
         self.course_nav.go_to_sequential('B')
 
-        # check if video "B" should start playing at speed "0.50"
+        # Video "B" should still play at speed .5 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '0.50x')
 
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "1.0"
-        self.assertEqual(self.video.speed, '1.0x')
+        # The change of speed for Video "A" should  impact Video "C" because it still has
+        # not been explicitly set to a speed.
+        self.video.verify_speed_changed('1.0x')
 
     def test_video_has_correct_transcript(self):
         """
