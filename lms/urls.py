@@ -97,6 +97,12 @@ urlpatterns = (
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
 )
 
+# Full Course/Library Import/Export API
+if settings.FEATURES["ENABLE_IMPORT_EXPORT_LMS"]:
+    urlpatterns += (
+        url(r'^api/import_export/v1/', include('openedx.core.djangoapps.import_export.urls')),
+    )
+
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (

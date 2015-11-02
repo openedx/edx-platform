@@ -400,6 +400,9 @@ FEATURES = {
     # Credit course API
     'ENABLE_CREDIT_API': True,
 
+    # Full Course/Library Import/Export API
+    'ENABLE_IMPORT_EXPORT_LMS': False,
+
     # The block types to disable need to be specified in "x block disable config" in django admin.
     'ENABLE_DISABLING_XBLOCK_TYPES': True,
 
@@ -428,6 +431,7 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
+GITHUB_REPO_ROOT = ENV_ROOT / "data"
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
@@ -465,6 +469,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
 
+OAUTH_OIDC_ISSUER_PATH = 'oauth2'
 OAUTH_OIDC_ISSUER = 'https:/example.com/oauth2'
 
 # OpenID Connect claim handlers
@@ -586,6 +591,12 @@ LMS_MIGRATION_ALLOWED_IPS = []
 COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
 COURSE_KEY_REGEX = COURSE_KEY_PATTERN.replace('P<course_key_string>', ':')
+
+# Pattern to match a course key or a library key
+COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
+    r'[^/:+]+/[^/:+]+/[^/:+]+',
+    r'[^/:]+:[^/+]+\+[^/+]+(\+[^/]+)?',
+)
 
 USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
@@ -1976,6 +1987,9 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
+
+    # Import/Export API
+    'openedx.core.djangoapps.import_export',
 
     'xblock_django',
 
