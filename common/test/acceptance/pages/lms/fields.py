@@ -179,7 +179,7 @@ class FieldsMixin(object):
 
         query = self.q(css=field_selector)
         query.fill(value)
-        query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
+        query.results[0].send_keys(u'\ue007')  # Press Enter
 
     def get_non_editable_mode_value(self, field_id):
         """
