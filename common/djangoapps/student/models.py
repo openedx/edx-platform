@@ -1377,7 +1377,7 @@ class CourseEnrollment(models.Model):
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
-        if refund_cutoff_date and datetime.now() > refund_cutoff_date:
+        if refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date:
             return False
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
@@ -1400,7 +1400,7 @@ class CourseEnrollment(models.Model):
             self.course_overview.start.replace(tzinfo=None)
         )
 
-        return refund_window_start_date + EnrollmentRefundConfiguration.current().refund_window
+        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
 
     @property
     def username(self):

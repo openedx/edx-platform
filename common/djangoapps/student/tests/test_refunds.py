@@ -113,10 +113,10 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.assertTrue(self.enrollment.refundable())
 
         with patch('student.models.CourseEnrollment.refund_cutoff_date') as cutoff_date:
-            cutoff_date.return_value = datetime.now() - timedelta(days=1)
+            cutoff_date.return_value = datetime.now(pytz.UTC) - timedelta(minutes=5)
             self.assertFalse(self.enrollment.refundable())
 
-            cutoff_date.return_value = datetime.now() + timedelta(days=1)
+            cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(minutes=5)
             self.assertTrue(self.enrollment.refundable())
 
     @ddt.data(
@@ -132,7 +132,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         """
         Assert that the later date is used with the configurable refund period in calculating the returned cutoff date.
         """
-        now = datetime.now().replace(microsecond=0)
+        now = datetime.now(pytz.UTC).replace(microsecond=0)
         order_date = now + order_date_delta
         course_start = now + course_start_delta
         expected_date = now + expected_date_delta
