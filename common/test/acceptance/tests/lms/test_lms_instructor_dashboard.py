@@ -222,6 +222,8 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Start the proctored exam.
         self.courseware_page.start_timed_exam()
 
+        self.courseware_page.stop_timed_exam()
+
     @flaky  # TODO fix this SOL-1183
     def test_can_add_remove_allowance(self):
         """
