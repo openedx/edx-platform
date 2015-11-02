@@ -11,6 +11,9 @@ from django.core.mail import send_mail
 from django.utils import simplejson
 
 from rest_framework.decorators import api_view
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
+from rest_framework import status
 
 # from opaque_keys.edx.locations import SlashSeparatedCourseKey # deprecated; use:
 from opaque_keys.edx.locator import CourseLocator
@@ -25,9 +28,22 @@ from student.forms import AccountCreationForm
 from student.views import _do_create_account
 from student.models import create_comments_service_user
 
+from .permissions import SecretKeyPermission
+from .serializers import UserSignupSerializer
+
 
 logger = logging.getLogger(__name__)
 APPSEMBLER_EMAIL = 'support@appsembler.com'
+
+
+class UserSignupAPIView(GenericAPIView):
+    permission_classes = (SecretKeyPermission,)
+    serializer_class = UserSignupSerializer
+    
+    def post(self, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK)
+
+user_signup_endpoint_new = UserSignupAPIView.as_view()
 
 
 @api_view(['POST'])
