@@ -1632,7 +1632,7 @@ def create_account_with_params(request, params):
                 'education': profile.level_of_education_display,
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
-                'country': profile.country,
+                'country': unicode(profile.country),
             }
         ]
 
