@@ -1,4 +1,5 @@
 import logging
+import random
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
@@ -41,7 +42,39 @@ class UserSignupAPIView(GenericAPIView):
     serializer_class = UserSignupSerializer
     
     def post(self, *args, **kwargs):
-        return Response(status=status.HTTP_200_OK)
+        serializer = self.get_serializer(data=self.request.DATA)
+        if serializer.is_valid():
+            user = self._create_user(serializer.data)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+    def _create_user(self, data):
+        try:
+            user = User.objects.get(email=data.get('email'))
+        except User.DoesNotExist:
+            # filter out any spaces and punctuation
+            username = ''.join(ch for ch in data.get('full_name') if ch.isalnum())
+
+            # make sure username is unique
+            while User.objects.filter(username=username):
+                username = username + str(random.randint(1, 9))
+
+            form = AccountCreationForm(
+                data={
+                    'username': username,
+                    'email': data.get('email'),
+                    'password': data.get('password'),
+                    'name': data.get('full_name')
+                },
+                tos_required=False
+            )
+            (user, profile, registration) = _do_create_account(form)
+            # create_comments_service_user(user)  # TODO: do we need this? if so, fix it
+
+            user.is_active = True
+            user.save()
+        return user
 
 user_signup_endpoint_new = UserSignupAPIView.as_view()
 
