@@ -184,7 +184,7 @@ from student.helpers import (
                       ## Translators: The course name will be added to the end of this sentence.
                       % if not is_course_blocked:
                       <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course_overview-number="${course_overview.number | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from the purchased course %(course_name)s ($(course_number)s)?")}', '${_("You will be refunded the amount you paid.")}')">
+                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?")}', '${_("You will be refunded the amount you paid.")}')">
                         ${_('Unenroll')}
                       </a>
                       % else:
