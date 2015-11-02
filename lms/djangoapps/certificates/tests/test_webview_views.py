@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 """Tests for certificates views. """
 
 import json
+import ddt
 from uuid import uuid4
 from nose.plugins.attrib import attr
 from mock import patch
@@ -48,6 +50,7 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 
 @attr('shard_1')
+@ddt.ddt
 class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     """
     Tests for the certificates web/html views
@@ -133,6 +136,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 course name: ${accomplishment_copy_course_name}
                 mode: ${course_mode}
                 ${accomplishment_copy_course_description}
+                ${twitter_url}
             </body>
             </html>
         """
@@ -615,3 +619,35 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'mode: {}'.format(mode))
+
+    @ddt.data(True, False)
+    def test_certificate_custom_template_with_unicode_data(self, custom_certs_enabled):
+        """
+        Tests custom template renders properly with unicode data.
+        """
+        mode = 'honor'
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(mode=mode)
+        with patch.dict("django.conf.settings.FEATURES", {
+            "CERTIFICATES_HTML_VIEW": True,
+            "CUSTOM_CERTIFICATE_TEMPLATES_ENABLED": custom_certs_enabled
+        }):
+            test_url = get_certificate_url(
+                user_id=self.user.id,
+                course_id=unicode(self.course.id)
+            )
+            with patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
+                "CERTIFICATE_TWITTER": True,
+                "CERTIFICATE_TWITTER_TEXT": u"nền tảng học tập"
+            }):
+                with patch('django.http.HttpRequest.build_absolute_uri') as mock_abs_uri:
+                    mock_abs_uri.return_value = '='.join(['http://localhost/?param', u'é'])
+                    with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+                        mock_get_orgs.return_value = []
+                        response = self.client.get(test_url)
+                        self.assertEqual(response.status_code, 200)
+                        if custom_certs_enabled:
+                            self.assertContains(response, 'mode: {}'.format(mode))
+                        else:
+                            self.assertContains(response, "Tweet this Accomplishment")
+                        self.assertContains(response, 'https://twitter.com/intent/tweet')
