@@ -11,7 +11,7 @@ class SecretKeyPermission(permissions.BasePermission):
         if request.method == "GET":
             return True
 
-        request_secret_key = request.POST.get('SecretKey', '')
+        request_secret_key = request.POST.get('secret_key', '')
         secret_key = settings.FEATURES.get('APPSEMBLER_SECRET_KEY', '')
         if not secret_key:
             logger.warning("APPSEMBLER_SECRET_KEY is not set")

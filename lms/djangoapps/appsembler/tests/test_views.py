@@ -30,21 +30,21 @@ class TestUserSignup(TestCase):
     @ddt.unpack
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_fail_without_required_data(self, first_name, last_name, email, password, secret_key, status_code):
-        payload = {'FirstName': first_name,
-                   'LastName': last_name,
-                   'Email': email,
-                   'Password': password,
-                   'SecretKey': secret_key}
+        payload = {'first_name': first_name,
+                   'last_name': last_name,
+                   'email': email,
+                   'password': password,
+                   'secret_key': secret_key}
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status_code)
 
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_user_without_enrollment(self):
-        payload = {'FirstName': 'John',
-                   'LastName': 'Doe',
-                   'Email': 'john@doe.com',
-                   'Password': 'password',
-                   'SecretKey': 'secret_key'}
+        payload = {'first_name': 'John',
+                   'last_name': 'Doe',
+                   'email': 'john@doe.com',
+                   'password': 'password',
+                   'secret_key': 'secret_key'}
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(User.objects.filter(email="john@doe.com").count(), 1)
