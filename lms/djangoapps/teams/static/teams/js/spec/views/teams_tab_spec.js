@@ -171,10 +171,11 @@ define([
                 ]
             }, function (url, expectedEvent) {
                 var teamsTabView = createTeamsTabView(this, {
-                        userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})
-                    });
+                    userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})
+                });
+                teamsTabView.teamsCollection = TeamSpecHelpers.createMockTeams();
                 teamsTabView.router.navigate(url, {trigger: true});
-                if (AjaxHelpers.currentRequest(requests)) {
+                if (requests.length > requests.currentIndex) {
                     AjaxHelpers.respondWithJson(requests, {});
                 }
                 expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', expectedEvent);
