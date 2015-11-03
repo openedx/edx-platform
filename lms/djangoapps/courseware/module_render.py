@@ -1037,7 +1037,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # New Relic. The suffix is necessary for XModule handlers because the
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
-        nr_tx_name += "/{}".format(suffix) if suffix else ""
+        nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
         newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
