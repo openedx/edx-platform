@@ -472,6 +472,7 @@ The following are ways in which a developer could shorten the development
 cycle for faster feedback. The options below can often be used together.
 
 **Multiprocessing Mode**
+
 Bok-choy tests can be threaded using the `-n` switch.  Using 2 threads generally
 reduces test cycles by 33%.  The recommendation is to make sure the
 number of threads is no more than the number of processors available. For
@@ -487,7 +488,8 @@ in multiprocessing mode, it may be worthwhile to run them in single-stream mode
 to understand if you are encountering such a failure. With that noted, this
 can speed development for most test classes.
 
-**Leave Your servers Running**
+**Leave Your Servers Running**
+
 There are two additional switches available in the `paver test_bokchoy` task.
 Used together, they can shorten the cycle between test runs. Similar to above,
 there are a handful of tests that won't work with this approach, due to insufficient
