@@ -30,6 +30,7 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
     course_id = None
     whitelist = True
+    notes = None
 
 
 class BadgeAssertionFactory(DjangoModelFactory):

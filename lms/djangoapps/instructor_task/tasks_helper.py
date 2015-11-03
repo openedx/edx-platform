@@ -1398,11 +1398,17 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
 def generate_students_certificates(
         _xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # pylint: disable=unused-argument
     """
-    For a given `course_id`, generate certificates for all students
-    that are enrolled.
+    For a given `course_id`, generate certificates for only students present in 'students' key in task_input
+    json column, otherwise generate certificates for all enrolled students.
     """
     start_time = time()
     enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+
+    students = task_input.get('students', None)
+
+    if students is not None:
+        enrolled_students = enrolled_students.filter(id__in=students)
+
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     current_step = {'step': 'Calculating students already have certificates'}

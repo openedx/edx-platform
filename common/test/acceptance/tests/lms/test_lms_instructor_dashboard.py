@@ -21,6 +21,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -588,9 +589,10 @@ class CertificatesTest(BaseInstructorDashboardTest):
     def setUp(self):
         super(CertificatesTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-        self.log_in_as_instructor()
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        self.certificates_section = instructor_dashboard_page.select_certificates()
+        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.certificates_section = self.instructor_dashboard_page.select_certificates()
+        disable_animations(self.certificates_section)
 
     def test_generate_certificates_buttons_is_visible(self):
         """
@@ -621,3 +623,112 @@ class CertificatesTest(BaseInstructorDashboardTest):
             Then I see 'Pending Instructor Tasks' section
         """
         self.assertTrue(self.certificates_section.pending_tasks_section.visible)
+
+    def test_certificate_exceptions_section_is_visible(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Certificate Exceptions section is visible.
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            Then I see 'CERTIFICATE EXCEPTIONS' section
+        """
+        self.assertTrue(self.certificates_section.certificate_exceptions_section.visible)
+
+    def test_instructor_can_add_certificate_exception(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor can added new certificate
+        exception to list
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I fill in student username and click 'Add Exception' button
+            Then new certificate exception should be visible in certificate exceptions list
+        """
+        # Add a student to Certificate exception list
+        self.certificates_section.add_certificate_exception(self.user_name, '')
+        self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+
+    def test_error_on_duplicate_certificate_exception(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard,
+        Error message appears if student being added already exists in certificate exceptions list
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I fill in student username that already is in the list and click 'Add Exception' button
+            Then Error Message should say 'username/email already in exception list'
+        """
+        # Add a student to Certificate exception list
+        self.certificates_section.add_certificate_exception(self.user_name, '')
+
+        # Add duplicate student to Certificate exception list
+        self.certificates_section.add_certificate_exception(self.user_name, '')
+
+        self.assertIn(
+            'username/email already in exception list',
+            self.certificates_section.message.text
+        )
+
+    def test_error_on_empty_user_name(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard,
+        Error message appears if no username/email is entered while clicking "Add Exception" button
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I click on 'Add Exception' button
+            AND student username/email field is empty
+            Then Error Message should say 'Student username/email is required.'
+        """
+        # Click 'Add Exception' button without filling username/email field
+        self.certificates_section.wait_for_certificate_exceptions_section()
+        self.certificates_section.click_add_exception_button()
+
+        self.assertIn(
+            'Student username/email is required.',
+            self.certificates_section.message.text
+        )
+
+    def test_generate_certificate_exception(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, when user clicks
+        'Generate Exception Certificates' newly added certificate exceptions should be synced on server
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I click 'Generate Exception Certificates'
+            Then newly added certificate exceptions should be synced on server
+        """
+        # Add a student to Certificate exception list
+        self.certificates_section.add_certificate_exception(self.user_name, '')
+
+        # Click 'Generate Exception Certificates' button
+        self.certificates_section.click_generate_certificate_exceptions_button()
+        self.certificates_section.wait_for_ajax()
+
+        # Revisit Page
+        self.certificates_section.refresh()
+
+        # wait for the certificate exception section to render
+        self.certificates_section.wait_for_certificate_exceptions_section()
+
+        # validate certificate exception synced with server is visible in certificate exceptions list
+        self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+
+    def test_invalid_user_on_generate_certificate_exception(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, when user clicks
+        'Generate Exception Certificates' error message should appear if user does not exist
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I click 'Generate Exception Certificates'
+            AND the user specified by instructor does not exist
+            Then an error message "Student (username/email=test_user) does not exist" is displayed
+        """
+        invalid_user = 'test_user_non_existent'
+        # Add a student to Certificate exception list
+        self.certificates_section.add_certificate_exception(invalid_user, '')
+
+        # Click 'Generate Exception Certificates' button
+        self.certificates_section.click_generate_certificate_exceptions_button()
+        self.certificates_section.wait_for_ajax()
+
+        # validate certificate exception synced with server is visible in certificate exceptions list
+        self.assertIn(
+            'Student (username/email={}) does not exist'.format(invalid_user),
+            self.certificates_section.message.text
+        )

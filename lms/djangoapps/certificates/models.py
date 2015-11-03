@@ -58,6 +58,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django_extensions.db.fields import CreationDateTimeField
 from django_extensions.db.fields.json import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -108,6 +109,40 @@ class CertificateWhitelist(models.Model):
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     whitelist = models.BooleanField(default=0)
+    created = CreationDateTimeField(_('created'))
+    notes = models.TextField(default=None, null=True)
+
+    @classmethod
+    def get_certificate_white_list(cls, course_id):
+        """
+        Return certificate white list for the given course as dict object,
+        returned dictionary will have the following key-value pairs
+
+        [{
+            id:         'id (pk) of CertificateWhitelist item'
+            user_id:    'User Id of the student'
+            user_name:  'name of the student'
+            user_email: 'email of the student'
+            course_id:  'Course key of the course to whom certificate exception belongs'
+            created:    'Creation date of the certificate exception'
+            notes:      'Additional notes for the certificate exception'
+        }, {...}, ...]
+
+        """
+        white_list = cls.objects.filter(course_id=course_id, whitelist=True)
+        result = []
+
+        for item in white_list:
+            result.append({
+                'id': item.id,
+                'user_id': item.user.id,
+                'user_name': unicode(item.user.username),
+                'user_email': unicode(item.user.email),
+                'course_id': unicode(item.course_id),
+                'created': item.created.strftime("%A, %B %d, %Y"),
+                'notes': unicode(item.notes or ''),
+            })
+        return result
 
 
 class GeneratedCertificate(models.Model):
