@@ -15,7 +15,7 @@ class WikiTab(EnrolledTab):
     """
 
     type = "wiki"
-    title = ugettext_noop('Theory')
+    title = ugettext_noop('Wiki')
     view_name = "course_wiki"
     is_hideable = True
     is_default = False

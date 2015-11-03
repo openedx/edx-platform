@@ -37,6 +37,7 @@ setup(
             "teams = lms.djangoapps.teams.plugins:TeamsTab",
             "textbooks = lms.djangoapps.courseware.tabs:TextbookTabs",
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
+            "labster_wiki = lms.djangoapps.labster_wiki.tab:LabsterWikiTab",
 
             # ORA 1 tabs (deprecated)
             "peer_grading = lms.djangoapps.open_ended_grading.views:PeerGradingTab",
