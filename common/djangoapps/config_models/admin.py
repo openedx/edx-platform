@@ -142,7 +142,7 @@ class KeyedConfigurationModelAdmin(ConfigurationModelAdmin):
     date_hierarchy = None
     list_filter = (ShowHistoryFilter, )
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Annote the queryset with an 'is_active' property that's true iff that row is the most
         recently added row for that particular set of KEY_FIELDS values.
