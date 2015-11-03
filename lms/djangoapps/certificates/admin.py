@@ -8,7 +8,6 @@ from util.organizations_helpers import get_organizations
 from certificates.models import (
     CertificateGenerationConfiguration,
     CertificateHtmlViewConfiguration,
-    BadgeImageConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
     GeneratedCertificate,
@@ -60,7 +59,6 @@ class GeneratedCertificateAdmin(admin.ModelAdmin):
 
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
-admin.site.register(BadgeImageConfiguration)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)
 admin.site.register(GeneratedCertificate, GeneratedCertificateAdmin)

@@ -48,26 +48,28 @@ Eligibility:
 import json
 import logging
 import uuid
-import os
 
+import os
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField
-from django_extensions.db.fields.json import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
-from xmodule.modulestore.django import modulestore
+
+from badges.events import course_complete
+from badges.models import BadgeAssertion, CourseCompleteImageConfiguration, BadgeClass
 from config_models.models import ConfigurationModel
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from course_modes.models import CourseMode
 from instructor_task.models import InstructorTask
+from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
+from xmodule.modulestore.django import modulestore
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -771,93 +773,6 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         return json_data
 
 
-class BadgeAssertion(models.Model):
-    """
-    Tracks badges on our side of the badge baking transaction
-    """
-    user = models.ForeignKey(User)
-    course_id = CourseKeyField(max_length=255, blank=True, default=None)
-    # Mode a badge was awarded for.
-    mode = models.CharField(max_length=100)
-    data = JSONField()
-
-    @property
-    def image_url(self):
-        """
-        Get the image for this assertion.
-        """
-
-        return self.data['image']
-
-    @property
-    def assertion_url(self):
-        """
-        Get the public URL for the assertion.
-        """
-        return self.data['json']['id']
-
-    class Meta(object):
-        unique_together = (('course_id', 'user', 'mode'),)
-        app_label = "certificates"
-
-
-def validate_badge_image(image):
-    """
-    Validates that a particular image is small enough, of the right type, and square to be a badge.
-    """
-    if image.width != image.height:
-        raise ValidationError(_(u"The badge image must be square."))
-    if not image.size < (250 * 1024):
-        raise ValidationError(_(u"The badge image file size must be less than 250KB."))
-
-
-class BadgeImageConfiguration(models.Model):
-    """
-    Contains the configuration for badges for a specific mode. The mode
-    """
-    class Meta(object):
-        app_label = "certificates"
-
-    mode = models.CharField(
-        max_length=125,
-        help_text=_(u'The course mode for this badge image. For example, "verified" or "honor".'),
-        unique=True,
-    )
-    icon = models.ImageField(
-        # Actual max is 256KB, but need overhead for badge baking. This should be more than enough.
-        help_text=_(
-            u"Badge images must be square PNG files. The file size should be under 250KB."
-        ),
-        upload_to='badges',
-        validators=[validate_badge_image]
-    )
-    default = models.BooleanField(
-        default=False,
-        help_text=_(
-            u"Set this value to True if you want this image to be the default image for any course modes "
-            u"that do not have a specified badge image. You can have only one default image."
-        )
-    )
-
-    def clean(self):
-        """
-        Make sure there's not more than one default.
-        """
-        if self.default and BadgeImageConfiguration.objects.filter(default=True).exclude(id=self.id):
-            raise ValidationError(_(u"There can be only one default image."))
-
-    @classmethod
-    def image_for_mode(cls, mode):
-        """
-        Get the image for a particular mode.
-        """
-        try:
-            return cls.objects.get(mode=mode).icon
-        except cls.DoesNotExist:
-            # Fall back to default, if there is one.
-            return cls.objects.get(default=True).icon
-
-
 class CertificateTemplate(TimeStampedModel):
     """A set of custom web certificate templates.
 
@@ -973,6 +888,28 @@ class CertificateTemplateAsset(TimeStampedModel):
         app_label = "certificates"
 
 
+def get_completion_badge(course_id, user):
+    """
+    Given a course key and a user, find the user's enrollment mode
+    and get the Course Completion badge.
+    """
+    from student.models import CourseEnrollment
+    mode = CourseEnrollment.objects.filter(
+        user=user, course_id=course_id
+    ).order_by('-is_active')[0].mode
+    course = modulestore().get_course(course_id)
+    return BadgeClass.get_badge_class(
+        slug=course_complete.course_slug(course_id, mode),
+        issuing_component='',
+        criteria=course_complete.criteria(course_id),
+        description=course_complete.badge_description(course, mode),
+        course_id=course_id,
+        mode=mode,
+        display_name=course.display_name,
+        image_file_handle=CourseCompleteImageConfiguration.image_for_mode(mode)
+    )
+
+
 @receiver(post_save, sender=GeneratedCertificate)
 #pylint: disable=unused-argument
 def create_badge(sender, instance, **kwargs):
@@ -984,14 +921,14 @@ def create_badge(sender, instance, **kwargs):
     if not modulestore().get_course(instance.course_id).issue_badges:
         LOGGER.info("Course is not configured to issue badges.")
         return
-    if BadgeAssertion.objects.filter(user=instance.user, course_id=instance.course_id):
-        LOGGER.info("Badge already exists for this user on this course.")
+    badge_class = get_completion_badge(instance.course_id, instance.user)
+    if BadgeAssertion.objects.filter(user=instance.user, badge_class=badge_class):
+        LOGGER.info("Completion badge already exists for this user on this course.")
         # Badge already exists. Skip.
         return
     # Don't bake a badge until the certificate is available. Prevents user-facing requests from being paused for this
     # by making sure it only gets run on the callback during normal workflow.
     if not instance.status == CertificateStatuses.downloadable:
         return
-    from .badge_handler import BadgeHandler
-    handler = BadgeHandler(instance.course_id)
-    handler.award(instance.user)
+    evidence = course_complete.evidence_url(instance.user.id, instance.course_id)
+    badge_class.award(instance.user, evidence_url=evidence)
