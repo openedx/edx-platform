@@ -10,6 +10,7 @@ class ProblemPage(PageObject):
     """
 
     url = None
+    CSS_PROBLEM_HEADER = '.problem-header'
 
     def is_browser_on_page(self):
         return self.q(css='.xblock-student_view').present
@@ -81,6 +82,7 @@ class ProblemPage(PageObject):
         Fill in the answer to a numerical problem.
         """
         self.q(css='div.problem section.inputtype input').fill(text)
+        self.wait_for_ajax()
 
     def click_check(self):
         """
@@ -88,6 +90,12 @@ class ProblemPage(PageObject):
         """
         self.q(css='div.problem button.check').click()
         self.wait_for_ajax()
+
+    def wait_for_status_icon(self):
+        """
+        wait for status icon
+        """
+        self.wait_for_element_visibility('div.problem section.inputtype div .status', 'wait for status icon')
 
     def click_hint(self):
         """
