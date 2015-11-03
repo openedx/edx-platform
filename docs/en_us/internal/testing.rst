@@ -465,6 +465,52 @@ relative to the ``common/test/acceptance/tests`` directory. This is an example f
 
     paver test_bokchoy --extra_args="-a 'a11y'" -t test_lms_dashboard.py:LmsDashboardA11yTest.test_dashboard_course_listings_a11y
 
+Options for Faster Development Cycles in Bok-Choy Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following are ways in which a developer could shorten the development
+cycle for faster feedback. The options below can often be used together.
+
+**Multiprocessing Mode**
+Bok-choy tests can be threaded using the `-n` switch.  Using 2 threads generally
+reduces test cycles by 33%.  The recommendation is to make sure the
+number of threads is no more than the number of processors available. For
+example, the Cypress release of devstack is provisioned by default with 2
+processors. In that case, to run tests in multiprocess mode::
+
+    paver test_bokchoy -n 2
+
+*Caveat*: Not all tests have been designed with multiprocessing in mind; some
+testcases (approx 10%) will fail in multiprocess mode for various reasons
+(e.g., shared fixtures, unexpected state, etc). If you have tests that fail
+in multiprocessing mode, it may be worthwhile to run them in single-stream mode
+to understand if you are encountering such a failure. With that noted, this
+can speed development for most test classes.
+
+**Leave Your servers Running**
+There are two additional switches available in the `paver test_bokchoy` task.
+Used together, they can shorten the cycle between test runs. Similar to above,
+there are a handful of tests that won't work with this approach, due to insufficient
+teardown and other unmanaged state.
+
+1. Start your servers in one terminal/ssh session::
+
+    paver test_bokchoy --serversonly
+
+Note if setup has already been done, you can run::
+
+    paver test_bokcyoy --serversonly --fasttest
+
+2. Run your tests only in another terminal/ssh session::
+
+    paver test_bokchoy --testsonly --fasttest
+
+You must run BOTH `--testsonly` and `--fasttest`.
+
+3. When done, you can kill your servers in the first terminal/ssh session with
+Control-C. *Warning*: Only hit Control-C one time so the nose test framework can
+properly clean up.
+
 Running Lettuce Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
