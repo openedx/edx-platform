@@ -362,28 +362,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         else:
             self.assertNotContains(result, "Classes End")
 
-    def test_chat_settings(self):
-        mock_user = MagicMock()
-        mock_user.username = "johndoe"
-
-        mock_course = MagicMock()
-        mock_course.id = "a/b/c"
-
-        # Stub this out in the case that it's not in the settings
-        domain = "jabber.edx.org"
-        settings.JABBER_DOMAIN = domain
-
-        chat_settings = views.chat_settings(mock_course, mock_user)
-
-        # Test the proper format of all chat settings
-        self.assertEqual(chat_settings['domain'], domain)
-        self.assertEqual(chat_settings['room'], "a-b-c_class")
-        self.assertEqual(chat_settings['username'], "johndoe@%s" % domain)
-
-        # TODO: this needs to be changed once we figure out how to
-        #       generate/store a real password.
-        self.assertEqual(chat_settings['password'], "johndoe@%s" % domain)
-
     def test_submission_history_accepts_valid_ids(self):
         # log into a staff account
         admin = AdminFactory()
