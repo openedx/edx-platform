@@ -501,7 +501,7 @@ teardown and other unmanaged state.
 
 Note if setup has already been done, you can run::
 
-    paver test_bokcyoy --serversonly --fasttest
+    paver test_bokchoy --serversonly --fasttest
 
 2. Run your tests only in another terminal/ssh session::
 
