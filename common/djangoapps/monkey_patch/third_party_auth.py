@@ -5,9 +5,11 @@ Remove once the module fully supports Django 1.8!
 
 from django.db import transaction
 from social.storage.django_orm import DjangoUserMixin
+from social.apps.django_app.default.models import (
+    UserSocialAuth, Nonce, Association, Code
+)
 
-
-def patch():
+def patch_lms():
     """
     Monkey-patch the DjangoUserMixin class.
     """
@@ -26,3 +28,12 @@ def patch():
         return classmethod(_create_social_auth)
 
     DjangoUserMixin.create_social_auth = create_social_auth_wrapper(DjangoUserMixin.create_social_auth)
+
+def patch_cms():
+    """
+    Monkey-patch some social auth models' Meta class to squelch Django19 warnings.
+    """
+    UserSocialAuth._meta.app_label = "default"
+    Nonce._meta.app_label = "default"
+    Association._meta.app_label = "default"
+    Code._meta.app_label = "default"
