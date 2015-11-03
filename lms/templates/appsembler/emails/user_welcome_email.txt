@@ -1,0 +1,17 @@
+Hello {{ first_name }},
+
+We are delighted to have you on board with us as a student at \
+Appsembler Academy{% if course_name %} in the {{ course_name }} Course{% endif %}!
+
+Here is your login information:
+Login: http://academy.appsembler.com
+Email: {{ email }}
+Password: {{ password }}
+
+If you need any assistance, we would love to hear from you at \
+info@appsembler.com or by phone toll free at 1-617-702-4331.
+
+Again, welcome!
+Team Appsembler
+academy.appsembler.com
+info@appsembler.com

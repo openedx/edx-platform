@@ -1,2 +1,1 @@
 python-intercom==0.2.13
-drf-compound-fields==0.2.2
