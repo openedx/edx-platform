@@ -6,10 +6,11 @@ from mock import patch
 from django.conf import settings
 from nose.plugins.attrib import attr
 
+from badges.tests.factories import CourseCompleteImageConfigurationFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
@@ -113,18 +114,18 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertEqual(completed_milestones[0]['namespace'], unicode(pre_requisite_course.id))
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    @patch('certificates.badge_handler.BadgeHandler', spec=True)
+    @patch('badges.backends.badgr.BadgrBackend', spec=True)
     def test_badge_callback(self, handler):
         student = UserFactory()
         course = CourseFactory.create(org='edx', number='998', display_name='Test Course', issue_badges=True)
+        CourseCompleteImageConfigurationFactory()
+        CourseEnrollmentFactory(user=student, course_id=course.location.course_key, mode='honor')
         cert = GeneratedCertificateFactory.create(
             user=student,
             course_id=course.id,
             status=CertificateStatuses.generating,
             mode='verified'
         )
-        # Check return value since class instance will be stored there.
-        self.assertFalse(handler.return_value.award.called)
         cert.status = CertificateStatuses.downloadable
         cert.save()
         self.assertTrue(handler.return_value.award.called)

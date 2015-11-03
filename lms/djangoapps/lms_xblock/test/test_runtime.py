@@ -12,7 +12,6 @@ from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator, SlashSep
 from lms.djangoapps.lms_xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
 from xblock.fields import ScopeIds
 from xmodule.modulestore.django import ModuleI18nService
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xblock.exceptions import NoSuchServiceError
 
