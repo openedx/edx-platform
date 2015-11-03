@@ -23,15 +23,3 @@ urlpatterns = patterns(
     url(r'search', views.search_by_user, name="search"),
     url(r'regenerate', views.regenerate_certificate_for_user, name="regenerate_certificate_for_user"),
 )
-
-
-if settings.FEATURES.get("ENABLE_OPENBADGES", False):
-    urlpatterns += (
-        url(
-            r'^badge_share_tracker/{}/(?P<network>[^/]+)/(?P<student_username>[^/]+)/$'.format(
-                settings.COURSE_ID_PATTERN
-            ),
-            views.track_share_redirect,
-            name='badge_share_tracker'
-        ),
-    )

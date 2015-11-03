@@ -815,6 +815,9 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
+
+    # Badging app, needed even if not used for migrations
+    'badges',
 )
 
 
