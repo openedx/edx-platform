@@ -8,7 +8,7 @@ class UserSignupSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=200)
     password = serializers.CharField(max_length=200)
     secret_key = serializers.CharField(max_length=100)
-    courses = compound_fields.ListField(serializers.IntegerField(), required=False)
+    course_id = serializers.CharField(max_length=200, required=False)
     full_name = serializers.SerializerMethodField('get_full_name')
 
     def get_full_name(self, obj):
