@@ -28,14 +28,14 @@ def _escape_json_for_html(json_str):
 
 def escape_json_dumps(obj, cls=EdxJSONEncoder):
     """
-    JSON dumps encoded JSON that is safe to be embedded in HTML.
+    JSON dumps and escapes JSON that is safe to be embedded in HTML.
 
     Usage:
         Can be used inside a Mako template inside a <SCRIPT> as follows:
             var my_json = ${escape_json_dumps(my_object) | n}
 
         Use the "n" Mako filter above.  It is possible that the
-            default filter may include html encoding in the future, and
+            default filter may include html escaping in the future, and
             we must make sure to get the proper escaping.
 
         Ensure ascii in json.dumps (ensure_ascii=True) allows safe skipping of Mako's
@@ -65,7 +65,7 @@ def escape_js_str(js_str):
         Must include the surrounding quotes for the string.
 
         Use the "n" Mako filter above.  It is possible that the
-            default filter may include html encoding in the future, and
+            default filter may include html escaping in the future, and
             we must make sure to get the proper escaping.
 
         Mako's default filter decode.utf8 is applied here since this default
