@@ -912,7 +912,17 @@ class CourseFields(object):
     enable_proctored_exams = Boolean(
         display_name=_("Enable Proctored Exams"),
         help=_(
-            "Enter true or false. If this value is true, timed and proctored exams are enabled in your course."
+            "Enter true or false. If this value is true, proctored exams are enabled in your course. "
+            "Note that enabling proctored exams will also enable timed exams."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
+    enable_timed_exams = Boolean(
+        display_name=_("Enable Timed Exams"),
+        help=_(
+            "Enter true or false. If this value is true, timed exams are enabled in your course."
         ),
         default=False,
         scope=Scope.settings
@@ -926,6 +936,17 @@ class CourseFields(object):
         ),
         default=0.8,
         scope=Scope.settings,
+    )
+
+    self_paced = Boolean(
+        display_name=_("Self Paced"),
+        help=_(
+            "Set this to \"true\" to mark this course as self-paced. Self-paced courses do not have "
+            "due dates for assignments, and students can progress through the course at any rate before "
+            "the course ends."
+        ),
+        default=False,
+        scope=Scope.settings
     )
 
 
@@ -1573,3 +1594,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if p.scheme != scheme
         ]
         self.user_partitions = other_partitions + partitions  # pylint: disable=attribute-defined-outside-init
+
+    @property
+    def can_toggle_course_pacing(self):
+        """
+        Whether or not the course can be set to self-paced at this time.
+
+        Returns:
+          bool: False if the course has already started, True otherwise.
+        """
+        return datetime.now(UTC()) <= self.start

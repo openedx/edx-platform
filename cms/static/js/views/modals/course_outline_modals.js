@@ -47,7 +47,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return new Editor({
                     parentElement: this.$('.modal-section'),
                     model: this.model,
-                    xblockType: this.options.xblockType
+                    xblockType: this.options.xblockType,
+                    enable_proctored_exams: this.options.enable_proctored_exams,
+                    enable_timed_exams: this.options.enable_timed_exams
                 });
             }, this);
         },
@@ -161,7 +163,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         render: function () {
             var html = this.template($.extend({}, {
                 xblockInfo: this.model,
-                xblockType: this.options.xblockType
+                xblockType: this.options.xblockType,
+                enable_proctored_exam: this.options.enable_proctored_exams,
+                enable_timed_exam: this.options.enable_timed_exams
             }, this.getContext()));
 
             this.$el.html(html);
@@ -261,36 +265,29 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     TimedExaminationPreferenceEditor = AbstractEditor.extend({
         templateName: 'timed-examination-preference-editor',
         className: 'edit-settings-timed-examination',
-
         events : {
-            'change #id_timed_examination': 'timedExamination',
+            'change #id_not_timed': 'notTimedExam',
+            'change #id_timed_exam': 'showTimeLimit',
+            'change #id_practice_exam': 'showTimeLimit',
+            'change #id_proctored_exam': 'showTimeLimit',
             'focusout #id_time_limit': 'timeLimitFocusout'
         },
+        notTimedExam: function (event) {
+            event.preventDefault();
+            this.$('#id_time_limit_div').hide();
+            this.$('#id_time_limit').val('00:00');
+        },
+        showTimeLimit: function (event) {
+            event.preventDefault();
+            this.$('#id_time_limit_div').show();
+            this.$('#id_time_limit').val("00:30");
+        },
         timeLimitFocusout: function(event) {
+            event.preventDefault();
             var selectedTimeLimit = $(event.currentTarget).val();
             if (!this.isValidTimeLimit(selectedTimeLimit)) {
                 $(event.currentTarget).val("00:30");
             }
-        },
-        timedExamination: function (event) {
-            event.preventDefault();
-            if (!$(event.currentTarget).is(':checked')) {
-                this.$('#id_exam_proctoring').attr('checked', false);
-                this.$('#id_time_limit').val('00:00');
-                this.$('#id_exam_proctoring').attr('disabled','disabled');
-                this.$('#id_time_limit').attr('disabled', 'disabled');
-                this.$('#id_practice_exam').attr('checked', false);
-                this.$('#id_practice_exam').attr('disabled','disabled');
-            }
-            else {
-                if (!this.isValidTimeLimit(this.$('#id_time_limit').val())) {
-                    this.$('#id_time_limit').val('00:30');
-                }
-                this.$('#id_practice_exam').removeAttr('disabled');
-                this.$('#id_exam_proctoring').removeAttr('disabled');
-                this.$('#id_time_limit').removeAttr('disabled');
-            }
-            return true;
         },
         afterRender: function () {
             AbstractEditor.prototype.afterRender.call(this);
@@ -300,34 +297,35 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 'maxTime': '05:00',
                 'forceRoundTime': false
             });
+
+            this.setExamType(this.model.get('is_time_limited'), this.model.get('is_proctored_exam'),
+                            this.model.get('is_practice_exam'));
             this.setExamTime(this.model.get('default_time_limit_minutes'));
-            this.setExamTmePreference(this.model.get('is_time_limited'));
-            this.setExamProctoring(this.model.get('is_proctored_enabled'));
-            this.setPracticeExam(this.model.get('is_practice_exam'));
         },
-        setPracticeExam: function(value) {
-            this.$('#id_practice_exam').prop('checked', value);
-        },
-        setExamProctoring: function(value) {
-            this.$('#id_exam_proctoring').prop('checked', value);
+        setExamType: function(is_time_limited, is_proctored_exam, is_practice_exam) {
+            if (!is_time_limited) {
+                this.$("#id_not_timed").prop('checked', true);
+                return;
+            }
+
+            this.$('#id_time_limit_div').show();
+
+            if (this.options.enable_proctored_exams && is_proctored_exam) {
+                if (is_practice_exam) {
+                    this.$('#id_practice_exam').prop('checked', true);
+                } else {
+                    this.$('#id_proctored_exam').prop('checked', true);
+                }
+            } else {
+                // Since we have an early exit at the top of the method
+                // if the subsection is not time limited, then
+                // here we rightfully assume that it just a timed exam
+                this.$("#id_timed_exam").prop('checked', true);
+            }
         },
         setExamTime: function(value) {
             var time = this.convertTimeLimitMinutesToString(value);
             this.$('#id_time_limit').val(time);
-        },
-        setExamTmePreference: function (value) {
-            this.$('#id_timed_examination').prop('checked', value);
-            if (!this.$('#id_timed_examination').is(':checked')) {
-                this.$('#id_exam_proctoring').attr('disabled','disabled');
-                this.$('#id_time_limit').attr('disabled', 'disabled');
-                this.$('#id_practice_exam').attr('disabled', 'disabled');
-            }
-        },
-        isExamTimeEnabled: function () {
-            return this.$('#id_timed_examination').is(':checked');
-        },
-        isPracticeExam: function () {
-            return this.$('#id_practice_exam').is(':checked');
         },
         isValidTimeLimit: function(time_limit) {
             var pattern = new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
@@ -348,16 +346,40 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var total_time = (parseInt(time[0]) * 60) + parseInt(time[1]);
             return total_time;
         },
-        isExamProctoringEnabled: function () {
-            return this.$('#id_exam_proctoring').is(':checked');
-        },
         getRequestData: function () {
+            var is_time_limited;
+            var is_practice_exam;
+            var is_proctored_exam;
             var time_limit = this.getExamTimeLimit();
+
+            if (this.$("#id_not_timed").is(':checked')){
+                is_time_limited = false;
+                is_practice_exam = false;
+                is_proctored_exam = false;
+            } else if (this.$("#id_timed_exam").is(':checked')){
+                is_time_limited = true;
+                is_practice_exam = false;
+                is_proctored_exam = false;
+            } else if (this.$("#id_proctored_exam").is(':checked')){
+                is_time_limited = true;
+                is_practice_exam = false;
+                is_proctored_exam = true;
+            } else if (this.$("#id_practice_exam").is(':checked')){
+                is_time_limited = true;
+                is_practice_exam = true;
+                is_proctored_exam = true;
+            }
+
             return {
                 metadata: {
-                    'is_practice_exam': this.isPracticeExam(),
-                    'is_time_limited': this.isExamTimeEnabled(),
-                    'is_proctored_enabled': this.isExamProctoringEnabled(),
+                    'is_practice_exam': is_practice_exam,
+                    'is_time_limited': is_time_limited,
+                    // We have to use the legacy field name
+                    // as the Ajax handler directly populates
+                    // the xBlocks fields. We will have to
+                    // update this call site when we migrate
+                    // seq_module.py to use 'is_proctored_exam'
+                    'is_proctored_enabled': is_proctored_exam,
                     'default_time_limit_minutes': this.convertTimeLimitToMinutes(time_limit)
                 }
             };
@@ -568,10 +590,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             } else if (xblockInfo.isSequential()) {
                 editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
 
-                // since timed/proctored exams are optional
-                // we want it before the StaffLockEditor
-                // to keep it closer to the GradingEditor
-                if (options.enable_proctored_exams) {
+                var enable_special_exams = (options.enable_proctored_exams || options.enable_timed_exams);
+                if (enable_special_exams) {
                     editors.push(TimedExaminationPreferenceEditor);
                 }
 
@@ -583,6 +603,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 if (xblockInfo.hasVerifiedCheckpoints()) {
                     editors.push(VerificationAccessEditor);
                 }
+            }
+            /* globals course */
+            if (course.get('self_paced')) {
+                editors = _.without(editors, ReleaseDateEditor, DueDateEditor);
             }
             return new SettingsXBlockModal($.extend({
                 editors: editors,

@@ -449,15 +449,14 @@ class CapaModuleTest(unittest.TestCase):
         # and that we get the same values back
         for key in result.keys():
             original_key = "input_" + key
-            self.assertTrue(original_key in valid_get_dict,
-                            "Output dict should have key %s" % original_key)
+            self.assertIn(original_key, valid_get_dict, "Output dict should have key %s" % original_key)
             self.assertEqual(valid_get_dict[original_key], result[key])
 
         # Valid GET param dict with list keys
         # Each tuple represents a single parameter in the query string
         valid_get_dict = MultiDict((('input_2[]', 'test1'), ('input_2[]', 'test2')))
         result = CapaModule.make_dict_of_responses(valid_get_dict)
-        self.assertTrue('2' in result)
+        self.assertIn('2', result)
         self.assertEqual(['test1', 'test2'], result['2'])
 
         # If we use [] at the end of a key name, we should always
@@ -730,7 +729,7 @@ class CapaModuleTest(unittest.TestCase):
             result = module.check_problem(get_request_dict)
 
         # Expect an AJAX alert message in 'success'
-        self.assertTrue(error_msg in result['success'])
+        self.assertIn(error_msg, result['success'])
 
     def test_check_problem_error_nonascii(self):
 
@@ -781,10 +780,10 @@ class CapaModuleTest(unittest.TestCase):
                 result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            self.assertTrue('test error' in result['success'])
+            self.assertIn('test error', result['success'])
 
             # We DO include traceback information for staff users
-            self.assertTrue('Traceback' in result['success'])
+            self.assertIn('Traceback', result['success'])
 
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
@@ -806,7 +805,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertTrue('success' in result and result['success'])
 
         # Expect that the problem HTML is retrieved
-        self.assertTrue('html' in result)
+        self.assertIn('html', result)
         self.assertEqual(result['html'], "<div>Test HTML</div>")
 
         # Expect that the problem was reset
@@ -852,7 +851,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(result['success'], 'correct')
 
         # Expect that we get no HTML
-        self.assertFalse('contents' in result)
+        self.assertNotIn('contents', result)
 
         # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
@@ -1263,7 +1262,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(bool(context['save_button']), show_save_button)
 
         # Assert that the encapsulated html contains the original html
-        self.assertTrue(html in html_encapsulated)
+        self.assertIn(html, html_encapsulated)
 
     demand_xml = """
         <problem>
@@ -1355,7 +1354,7 @@ class CapaModuleTest(unittest.TestCase):
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
-        self.assertTrue("error" in context['problem']['html'])
+        self.assertIn("error", context['problem']['html'])
 
         # Expect that the module has created a new dummy problem with the error
         self.assertNotEqual(original_problem, module.lcp)
@@ -1385,7 +1384,7 @@ class CapaModuleTest(unittest.TestCase):
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
-        self.assertTrue(error_msg in context['problem']['html'])
+        self.assertIn(error_msg, context['problem']['html'])
 
     @ddt.data(
         'false',

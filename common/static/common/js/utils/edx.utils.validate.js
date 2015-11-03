@@ -24,12 +24,13 @@
             var _fn = {
                 validate: {
 
+                   template: _.template( '<li><%= content %></li>' ),
+
                     msg: {
-                        email: '<li><%- gettext("The email address you\'ve provided isn\'t formatted correctly.") %></li>',
-                        min: '<li><%- _.sprintf( gettext("%(field)s must have at least %(count)d characters."), context ) %></li>',
-                        max: '<li><%- _.sprintf( gettext("%(field)s can only contain up to %(count)d characters."), context ) %></li>',
-                        required: '<li><%- _.sprintf( gettext("Please enter your %(field)s."), context ) %></li>',
-                        custom: '<li><%= content %></li>'
+                        email: gettext("The email address you've provided isn't formatted correctly."),
+                        min: gettext("%(field)s must have at least %(count)d characters."),
+                        max: gettext("%(field)s can only contain up to %(count)d characters."),
+                        required: gettext("Please enter your %(field)s.")
                     },
 
                     field: function( el ) {
@@ -131,9 +132,9 @@
 
                     getMessage: function( $el, tests ) {
                         var txt = [],
-                            tpl,
                             label,
-                            obj,
+                            context,
+                            content,
                             customMsg;
 
                         _.each( tests, function( value, key ) {
@@ -143,30 +144,20 @@
 
                                 // If the field has a custom error msg attached, use it
                                 if ( customMsg ) {
-                                    tpl = _fn.validate.msg.custom;
-
-                                    obj = {
-                                        content: customMsg
-                                    };
+                                    content = customMsg;
                                 } else {
-                                    tpl = _fn.validate.msg[key];
-
-                                    obj = {
-                                        // We pass the context object to the template so that
-                                        // we can perform variable interpolation using sprintf
-                                        context: {
-                                            field: label
-                                        }
-                                    };
+                                    context = {field: label};
 
                                     if ( key === 'min' ) {
-                                        obj.context.count = parseInt( $el.attr('minlength'), 10 );
+                                        context.count = parseInt( $el.attr('minlength'), 10 );
                                     } else if ( key === 'max' ) {
-                                        obj.context.count = parseInt( $el.attr('maxlength'), 10 );
+                                        context.count = parseInt( $el.attr('maxlength'), 10 );
                                     }
+
+                                    content = _.sprintf( _fn.validate.msg[key], context );
                                 }
 
-                                txt.push( _.template( tpl, obj ) );
+                                txt.push( _fn.validate.template( {content: content} ) );
                             }
                         });
 

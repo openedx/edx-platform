@@ -2,16 +2,20 @@
 import logging
 
 from django.http import Http404
+from edx_rest_api_client import exceptions
 from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
+from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_oauth.authentication import OAuth2Authentication
 
 from commerce.api.v1.models import Course
 from commerce.api.v1.permissions import ApiKeyOrModelPermission
 from commerce.api.v1.serializers import CourseSerializer
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.lib.api.mixins import PutAsCreateMixin
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -54,3 +58,18 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
         # There is nothing to pre-save. The default behavior changes the Course.id attribute from
         # a CourseKey to a string, which is not desired.
         pass
+
+
+class OrderView(APIView):
+    """ Retrieve order details. """
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, number):  # pylint:disable=unused-argument
+        """ HTTP handler. """
+        try:
+            order = ecommerce_api_client(request.user).orders(number).get()
+            return JsonResponse(order)
+        except exceptions.HttpNotFoundError:
+            return JsonResponse(status=404)

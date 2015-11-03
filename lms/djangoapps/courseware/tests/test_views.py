@@ -6,6 +6,7 @@ import cgi
 from urllib import urlencode
 import ddt
 import json
+import itertools
 import unittest
 from datetime import datetime
 from HTMLParser import HTMLParser
@@ -36,6 +37,7 @@ from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.tests import mako_middleware_process_request
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
@@ -45,7 +47,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 @attr('shard_1')
@@ -669,10 +671,18 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.request.user = self.user
 
         mako_middleware_process_request(self.request)
+
+        self.setup_course()
+
+    def setup_course(self, **options):
+        """Create the test course."""
         course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
+            **options
         )
+
+        # pylint: disable=attribute-defined-outside-init
         self.course = modulestore().get_course(course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
@@ -828,6 +838,18 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertContains(resp, u"Download Your Certificate")
+
+    @ddt.data(
+        *itertools.product(((18, 4, True), (18, 4, False)), (True, False))
+    )
+    @ddt.unpack
+    def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
+        """Test that query counts remain the same for self-paced and instructor-led courses."""
+        SelfPacedConfiguration(enabled=self_paced_enabled).save()
+        self.setup_course(self_paced=self_paced)
+        with self.assertNumQueries(sql_calls), check_mongo_calls(mongo_calls):
+            resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertEqual(resp.status_code, 200)
 
 
 @attr('shard_1')
@@ -1151,3 +1173,17 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)
+
+
+class TestRenderXBlockSelfPaced(TestRenderXBlock):
+    """
+    Test rendering XBlocks for a self-paced course. Relies on the query
+    count assertions in the tests defined by RenderXBlockMixin.
+    """
+
+    def setUp(self):
+        super(TestRenderXBlockSelfPaced, self).setUp()
+        SelfPacedConfiguration(enabled=True).save()
+
+    def course_options(self):
+        return {'self_paced': True}

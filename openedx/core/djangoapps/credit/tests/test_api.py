@@ -304,16 +304,27 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Initially, the status should be None
         req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
         self.assertEqual(req_status[0]["status"], None)
+        self.assertEqual(req_status[0]["order"], 0)
 
         # Set the requirement to "satisfied" and check that it's actually set
         api.set_credit_requirement_status("staff", self.course_key, "grade", "grade")
         req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
         self.assertEqual(req_status[0]["status"], "satisfied")
+        self.assertEqual(req_status[0]["order"], 0)
 
         # Set the requirement to "failed" and check that it's actually set
         api.set_credit_requirement_status("staff", self.course_key, "grade", "grade", status="failed")
         req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
         self.assertEqual(req_status[0]["status"], "failed")
+        self.assertEqual(req_status[0]["order"], 0)
+
+        req_status = api.get_credit_requirement_status(self.course_key, "staff")
+        self.assertEqual(req_status[0]["status"], "failed")
+        self.assertEqual(req_status[0]["order"], 0)
+
+        # make sure the 'order' on the 2nd requiemtn is set correctly (aka 1)
+        self.assertEqual(req_status[1]["status"], None)
+        self.assertEqual(req_status[1]["order"], 1)
 
         # Set the requirement to "declined" and check that it's actually set
         api.set_credit_requirement_status(
@@ -642,7 +653,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # Validate the timestamp
         self.assertIn('timestamp', parameters)
         parsed_date = from_timestamp(parameters['timestamp'])
-        self.assertTrue(parsed_date < datetime.datetime.now(pytz.UTC))
+        self.assertLess(parsed_date, datetime.datetime.now(pytz.UTC))
 
         # Validate course information
         self.assertEqual(parameters['course_org'], self.course_key.org)

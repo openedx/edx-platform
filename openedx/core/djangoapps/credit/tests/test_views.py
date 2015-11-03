@@ -469,23 +469,47 @@ class CreditCourseViewSetTests(TestCase):
         response = self.client.get(self.path, **headers)
         self.assertEqual(response.status_code, 200)
 
-    def test_create(self):
-        """ Verify the endpoint supports creating new CreditCourse objects. """
-        course_key = CourseKey.from_string('a/b/c')
+    def assert_course_created(self, course_id, response):
+        """ Verify an API request created a new CreditCourse object. """
         enabled = True
         data = {
-            'course_key': unicode(course_key),
+            'course_key': unicode(course_id),
             'enabled': enabled
         }
 
-        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON)
         self.assertEqual(response.status_code, 201)
 
         # Verify the API returns the serialized CreditCourse
         self.assertDictEqual(json.loads(response.content), data)
 
         # Verify the CreditCourse was actually created
+        course_key = CourseKey.from_string(course_id)
         self.assertTrue(CreditCourse.objects.filter(course_key=course_key, enabled=enabled).exists())
+
+    def test_create(self):
+        """ Verify the endpoint supports creating new CreditCourse objects. """
+        course_id = 'a/b/c'
+        enabled = True
+        data = {
+            'course_key': unicode(course_id),
+            'enabled': enabled
+        }
+
+        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON)
+        self.assert_course_created(course_id, response)
+
+    def test_put_as_create(self):
+        """ Verify the update endpoint supports creating a new CreditCourse object. """
+        course_id = 'd/e/f'
+        enabled = True
+        data = {
+            'course_key': unicode(course_id),
+            'enabled': enabled
+        }
+
+        path = reverse('credit:creditcourse-detail', args=[course_id])
+        response = self.client.put(path, data=json.dumps(data), content_type=JSON)
+        self.assert_course_created(course_id, response)
 
     def test_get(self):
         """ Verify the endpoint supports retrieving CreditCourse objects. """

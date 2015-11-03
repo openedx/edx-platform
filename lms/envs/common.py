@@ -391,8 +391,8 @@ FEATURES = {
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
-    # Timed Proctored Exams
-    'ENABLE_PROCTORED_EXAMS': False,
+    # Special Exams, aka Timed and Proctored Exams
+    'ENABLE_SPECIAL_EXAMS': False,
 
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
     'ENABLE_OPENBADGES': False,
@@ -1223,17 +1223,33 @@ from openedx.core.lib.rooted_paths import rooted_glob
 courseware_js = (
     [
         'coffee/src/' + pth + '.js'
-        for pth in ['courseware', 'histogram', 'navigation', 'time']
+        for pth in ['courseware', 'histogram', 'navigation']
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
 proctoring_js = (
-    ['proctoring/js/models/*.js'] +
-    ['proctoring/js/collections/*.js'] +
-    ['proctoring/js/views/*.js'] +
-    ['proctoring/js/*.js']
+    [
+        'proctoring/js/models/proctored_exam_allowance_model.js',
+        'proctoring/js/models/proctored_exam_attempt_model.js',
+        'proctoring/js/models/proctored_exam_model.js'
+    ] +
+    [
+        'proctoring/js/collections/proctored_exam_allowance_collection.js',
+        'proctoring/js/collections/proctored_exam_attempt_collection.js',
+        'proctoring/js/collections/proctored_exam_collection.js'
+    ] +
+    [
+        'proctoring/js/views/Backbone.ModalDialog.js',
+        'proctoring/js/views/proctored_exam_add_allowance_view.js',
+        'proctoring/js/views/proctored_exam_allowance_view.js',
+        'proctoring/js/views/proctored_exam_attempt_view.js',
+        'proctoring/js/views/proctored_exam_view.js'
+    ] +
+    [
+        'proctoring/js/proctored_app.js'
+    ]
 )
 
 # Before a student accesses courseware, we do not
@@ -1260,7 +1276,6 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/json2.js',
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
-    'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
 ]
 
@@ -1819,7 +1834,6 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.theming',
 
     # Our courseware
-    'circuit',
     'courseware',
     'student',
 
@@ -1964,6 +1978,12 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # programs support
+    'openedx.core.djangoapps.programs',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
 )
 
 ######################### CSRF #########################################

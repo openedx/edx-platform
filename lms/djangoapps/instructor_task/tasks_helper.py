@@ -29,6 +29,7 @@ from shoppingcart.models import (
     PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
     Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
 )
+from survey.models import SurveyAnswer
 
 from track.views import task_track
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
@@ -1307,6 +1308,62 @@ def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _ta
     return task_progress.update_task_state(extra_meta=current_step)
 
 
+def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+    """
+    For a given `course_id`, generate a html report containing the survey results for a course.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+    num_reports = 1
+    task_progress = TaskProgress(action_name, num_reports, start_time)
+
+    current_step = {'step': 'Gathering course survey report information'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    distinct_survey_fields_queryset = SurveyAnswer.objects.filter(course_key=course_id).values('field_name').distinct()
+    survey_fields = []
+    for unique_field_row in distinct_survey_fields_queryset:
+        survey_fields.append(unique_field_row['field_name'])
+    survey_fields.sort()
+
+    user_survey_answers = OrderedDict()
+    survey_answers_for_course = SurveyAnswer.objects.filter(course_key=course_id)
+
+    for survey_field_record in survey_answers_for_course:
+        user_id = survey_field_record.user.id
+        if user_id not in user_survey_answers.keys():
+            user_survey_answers[user_id] = {}
+
+        user_survey_answers[user_id][survey_field_record.field_name] = survey_field_record.field_value
+
+    header = ["User ID", "User Name", "Email"]
+    header.extend(survey_fields)
+    csv_rows = []
+
+    for user_id in user_survey_answers.keys():
+        row = []
+        row.append(user_id)
+        user_obj = User.objects.get(id=user_id)
+        row.append(user_obj.username)
+        row.append(user_obj.email)
+        for survey_field in survey_fields:
+            row.append(user_survey_answers[user_id].get(survey_field, ''))
+        csv_rows.append(row)
+
+    task_progress.attempted = task_progress.succeeded = len(csv_rows)
+    task_progress.skipped = task_progress.total - task_progress.attempted
+
+    csv_rows.insert(0, header)
+
+    current_step = {'step': 'Uploading CSV'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Perform the upload
+    upload_csv_to_report_store(csv_rows, 'course_survey_results', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
 def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
     """
     For a given `course_id`, generate a CSV file containing
@@ -1429,8 +1486,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                 continue
 
             try:
-                with transaction.commit_on_success():
-                    add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
+                add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
                 cohorts_status[cohort_name]['Students Added'] += 1
                 task_progress.succeeded += 1
             except User.DoesNotExist:

@@ -11,6 +11,10 @@ from instructor.views.tools import get_student_from_identifier
 from django.core.exceptions import ObjectDoesNotExist
 import instructor.enrollment as enrollment
 
+from student.roles import CourseStaffRole
+
+from student import auth
+
 
 log = logging.getLogger(__name__)
 
@@ -69,3 +73,10 @@ class InstructorService(object):
                     )
                 )
                 log.error(err_msg)
+
+    def is_course_staff(self, user, course_id):
+        """
+        Returns True if the user is the course staff
+        else Returns False
+        """
+        return auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))

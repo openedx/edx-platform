@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-22 18:44+0000\n"
-"PO-Revision-Date: 2015-10-22 18:44:09.818906\n"
+"POT-Creation-Date: 2015-10-30 16:56+0000\n"
+"PO-Revision-Date: 2015-10-30 16:56:53.240310\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -590,6 +590,14 @@ msgstr "رشوث خب فاث ثرقخمموثرف شففقهزعفث"
 msgid "Value of the enrollment attribute"
 msgstr "دشمعث خب فاث ثرقخمموثرف شففقهزعفث"
 
+#: common/djangoapps/student/models.py
+msgid ""
+"The window of time after enrolling during which users can be granted a "
+"refund, represented in microseconds. The default is 14 days."
+msgstr ""
+"فاث صهريخص خب فهوث شبفثق ثرقخممهرل يعقهرل صاهذا عسثقس ذشر زث لقشرفثي ش "
+"قثبعري, قثحقثسثرفثي هر وهذقخسثذخريس. فاث يثبشعمف هس 14 يشغس."
+
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
 msgstr "فاث ذخعقسث غخع شقث مخخنهرل بخق يخثس رخف سفشقف عرفهم {date}."
@@ -613,6 +621,10 @@ msgstr "ذخعمي رخف ثرقخمم"
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
 msgstr "غخع شقث رخف ثرقخممثي هر فاهس ذخعقسث"
+
+#: common/djangoapps/student/views.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr "غخعق ذثقفهبهذشفث حقثدثرفس غخع بقخو عرثرقخممهرل بقخو فاهس ذخعقسث"
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
@@ -3174,11 +3186,25 @@ msgstr "ثرشزمث حقخذفخقثي ثطشوس"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If this value is true, timed and proctored exams are "
-"enabled in your course."
+"Enter true or false. If this value is true, proctored exams are enabled in "
+"your course. Note that enabling proctored exams will also enable timed "
+"exams."
 msgstr ""
-"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, فهوثي شري حقخذفخقثي ثطشوس شقث "
-"ثرشزمثي هر غخعق ذخعقسث."
+"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, حقخذفخقثي ثطشوس شقث ثرشزمثي هر "
+"غخعق ذخعقسث. رخفث فاشف ثرشزمهرل حقخذفخقثي ثطشوس صهمم شمسخ ثرشزمث فهوثي "
+"ثطشوس."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Timed Exams"
+msgstr "ثرشزمث فهوثي ثطشوس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed exams are enabled in your "
+"course."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, فهوثي ثطشوس شقث ثرشزمثي هر غخعق "
+"ذخعقسث."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -3191,6 +3217,20 @@ msgid ""
 msgstr ""
 "فاث وهرهوعو لقشيث فاشف ش مثشقرثق وعسف ثشقر فخ قثذثهدث ذقثيهف هر فاث ذخعقسث, "
 "شس ش يثذهوشم زثفصثثر 0.0 شري 1.0. بخق ثطشوحمث, بخق 75%, ثرفثق 0.75."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Self Paced"
+msgstr "سثمب حشذثي"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Set this to \"true\" to mark this course as self-paced. Self-paced courses "
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
+msgstr ""
+"سثف فاهس فخ \"فقعث\" فخ وشقن فاهس ذخعقسث شس سثمب-حشذثي. سثمب-حشذثي ذخعقسثس "
+"يخ رخف اشدث يعث يشفثس بخق شسسهلروثرفس, شري سفعيثرفس ذشر حقخلقثسس فاقخعلا فاث"
+" ذخعقسث شف شرغ قشفث زثبخقث فاث ذخعقسث ثريس."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -6171,6 +6211,24 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
+"The survey report is being created. To view the status of the report, see "
+"Pending Instructor Tasks below."
+msgstr ""
+"فاث سعقدثغ قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث قثحخقف, سثث "
+"حثريهرل هرسفقعذفخق فشسنس زثمخص."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is currently being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
+msgstr ""
+"فاث سعقدثغ قثحخقف هس ذعققثرفمغ زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
+"قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص. غخع صهمم زث شزمث فخ يخصرمخشي فاث"
+" قثحخقف صاثر هف هس ذخوحمثفث."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
 "The proctored exam results report is being created. To view the status of "
 "the report, see Pending Instructor Tasks below."
 msgstr ""
@@ -6375,8 +6433,8 @@ msgid "E-Commerce"
 msgstr "ث-ذخووثقذث"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Proctoring"
-msgstr "حقخذفخقهرل"
+msgid "Special Exams"
+msgstr "سحثذهشم ثطشوس"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/djangoapps/support/views/index.py cms/templates/certificates.html
@@ -9400,6 +9458,22 @@ msgstr "وز"
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
 msgstr "رخ بهمث حقخدهيثي بخق حقخبهمث هوشلث"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Internal Service URL"
+msgstr "هرفثقرشم سثقدهذث عقم"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Public Service URL"
+msgstr "حعزمهذ سثقدهذث عقم"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr "شحه دثقسهخر"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
+msgstr "ثرشزمث سفعيثرف يشسازخشقي يهسحمشغس"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
@@ -14900,6 +14974,14 @@ msgid "Generate Proctored Exam Results Report"
 msgstr "لثرثقشفث حقخذفخقثي ثطشو قثسعمفس قثحخقف"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to generate a CSV file of survey results for this course."
+msgstr "ذمهذن فخ لثرثقشفث ش ذسد بهمث خب سعقدثغ قثسعمفس بخق فاهس ذخعقسث."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Survey Results Report"
+msgstr "لثرثقشفث سعقدثغ قثسعمفس قثحخقف"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "To generate a CSV file that lists all student answers to a given problem, "
 "enter the location of the problem (from its Staff Debug Info)."
@@ -15906,14 +15988,6 @@ msgstr "فاهس هس ش حشقفهشم مهسف, فخ دهثص شمم سفعي�
 msgid "There are no problems in this section."
 msgstr "فاثقث شقث رخ حقخزمثوس هر فاهس سثذفهخر."
 
-#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
-msgid "Allowance Section"
-msgstr "شممخصشرذث سثذفهخر"
-
-#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
-msgid "Student Proctored Exam Section"
-msgstr "سفعيثرف حقخذفخقثي ثطشو سثذفهخر"
-
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
 msgstr "سثري ثوشهم"
@@ -16033,6 +16107,14 @@ msgstr "حمثشسث ثرفثق ذخعقسث وخيث يثفشهم زثمخص"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Set Price"
 msgstr "سثف حقهذث"
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Allowance Section"
+msgstr "شممخصشرذث سثذفهخر"
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Student Special Exam Attempts"
+msgstr "سفعيثرف سحثذهشم ثطشو شففثوحفس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
@@ -19605,11 +19687,11 @@ msgstr ""
 
 #: cms/templates/manage_users.html
 msgid ""
-"All course team members are automatically enrolled in the course and can "
-"access content in Studio, the LMS, and Insights."
+"All course team members can access content in Studio, the LMS, and Insights,"
+" but are not automatically enrolled in the course."
 msgstr ""
-"شمم ذخعقسث فثشو وثوزثقس شقث شعفخوشفهذشممغ ثرقخممثي هر فاث ذخعقسث شري ذشر "
-"شذذثسس ذخرفثرف هر سفعيهخ, فاث موس, شري هرسهلافس."
+"شمم ذخعقسث فثشو وثوزثقس ذشر شذذثسس ذخرفثرف هر سفعيهخ, فاث موس, شري هرسهلافس,"
+" زعف شقث رخف شعفخوشفهذشممغ ثرقخممثي هر فاث ذخعقسث."
 
 #: cms/templates/manage_users.html
 msgid "Transferring Ownership"
@@ -20115,6 +20197,34 @@ msgid ""
 msgstr ""
 "فاث سذخقث سفعيثرف وعسف وثثف هر خقيثق فخ سعذذثسسبعممغ ذخوحمثفث فاث ثرفقشرذث "
 "ثطشو. "
+
+#: cms/templates/settings.html
+msgid "Course Pacing"
+msgstr "ذخعقسث حشذهرل"
+
+#: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr "سثف فاث حشذهرل بخق فاهس ذخعقسث"
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-led courses progress at the pace that the course author sets. You"
+" can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+"هرسفقعذفخق-مثي ذخعقسثس حقخلقثسس شف فاث حشذث فاشف فاث ذخعقسث شعفاخق سثفس. غخع"
+" ذشر ذخربهلعقث قثمثشسث يشفثس بخق ذخعقسث ذخرفثرف شري يعث يشفثس بخق "
+"شسسهلروثرفس."
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
+"سثمب-حشذثي ذخعقسثس يخ رخف اشدث قثمثشسث يشفثس بخق ذخعقسث ذخرفثرف خق يعث يشفثس"
+" بخق شسسهلروثرفس. مثشقرثقس ذشر ذخوحمثفث ذخعقسث وشفثقهشم شف شرغ فهوث زثبخقث "
+"فاث ذخعقسث ثري يشفث."
 
 #: cms/templates/settings.html
 msgid "Course Content License"

@@ -97,6 +97,16 @@ class ProctoringFields(object):
         scope=Scope.settings,
     )
 
+    @property
+    def is_proctored_exam(self):
+        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
+        return self.is_proctored_enabled
+
+    @is_proctored_exam.setter
+    def is_proctored_exam(self, value):
+        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
+        self.is_proctored_enabled = value
+
 
 @XBlock.wants('proctoring')
 @XBlock.wants('credit')
@@ -221,14 +231,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         proctoring_service = self.runtime.service(self, 'proctoring')
         credit_service = self.runtime.service(self, 'credit')
 
-        # Is the feature turned on and do we have all required services
-        # Also, the ENABLE_PROCTORED_EXAMS feature flag must be set to
-        # True and the Sequence in question, should have the
-        # fields set to indicate this is a timed/proctored exam
+        # Is this sequence designated as a Timed Examination, which includes
+        # Proctored Exams
         feature_enabled = (
             proctoring_service and
             credit_service and
-            proctoring_service.is_feature_enabled()
+            self.is_time_limited
         )
         if feature_enabled:
             user_id = self.runtime.user_id
@@ -242,7 +250,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     self.default_time_limit_minutes if
                     self.default_time_limit_minutes else 0
                 ),
-                'is_practice_exam': self.is_practice_exam
+                'is_practice_exam': self.is_practice_exam,
+                'due_date': self.due
             }
 
             # inject the user's credit requirements and fulfillments

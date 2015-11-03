@@ -4,6 +4,8 @@ Tests for the edx_proctoring integration into Studio
 
 from mock import patch
 import ddt
+from datetime import datetime, timedelta
+from pytz import UTC
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -13,7 +15,7 @@ from edx_proctoring.api import get_all_exams_for_course
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoredExams(ModuleStoreTestCase):
     """
     Tests for the publishing of proctored exams
@@ -46,7 +48,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['content_id'], unicode(sequence.location))
         self.assertEqual(exam['exam_name'], sequence.display_name)
         self.assertEqual(exam['time_limit_mins'], sequence.default_time_limit_minutes)
-        self.assertEqual(exam['is_proctored'], sequence.is_proctored_enabled)
+        self.assertEqual(exam['is_proctored'], sequence.is_proctored_exam)
         self.assertEqual(exam['is_active'], expected_active)
 
     @ddt.data(
@@ -56,7 +58,7 @@ class TestProctoredExams(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_publishing_exam(self, is_time_limited, default_time_limit_minutes,
-                             is_procted_enabled, expected_active, republish):
+                             is_proctored_exam, expected_active, republish):
         """
         Happy path testing to see that when a course is published which contains
         a proctored exam, it will also put an entry into the exam tables
@@ -70,7 +72,8 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=is_time_limited,
             default_time_limit_minutes=default_time_limit_minutes,
-            is_proctored_enabled=is_procted_enabled
+            is_proctored_exam=is_proctored_exam,
+            due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1)
         )
 
         listen_for_course_publish(self, self.course.id)
@@ -102,7 +105,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_enabled=True
+            is_proctored_exam=True
         )
 
         listen_for_course_publish(self, self.course.id)
@@ -111,7 +114,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(len(exams), 1)
 
         sequence.is_time_limited = False
-        sequence.is_proctored_enabled = False
+        sequence.is_proctored_exam = False
 
         self.store.update_item(sequence, self.user.id)
 
@@ -132,7 +135,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_enabled=True
+            is_proctored_exam=True
         )
 
         listen_for_course_publish(self, self.course.id)
@@ -153,7 +156,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         exam = exams[0]
         self.assertEqual(exam['is_active'], False)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': False})
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': False})
     def test_feature_flag_off(self):
         """
         Make sure the feature flag is honored
@@ -167,7 +170,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_enabled=True
+            is_proctored_exam=True
         )
 
         listen_for_course_publish(self, self.course.id)
@@ -175,7 +178,13 @@ class TestProctoredExams(ModuleStoreTestCase):
         exams = get_all_exams_for_course(unicode(self.course.id))
         self.assertEqual(len(exams), 0)
 
-    def test_advanced_setting_off(self):
+    @ddt.data(
+        (True, False, 1),
+        (False, True, 1),
+        (False, False, 0),
+    )
+    @ddt.unpack
+    def test_advanced_settings(self, enable_timed_exams, enable_proctored_exams, expected_count):
         """
         Make sure the feature flag is honored
         """
@@ -184,7 +193,8 @@ class TestProctoredExams(ModuleStoreTestCase):
             org='edX',
             course='901',
             run='test_run2',
-            enable_proctored_exams=False
+            enable_proctored_exams=enable_proctored_exams,
+            enable_timed_exams=enable_timed_exams
         )
 
         chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
@@ -195,7 +205,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_enabled=True
+            is_proctored_exam=True
         )
 
         listen_for_course_publish(self, self.course.id)
@@ -203,4 +213,4 @@ class TestProctoredExams(ModuleStoreTestCase):
         # there shouldn't be any exams because we haven't enabled that
         # advanced setting flag
         exams = get_all_exams_for_course(unicode(self.course.id))
-        self.assertEqual(len(exams), 0)
+        self.assertEqual(len(exams), expected_count)

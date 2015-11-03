@@ -20,7 +20,7 @@ from certificates.tests.factories import GeneratedCertificateFactory, Certificat
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -32,6 +32,7 @@ from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactor
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from instructor_task.models import ReportStore
+from survey.models import SurveyForm, SurveyAnswer
 from instructor_task.tasks_helper import (
     cohort_students_and_upload,
     upload_problem_responses_csv,
@@ -41,6 +42,7 @@ from instructor_task.tasks_helper import (
     upload_may_enroll_csv,
     upload_enrollment_report,
     upload_exec_summary_report,
+    upload_course_survey_report,
     generate_students_certificates,
 )
 from instructor_analytics.basic import UNAVAILABLE
@@ -142,8 +144,10 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         magneto = u'MàgnëtÖ'
         cohort1 = CohortFactory(course_id=course.id, name=professor_x)
         cohort2 = CohortFactory(course_id=course.id, name=magneto)
-        cohort1.users.add(user1)
-        cohort2.users.add(user2)
+        membership1 = CohortMembership(course_user_group=cohort1, user=user1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=cohort2, user=user2)
+        membership2.save()
 
         self._verify_cell_data_for_user(user1.username, course.id, 'Cohort Name', professor_x)
         self._verify_cell_data_for_user(user2.username, course.id, 'Cohort Name', magneto)
@@ -954,6 +958,99 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
 
 
 @ddt.ddt
+class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that Course Survey report generation works.
+    """
+    def setUp(self):
+        super(TestCourseSurveyReport, self).setUp()
+        self.course = CourseFactory.create()
+
+        self.question1 = "question1"
+        self.question2 = "question2"
+        self.question3 = "question3"
+        self.answer1 = "answer1"
+        self.answer2 = "answer2"
+        self.answer3 = "answer3"
+
+        self.student1 = UserFactory()
+        self.student2 = UserFactory()
+
+        self.test_survey_name = 'TestSurvey'
+        self.test_form = '<input name="field1"></input>'
+        self.survey_form = SurveyForm.create(self.test_survey_name, self.test_form)
+
+        self.survey1 = SurveyAnswer.objects.create(user=self.student1, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question1, field_value=self.answer1)
+        self.survey2 = SurveyAnswer.objects.create(user=self.student1, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question2, field_value=self.answer2)
+        self.survey3 = SurveyAnswer.objects.create(user=self.student2, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question1, field_value=self.answer3)
+        self.survey4 = SurveyAnswer.objects.create(user=self.student2, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question2, field_value=self.answer2)
+        self.survey5 = SurveyAnswer.objects.create(user=self.student2, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question3, field_value=self.answer1)
+
+    def test_successfully_generate_course_survey_report(self):
+        """
+        Test that successfully generates the course survey report.
+        """
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_course_survey_report(
+                None, None, self.course.id,
+                task_input, 'generating course survey report'
+            )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    def test_generate_course_survey_report(self):
+        """
+        test to generate course survey report
+        and then test the report authenticity.
+        """
+
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_course_survey_report(
+                None, None, self.course.id,
+                task_input, 'generating course survey report'
+            )
+
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        header_row = ",".join(['User ID', 'User Name', 'Email', self.question1, self.question2, self.question3])
+        student1_row = ",".join([
+            str(self.student1.id),  # pylint: disable=no-member
+            self.student1.username,
+            self.student1.email,
+            self.answer1,
+            self.answer2
+        ])
+        student2_row = ",".join([
+            str(self.student2.id),  # pylint: disable=no-member
+            self.student2.username,
+            self.student2.email,
+            self.answer3,
+            self.answer2,
+            self.answer1
+        ])
+        expected_data = [header_row, student1_row, student2_row]
+
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self._verify_csv_file_report(report_store, expected_data)
+
+    def _verify_csv_file_report(self, report_store, expected_data):
+        """
+        Verify course survey data.
+        """
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+            csv_file_data = csv_file.read()
+            for data in expected_data:
+                self.assertIn(data, csv_file_data)
+
+
+@ddt.ddt
 class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that CSV student profile report generation works.
@@ -1304,8 +1401,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
     def test_move_users_to_new_cohort(self):
-        self.cohort_1.users.add(self.student_1)
-        self.cohort_2.users.add(self.student_2)
+        membership1 = CohortMembership(course_user_group=self.cohort_1, user=self.student_1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=self.cohort_2, user=self.student_2)
+        membership2.save()
 
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'
@@ -1322,8 +1421,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
     def test_move_users_to_same_cohort(self):
-        self.cohort_1.users.add(self.student_1)
-        self.cohort_2.users.add(self.student_2)
+        membership1 = CohortMembership(course_user_group=self.cohort_1, user=self.student_1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=self.cohort_2, user=self.student_2)
+        membership2.save()
 
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'

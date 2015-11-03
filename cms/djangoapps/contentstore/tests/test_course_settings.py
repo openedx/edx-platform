@@ -30,6 +30,7 @@ from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
 import ddt
 from xmodule.modulestore import ModuleStoreEnum
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from util.milestones_helpers import seed_milestone_relationship_types
 
 
@@ -56,6 +57,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
         self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
         self.assertIsNone(details.has_cert_config)
+        self.assertFalse(details.self_paced)
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -86,6 +88,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
     def test_update_and_fetch(self):
+        SelfPacedConfiguration(enabled=True).save()
         jsondetails = CourseDetails.fetch(self.course.id)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -113,10 +116,20 @@ class CourseDetailsTestCase(CourseTestCase):
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).effort,
             jsondetails.effort, "After set effort"
         )
+        jsondetails.self_paced = True
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
+            jsondetails.self_paced
+        )
         jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).start_date,
             jsondetails.start_date
+        )
+        jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC())
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).end_date,
+            jsondetails.end_date
         )
         jsondetails.course_image_name = "an_image.jpg"
         self.assertEqual(
@@ -283,6 +296,19 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
 
+    def test_toggle_pacing_during_course_run(self):
+        SelfPacedConfiguration(enabled=True).save()
+        self.course.start = datetime.datetime.now()
+        modulestore().update_item(self.course, self.user.id)
+
+        details = CourseDetails.fetch(self.course.id)
+        updated_details = CourseDetails.update_from_json(
+            self.course.id,
+            dict(details.__dict__, self_paced=True),
+            self.user
+        )
+        self.assertFalse(updated_details.self_paced)
+
 
 @ddt.ddt
 class CourseDetailsViewTest(CourseTestCase):
@@ -314,6 +340,7 @@ class CourseDetailsViewTest(CourseTestCase):
         return Date().to_json(datetime_obj)
 
     def test_update_and_fetch(self):
+        SelfPacedConfiguration(enabled=True).save()
         details = CourseDetails.fetch(self.course.id)
 
         # resp s/b json from here on
@@ -334,6 +361,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'effort', "effort")
         self.alter_field(url, details, 'course_image_name', "course_image_name")
         self.alter_field(url, details, 'language', "en")
+        self.alter_field(url, details, 'self_paced', "true")
 
     def compare_details_with_encoding(self, encoded, details, context):
         """

@@ -412,6 +412,33 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             </section>
           % endif
 
+          % if self_paced_enabled:
+
+            <hr class="divide" />
+
+            <section class="group-settings pacing">
+              <header>
+                <h2 class="title-2">${_("Course Pacing")}</h2>
+                <span class="tip">${_("Set the pacing for this course")}</span>
+              </header>
+              <span class="msg" id="course-pace-toggle-tip"></span>
+
+              <ol class="list-input">
+                <li class="field">
+                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-instructor-led" value="false"/>
+                  <label class="course-pace-label" for="course-pace-instructor-led">Instructor-Led</label>
+                  <span class="tip">${_("Instructor-led courses progress at the pace that the course author sets. You can configure release dates for course content and due dates for assignments.")}</span>
+                </li>
+                <li class="field">
+                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-self-paced" value="true"/>
+                  <label class="course-pace-label" for="course-pace-self-paced">Self-Paced</label>
+                  <span class="tip">${_("Self-paced courses do not have release dates for course content or due dates for assignments. Learners can complete course material at any time before the course end date.")}</span>
+                </li>
+              </ol>
+            </section>
+
+          % endif
+
           % if settings.FEATURES.get("LICENSING", False):
             <hr class="divide" />
 

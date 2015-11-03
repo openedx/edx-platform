@@ -676,6 +676,11 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
+##### Self-Paced Course Due Dates #####
+FIELD_OVERRIDE_PROVIDERS += (
+    'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
+)
+
 # PROFILE IMAGE CONFIG
 PROFILE_IMAGE_BACKEND = ENV_TOKENS.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BACKEND)
 PROFILE_IMAGE_SECRET_KEY = AUTH_TOKENS.get('PROFILE_IMAGE_SECRET_KEY', PROFILE_IMAGE_SECRET_KEY)

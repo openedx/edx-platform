@@ -31,48 +31,62 @@ export NO_PREREQ_INSTALL='true'
 
 EXIT=0
 
-case $CIRCLE_NODE_INDEX in
-    0)  # run the quality metrics
-        echo "Finding fixme's and storing report..."
-        paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
+    echo "Only 1 container is being used to run the tests."
+    echo "To run in more containers, configure parallelism for this repo's settings "
+    echo "via the CircleCI UI and adjust scripts/circle-ci-tests.sh to match."
 
-        echo "Finding pep8 violations and storing report..."
-        paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
+    echo "Running tests for common/lib/ and pavelib/"
+    paver test_lib --extra_args="--with-flaky" --cov_args="-p" || EXIT=1
+    echo "Running python tests for Studio"
+    paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || EXIT=1
+    echo "Running python tests for lms"
+    paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || EXIT=1
 
-        echo "Finding pylint violations and storing in report..."
-        # HACK: we need to print something to the console, otherwise circleci
-        # fails and aborts the job because nothing is displayed for > 10 minutes.
-        paver run_pylint -l $PYLINT_THRESHOLD | tee pylint.log || EXIT=1
+    exit $EXIT
+else
+    # Split up the tests to run in parallel on 4 containers
+    case $CIRCLE_NODE_INDEX in
+        0)  # run the quality metrics
+            echo "Finding fixme's and storing report..."
+            paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
 
-        mkdir -p reports
-        echo "Finding jshint violations and storing report..."
-        PATH=$PATH:node_modules/.bin
-        paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
+            echo "Finding pep8 violations and storing report..."
+            paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
-        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-        paver run_quality -p 100 || EXIT=1
+            echo "Finding pylint violations and storing in report..."
+            paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
 
-        echo "Running code complexity report (python)."
-        paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+            mkdir -p reports
+            echo "Finding jshint violations and storing report..."
+            PATH=$PATH:node_modules/.bin
+            paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
 
-        exit $EXIT
-        ;;
+            # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+            paver run_quality -p 100 || EXIT=1
 
-    1)  # run all of the lms unit tests
-        paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
-        ;;
+            echo "Running code complexity report (python)."
+            paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
 
-    2)  # run all of the cms unit tests
-        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
-        ;;
+            exit $EXIT
+            ;;
 
-    3)  # run the commonlib unit tests
-        paver test_lib --extra_args="--with-flaky" --cov_args="-p"
-        ;;
+        1)  # run all of the lms unit tests
+            paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+            ;;
 
-    *)
-        echo "No tests were executed in this container."
-        echo "Please adjust scripts/circle-ci-tests.sh to match your parallelism."
-        exit 1
-        ;;
-esac
+        2)  # run all of the cms unit tests
+            paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
+            ;;
+
+        3)  # run the commonlib unit tests
+            paver test_lib --extra_args="--with-flaky" --cov_args="-p"
+            ;;
+
+        *)
+            echo "No tests were executed in this container."
+            echo "Please adjust scripts/circle-ci-tests.sh to match your parallelism."
+            exit 1
+            ;;
+    esac
+fi

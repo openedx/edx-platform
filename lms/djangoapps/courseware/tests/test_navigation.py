@@ -281,7 +281,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         test_course_id = self.test_course.id.to_deprecated_string()
 
-        with patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': False}):
+        with patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False}):
             url = reverse(
                 'courseware',
                 kwargs={'course_id': test_course_id}
@@ -290,7 +290,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
             self.assertNotContains(resp, '/static/js/lms-proctoring.js')
 
-        with patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True}):
+        with patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True}):
             url = reverse(
                 'courseware',
                 kwargs={'course_id': test_course_id}

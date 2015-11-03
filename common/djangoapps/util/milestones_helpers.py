@@ -24,6 +24,14 @@ def get_namespace_choices():
     return NAMESPACE_CHOICES
 
 
+def is_entrance_exams_enabled():
+    """
+    Checks to see if the Entrance Exams feature is enabled
+    Use this operation instead of checking the feature flag all over the place
+    """
+    return settings.FEATURES.get('ENTRANCE_EXAMS', False)
+
+
 def is_prerequisite_courses_enabled():
     """
     Returns boolean indicating prerequisite courses enabled system wide or not.

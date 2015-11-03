@@ -400,12 +400,13 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
     def test_basic(self):
         self.register_get_user_response(self.user)
-        self.register_post_thread_response({
+        cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
             "username": self.user.username,
             "created_at": "2015-05-19T00:00:00Z",
             "updated_at": "2015-05-19T00:00:00Z",
         })
+        self.register_post_thread_response(cs_thread)
         request_data = {
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
@@ -441,6 +442,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             "read": False,
             "has_endorsed": False,
+            "response_count": 0,
         }
         response = self.client.post(
             self.url,
@@ -536,6 +538,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
             "read": False,
             "has_endorsed": False,
+            "response_count": 0,
         }
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
@@ -662,7 +665,6 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "endorsed": False,
             "abuse_flaggers": [],
             "votes": {"up_count": 4},
-            "children": [],
         }]
         expected_comments = [{
             "id": "test_comment",
@@ -681,8 +683,8 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "abuse_flagged": False,
             "voted": True,
             "vote_count": 4,
-            "children": [],
             "editable_fields": ["abuse_flagged", "voted"],
+            "children": [],
         }]
         self.register_get_thread_response({
             "id": self.thread_id,
@@ -706,7 +708,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
             {
-                "recursive": ["True"],
+                "recursive": ["False"],
                 "resp_skip": ["0"],
                 "resp_limit": ["10"],
                 "user_id": [str(self.user.id)],
@@ -740,7 +742,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
             {
-                "recursive": ["True"],
+                "recursive": ["False"],
                 "resp_skip": ["68"],
                 "resp_limit": ["4"],
                 "user_id": [str(self.user.id)],
@@ -1023,5 +1025,76 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase)
 
     def test_retrieve_nonexistent_thread(self):
         self.register_get_thread_error_response(self.thread_id, 404)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+
+@httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for CommentViewSet Retrieve"""
+    def setUp(self):
+        super(CommentViewSetRetrieveTest, self).setUp()
+        self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
+        self.thread_id = "test_thread"
+        self.comment_id = "test_comment"
+
+    def make_comment_data(self, comment_id, parent_id=None, children=[]):  # pylint: disable=W0102
+        """
+        Returns comment dict object as returned by comments service
+        """
+        return make_minimal_cs_comment({
+            "id": comment_id,
+            "parent_id": parent_id,
+            "course_id": unicode(self.course.id),
+            "thread_id": self.thread_id,
+            "thread_type": "discussion",
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+            "created_at": "2015-06-03T00:00:00Z",
+            "updated_at": "2015-06-03T00:00:00Z",
+            "body": "Original body",
+            "children": children,
+        })
+
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_comment_child = self.make_comment_data("test_child_comment", self.comment_id, children=[])
+        cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
+        cs_thread = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "children": [cs_comment],
+        })
+        self.register_get_thread_response(cs_thread)
+        self.register_get_comment_response(cs_comment)
+
+        expected_response_data = {
+            "id": "test_child_comment",
+            "parent_id": self.comment_id,
+            "thread_id": self.thread_id,
+            "author": self.user.username,
+            "author_label": None,
+            "raw_body": "Original body",
+            "rendered_body": "<p>Original body</p>",
+            "created_at": "2015-06-03T00:00:00Z",
+            "updated_at": "2015-06-03T00:00:00Z",
+            "children": [],
+            "endorsed_at": None,
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "voted": False,
+            "vote_count": 0,
+            "abuse_flagged": False,
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"]
+        }
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)['results'][0], expected_response_data)
+
+    def test_retrieve_nonexistent_comment(self):
+        self.register_get_comment_error_response(self.comment_id, 404)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)

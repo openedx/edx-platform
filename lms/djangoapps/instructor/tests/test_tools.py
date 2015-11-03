@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from student.tests.factories import UserFactory  # pylint: disable=import-error
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -196,7 +197,6 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         Fixtures.
         """
         super(TestSetDueDateExtension, self).setUp()
-        OverrideFieldData.provider_classes = None
 
         self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
@@ -216,12 +216,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.week3 = week3
         self.user = user
 
-        # Apparently the test harness doesn't use LmsFieldStorage, and I'm not
-        # sure if there's a way to poke the test harness to do so.  So, we'll
-        # just inject the override field storage in this brute force manner.
-        for block in (course, week1, week2, week3, homework, assignment):
-            block._field_data = OverrideFieldData.wrap(  # pylint: disable=protected-access
-                user, course, block._field_data)  # pylint: disable=protected-access
+        inject_field_overrides((course, week1, week2, week3, homework, assignment), course, user)
 
     def tearDown(self):
         super(TestSetDueDateExtension, self).tearDown()

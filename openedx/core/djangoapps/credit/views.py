@@ -1,8 +1,8 @@
 """
 Views for the credit Django app.
 """
-import json
 import datetime
+import json
 import logging
 
 from django.conf import settings
@@ -21,13 +21,15 @@ import pytz
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
-from util.json_request import JsonResponse
-from util.date_utils import from_timestamp
+
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.exceptions import CreditApiBadRequest, CreditRequestNotFound
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.serializers import CreditCourseSerializer
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
+from openedx.core.lib.api.mixins import PutAsCreateMixin
+from util.date_utils import from_timestamp
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -371,7 +373,7 @@ def _validate_timestamp(timestamp_value, provider_id):
         return HttpResponseForbidden(u"Timestamp is too far in the past.")
 
 
-class CreditCourseViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
+class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
     """ CreditCourse endpoints. """
 
     lookup_field = 'course_key'

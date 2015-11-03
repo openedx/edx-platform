@@ -6,6 +6,7 @@ import json
 import re
 import pytz
 import ddt
+import urlparse
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 
@@ -14,12 +15,13 @@ from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response
 from request_cache.middleware import RequestCache
+from opaque_keys.edx.keys import CourseKey
 from student.roles import CourseCcxCoachRole
 from student.models import (
     CourseEnrollment,
@@ -200,7 +202,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.make_coach()
         url = reverse(
             'ccx_coach_dashboard',
-            kwargs={'course_id': self.course.id.to_deprecated_string()})
+            kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search(
@@ -212,15 +214,26 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         Create CCX. Follow redirect to coach dashboard, confirm we see
         the coach dashboard for the new CCX.
         """
+
         self.make_coach()
         url = reverse(
             'create_ccx',
-            kwargs={'course_id': self.course.id.to_deprecated_string()})
+            kwargs={'course_id': unicode(self.course.id)})
+
         response = self.client.post(url, {'name': 'New CCX'})
         self.assertEqual(response.status_code, 302)
         url = response.get('location')  # pylint: disable=no-member
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        # Get the ccx_key
+        path = urlparse.urlparse(url).path
+        resolver = resolve(path)
+        ccx_key = resolver.kwargs['course_id']
+
+        course_key = CourseKey.from_string(ccx_key)
+
+        self.assertTrue(CourseEnrollment.is_enrolled(self.coach, course_key))
         self.assertTrue(re.search('id="ccx-schedule"', response.content))
 
     @SharedModuleStoreTestCase.modifies_courseware

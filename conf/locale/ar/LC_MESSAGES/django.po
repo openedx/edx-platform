@@ -72,6 +72,7 @@
 # Hani <hani0a@hotmail.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2014
@@ -132,7 +133,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-22 18:35+0000\n"
+"POT-Creation-Date: 2015-10-30 14:33+0000\n"
 "PO-Revision-Date: 2015-10-13 19:58+0000\n"
 "Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -679,6 +680,12 @@ msgstr "اسم صفة التسجيل"
 msgid "Value of the enrollment attribute"
 msgstr "قيمة صفة التسجيل"
 
+#: common/djangoapps/student/models.py
+msgid ""
+"The window of time after enrolling during which users can be granted a "
+"refund, represented in microseconds. The default is 14 days."
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
 msgstr "عذرًا، المساق الذي تبحث عنه لن يبدأ حتى {date}. "
@@ -702,6 +709,10 @@ msgstr "نأسف لتعذُّر إمكانية التسجيل"
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
 msgstr "عذرًا، أنت غير مسجَّل في هذا المساق "
+
+#: common/djangoapps/student/views.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
@@ -2107,7 +2118,7 @@ msgstr[0] "{num_second} ثانية"
 msgstr[1] "{num_second} ثانية"
 msgstr[2] "{num_second} ثانية"
 msgstr[3] "{num_second} ثوانٍ"
-msgstr[4] "{num_second} ثوانٍ"
+msgstr[4] "{num_second} ثانية"
 msgstr[5] "{num_second} ثوانٍ"
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
@@ -3334,6 +3345,17 @@ msgid ""
 msgstr ""
 "الدرجة الدنيا التي يجب على المتعلِّم إحرازها للحصول على تقدير في المساق، "
 "كقيمة عشرية بين 0.0 و1.0. ومثلًا، تبلغ 0.75 لدرجة 75%."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Self Paced"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Set this to \"true\" to mark this course as self-paced. Self-paced courses "
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -6316,6 +6338,19 @@ msgid ""
 msgstr ""
 "يجري حاليًّا إعداد تقرير الملخَّص التنفيذي. يمكنك متابعة حالة هذا التقرير في"
 " قسم ’مهام الأستاذ المعلَّقة‘ أدناه. ويمكنك تنزيل التقرير حالما يَكتمل."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is being created. To view the status of the report, see "
+"Pending Instructor Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The survey report is currently being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -9502,6 +9537,22 @@ msgstr "ميغا بايت"
 msgid "No file provided for profile image"
 msgstr "لم يجرِ توفير ملفّ لصورة الملف الشخصي"
 
+#: openedx/core/djangoapps/programs/models.py
+msgid "Internal Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Public Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -12038,7 +12089,7 @@ msgstr "سياسة التقييم"
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
-msgstr "التسجيل على دفعات"
+msgstr "تسجيل المجموعات"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14963,6 +15014,14 @@ msgid "Generate Proctored Exam Results Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to generate a CSV file of survey results for this course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Survey Results Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "To generate a CSV file that lists all student answers to a given problem, "
 "enter the location of the problem (from its Staff Debug Info)."
@@ -15625,7 +15684,7 @@ msgstr "أرسل لي نسخة من الفاتورة"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
-msgstr "لوحة المعلومات الخاصة بموجّه المساق"
+msgstr "لوحة المعلومات الخاصة بالأستاذ"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -15689,7 +15748,7 @@ msgstr "تحميل ملف CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Beta Tester Addition"
-msgstr "إضافة دفعة مختبر النسخة التجريبية"
+msgstr "إضافة مختبري النسخة التجريبية للمساق"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -15710,16 +15769,16 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Checking this box has no effect if 'Remove beta testers' is selected."
 msgstr ""
-"لا يكون لوضع إشارة في هذا المربّع أي مفعول إذا تمّ \"إلغاء أفراد من مختبر "
+"لا يكون لوضع إشارة في هذا المربّع أي مفعول إذا تمّ \"إلغاء أفراد من مختبري "
 "النسخة التجريبية\"."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add beta testers"
-msgstr "إضافة أفراد إلى مختبر النسخة التجريبية"
+msgstr "إضافة أفراد إلى مختبري النسخة التجريبية"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Remove beta testers"
-msgstr "إلغاء أفراد من مختبر النسخة التجريبية"
+msgstr "إرالة أفراد من مختبري النسخة التجريبية"
 
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
@@ -15784,7 +15843,7 @@ msgstr "اضافة مشرف"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
-msgstr "مختبر النسخة التجريبية"
+msgstr "مختبرو النسخة التجريبية"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -15798,11 +15857,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
-msgstr "إضافة شخص إلى مختبر النسخة التجريبية"
+msgstr "إضافة مختبرينَ للنسخة التجريبية"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Admins"
-msgstr "مشرفوا النقاشات"
+msgstr "مشرفو النقاشات"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -15824,7 +15883,7 @@ msgstr "إضافة مشرف نقاشات"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
-msgstr "مشرفوا المنتدى النقاش"
+msgstr "مشرفو منتدى النقاش"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -15846,7 +15905,7 @@ msgstr "إضافة مشرف للمنتدى "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Community TAs"
-msgstr "نقاش مساعد أستاذ لشؤون المتعلمين "
+msgstr "مساعدو مشرفي منتدى النقاش"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -16505,9 +16564,9 @@ msgid ""
 "account activation message to {email}. To activate your account and start "
 "enrolling in courses, click the link in the message."
 msgstr ""
-"لقد أنشأت حسابك بنجاح على {platform_name}، وقد أرسلنا رسالة إلكترونية لتفعيل"
-" الحساب {email}، انقر على الرابط الموجود في الرسالة لتفعيل حسابك والبدء "
-"بالتسجيل في المساقات."
+"لقد أنشأت حسابك بنجاح على {platform_name}، وقد أرسلنا رسالة إلكترونية لتفعيل الحساب {email}، انقر على الرابط الموجود في الرسالة لتفعيل حسابك والبدء بالتسجيل في المساقات.\n"
+"\n"
+"إذا لم تصلك الرسالة في صندوق الوارد، فضلًا تفقد صندوق الرسائل المهملة."
 
 #: lms/templates/registration/activation_complete.html
 msgid "Activation Complete!"
@@ -17695,7 +17754,7 @@ msgstr "فتح محتويات المساق في نظام إدارة التعلّ
 
 #: cms/templates/container.html
 msgid "View Live Version"
-msgstr "مشاهدة النسخة الحالية"
+msgstr "شاهد النسخة الحالية"
 
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
@@ -18035,7 +18094,7 @@ msgstr ""
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
 #: cms/templates/index.html
 msgid "View Live"
-msgstr "المشاهدة عبر بثّ مباشر"
+msgstr "شاهد النسخة الحالية"
 
 #: cms/templates/course_outline.html
 msgid "Edit Start Date"
@@ -19621,11 +19680,9 @@ msgstr ""
 
 #: cms/templates/manage_users.html
 msgid ""
-"All course team members are automatically enrolled in the course and can "
-"access content in Studio, the LMS, and Insights."
+"All course team members can access content in Studio, the LMS, and Insights,"
+" but are not automatically enrolled in the course."
 msgstr ""
-"جميع أعضاء فريق المساق مسجَّلون تلقائيًّا في المساق ولديهم صلاحية رؤية "
-"المحتوى في \"استوديو\" ونظام إدارة التعلّم LMS و\"إنسايتس\"."
 
 #: cms/templates/manage_users.html
 msgid "Transferring Ownership"
@@ -20131,6 +20188,28 @@ msgid ""
 "The score student must meet in order to successfully complete the entrance "
 "exam. "
 msgstr "مجموع الدرجات الذي يجب على الطالب إحرازه لاجتياز امتحان الدخول."
+
+#: cms/templates/settings.html
+msgid "Course Pacing"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-led courses progress at the pace that the course author sets. You"
+" can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Content License"

@@ -11,6 +11,9 @@ import django.contrib.auth.views
 from microsite_configuration import microsite
 import auth_exchange.views
 
+from config_models.views import ConfigurationModelCurrentAPIView
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
@@ -331,10 +334,6 @@ if settings.COURSEWARE_ENABLED:
 
         # TODO: These views need to be updated before they work
         url(r'^calculate$', 'util.views.calculate'),
-        # TODO: We should probably remove the circuit package. I believe it was only used in the old way of saving wiki
-        # circuits for the wiki
-        # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
-        # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
@@ -738,6 +737,10 @@ if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
     urlpatterns += (
         url(r'^lti_provider/', include('lti_provider.urls')),
     )
+
+urlpatterns += (
+    url(r'config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
+)
 
 urlpatterns = patterns(*urlpatterns)
 

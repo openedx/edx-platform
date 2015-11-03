@@ -47,7 +47,7 @@ from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
 from openedx.core.djangoapps.credit.models import CreditCourse
@@ -127,7 +127,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         super(ModuleRenderTestCase, self).setUp()
 
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.toy_course = modulestore().get_course(self.course_key)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
@@ -403,7 +403,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         super(TestHandleXBlockCallback, self).setUp()
 
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.location = self.course_key.make_usage_key('chapter', 'Overview')
         self.toy_course = modulestore().get_course(self.course_key)
         self.mock_user = UserFactory.create()
@@ -602,8 +602,11 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
 @ddt.ddt
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
-    def setup_modulestore(self, default_ms, num_finds, num_sends):
-        self.course_key = self.create_toy_course()
+    def setup_request_and_course(self, num_finds, num_sends):
+        """
+        Sets up the toy course in the modulestore and the request object.
+        """
+        self.course_key = ToyCourseFactory.create().id  # pylint: disable=attribute-defined-outside-init
         self.chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
         factory = RequestFactory()
@@ -612,9 +615,9 @@ class TestTOC(ModuleStoreTestCase):
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
         with self.modulestore.bulk_operations(self.course_key):
             with check_mongo_calls(num_finds, num_sends):
-                self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+                self.toy_course = self.store.get_course(self.course_key, depth=2)  # pylint: disable=attribute-defined-outside-init
                 self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                    self.toy_loc, self.request.user, self.toy_course, depth=2
+                    self.course_key, self.request.user, self.toy_course, depth=2
                 )
 
     # Mongo makes 3 queries to load the course to depth 2:
@@ -632,7 +635,7 @@ class TestTOC(ModuleStoreTestCase):
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
-            self.setup_modulestore(default_ms, setup_finds, setup_sends)
+            self.setup_request_and_course(setup_finds, setup_sends)
 
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
@@ -672,7 +675,7 @@ class TestTOC(ModuleStoreTestCase):
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
-            self.setup_modulestore(default_ms, setup_finds, setup_sends)
+            self.setup_request_and_course(setup_finds, setup_sends)
             section = 'Welcome'
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
@@ -699,7 +702,7 @@ class TestTOC(ModuleStoreTestCase):
 
 @attr('shard_1')
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
     def setUp(self):
@@ -707,7 +710,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         Set up the initial mongo datastores
         """
         super(TestProctoringRendering, self).setUp()
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
         factory = RequestFactory()
@@ -715,9 +718,9 @@ class TestProctoringRendering(ModuleStoreTestCase):
         self.request.user = UserFactory()
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
         with self.modulestore.bulk_operations(self.course_key):
-            self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+            self.toy_course = self.store.get_course(self.course_key, depth=2)
             self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                self.toy_loc, self.request.user, self.toy_course, depth=2
+                self.course_key, self.request.user, self.toy_course, depth=2
             )
 
     @ddt.data(
@@ -963,7 +966,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         sequence = self.modulestore.get_item(usage_key)
 
         sequence.is_time_limited = True
-        sequence.is_proctored_enabled = True
+        sequence.is_proctored_exam = True
         sequence.is_practice_exam = is_practice_exam
 
         self.modulestore.update_item(sequence, self.user.id)
@@ -1475,7 +1478,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         super(TestAnonymousStudentId, self).setUp(create_user=False)
         self.user = UserFactory()
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))

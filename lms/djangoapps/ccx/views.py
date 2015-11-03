@@ -47,7 +47,6 @@ from instructor.enrollment import (
     unenroll_email,
     get_email_params,
 )
-
 from .models import CustomCourseForEdX
 from .overrides import (
     get_override_for_ccx,
@@ -55,7 +54,6 @@ from .overrides import (
     clear_ccx_field_info_from_ccx_map,
     bulk_delete_ccx_override_fields,
 )
-
 
 log = logging.getLogger(__name__)
 TODAY = datetime.datetime.today  # for patching in tests
@@ -183,7 +181,19 @@ def create_ccx(request, course, ccx=None):
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
     ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)  # pylint: disable=no-member
+
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
+
+    # Enroll the coach in the course
+    email_params = get_email_params(course, auto_enroll=True, course_key=ccx_id, display_name=ccx.display_name)
+    enroll_email(
+        course_id=ccx_id,
+        student_email=request.user.email,
+        auto_enroll=True,
+        email_students=True,
+        email_params=email_params,
+    )
+
     return redirect(url)
 
 

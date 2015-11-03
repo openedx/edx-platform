@@ -84,6 +84,7 @@ def handle_500(template_path, context=None):
                     # In debug mode let django process the 500 errors and display debug info for the developer
                     raise
                 else:
+                    log.exception("Error in django view.")
                     return render_to_response(template_path, context)
         return inner
     return decorator

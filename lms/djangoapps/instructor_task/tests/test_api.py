@@ -20,6 +20,7 @@ from instructor_task.api import (
     submit_detailed_enrollment_features_csv,
     submit_calculate_may_enroll_csv,
     submit_executive_summary_report,
+    submit_course_survey_report,
     generate_certificates_for_all_students,
 )
 
@@ -227,6 +228,12 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def test_submit_executive_summary_report(self):
         api_call = lambda: submit_executive_summary_report(
+            self.create_task_request(self.instructor), self.course.id
+        )
+        self._test_resubmission(api_call)
+
+    def test_submit_course_survey_report(self):
+        api_call = lambda: submit_course_survey_report(
             self.create_task_request(self.instructor), self.course.id
         )
         self._test_resubmission(api_call)

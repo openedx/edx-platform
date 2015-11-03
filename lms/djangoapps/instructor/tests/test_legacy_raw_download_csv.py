@@ -67,14 +67,19 @@ class TestRawGradeCSV(TestSubmittingProblems):
 '''
         self.assertEqual(body, expected_csv, msg)
 
-    def test_grade_summary_data(self):
+    def get_expected_grade_data(
+            self, get_grades=True, get_raw_scores=False,
+            use_offline=False):
         """
-        Test grade summary data report generation
-        """
-        self.answer_question()
+        Return expected results from the get_student_grade_summary_data call
+        with any options selected.
 
-        request = DummyRequest()
-        data = get_student_grade_summary_data(request, self.course, get_raw_scores=False)
+        Note that the kwargs accepted by get_expected_grade_data (and their
+        default values) must be identical to those in
+        get_student_grade_summary_data for this function to be accurate.
+        If kwargs are added or removed, or the functionality triggered by
+        them changes, this function must be updated to match.
+        """
         expected_data = {
             'students': [self.student_user, self.student_user2],
             'header': [
@@ -104,9 +109,150 @@ class TestRawGradeCSV(TestSubmittingProblems):
             ]
         }
 
-        for key in ['assignments', 'header']:
-            self.assertListEqual(expected_data[key], data[key])
+        # The first five columns contain the student ID, username,
+        # full name, and e-mail addresses.
+        non_grade_columns = 5
+        # If the following 'if' is triggered, the
+        # get_student_grade_summary_data function will not return any
+        # grade data. Only the "non_grade_columns."
+        # So strip out the headers beyond the "non_grade_columns," and
+        # strip out all the grades in the 'data' key.
+        if not get_grades or use_offline:
+            expected_data["header"] = expected_data["header"][:non_grade_columns]
+            # This iterates over the lists of grades in the 'data' key
+            # of the return dictionary and strips out everything after
+            # the non_grade_columns.
+            for index, rec in enumerate(expected_data["data"]):
+                expected_data["data"][index] = rec[:non_grade_columns]
+            # Wipe out all data in the 'assignments' key if use_offline
+            # is True; no assignment data is returned.
+            if use_offline:
+                expected_data['assignments'] = []
+            # If get_grades is False, get_student_grade_summary_data doesn't
+            # even return an 'assignments' key, so delete it.
+            if get_grades is False:
+                del expected_data['assignments']
+        # If get_raw_scores is true, get_student_grade_summary_data returns
+        # the raw score per assignment. For example, the "0.3333333333333333"
+        # in the data above is for getting one out of three possible
+        # answers correct. Getting raw scores means the actual score (1) is
+        # return instead of: 1.0/3.0
+        # For some reason, this also causes it to not to return any assignments
+        # without attempts, so most of the headers are removed.
+        elif get_raw_scores:
+            expected_data["data"] = [
+                [
+                    1, u'u1', u'username', u'view@test.com',
+                    '', None, None, None
+                ],
+                [
+                    2, u'u2', u'username', u'view2@test.com',
+                    '', 0.0, 1.0, 0.0
+                ],
+            ]
+            expected_data["assignments"] = [u'p3', u'p2', u'p1']
+            expected_data["header"] = [
+                u'ID', u'Username', u'Full Name', u'edX email',
+                u'External email', u'p3', u'p2', u'p1'
+            ]
 
+        return expected_data
+
+    def test_grade_summary_data_defaults(self):
+        """
+        Test grade summary data report generation with all default kwargs.
+
+        This test compares the output of the get_student_grade_summary_data
+        with a dictionary of exected values. The purpose of this test is
+        to ensure that future changes to the get_student_grade_summary_data
+        function (for example, mitocw/edx-platform #95).
+        """
+        request = DummyRequest()
+        self.answer_question()
+        data = get_student_grade_summary_data(request, self.course)
+        expected_data = self.get_expected_grade_data()
+        self.compare_data(data, expected_data)
+
+    def test_grade_summary_data_raw_scores(self):
+        """
+        Test grade summary data report generation with get_raw_scores True.
+        """
+        request = DummyRequest()
+        self.answer_question()
+        data = get_student_grade_summary_data(
+            request, self.course, get_raw_scores=True,
+        )
+        expected_data = self.get_expected_grade_data(get_raw_scores=True)
+        self.compare_data(data, expected_data)
+
+    def test_grade_summary_data_no_grades(self):
+        """
+        Test grade summary data report generation with
+        get_grades set to False.
+        """
+        request = DummyRequest()
+        self.answer_question()
+
+        data = get_student_grade_summary_data(
+            request, self.course, get_grades=False
+        )
+        expected_data = self.get_expected_grade_data(get_grades=False)
+        # if get_grades == False, get_expected_grade_data does not
+        # add an "assignments" key.
+        self.assertNotIn("assignments", expected_data)
+        self.compare_data(data, expected_data)
+
+    def test_grade_summary_data_use_offline(self):
+        """
+        Test grade summary data report generation with use_offline True.
+        """
+        request = DummyRequest()
+        self.answer_question()
+        data = get_student_grade_summary_data(
+            request, self.course, use_offline=True)
+        expected_data = self.get_expected_grade_data(use_offline=True)
+        self.compare_data(data, expected_data)
+
+    def test_grade_summary_data_use_offline_and_raw_scores(self):
+        """
+        Test grade summary data report generation with use_offline
+        and get_raw_scores both True.
+        """
+        request = DummyRequest()
+        self.answer_question()
+        data = get_student_grade_summary_data(
+            request, self.course, use_offline=True, get_raw_scores=True
+        )
+        expected_data = self.get_expected_grade_data(
+            use_offline=True, get_raw_scores=True
+        )
+        self.compare_data(data, expected_data)
+
+    def compare_data(self, data, expected_data):
+        """
+        Compare the output of the get_student_grade_summary_data
+        function to the expected_data data.
+        """
+
+        # Currently, all kwargs to get_student_grade_summary_data
+        # return a dictionary with the same keys, except for
+        # get_grades=False, which results in no 'assignments' key.
+        # This is explicitly checked for above in
+        # test_grade_summary_data_no_grades. This is a backup which
+        # will catch future changes.
+        self.assertListEqual(
+            expected_data.keys(),
+            data.keys(),
+        )
+
+        # Ensure the student info and assignment names are as expected.
+        for key in ['assignments', 'header']:
+            self.assertListEqual(
+                expected_data.get(key, []),
+                data.get(key, []),
+            )
+
+        # Ensure each student's grades are as expected for each assignment.
         for index, student in enumerate(expected_data['students']):
             self.assertEqual(
                 student.username,

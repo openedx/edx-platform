@@ -193,14 +193,14 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     }
 
                     #
-                    # Add in rendering context for proctored exams
-                    # if applicable
+                    # Add in rendering context if exam is a timed exam (which includes proctored)
                     #
-                    is_proctored_enabled = (
-                        getattr(section, 'is_proctored_enabled', False) and
-                        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+
+                    section_is_time_limited = (
+                        getattr(section, 'is_time_limited', False) and
+                        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
                     )
-                    if is_proctored_enabled:
+                    if section_is_time_limited:
                         # We need to import this here otherwise Lettuce test
                         # harness fails. When running in 'harvest' mode, the
                         # test service appears to get into trouble with
@@ -223,9 +223,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                         # This will return None, if (user, course_id, content_id)
                         # is not applicable
                         #
-                        proctoring_attempt_context = None
+                        timed_exam_attempt_context = None
                         try:
-                            proctoring_attempt_context = get_attempt_status_summary(
+                            timed_exam_attempt_context = get_attempt_status_summary(
                                 user.id,
                                 unicode(course.id),
                                 unicode(section.location)
@@ -237,12 +237,12 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             # unhandled exception
                             log.exception(ex)
 
-                        if proctoring_attempt_context:
+                        if timed_exam_attempt_context:
                             # yes, user has proctoring context about
                             # this level of the courseware
                             # so add to the accordion data context
                             section_context.update({
-                                'proctoring': proctoring_attempt_context,
+                                'proctoring': timed_exam_attempt_context,
                             })
 
                     sections.append(section_context)
@@ -469,7 +469,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         # Fulfillment Use Case: Entrance Exam
         # If this module is part of an entrance exam, we'll need to see if the student
         # has reached the point at which they can collect the associated milestone
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+        if milestones_helpers.is_entrance_exams_enabled():
             course = modulestore().get_course(course_key)
             content = modulestore().get_item(content_key)
             entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
@@ -1037,7 +1037,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # New Relic. The suffix is necessary for XModule handlers because the
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
-        nr_tx_name += "/{}".format(suffix) if suffix else ""
+        nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
         newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'

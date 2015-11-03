@@ -1,6 +1,7 @@
 """
 Specific overrides to the base prod settings to make development easier.
 """
+from os.path import abspath, dirname, join
 
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -219,10 +220,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 #####################################################################
 # See if the developer has any local overrides.
-try:
-    from .private import *      # pylint: disable=wildcard-import
-except ImportError:
-    pass
+if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
+    from .private import *  # pylint: disable=import-error,wildcard-import
 
 #####################################################################
 # Lastly, run any migrations, if needed.

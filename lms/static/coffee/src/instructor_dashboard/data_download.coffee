@@ -75,6 +75,7 @@ class DataDownload
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']'")
+    @$survey_results_csv_btn = @$section.find("input[name='survey-results-report']'")
     @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
     @$list_problem_responses_csv_input = @$section.find("input[name='problem-location']")
     @$list_problem_responses_csv_btn = @$section.find("input[name='list-problem-responses-csv']")
@@ -114,6 +115,25 @@ class DataDownload
           @clear_display()
           @$reports_request_response_error.text gettext(
             "Error generating proctored exam results. Please try again."
+          )
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @clear_display()
+          @$reports_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
+
+    # attach click handlers
+    # The list_proctored_exam_results case is always CSV
+    @$survey_results_csv_btn.click (e) =>
+      url = @$survey_results_csv_btn.data 'endpoint'
+      # display html from survey results config endpoint
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: (std_ajax_err) =>
+          @clear_display()
+          @$reports_request_response_error.text gettext(
+            "Error generating survey results. Please try again."
           )
           $(".msg-error").css({"display":"block"})
         success: (data) =>

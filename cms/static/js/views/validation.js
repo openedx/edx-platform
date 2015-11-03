@@ -157,6 +157,7 @@ var ValidatingView = BaseView.extend({
             {
                 success: function() {
                     self.showSavedBar();
+                    self.render();
                 },
                 silent: true
             }
