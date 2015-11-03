@@ -147,6 +147,7 @@ def install_ruby_prereqs():
     Installs Ruby prereqs
     """
     if no_prereq_install():
+        print "NO_PREREQ_INSTALL is set, not installing Ruby prereqs"
         return
 
     prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
@@ -158,6 +159,7 @@ def install_node_prereqs():
     Installs Node prerequisites
     """
     if no_prereq_install():
+        print "NO_PREREQ_INSTALL is set, not installing node prereqs"
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
@@ -169,6 +171,7 @@ def install_python_prereqs():
     Installs Python prerequisites
     """
     if no_prereq_install():
+        print "NO_PREREQ_INSTALL is set, not installing Python prereqs"
         return
 
     prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], python_prereqs_installation)
@@ -180,6 +183,7 @@ def install_prereqs():
     Installs Ruby, Node and Python prerequisites
     """
     if no_prereq_install():
+        print "NO_PREREQ_INSTALL is set, not installing any prereqs"
         return
 
     install_ruby_prereqs()
