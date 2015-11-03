@@ -8,7 +8,7 @@
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@42f769d422850df81bcbd2dbcc344f86b6a17d8e#egg=xblock-ooyala
 -e git+https://github.com/edx-solutions/xblock-group-project.git@6b3393a1a5eb76224ecd3311e870ab8adf4badbf#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@effa22006bb6528bc6d3788787466eb4e74e1161#egg=xblock-adventure
--e git+https://github.com/mckinseyacademy/xblock-poll.git@a71e71b76fd5ab35e264973abb7b2b9f27f0ec53#egg=xblock-poll
+-e git+https://github.com/open-craft/xblock-poll.git@ed7f32a570fb29a18cce57b14f322667a5f33cd5#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@275b8354593048ecae3e06642985b702b81140cc#egg=edx-notifications
 -e git+https://github.com/open-craft/problem-builder.git@ff271b2dcf8098cc3bfed424244c76ea2c53cc96#egg=problem-builder
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@da8ab1e0e110cb3d2525157958a88f101fd1abdb#egg=xblock-group-project-v2
