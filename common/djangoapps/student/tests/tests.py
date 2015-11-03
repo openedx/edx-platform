@@ -79,7 +79,6 @@ class CourseEndingTest(TestCase):
                 'show_disabled_download_button': False,
                 'show_download_url': False,
                 'show_survey_button': False,
-                'can_unenroll': True,
             }
         )
 
@@ -92,8 +91,7 @@ class CourseEndingTest(TestCase):
                 'show_download_url': False,
                 'show_survey_button': False,
                 'mode': None,
-                'linked_in_url': None,
-                'can_unenroll': True,
+                'linked_in_url': None
             }
         )
 
@@ -108,8 +106,7 @@ class CourseEndingTest(TestCase):
                 'survey_url': survey_url,
                 'grade': '67',
                 'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': False,
+                'linked_in_url': None
             }
         )
 
@@ -124,8 +121,7 @@ class CourseEndingTest(TestCase):
                 'survey_url': survey_url,
                 'grade': '67',
                 'mode': 'verified',
-                'linked_in_url': None,
-                'can_unenroll': False,
+                'linked_in_url': None
             }
         )
 
@@ -147,8 +143,7 @@ class CourseEndingTest(TestCase):
                 'survey_url': survey_url,
                 'grade': '67',
                 'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': False,
+                'linked_in_url': None
             }
         )
 
@@ -167,8 +162,7 @@ class CourseEndingTest(TestCase):
                 'survey_url': survey_url,
                 'grade': '67',
                 'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': True,
+                'linked_in_url': None
             }
         )
 
@@ -187,8 +181,7 @@ class CourseEndingTest(TestCase):
                 'show_survey_button': False,
                 'grade': '67',
                 'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': True,
+                'linked_in_url': None
             }
         )
 
