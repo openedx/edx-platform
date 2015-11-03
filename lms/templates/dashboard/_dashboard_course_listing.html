@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, course_program_info" />
+<%page args="course_overview, enrollment, show_courseware_link, cert_status, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, course_program_info" />
 
 <%!
 import urllib
@@ -14,8 +14,7 @@ from student.helpers import (
   VERIFY_STATUS_SUBMITTED,
   VERIFY_STATUS_APPROVED,
   VERIFY_STATUS_MISSED_DEADLINE,
-  VERIFY_STATUS_NEED_TO_REVERIFY,
-  DISABLE_UNENROLL_CERT_STATES,
+  VERIFY_STATUS_NEED_TO_REVERIFY
 )
 %>
 
@@ -178,8 +177,7 @@ from student.helpers import (
               </a>
               <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" aria-label="${_('Additional Actions Menu')}">
                 <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
-                  % if can_unenroll:
-                    <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
+                  <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
                     % if is_paid_course and show_refund_option:
                       ## Translators: The course name will be added to the end of this sentence.
                       % if not is_course_blocked:
@@ -263,7 +261,6 @@ from student.helpers import (
                       % endif
                     % endif
                   </li>
-                  % endif
                   <li class="actions-item" id="actions-item-email-settings-${dashboard_index}">
                     % if show_email_settings:
                       % if not is_course_blocked:

@@ -107,8 +107,7 @@ import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
     check_verify_status_by_course,
-    auth_pipeline_urls, get_next_url_for_login_page,
-    DISABLE_UNENROLL_CERT_STATES,
+    auth_pipeline_urls, get_next_url_for_login_page
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user
@@ -202,7 +201,6 @@ def cert_info(user, course_overview, course_mode):
             'show_survey_button': bool
             'survey_url': url, only if show_survey_button is True
             'grade': if status is not 'processing'
-            'can_unenroll': if status allows for unenrollment
     """
     if not course_overview.may_certify():
         return {}
@@ -303,7 +301,6 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     'show_disabled_download_button': False,
                     'show_download_url': False,
                     'show_survey_button': False,
-                    'can_unenroll': True
                     }
 
     if cert_status is None:
@@ -321,8 +318,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         'show_download_url': status == 'ready',
         'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
-        'linked_in_url': None,
-        'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
+        'linked_in_url': None
     }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
@@ -1029,14 +1025,8 @@ def change_enrollment(request, check_access=True):
         # Otherwise, there is only one mode available (the default)
         return HttpResponse()
     elif action == "unenroll":
-        enrollment = CourseEnrollment.get_enrollment(user, course_id)
-        if not enrollment:
+        if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
-
-        certicifate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
-        if certicifate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
-            return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
-
         CourseEnrollment.unenroll(user, course_id)
         return HttpResponse()
     else:
