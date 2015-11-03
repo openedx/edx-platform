@@ -3,8 +3,6 @@
 Tests for video outline API
 """
 
-from unittest import skip
-
 import ddt
 import itertools
 from uuid import uuid4
@@ -644,7 +642,6 @@ class TestVideoSummaryList(
         self.assertTrue(unit_url)
         self.assertEqual(section_url, unit_url)
 
-    @skip("This test segfaults: see TNL-3447")
     @ddt.data(
         *itertools.product([True, False], ["video", "problem"])
     )
@@ -672,7 +669,6 @@ class TestVideoSummaryList(
             )
             self.assertIn(u"split test block", video_outline[block_index]["summary"]["name"])
 
-    @skip("This test segfaults: see TNL-3447")
     def test_with_split_vertical(self):
         """Test with split_module->vertical->video structure."""
         self.login_and_enroll()
@@ -729,7 +725,6 @@ class TestVideoSummaryList(
             display_name=u"video for group " + unicode(group_id),
         )
 
-    @skip("This test segfaults: see TNL-3447")
     @ddt.data("_create_cohorted_video", "_create_cohorted_vertical_with_video")
     def test_with_cohorted_content(self, content_creator_method_name):
         self.login_and_enroll()
