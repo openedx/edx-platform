@@ -7,12 +7,14 @@ from django.test.utils import override_settings
 from mock import patch
 
 from opaque_keys.edx.locator import CourseLocator
-from certificates.tests.factories import BadgeAssertionFactory
+
+from badges.models import BadgeAssertion
+from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
-from certificates.models import GeneratedCertificate, CertificateStatuses, BadgeAssertion
+from certificates.models import GeneratedCertificate, CertificateStatuses, get_completion_badge
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -29,13 +31,15 @@ class CertificateManagementTest(ModuleStoreTestCase):
             CourseFactory.create()
             for __ in range(3)
         ]
+        CourseCompleteImageConfigurationFactory.create()
 
     def _create_cert(self, course_key, user, status):
         """Create a certificate entry. """
         # Enroll the user in the course
         CourseEnrollmentFactory.create(
             user=user,
-            course_id=course_key
+            course_id=course_key,
+            mode='honor'
         )
 
         # Create the certificate
@@ -167,9 +171,10 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         And the badge will be deleted
         """
         key = self.course.location.course_key
-        BadgeAssertionFactory(user=self.user, course_id=key, data={})
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
-        self.assertTrue(BadgeAssertion.objects.filter(user=self.user, course_id=key))
+        badge_class = get_completion_badge(key, self.user)
+        BadgeAssertionFactory(badge_class=badge_class, user=self.user)
+        self.assertTrue(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class))
         self._run_command(
             username=self.user.email, course=unicode(key), noop=False, insecure=False, template_file=None,
             grade_value=None
@@ -182,7 +187,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             template_file=None,
             generate_pdf=True
         )
-        self.assertFalse(BadgeAssertion.objects.filter(user=self.user, course_id=key))
+        self.assertFalse(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class))
 
     @override_settings(CERT_QUEUE='test-queue')
     @patch('capa.xqueue_interface.XQueueInterface.send_to_queue', spec=True)

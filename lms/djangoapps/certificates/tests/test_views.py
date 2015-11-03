@@ -1,25 +1,17 @@
 """Tests for certificates views. """
 
 import json
-import ddt
 from uuid import uuid4
-from nose.plugins.attrib import attr
-from mock import patch
 
+import ddt
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
-
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.lib.tests.assertions.events import assert_event_matches
-from student.tests.factories import UserFactory
-from track.tests import EventTrackingTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from util.testing import UrlResetMixin
 
 from certificates.api import get_certificate_url
 from certificates.models import (
@@ -28,10 +20,9 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateHtmlViewConfiguration,
 )
-
-from certificates.tests.factories import (
-    BadgeAssertionFactory,
-)
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -340,51 +331,3 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertNotIn('platform_microsite', response.content)
         self.assertNotIn('http://www.microsite.org', response.content)
         self.assertNotIn('This should not survive being overwritten by static content', response.content)
-
-
-class TrackShareRedirectTest(UrlResetMixin, ModuleStoreTestCase, EventTrackingTestCase):
-    """
-    Verifies the badge image share event is sent out.
-    """
-
-    @patch.dict(settings.FEATURES, {"ENABLE_OPENBADGES": True})
-    def setUp(self):
-        super(TrackShareRedirectTest, self).setUp('certificates.urls')
-        self.client = Client()
-        self.course = CourseFactory.create(
-            org='testorg', number='run1', display_name='trackable course'
-        )
-        self.assertion = BadgeAssertionFactory(
-            user=self.user, course_id=self.course.id, data={
-                'image': 'http://www.example.com/image.png',
-                'json': {'id': 'http://www.example.com/assertion.json'},
-                'issuer': 'http://www.example.com/issuer.json'
-            },
-        )
-
-    def test_social_event_sent(self):
-        test_url = '/certificates/badge_share_tracker/{}/social_network/{}/'.format(
-            unicode(self.course.id),
-            self.user.username,
-        )
-        self.recreate_tracker()
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], 'http://www.example.com/image.png')
-        assert_event_matches(
-            {
-                'name': 'edx.badge.assertion.shared',
-                'data': {
-                    'course_id': 'testorg/run1/trackable_course',
-                    'social_network': 'social_network',
-                    # pylint: disable=no-member
-                    'assertion_id': self.assertion.id,
-                    'assertion_json_url': 'http://www.example.com/assertion.json',
-                    'assertion_image_url': 'http://www.example.com/image.png',
-                    'user_id': self.user.id,
-                    'issuer': 'http://www.example.com/issuer.json',
-                    'enrollment_mode': 'honor'
-                },
-            },
-            self.get_event()
-        )
