@@ -86,9 +86,8 @@ def should_show_debug_toolbar(_):
 
 ########################### PIPELINE #################################
 
-# Skip packaging and optimization in development
 PIPELINE_ENABLED = False
-STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
