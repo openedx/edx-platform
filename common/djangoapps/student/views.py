@@ -312,7 +312,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing')
 
     if course_overview.certificates_display_behavior == 'early_no_info' and is_hidden_status:
-        return None
+        return {}
 
     status = template_state.get(cert_status['status'], default_status)
 
@@ -1033,8 +1033,8 @@ def change_enrollment(request, check_access=True):
         if not enrollment:
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
 
-        certicifate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
-        if certicifate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
+        certificate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
+        if certificate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
             return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
 
         CourseEnrollment.unenroll(user, course_id)
