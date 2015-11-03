@@ -1,16 +1,16 @@
 """
-Tests for json_utils.py
+Tests for js_utils.py
 """
 import json
 from unittest import TestCase
-from openedx.core.lib.json_utils import (
-    escape_json_dumps, EscapedEdxJSONEncoder
+from openedx.core.lib.js_utils import (
+    escape_json_dumps, escape_js_str
 )
 
 
-class TestJsonUtils(TestCase):
+class TestJSUtils(TestCase):
     """
-    Test JSON Utils
+    Test JS utils
     """
 
     class NoDefaultEncoding(object):
@@ -27,16 +27,6 @@ class TestJsonUtils(TestCase):
         # pylint: disable=method-hidden
         def default(self, noDefaultEncodingObj):
             return noDefaultEncodingObj.value.replace("<script>", "sample-encoder-was-here")
-
-    def test_escapes_forward_slashes(self):
-        """
-        Verify that we escape forward slashes with backslashes.
-        """
-        malicious_json = {'</script><script>alert("hello, ");</script>': '</script><script>alert("world!");</script>'}
-        self.assertNotIn(
-            '</script>',
-            json.dumps(malicious_json, cls=EscapedEdxJSONEncoder)
-        )
 
     def test_escape_json_dumps_escapes_unsafe_html(self):
         """
@@ -70,3 +60,15 @@ class TestJsonUtils(TestCase):
 
         encoded_json = escape_json_dumps(malicious_json, cls=self.SampleJSONEncoder)
         self.assertEquals(expected_custom_encoded_json, encoded_json)
+
+    def test_escape_js_str_escapes_unsafe_html(self):
+        """
+        Test escape_js_str escapes &, <, and >, as well as returns a unicode type
+        """
+        malicious_js_str = "</script><script>alert('hello, ');</script>"
+
+        expected_escaped_js_str = unicode(
+            r"\u003C/script\u003E\u003Cscript\u003Ealert(\u0027hello, \u0027)\u003B\u003C/script\u003E"
+        )
+        escaped_js_str = escape_js_str(malicious_js_str)
+        self.assertEquals(expected_escaped_js_str, escaped_js_str)

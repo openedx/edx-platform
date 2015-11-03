@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, HttpResponseBadRequest
 
+from openedx.core.lib.js_utils import escape_json_dumps
 from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
 from contentstore.views.item import delete_item
 from models.settings.course_metadata import CourseMetadata
@@ -213,7 +214,7 @@ def _get_entrance_exam(request, course_key):  # pylint: disable=W0613
     try:
         exam_descriptor = modulestore().get_item(exam_key)
         return HttpResponse(
-            _serialize_entrance_exam(exam_descriptor),
+            escape_json_dumps({'locator': unicode(exam_descriptor.location)}),
             status=200, mimetype='application/json')
     except ItemNotFoundError:
         return HttpResponse(status=404)
@@ -274,12 +275,3 @@ def _delete_entrance_exam(request, course_key):
         remove_entrance_exam_graders(course_key, request.user)
 
     return HttpResponse(status=204)
-
-
-def _serialize_entrance_exam(entrance_exam_module):
-    """
-    Internal helper to convert an entrance exam module/object into JSON
-    """
-    return json.dumps({
-        'locator': unicode(entrance_exam_module.location)
-    })

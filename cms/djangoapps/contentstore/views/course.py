@@ -36,6 +36,7 @@ from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
 
 from django.views.decorators.csrf import ensure_csrf_cookie
+from openedx.core.lib.js_utils import escape_json_dumps
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.course_group_config import (
     GroupConfiguration,
@@ -317,10 +318,10 @@ def course_search_index_handler(request, course_key_string):
         try:
             reindex_course_and_check_access(course_key, request.user)
         except SearchIndexingError as search_err:
-            return HttpResponse(json.dumps({
+            return HttpResponse(escape_json_dumps({
                 "user_message": search_err.error_list
             }), content_type=content_type, status=500)
-        return HttpResponse(json.dumps({
+        return HttpResponse(escape_json_dumps({
             "user_message": _("Course has been successfully reindexed.")
         }), content_type=content_type, status=200)
 
@@ -552,9 +553,6 @@ def course_index(request, course_key):
             'sections': sections,
             'course_structure': course_structure,
             'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,
-            'course_graders': json.dumps(
-                CourseGradingModel.fetch(course_key).graders
-            ),
             'rerun_notification_id': current_action.id if current_action else None,
             'course_release_date': course_release_date,
             'settings_url': settings_url,
@@ -1048,7 +1046,7 @@ def grading_handler(request, course_key_string, grader_index=None):
             return render_to_response('settings_graders.html', {
                 'context_course': course_module,
                 'course_locator': course_key,
-                'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
+                'course_details': course_details,
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
             })
