@@ -1,10 +1,9 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "content_libraries" %></%def>
 <%!
-import json
-
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
 from django.utils.translation import ugettext as _
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 <%block name="title">${context_library.display_name_with_default} ${xblock_type_display_name(context_library)}</%block>
 <%block name="bodyclass">is-signedin course container view-container view-library</%block>
@@ -25,8 +24,8 @@ from django.utils.translation import ugettext as _
 <%block name="requirejs">
     require(["js/factories/library"], function(LibraryFactory) {
         LibraryFactory(
-            ${component_templates | n},
-            ${json.dumps(xblock_info) | n},
+            ${escape_json_dumps(component_templates) | n},
+            ${escape_json_dumps(xblock_info) | n},
             {
                 isUnitPage: false,
                 page_size: 10,

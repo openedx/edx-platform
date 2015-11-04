@@ -5,10 +5,10 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  import json
   import urllib
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="header_extras">
@@ -31,7 +31,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
 <%block name="requirejs">
     require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory("${details_url}", ${json.dumps(show_min_grade_warning)});
+        SettingsFactory("${details_url}", ${escape_json_dumps(show_min_grade_warning) | n});
     });
 </%block>
 

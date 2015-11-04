@@ -191,7 +191,7 @@ def library_blocks_view(library, user, response_format):
     return render_to_response('library.html', {
         'can_edit': can_edit,
         'context_library': library,
-        'component_templates': json.dumps(component_templates),
+        'component_templates': component_templates,
         'xblock_info': xblock_info,
         'templates': CONTAINER_TEMPLATES,
     })
