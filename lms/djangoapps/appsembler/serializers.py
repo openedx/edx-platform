@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from drf_compound_fields import fields as compound_fields
 
 
 class UserSignupSerializer(serializers.Serializer):
