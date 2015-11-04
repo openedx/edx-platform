@@ -1112,7 +1112,6 @@
               chooseFile.name = "file-upload";
               chooseFile.id = "file-upload";
               chooseFile.onchange = function() {
-                debugger;
                 imageUploadHandler(this, input);
               };
               form.appendChild(doc.createElement("br"));
