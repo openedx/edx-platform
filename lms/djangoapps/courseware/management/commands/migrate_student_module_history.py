@@ -30,22 +30,28 @@ class Command(BaseCommand):
         archive_entries = (
             StudentModuleHistoryArchive.objects
             .select_related('student')
-            .filter(id__lt=max_id)
             .order_by('-id')
         )
 
         entry = None
+        count = 0
+        window = 1000
 
-        for count, entry in enumerate(archive_entries):
-            StudentModuleHistory.from_archive(entry).save()
-            if count % 1000 == 0:
-                transaction.commit()
-                duration = time.time() - start_time
-                self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
-                self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
-                    (count + 1) / duration,
-                    timedelta(seconds=(entry.id / (count + 1)) * duration),
-                ))
+        while max_id > 0:
+            for entry in archive_entries.filter(id__lt=max_id, id__gte=max_id-window):
+                StudentModuleHistory.from_archive(entry).save()
+                count += 1
+
+                if count % window == 0:
+                    transaction.commit()
+                    duration = time.time() - start_time
+                    self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
+                    self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
+                        (count + 1) / duration,
+                        timedelta(seconds=(entry.id / (count + 1)) * duration),
+                    ))
+
+            max_id -= window
 
         transaction.commit()
         if entry:
