@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
-from django.contrib.staticfiles.storage import CachedStaticFilesStorage
+from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingStorage
 
 
 class ComprehensiveThemeFinder(BaseFinder):
@@ -33,7 +33,7 @@ class ComprehensiveThemeFinder(BaseFinder):
         else:
             THEME_STATIC_DIR = Path(settings.COMP_THEME_DIR) / "lms" / "static"  # pylint: disable=invalid-name
 
-        self.storage = CachedStaticFilesStorage(location=THEME_STATIC_DIR)
+        self.storage = CachedComprehensiveThemingStorage(location=THEME_STATIC_DIR)
 
         super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
 
