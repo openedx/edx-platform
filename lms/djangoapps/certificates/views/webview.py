@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
 from django.core.urlresolvers import reverse
 
 from courseware.courses import course_image_url
@@ -416,10 +417,12 @@ def render_html_view(request, user_id, course_id):
         )
     )
     context['share_url'] = share_url
-    twitter_url = 'https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}'.format(
-        twitter_share_text=context['twitter_share_text'],
-        share_url=urllib.quote_plus(share_url)
-    )
+    twitter_url = ''
+    if context.get('twitter_share_enabled', False):
+        twitter_url = 'https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}'.format(
+            twitter_share_text=smart_str(context['twitter_share_text']),
+            share_url=urllib.quote_plus(smart_str(share_url))
+        )
     context['twitter_url'] = twitter_url
     context['full_course_image_url'] = request.build_absolute_uri(course_image_url(course))
 
@@ -432,10 +435,10 @@ def render_html_view(request, user_id, course_id):
             course.id,
             course.display_name,
             user_certificate.mode,
-            request.build_absolute_uri(get_certificate_url(
+            smart_str(request.build_absolute_uri(get_certificate_url(
                 user_id=user.id,
                 course_id=unicode(course.id)
-            ))
+            )))
         )
     else:
         context['linked_in_url'] = None
@@ -471,7 +474,13 @@ def render_html_view(request, user_id, course_id):
     if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
         custom_template = get_certificate_template(course_key, user_certificate.mode)
         if custom_template:
-            template = Template(custom_template)
+            template = Template(
+                custom_template,
+                output_encoding='utf-8',
+                input_encoding='utf-8',
+                default_filters=['decode.utf8'],
+                encoding_errors='replace',
+            )
             context = RequestContext(request, context)
             return HttpResponse(template.render(context))
 
