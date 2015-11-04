@@ -3,7 +3,6 @@ import urlparse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
-from django.utils.encoding import filepath_to_uri
 from django.utils._os import safe_join
 
 
@@ -67,15 +66,10 @@ class ComprehensiveThemingAwareMixin(object):
             raise SuspiciousOperation("Attempted access to '%s' denied." % name)
         return os.path.normpath(path)
 
-    def url(self, name):
+    def url(self, name, *args, **kwargs):
         if self.themed(name):
-            # note that self.base_url will be settings.STATIC_URL, which is
-            # assumed to end in a slash (as per Django's documentation)
-            base_url = self.base_url + self.prefix
-        else:
-            base_url = self.base_url
-
-        return urlparse.urljoin(base_url, filepath_to_uri(name))
+            name = self.prefix + name
+        return super(ComprehensiveThemingAwareMixin, self).url(name, *args, **kwargs)
 
 
 class CachedComprehensiveThemingStorage(
