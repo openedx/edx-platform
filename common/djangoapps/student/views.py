@@ -194,7 +194,7 @@ def cert_info(user, course_overview, course_mode):
         course_mode (str): The enrollment mode (honor, verified, audit, etc.)
 
     Returns:
-        dict: A dictionary with keys:
+        dict: Empty dict if certificates are disabled or hidden, or a dictionary with keys:
             'status': one of 'generating', 'ready', 'notpassing', 'processing', 'restricted'
             'show_download_url': bool
             'download_url': url, only present if show_download_url is True
