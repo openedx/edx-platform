@@ -3,6 +3,9 @@
 """
 Acceptance tests for Video.
 """
+import os
+
+from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf, skip
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
@@ -30,7 +33,6 @@ HTML5_SOURCES_INCORRECT = [
 ]
 
 
-@attr('shard_4')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
     """
@@ -192,6 +194,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.video.wait_for_video_player_render()
 
 
+@attr('shard_4')
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
 
@@ -849,6 +852,7 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(tab1_video_names)
 
 
+@attr('shard_4')
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
@@ -870,6 +874,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
+@attr('shard_4')
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
 
@@ -1055,6 +1060,7 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
+@attr('shard_4')
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
@@ -1099,3 +1105,36 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.click_player_button('quality')
 
         self.assertTrue(self.video.is_quality_button_active)
+
+
+@attr('a11y')
+class LMSVideoModuleA11yTest(VideoBaseTest):
+    """
+    LMS Video Accessibility Test Class
+    """
+
+    def setUp(self):
+        browser = os.environ.get('SELENIUM_BROWSER', 'firefox')
+
+        # the a11y tests run in CI under phantomjs which doesn't
+        # support html5 video or flash player, so the video tests
+        # don't work in it. We still want to be able to run these
+        # tests in CI, so override the browser setting if it is
+        # phantomjs.
+        if browser == 'phantomjs':
+            browser = 'firefox'
+
+        with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
+            super(LMSVideoModuleA11yTest, self).setUp()
+
+    def test_video_player_a11y(self):
+        self.navigate_to_video()
+
+        # Limit the scope of the audit to the video player only.
+        self.video.a11y_audit.config.set_scope(include=["div.video"])
+        self.video.a11y_audit.config.set_rules({
+            "ignore": [
+                'link-href',  # TODO: AC-223
+            ],
+        })
+        self.video.a11y_audit.check_for_accessibility_errors()

@@ -344,6 +344,11 @@ class CMSVideoA11yTest(CMSVideoBaseTest):
     def test_video_player_a11y(self):
         # Limit the scope of the audit to the video player only.
         self.outline.a11y_audit.config.set_scope(include=["div.video"])
+        self.outline.a11y_audit.config.set_rules({
+            "ignore": [
+                'link-href',  # TODO: AC-223
+            ],
+        })
 
         self._create_course_unit()
         self.outline.a11y_audit.check_for_accessibility_errors()
