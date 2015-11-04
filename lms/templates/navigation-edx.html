@@ -39,10 +39,9 @@ site_status_msg = get_site_status_msg(course_id)
 <header class="${"global slim" if course and not disable_courseware_header else "global-new"}" aria-label="Main" role="banner">
   <div class="${'rwd ' if responsive else ''}wrapper-header nav-container">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
-      <a href="${marketing_link('ROOT')}" title="Home page" itemprop="url">
+      <a href="${marketing_link('ROOT')}" itemprop="url">
         <%block name="navigation_logo">
-            <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}" title="${platform_name()}" itemprop="url" />
-            <span class="sr">${_("Home Page")}</span>
+            <img src="${static.url(branding.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}" itemprop="logo" />
         </%block>
       </a>
     </h1>
