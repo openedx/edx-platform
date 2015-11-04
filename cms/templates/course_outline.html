@@ -7,6 +7,7 @@ from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
 from contentstore.utils import reverse_usage_url
 from microsite_configuration import microsite
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -161,6 +162,16 @@ from microsite_configuration import microsite
                       </li>
                     </ul>
                 </div>
+                % if SelfPacedConfiguration.current().enabled:
+                    <div class="status-pacing">
+                        <h2 class=status-pacing-label>${_("Course Pacing:")}</h2>
+                        % if context_course.self_paced:
+                            <p class="status-pacing-value">${_("Self-Paced")}</p>
+                        % else:
+                            <p class="status-pacing-value">${_("Instructor-Paced")}</p>
+                        % endif
+                    </div>
+               % endif
             </div>
 
             <div class="wrapper-dnd">

@@ -209,11 +209,11 @@ class CoursePacingTest(StudioSettingsDetailsTest):
         # Set the course start date to tomorrow in order to allow setting pacing
         self.course_fixture.add_course_details({'start_date': datetime.now() + timedelta(days=1)})
 
-    def test_default_instructor_led(self):
+    def test_default_instructor_paced(self):
         """
-        Test that the 'instructor led' button is checked by default.
+        Test that the 'instructor paced' button is checked by default.
         """
-        self.assertEqual(self.settings_detail.course_pacing, 'Instructor-Led')
+        self.assertEqual(self.settings_detail.course_pacing, 'Instructor-Paced')
 
     def test_self_paced(self):
         """

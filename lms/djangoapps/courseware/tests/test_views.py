@@ -822,7 +822,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
-        """Test that query counts remain the same for self-paced and instructor-led courses."""
+        """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(sql_calls), check_mongo_calls(mongo_calls):

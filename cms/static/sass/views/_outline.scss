@@ -178,25 +178,37 @@
   .course-status {
     margin-bottom: $baseline;
 
-    .status-release {
+    .status-release,
+    .status-pacing {
       @extend %t-copy-base;
       display: inline-block;
       color: $color-copy-base;
+
+      // STATE: hover
+      &:hover {
+        .status-actions {
+          opacity: 1.0;
+        }
+      }
     }
 
     .status-release-label,
     .status-release-value,
+    .status-pacing-label,
+    .status-pacing-value,
     .status-actions {
       display: inline-block;
       vertical-align: middle;
       margin-bottom: 0;
     }
 
-    .status-release-label {
+    .status-release-label,
+    .status-pacing-label {
       margin-right: ($baseline/4);
     }
 
-    .status-release-value {
+    .status-release-value,
+    .status-pacing-value {
       @extend %t-strong;
     }
 
@@ -205,14 +217,6 @@
       @include transition(opacity $tmg-f1 ease-in-out 0);
       margin-left: ($baseline/4);
       opacity: 0.0;
-    }
-
-    // STATE: hover
-    &:hover {
-
-      .status-actions {
-        opacity: 1.0;
-      }
     }
   }
 
