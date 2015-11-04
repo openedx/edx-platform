@@ -76,13 +76,14 @@ from xblock.fields import Boolean, Float
 
 log = logging.getLogger(__name__)
 
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
-
 DOCS_ANCHOR_TAG_OPEN = (
     "<a target='_blank' "
     "href='http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/lti_component.html'>"
 )
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
 
 
 class LTIFields(object):
