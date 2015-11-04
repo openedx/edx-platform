@@ -97,6 +97,7 @@ ignore-imports = no
 ignore-mixin-members = yes
 ignored-classes = SQLObject
 zope = no
+unsafe-load-any-extension = yes
 generated-members = 
 	REQUEST,
 	acl_users,
@@ -152,4 +153,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# e1ea95cb153c6479ac4bc970053b86b5c347fd7d
+# d1176b1265180b3207835622b1d89b3087196517
