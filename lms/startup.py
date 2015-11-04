@@ -24,7 +24,7 @@ def run():
     """
     Executed during django startup
     """
-    third_party_auth.patch_lms()
+    third_party_auth.patch()
 
     # To override the settings before executing the autostartup() for python-social-auth
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):

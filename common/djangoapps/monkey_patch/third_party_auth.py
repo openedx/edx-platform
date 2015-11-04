@@ -10,7 +10,7 @@ from social.apps.django_app.default.models import (
 )
 
 
-def patch_lms():
+def patch():
     """
     Monkey-patch the DjangoUserMixin class.
     """
@@ -30,11 +30,7 @@ def patch_lms():
 
     DjangoUserMixin.create_social_auth = create_social_auth_wrapper(DjangoUserMixin.create_social_auth)
 
-
-def patch_cms():
-    """
-    Monkey-patch some social auth models' Meta class to squelch Django19 warnings.
-    """
+    # Monkey-patch some social auth models' Meta class to squelch Django19 warnings.
     # pylint: disable=protected-access
     UserSocialAuth._meta.app_label = "default"
     Nonce._meta.app_label = "default"

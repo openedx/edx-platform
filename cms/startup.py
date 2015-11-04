@@ -16,7 +16,7 @@ def run():
     """
     Executed during django startup
     """
-    third_party_auth.patch_cms()
+    third_party_auth.patch()
 
     django.setup()
 
