@@ -11,6 +11,7 @@ from django.conf import settings
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
+from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -38,7 +39,10 @@ class TestStudentDashboardUnenrollments(ModuleStoreTestCase):
     def mock_cert(self, _user, _course_overview, _course_mode):  # pylint: disable=unused-argument
         """ Return a preset certificate status. """
         if self.cert_status is not None:
-            return {'status': self.cert_status}
+            return {
+                'status': self.cert_status,
+                'can_unenroll': self.cert_status not in DISABLE_UNENROLL_CERT_STATES
+            }
         else:
             return {}
 
@@ -85,3 +89,17 @@ class TestStudentDashboardUnenrollments(ModuleStoreTestCase):
                 course_enrollment.assert_called_with(self.user, self.course.id)
             else:
                 course_enrollment.assert_not_called()
+
+    def test_no_cert_status(self):
+        """ Assert that the dashboard loads when cert_status is None."""
+        with patch('student.views.cert_info', return_value=None):
+            response = self.client.get(reverse('dashboard'))
+
+            self.assertEqual(response.status_code, 200)
+
+    def test_cant_unenroll_status(self):
+        """ Assert that the dashboard loads when cert_status does not allow for unenrollment"""
+        with patch('certificates.models.certificate_status_for_student', return_value={'status': 'ready'}):
+            response = self.client.get(reverse('dashboard'))
+
+            self.assertEqual(response.status_code, 200)

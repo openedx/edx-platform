@@ -202,6 +202,7 @@ def cert_info(user, course_overview, course_mode):
             'show_survey_button': bool
             'survey_url': url, only if show_survey_button is True
             'grade': if status is not 'processing'
+            'can_unenroll': if status allows for unenrollment
     """
     if not course_overview.may_certify():
         return {}
@@ -302,6 +303,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     'show_disabled_download_button': False,
                     'show_download_url': False,
                     'show_survey_button': False,
+                    'can_unenroll': True
                     }
 
     if cert_status is None:
@@ -310,7 +312,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing')
 
     if course_overview.certificates_display_behavior == 'early_no_info' and is_hidden_status:
-        return None
+        return {}
 
     status = template_state.get(cert_status['status'], default_status)
 
@@ -319,7 +321,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         'show_download_url': status == 'ready',
         'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
-        'linked_in_url': None
+        'linked_in_url': None,
+        'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
@@ -581,7 +584,7 @@ def dashboard(request):
     # program-related information on the dashboard view.
     course_programs = {}
     if is_student_dashboard_programs_enabled():
-        course_programs = _get_course_programs(user, show_courseware_links_for)
+        course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -1030,8 +1033,8 @@ def change_enrollment(request, check_access=True):
         if not enrollment:
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
 
-        certicifate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
-        if certicifate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
+        certificate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
+        if certificate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
             return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
 
         CourseEnrollment.unenroll(user, course_id)
