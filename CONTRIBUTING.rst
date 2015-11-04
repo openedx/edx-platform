@@ -6,7 +6,7 @@ Contributions to Open edX are very welcome, and strongly encouraged! We've
 put together `some documentation that describes our contribution process`_,
 but here's a step-by-step guide that should help you get started.
 
-.. _some documentation that describes our contribution process: http://edx.readthedocs.org/projects/userdocs/en/latest/process/overview.html
+.. _some documentation that describes our contribution process: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/overview.html
 
 Step 0: Join the Conversation
 =============================
@@ -122,7 +122,7 @@ requests must meet in order to be reviewed by a core committer. These requiremen
 include things like documentation and passing tests: see the
 `contributor documentation`_ page for the full list.
 
-.. _contributor documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/process/contributor.html
+.. _contributor documentation: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/contributor.html
 
 Areas of particular concern with their own detailed guidelines are:
 
