@@ -329,9 +329,7 @@ MIDDLEWARE_CLASSES = (
     'embargo.middleware.EmbargoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
-    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
-    # 'django.middleware.locale.LocaleMiddleware',
-    'django_locale.middleware.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
