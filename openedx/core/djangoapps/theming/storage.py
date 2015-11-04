@@ -2,6 +2,7 @@ import os
 import urlparse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
 from django.utils.encoding import filepath_to_uri
 from django.utils._os import safe_join
 
@@ -28,6 +29,17 @@ class ComprehensiveThemingAwareMixin(object):
         else:
             system = "lms"
         self.theme_location = os.path.join(COMP_THEME_DIR, system, "static")
+
+    @property
+    def prefix(self):
+        """
+        This is used by the ComprehensiveThemeFinder in the collection step.
+        """
+        COMP_THEME_DIR = getattr(settings, "COMP_THEME_DIR", "")  # pylint: disable=invalid-name
+        if not COMP_THEME_DIR:
+            return None
+        theme_name = os.path.basename(os.path.normpath(COMP_THEME_DIR))
+        return "themes/{name}/".format(name=theme_name)
 
     def themed(self, name):
         """
@@ -57,16 +69,18 @@ class ComprehensiveThemingAwareMixin(object):
 
     def url(self, name):
         if self.themed(name):
-            theme_name = os.path.basename(os.path.normpath(settings.COMP_THEME_DIR))
             # note that self.base_url will be settings.STATIC_URL, which is
             # assumed to end in a slash (as per Django's documentation)
-            base_url = "{base_url}themes/{theme_name}/".format(
-                base_url=self.base_url,
-                theme_name=theme_name,
-            )
+            base_url = self.base_url + self.prefix
         else:
             base_url = self.base_url
 
         return urlparse.urljoin(base_url, filepath_to_uri(name))
 
 
+class CachedComprehensiveThemingStorage(
+        ComprehensiveThemingAwareMixin,
+        CachedFilesMixin,
+        StaticFilesStorage
+    ):
+    pass
