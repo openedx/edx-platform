@@ -92,7 +92,7 @@ from instructor.views import INVOICE_KEY
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
-from certificates.models import CertificateWhitelist
+from certificates.models import CertificateWhitelist, GeneratedCertificate
 
 from bulk_email.models import CourseEmail
 from student.models import get_user_by_username_or_email
@@ -2704,6 +2704,43 @@ def start_certificate_generation(request, course_id):
     response_payload = {
         'message': message,
         'task_id': task.task_id
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def start_certificate_regeneration(request, course_id):
+    """
+    Start regenerating certificates for students whose certificate statuses lie with in 'certificate_statuses'
+    entry in POST data.
+    """
+    course_key = CourseKey.from_string(course_id)
+    certificates_statuses = request.POST.getlist('certificate_statuses', [])
+    if not certificates_statuses:
+        return JsonResponse(
+            {'message': _('Please select one or more certificate statuses that require certificate regeneration.')},
+            status=400
+        )
+
+    # Check if the selected statuses are allowed
+    allowed_statuses = GeneratedCertificate.get_unique_statuses(course_key=course_key, flat=True)
+    if not set(certificates_statuses).issubset(allowed_statuses):
+        return JsonResponse(
+            {'message': _('Please select certificate statuses from the list only.')},
+            status=400
+        )
+    try:
+        instructor_task.api.regenerate_certificates(request, course_key, certificates_statuses)
+    except AlreadyRunningError as error:
+        return JsonResponse({'message': error.message}, status=400)
+
+    response_payload = {
+        'message': _('Certificate regeneration task has been started. '
+                     'You can view the status of the generation task in the "Pending Tasks" section.'),
+        'success': True
     }
     return JsonResponse(response_payload)
 

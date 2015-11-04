@@ -1635,3 +1635,149 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             },
             result
         )
+
+    def test_certificate_regeneration_for_students(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
+        """
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor'
+            )
+
+        # mark 6th students to have certificates generated with status 'deleted'
+        for student in students[5:6]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.deleted,
+                mode='honor'
+            )
+
+        # white-list 7 students
+        for student in students[:7]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Certificates should be regenerated for students having generated certificates with status
+        # 'downloadable' or 'error' which are total of 5 students in this test case
+        task_input = {'statuses_to_regenerate': [CertificateStatuses.downloadable, CertificateStatuses.error]}
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 5,
+                'succeeded': 5,
+                'failed': 0,
+                'skipped': 5
+            },
+            result
+        )
+
+    def test_certificate_regeneration_with_expected_failures(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
+        """
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor'
+            )
+
+        # mark 6th students to have certificates generated with status 'deleted'
+        for student in students[5:6]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.deleted,
+                mode='honor'
+            )
+
+        # mark rest of the 4 students with having generated certificates with status 'generating'
+        # These students are not added in white-list and they have not completed grades so certificate generation
+        # for these students should fail other than the one student that has been added to white-list
+        # so from these students 3 failures and 1 success
+        for student in students[6:]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.generating,
+                mode='honor'
+            )
+
+        # white-list 7 students
+        for student in students[:7]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Regenerated certificates for students having generated certificates with status
+        # 'deleted' or 'generating'
+        task_input = {'statuses_to_regenerate': [CertificateStatuses.deleted, CertificateStatuses.generating]}
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 5,
+                'succeeded': 2,
+                'failed': 3,
+                'skipped': 5
+            },
+            result
+        )

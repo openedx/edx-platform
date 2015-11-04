@@ -1414,7 +1414,8 @@ def generate_students_certificates(
     current_step = {'step': 'Calculating students already have certificates'}
     task_progress.update_task_state(extra_meta=current_step)
 
-    students_require_certs = students_require_certificate(course_id, enrolled_students)
+    statuses_to_regenerate = task_input.get('statuses_to_regenerate', [])
+    students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
 
     task_progress.skipped = task_progress.total - len(students_require_certs)
 
@@ -1523,15 +1524,31 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def students_require_certificate(course_id, enrolled_students):
-    """ Returns list of students where certificates needs to be generated.
-    Removing those students who have their certificate already generated
-    from total enrolled students for given course.
+def students_require_certificate(course_id, enrolled_students, statuses_to_regenerate=None):
+    """
+    Returns list of students where certificates needs to be generated.
+    if 'statuses_to_regenerate' is given then return students that have Generated Certificates
+    and the generated certificate status lies in 'statuses_to_regenerate'
+
+    if 'statuses_to_regenerate' is not given then return all the enrolled student skipping the ones
+    whose certificates have already been generated.
+
     :param course_id:
     :param enrolled_students:
+    :param statuses_to_regenerate:
     """
-    # compute those students where certificates already generated
-    students_already_have_certs = User.objects.filter(
-        ~Q(generatedcertificate__status=CertificateStatuses.unavailable),
-        generatedcertificate__course_id=course_id)
-    return list(set(enrolled_students) - set(students_already_have_certs))
+    if statuses_to_regenerate:
+        # Return Students that have Generated Certificates and the generated certificate status
+        # lies in 'statuses_to_regenerate'
+        return User.objects.filter(
+            generatedcertificate__course_id=course_id,
+            generatedcertificate__status__in=statuses_to_regenerate
+        )
+    else:
+        # compute those students whose certificates are already generated
+        students_already_have_certs = User.objects.filter(
+            ~Q(generatedcertificate__status=CertificateStatuses.unavailable),
+            generatedcertificate__course_id=course_id)
+
+        # Return all the enrolled student skipping the ones whose certificates have already been generated
+        return list(set(enrolled_students) - set(students_already_have_certs))
