@@ -11,6 +11,7 @@ from .utils.envs import Env
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "http://registry.npmjs.org/"
+NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
@@ -147,6 +148,7 @@ def install_ruby_prereqs():
     Installs Ruby prereqs
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
@@ -158,6 +160,7 @@ def install_node_prereqs():
     Installs Node prerequisites
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
@@ -169,6 +172,7 @@ def install_python_prereqs():
     Installs Python prerequisites
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], python_prereqs_installation)
@@ -180,6 +184,7 @@ def install_prereqs():
     Installs Ruby, Node and Python prerequisites
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     install_ruby_prereqs()
