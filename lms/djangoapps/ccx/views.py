@@ -420,7 +420,7 @@ def ccx_invite(request, course, ccx=None):
     action = request.POST.get('enrollment-button')
     identifiers_raw = request.POST.get('student-ids')
     identifiers = _split_input_list(identifiers_raw)
-    auto_enroll = True if 'auto-enroll' in request.POST else False
+    auto_enroll = True
     email_students = True if 'email-students' in request.POST else False
     for identifier in identifiers:
         user = None
