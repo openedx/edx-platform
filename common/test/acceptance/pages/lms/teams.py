@@ -353,6 +353,17 @@ class TeamManagementPage(CoursePage, FieldsMixin, BreadcrumbsMixin):
         self.q(css='.create-team .action-primary').first.click()
         self.wait_for_ajax()
 
+    def try_double_create(self):
+        """
+        Attempt to trigger the double-create bug.
+        Note that this method may be unsafe to use in other tests, as the user
+        behavior we're trying to safeguard against requires not using a
+        wait_for_ajax() call at this point.
+        """
+        create_button = self.q(css='.create-team .action-primary').first
+        create_button.click()
+        create_button.click()
+
     def cancel_team(self):
         """Click on cancel team button"""
         self.q(css='.create-team .action-cancel').first.click()
