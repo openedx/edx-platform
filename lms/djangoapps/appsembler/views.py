@@ -5,13 +5,12 @@ from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from courseware.courses import get_course_by_id
+from courseware.courses import get_course
 from instructor.enrollment import enroll_email
 from student.forms import AccountCreationForm
 from student.views import _do_create_account
@@ -90,10 +89,10 @@ class UserSignupAPIView(GenericAPIView):
             enrollment = enroll_email(
                 course_id, user.email, auto_enroll=True, email_students=False
             )
-            course = get_course_by_id(course_id)
+            course = get_course(course_id)
             course_name = course.display_name
         # if we can't find the course, log as an error, since we know we sent a course id
-        except InvalidKeyError:
+        except ValueError:
             logger.error("Could not find this course: {0}".format(course_id_str))
             course_name = None
         return course_name
