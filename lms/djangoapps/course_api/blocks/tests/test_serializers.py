@@ -6,7 +6,7 @@ from mock import MagicMock
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
-from lms.djangoapps.course_blocks.api import get_course_blocks, LMS_COURSE_TRANSFORMERS
+from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
 
 from ..transformers.blocks_api import BlocksAPITransformer
 from ..serializers import BlockSerializer, BlockDictSerializer
@@ -21,7 +21,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestBlockSerializerBase, cls).setUpClass()
 
-        cls.course_key = ToyCourseFactory.create().id
+        cls.course = ToyCourseFactory.create()
 
     def setUp(self):
         super(TestBlockSerializerBase, self).setUp()
@@ -33,8 +33,8 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         )
         self.block_structure = get_course_blocks(
             self.user,
-            course_key=self.course_key,
-            transformers=LMS_COURSE_TRANSFORMERS + [blocks_api_transformer],
+            root_block_usage_key=self.course.location,
+            transformers=COURSE_BLOCK_ACCESS_TRANSFORMERS + [blocks_api_transformer],
         )
         self.serializer_context = {
             'request': MagicMock(),
@@ -46,7 +46,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         """
         Verifies the given serialized_block when basic fields are requested.
         """
-        block_key = deserialize_usage_key(block_key_string, self.course_key)
+        block_key = deserialize_usage_key(block_key_string, self.course.id)
         self.assertEquals(
             self.block_structure.get_xblock_field(block_key, 'category'),
             serialized_block['type'],
