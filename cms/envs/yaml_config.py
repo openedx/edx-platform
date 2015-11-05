@@ -145,7 +145,7 @@ ENV_TOKENS = convert_tokens(ENV_TOKENS)
 # into settings some dictionary settings
 # need to be merged from common.py
 
-ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
