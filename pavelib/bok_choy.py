@@ -63,7 +63,7 @@ def test_bokchoy(options):
         'fasttest': getattr(options, 'fasttest', False),
         'serversonly': getattr(options, 'serversonly', False),
         'testsonly': getattr(options, 'testsonly', False),
-        'default_store': getattr(options, 'default_store', 'split'),
+        'default_store': getattr(options, 'default_store', os.environ.get('DEFAULT_STORE', 'split')),
         'verbosity': getattr(options, 'verbosity', 2),
         'extra_args': getattr(options, 'extra_args', ''),
         'pdb': getattr(options, 'pdb', False),
@@ -90,7 +90,7 @@ def perf_report_bokchoy(options):
     opts = {
         'test_spec': getattr(options, 'test_spec', None),
         'fasttest': getattr(options, 'fasttest', False),
-        'default_store': getattr(options, 'default_store', 'split'),
+        'default_store': getattr(options, 'default_store', os.environ.get('DEFAULT_STORE', 'split')),
         'imports_dir': getattr(options, 'imports_dir', None),
         'verbosity': getattr(options, 'verbosity', 2),
         'test_dir': 'performance',
