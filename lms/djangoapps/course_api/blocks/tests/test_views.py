@@ -50,13 +50,13 @@ class TestBlocksViewMixin(object):
             expected_status_code: (default 200)
             params:
                 query parameters to include in the request (includes
-                user=[self.user.username]&depth=all by default)
+                username=[self.user.username]&depth=all by default)
             url: (default [self.url])
 
         Returns:
             response: The HttpResponse returned by the request
         """
-        query_params = {'user': self.user.username, 'depth': 'all'}
+        query_params = {'username': self.user.username, 'depth': 'all'}
         if params:
             query_params.update(params)
         response = self.client.get(url or self.url, query_params)
@@ -243,7 +243,7 @@ class TestBlocksInCourseView(TestBlocksViewMixin, SharedModuleStoreTestCase):  #
         self.verify_response(400, params={'course_id': 'invalid_course_id'})
 
     def test_with_list_field_url(self):
-        url = '{base_url}?course_id={course_id}&user={username}&depth=all'.format(
+        url = '{base_url}?course_id={course_id}&username={username}&depth=all'.format(
             course_id=unicode(self.course_key),
             base_url=self.url.format(),
             username=self.user.username,

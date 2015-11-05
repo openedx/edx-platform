@@ -43,7 +43,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.initial = {'requesting_user': self.student}
         self.form_data = QueryDict(
             urlencode({
-                'user': self.student.username,
+                'username': self.student.username,
                 'usage_key': unicode(usage_key),
             }),
             mutable=True,
@@ -56,7 +56,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
             'requested_fields': {'display_name', 'type'},
             'student_view_data': set(),
             'usage_key': usage_key,
-            'user': self.student,
+            'username': self.student,
         }
 
     def assert_raises_permission_denied(self):
@@ -100,20 +100,20 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     #-- user
 
     def test_no_user_param(self):
-        self.form_data.pop('user')
+        self.form_data.pop('username')
         self.assert_raises_permission_denied()
 
     def test_nonexistent_user_by_student(self):
-        self.form_data['user'] = 'non_existent_user'
+        self.form_data['username'] = 'non_existent_user'
         self.assert_raises_permission_denied()
 
     def test_nonexistent_user_by_staff(self):
         self.initial = {'requesting_user': self.staff}
-        self.form_data['user'] = 'non_existent_user'
+        self.form_data['username'] = 'non_existent_user'
         self.assert_raises_not_found()
 
     def test_other_user_by_student(self):
-        self.form_data['user'] = self.student2.username
+        self.form_data['username'] = self.student2.username
         self.assert_raises_permission_denied()
 
     def test_other_user_by_staff(self):
@@ -127,7 +127,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     def test_unenrolled_staff(self):
         CourseEnrollment.unenroll(self.staff, self.course.id)
         self.initial = {'requesting_user': self.staff}
-        self.form_data['user'] = self.staff.username
+        self.form_data['username'] = self.staff.username
         self.get_form(expected_valid=True)
 
     def test_unenrolled_student_by_staff(self):

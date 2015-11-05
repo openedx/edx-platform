@@ -19,7 +19,7 @@ class BlockListGetForm(Form):
     """
     A form to validate query parameters in the block list retrieval endpoint
     """
-    user = CharField(required=True)  # TODO return all blocks if user is not specified by requesting staff user
+    username = CharField(required=True)  # TODO return all blocks if user is not specified by requesting staff user
     usage_key = CharField(required=True)
     requested_fields = MultiValueField(required=False)
     student_view_data = MultiValueField(required=False)
