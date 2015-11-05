@@ -175,8 +175,8 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
     }
     try:
         ticket_id = zendesk_api.create_ticket(new_ticket)
-    except zendesk.ZendeskError as err:
-        log.error("Error creating Zendesk ticket: %s", str(err))
+    except zendesk.ZendeskError:
+        log.exception("Error creating Zendesk ticket")
         return False
 
     # Additional information is provided as a private update so the information
@@ -184,8 +184,8 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
     ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
     try:
         zendesk_api.update_ticket(ticket_id, ticket_update)
-    except zendesk.ZendeskError as err:
-        log.error("Error updating Zendesk ticket: %s", str(err))
+    except zendesk.ZendeskError:
+        log.exception("Error updating Zendesk ticket")
         # The update is not strictly necessary, so do not indicate failure to the user
         pass
 
