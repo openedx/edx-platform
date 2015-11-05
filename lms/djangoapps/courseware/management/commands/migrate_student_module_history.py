@@ -10,6 +10,7 @@ from django.db import transaction
 
 from courseware.models import StudentModuleHistory, StudentModuleHistoryArchive
 
+SQL_MAX_INT = 2**31 - 1
 
 class Command(BaseCommand):
     """
@@ -18,27 +19,36 @@ class Command(BaseCommand):
     """
     help = dedent(__doc__).strip()
     option_list = BaseCommand.option_list + (
-        make_option('-M', '--max-id', type='int', default=None, dest='max_id',
-            help='maximum ID to copy. Defaults to max ID in CSMH.')
-        make_option('-m', '--min_id', type='int', default=0, dest='min_id',
-            help='minimum ID to copy. Defaults to 0.')
+        make_option('-i', '--index', type='int', default=0, dest='index',
+            help='chunk index to sync (0-indexed)'),
+        make_option('-n', '--num-chunks', type='int', default=1, dest='num_chunks',
+            help='number of chunks to use'),
         make_option('-w', '--window', type='int', default=1000, dest='window',
-            help='how many rows to migrate per query. Defaults to 1000.')
+            help='how many rows to migrate per query'),
     )
 
     def handle(self, *arguments, **options):
         opts, args = _parse_args(arguments, options)
+        if options['index'] >= options['num_chunks']:
+            self.stdout.write("Index {} is too large for {} chunks".format(options['index'], options['num_chunks']))
+            return
 
-        if options['max_id'] is None:
-            try:
-                max_id = StudentModuleHistory.objects.all().order_by('id')[0].id
-            except IndexError:
-                self.stdout.write("No entries found in StudentModuleHistory, aborting migration.\n")
-                return
+        try:
+            StudentModuleHistory.objects.all().order_by('id')[0]
+        except IndexError:
+            self.stdout.write("No entries found in StudentModuleHistory, aborting migration.\n")
+            return
+
+        chunk_size = SQL_MAX_INT / options['num_chunks']
+
+        min_id = chunk_size * options['index']
+
+        if options['index'] == options['num_chunks'] - 1:
+            max_id = SQL_MAX_INT
         else:
-            max_id = options['max_id']
+            max_id = chunk_size * options['index'] + chunk_size - 1
 
-        self.migrate_range(options['min_id'], max_id, options['window'])
+        self.migrate_range(min_id, max_id, options['window'])
 
 
     @transaction.commit_manually
