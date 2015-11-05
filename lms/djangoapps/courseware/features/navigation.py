@@ -136,12 +136,6 @@ def and_i_return_to_the_course(step):
     world.css_click(course)
 
 
-@step(u'I see that I was most recently in the subsection')
-def then_i_see_that_i_was_most_recently_in_the_subsection(step):
-    message = world.css_text('section.course-content > p')
-    assert_in("You were most recently in Test Subsection 2", message)
-
-
 def create_course():
     world.clear_courses()
     world.scenario_dict['COURSE'] = world.CourseFactory.create(

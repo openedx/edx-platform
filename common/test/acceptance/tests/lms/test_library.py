@@ -127,9 +127,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         Open library page in LMS
         """
         self.courseware_page.visit()
-        paragraphs = self.courseware_page.q(css='.course-content p')
-        if paragraphs and "You were most recently in" in paragraphs.text[0]:
-            paragraphs[0].find_element_by_tag_name('a').click()
+        paragraphs = self.courseware_page.q(css='.course-content p').results
+        if not paragraphs:
+            self.courseware_page.q(css='.menu-item a').results[0].click()
         block_id = block_id if block_id is not None else self.lib_block.locator
         #pylint: disable=attribute-defined-outside-init
         self.library_content_page = LibraryContentXBlockWrapper(self.browser, block_id)
