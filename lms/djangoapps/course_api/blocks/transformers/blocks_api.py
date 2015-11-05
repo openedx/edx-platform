@@ -13,11 +13,13 @@ class BlocksAPITransformer(BlockStructureTransformer):
     Umbrella transformer that contains all the transformers needed by the
     Course Blocks API.
 
-    Contained Transformers (in this order):
+    Contained Transformers (processed in this order):
         StudentViewTransformer
         BlockCountsTransformer
         BlockDepthTransformer
         BlockNavigationTransformer
+
+    Note: BlockDepthTransformer must be executed before BlockNavigationTransformer.
     """
 
     VERSION = 1
