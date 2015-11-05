@@ -38,10 +38,7 @@ class Command(BaseCommand):
         window = 10000
 
         while max_id > 0:
-            query = archive_entries.filter(id__lt=max_id, id__gte=max_id-window)
-            self.stdout.write("Migrating with query: {}".format(query.query))
-
-            for entry in query:
+            for entry in archive_entries.filter(id__lt=max_id, id__gte=max_id-window):
                 StudentModuleHistory.from_archive(entry).save(force_insert=True)
                 count += 1
 
