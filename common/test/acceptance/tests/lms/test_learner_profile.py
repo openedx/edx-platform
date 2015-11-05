@@ -75,7 +75,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
         # Reset event tracking so that the tests only see events from
         # loading the profile page.
-        self.reset_event_tracking()
+        self.start_time = datetime.now()  # pylint: disable=attribute-defined-outside-init
 
         # Load the page
         profile_page.visit()
@@ -119,7 +119,9 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
 
         actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.user.settings.viewed'}, number_of_matches=1)
+            start_time=self.start_time,
+            event_filter={'event_type': 'edx.user.settings.viewed', 'username': requesting_username},
+            number_of_matches=1)
         self.assert_events_match(
             [
                 {
@@ -150,6 +152,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
         event_filter = {
             'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
+            'username': username,
         }
         with self.assert_events_match_during(event_filter=event_filter, expected_events=[expected_event]):
             yield
