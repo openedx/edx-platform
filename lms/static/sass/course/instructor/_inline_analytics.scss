@@ -3,138 +3,143 @@
 ***********************************************/
 
 .inline-analytics-item {
-  clear: both;
-}
-
-.grid-wrapper {
-    position: relative;
-    float: left;
     clear: both;
-    margin: 0 25px 50px 25px;
-    
-    &.radio .graph {
-        height: 150px;
-    }
-    
-    &.checkbox .graph {
-        height: 250px;
-    }
-}
 
-.grid-block {
-    position: relative;
-    float: left;
-    margin: 0 25px 0 0;
-
-    .analytics-table {
-        border-collapse: separate;
-        border-spacing: 1px;
-    }
-
-    .graph {
-        float: left;
-        width: 300px;
-        margin-left: 50px;
-        border-left: 2px solid #444;
-        border-bottom: 2px solid #444;
-        
-        .y-label {
-            position: absolute;
-            width: 45px;
-            top: -8px;
-            left: 0;
-            text-align: right;
-        }
-        
-        .column {
-            position: relative;
-            height: 100%;
-            width: 45px;
-            margin: 0 15px;
-            float: left;
-		    
-            .block {
-                position: absolute;
-                width: 100%;
-                text-align: center;
-		    }
-        }
-    }
-    
-    .legend {
+    .grid-wrapper {
+        position: relative;
         float: left;
         clear: both;
-        height: 28px;
-        width: 300px;
-        margin-left: 50px;
-        
-        .label {
-            float: left;
-            width: 75px;
-            padding: 5px 0;
-            text-align: center;
+        margin: 0 25px 50px 25px;
+
+        &.radio .graph {
+            height: 150px;
+        }
+
+        &.checkbox .graph {
+            height: 250px;
         }
     }
-}
 
-.answer-box {
-    padding: 5px 0;
-    background-color: #efefef;
-    text-align: center;
-}
+    .grid-block {
+        position: relative;
+        float: left;
+        margin: 0 25px 0 0;
 
-.instructor-analytics-action {
-    &:hover {
-        cursor: pointer;
+        .analytics-table {
+            border-collapse: separate;
+            border-spacing: 1px;
+        }
+
+        .graph {
+            float: left;
+            width: 300px;
+            margin-left: 50px;
+            border-left: 2px solid #444;
+            border-bottom: 2px solid #444;
+
+            .y-label {
+                position: absolute;
+                width: 45px;
+                top: -8px;
+                left: 0;
+                text-align: right;
+            }
+
+            .column {
+                position: relative;
+                height: 100%;
+                width: 45px;
+                margin: 0 15px;
+                float: left;
+
+                .block {
+                    position: absolute;
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+        }
+
+        .legend {
+            float: left;
+            clear: both;
+            height: 28px;
+            width: 300px;
+            margin-left: 50px;
+
+            .label {
+                float: left;
+                width: 75px;
+                padding: 5px 0;
+                text-align: center;
+            }
+        }
     }
-}
 
-.checkbox-first-attempt {
-    background-color:#dedede;
-}
+    td {
+        vertical-align: middle;
+        padding: 0 10px;
+    }
 
-.checkbox-last-attempt {
-    background-color:#c2c2c2;
-}
+    .answer-box {
+        padding: 5px 0;
+        background-color: #efefef;
+        text-align: center;
+    }
 
-.inline-analytics-incorrect {
-    background-color:#ffa4a2;
-}
+    .instructor-analytics-action {
+        &:hover {
+            cursor: pointer;
+        }
+    }
 
-.inline-analytics-correct {
-    background-color:#96ec9c;
-}
+    .checkbox-first-attempt {
+        background-color:#dedede;
+    }
 
-.dot {
-    position: relative;
-    top: 2px;
-    display: inline-block;
-    height:20px;
-    width: 20px;
-    border-radius: 10px;
-    background-color: #444;
-    margin: 0;
-}
+    .checkbox-last-attempt {
+        background-color:#c2c2c2;
+    }
 
-.plus {
-    font-size:36px;
-    font-weight:bold;
-    padding-bottom: 5px;
-}
+    .inline-analytics-incorrect {
+        background-color:#ffa4a2;
+    }
 
-.close {
-    position: relative;
-    top: 25px;
-    right: 0;
-    float: right;
-}
+    .inline-analytics-correct {
+        background-color:#96ec9c;
+    }
 
-.header {
-    width:65px;
-}
+    .dot {
+        position: relative;
+        top: 2px;
+        display: inline-block;
+        height:20px;
+        width: 20px;
+        border-radius: 10px;
+        background-color: #444;
+        margin: 0;
+    }
 
-.not-displayed {
-    width:400px;
+    .plus {
+        font-size:36px;
+        font-weight:bold;
+        padding-bottom: 5px;
+    }
+
+    .close {
+        position: relative;
+        top: 25px;
+        right: 0;
+        float: right;
+    }
+
+    .header {
+        width:65px;
+    }
+
+    .not-displayed {
+        width:400px;
+    }
 }
 
 /**********************************************/
