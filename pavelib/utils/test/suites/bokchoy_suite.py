@@ -43,7 +43,7 @@ class BokChoyTestSuite(TestSuite):
         super(BokChoyTestSuite, self).__init__(*args, **kwargs)
         self.test_dir = Env.BOK_CHOY_DIR / kwargs.get('test_dir', 'tests')
         self.log_dir = Env.BOK_CHOY_LOG_DIR
-        self.report_dir = Env.BOK_CHOY_REPORT_DIR
+        self.report_dir = kwargs.get('report_dir', Env.BOK_CHOY_REPORT_DIR)
         self.xunit_report = self.report_dir / "xunit.xml"
         self.cache = Env.BOK_CHOY_CACHE
         self.fasttest = kwargs.get('fasttest', False)
@@ -56,6 +56,7 @@ class BokChoyTestSuite(TestSuite):
         self.extra_args = kwargs.get('extra_args', '')
         self.har_dir = self.log_dir / 'hars'
         self.imports_dir = kwargs.get('imports_dir', None)
+        self.coveragerc = kwargs.get('coveragerc', None)
 
     def __enter__(self):
         super(BokChoyTestSuite, self).__enter__()
@@ -165,7 +166,7 @@ class BokChoyTestSuite(TestSuite):
         # Ensure the test servers are available
         msg = colorize('green', "Confirming servers are running...")
         print msg
-        bokchoy_utils.start_servers(self.default_store)
+        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
 
     def run_servers_continuously(self):
         """
