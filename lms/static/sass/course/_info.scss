@@ -1,9 +1,13 @@
-.home-wrapper {
-  max-width: 1180px;
+.home {
+  @include clearfix();
+  max-width: 1140px;
   margin: 0 auto;
+  padding: $baseline $baseline ($baseline/2) $baseline;
 
-  .home {
-    margin: $baseline;
+  .page-header-main {
+    display: inline-block;
+    width: flex-grid(8, 12);
+    margin: 0;
 
     .page-title {
       margin-bottom: 5px;
@@ -17,11 +21,29 @@
       text-transform: none;
     }
   }
+
+  .page-header-secondary {
+    display: inline-block;
+    width: flex-grid(4, 12);
+    margin: 0;
+    padding: ($baseline/2) ($baseline*0.75);
+    border: 1px solid $blue;
+    background-color: $homepage-background;
+    @extend %t-title8;
+    color: $blue-d1;
+    @extend %cont-truncated;
+    vertical-align: text-bottom;
+
+    .last-accessed-message {
+      display: inline-block;
+      @include margin-left($baseline*0.75);
+    }
+  }
 }
 
 div.info-wrapper {
 
-  background-color: rgb(252, 252, 252);
+  background-color: $homepage-background;
 
   section.updates {
     @extend .content;
@@ -63,7 +85,7 @@ div.info-wrapper {
           margin-bottom: ($baseline/4);
           text-transform: none;
           background: url('#{$static-path}/images/calendar-icon.png') 0 center no-repeat;
-          padding-left: $baseline;
+          @include padding-left($baseline);
         }
 
         section.update-description {
