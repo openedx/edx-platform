@@ -38,18 +38,20 @@ class Command(BaseCommand):
         window = 10000
 
         while max_id > 0:
-            for entry in archive_entries.filter(id__lt=max_id, id__gte=max_id-window):
-                StudentModuleHistory.from_archive(entry).save(force_insert=True)
-                count += 1
+            entries = archive_entries.filter(id__lt=max_id, id__gte=max_id - window)
+            new_entries = [StudentModuleHistory.from_archive(entry) for entry in entries]
 
-                if count % window == 0:
-                    transaction.commit()
-                    duration = time.time() - start_time
-                    self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
-                    self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
-                        (count + 1) / duration,
-                        timedelta(seconds=(entry.id / (count + 1)) * duration),
-                    ))
+            StudentModuleHistory.objects.bulk_create(new_entries)
+            count += len(entries)
+
+            if entries:
+                transaction.commit()
+                duration = time.time() - start_time
+                self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
+                self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
+                    (count + 1) / duration,
+                    timedelta(seconds=(entry.id / (count + 1)) * duration),
+                ))
 
             max_id -= window
 
