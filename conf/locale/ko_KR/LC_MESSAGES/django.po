@@ -92,7 +92,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-30 14:33+0000\n"
+"POT-Creation-Date: 2015-11-05 18:36+0000\n"
 "PO-Revision-Date: 2015-09-25 11:11+0000\n"
 "Last-Translator: Hongseob Lee <shevious@yahoo.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -221,6 +221,7 @@ msgid "Mode"
 msgstr "모드"
 
 #: common/djangoapps/course_modes/admin.py
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Deadline"
 msgstr "인증 유효기간"
 
@@ -2234,16 +2235,6 @@ msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "이 강좌를 관리할 방법을 선택하여 주십시오. (\"XML\"이나 \"스튜디오\" 중에서 선택 가능) "
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Show Chat Widget"
-msgstr "채팅 위젯 보이기"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. When true, students can see the chat widget in the "
-"course."
-msgstr "True 또는 False를 입력하세요. True를 입력하면, 강좌 화면에 채팅 위젯이 나타납니다."
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Survey URL"
 msgstr "강좌 설문 URL"
 
@@ -3041,9 +3032,20 @@ msgstr "시험감독 평가 활성화 "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If this value is true, timed and proctored exams are "
-"enabled in your course."
-msgstr "True와 False를 입력하세요. True를 입력하면 강좌의 시험 감독 평가가 활성화 됩니다.  "
+"Enter true or false. If this value is true, proctored exams are enabled in "
+"your course. Note that enabling proctored exams will also enable timed "
+"exams."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Timed Exams"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed exams are enabled in your "
+"course."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -4635,6 +4637,10 @@ msgstr "\"{course_name}\" ({course_mode}, {start_date} - {end_date}) 강좌를 �
 msgid "Completed the course \"{course_name}\" ({course_mode})"
 msgstr "\"{course_name}\"({course_mode}) 강좌를 수료했습니다."
 
+#: wiki/admin.py wiki/models/article.py
+msgid "created"
+msgstr "생성되었습니다."
+
 #: lms/djangoapps/certificates/models.py
 msgid ""
 "A human-readable description of the example certificate.  For example, "
@@ -5141,6 +5147,69 @@ msgstr "이 강좌에 접근할 수 없습니다. "
 #: lms/djangoapps/courseware/access_response.py
 msgid "You do not have access to this course on a mobile device"
 msgstr "모바일 기기로 이 강좌에 접근할 수 없습니다. "
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Today is {date}"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Course Starts"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Course End"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"To earn a certificate, you must complete all requirements before this date."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"This course is archived, which means you can review course content but it is"
+" no longer active."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Verification Upgrade Deadline"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "You are still eligible to upgrade to a Verified Certificate!"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Upgrade to Verified Certificate"
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "자세히 알아보기"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Retry Verification"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Verify My Identity"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Missed Verification Deadline"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"Unfortunately you missed this course's deadline for a successful "
+"verification."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"You must successfully complete verification before this date to qualify for "
+"a Verified Certificate."
+msgstr ""
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
@@ -5989,6 +6058,35 @@ msgid ""
 msgstr ""
 "이 강좌를 수강하는 모든 학습자의 이수증 생성 작업이 시작되었습니다. 생성 작업의 상태를 \"대기중인 작업\" 에서 볼 수 있습니다."
 
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid Json data"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Students added to Certificate white list successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Student username/email is required."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Duplicate Student Username/password."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Student (username/email={user}) does not exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Multiple Students found with username/email={user}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Student (username/email={user_id} already in certificate exception  list)"
+msgstr ""
+
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
 msgstr "쿠폰 ID가 없습니다."
@@ -6056,7 +6154,7 @@ msgid "E-Commerce"
 msgstr "전자 상거래"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Proctoring"
+msgid "Special Exams"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -8929,6 +9027,10 @@ msgstr ""
 msgid "Enable Student Dashboard Displays"
 msgstr ""
 
+#: openedx/core/djangoapps/self_paced/models.py
+msgid "Enable course home page improvements."
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -10428,9 +10530,10 @@ msgstr ""
 msgid "Raw data:"
 msgstr "원자료:"
 
-#: lms/templates/navigation-edx.html
-msgid "Home Page"
-msgstr "홈페이지"
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
+msgid "{platform_name} Home Page"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: themes/red-theme/lms/templates/header.html
@@ -11616,14 +11719,6 @@ msgid ""
 "technical support."
 msgstr ""
 
-#: lms/templates/chat/toggle_chat.html
-msgid "Open Chat"
-msgstr "대화창 열기"
-
-#: lms/templates/chat/toggle_chat.html
-msgid "Close Chat"
-msgstr "대화창 닫기"
-
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
 msgstr "개방형 답변"
@@ -11787,6 +11882,17 @@ msgid ""
 "Your transaction has been cancelled. If you feel an error has occurred, "
 "contact {email}."
 msgstr "전송이 취소되었습니다. 오류가 발생한 것으로 보일 경우 {email}로 메일 보내세요."
+
+#: lms/templates/commerce/checkout_error.html
+msgid "Checkout Error"
+msgstr ""
+
+#: lms/templates/commerce/checkout_error.html
+msgid ""
+"An error has occurred with your payment. <b>You have not been charged.</b> "
+"Please try to submit your payment again. If this problem persists, contact "
+"{email}."
+msgstr ""
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
@@ -12067,6 +12173,10 @@ msgstr "공지사항"
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
 msgstr "학습 자료 찾기"
+
+#: lms/templates/courseware/info.html
+msgid "Important Course Dates"
+msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
@@ -12507,7 +12617,7 @@ msgstr ""
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
-msgstr "곧 강좌를 수강할 수 있습니다."
+msgstr "최종 강좌 세부 사항을 산출 중입니다. 최종 결과가 곧 발표될 될 것입니다."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -12599,6 +12709,10 @@ msgstr ""
 "이수증을 수여할 수 없습니다. 대신 {cert_name_short}명예 수료증 발급은 가능합니다. "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{category} Program Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr "{course_number} {course_name} 홈페이지"
 
@@ -12659,19 +12773,12 @@ msgstr "이용가능한 액션"
 #, python-format
 msgid ""
 "Are you sure you want to unenroll from the purchased course %(course_name)s "
-"($(course_number)s)?"
+"(%(course_number)s)?"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
 msgstr "결제한 금액을 환불해 드릴것입니다."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the purchased course %(course_name)s "
-"(%(course_number)s)?"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
@@ -12785,8 +12892,8 @@ msgstr "결제 처리과정에서 오류가 발생했습니다. {support_email}�
 #. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"You are now eligible to purchase course credit for this course. Click "
-"<strong>Get Credit</strong> to get started."
+"You have completed this course and are eligible to purchase course credit. "
+"Select <strong>Get Credit</strong> to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -12797,24 +12904,37 @@ msgstr ""
 #. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you for your payment. To receive course credit, you must now request "
-"credit at the {provider_name} website."
+"{provider_name} has received your course credit request. We will update you "
+"when credit processing is complete."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Finalize Credit"
-msgstr ""
-
-#. Translators: provider_name is the name of a credit provider or university
-#. (e.g. State University)
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"<strong>Congratulations!</strong> {provider_name} has converted your course "
-"credit. To see your course credit, click <strong>Access Credit</strong>."
+"Thank you for your payment. To receive course credit, you must now request "
+"credit at the {link_to_provider_site}  website. Select <b>Request Credit</b>"
+" to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Access Credit"
+msgid "View Details"
+msgstr ""
+
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'.
+#. provider_name is the name of credit provider.
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"<b>Congratulations!</b> {provider_name} has approved your request for course"
+" credit. To see your course credit, visit the {link_to_provider_site} "
+"website."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "View Credit"
 msgstr ""
 
 #. Translators: link_to_provider_site is a link to an external webpage. The
@@ -12878,6 +12998,20 @@ msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
 msgstr "선택한 {provider_name} 계정은 이미 다른 {platform_name} 계정에 링크되어 있습니다."
+
+#: lms/templates/dashboard/_dashboard_xseries_info.html
+msgid "{category} Program: Interested in more courses in this subject?"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_xseries_info.html
+msgid ""
+"This course is 1 of {course_count} courses in the "
+"{link_start}{program_display_name}{link_end} {program_category}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_xseries_info.html
+msgid "View {category} Details"
+msgstr ""
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -13938,6 +14072,16 @@ msgstr "보류중이 과제"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
 msgstr "활성 작업의 상태는 아래 표에 나타납니다."
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Certificate Exceptions"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Use this to generate certificates for users who did not pass the course but "
+"have been given an exception by the Course Team to earn a certificate."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -15038,14 +15182,6 @@ msgstr "모든 학습자의 다운로드를 CSV로 보기 위한 부분적 목�
 msgid "There are no problems in this section."
 msgstr "본 영역에는 문제가 없습니다."
 
-#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
-msgid "Allowance Section"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
-msgid "Student Proctored Exam Section"
-msgstr ""
-
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
 msgstr "이메일 발신"
@@ -15154,6 +15290,14 @@ msgstr "상세 강좌 유형을 아래에 입력하세요."
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Set Price"
 msgstr "금액 설정"
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Allowance Section"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Student Special Exam Attempts"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
@@ -16972,6 +17116,18 @@ msgid "Edit Start Date"
 msgstr "시작일 변경"
 
 #: cms/templates/course_outline.html
+msgid "Course Pacing:"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Self-Paced"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Instructor-Paced"
+msgstr ""
+
+#: cms/templates/course_outline.html
 msgid "Creating your course organization"
 msgstr "강좌 만들기"
 
@@ -17441,10 +17597,6 @@ msgstr ""
 "신규 콘텐츠 그룹을 추가하려면 {em_start}첫 번째 콘텐츠 그룹을 추가하세요{em_end}를 클릭합니다. 콘텐츠 그룹의 이름을 "
 "변경하려면, 박스 상단의 {em_start}편집{em_end}을 클릭하세요. 추후 학습활동에서 활용하지 않는다면 콘텐츠 그룹을 삭제할 수"
 " 있습니다. 삭제는 박스 상단의 삭제 아이콘을 클릭하면 됩니다."
-
-#: cms/templates/group_configurations.html
-msgid "Learn More"
-msgstr "자세히 알아보기"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -18902,8 +19054,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"Instructor-led courses progress at the pace that the course author sets. You"
-" can configure release dates for course content and due dates for "
+"Instructor-paced courses progress at the pace that the course author sets. "
+"You can configure release dates for course content and due dates for "
 "assignments."
 msgstr ""
 
@@ -19492,10 +19644,6 @@ msgstr "이름"
 # empty
 msgid "This is a key string."
 msgstr "키 문자열입니다."
-
-#: wiki/admin.py wiki/models/article.py
-msgid "created"
-msgstr "생성되었습니다."
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

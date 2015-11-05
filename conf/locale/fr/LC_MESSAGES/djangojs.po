@@ -22,7 +22,7 @@
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
-# Kulgar <kulgar@ct2c.fr>, 2015
+# Régis Millet <kulgar@ct2c.fr>, 2015
 # laurentFUN <laurent.at.fun@gmail.com>, 2014-2015
 # moocit-france <contact@moocit.fr>, 2015
 # Manjari <mringuet@gmail.com>, 2014
@@ -42,6 +42,7 @@
 # SLOG90 <slog90@gmail.com>, 2014
 # Tahar <taharbrahmi@hotmail.fr>, 2015
 # Xavier Antoviaque <xavier@antoviaque.org>, 2014
+# Xynn <xynn.anhnguyen@gmail.com>, 2015
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -112,8 +113,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-30 14:32+0000\n"
-"PO-Revision-Date: 2015-10-29 17:55+0000\n"
+"POT-Creation-Date: 2015-11-05 18:35+0000\n"
+"PO-Revision-Date: 2015-11-02 17:10+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -3817,6 +3818,10 @@ msgstr ""
 msgid "Enter Start Date and Time"
 msgstr ""
 
+#: lms/static/js/certificates/models/certificate_exception.js
+msgid "Student username/email is required."
+msgstr ""
+
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
@@ -6220,15 +6225,6 @@ msgid "Due:"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
-#: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/cms/templates/ccx/schedule.50fbfd435a6f.underscore
-#: test_root/staticfiles/cms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/lms/templates/ccx/schedule.50fbfd435a6f.underscore
-#: test_root/staticfiles/lms/templates/ccx/schedule.underscore
-msgid "Due Date"
-msgstr "Date d'échéance"
-
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/course-outline.05246d1f7f2d.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/course-outline.underscore
@@ -7950,6 +7946,13 @@ msgid "endorsed %(time_ago)s"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-response.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/static/common/templates/discussion/thread-response.underscore
 msgid "fmts"
 msgstr ""
 
@@ -8059,6 +8062,7 @@ msgid "username or email"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr ""
 
@@ -8223,6 +8227,14 @@ msgstr "Unité"
 #: test_root/staticfiles/lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Date de début"
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/cms/templates/ccx/schedule.50fbfd435a6f.underscore
+#: test_root/staticfiles/cms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/lms/templates/ccx/schedule.50fbfd435a6f.underscore
+#: test_root/staticfiles/lms/templates/ccx/schedule.underscore
+msgid "Due Date"
+msgstr "Date d'échéance"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/cms/templates/ccx/schedule.50fbfd435a6f.underscore
@@ -8568,6 +8580,52 @@ msgstr "Cliquer pour modifier"
 #: test_root/staticfiles/lms/templates/fields/field_text.underscore
 msgid "title"
 msgstr "titre"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid ""
+"Specify either Student's username or email for whom to create certificate "
+"exception"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Enter Notes associated with this certificate exception"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User ID"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User Email"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Date Exception Granted"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "New"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "additions to the Exception list"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all users on the Exception list"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate Exception Certificates"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
@@ -10512,11 +10570,19 @@ msgid "(Add signatories for a certificate)"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
+msgid "Ungraded"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Practice proctored Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
-msgid "Timed and Proctored Exam"
+msgid "Timed Exam"
 msgstr ""
 
 #: cms/templates/js/list.underscore
@@ -10545,11 +10611,39 @@ msgid "Image must be in PNG format"
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "Timed Exam"
+msgid "Additional Options:"
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "This exam is timed"
+msgid "Timed"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use a timed exam to limit the time learners can spend on problems in this "
+"subsection. Learners must submit answers before the time expires. You can "
+"allow additional time on per learner basis through the Instructor Dashboard."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Proctored"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Proctored exams are timed, and software records video of each learner taking"
+" the exam. These videos are then reviewed by a third party."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Practice Proctored"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use a practice proctored exam to introduce learners to the proctoring tools "
+"and processes. Results of the practice exam do not count towards the "
+"learner's grade."
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
@@ -10559,31 +10653,9 @@ msgstr ""
 #: cms/templates/js/timed-examination-preference-editor.underscore
 #, python-format
 msgid ""
-"Students see warnings when 20% and 5% of the allotted time remains. In "
-"certain cases, students can be granted allowances that give them extra time "
-"to complete the exam."
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "This exam is for practice only"
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"Learners can experience the proctoring software setup process and try some "
-"example problems. Make sure this practice exam is set up as an ungraded "
-"exam."
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "This exam is proctored"
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"Students can choose to take this exam with or without online proctoring, but"
-" only students who choose the proctored option are eligible for credit. "
-"Proctored exams must also be timed exams."
+"Learners see warnings when 20% and 5% of the allotted time remains. You can "
+"grant learners extra time to complete the exam through the Instructor "
+"Dashboard."
 msgstr ""
 
 #: cms/templates/js/verification-access-editor.underscore

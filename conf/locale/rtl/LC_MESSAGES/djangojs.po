@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-30 16:55+0000\n"
-"PO-Revision-Date: 2015-10-30 16:56:53.558449\n"
+"POT-Creation-Date: 2015-11-05 18:53+0000\n"
+"PO-Revision-Date: 2015-11-05 18:54:08.607278\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -219,6 +219,7 @@ msgstr "عحمخشيهرل"
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/asset-library.a80d4a190855.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/asset-library.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/previous-video-upload-list.51e26b0e6476.underscore
@@ -3921,6 +3922,10 @@ msgstr "ثرفثق يعث يشفث شري فهوث"
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Start Date and Time"
 msgstr "ثرفثق سفشقف يشفث شري فهوث"
+
+#: lms/static/js/certificates/models/certificate_exception.js
+msgid "Student username/email is required."
+msgstr "سفعيثرف عسثقرشوث/ثوشهم هس قثضعهقثي."
 
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
@@ -8159,6 +8164,13 @@ msgid "endorsed %(time_ago)s"
 msgstr "ثريخقسثي %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] "ساخص ذخووثرف (%(num_comments)s)"
+msgstr[1] "ساخص ذخووثرفس (%(num_comments)s)"
+
+#: common/static/common/templates/discussion/thread-response.underscore
 msgid "fmts"
 msgstr "بوفس"
 
@@ -8270,6 +8282,7 @@ msgid "username or email"
 msgstr "عسثقرشوث خق ثوشهم"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr "رخ قثسعمفس"
 
@@ -8796,6 +8809,54 @@ msgstr "ذمهذن فخ ثيهف"
 #: test_root/staticfiles/lms/templates/fields/field_text.underscore
 msgid "title"
 msgstr "فهفمث"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid ""
+"Specify either Student's username or email for whom to create certificate "
+"exception"
+msgstr ""
+"سحثذهبغ ثهفاثق سفعيثرف'س عسثقرشوث خق ثوشهم بخق صاخو فخ ذقثشفث ذثقفهبهذشفث "
+"ثطذثحفهخر"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Enter Notes associated with this certificate exception"
+msgstr "ثرفثق رخفثس شسسخذهشفثي صهفا فاهس ذثقفهبهذشفث ثطذثحفهخر"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User ID"
+msgstr "عسثق هي"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User Email"
+msgstr "عسثق ثوشهم"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Date Exception Granted"
+msgstr "يشفث ثطذثحفهخر لقشرفثي"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr "رخفثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all"
+msgstr "لثرثقشفث ش ذثقفهبهذشفث بخق شمم"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "New"
+msgstr "رثص"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "additions to the Exception list"
+msgstr "شييهفهخرس فخ فاث ثطذثحفهخر مهسف"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all users on the Exception list"
+msgstr "لثرثقشفث ش ذثقفهبهذشفث بخق شمم عسثقس خر فاث ثطذثحفهخر مهسف"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate Exception Certificates"
+msgstr "لثرثقشفث ثطذثحفهخر ذثقفهبهذشفثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
