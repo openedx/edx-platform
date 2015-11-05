@@ -3,6 +3,7 @@
 from datetime import timedelta
 from textwrap import dedent
 import time
+from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -12,23 +13,36 @@ from courseware.models import StudentModuleHistory, StudentModuleHistoryArchive
 
 class Command(BaseCommand):
     """
-    Command to migrate all data from StudentModuleHistoryArchive into StudentModuleHistory.
+    Command to migrate data from StudentModuleHistoryArchive into StudentModuleHistory.
+    Works from largest ID to smallest.
     """
     help = dedent(__doc__).strip()
+    option_list = BaseCommand.option_list + (
+        make_option('-M', '--max-id', type='int', default=None, dest='max_id',
+            help='maximum ID to copy. Defaults to max ID in CSMH.')
+        make_option('-m', '--min_id', type='int', default=0, dest='min_id',
+            help='minimum ID to copy. Defaults to 0.')
+        make_option('-w', '--window', type='int', default=1000, dest='window',
+            help='how many rows to migrate per query. Defaults to 1000.')
+    )
 
+    def handle(self, *arguments, **options):
+        opts, args = _parse_args(arguments, options)
 
-    def handle(self, *args, **options):
-        try:
-            max_id = StudentModuleHistory.objects.all().order_by('id')[0].id
-        except IndexError:
-            self.stdout.write("No entries found in StudentModuleHistory, aborting migration.\n")
-            return
+        if options['max_id'] is None:
+            try:
+                max_id = StudentModuleHistory.objects.all().order_by('id')[0].id
+            except IndexError:
+                self.stdout.write("No entries found in StudentModuleHistory, aborting migration.\n")
+                return
+        else:
+            max_id = options['max_id']
 
-        self.migrate_range(0, max_id)
+        self.migrate_range(options['min_id'], max_id, options['window'])
 
 
     @transaction.commit_manually
-    def migrate_range(self, min_id, max_id, window=1000):
+    def _migrate_range(self, min_id, max_id, window):
         self.stdout.write("Migrating StudentModuleHistoryArchive entries {}-{}\n".format(max_id, min_id))
         start_time = time.time()
 
