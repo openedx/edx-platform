@@ -26,13 +26,20 @@ class SupportedFieldType(object):
         self.default_value = default_value
 
 
-SUPPORTED_FIELDS = (
-    SupportedFieldType('category', None, 'type'),
+# A list of metadata for additional requested fields to be used by the
+# BlockSerializer` class.  Each entry provides information on how that field can
+# be requested (`requested_field_name`), can be found (`transformer` and
+# `block_field_name`), and should be serialized (`serializer_field_name` and
+# `default_value`).
+
+SUPPORTED_FIELDS = [
+    SupportedFieldType('category', requested_field_name='type'),
     SupportedFieldType('display_name', default_value=''),
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
-
+    # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
+    # 'student_view_multi_device'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_MULTI_DEVICE, StudentViewTransformer),
 
     # set the block_field_name to None so the entire data for the transformer is serialized
@@ -44,4 +51,5 @@ SUPPORTED_FIELDS = (
         requested_field_name='nav_depth',
         serializer_field_name='descendants',
     )
-)
+]
+
