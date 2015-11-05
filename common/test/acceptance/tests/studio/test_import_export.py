@@ -364,6 +364,34 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         """
         self.assertEqual(self.import_page.header_text, 'Course Import')
 
+    def test_multiple_course_import_message(self):
+        """
+        Given that I visit an empty course before import
+        When I visit the import page
+        And I upload a course with file name 2015.lzdwNM.tar.gz
+        Then timestamp is visible after course is updated successfully
+        And then I create a new course
+        When I visit the import page of this new course
+        Then timestamp is not visible
+        """
+        self.import_page.visit()
+        self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
+        self.assertTrue(self.import_page.is_timestamp_visible())
+
+        # Create a new course and visit the import page
+        self.course_info = {
+            'org': 'test_org_2',
+            'number': self.unique_id + '_2',
+            'run': 'test_run_2',
+            'display_name': 'Test Course 2' + self.unique_id
+        }
+        self.install_course_fixture()
+        self.import_page = self.import_page_class(*self.page_args())
+        self.import_page.visit()
+        # As this is new course which is never import so timestamp should not present
+        self.assertFalse(self.import_page.is_timestamp_visible())
+
 
 @attr('shard_4')
 class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
