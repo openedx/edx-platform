@@ -1080,9 +1080,9 @@ def submission_history(request, course_id, student_username, location):
     # This is ugly, but until we have a proper submissions API that we can use to provide
     # the scores instead, it will have to do.
     scores = list(StudentModuleHistory.objects.filter(
-        student_module__module_state_key=usage_key,
-        student_module__student__username=student_username,
-        student_module__course_id=course_key
+        usage_key=usage_key,
+        username=student_username,
+        course_key=course_key
     ).order_by('-id'))
 
     if len(scores) != len(history_entries):

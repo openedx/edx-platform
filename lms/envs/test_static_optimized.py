@@ -18,7 +18,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
     },
-
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+    },
 }
 
 # Provide a dummy XQUEUE_INTERFACE setting as LMS expects it to exist on start up

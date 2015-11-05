@@ -182,7 +182,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / 'db' / 'edx.db'
     },
-
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': TEST_ROOT / 'db' / 'student_module_history.db'
+    },
 }
 
 CACHES = {

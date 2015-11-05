@@ -18,6 +18,7 @@ import itertools
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
+from django.db.models.fields import CharField
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 
@@ -25,9 +26,10 @@ from model_utils.models import TimeStampedModel
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
+from courseware.fields import UnsignedBigIntAutoField
 from openedx.core.djangoapps.call_stack_manager import CallStackManager, CallStackMixin
-from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
-log = logging.getLogger(__name__)
+from xmodule_django.models import CourseKeyField, UsageKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
+
 
 log = logging.getLogger("edx.courseware")
 
@@ -157,6 +159,30 @@ class StudentModule(CallStackMixin, models.Model):
         return unicode(repr(self))
 
 
+class StudentModuleHistoryArchive(CallStackMixin, models.Model):
+    """
+    An archive of StudentModuleHistory from before the primary key space extended.
+
+    This is only used in an interim fashion while migrating the data from the archive
+    into the new StudentModuleHistory table.
+    """
+    objects = CallStackManager()
+    HISTORY_SAVING_TYPES = {'problem'}
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = "created"
+        db_table = "courseware_studentmodulehistory"
+
+    student_module = models.ForeignKey(StudentModule, db_index=True)
+    version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+
+    # This should be populated from the modified field in StudentModule
+    created = models.DateTimeField(db_index=True)
+    state = models.TextField(null=True, blank=True)
+    grade = models.FloatField(null=True, blank=True)
+    max_grade = models.FloatField(null=True, blank=True)
+
+
 class StudentModuleHistory(CallStackMixin, models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
@@ -167,7 +193,15 @@ class StudentModuleHistory(CallStackMixin, models.Model):
     class Meta(object):
         get_latest_by = "created"
 
-    student_module = models.ForeignKey(StudentModule, db_index=True)
+    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+
+    # These 3 keys uniquely identify the StudentModule that this record
+    # is associated with. It doesn't use a ForeignKey so that the table can be placed
+    # in a separate database.
+    course_key = CourseKeyField(max_length=255)
+    usage_key = UsageKeyField(max_length=255)
+    username = CharField(max_length=255)
+
     version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
 
     # This should be populated from the modified field in StudentModule
@@ -184,13 +218,34 @@ class StudentModuleHistory(CallStackMixin, models.Model):
         we save.
         """
         if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
-            history_entry = StudentModuleHistory(student_module=instance,
-                                                 version=None,
-                                                 created=instance.modified,
-                                                 state=instance.state,
-                                                 grade=instance.grade,
-                                                 max_grade=instance.max_grade)
+            history_entry = StudentModuleHistory(
+                usage_key=instance.module_state_key,
+                course_key=instance.course_id,
+                username=instance.student.username,
+                version=None,
+                created=instance.modified,
+                state=instance.state,
+                grade=instance.grade,
+                max_grade=instance.max_grade)
             history_entry.save()
+
+    @classmethod
+    def from_archive(cls, archive_entry):
+        """
+        Return a new StudentModuleHistory entry, created from
+        the supplied StudentModuleHistoryArchive entry.
+        """
+        return cls(
+            id=archive_entry.id,
+            usage_key=archive_entry.student_module.module_state_key,
+            course_key=archive_entry.student_module.course_id,
+            username=archive_entry.student_module.student.username,
+            version=archive_entry.version,
+            created=archive_entry.created,
+            state=archive_entry.state,
+            grade=archive_entry.grade,
+            max_grade=archive_entry.max_grade,
+        )
 
 
 class XBlockFieldBase(models.Model):
