@@ -131,6 +131,13 @@ class MicrositeOrgMapping(models.Model):
     # for archiving
     history = HistoricalRecords()
 
+    def __unicode__(self):
+        """String conversion"""
+        return u'{microsite_key}: {org}'.format(
+            microsite_key=self.microsite.key,
+            org=self.org
+        )
+
     @classmethod
     def get_orgs_for_microsite(cls, microsite_key):
         """
@@ -170,6 +177,13 @@ class MicrositeTemplate(models.Model):
 
     # for archiving
     history = HistoricalRecords()
+
+    def __unicode__(self):
+        """String conversion"""
+        return u'{microsite_key}: {template_uri}'.format(
+            microsite_key=self.microsite.key,
+            template_uri=self.template_uri
+        )
 
     class Meta(object):
         """ Meta class for this Django model """
