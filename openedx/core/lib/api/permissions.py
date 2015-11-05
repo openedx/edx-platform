@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import Http404
 from rest_framework import permissions
 
-from student.roles import CourseStaffRole
+from student.roles import CourseStaffRole, CourseInstructorRole
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -62,6 +62,15 @@ class IsUserInUrl(permissions.BasePermission):
                 return False  # staff gets 403
             raise Http404()
         return True
+
+
+class IsCourseInstructor(permissions.BasePermission):
+    """
+    Permission to check that user is a course instructor.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return hasattr(request, 'user') and CourseInstructorRole(obj.course_id).has_user(request.user)
 
 
 class IsUserInUrlOrStaff(IsUserInUrl):
