@@ -447,3 +447,42 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
             res_json['message'],
             u"Student (username/email={user_id} already in certificate exception  list)".format(user_id=user)
         )
+
+    def test_certificate_exception_same_user_in_two_different_courses(self):
+        """
+        Test certificates exception addition api endpoint in scenario when same
+        student is added to two different courses.
+        """
+
+        self.client.login(username=self.global_staff.username, password='test')
+
+        url_course1 = reverse(
+            'create_certificate_exception',
+            kwargs={'course_id': unicode(self.course.id), 'white_list_student': ''}
+        )
+
+        response = self.client.post(
+            url_course1,
+            data=json.dumps(self.certificate_exception_data),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertTrue(res_json['success'])
+
+        course2 = CourseFactory.create()
+        url_course2 = reverse(
+            'create_certificate_exception',
+            kwargs={'course_id': unicode(course2.id), 'white_list_student': ''}
+        )
+
+        # add certificate exception for same user in a different course
+        self.client.post(
+            url_course2,
+            data=json.dumps(self.certificate_exception_data),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertTrue(res_json['success'])
