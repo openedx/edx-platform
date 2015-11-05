@@ -42,6 +42,7 @@ class CourseModeForm(forms.ModelForm):
     )
 
     mode_slug = forms.ChoiceField(choices=COURSE_MODE_SLUG_CHOICES, label=_("Mode"))
+    expiration_datetime = forms.DateTimeField(label=_("Expiration Date"))
 
     # The verification deadline is stored outside the course mode in the verify_student app.
     # (we used to use the course mode expiration_datetime as both an upgrade and verification deadline).
