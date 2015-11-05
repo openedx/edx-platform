@@ -2780,7 +2780,7 @@ def process_certificate_exceptions(data_list, course_key):
         except MultipleObjectsReturned:
             raise ValueError(_('Multiple Students found with username/email={user}').format(user=user))
 
-        if CertificateWhitelist.objects.filter(user=db_user, whitelist=True).count() > 0:
+        if CertificateWhitelist.objects.filter(user=db_user, course_id=course_key, whitelist=True).count() > 0:
             raise ValueError(
                 _("Student (username/email={user_id} already in certificate exception  list)").format(user_id=user)
             )
