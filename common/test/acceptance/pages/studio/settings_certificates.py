@@ -488,7 +488,6 @@ class Signatory(object):
         """
         self.wait_for_signature_image_upload_button()
         self.find_css('.action-upload-signature').first.click()
-        self.find_css('.action-upload-signature').first.click()
         self.wait_for_signature_image_upload_prompt()
 
         asset_file_path = self.file_path(image_filename)
