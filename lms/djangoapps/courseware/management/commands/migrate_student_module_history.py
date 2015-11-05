@@ -42,7 +42,7 @@ class Command(BaseCommand):
             self.stdout.write("Migrating with query: {}".format(query.query))
 
             for entry in query:
-                StudentModuleHistory.from_archive(entry).save()
+                StudentModuleHistory.from_archive(entry).save(force_insert=True)
                 count += 1
 
                 if count % window == 0:
