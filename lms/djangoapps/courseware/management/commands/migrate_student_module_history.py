@@ -29,13 +29,13 @@ class Command(BaseCommand):
         self.stdout.write("Migrating StudentModuleHistoryArchive entries before {}\n".format(max_id))
         archive_entries = (
             StudentModuleHistoryArchive.objects
-            .select_related('student')
+            .select_related('student_module__student')
             .order_by('-id')
         )
 
         entry = None
         count = 0
-        window = 1000
+        window = 10000
 
         while max_id > 0:
             for entry in archive_entries.filter(id__lt=max_id, id__gte=max_id-window):
