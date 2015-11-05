@@ -52,16 +52,16 @@ class Command(BaseCommand):
             .order_by('-id')
         )
 
-
         real_max_id = None
         count = 0
         current_max_id = max_id
 
         try:
-            #what about the entries min_id < x < window when (max_id - min_id) % window != 0?
             while current_max_id > min_id:
-                #this could overlap into the range below
-                entries = archive_entries.filter(id__lt=current_max_id, id__gte=current_max_id - window)
+                entries = archive_entries.filter(id__lt=current_max_id, id__gte=max(current_max_id - window, min_id))
+
+                if real_max_id is None:
+                    real_max_id = entries[0].id
 
                 new_entries = [StudentModuleHistory.from_archive(entry) for entry in entries]
 
@@ -74,8 +74,8 @@ class Command(BaseCommand):
 
                     self.stdout.write("Migrated StudentModuleHistoryArchive {}-{} to StudentModuleHistory\n".format(entries[0].id, entries[-1].id))
                     self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
-                        (count + 1) / duration,     #why count+1?
-                        timedelta(seconds=(entries[-1].id / (count + 1)) * duration),  #as above
+                        count / duration,
+                        timedelta(seconds=(entries[-1].id - min_id) / count * duration),
                     ))
 
                 current_max_id -= window
@@ -84,8 +84,6 @@ class Command(BaseCommand):
             raise
         else:
             transaction.commit()
-            if real_max_id is None:
-                real_max_id = entries[0]
 
             if entries:
                 self.stdout.write("Migrated StudentModuleHistoryArchive {}-{} to StudentModuleHistory\n".format(real_max_id, entries[-1].id))
