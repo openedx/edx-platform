@@ -461,7 +461,7 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
         self.visit_account_settings_page()
         self.account_settings_page.a11y_audit.config.set_rules({
             'ignore': [
-                'link-href',  # TODO: AC-233, AC-230
+                'link-href',  # TODO: AC-233, AC-238
                 'skip-link',  # TODO: AC-179
             ],
         })
