@@ -1,6 +1,14 @@
 /***********************************************
 * Inline Analytics Style
 ***********************************************/
+.analytics_close_button {
+    .close {
+        position: relative;
+        top: 25px;
+        right: 0;
+        float: right;
+    }
+}
 
 .inline-analytics-item {
     clear: both;
@@ -124,13 +132,6 @@
         font-size:36px;
         font-weight:bold;
         padding-bottom: 5px;
-    }
-
-    .close {
-        position: relative;
-        top: 25px;
-        right: 0;
-        float: right;
     }
 
     .header {
