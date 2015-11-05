@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-30 16:55+0000\n"
-"PO-Revision-Date: 2015-10-30 16:56:53.558449\n"
+"POT-Creation-Date: 2015-11-05 18:53+0000\n"
+"PO-Revision-Date: 2015-11-05 18:54:08.607278\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -219,6 +219,7 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/asset-library.a80d4a190855.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/asset-library.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/previous-video-upload-list.51e26b0e6476.underscore
@@ -4256,6 +4257,11 @@ msgstr "Éntér Düé Däté änd Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Start Date and Time"
 msgstr "Éntér Stärt Däté änd Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/static/js/certificates/models/certificate_exception.js
+msgid "Student username/email is required."
+msgstr ""
+"Stüdént üsérnämé/émäïl ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
@@ -8892,6 +8898,13 @@ msgid "endorsed %(time_ago)s"
 msgstr "éndörséd %(time_ago)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/thread-response.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] "Shöw Çömmént (%(num_comments)s) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgstr[1] "Shöw Çömménts (%(num_comments)s) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/templates/discussion/thread-response.underscore
 msgid "fmts"
 msgstr "fmts Ⱡ'σяєм ι#"
 
@@ -9012,6 +9025,7 @@ msgid "username or email"
 msgstr "üsérnämé ör émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr "Nö résülts Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -9559,6 +9573,58 @@ msgstr "Çlïçk tö édït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: test_root/staticfiles/lms/templates/fields/field_text.underscore
 msgid "title"
 msgstr "tïtlé Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid ""
+"Specify either Student's username or email for whom to create certificate "
+"exception"
+msgstr ""
+"Spéçïfý éïthér Stüdént's üsérnämé ör émäïl för whöm tö çréäté çértïfïçäté "
+"éxçéptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Enter Notes associated with this certificate exception"
+msgstr ""
+"Éntér Nötés ässöçïätéd wïth thïs çértïfïçäté éxçéptïön Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User ID"
+msgstr "Ûsér ÌD Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User Email"
+msgstr "Ûsér Émäïl Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Date Exception Granted"
+msgstr "Däté Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr "Nötés Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all"
+msgstr "Généräté ä Çértïfïçäté för äll Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "New"
+msgstr "Néw Ⱡ'σяєм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "additions to the Exception list"
+msgstr "äddïtïöns tö thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all users on the Exception list"
+msgstr ""
+"Généräté ä Çértïfïçäté för äll üsérs ön thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate Exception Certificates"
+msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore

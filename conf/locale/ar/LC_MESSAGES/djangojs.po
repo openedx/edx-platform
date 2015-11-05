@@ -11,7 +11,7 @@
 # Abdullatif El Ali <abdullatifalali@gmail.com>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # ayshibly <ayshibly@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # br1ng <ibnalawam@gmail.com>, 2014
@@ -41,7 +41,7 @@
 # Abdallah Nassif <abdoosh00@gmail.com>, 2015
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2014
@@ -58,8 +58,9 @@
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # qrfahasan <ahasan@qrf.org>, 2014
 # Ahmad <reload_cobra2@yahoo.com>, 2015
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # mohammad hamdi <babrica@hotmail.com>, 2014
+# Emad Ahmad Alghamdi <eaalghamdi@kau.edu.sa>, 2015
 # may <may@qordoba.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # omarithawi <oithawi@qrf.org>, 2015
@@ -71,7 +72,7 @@
 # 
 # Translators:
 # Abdallah Nassif <abdoosh00@gmail.com>, 2014
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # may <may@qordoba.com>, 2014
 # Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
@@ -82,8 +83,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-30 14:32+0000\n"
-"PO-Revision-Date: 2015-10-29 17:55+0000\n"
+"POT-Creation-Date: 2015-11-05 18:35+0000\n"
+"PO-Revision-Date: 2015-11-02 17:10+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -3956,6 +3957,10 @@ msgstr ""
 msgid "Enter Start Date and Time"
 msgstr ""
 
+#: lms/static/js/certificates/models/certificate_exception.js
+msgid "Student username/email is required."
+msgstr ""
+
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
@@ -6405,15 +6410,6 @@ msgid "Due:"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
-#: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/cms/templates/ccx/schedule.50fbfd435a6f.underscore
-#: test_root/staticfiles/cms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/lms/templates/ccx/schedule.50fbfd435a6f.underscore
-#: test_root/staticfiles/lms/templates/ccx/schedule.underscore
-msgid "Due Date"
-msgstr "تاريخ الاستحقاق"
-
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/course-outline.05246d1f7f2d.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/course-outline.underscore
@@ -6526,7 +6522,7 @@ msgstr ""
 #: test_root/staticfiles/cms/templates/course_info_handouts.03885b977531.underscore
 #: test_root/staticfiles/cms/templates/course_info_handouts.underscore
 msgid "Course Handouts"
-msgstr ""
+msgstr "نشرات المساق"
 
 #: cms/templates/js/course_info_handouts.underscore
 #: test_root/staticfiles/cms/coffee/fixtures/course_info_handouts.03885b977531.underscore
@@ -8141,6 +8137,17 @@ msgid "endorsed %(time_ago)s"
 msgstr "مصادقة عليها %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: common/static/common/templates/discussion/thread-response.underscore
 msgid "fmts"
 msgstr ""
 
@@ -8252,6 +8259,7 @@ msgid "username or email"
 msgstr "اسم المستخدم أو البريد الإلكتروني:"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr "لا نتائج"
 
@@ -8416,6 +8424,14 @@ msgstr "الوحدة"
 #: test_root/staticfiles/lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "تاريخ البدء"
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/cms/templates/ccx/schedule.50fbfd435a6f.underscore
+#: test_root/staticfiles/cms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/lms/templates/ccx/schedule.50fbfd435a6f.underscore
+#: test_root/staticfiles/lms/templates/ccx/schedule.underscore
+msgid "Due Date"
+msgstr "تاريخ الاستحقاق"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/cms/templates/ccx/schedule.50fbfd435a6f.underscore
@@ -8760,6 +8776,52 @@ msgstr "يُرجى النقر للتعديل"
 #: test_root/staticfiles/lms/templates/fields/field_text.underscore
 msgid "title"
 msgstr "العنوان"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid ""
+"Specify either Student's username or email for whom to create certificate "
+"exception"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Enter Notes associated with this certificate exception"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User ID"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User Email"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Date Exception Granted"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "New"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "additions to the Exception list"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all users on the Exception list"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate Exception Certificates"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
@@ -10738,12 +10800,20 @@ msgid "(Add signatories for a certificate)"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
+msgid "Ungraded"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Practice proctored Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
 msgstr "امتحان مراقَب"
 
 #: cms/templates/js/course-outline.underscore
-msgid "Timed and Proctored Exam"
-msgstr "امتحان مراقَب ومحدَّد التوقيت"
+msgid "Timed Exam"
+msgstr "امتحان محدَّد التوقيت"
 
 #: cms/templates/js/list.underscore
 #, python-format
@@ -10771,12 +10841,40 @@ msgid "Image must be in PNG format"
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "Timed Exam"
-msgstr "امتحان محدَّد التوقيت"
+msgid "Additional Options:"
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "This exam is timed"
-msgstr "هذا الامتحان له وقت محدَّد"
+msgid "Timed"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use a timed exam to limit the time learners can spend on problems in this "
+"subsection. Learners must submit answers before the time expires. You can "
+"allow additional time on per learner basis through the Instructor Dashboard."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Proctored"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Proctored exams are timed, and software records video of each learner taking"
+" the exam. These videos are then reviewed by a third party."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Practice Proctored"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use a practice proctored exam to introduce learners to the proctoring tools "
+"and processes. Results of the practice exam do not count towards the "
+"learner's grade."
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Time Allotted (HH:MM):"
@@ -10785,37 +10883,10 @@ msgstr "الوقت المخصَّص (HH:MM): "
 #: cms/templates/js/timed-examination-preference-editor.underscore
 #, python-format
 msgid ""
-"Students see warnings when 20% and 5% of the allotted time remains. In "
-"certain cases, students can be granted allowances that give them extra time "
-"to complete the exam."
+"Learners see warnings when 20% and 5% of the allotted time remains. You can "
+"grant learners extra time to complete the exam through the Instructor "
+"Dashboard."
 msgstr ""
-"يرى الطلّاب تحذيرًا عندما يتبقى 20% و 5% من الوقت المقرر. في بعض الحالات، "
-"يمكن للطلاب أن يحصلوا على وقت إضافي  لمساعدتهم في إنهاء الاختبار."
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "This exam is for practice only"
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"Learners can experience the proctoring software setup process and try some "
-"example problems. Make sure this practice exam is set up as an ungraded "
-"exam."
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "This exam is proctored"
-msgstr "هذا الامتحان مراقَب"
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"Students can choose to take this exam with or without online proctoring, but"
-" only students who choose the proctored option are eligible for credit. "
-"Proctored exams must also be timed exams."
-msgstr ""
-"يمكن للطلّاب أن يختاروا الخضوع لهذا الامتحان مع أو من دون مراقبة عبر "
-"الإنترنت، لكنّ فقط الطلّاب الذين يختارون المراقبة يتأهّلون للنجاح في المادة."
-" ويُشترط في الامتحانات المراقَبة أيضًا أن تكون محدَّدة التوقيت."
 
 #: cms/templates/js/verification-access-editor.underscore
 msgid "Verification Checkpoint"

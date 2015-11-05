@@ -10,7 +10,7 @@
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # qrfahasan <ahasan@qrf.org>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # A <smart.9922@hotmail.com>, 2014
@@ -42,7 +42,7 @@
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <abdoosh00@gmail.com>, 2015
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # Assyass Mahmoud <mahmoud.assyass@edu.uiz.ac.ma>, 2015
 # AzizAhmed <dr.zezo@gmail.com>, 2014
@@ -64,7 +64,8 @@
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013-2015
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # ayshibly <ayshibly@gmail.com>, 2014
 # baraahadri <baraahadri@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
@@ -92,7 +93,7 @@
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <abdoosh00@gmail.com>, 2014
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # A <smart.9922@hotmail.com>, 2014
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # Safaa_fadl <fadlaoui_safaa@yahoo.fr>, 2014
@@ -123,7 +124,7 @@
 # 
 # Translators:
 # Almaazon <Ahmed.Almaazon@hotmail.com>, 2014
-# Ahmed Jazzar <ajazzar@edraak.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # mabdelhaq <mabdelhaq@qou.edu>, 2014
 # may <may@qordoba.com>, 2014
@@ -133,9 +134,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-10-30 14:33+0000\n"
+"POT-Creation-Date: 2015-11-05 18:36+0000\n"
 "PO-Revision-Date: 2015-10-13 19:58+0000\n"
-"Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
+"Last-Translator: Ahmed Jazzar <ajazzar@qrf.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -264,6 +265,7 @@ msgid "Mode"
 msgstr "الوضعية"
 
 #: common/djangoapps/course_modes/admin.py
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Deadline"
 msgstr "الموعد النهائي للتحقّق"
 
@@ -2433,18 +2435,6 @@ msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "يُرجى إدخال طريقة تعديل هذا المساق (\"XML\" أو \"ستوديو\")."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Show Chat Widget"
-msgstr "إظهار أداة الدردشة"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. When true, students can see the chat widget in the "
-"course."
-msgstr ""
-"يُرجى إدخال صحيح أو خاطئ. ويسمح اختيارك لصحيح بأن يرى الطلّاب أداة الدردشة "
-"في المساق."
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Survey URL"
 msgstr "الرابط لاستبيان المساق"
 
@@ -3328,11 +3318,20 @@ msgstr "تفعيل الامتحانات المراقَبة"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If this value is true, timed and proctored exams are "
-"enabled in your course."
+"Enter true or false. If this value is true, proctored exams are enabled in "
+"your course. Note that enabling proctored exams will also enable timed "
+"exams."
 msgstr ""
-"يُرجى إدخال صحيح أو خاطئ. ويسمح اختيارك لصحيح بتفعيل الامتحانات المراقبة "
-"ومحدَّدة التوقيت في مساقك."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Timed Exams"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed exams are enabled in your "
+"course."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -5068,6 +5067,10 @@ msgstr ""
 msgid "Completed the course \"{course_name}\" ({course_mode})"
 msgstr "لقد أكملت مساق \"{course_name}\" ({course_mode})"
 
+#: wiki/admin.py wiki/models/article.py
+msgid "created"
+msgstr "أُنشئ المقال."
+
 #: lms/djangoapps/certificates/models.py
 msgid ""
 "A human-readable description of the example certificate.  For example, "
@@ -5596,6 +5599,69 @@ msgstr "عذرًا، لا تملك صلاحية دخول هذا المساق"
 #: lms/djangoapps/courseware/access_response.py
 msgid "You do not have access to this course on a mobile device"
 msgstr "عذرًا، لا تملك صلاحية دخول هذا المساق من جهاز محمول"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Today is {date}"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Course Starts"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Course End"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"To earn a certificate, you must complete all requirements before this date."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"This course is archived, which means you can review course content but it is"
+" no longer active."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Verification Upgrade Deadline"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "You are still eligible to upgrade to a Verified Certificate!"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Upgrade to Verified Certificate"
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "تعلّم المزيد"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Retry Verification"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Verify My Identity"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Missed Verification Deadline"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"Unfortunately you missed this course's deadline for a successful "
+"verification."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"You must successfully complete verification before this date to qualify for "
+"a Verified Certificate."
+msgstr ""
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
@@ -6483,6 +6549,35 @@ msgstr ""
 "بدأت مهمّة إعداد الشهادات لجميع الطلّاب في هذا المساق. يمكنك متابعة حالة "
 "مهمّة هذا الإعداد في قسم ’مهام الأستاذ المعلَّقة‘."
 
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid Json data"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Students added to Certificate white list successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Student username/email is required."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Duplicate Student Username/password."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Student (username/email={user}) does not exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Multiple Students found with username/email={user}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Student (username/email={user_id} already in certificate exception  list)"
+msgstr ""
+
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
 msgstr "لا يوجد رقم للقسيمة"
@@ -6551,7 +6646,7 @@ msgid "E-Commerce"
 msgstr "التجارة الإلكترونية"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Proctoring"
+msgid "Special Exams"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -9553,6 +9648,10 @@ msgstr ""
 msgid "Enable Student Dashboard Displays"
 msgstr ""
 
+#: openedx/core/djangoapps/self_paced/models.py
+msgid "Enable course home page improvements."
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -11144,9 +11243,10 @@ msgstr ""
 msgid "Raw data:"
 msgstr "البيانات الأوّلية:"
 
-#: lms/templates/navigation-edx.html
-msgid "Home Page"
-msgstr "الصفحة الرئيسية"
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/red-theme/lms/templates/header.html
+msgid "{platform_name} Home Page"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: themes/red-theme/lms/templates/header.html
@@ -12367,14 +12467,6 @@ msgid ""
 "technical support."
 msgstr ""
 
-#: lms/templates/chat/toggle_chat.html
-msgid "Open Chat"
-msgstr "فتح الشات"
-
-#: lms/templates/chat/toggle_chat.html
-msgid "Close Chat"
-msgstr "إغلاق الشات"
-
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
 msgstr "ردود مفتوحة "
@@ -12553,6 +12645,17 @@ msgid ""
 "contact {email}."
 msgstr ""
 "لقد أُلغيت عمليتك. إذا كنتَ ترى أن خطًأ قد وقع يرجى الاتصال مع {email}."
+
+#: lms/templates/commerce/checkout_error.html
+msgid "Checkout Error"
+msgstr ""
+
+#: lms/templates/commerce/checkout_error.html
+msgid ""
+"An error has occurred with your payment. <b>You have not been charged.</b> "
+"Please try to submit your payment again. If this problem persists, contact "
+"{email}."
+msgstr ""
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
@@ -12840,6 +12943,10 @@ msgid "Handout Navigation"
 msgstr "تصفّح النشرات "
 
 #: lms/templates/courseware/info.html
+msgid "Important Course Dates"
+msgstr ""
+
+#: lms/templates/courseware/info.html
 msgid "Course Handouts"
 msgstr "نشرات المساق"
 
@@ -13118,7 +13225,7 @@ msgstr "استعراض عملية التقييم في استوديو"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
-msgstr "تقدّم عمل الطالب '{username}' ({email}) على المساق"
+msgstr "تقدّم عمل الطالب '{username}'‏ ({email}) في المساق"
 
 #: lms/templates/courseware/progress.html
 msgid "Your certificate is available"
@@ -13406,6 +13513,10 @@ msgstr ""
 "{cert_name_short}، ومنحناك عوضًا عنها شهادة ميثاق شرف {cert_name_short}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{category} Program Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr "{course_number} {course_name} الصفحة الرئيسية"
 
@@ -13466,19 +13577,12 @@ msgstr "الإجراءات المتاحة"
 #, python-format
 msgid ""
 "Are you sure you want to unenroll from the purchased course %(course_name)s "
-"($(course_number)s)?"
+"(%(course_number)s)?"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
 msgstr "سوف يعاد لك المبلغ الذي دفعته."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the purchased course %(course_name)s "
-"(%(course_number)s)?"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
@@ -13603,8 +13707,8 @@ msgstr ""
 #. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"You are now eligible to purchase course credit for this course. Click "
-"<strong>Get Credit</strong> to get started."
+"You have completed this course and are eligible to purchase course credit. "
+"Select <strong>Get Credit</strong> to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -13615,24 +13719,37 @@ msgstr ""
 #. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you for your payment. To receive course credit, you must now request "
-"credit at the {provider_name} website."
+"{provider_name} has received your course credit request. We will update you "
+"when credit processing is complete."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Finalize Credit"
-msgstr ""
-
-#. Translators: provider_name is the name of a credit provider or university
-#. (e.g. State University)
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"<strong>Congratulations!</strong> {provider_name} has converted your course "
-"credit. To see your course credit, click <strong>Access Credit</strong>."
+"Thank you for your payment. To receive course credit, you must now request "
+"credit at the {link_to_provider_site}  website. Select <b>Request Credit</b>"
+" to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Access Credit"
+msgid "View Details"
+msgstr ""
+
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'.
+#. provider_name is the name of credit provider.
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"<b>Congratulations!</b> {provider_name} has approved your request for course"
+" credit. To see your course credit, visit the {link_to_provider_site} "
+"website."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "View Credit"
 msgstr ""
 
 #. Translators: link_to_provider_site is a link to an external webpage. The
@@ -13700,6 +13817,20 @@ msgid ""
 msgstr ""
 "إنّ حساب {provider_name} الذي اخترتَه مرتبط مسبقًا بحساب آخر في "
 "{platform_name}. "
+
+#: lms/templates/dashboard/_dashboard_xseries_info.html
+msgid "{category} Program: Interested in more courses in this subject?"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_xseries_info.html
+msgid ""
+"This course is 1 of {course_count} courses in the "
+"{link_start}{program_display_name}{link_end} {program_category}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_xseries_info.html
+msgid "View {category} Details"
+msgstr ""
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -14857,6 +14988,16 @@ msgstr "مهام معلقة"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
 msgstr "حالة أية مهام فعالة تظهر في الجدول أدناه. "
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Certificate Exceptions"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Use this to generate certificates for users who did not pass the course but "
+"have been given an exception by the Course Team to earn a certificate."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -16019,14 +16160,6 @@ msgstr "هذه قائمة جزئية، لعرض جميع الطلاب يرجى �
 msgid "There are no problems in this section."
 msgstr "لا توجد مسائل في هذا القسم."
 
-#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
-msgid "Allowance Section"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
-msgid "Student Proctored Exam Section"
-msgstr ""
-
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
 msgstr "إرسال بريد إلكتروني"
@@ -16144,6 +16277,14 @@ msgstr "يرجى إدخال تفاصيل وضعية المساق أدناه"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Set Price"
 msgstr "السعر المحدد"
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Allowance Section"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Student Special Exam Attempts"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
@@ -18101,6 +18242,18 @@ msgid "Edit Start Date"
 msgstr "تعديل تاريخ البداية"
 
 #: cms/templates/course_outline.html
+msgid "Course Pacing:"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Self-Paced"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Instructor-Paced"
+msgstr ""
+
+#: cms/templates/course_outline.html
 msgid "Creating your course organization"
 msgstr "إنشاء مؤسّسة المساق الخاصة بك"
 
@@ -18609,10 +18762,6 @@ msgstr ""
 "{em_start}تعديل{em_end}. ويُرجى الانتباه إلى أنّه لا يمكن حذف إحدى مجموعات "
 "المحتوى إلّا إذا لم تكن قيد الاستخدام في إحدى الوحدات. ولحذفها، حرِّك الماوس"
 " فوق خانتها وانقر على رمز الحذف."
-
-#: cms/templates/group_configurations.html
-msgid "Learn More"
-msgstr "تعلّم المزيد"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -20199,8 +20348,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"Instructor-led courses progress at the pace that the course author sets. You"
-" can configure release dates for course content and due dates for "
+"Instructor-paced courses progress at the pace that the course author sets. "
+"You can configure release dates for course content and due dates for "
 "assignments."
 msgstr ""
 
@@ -20831,10 +20980,6 @@ msgstr "الاسم"
 # empty
 msgid "This is a key string."
 msgstr "هذا نص أساسي. "
-
-#: wiki/admin.py wiki/models/article.py
-msgid "created"
-msgstr "أُنشئ المقال."
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"
