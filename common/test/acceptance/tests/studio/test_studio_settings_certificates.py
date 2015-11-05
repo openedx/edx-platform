@@ -2,6 +2,7 @@
 Acceptance tests for Studio's Setting pages
 """
 import re
+import uuid
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.settings_certificates import CertificatesPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
@@ -60,7 +61,7 @@ class CertificatesTest(StudioCourseTest):
             certificate.signatories[idx].name = signatory['name']
             certificate.signatories[idx].title = signatory['title']
             certificate.signatories[idx].organization = signatory['organization']
-            certificate.signatories[idx].upload_signature_image('Signature-{}.png'.format(idx))
+            certificate.signatories[idx].upload_signature_image('Signature-{}.png'.format(uuid.uuid4().hex[:4]))
 
             added_signatories += 1
             if len(signatories) > added_signatories:
