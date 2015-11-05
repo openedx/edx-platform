@@ -69,6 +69,9 @@ class HtmlBlock(object):
 
     @XBlock.supports("multi_device")
     def student_view(self, _context):
+        """
+        Return a fragment that contains the html for the student view
+        """
         return Fragment(self.get_html())
 
     def get_html(self):
@@ -76,6 +79,7 @@ class HtmlBlock(object):
         When we switch this to an XBlock, we can merge this with student_view,
         but for now the XModule mixin requires that this method be defined.
         """
+        # pylint: disable=no-member
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data

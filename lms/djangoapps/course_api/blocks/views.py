@@ -172,7 +172,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 get_blocks(
                     request,
                     params.cleaned_data['usage_key'],
-                    params.cleaned_data['username'],
+                    params.cleaned_data['user'],
                     params.cleaned_data['depth'],
                     params.cleaned_data.get('nav_depth'),
                     params.cleaned_data['requested_fields'],

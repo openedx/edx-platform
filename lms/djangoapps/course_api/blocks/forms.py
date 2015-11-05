@@ -80,7 +80,7 @@ class BlockListGetForm(Form):
         """
         Validates and returns the requested_user, while checking permissions.
         """
-        requested_username = cleaned_data.get('user', '')
+        requested_username = cleaned_data.get('username', '')
         requesting_user = self.initial['requesting_user']
 
         if requesting_user.username.lower() == requested_username.lower():
