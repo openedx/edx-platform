@@ -19,10 +19,8 @@ from openedx.core.djangoapps.user_api.preferences.api import (
 )
 from lang_pref import LANGUAGE_KEY
 
-# TODO re-import this once we're on Django 1.5 or greater. [PLAT-671]
-# from django.utils.translation.trans_real import parse_accept_lang_header
-# from django.utils.translation import LANGUAGE_SESSION_KEY
-from django_locale.trans_real import parse_accept_lang_header, LANGUAGE_SESSION_KEY
+from django.utils.translation.trans_real import parse_accept_lang_header
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 
 def dark_parse_accept_lang_header(accept):
