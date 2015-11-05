@@ -118,6 +118,16 @@ class BlockStructure(object):
         """
         return usage_key in self._block_relations
 
+    def get_block_keys(self):
+        """
+        Returns the block keys in the block structure.
+
+        Returns:
+            iterator(UsageKey) - An iterator of the usage
+            keys of all the blocks in the block structure.
+        """
+        return self._block_relations.iterkeys()
+
     #--- Block structure traversal methods ---#
 
     def topological_traversal(
@@ -197,13 +207,6 @@ class BlockStructure(object):
 
         # Replace this structure's relations with the newly pruned one.
         self._block_relations = pruned_block_relations
-
-    def _get_block_keys(self):
-        """
-        Returns an iterator of all the block keys in the block
-        structure.
-        """
-        return self._block_relations.iterkeys()
 
     def _add_relation(self, parent_key, child_key):
         """

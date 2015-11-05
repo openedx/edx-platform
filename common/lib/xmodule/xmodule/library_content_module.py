@@ -134,8 +134,65 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     any particular student.
     """
 
+    @classmethod
+    def make_selection(cls, selected, children, max_count, mode):
+        """
+        Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
+
+        Arguments:
+            selected - list of (block_type, block_id) tuples assigned to this student
+            children - children of this block
+            max_count - number of components to display to each student
+            mode - how content is drawn from the library
+
+        Returns:
+            A dict containing the following keys:
+
+            'selected' (set) of (block_type, block_id) tuples assigned to this student
+            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
+            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
+            'added' (set) of newly added (block_type, block_id) tuples
+        """
+        selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
+
+        # Determine which of our children we will show:
+        valid_block_keys = set([(c.block_type, c.block_id) for c in children])
+        # Remove any selected blocks that are no longer valid:
+        invalid_block_keys = (selected - valid_block_keys)
+        if invalid_block_keys:
+            selected -= invalid_block_keys
+
+        # If max_count has been decreased, we may have to drop some previously selected blocks:
+        overlimit_block_keys = set()
+        while len(selected) > max_count:
+            overlimit_block_keys.add(selected.pop())
+
+        # Do we have enough blocks now?
+        num_to_add = max_count - len(selected)
+
+        added_block_keys = None
+        if num_to_add > 0:
+            # We need to select [more] blocks to display to this user:
+            pool = valid_block_keys - selected
+            if mode == "random":
+                num_to_add = min(len(pool), num_to_add)
+                added_block_keys = set(random.sample(pool, num_to_add))
+                # We now have the correct n random children to show for this user.
+            else:
+                raise NotImplementedError("Unsupported mode.")
+            selected |= added_block_keys
+
+        return {
+            'selected': selected,
+            'invalid': invalid_block_keys,
+            'overlimit': overlimit_block_keys,
+            'added': added_block_keys,
+        }
+
     def _publish_event(self, event_name, result, **kwargs):
-        """ Helper method to publish an event for analytics purposes """
+        """
+        Helper method to publish an event for analytics purposes
+        """
         event_data = {
             "location": unicode(self.location),
             "result": result,
@@ -145,6 +202,61 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         event_data.update(kwargs)
         self.runtime.publish(self, "edx.librarycontentblock.content.{}".format(event_name), event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
+
+    @classmethod
+    def publish_selected_children_events(cls, block_keys, format_block_keys, publish_event):
+        """
+        Helper method for publishing events when children blocks are
+        selected/updated for a user.  This helper is also used by
+        the ContentLibraryTransformer.
+
+        Arguments:
+
+            block_keys -
+                A dict describing which events to publish (add or
+                remove), see `make_selection` above for format details.
+
+            format_block_keys -
+                A function to convert block keys to the format expected
+                by publish_event. Must have the signature:
+
+                    [(block_type, block_id)] -> T
+
+                Where T is a collection of block keys as accepted by
+                `publish_event`.
+
+            publish_event -
+                Function that handles the actual publishing.  Must have
+                the signature:
+
+                    <'removed'|'assigned'> -> result:T -> removed:T -> reason:basestring -> None
+
+                Where T is a collection of block_keys as returned by
+                `format_block_keys`.
+        """
+        if block_keys['invalid']:
+            # reason "invalid" means deleted from library or a different library is now being used.
+            publish_event(
+                "removed",
+                result=format_block_keys(block_keys['selected']),
+                removed=format_block_keys(block_keys['invalid']),
+                reason="invalid"
+            )
+
+        if block_keys['overlimit']:
+            publish_event(
+                "removed",
+                result=format_block_keys(block_keys['selected']),
+                removed=format_block_keys(block_keys['overlimit']),
+                reason="overlimit"
+            )
+
+        if block_keys['added']:
+            publish_event(
+                "assigned",
+                result=format_block_keys(block_keys['selected']),
+                added=format_block_keys(block_keys['added'])
+            )
 
     def selected_children(self):
         """
@@ -161,61 +273,23 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             # Already done:
             return self._selected_set  # pylint: disable=access-member-before-definition
 
-        selected = set(tuple(k) for k in self.selected)  # set of (block_type, block_id) tuples assigned to this student
+        block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
 
+        # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
+        self.publish_selected_children_events(
+            block_keys,
+            format_block_keys,
+            self._publish_event,
+        )
 
-        # Determine which of our children we will show:
-        valid_block_keys = set([(c.block_type, c.block_id) for c in self.children])  # pylint: disable=no-member
-        # Remove any selected blocks that are no longer valid:
-        invalid_block_keys = (selected - valid_block_keys)
-        if invalid_block_keys:
-            selected -= invalid_block_keys
-            # Publish an event for analytics purposes:
-            # reason "invalid" means deleted from library or a different library is now being used.
-            self._publish_event(
-                "removed",
-                result=format_block_keys(selected),
-                removed=format_block_keys(invalid_block_keys),
-                reason="invalid"
-            )
-        # If max_count has been decreased, we may have to drop some previously selected blocks:
-        overlimit_block_keys = set()
-        while len(selected) > self.max_count:
-            overlimit_block_keys.add(selected.pop())
-        if overlimit_block_keys:
-            # Publish an event for analytics purposes:
-            self._publish_event(
-                "removed",
-                result=format_block_keys(selected),
-                removed=format_block_keys(overlimit_block_keys),
-                reason="overlimit"
-            )
-        # Do we have enough blocks now?
-        num_to_add = self.max_count - len(selected)
-        if num_to_add > 0:
-            added_block_keys = None
-            # We need to select [more] blocks to display to this user:
-            pool = valid_block_keys - selected
-            if self.mode == "random":
-                num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(random.sample(pool, num_to_add))
-                # We now have the correct n random children to show for this user.
-            else:
-                raise NotImplementedError("Unsupported mode.")
-            selected |= added_block_keys
-            if added_block_keys:
-                # Publish an event for analytics purposes:
-                self._publish_event(
-                    "assigned",
-                    result=format_block_keys(selected),
-                    added=format_block_keys(added_block_keys)
-                )
         # Save our selections to the user state, to ensure consistency:
+        selected = block_keys['selected']
         self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
         # Cache the results
         self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
+
         return selected
 
     def _get_selected_child_blocks(self):

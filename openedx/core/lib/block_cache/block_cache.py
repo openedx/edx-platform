@@ -36,6 +36,12 @@ def get_blocks(cache, modulestore, usage_info, root_block_usage_key, transformer
             transformers whose transform methods are to be called.
             This list should be a subset of the list of registered
             transformers in the Transformer Registry.
+
+    Returns:
+        BlockStructureBlockData - A transformed block structure,
+            starting at root_block_usage_key, that has undergone the
+            transform methods in the given transformers with the
+            given usage_info.
     """
 
     # Verify that all requested transformers are registered in the
