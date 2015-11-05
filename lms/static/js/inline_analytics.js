@@ -267,7 +267,7 @@ window.InlineAnalytics = (function() {
         result,
         partId,
         totalFirstAttemptCount,
-        totalLastAttemptCount,	
+        totalLastAttemptCount,
         correctResponse,
         lastUpdateDate) {
 
@@ -297,7 +297,7 @@ window.InlineAnalytics = (function() {
 
         // Add "First Attempt" to the choice number column
         $('#' + partId + '_table .checkbox_header_row').after('<tr><td id="first_attempt" class="answer-box checkbox-first-attempt">' + gettext('First Attempt') + '</td></tr>');
-        
+
         // Construct the choice number column array
         while (choiceCounter <= choiceText.length) {
             tr = $('<tr><td id="column0:row' + choiceCounter + '" class="answer-box" title="' +
@@ -358,7 +358,7 @@ window.InlineAnalytics = (function() {
 
                     choiceCounter += 1;
                 }
-                
+
                 // Construct the First Attempt row
                 firstCount = result[index]['first_count'];
                 firstPercent = Math.round(firstCount * 1000 / (totalFirstAttemptCount * 10));
@@ -391,7 +391,7 @@ window.InlineAnalytics = (function() {
         }
         //Append count row to the first attempt row
         $('#' + partId + '_table #first_attempt').after(firstCountRow);
-        
+
         // Append count row to the last attempt row
         $('#' + partId + '_table #last_attempt').after(lastCountRow);
 
@@ -442,16 +442,16 @@ window.InlineAnalytics = (function() {
         // graphics (not radio or checkbox)
         var part = document.getElementById(partId + '_analytics');
         part = $(part);
-        
+
         var correctFirstPercent = Math.round(totalFirstCorrectCount * 1000 / (totalFirstAttemptCount * 10));
         var incorrectFirstPercent = Math.round(totalFirstIncorrectCount * 1000 / (totalFirstAttemptCount * 10));
-        
+
         var correctLastPercent = Math.round(totalLastCorrectCount * 1000 / (totalLastAttemptCount * 10));
         var incorrectLastPercent = Math.round(totalLastIncorrectCount * 1000 / (totalLastAttemptCount * 10));
-        
+
         part.find('.num-students-extra-first-correct').text(totalFirstCorrectCount + ' (' + correctFirstPercent + '%) ');
         part.find('.num-students-extra-first-incorrect').text(totalFirstIncorrectCount + ' (' + incorrectFirstPercent + '%) ');
-        
+
         part.find('.num-students-extra-last-correct').text(totalLastCorrectCount + ' (' + correctLastPercent + '%) ');
         part.find('.num-students-extra-last-incorrect').text(totalLastIncorrectCount + ' (' + incorrectLastPercent + '%) ');
     }
@@ -493,7 +493,7 @@ window.InlineAnalytics = (function() {
         // Use elementId to attach handlers to the correct button since there
         // may be many problems on the page.
         $('#' + elementId + '_analytics_button').click(function(event) {
-
+            event.preventDefault();
             var location = this.dataset.location;
             var answerDistUrl = this.dataset.answerDistUrl;
             var courseId = this.dataset.courseId;
