@@ -125,7 +125,7 @@ def get_consumer_secret(user, license):
     return response['consumer_key'], response['secret_key']
 
 
-def get_licensed_simulations(user, course_key, consumer_keys):
+def get_licensed_simulations(consumer_keys):
     """
     Return a list of available for the user simulation ids.
     Raises: LabsterApiError
@@ -194,7 +194,7 @@ def set_license(request, course, ccx):
     # Getting a list of licensed simulations
     consumer_keys = [LtiPassport(passport_str).consumer_key for passport_str in passports]
     try:
-        licensed_simulations = get_licensed_simulations(request.user, unicode(course_key), consumer_keys)
+        licensed_simulations = get_licensed_simulations(consumer_keys)
     except LabsterApiError:
         messages.error(
             request, _('Your license is successfully applied, but there was an error with updating your course.')
