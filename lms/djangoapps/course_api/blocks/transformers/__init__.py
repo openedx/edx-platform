@@ -52,4 +52,3 @@ SUPPORTED_FIELDS = [
         serializer_field_name='descendants',
     )
 ]
-
