@@ -35,29 +35,33 @@ class Command(BaseCommand):
 
         entry = None
         count = 0
-        window = 10000
+        window = 100
 
-        while max_id > 0:
-            entries = archive_entries.filter(id__lt=max_id, id__gte=max_id - window)
-            new_entries = [StudentModuleHistory.from_archive(entry) for entry in entries]
+        try:
+            while max_id > 0:
+                entries = archive_entries.filter(id__lt=max_id, id__gte=max_id - window)
+                new_entries = [StudentModuleHistory.from_archive(entry) for entry in entries]
 
-            StudentModuleHistory.objects.bulk_create(new_entries)
-            count += len(entries)
+                StudentModuleHistory.objects.bulk_create(new_entries)
+                count += len(entries)
 
-            if entries:
-                transaction.commit()
-                duration = time.time() - start_time
-                self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
-                self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
-                    (count + 1) / duration,
-                    timedelta(seconds=(entry.id / (count + 1)) * duration),
-                ))
+                if entries:
+                    transaction.commit()
+                    duration = time.time() - start_time
+                    self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
+                    self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
+                        (count + 1) / duration,
+                        timedelta(seconds=(entry.id / (count + 1)) * duration),
+                    ))
 
-            max_id -= window
-
-        transaction.commit()
-        if entry:
-            self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
-            self.stdout.write("Migration complete\n")
+                max_id -= window
+        except:
+            transaction.rollback()
+            raise
         else:
-            self.stdout.write("No migration needed\n")
+            transaction.commit()
+            if entry:
+                self.stdout.write("Migrated StudentModuleHistoryArchive {} to StudentModuleHistory\n".format(entry.id))
+                self.stdout.write("Migration complete\n")
+            else:
+                self.stdout.write("No migration needed\n")
