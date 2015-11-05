@@ -70,22 +70,22 @@ class Command(BaseCommand):
             while current_max_id > min_id:
                 entries = archive_entries.filter(id__lt=current_max_id, id__gte=max(current_max_id - window, min_id))
 
-                if real_max_id is None:
-                    real_max_id = entries[0].id
-
                 new_entries = [StudentModuleHistory.from_archive(entry) for entry in entries]
 
                 StudentModuleHistory.objects.bulk_create(new_entries)
-                count += len(entries)
+                count += len(new_entries)
 
-                if entries:     #when would this be false?
+                if new_entries:
+                    if real_max_id is None:
+                        real_max_id = new_entries[0].id
+
                     transaction.commit()
                     duration = time.time() - start_time
 
-                    self.stdout.write("Migrated StudentModuleHistoryArchive {}-{} to StudentModuleHistory\n".format(entries[0].id, entries[-1].id))
+                    self.stdout.write("Migrated StudentModuleHistoryArchive {}-{} to StudentModuleHistory\n".format(new_entries[0].id, new_entries[-1].id))
                     self.stdout.write("Migrating {} entries per second. {} seconds remaining...\n".format(
                         count / duration,
-                        timedelta(seconds=(entries[-1].id - min_id) / count * duration),
+                        timedelta(seconds=(new_entries[-1].id - min_id) / count * duration),
                     ))
 
                 current_max_id -= window
@@ -95,8 +95,8 @@ class Command(BaseCommand):
         else:
             transaction.commit()
 
-            if entries:
-                self.stdout.write("Migrated StudentModuleHistoryArchive {}-{} to StudentModuleHistory\n".format(real_max_id, entries[-1].id))
+            if new_entries:
+                self.stdout.write("Migrated StudentModuleHistoryArchive {}-{} to StudentModuleHistory\n".format(real_max_id, new_entries[-1].id))
                 self.stdout.write("Migration complete\n")
             else:
                 self.stdout.write("No migration needed\n")
