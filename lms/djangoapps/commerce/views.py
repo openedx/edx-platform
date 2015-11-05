@@ -23,6 +23,13 @@ def checkout_cancel(_request):
 
 
 @csrf_exempt
+def checkout_error(_request):
+    """ Checkout/payment error view. """
+    context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
+    return render_to_response("commerce/checkout_error.html", context)
+
+
+@csrf_exempt
 @login_required
 def checkout_receipt(request):
     """ Receipt view. """
