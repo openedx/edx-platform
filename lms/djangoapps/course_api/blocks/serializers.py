@@ -23,8 +23,6 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         else:
             value = self.context['block_structure'].get_transformer_block_field(block_key, transformer, field_name)
 
-        # TODO should we return falsey values in the response?
-        # for example, if student_view_multi_device is false, just don't specify it?
         return value if (value is not None) else default
 
     def to_representation(self, block_key):
@@ -56,6 +54,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                     supported_field.default_value,
                 )
                 if field_value is not None:
+                    # only return fields that have data
                     data[supported_field.serializer_field_name] = field_value
 
         if 'children' in self.context['requested_fields']:

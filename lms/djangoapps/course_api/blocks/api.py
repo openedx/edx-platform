@@ -5,7 +5,7 @@ API function for retrieving course blocks data
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.proctored_exam import ProctoredExamTransformer
 from .serializers import BlockSerializer, BlockDictSerializer
-from lms.djangoapps.course_blocks.api import get_course_blocks, LMS_COURSE_TRANSFORMERS
+from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
 
 
 def get_blocks(
@@ -36,7 +36,7 @@ def get_blocks(
     blocks = get_course_blocks(
         user,
         usage_key,
-        transformers=LMS_COURSE_TRANSFORMERS + [ProctoredExamTransformer(), blocks_api_transformer],
+        transformers=COURSE_BLOCK_ACCESS_TRANSFORMERS + [ProctoredExamTransformer(), blocks_api_transformer],
     )
 
     # serialize

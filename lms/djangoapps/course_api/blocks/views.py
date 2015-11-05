@@ -57,19 +57,23 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
           for each block.  For a list of available fields see under `Response
           Values -> blocks`, below.
 
-          The following fields are always returned: type, display_name
+          The following fields are always returned: id, type, display_name
 
           Example: requested_fields=graded,format,student_view_multi_device
 
-        * depth (integer or all) Indicates how deep to traverse into the blocks
+        * depth: (integer or all) Indicates how deep to traverse into the blocks
           hierarchy.  A value of all means the entire hierarchy.
 
           Default is 0
 
           Example: depth=all
 
-        * nav_depth (integer) Indicates how far deep to traverse into the
-          course hierarchy before bundling all the descendants.
+        * nav_depth: (integer)
+
+          WARNING: nav_depth is not supported, and may be removed at any time.
+
+          Indicates how far deep to traverse into the
+          course hierarchy before bundling all the descendants. (
 
           Default is 3 since typical navigational views of the course show a
           maximum of chapter->sequential->vertical.
