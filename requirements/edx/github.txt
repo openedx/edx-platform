@@ -40,7 +40,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 
--e git+https://github.com/Stanford-Online/edx-ora2.git@ef216a4e783c4883082eacbc64e2f3540d573ff8#egg=edx-ora2
+-e git+https://github.com/Stanford-Online/edx-ora2.git@76ea060fbe5694f21443ee5dde2b669c1b6efadc#egg=edx-ora2
 
 # Forking Submissions repo for ORA2 score override function.
 -e git+https://github.com/Stanford-Online/edx-submissions.git@1e8d8ea9a15d0f15ea28d1d348c79cfa66016608#egg=edx-submissions
