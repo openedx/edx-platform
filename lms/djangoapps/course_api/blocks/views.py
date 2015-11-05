@@ -73,7 +73,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
           WARNING: nav_depth is not supported, and may be removed at any time.
 
           Indicates how far deep to traverse into the
-          course hierarchy before bundling all the descendants. (
+          course hierarchy before bundling all the descendants.
 
           Default is 3 since typical navigational views of the course show a
           maximum of chapter->sequential->vertical.
