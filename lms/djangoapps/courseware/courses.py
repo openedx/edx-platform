@@ -1,9 +1,15 @@
+"""
+Functions for accessing and displaying courses within the
+courseware.
+"""
+from datetime import datetime
 from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 import logging
 import inspect
 
 from path import Path as path
+import pytz
 from django.http import Http404
 from django.conf import settings
 
@@ -334,7 +340,16 @@ def _get_course_date_summary_blocks(course, user):
     )
 
     blocks = (cls(course, user) for cls in block_classes)
-    return sorted((b for b in blocks if b.is_enabled), key=lambda b: b.date)
+
+    def block_key_fn(block):
+        """
+        If the block's date is None, return the maximum datetime in order
+        to force it to the end of the list of displayed blocks.
+        """
+        if block.date is None:
+            return datetime.max.replace(tzinfo=pytz.UTC)
+        return block.date
+    return sorted((b for b in blocks if b.is_enabled), key=block_key_fn)
 
 
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.

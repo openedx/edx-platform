@@ -1,4 +1,3 @@
-# pylint: disable=missing-docstring
 """
 This module provides date summary blocks for the Course Info
 page. Each block gives information about a particular
@@ -20,27 +19,46 @@ from student.models import CourseEnrollment
 class DateSummary(object):
     """Base class for all date summary blocks."""
 
-    # The CSS class of this summary. Indicates the type of information
-    # this summary block contains, and its urgency.
-    css_class = ''
+    @property
+    def css_class(self):
+        """
+        The CSS class of this summary. Indicates the type of information
+        this summary block contains, and its urgency.
+        """
+        return ''
 
-    # The title of this summary.
-    title = ''
+    @property
+    def title(self):
+        """The title of this summary."""
+        return ''
 
-    # The detail text displayed by this summary.
-    description = ''
+    @property
+    def description(self):
+        """The detail text displayed by this summary."""
+        return ''
 
-    # This summary's date.
-    date = None
+    @property
+    def date(self):
+        """This summary's date."""
+        return None
 
-    # The format to display this date in. By default, displays like Jan 01, 2015.
-    date_format = '%b %d, %Y'
+    @property
+    def date_format(self):
+        """
+        The format to display this date in. By default, displays like Jan
+        01, 2015.
+        """
+        return '%b %d, %Y'
 
-    # The location to link to for more information.
-    link = ''
+    @property
+    def link(self):
+        """The location to link to for more information."""
+        return ''
 
-    # The text of the link.
-    link_text = ''
+    @property
+    def link_text(self):
+        """The text of the link."""
+        return ''
 
     def __init__(self, course, user):
         self.course = course
@@ -126,7 +144,10 @@ class CourseEndDate(DateSummary):
     """
     css_class = 'end-date'
     title = _('Course End')
-    is_enabled = True
+
+    @property
+    def is_enabled(self):
+        return self.date is not None
 
     @property
     def description(self):

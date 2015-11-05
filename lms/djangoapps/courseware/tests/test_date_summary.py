@@ -48,10 +48,14 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         """Set up the course and user for this test."""
         now = datetime.now(pytz.UTC)
         self.course = CourseFactory.create(  # pylint: disable=attribute-defined-outside-init
-            start=now + timedelta(days=days_till_start),
-            end=now + timedelta(days=days_till_end),
+            start=now + timedelta(days=days_till_start)
         )
         self.user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
+
+        if days_till_end is not None:
+            self.course.end = now + timedelta(days=days_till_end)
+        else:
+            self.course.end = None
 
         if enrollment_mode is not None and days_till_upgrade_deadline is not None:
             CourseModeFactory.create(
@@ -97,6 +101,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
           'days_till_verification_deadline': -5,
           'verification_status': 'approved'},
          (TodaysDate, CourseEndDate)),
+        # No course end date
+        ({'days_till_end': None},
+         (CourseStartDate, TodaysDate, VerificationDeadlineDate, VerifiedUpgradeDeadlineDate)),
         # During course run
         ({'days_till_start': -1},
          (TodaysDate, CourseEndDate, VerificationDeadlineDate, VerifiedUpgradeDeadlineDate)),
@@ -131,13 +138,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertHTMLEqual(block.render(), html)
         self.assertFalse(block.is_enabled)
 
-    @freezegun.freeze_time('2015-01-02')
-    def test_date_render(self):
-        self.setup_course_and_user()
-        block = DateSummary(self.course, self.user)
-        block.date = datetime.now(pytz.UTC)
-        self.assertIn('Jan 02, 2015', block.render())
-
     ## TodaysDate
 
     @freezegun.freeze_time('2015-01-02')
@@ -148,6 +148,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertEqual(block.date, datetime.now(pytz.UTC))
         self.assertEqual(block.title, 'Today is Jan 02, 2015')
         self.assertNotIn('date-summary-date', block.render())
+
+    @freezegun.freeze_time('2015-01-02')
+    def test_date_render(self):
+        self.setup_course_and_user()
+        block = TodaysDate(self.course, self.user)
+        self.assertIn('Jan 02, 2015', block.render())
 
     ## CourseStartDate
 
