@@ -4,6 +4,9 @@ div.welcome-wrapper {
 
   .welcome {
     margin: $baseline;
+    display: inline-block;
+    @include float(left);
+
     h1 {
       margin-bottom: 5px;
       color: $dark-gray1;
@@ -13,6 +16,26 @@ div.welcome-wrapper {
       color: $dark-gray2;
       font-size: 14px;
       text-transform: none;
+    }
+  }
+
+  .last-accessed-courseware {
+    display: inline-block;
+    @include float(right);
+    margin: $baseline;
+    padding: ($baseline/2) ($baseline*0.75);
+    border: 1px solid $blue;
+    background-color: rgb(252, 252, 252);
+    font-size: 12px;
+    color: $blue-d1;
+    max-width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    p {
+      display: inline-block;
+      @include margin-left($baseline*0.75);
     }
   }
 }

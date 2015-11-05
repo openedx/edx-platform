@@ -50,6 +50,13 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
         <h1>${_("Welcome to {org}'s {course_name}!").format(org=course.id.org, course_name=course.id.course) | h}</h1>
         <h2>${course.display_name | h}</h2>
     </section>
+    % if last_accessed_courseware:
+      <section class="last-accessed-courseware">
+          <i class="fa fa-clock-o"></i>
+          <p>${_("Jump back to where you were last:")}</p>
+          <a href="${last_accessed_url}">${last_accessed_courseware.display_name | h}</a>
+      </section>
+    % endif
   </div>
   <div class="info-wrapper">
     % if user.is_authenticated():
