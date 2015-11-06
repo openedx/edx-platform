@@ -9,9 +9,10 @@ EMAIL = USERNAME + '@fake.email'
 
 def forwards(apps, schema_editor):
     """Add the service user."""
-    user = User.objects.create(username=USERNAME, email=EMAIL)
-    user.set_unusable_password()
-    user.save()
+    user, created = User.objects.get_or_create(username=USERNAME, email=EMAIL)
+    if created:
+        user.set_unusable_password()
+        user.save()
 
 def backwards(apps, schema_editor):
     """Remove the service user."""
