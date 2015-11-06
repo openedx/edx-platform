@@ -258,9 +258,6 @@ AUTHENTICATION_BACKENDS = (
     'third_party_auth.saml.SAMLAuthBackend',
 ) + AUTHENTICATION_BACKENDS
 
-FAKE_EMAIL_DOMAIN = 'fake-email-domain.foo'
-THIRD_PARTY_AUTH_FALLBACK_FULL_NAME = "Unknown"
-
 THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
     'custom1': {
         'secret_key': 'opensesame',
