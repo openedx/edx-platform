@@ -1,0 +1,31 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+from django.conf import settings
+from django.core.files import File
+
+def forwards(apps, schema_editor):
+    """Add default modes"""
+    badge_image_configuration_model = apps.get_model("certificates", "BadgeImageConfiguration")
+
+    for mode in ['honor', 'verified', 'professional']:
+        conf, __ = badge_image_configuration_model.objects.get_or_create(mode=mode)
+        file_name = '{0}{1}'.format(mode, '.png')
+        conf.icon.save(
+            'badges/{}'.format(file_name),
+            File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name))
+        )
+
+        conf.save()
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('certificates', '0003_auto_20151106_0743'),
+    ]
+
+    operations = [
+        migrations.RunPython(forwards)
+    ]
