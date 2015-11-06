@@ -170,6 +170,7 @@ def create_ccx(request, course, ccx=None):
     start = TODAY().replace(tzinfo=pytz.UTC)
     override_field_for_ccx(ccx, course, 'start', start)
     override_field_for_ccx(ccx, course, 'due', None)
+    override_field_for_ccx(ccx, course, 'lti_passports', [])
 
     # Hide anything that can show up in the schedule
     hidden = 'visible_to_staff_only'
