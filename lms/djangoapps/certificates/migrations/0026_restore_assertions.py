@@ -74,14 +74,17 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
             'issuing_component': ('django.db.models.fields.SlugField', [], {'default': "''", 'max_length': '50', 'blank': 'True'}),
-            'mode': ('django.db.models.fields.CharField', [], {'max_length': '100', 'default': "''"}),
+            'mode': ('django.db.models.fields.CharField', [], {'max_length': '100', 'default': '""', 'blank': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'})
         },
         'badges.badgeassertion': {
             'Meta': {'object_name': 'BadgeAssertion'},
             'data': ('jsonfield.fields.JSONField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'backend': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'badge_class': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['badges.BadgeClass']"}),
+            'image_url': ('django.db.models.fields.URLField', [], {}),
+            'assertion_url': ('django.db.models.fields.URLField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'badges.coursecompleteimageconfiguration': {

@@ -7,6 +7,7 @@ from factory import DjangoModelFactory
 from factory.django import ImageField
 
 from badges.models import BadgeAssertion, CourseCompleteImageConfiguration, BadgeClass
+from student.tests.factories import UserFactory
 
 
 def generate_dummy_image(_unused):
@@ -54,4 +55,8 @@ class BadgeAssertionFactory(DjangoModelFactory):
     class Meta(object):
         model = BadgeAssertion
 
+    user = factory.SubFactory(UserFactory)
     badge_class = factory.SubFactory(BadgeClassFactory)
+    data = {}
+    assertion_url = 'http://example.com/example.json'
+    image_url = 'http://example.com/image.png'

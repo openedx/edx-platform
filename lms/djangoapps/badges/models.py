@@ -34,7 +34,7 @@ class BadgeClass(models.Model):
     description = models.TextField()
     criteria = models.TextField()
     # Mode a badge was awarded for. Included for legacy/migration purposes.
-    mode = models.CharField(max_length=100, default='')
+    mode = models.CharField(max_length=100, default='', blank=True)
     image = models.ImageField(upload_to='badge_classes', validators=[validate_badge_image])
 
     def __unicode__(self):
@@ -66,6 +66,7 @@ class BadgeClass(models.Model):
             criteria=criteria,
         )
         badge_class.image.save(image_file_handle.name, image_file_handle)
+        badge_class.full_clean()
         badge_class.save()
         return badge_class
 
@@ -91,7 +92,7 @@ class BadgeClass(models.Model):
         """
         Contacts the backend to have a badge assertion created for this badge class for this user.
         """
-        return self.backend.award(user, evidence_url)
+        return self.backend.award(self, user, evidence_url=evidence_url)
 
 
 class BadgeAssertion(models.Model):
@@ -101,28 +102,15 @@ class BadgeAssertion(models.Model):
     user = models.ForeignKey(User)
     badge_class = models.ForeignKey(BadgeClass)
     data = JSONField()
+    backend = models.CharField(max_length=50)
+    image_url = models.URLField()
+    assertion_url = models.URLField()
 
     def __unicode__(self):
         return u"<{username} Badge Assertion for {slug} for {issuing_component}".format(
             username=self.user.username, slug=self.badge_class.slug,
             issuing_component=self.badge_class.issuing_component,
         )
-
-    @property
-    def image_url(self):
-        """
-        Get the image for this assertion.
-        """
-        # pylint: disable=invalid-sequence-index
-        return self.data['image']
-
-    @property
-    def assertion_url(self):
-        """
-        Get the public URL for the assertion.
-        """
-        # pylint: disable=invalid-sequence-index
-        return self.data['json']['id']
 
     class Meta(object):
         unique_together = (('badge_class', 'user'),)

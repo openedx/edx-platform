@@ -113,8 +113,8 @@ class BadgrBackend(BadgeBackend):
                 'course_id': unicode(assertion.badge_class.course_id),
                 'enrollment_mode': assertion.badge_class.mode,
                 'assertion_id': assertion.id,
-                'assertion_image_url': assertion.data['image'],
-                'assertion_json_url': assertion.data['json']['id'],
+                'assertion_image_url': assertion.image_url,
+                'assertion_json_url': assertion.assertion_url,
                 'issuer': assertion.data['issuer'],
             }
         )
@@ -132,8 +132,11 @@ class BadgrBackend(BadgeBackend):
             self._assertion_url(self._slugify(badge_class)), headers=self._get_headers(), data=data
         )
         self._log_if_raised(response, data)
-        assertion, __ = BadgeAssertion.objects.get_or_create(user=user, badge_class=badge_class, data=response.json())
+        assertion, __ = BadgeAssertion.objects.get_or_create(user=user, badge_class=badge_class)
         assertion.data = response.json()
+        assertion.backend = 'BadgrBackend'
+        assertion.image_url = assertion.data['image']
+        assertion.assertion_url = assertion.data['json']['id']
         assertion.save()
         self.send_assertion_created_event(user, assertion)
         return assertion

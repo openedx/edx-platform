@@ -45,7 +45,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.location.course_key, mode='honor')
         # Need to empty this on each run.
         BadgrBackend.badges = []
-        self.badge_class = BadgeClassFactory(course_id=self.course.location.course_key)
+        self.badge_class = BadgeClassFactory.create(course_id=self.course.location.course_key)
 
     @lazy
     def handler(self):
@@ -166,6 +166,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         assertion = BadgeAssertion.objects.get(user=self.user, badge_class__course_id=self.course.location.course_key)
         self.assertEqual(assertion.data, result)
         self.assertEqual(assertion.image_url, 'http://www.example.com/example.png')
+        self.assertEqual(assertion.assertion_url, 'http://www.example.com/example')
         self.assertEqual(kwargs['data'], {
             'email': 'example@example.com',
             'evidence': 'https://example.com/irrefutable_proof'
