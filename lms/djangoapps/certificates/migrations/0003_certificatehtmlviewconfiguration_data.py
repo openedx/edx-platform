@@ -3,6 +3,8 @@
 from __future__ import unicode_literals
 import json
 
+# Converted from the original South migration 0020_certificatehtmlviewconfiguration_data.py
+
 from django.db import migrations, models
 
 
