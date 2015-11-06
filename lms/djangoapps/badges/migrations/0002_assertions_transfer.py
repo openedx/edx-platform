@@ -91,6 +91,8 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'backend': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'badge_class': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['badges.BadgeClass']"}),
+            'image_url': ('django.db.models.fields.URLField', [], {}),
+            'assertion_url': ('django.db.models.fields.URLField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'badges.badgeclass': {
@@ -118,8 +120,6 @@ class Migration(DataMigration):
             'data': ('django.db.models.fields.TextField', [], {'default': "'{}'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mode': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'image_url': ('django.db.models.fields.URLField', [], {}),
-            'assertion_url': ('django.db.models.fields.URLField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'deprecated_assertions'", 'to': "orm['auth.User']"})
         },
         'certificates.badgeimageconfiguration': {
