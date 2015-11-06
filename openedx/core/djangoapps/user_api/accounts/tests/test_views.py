@@ -241,7 +241,7 @@ class TestAccountAPI(UserAPITestCase):
         self.create_mock_profile(self.user)
         with self.assertNumQueries(9):
             response = self.send_get(self.different_client)
-        self._verify_full_shareable_account_response(response)
+        self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
@@ -256,7 +256,7 @@ class TestAccountAPI(UserAPITestCase):
         self.create_mock_profile(self.user)
         with self.assertNumQueries(9):
             response = self.send_get(self.different_client)
-        self._verify_private_account_response(response)
+        self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
 
     @ddt.data(
         ("client", "user", PRIVATE_VISIBILITY),
@@ -305,7 +305,7 @@ class TestAccountAPI(UserAPITestCase):
             """
             Internal helper to perform the actual assertions
             """
-            with self.assertNumQueries(8):
+            with self.assertNumQueries(7):
                 response = self.send_get(self.client)
             data = response.data
             self.assertEqual(16, len(data))
@@ -322,7 +322,7 @@ class TestAccountAPI(UserAPITestCase):
             self._verify_profile_image_data(data, False)
             self.assertTrue(data["requires_parental_consent"])
             self.assertEqual([], data["language_proficiencies"])
-            self.assertEqual(None, data["account_privacy"])
+            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
 
         self.client.login(username=self.user.username, password=self.test_password)
         verify_get_own_information()
@@ -344,7 +344,7 @@ class TestAccountAPI(UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=self.test_password)
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(7):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])
@@ -403,6 +403,14 @@ class TestAccountAPI(UserAPITestCase):
         Test the behavior of patch, when using the correct content_type.
         """
         client = self.login_client("client", "user")
+
+        if field == 'account_privacy':
+            # Ensure the user has birth year set, and is over 13, so
+            # account_privacy behaves normally
+            legacy_profile = UserProfile.objects.get(id=self.user.id)
+            legacy_profile.year_of_birth = 2000
+            legacy_profile.save()
+
         response = self.send_patch(client, {field: value})
         self.assertEqual(value, response.data[field])
 
@@ -687,16 +695,16 @@ class TestAccountAPI(UserAPITestCase):
             self.assertIsNotNone(data["date_joined"])
             self._verify_profile_image_data(data, False)
             self.assertTrue(data["requires_parental_consent"])
-            self.assertEqual(ALL_USERS_VISIBILITY, data["account_privacy"])
+            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
         else:
             self._verify_private_account_response(
-                response, requires_parental_consent=True, account_privacy=ALL_USERS_VISIBILITY
+                response, requires_parental_consent=True, account_privacy=PRIVATE_VISIBILITY
             )
 
         # Verify that the shared view is still private
         response = self.send_get(client, query_parameters='view=shared')
         self._verify_private_account_response(
-            response, requires_parental_consent=True, account_privacy=ALL_USERS_VISIBILITY
+            response, requires_parental_consent=True, account_privacy=PRIVATE_VISIBILITY
         )
 
 
