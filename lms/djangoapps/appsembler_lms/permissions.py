@@ -12,6 +12,7 @@ class SecretKeyPermission(permissions.BasePermission):
             return True
 
         request_secret_key = request.POST.get('secret_key', '')
+        # TODO: put this into auth json file
         secret_key = settings.FEATURES.get('APPSEMBLER_SECRET_KEY', '')
         if not secret_key:
             logger.warning("APPSEMBLER_SECRET_KEY is not set")
