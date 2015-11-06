@@ -12,14 +12,15 @@ def forwards(apps, schema_editor):
     badge_image_configuration_model = apps.get_model("certificates", "BadgeImageConfiguration")
 
     for mode in ['honor', 'verified', 'professional']:
-        conf, __ = badge_image_configuration_model.objects.get_or_create(mode=mode)
-        file_name = '{0}{1}'.format(mode, '.png')
-        conf.icon.save(
-            'badges/{}'.format(file_name),
-            File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name))
-        )
+        conf, created = badge_image_configuration_model.objects.get_or_create(mode=mode)
+        if created:
+            file_name = '{0}{1}'.format(mode, '.png')
+            conf.icon.save(
+                'badges/{}'.format(file_name),
+                File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name))
+            )
 
-        conf.save()
+            conf.save()
 
 
 class Migration(migrations.Migration):

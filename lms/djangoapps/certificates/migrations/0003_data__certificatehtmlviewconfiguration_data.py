@@ -35,10 +35,12 @@ def forwards(apps, schema_editor):
     certificate_html_view_configuration_model = apps.get_model("certificates", "CertificateHtmlViewConfiguration")
     db_alias = schema_editor.connection.alias
 
-    certificate_html_view_configuration_model.objects.using(db_alias).create(
-        configuration=json.dumps(config),
-        enabled=False,
-    )
+    objects = certificate_html_view_configuration_model.objects.using(db_alias)
+    if not objects.exists():
+        objects.create(
+            configuration=json.dumps(config),
+            enabled=False,
+        )
 
 def backwards(apps, schema_editor):
     """
