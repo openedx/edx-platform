@@ -91,7 +91,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
             "requires_parental_consent": profile.requires_parental_consent(),
-            "account_privacy": UserPreference.get_value(user, 'account_privacy'),
+            "account_privacy": self._get_profile_visibility(profile, user),
         }
 
         return self._filter_fields(
@@ -185,19 +185,19 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             raise serializers.ValidationError("The language_proficiencies field must consist of unique languages")
         return value
 
-    def transform_gender(self, user_profile, value):
+    def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
-    def transform_country(self, user_profile, value):
+    def transform_country(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
-    def transform_level_of_education(self, user_profile, value):
+    def transform_level_of_education(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
-    def transform_bio(self, user_profile, value):
+    def transform_bio(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
