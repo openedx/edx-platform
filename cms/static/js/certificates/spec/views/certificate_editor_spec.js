@@ -246,7 +246,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(this.view.$('.certificate-edit-error')).not.toHaveClass('is-shown');
             });
 
-            it('signatories should not save when title span on more than 2 lines', function() {
+            it('signatories should save when title span on more than 2 lines', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 setValuesToInputs(this.view, {
                     inputCertificateName: 'New Certificate Name'
@@ -265,7 +265,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 this.view.$(SELECTORS.saveCertificateButton).click();
-                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+                expect(this.view.$('.certificate-edit-error')).not.toHaveClass('is-shown');
             });
 
             it('user can delete those signatories already saved', function() {
