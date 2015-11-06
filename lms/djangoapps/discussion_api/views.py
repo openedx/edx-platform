@@ -3,9 +3,6 @@ Discussion API views
 """
 from django.core.exceptions import ValidationError
 
-from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
@@ -28,19 +25,11 @@ from discussion_api.api import (
     update_thread,
 )
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm, _PaginationForm
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 
-class _ViewMixin(object):
-    """
-    Mixin to provide common characteristics and utility functions for Discussion
-    API views
-    """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (IsAuthenticated,)
-
-
-class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
+@view_auth_classes()
+class CourseView(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
 
@@ -72,7 +61,8 @@ class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
         return Response(get_course(request, course_key))
 
 
-class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
+@view_auth_classes()
+class CourseTopicsView(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
 
@@ -106,7 +96,8 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
         return Response(response)
 
 
-class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
+@view_auth_classes()
+class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
     """
     **Use Cases**
 
@@ -294,7 +285,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         return Response(status=204)
 
 
-class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
+@view_auth_classes()
+class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
     """
     **Use Cases**
 
