@@ -244,24 +244,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                     this.view.$(SELECTORS.signatory_organization_value)
                 ).toContainText('New Signatory Test Organization');
             });
-            it('should not allow invalid data when saving changes made during in-line signatory editing', function() {
-                this.view.$(SELECTORS.edit_signatory).click();
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryName: 'New Signatory Test Name'
-                });
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'Signatory Title \non three \nlines'
-                });
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryOrganization: 'New Signatory Test Organization'
-                });
-
-                this.view.$(SELECTORS.signatory_panel_save).click();
-                expect(this.view.$(SELECTORS.inputSignatoryTitle).parent()).toHaveClass('error');
-            });
         });
     });
 });
