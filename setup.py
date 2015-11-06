@@ -50,9 +50,12 @@ setup(
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
+            "split_test = lms.djangoapps.course_blocks.transformers.split_test:SplitTestTransformer",
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
+            "proctored_exam = lms.djangoapps.course_api.blocks.transformers.proctored_exam:ProctoredExamTransformer",
         ],
     }
 )

@@ -398,7 +398,7 @@ class BlockStructureBlockData(BlockStructure):
         else:
             return block_data.transformer_data.get(transformer.name(), default)
 
-    def remove_transformer_block_data(self, usage_key, transformer):
+    def remove_transformer_block_field(self, usage_key, transformer, key):
         """
         Deletes the given transformer's entire data dict for the
         block identified by the given usage_key.
@@ -410,7 +410,8 @@ class BlockStructureBlockData(BlockStructure):
             transformer (BlockStructureTransformer) - The transformer
                 whose data entry is to be deleted.
         """
-        self._block_data_map[usage_key].transformer_data.pop(transformer.name(), None)
+        transformer_block_data = self.get_transformer_block_data(usage_key, transformer)
+        transformer_block_data.pop(key, None)
 
     def remove_block(self, usage_key, keep_descendants):
         """
@@ -487,6 +488,19 @@ class BlockStructureBlockData(BlockStructure):
         # but it will be as soon as we remove support for DAGs.
         for _ in self.topological_traversal(filter_func=filter_func, **kwargs):
             pass
+
+    def get_block_keys(self):
+        """
+        Returns the block keys in the block structure.
+
+        Returns:
+            iterator(UsageKey) - An iterator of the usage
+            keys of all the blocks in the block structure.
+        """
+        return self._block_relations.iterkeys()
+
+    #--- Internal methods ---#
+    # To be used within the block_cache framework or by tests.
 
     def _get_transformer_data_version(self, transformer):
         """
