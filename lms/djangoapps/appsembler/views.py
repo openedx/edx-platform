@@ -1,4 +1,5 @@
 import logging
+import unicodedata
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -56,7 +57,8 @@ class UserSignupAPIView(GenericAPIView):
             user = User.objects.get(email=data.get('email'))
         except User.DoesNotExist:
             # filter out any spaces and punctuation
-            username = ''.join(ch for ch in data.get('full_name') if ch.isalnum())
+            username = u''.join(ch for ch in data.get('full_name') if ch.isalnum())
+            username = unicodedata.normalize('NFKD', username).encode('ascii', 'ignore')
 
             # make sure username is unique
             i = 1
