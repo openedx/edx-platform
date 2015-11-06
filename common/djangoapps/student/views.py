@@ -362,7 +362,10 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
             # Clicking this button sends the user to LinkedIn where they
             # can add the certificate information to their profile.
             linkedin_config = LinkedInAddToProfileConfiguration.current()
-            if linkedin_config.enabled:
+
+            # posting certificates to LinkedIn is not currently
+            # supported in microsites/White Labels
+            if linkedin_config.enabled and not microsite.is_request_in_microsite():
                 status_dict['linked_in_url'] = linkedin_config.add_to_profile_url(
                     course_overview.id,
                     course_overview.display_name,
