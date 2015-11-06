@@ -9,7 +9,7 @@ EMAIL = USERNAME + '@fake.email'
 
 def forwards(apps, schema_editor):
     """Add the service user."""
-    user = User.objects.create(username=USERNAME, email=EMAIL)
+    user, __ = User.objects.get_or_create(username=USERNAME, email=EMAIL)
     user.set_unusable_password()
     user.save()
 
