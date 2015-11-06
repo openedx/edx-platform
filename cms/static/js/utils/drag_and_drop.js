@@ -1,6 +1,6 @@
-define(["jquery", "jquery.ui", "underscore", "json2", "gettext", "draggabilly",
+define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
         "js/utils/module", "common/js/components/views/feedback_notification"],
-    function ($, ui, _, JSON, gettext, Draggabilly, ModuleUtils, NotificationView) {
+    function ($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
         'use strict';
 
         var contentDragger = {

@@ -1748,7 +1748,14 @@ return Unidragger;
 
   if ( typeof define == 'function' && define.amd ) {
     // AMD
-    define( [
+    // Note: fixed by andy-armstrong to include a name for the definition
+    // so that this works when optimized using r.js. This is only an issue
+    // in Studio, as the LMS uses a namespaced version of RequireJS so
+    // this clause isn't reached.
+    // See http://requirejs.org/docs/errors.html#mismatch
+    define(
+      'draggabilly',
+      [
         'classie/classie',
         'get-style-property/get-style-property',
         'get-size/get-size',
