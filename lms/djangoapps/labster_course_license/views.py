@@ -83,8 +83,7 @@ def update_course(ccx, course_info, descriptors):
     for descriptor in descriptors:
         info = course_info[descriptor]
         override_field_for_ccx(ccx, descriptor, hidden, info.is_hidden)
-        if info.is_hidden is False:
-            update_course(ccx, course_info, info.children)
+        update_course(ccx, course_info, info.children)
 
 
 def _send_request(url, data):
