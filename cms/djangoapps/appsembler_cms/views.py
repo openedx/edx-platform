@@ -10,7 +10,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 
-from appsembler.permissions import SecretKeyPermission
+from appsembler_lms.permissions import SecretKeyPermission
 from .serializers import CreateCourseSerializer
 
 logger = logging.getLogger(__name__)
