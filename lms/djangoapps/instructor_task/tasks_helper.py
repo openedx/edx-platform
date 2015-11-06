@@ -1327,12 +1327,15 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
     survey_fields.sort()
 
     user_survey_answers = OrderedDict()
-    survey_answers_for_course = SurveyAnswer.objects.filter(course_key=course_id)
+    survey_answers_for_course = SurveyAnswer.objects.filter(course_key=course_id).select_related('user')
 
     for survey_field_record in survey_answers_for_course:
         user_id = survey_field_record.user.id
         if user_id not in user_survey_answers.keys():
-            user_survey_answers[user_id] = {}
+            user_survey_answers[user_id] = {
+                'username': survey_field_record.user.username,
+                'email': survey_field_record.user.email
+            }
 
         user_survey_answers[user_id][survey_field_record.field_name] = survey_field_record.field_value
 
@@ -1343,9 +1346,8 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
     for user_id in user_survey_answers.keys():
         row = []
         row.append(user_id)
-        user_obj = User.objects.get(id=user_id)
-        row.append(user_obj.username)
-        row.append(user_obj.email)
+        row.append(user_survey_answers[user_id].get('username', ''))
+        row.append(user_survey_answers[user_id].get('email', ''))
         for survey_field in survey_fields:
             row.append(user_survey_answers[user_id].get(survey_field, ''))
         csv_rows.append(row)
