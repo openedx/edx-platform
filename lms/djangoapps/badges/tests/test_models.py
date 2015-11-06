@@ -170,7 +170,9 @@ class BadgeClassTest(TestCase, ImageFetchingMixin):
 
 
 class ValidBadgeImageTest(TestCase, ImageFetchingMixin):
-
+    """
+    Tests the badge image field validator.
+    """
     def test_good_image(self):
         """
         Verify that saving a valid badge image is no problem.
