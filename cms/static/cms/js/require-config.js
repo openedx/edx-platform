@@ -17,7 +17,6 @@ require.config({
     paths: {
         "domReady": "js/vendor/domReady",
         "gettext": "/i18n",
-        "json2": "js/vendor/json2",
         "mustache": "js/vendor/mustache",
         "codemirror": "js/vendor/codemirror-compressed",
         "codemirror/stex": "js/vendor/CodeMirror/stex",
@@ -96,9 +95,6 @@ require.config({
         ]
     },
     shim: {
-        "json2": {
-            exports: "JSON"
-        },
         "gettext": {
             exports: "gettext"
         },
