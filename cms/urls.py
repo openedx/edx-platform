@@ -113,7 +113,7 @@ urlpatterns += patterns(
     url(r'^api/val/v0/', include('edxval.urls')),
 
     # appsembler management console endpoint for course creation
-    url(r'^appsemblerstudio/', include('cms.djangoapps.appsembler.urls')),
+    url(r'^appsemblerstudio/', include('appsembler_cms.urls')),
 )
 
 JS_INFO_DICT = {
