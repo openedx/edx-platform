@@ -84,8 +84,11 @@ class VideoLicenseTest(StudioCourseTest):
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")
         self.assertTrue(video.is_present())
-        video_license = self.lms_courseware.q(css=".vert .xblock.xmodule_VideoModule .xblock-license")
-        self.assertTrue(video_license.is_present())
+        video_license_css = ".vert .xblock.xmodule_VideoModule .xblock-license"
+        self.lms_courseware.wait_for_element_presence(
+            video_license_css, "Video module license block is present"
+        )
+        video_license = self.lms_courseware.q(css=video_license_css)
         self.assertEqual(video_license.text[0], "© All Rights Reserved")
 
     def test_cc_license(self):
@@ -111,6 +114,9 @@ class VideoLicenseTest(StudioCourseTest):
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")
         self.assertTrue(video.is_present())
-        video_license = self.lms_courseware.q(css=".vert .xblock.xmodule_VideoModule .xblock-license")
-        self.assertTrue(video_license.is_present())
+        video_license_css = ".vert .xblock.xmodule_VideoModule .xblock-license"
+        self.lms_courseware.wait_for_element_presence(
+            video_license_css, "Video module license block is present"
+        )
+        video_license = self.lms_courseware.q(css=video_license_css)
         self.assertIn("Some Rights Reserved", video_license.text[0])
