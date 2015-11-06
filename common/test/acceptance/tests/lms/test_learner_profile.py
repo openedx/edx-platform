@@ -765,10 +765,12 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
         username, _ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username)
 
-        # TODO: There are several existing color contrast errors on this page,
-        # we will ignore this error in the test until we fix them.
         profile_page.a11y_audit.config.set_rules({
-            "ignore": ['color-contrast'],
+            "ignore": [
+                'color-contrast',  # TODO: AC-232
+                'skip-link',  # TODO: AC-179
+                'link-href',  # TODO: AC-231
+            ],
         })
 
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -791,4 +793,12 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
         different_username, _ = self.initialize_different_user(privacy=self.PRIVACY_PUBLIC)
         self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(different_username)
+
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'skip-link',  # TODO: AC-179
+                'link-href',  # TODO: AC-231
+            ],
+        })
+
         profile_page.a11y_audit.check_for_accessibility_errors()
