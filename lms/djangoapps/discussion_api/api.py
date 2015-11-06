@@ -601,6 +601,10 @@ def create_comment(request, comment_data):
     except Http404:
         raise ValidationError({"thread_id": ["Invalid value."]})
 
+    # if a thread is closed; no new comments could be made to it
+    if cc_thread['closed']:
+        raise PermissionDenied
+
     _check_initializable_comment_fields(comment_data, context)
     serializer = CommentSerializer(data=comment_data, context=context)
     actions_form = CommentActionsForm(comment_data)
