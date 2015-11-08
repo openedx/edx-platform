@@ -317,6 +317,12 @@ FEATURES['STORE_BILLING_INFO'] = True
 FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
 GIT_REPO_DIR = TEST_ROOT / "course_repos"
 
+################################# Middleware ######################################
+
+DJANGO_HTML5VALIDATOR_DIR = _REPORT_DIR / "html_validation"
+
+MIDDLEWARE_CLASSES += ('django_html5validator.middleware.DjangoHTML5Validator',)
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
