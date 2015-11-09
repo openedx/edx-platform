@@ -204,7 +204,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -216,7 +216,7 @@ def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def exec_summary_report_csv(entry_id, xmodule_instance_args):
     """
     Compute executive summary report for a course and upload the
@@ -228,7 +228,7 @@ def exec_summary_report_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def course_survey_report_csv(entry_id, xmodule_instance_args):
     """
     Compute the survey report for a course and upload the
@@ -240,7 +240,7 @@ def course_survey_report_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     """
     Compute proctored exam results report for a course and upload the

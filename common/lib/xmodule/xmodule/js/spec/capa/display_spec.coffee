@@ -538,19 +538,6 @@ describe 'Problem', ->
       runs ->
         expect(window.SR.readElts).toHaveBeenCalled()
 
-    it 'disables check button while posting', ->
-      runs ->
-        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'OK')
-        spyOn @problem, 'enableCheckButton'
-        @problem.save()
-        expect(@problem.enableCheckButton).toHaveBeenCalledWith false
-      waitsFor (->
-        return jQuery.active == 0
-      ), "jQuery requests finished", 1000
-
-      runs ->
-        expect(@problem.enableCheckButton).toHaveBeenCalledWith true
-
   describe 'refreshMath', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))

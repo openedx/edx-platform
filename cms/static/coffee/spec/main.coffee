@@ -23,7 +23,6 @@ requirejs.config({
         "jquery.simulate": "xmodule_js/common_static/js/vendor/jquery.simulate",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
-        "json2": "xmodule_js/common_static/js/vendor/json2",
         "moment": "xmodule_js/common_static/js/vendor/moment.min",
         "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
@@ -59,9 +58,6 @@ requirejs.config({
         "js/spec/test_utils": "js/spec/test_utils",
     }
     shim: {
-        "json2": {
-            exports: "JSON"
-        },
         "gettext": {
             exports: "gettext"
         },

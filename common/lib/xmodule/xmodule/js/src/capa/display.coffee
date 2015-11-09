@@ -412,13 +412,11 @@ class @Problem
       @save_internal()
 
   save_internal: =>
-    @enableCheckButton false
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
       @gentle_alert saveMessage
       @updateProgress response
-      @enableCheckButton true
 
   refreshMath: (event, element) =>
     element = event.target unless element

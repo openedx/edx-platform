@@ -136,7 +136,11 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
+    raw_id_fields = ('user',)
     search_fields = ('course_id', 'mode', 'user__username',)
+
+    def queryset(self, request):
+        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
 
     class Meta(object):
         model = CourseEnrollment
@@ -145,6 +149,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
 class UserProfileAdmin(admin.ModelAdmin):
     """ Admin interface for UserProfile model. """
     list_display = ('user', 'name',)
+    raw_id_fields = ('user',)
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
 
     def get_readonly_fields(self, request, obj=None):
