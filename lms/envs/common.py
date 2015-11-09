@@ -2188,6 +2188,10 @@ REGISTRATION_EXTRA_FIELDS = {
     'country': 'hidden',
 }
 
+# When the feature flag REGISTRATION_WITHOUT_EMAIL is enabled, this template is used to generate
+# a fake email address.
+FAKE_EMAIL_TEMPLATE = 'catchall+{username}@example.com'
+
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"

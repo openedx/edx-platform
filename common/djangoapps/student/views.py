@@ -1056,7 +1056,9 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     running_pipeline = None
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
     third_party_auth_successful = False
-    trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
+    trumped_by_first_party_auth = any((
+        request.POST.get('email'), request.POST.get('username'), request.POST.get('password')
+    ))
     user = None
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
 
@@ -1097,16 +1099,22 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
 
     else:
 
-        if 'email' not in request.POST or 'password' not in request.POST:
+        email = request.POST.get('email')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if (email is None and username is None) or password is None:
             return JsonResponse({
                 "success": False,
                 "value": _('There was an error receiving your login information. Please email us.'),  # TODO: User error message
             })  # TODO: this should be status code 400  # pylint: disable=fixme
 
-        email = request.POST['email']
-        password = request.POST['password']
         try:
-            user = User.objects.get(email=email)
+            if email:
+                user = User.objects.get(email=email)
+            else:
+                user = User.objects.get(username=username)
+                email = user.email
         except User.DoesNotExist:
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
                 AUDIT_LOG.warning(u"Login failed - Unknown user email")
@@ -1560,6 +1568,9 @@ def create_account_with_params(request, params):
         )
     )
 
+    if settings.FEATURES.get('REGISTRATION_WITHOUT_EMAIL'):
+        params['email'] = settings.FAKE_EMAIL_TEMPLATE.format(username=params['username'])
+
     form = AccountCreationForm(
         data=params,
         extra_fields=extra_fields,
@@ -1679,7 +1690,8 @@ def create_account_with_params(request, params):
     # changing settings on a running system to make sure no users are
     # left in an inconsistent state (or doing a migration if they are).
     send_email = (
-        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
+        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION') and
+        not settings.FEATURES.get('REGISTRATION_WITHOUT_EMAIL') and
         not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
         not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
         not (

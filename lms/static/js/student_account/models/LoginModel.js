@@ -10,7 +10,8 @@
             defaults: {
                 email: '',
                 password: '',
-                remember: false
+                remember: false,
+                username: ''
             },
 
             ajaxType: '',

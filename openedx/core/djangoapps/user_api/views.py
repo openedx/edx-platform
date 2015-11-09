@@ -63,6 +63,38 @@ class LoginSessionView(APIView):
         """
         form_desc = FormDescription("post", reverse("user_api_login_session"))
 
+        if settings.FEATURES.get('REGISTRATION_WITHOUT_EMAIL'):
+            self._add_username_field(form_desc)
+        else:
+            self._add_email_field(form_desc)
+
+        # Translators: This label appears above a field on the login form
+        # meant to hold the user's password.
+        password_label = _(u"Password")
+
+        form_desc.add_field(
+            "password",
+            label=password_label,
+            field_type="password",
+            restrictions={
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
+            }
+        )
+
+        form_desc.add_field(
+            "remember",
+            field_type="checkbox",
+            label=_("Remember me"),
+            default=False,
+            required=False,
+        )
+
+        return HttpResponse(form_desc.to_json(), content_type="application/json")
+
+    def _add_email_field(self, form_desc):
+        """Add an email field to the FormDescription instance form_desc."""
+
         # Translators: This label appears above a field on the login form
         # meant to hold the user's email address.
         email_label = _(u"Email")
@@ -89,31 +121,30 @@ class LoginSessionView(APIView):
             }
         )
 
+    def _add_username_field(self, form_desc):
+        """Add a username field to the FormDescription instance form_desc."""
+
         # Translators: This label appears above a field on the login form
-        # meant to hold the user's password.
-        password_label = _(u"Password")
+        # meant to hold the username.
+        username_label = _(u"Username")
+
+        # Translators: These instructions appear on the login form, immediately
+        # below a field meant to hold the username.
+        username_instructions = _(
+            u"The username you used to register with {platform_name}"
+        ).format(platform_name=settings.PLATFORM_NAME)
 
         form_desc.add_field(
-            "password",
-            label=password_label,
-            field_type="password",
+            "username",
+            label=username_label,
+            instructions=username_instructions,
             restrictions={
-                "min_length": PASSWORD_MIN_LENGTH,
-                "max_length": PASSWORD_MAX_LENGTH,
+                "min_length": USERNAME_MIN_LENGTH,
+                "max_length": USERNAME_MAX_LENGTH,
             }
         )
 
-        form_desc.add_field(
-            "remember",
-            field_type="checkbox",
-            label=_("Remember me"),
-            default=False,
-            required=False,
-        )
-
-        return HttpResponse(form_desc.to_json(), content_type="application/json")
-
-    @method_decorator(require_post_params(["email", "password"]))
+    @method_decorator(require_post_params(["email", "password", "username"]))
     @method_decorator(csrf_protect)
     def post(self, request):
         """Log in a user.
@@ -194,6 +225,10 @@ class RegistrationView(APIView):
                 msg = u"Setting REGISTRATION_EXTRA_FIELDS values must be either required, optional, or hidden."
                 raise ImproperlyConfigured(msg)
 
+        if settings.FEATURES.get('REGISTRATION_WITHOUT_EMAIL'):
+            self.DEFAULT_FIELDS = self.DEFAULT_FIELDS[:]
+            self.DEFAULT_FIELDS.remove('email')
+
         # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
         for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
@@ -260,7 +295,10 @@ class RegistrationView(APIView):
         """
         data = request.POST.copy()
 
-        email = data.get('email')
+        if settings.FEATURES.get('REGISTRATION_WITHOUT_EMAIL'):
+            email = None
+        else:
+            email = data.get('email')
         username = data.get('username')
 
         # Handle duplicate email/username
