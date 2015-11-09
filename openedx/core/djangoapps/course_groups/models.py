@@ -73,15 +73,6 @@ class CohortMembership(models.Model):
     class Meta(object):
         unique_together = (('user', 'course_id'), )
 
-    # The sole purpose of overriding this method is to get the django 1.6 behavior of allowing 'validate_unique'
-    # For django 1.8 upgrade, just remove this method and allow the base method to be called instead.
-    # Reference: https://docs.djangoproject.com/en/1.6/ref/models/instances/, under "Validating Objects"
-    def full_clean(self, **kwargs):
-        self.clean_fields()
-        self.clean()
-        if 'validate_unique' not in kwargs or kwargs['validate_unique'] is True:
-            self.validate_unique()
-
     def clean_fields(self, *args, **kwargs):
         if self.course_id is None:
             self.course_id = self.course_user_group.course_id
