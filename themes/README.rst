@@ -176,3 +176,40 @@ name in the ``@import`` line.
 Run the ``update_assets`` command to recompile the theme::
 
     $ paver update_assets lms --settings=aws
+
+Microsites
+==========
+
+If you want to continue using the "Microsites" theming system, there are a few
+changes you'll need to make. A few templates have been renamed, or folded into
+other templates:
+
+* ``header_extra.html`` has been renamed to ``head-extra.html``. This file
+  was always inserted into the ``<head>`` element of the page, rather than
+  the header of the ``<body>`` element, so this change makes the name more
+  accurate.
+* ``google_analytics.html`` has been removed. The contents of this template
+  can and should be added to the ``head-extra.html`` template.
+* ``google_tag_manager.html`` has been renamed to ``body-extra.html``. The
+  template include has been adjusted so that it is included at the *end* of
+  the ``<body>`` element, rather than at the start.
+
+In addition, there are some other changes you'll need to make:
+
+* The ``css_overrides_file`` config value is now ignored. To add a CSS override
+  file to your microsite, create a ``head-extra.html`` template with the
+  following content:
+
+  .. code-block:: mako
+
+    <%namespace name='static' file='../../static_content.html'/>
+    <%! from microsite_configuration import microsite %>
+    <% style_overrides_file = microsite.get_value('css_overrides_file') %>
+
+    % if style_overrides_file:
+      <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+    % endif
+
+  If you already have a ``head-extra.html`` template, you can modify it to
+  output this ``<link rel="stylesheet">`` tag, in addition to whatever else you
+  already have in that template.
