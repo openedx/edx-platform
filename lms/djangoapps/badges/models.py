@@ -112,6 +112,15 @@ class BadgeAssertion(models.Model):
             issuing_component=self.badge_class.issuing_component,
         )
 
+    @classmethod
+    def assertions_for_user(cls, user, course_id=None):
+        """
+        Get all assertions for a user, optionally constrained to a course.
+        """
+        if course_id:
+            return cls.objects.filter(user=user, badge_class__course_id=course_id)
+        return cls.objects.filter(user=user)
+
     class Meta(object):
         unique_together = (('badge_class', 'user'),)
 

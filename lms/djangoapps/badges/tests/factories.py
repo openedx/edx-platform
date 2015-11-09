@@ -1,6 +1,8 @@
 """
 Factories for Badge tests
 """
+from random import random
+
 import factory
 from django.core.files.base import ContentFile
 from factory import DjangoModelFactory
@@ -48,6 +50,13 @@ class BadgeClassFactory(DjangoModelFactory):
     image = factory.LazyAttribute(generate_dummy_image)
 
 
+class RandomBadgeClassFactory(BadgeClassFactory):
+    """
+    Same as BadgeClassFactory, but randomize the slug.
+    """
+    slug = factory.lazy_attribute(lambda _: 'test_slug_' + str(random()))
+
+
 class BadgeAssertionFactory(DjangoModelFactory):
     """
     Factory for BadgeAssertions
@@ -56,7 +65,7 @@ class BadgeAssertionFactory(DjangoModelFactory):
         model = BadgeAssertion
 
     user = factory.SubFactory(UserFactory)
-    badge_class = factory.SubFactory(BadgeClassFactory)
+    badge_class = factory.SubFactory(RandomBadgeClassFactory)
     data = {}
     assertion_url = 'http://example.com/example.json'
     image_url = 'http://example.com/image.png'

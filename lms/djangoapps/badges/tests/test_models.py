@@ -7,9 +7,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from badges.models import CourseCompleteImageConfiguration, validate_badge_image, BadgeClass
-from badges.tests.factories import BadgeClassFactory, BadgeAssertionFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from badges.models import CourseCompleteImageConfiguration, validate_badge_image, BadgeClass, BadgeAssertion
+from badges.tests.factories import BadgeClassFactory, BadgeAssertionFactory, RandomBadgeClassFactory
 from certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
 
@@ -167,6 +170,27 @@ class BadgeClassTest(TestCase, ImageFetchingMixin):
                 description='test4', image=self.get_image('unbalanced')
             ).full_clean
         )
+
+
+class BadgeAssertionTest(ModuleStoreTestCase):
+    """
+    Tests for the BadgeAssertion model
+    """
+    def test_assertions_for_user(self):
+        """
+        Verify that grabbing all assertions for a user behaves as expected.
+        """
+        user = UserFactory()
+        assertions = [BadgeAssertionFactory.create(user=user) for _i in range(3)]
+        course = CourseFactory.create()
+        course_key = course.location.course_key
+        course_badges = [RandomBadgeClassFactory(course_id=course_key) for _i in range(3)]
+        course_assertions = [
+            BadgeAssertionFactory.create(user=user, badge_class=badge_class) for badge_class in course_badges
+        ]
+        assertions.extend(course_assertions)
+        self.assertItemsEqual(BadgeAssertion.assertions_for_user(user), assertions)
+        self.assertItemsEqual(BadgeAssertion.assertions_for_user(user, course_id=course_key), course_assertions)
 
 
 class ValidBadgeImageTest(TestCase, ImageFetchingMixin):
