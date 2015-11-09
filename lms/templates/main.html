@@ -97,13 +97,9 @@ from branding import api as branding_api
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
-
-  <%static:optional_include_mako file="google-analytics.html" with_microsite="True" />
-
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-<%static:optional_include_mako file="google_tag_manager.html" with_microsite="True" />
 <div id="page-prompt"></div>
 % if not disable_window_wrap:
   <div class="window-wrap" dir="${static.dir_rtl()}">
@@ -131,6 +127,7 @@ from branding import api as branding_api
   <%include file="widgets/segment-io-footer.html" />
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
   <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
+  <%static:optional_include_mako file="body-extra.html" with_microsite="True" />
 </body>
 </html>
 
