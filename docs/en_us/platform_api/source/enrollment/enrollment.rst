@@ -16,7 +16,7 @@ following tasks.
 Get the User's Enrollment Status in a Course
 ********************************************
 
-.. autoclass:: enrollment.views.EnrollmentView
+.. .. autoclass:: enrollment.views.EnrollmentView
 
 **Example response showing the user's enrollment status in a course**
 
@@ -57,7 +57,7 @@ Get the User's Enrollment Status in a Course
 Get the User's Enrollment Information for a Course
 **************************************************
 
-.. autoclass:: enrollment.views.EnrollmentCourseDetailView
+.. .. autoclass:: enrollment.views.EnrollmentCourseDetailView
 
 **Example response showing a user's course enrollment information**
 
@@ -93,7 +93,7 @@ Get the User's Enrollment Information for a Course
 View a User's Enrollments or Enroll a User in a Course
 **********************************************************
 
-.. autoclass:: enrollment.views.EnrollmentListView
+.. .. autoclass:: enrollment.views.EnrollmentListView
 
 
 **Example response showing a user who is enrolled in two courses**

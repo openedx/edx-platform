@@ -15,7 +15,7 @@ the following tasks.
 Get a List of Courses
 **************************
 
-.. autoclass:: course_structure_api.v0.views.CourseList
+.. .. autoclass:: course_structure_api.v0.views.CourseList
 
 **Example response**
 
@@ -92,7 +92,7 @@ Get Course Details
 Get the Course Structure
 **************************
 
-.. .. autoclass:: course_structure_api.v0.views.CourseStructure
+.. autoclass:: course_structure_api.v0.views.CourseStructure
 
 **Example response**
 
