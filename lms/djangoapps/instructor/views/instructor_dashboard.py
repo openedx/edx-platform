@@ -587,7 +587,7 @@ def _section_send_email(course, access):
         'section_display_name': _('Email'),
         'keywords_supported': get_keywords_supported(),
         'access': access,
-        'to_options': CourseEmail.TO_OPTION_CHOICES + query_options,
+        'to_options': query_options,
         'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
         'editor': email_editor,
         'list_instructor_tasks_url': reverse(
