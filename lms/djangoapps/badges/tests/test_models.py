@@ -179,18 +179,28 @@ class BadgeAssertionTest(ModuleStoreTestCase):
     def test_assertions_for_user(self):
         """
         Verify that grabbing all assertions for a user behaves as expected.
+
+        This function uses object IDs because for some reason Jenkins trips up
+        on its assertItemsEqual check here despite the items being equal.
         """
         user = UserFactory()
-        assertions = [BadgeAssertionFactory.create(user=user) for _i in range(3)]
+        assertions = [BadgeAssertionFactory.create(user=user).id for _i in range(3)]
         course = CourseFactory.create()
         course_key = course.location.course_key
         course_badges = [RandomBadgeClassFactory(course_id=course_key) for _i in range(3)]
         course_assertions = [
-            BadgeAssertionFactory.create(user=user, badge_class=badge_class) for badge_class in course_badges
+            BadgeAssertionFactory.create(user=user, badge_class=badge_class).id for badge_class in course_badges
         ]
         assertions.extend(course_assertions)
-        self.assertItemsEqual(BadgeAssertion.assertions_for_user(user), assertions)
-        self.assertItemsEqual(BadgeAssertion.assertions_for_user(user, course_id=course_key), course_assertions)
+        assertions.sort()
+        assertions_for_user = [badge.id for badge in BadgeAssertion.assertions_for_user(user)]
+        assertions_for_user.sort()
+        self.assertEqual(assertions_for_user, assertions)
+        course_scoped_assertions = [
+            badge.id for badge in BadgeAssertion.assertions_for_user(user, course_id=course_key)
+        ]
+        course_scoped_assertions.sort()
+        self.assertEqual(course_scoped_assertions, course_assertions)
 
 
 class ValidBadgeImageTest(TestCase, ImageFetchingMixin):
