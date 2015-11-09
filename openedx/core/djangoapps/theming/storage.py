@@ -1,7 +1,7 @@
 import os
 import urlparse
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
 from django.utils._os import safe_join
 
