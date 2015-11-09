@@ -46,7 +46,7 @@ class UserSignupAPIView(GenericAPIView):
                 subject = render_to_string('appsembler/emails/user_welcome_email_subject.txt')
                 message = render_to_string('appsembler/emails/user_welcome_email.txt', message_data)
                 send_mail(subject, message, 'info@appsembler.com', [user.email], fail_silently=False)
-                return Response(status=status.HTTP_200_OK, data=response_data)
+                return Response(status=status.HTTP_201_CREATED, data=response_data)
             except Exception as e:
                 # TODO: check different exceptions and handle them
                 pass
