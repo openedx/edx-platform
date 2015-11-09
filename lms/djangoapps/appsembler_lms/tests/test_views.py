@@ -51,7 +51,7 @@ class TestUserSignup(TestCase):
                    'password': 'password',
                    'secret_key': 'secret_key'}
         response = self.client.post(self.url, payload)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn('JohnDoe', response.content)
         self.assertEqual(User.objects.filter(email="john@doe.com").count(), 1)
 
@@ -77,7 +77,7 @@ class TestUserSignup(TestCase):
                    'password': 'password',
                    'secret_key': 'secret_key'}
         response = self.client.post(self.url, payload)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn('JohnDoe', response.content)
         self.assertEqual(User.objects.filter(username="JohnDoe1").count(), 1)
 
@@ -105,7 +105,7 @@ class TestUserEnroll(ModuleStoreTestCase):
                    'course_id': 'edX/toy/2012_Fall'}
         response = self.client.post(self.url, payload)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn('JohnDoe', response.content)
         self.assertEqual(User.objects.filter(email="john@doe.com").count(), 1)
 
