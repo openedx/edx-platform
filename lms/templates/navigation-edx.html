@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 # App that handles subdomain specific branding
 import branding
@@ -79,7 +80,12 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="sr">${_("Dashboard for:")}</span>
-          <div>${user.username}</div>
+          <%
+          username = user.username
+          profile_image_url = get_profile_image_urls_for_user(user)['medium']
+          %>
+          <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
+          <div class="label-username">${username}</div>
         </a>
       </li>
       <li class="primary">
