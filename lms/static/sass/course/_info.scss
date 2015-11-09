@@ -1,11 +1,39 @@
+.home-wrapper {
+  max-width: 1180px;
+  margin: 0 auto;
+
+  .home {
+    margin: $baseline;
+
+    .page-title {
+      margin-bottom: 5px;
+      color: $dark-gray1;
+      font-size: 24px;
+    }
+
+    .page-subtitle {
+      color: $dark-gray2;
+      font-size: 14px;
+      text-transform: none;
+    }
+  }
+}
+
 div.info-wrapper {
+
+  background-color: rgb(252, 252, 252);
 
   section.updates {
     @extend .content;
+    @include padding-left($baseline);
     line-height: lh();
 
-    > h1 {
-      @extend .top-header;
+    h1 {
+      @include text-align(left);
+      @extend %t-strong;
+      @extend %t-title6;
+      margin-bottom: $baseline;
+      font-style: normal;
     }
 
     > p {
@@ -19,10 +47,10 @@ div.info-wrapper {
 
       > li,article {
         @extend .clearfix;
-        border-bottom: 1px solid lighten($border-color, 10%);
+        padding: $baseline;
         list-style-type: none;
         margin-bottom: lh(1.5);
-        padding-bottom: lh(.75);
+        background-color: $white;
 
         ol, ul {
           ol,ul {
@@ -31,8 +59,9 @@ div.info-wrapper {
         }
 
         h2 {
-          font-size: $body-font-size;
-          font-weight: bold;
+          @extend %t-title9;
+          margin-bottom: ($baseline/4);
+          text-transform: none;
           background: url('#{$static-path}/images/calendar-icon.png') 0 center no-repeat;
           padding-left: $baseline;
         }
@@ -81,8 +110,7 @@ div.info-wrapper {
     padding: 20px 30px;
     margin: 0;
     @extend .sidebar;
-    border-radius: 0 4px 4px 0;
-    @include border-left(1px solid #ddd);
+    background: rgba(0, 0, 0, 0);
     box-shadow: none;
     font-size: 14px;
 
@@ -97,15 +125,14 @@ div.info-wrapper {
 
     h1 {
       @include text-align(left);
+      @extend %t-strong;
+      @extend %t-title6;
       margin-bottom: 0;
       padding: 12px 26px 20px 0;
-      font-size: 18px;
       font-style: normal;
-      font-weight: bold;
     }
 
     ul {
-      background-color: #f6f6f6;
       margin-bottom: 14px;
     }
 
@@ -119,7 +146,8 @@ div.info-wrapper {
           padding: 0;
           color: $link-color;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background: transparent;
           }
         }
@@ -154,7 +182,8 @@ div.info-wrapper {
             display: inline-block;
             padding: 0;
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               background: transparent;
             }
           }
@@ -175,7 +204,8 @@ div.info-wrapper {
               display: inline-block;
               padding: 0;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 background: transparent;
               }
             }
@@ -191,7 +221,8 @@ div.info-wrapper {
           position: absolute;
           width: 100%;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             opacity: 0.6;
             filter: alpha(opacity=60);
 
