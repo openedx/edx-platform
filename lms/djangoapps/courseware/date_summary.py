@@ -186,7 +186,10 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     """
     css_class = 'verified-upgrade-deadline'
     title = _('Verification Upgrade Deadline')
-    description = _('You are still eligible to upgrade to a Verified Certificate!')
+    description = _(
+        'You are still eligible to upgrade to a Verified Certificate! '
+        'Pursue it to highlight the knowledge and skills you gain in this course.'
+    )
     link_text = _('Upgrade to Verified Certificate')
 
     @property
