@@ -13,7 +13,7 @@ for feature, value in ENV_LABSTER_FEATURES.items():
 
 INSTALLED_APPS += ('labster_course_license',)
 
-LABSTER_WIKI_LINK = ENV_TOKENS.get('LABSTER_WIKI_LINK', 'http://wiki.labster.com/')
+LABSTER_WIKI_LINK = ENV_TOKENS.get('LABSTER_WIKI_LINK', 'http://theory.labster.com/')
 LABSTER_API_AUTH_TOKEN = AUTH_TOKENS.get('LABSTER_API_AUTH_TOKEN', '')
 
 LABSTER_API_URL = ENV_TOKENS.get('LABSTER_API_URL', '')

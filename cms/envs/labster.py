@@ -1,5 +1,4 @@
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
-from lms.envs.common import LABSTER_WIKI_LINK
 
 
 FEATURES['CUSTOM_COURSES_EDX'] = True
@@ -15,3 +14,5 @@ INSTALLED_APPS += (
     'rest_framework.authtoken',
     'labster',
 )
+
+LABSTER_WIKI_LINK = ENV_TOKENS.get('LABSTER_WIKI_LINK', 'http://theory.labster.com/')
