@@ -71,6 +71,10 @@ class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
             {"developer_message": "Authentication credentials were not provided."}
         )
 
+    def test_inactive(self):
+        self.user.is_active = False
+        self.test_basic()
+
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -89,7 +93,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {"developer_message": "Course not found."}
         )
 
-    def test_get_success(self):
+    def test_basic(self):
         response = self.client.get(self.url)
         self.assert_response_correct(
             response,
@@ -150,7 +154,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {"developer_message": "Course not found."}
         )
 
-    def test_get_success(self):
+    def test_basic(self):
         response = self.client.get(self.url)
         self.assert_response_correct(
             response,
