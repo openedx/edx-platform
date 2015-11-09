@@ -15,10 +15,12 @@ class ReadableOnlyByAuthors(DjangoModelPermissions):
 
 
 class AtomicMixin(object):
+    """Mixin to provide atomic transaction for as_view."""
     @classmethod
     def create_atomic_wrapper(cls, wrapped_func):
-
+        """Returns a wrapped function."""
         def _create_atomic_wrapper(*args, **kwargs):
+            """Actual wrapper."""
             # When a view call fails due to a permissions error, it raises an exception.
             # An uncaught exception breaks the DB transaction for any following DB operations
             # unless it's wrapped in a atomic() decorator or context manager.
@@ -29,6 +31,7 @@ class AtomicMixin(object):
 
     @classmethod
     def as_view(cls, **initkwargs):
+        """Overrides as_view to add atomic transaction."""
         view = super(AtomicMixin, cls).as_view(**initkwargs)
         return cls.create_atomic_wrapper(view)
 
