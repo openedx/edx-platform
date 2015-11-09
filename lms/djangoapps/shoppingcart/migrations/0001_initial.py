@@ -12,8 +12,8 @@ import xmodule_django.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('student', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('student', '0001_initial'),
     ]
 
     operations = [
