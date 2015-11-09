@@ -59,7 +59,8 @@ class Course(object):
         """ Save the CourseMode objects to the database. """
 
         # Update the verification deadline for the course (not the individual modes)
-        VerificationDeadline.set_deadline(self.id, self.verification_deadline)
+        if self.verification_deadline is not None:
+            VerificationDeadline.set_deadline(self.id, self.verification_deadline, is_override_deadline=True)
 
         for mode in self.modes:
             mode.course_id = self.id
@@ -87,7 +88,9 @@ class Course(object):
             merged_mode.min_price = posted_mode.min_price
             merged_mode.currency = posted_mode.currency
             merged_mode.sku = posted_mode.sku
-            merged_mode.expiration_datetime = posted_mode.expiration_datetime
+            if posted_mode.expiration_datetime is not None:
+                merged_mode.expiration_datetime = posted_mode.expiration_datetime
+                merged_mode.expiration_datetime_is_explicit = True
 
             merged_modes.add(merged_mode)
             merged_mode_keys.add(merged_mode.mode_slug)

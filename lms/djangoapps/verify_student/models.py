@@ -955,7 +955,7 @@ class VerificationDeadline(TimeStampedModel):
     # The system prefers to set this automatically based on default settings. But
     # if the field is set manually we want a way to indicate that so we don't
     # overwrite the manual setting of the field.
-    deadline_is_explicit = models.BooleanField(default=True)
+    deadline_is_explicit = models.BooleanField(default=False)
 
     # Maintain a history of changes to deadlines for auditing purposes
     history = HistoricalRecords()
@@ -963,7 +963,7 @@ class VerificationDeadline(TimeStampedModel):
     ALL_DEADLINES_CACHE_KEY = "verify_student.all_verification_deadlines"
 
     @classmethod
-    def set_deadline(cls, course_key, deadline):
+    def set_deadline(cls, course_key, deadline, is_override_deadline=False):
         """
         Configure the verification deadline for a course.
 
