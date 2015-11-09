@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 import django.utils.timezone
 import django_countries.fields
 import django.db.models.deletion
@@ -76,6 +76,20 @@ class Migration(migrations.Migration):
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
                 ('recent_enrollment_time_delta', models.PositiveIntegerField(default=0, help_text=b"The number of seconds in which a new enrollment is considered 'recent'. Used to display notifications.")),
+                ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
+            ],
+            options={
+                'ordering': ('-change_date',),
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='EnrollmentRefundConfiguration',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
+                ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
+                ('refund_window_microseconds', models.BigIntegerField(default=1209600000000, help_text='The window of time after enrolling during which users can be granted a refund, represented in microseconds. The default is 14 days.')),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
             options={
@@ -206,8 +220,8 @@ class Migration(migrations.Migration):
                 ('language', models.CharField(db_index=True, max_length=255, blank=True)),
                 ('location', models.CharField(db_index=True, max_length=255, blank=True)),
                 ('year_of_birth', models.IntegerField(db_index=True, null=True, blank=True)),
-                ('gender', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'm', b'Male'), (b'f', b'Female'), (b'o', b'Other')])),
-                ('level_of_education', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'p', b'Doctorate'), (b'm', b"Master's or professional degree"), (b'b', b"Bachelor's degree"), (b'a', b'Associate degree'), (b'hs', b'Secondary/high school'), (b'jhs', b'Junior secondary/junior high/middle school'), (b'el', b'Elementary/primary school'), (b'none', b'None'), (b'other', b'Other')])),
+                ('gender', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'm', b'Male'), (b'f', b'Female'), (b'o', b'Other/Prefer Not to Say')])),
+                ('level_of_education', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'p', b'Doctorate'), (b'm', b"Master's or professional degree"), (b'b', b"Bachelor's degree"), (b'a', b'Associate degree'), (b'hs', b'Secondary/high school'), (b'jhs', b'Junior secondary/junior high/middle school'), (b'el', b'Elementary/primary school'), (b'none', b'No Formal Education'), (b'other', b'Other Education')])),
                 ('mailing_address', models.TextField(null=True, blank=True)),
                 ('city', models.TextField(null=True, blank=True)),
                 ('country', django_countries.fields.CountryField(blank=True, max_length=2, null=True)),

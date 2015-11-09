@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 import certificates.models
 import model_utils.fields
 import xmodule_django.models
@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
                 ('template', models.TextField(help_text='Django template HTML.')),
                 ('organization_id', models.IntegerField(help_text='Organization of template.', null=True, db_index=True, blank=True)),
                 ('course_key', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
-                ('mode', models.CharField(default=b'honor', choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit')], max_length=125, blank=True, help_text='The course mode for this template.', null=True)),
+                ('mode', models.CharField(default=b'honor', choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional')], max_length=125, blank=True, help_text='The course mode for this template.', null=True)),
                 ('is_active', models.BooleanField(default=False, help_text='On/Off switch.')),
             ],
             options={
@@ -157,7 +157,7 @@ class Migration(migrations.Migration):
                 ('key', models.CharField(default=b'', max_length=32, blank=True)),
                 ('distinction', models.BooleanField(default=False)),
                 ('status', models.CharField(default=b'unavailable', max_length=32)),
-                ('mode', models.CharField(default=b'honor', max_length=32, choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit')])),
+                ('mode', models.CharField(default=b'honor', max_length=32, choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional')])),
                 ('name', models.CharField(max_length=255, blank=True)),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),

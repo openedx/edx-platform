@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 import openedx.core.djangoapps.credit.models
 import model_utils.fields
 import xmodule_django.models
@@ -105,7 +105,7 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('username', models.CharField(max_length=255, db_index=True)),
-                ('status', models.CharField(max_length=32, choices=[(b'satisfied', b'satisfied'), (b'failed', b'failed')])),
+                ('status', models.CharField(max_length=32, choices=[(b'satisfied', b'satisfied'), (b'failed', b'failed'), (b'declined', b'declined')])),
                 ('reason', jsonfield.fields.JSONField(default={})),
                 ('requirement', models.ForeignKey(related_name='statuses', to='credit.CreditRequirement')),
             ],
@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('username', models.CharField(max_length=255, db_index=True)),
-                ('status', models.CharField(max_length=32, choices=[(b'satisfied', b'satisfied'), (b'failed', b'failed')])),
+                ('status', models.CharField(max_length=32, choices=[(b'satisfied', b'satisfied'), (b'failed', b'failed'), (b'declined', b'declined')])),
                 ('reason', jsonfield.fields.JSONField(default={})),
                 ('history_id', models.AutoField(serialize=False, primary_key=True)),
                 ('history_date', models.DateTimeField()),
