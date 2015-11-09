@@ -1053,9 +1053,9 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     running_pipeline = None
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
     third_party_auth_successful = False
-    trumped_by_first_party_auth = bool(
-        request.POST.get('email') or request.POST.get('username') or request.POST.get('password')
-    )
+    trumped_by_first_party_auth = any((
+        request.POST.get('email'), request.POST.get('username'), request.POST.get('password')
+    ))
     user = None
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
 
