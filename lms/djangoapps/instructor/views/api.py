@@ -1390,6 +1390,7 @@ def get_course_survey_results(request, course_id):
     })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
