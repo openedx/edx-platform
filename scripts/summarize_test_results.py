@@ -13,10 +13,25 @@ from lxml import etree
 
 
 @click.command()
-@click.option("--errors/--no-errors", help="Show details of errors")
-@click.option("--names/--no-names", help="Show all test names")
-@click.option("--outcomes/--no-outcomes", help="Show pass/fail/error with names")
-@click.argument("start", default="reports")
+@click.option(
+    "--errors/--no-errors",
+    help="Show details of errors and failures",
+)
+@click.option(
+    "--names/--no-names",
+    help=(
+        "Show test names"
+        " (with --errors, categorized by error message)"
+    ),
+)
+@click.option(
+    "--outcomes/--no-outcomes",
+    help="Show pass/fail/error with names",
+)
+@click.argument(
+    "start",
+    default="reports",
+)
 def report_all_files(errors, names, outcomes, start):
     """Find all the nosetests.xml files, and report on them.
 
@@ -80,6 +95,14 @@ def error_line_from_error_element(element):
     return element.get("message").splitlines()[0]
 
 
+def testcase_name(testcase):
+    """Given a <testcase> element, return the name of the test."""
+    return "{classname}.{name}".format(
+        classname=testcase.get("classname"),
+        name=testcase.get("name"),
+    )
+
+
 def report_file(path, errors, names, outcomes):
     """Report on one nosetests.xml file."""
     print "\n{}".format(path)
@@ -91,33 +114,36 @@ def report_file(path, errors, names, outcomes):
     print results
 
     if errors:
-        errors = collections.Counter()
+        errors = collections.defaultdict(list)
         for error_element in tree.xpath(".//error|.//failure"):
-            errors[error_line_from_error_element(error_element)] += 1
+            error_line = error_line_from_error_element(error_element)
+            testcases = error_element.xpath("..")
+            if testcases:
+                testcase = testcases[0]
+                errors[error_line].append(testcase_name(testcase))
 
         if errors:
             print ""
-            for error_message, number in errors.most_common():
-                print "{0:4d}: {1}".format(number, error_message)
+            errors = sorted(errors.items(), key=lambda kv: len(kv[1]), reverse=True)
+            for error_message, test_names in errors:
+                print "{0:4d}: {1}".format(len(test_names), error_message)
+                if names:
+                    for test_name in test_names:
+                        print "        {}".format(test_name)
 
-    if names:
+    elif names:
         for testcase in tree.xpath(".//testcase"):
             if outcomes:
-                result = testcase.xpath("*")
+                result = testcase.xpath("error|failure|skipped")
                 if result:
-                    outcome = result[0].tag
-                    if outcome == "system-out":
-                        outcome = "."
-                    else:
-                        outcome = outcome[0].upper()
+                    outcome = result[0].tag[0].upper()
                 else:
                     outcome = "."
             else:
                 outcome = ""
-            print "  {outcome} {classname}.{name}".format(
+            print "  {outcome} {testname}".format(
                 outcome=outcome,
-                classname=testcase.get("classname"),
-                name=testcase.get("name"),
+                testname=testcase_name(testcase),
             )
 
     return results
