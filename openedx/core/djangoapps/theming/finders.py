@@ -44,6 +44,10 @@ class ComprehensiveThemeFinder(BaseFinder):
         if not self.storage:
             return []
 
+        if path.startswith(self.storage.prefix):
+            # strip the prefix
+            path = path[len(self.storage.prefix):]
+
         if self.storage.exists(path):
             match = self.storage.path(path)
             if all:
