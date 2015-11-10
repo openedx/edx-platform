@@ -57,7 +57,7 @@ class UserSignupAPIView(GenericAPIView):
             user = User.objects.get(email=data.get('email'))
         except User.DoesNotExist:
             # filter out any spaces and punctuation
-            username = u''.join(ch for ch in data.get('full_name') if ch.isalnum())
+            username = u''.join(ch for ch in data.get('name') if ch.isalnum())
             username = unicodedata.normalize('NFKD', username).encode('ascii', 'ignore')
 
             # make sure username is unique
@@ -71,7 +71,7 @@ class UserSignupAPIView(GenericAPIView):
                     'username': username,
                     'email': data.get('email'),
                     'password': data.get('password'),
-                    'name': data.get('full_name')
+                    'name': data.get('name')
                 },
                 tos_required=False
             )
