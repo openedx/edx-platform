@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
 from django.shortcuts import redirect
+from util.db import outer_atomic
 import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
@@ -2729,6 +2730,7 @@ def start_certificate_generation(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
@@ -2746,13 +2748,15 @@ def create_certificate_exception(request, course_id, white_list_student=None):
             'success': False,
             'message': _('Invalid Json data')
         }, status=400)
-    try:
-        certificate_white_list, students = process_certificate_exceptions(certificate_white_list, course_key)
-    except ValueError as error:
-        return JsonResponse(
-            {'success': False, 'message': error.message, 'data': json.dumps(certificate_white_list)},
-            status=400
-        )
+
+    with outer_atomic():
+        try:
+            certificate_white_list, students = process_certificate_exceptions(certificate_white_list, course_key)
+        except ValueError as error:
+            return JsonResponse(
+                {'success': False, 'message': error.message, 'data': json.dumps(certificate_white_list)},
+                status=400
+            )
 
     if white_list_student == 'all':
         # Generate Certificates for all white listed students
