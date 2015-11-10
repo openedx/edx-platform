@@ -21,6 +21,8 @@ front-end validation will not pass.
 from nose.plugins.attrib import attr
 from .test_studio_video_module import CMSVideoBaseTest
 
+from flaky import flaky
+
 
 @attr('shard_6')
 class VideoTranscriptTest(CMSVideoBaseTest):
@@ -640,6 +642,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_3'))
 
+    @flaky(max_runs=15, min_passes=15)
     def test_upload_subtitles(self):
         """
         Scenario: File name and name of subs are different (Uploading subtitles with different file name than file)
@@ -669,6 +672,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.edit_component()
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
 
+    @flaky(max_runs=15, min_passes=15)
     def test_video_wo_subtitles(self):
         """
         Scenario: Video w/o subs - another video w/o subs - Not found message
@@ -686,6 +690,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.video.set_url_field('video_name_1.mp4', 1)
         self.assertEqual(self.video.message('status'), 'No Timed Transcript')
 
+    @flaky(max_runs=15, min_passes=15)
     def test_subtitles_copy(self):
         """
         Scenario: Subtitles are copied for every html5 video source
@@ -717,6 +722,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_2'))
 
+    @flaky(max_runs=15, min_passes=15)
     def test_upload_button_w_youtube(self):
         """
         Scenario: Upload button for single youtube id
@@ -741,6 +747,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.edit_component()
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
 
+    @flaky(max_runs=15, min_passes=15)
     def test_upload_button_w_html5_ids(self):
         """
         Scenario: Upload button for youtube id with html5 ids
@@ -778,6 +785,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.edit_component()
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
 
+    @flaky(max_runs=15, min_passes=15)
     def test_advanced_tab_transcript_fields(self):
         """
         Scenario: Change transcripts field in Advanced tab
