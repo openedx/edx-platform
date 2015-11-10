@@ -42,7 +42,7 @@ git+https://github.com/edx/nose.git@99c2aff0ff51bf228bfa5482e97e612c97a23245#egg
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@django1.8-upgrade#egg=event-tracking==0.2.1
--e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
+-e git+https://github.com/edx/django-splash.git@ammar/upgrade-to-django1.8#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@ned/django-upgrade-1.8#egg=ora2==0.2.1
 -e git+https://github.com/edx/edx-submissions.git@muzaffar/upgrage-django-1.8#egg=edx-submissions==0.1.1
