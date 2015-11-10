@@ -111,7 +111,7 @@ class OpenResponseTest(UniqueCourseTest):
         # Log in and navigate to the essay problems
         self.auth_page.visit()
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
     def submit_essay(self, expected_assessment_type, expected_prompt):
         """
@@ -352,7 +352,7 @@ class PeerAssessmentTest(OpenResponseTest):
 
         # Need to reload the page to update the peer grading module
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
         self.course_nav.go_to_section('Test Section', 'Test Subsection')
 
         # Select the problem to calibrate
