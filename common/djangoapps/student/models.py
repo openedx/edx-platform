@@ -255,6 +255,7 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
 
     MARKET_CHOICES = (
+
         ('23', ugettext_noop('Atlanta')),
         ('60', ugettext_noop('Austin')),
         ('46', ugettext_noop('Baltimore')),
@@ -290,10 +291,27 @@ class UserProfile(models.Model):
         ('15', ugettext_noop('Silicon Valley')),
         ('37', ugettext_noop('St. Louis')),
         ('68', ugettext_noop('Tampa')),
-        ('40', ugettext_noop('Toronto')),
-        ('47', ugettext_noop('Vancouver')),
         ('25', ugettext_noop('Washington, DC')),
-        ('881', ugettext_noop('Wisconsin'))
+        ('881', ugettext_noop('Wisconsin')),
+
+        ('XX', ugettext_noop('Canada')),
+            ('40', ugettext_noop('Toronto')),
+            ('47', ugettext_noop('Vancouver')),
+
+        ('XX', ugettext_noop('Europe')),
+            ('29', ugettext_noop('London')),
+            ('43', ugettext_noop('Amsterdam')),
+            ('35', ugettext_noop('Paris')),
+
+        ('XX', ugettext_noop('Australia')),
+            ('36', ugettext_noop('Melbourne')),
+            ('39', ugettext_noop('Sydney')),
+
+        ('XX', ugettext_noop('Japan')),
+            ('92', ugettext_noop('Fukuoka')),
+            ('79', ugettext_noop('Nagoya')),
+            ('64', ugettext_noop('Osaka')),
+            ('44', ugettext_noop('Tokyo'))
     )
     market = models.IntegerField(blank=True, null=True, choices = MARKET_CHOICES)
 
