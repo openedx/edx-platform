@@ -955,7 +955,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
     @ddt.unpack
     def test_get_xseries_programs_method(self, program_status, course_codes, marketing_slug):
         """Verify that program data is parsed correctly for a given course"""
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = {
                 u'edx/demox/Run_1': {
                     'category': self.category,
@@ -997,15 +997,10 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         """
         CourseEnrollment.enroll(self.user, self.course_1.id)
         self.client.login(username="jack", password="test")
-        with patch('student.views.get_course_programs_for_dashboard') as mock_method:
-            mock_method.return_value = self._create_program_data(
-                [(self.course_1.id, 'active')]
-            )
+        with patch('student.views.get_programs_for_dashboard') as mock_method:
+            mock_method.return_value = self._create_program_data([])
             response = self.client.get(reverse('dashboard'))
 
-            # Verify that without the programs configuration the method
-            # 'get_course_programs_for_dashboard' should not be called
-            self.assertFalse(mock_method.called)
             self.assertEquals(response.status_code, 200)
             self.assertIn('Pursue a Certificate of Achievement to highlight', response.content)
             self._assert_responses(response, 0)
@@ -1020,9 +1015,9 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_2.id, mode=course_mode)
 
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_config()
 
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
                 [(self.course_1.id, 'active'), (self.course_2.id, 'unpublished')]
             )
@@ -1053,10 +1048,10 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_1.id, mode='verified')
 
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_config()
 
         with patch(
-            'student.views.get_course_programs_for_dashboard',
+            'student.views.get_programs_for_dashboard',
             return_value=self._create_program_data([(self.course_1.id, 'active')])
         ) as mock_get_programs:
             response = self.client.get(reverse('dashboard'))
@@ -1083,9 +1078,9 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_3.id, mode='honor')
 
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_config()
 
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
                 [(self.course_1.id, status_1),
                  (self.course_2.id, status_2),
@@ -1104,13 +1099,13 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
 
         CourseEnrollment.enroll(self.user, self.course_1.id)
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_config()
 
         program_data = self._create_program_data([(self.course_1.id, 'active')])
         if key_remove and key_remove in program_data[unicode(self.course_1.id)]:
             del program_data[unicode(self.course_1.id)][key_remove]
 
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = program_data
 
             response = self.client.get(reverse('dashboard'))

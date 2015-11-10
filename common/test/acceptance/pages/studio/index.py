@@ -128,3 +128,49 @@ class DashboardPage(PageObject):
             if all([lib[key] == kwargs[key] for key in kwargs]):
                 return True
         return False
+
+
+class DashboardPageWithPrograms(DashboardPage):
+    """
+    Extends DashboardPage for bok choy testing programs-related behavior.
+    """
+
+    def is_programs_tab_present(self):
+        """
+        Determine if the programs tab appears on the studio home page.
+        """
+        return self.q(css='#course-index-tabs .programs-tab a').present
+
+    def _click_programs_tab(self):
+        """
+        DRY helper.
+        """
+        self.q(css='#course-index-tabs .programs-tab a').click()
+        self.wait_for_element_visibility("div.programs-tab.active", "Switch to programs tab")
+
+    def is_new_program_button_present(self):
+        """
+        Determine if the "new program" button is visible in the top "nav
+        actions" section of the page.
+        """
+        return self.q(css='.nav-actions button.new-program-button').present
+
+    def is_empty_list_create_button_present(self):
+        """
+        Determine if the "create your first program" button is visible under
+        the programs tab (when the program list result is empty).
+        """
+        self._click_programs_tab()
+        return self.q(css='div.programs-tab.active button.new-program-button').present
+
+    def get_program_list(self):
+        """
+        Fetch the content of the program list under the programs tab (assuming
+        it is nonempty).
+        """
+        self._click_programs_tab()
+        div2info = lambda element: (
+            element.find_element_by_css_selector('.course-title').text,  # name
+            element.find_element_by_css_selector('.course-org .value').text,  # org key
+        )
+        return self.q(css='div.programs-tab li.course-item').map(div2info).results
