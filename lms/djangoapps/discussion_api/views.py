@@ -2,6 +2,8 @@
 Discussion API views
 """
 from django.core.exceptions import ValidationError
+from rest_framework.exceptions import UnsupportedMediaType
+from rest_framework.parsers import JSONParser
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,6 +27,7 @@ from discussion_api.api import (
     update_thread,
 )
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm, _PaginationForm
+from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 
@@ -119,6 +122,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         PATCH /api/discussion/v1/threads/thread_id
         {"raw_body": "Edited text"}
+        Content Type: "application/merge-patch+json"
 
         DELETE /api/discussion/v1/threads/thread_id
 
@@ -174,6 +178,9 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         topic_id, type, title, and raw_body are accepted with the same meaning
         as in a POST request
+
+        If "application/merge-patch+json" is not the specified content type,
+        a 415 error is returned.
 
     **GET Response Values**:
 
@@ -232,6 +239,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
     """
     lookup_field = "thread_id"
+    parser_classes = (JSONParser, MergePatchParser,)
 
     def list(self, request):
         """
@@ -274,6 +282,8 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the PATCH method for the instance endpoint as described in
         the class docstring.
         """
+        if request.content_type != MergePatchParser.media_type:
+            raise UnsupportedMediaType(request.content_type)
         return Response(update_thread(request, thread_id, request.data))
 
     def destroy(self, request, thread_id):
@@ -307,6 +317,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
         PATCH /api/discussion/v1/comments/comment_id
         {"raw_body": "Edited text"}
+        Content Type: "application/merge-patch+json"
 
         DELETE /api/discussion/v1/comments/comment_id
 
@@ -346,6 +357,9 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
     **PATCH Parameters**:
 
         raw_body is accepted with the same meaning as in a POST request
+
+        If "application/merge-patch+json" is not the specified content type,
+        a 415 error is returned.
 
     **GET Response Values**:
 
@@ -409,6 +423,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
     """
     lookup_field = "comment_id"
+    parser_classes = (JSONParser, MergePatchParser,)
 
     def list(self, request):
         """
@@ -465,4 +480,6 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the PATCH method for the instance endpoint as described in
         the class docstring.
         """
+        if request.content_type != MergePatchParser.media_type:
+            raise UnsupportedMediaType(request.content_type)
         return Response(update_comment(request, comment_id, request.data))

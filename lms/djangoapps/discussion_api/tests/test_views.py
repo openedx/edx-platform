@@ -11,6 +11,7 @@ import mock
 from pytz import UTC
 
 from django.core.urlresolvers import reverse
+from rest_framework.parsers import JSONParser
 
 from rest_framework.test import APIClient
 from xmodule.modulestore import ModuleStoreEnum
@@ -24,7 +25,7 @@ from discussion_api.tests.utils import (
     make_minimal_cs_thread,
 )
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from util.testing import UrlResetMixin, PatchMediaTypeMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
 
@@ -536,9 +537,10 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @httpretty.activate
 @disable_signal(api, 'thread_edited')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
     """Tests for ThreadViewSet partial_update"""
     def setUp(self):
+        self.unsupported_media_type = JSONParser.media_type
         super(ThreadViewSetPartialUpdateTest, self).setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
 
@@ -592,7 +594,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
             json.dumps(request_data),
-            content_type="application/json"
+            content_type="application/merge-patch+json"
         )
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
@@ -625,7 +627,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
             json.dumps(request_data),
-            content_type="application/json"
+            content_type="application/merge-patch+json"
         )
         expected_response_data = {
             "field_errors": {"title": {"developer_message": "This field may not be blank."}}
@@ -930,9 +932,10 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @disable_signal(api, 'comment_edited')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
     """Tests for CommentViewSet partial_update"""
     def setUp(self):
+        self.unsupported_media_type = JSONParser.media_type
         super(CommentViewSetPartialUpdateTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
@@ -982,7 +985,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
             json.dumps(request_data),
-            content_type="application/json"
+            content_type="application/merge-patch+json"
         )
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
@@ -1004,7 +1007,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
             json.dumps(request_data),
-            content_type="application/json"
+            content_type="application/merge-patch+json"
         )
         expected_response_data = {
             "field_errors": {"raw_body": {"developer_message": "This field may not be blank."}}
