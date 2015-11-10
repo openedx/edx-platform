@@ -1,0 +1,30 @@
+<%inherit file="base.html" />
+<%namespace name='static' file='static_content.html'/>
+<%!
+  from django.utils.translation import ugettext as _
+  import json
+%>
+<%block name="title">Escalation Dashboard
+</%block>
+<%block name="bodyclass">is-signedin course tools view-import</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <h1 class="page-header">
+      Escalation Management Dashboard
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+        %for command in commands:
+             <a href="${command.slug}">${command.short_desc}</a></br>
+        %endfor
+    </article>
+  </section>
+</div>
+</%block>
+

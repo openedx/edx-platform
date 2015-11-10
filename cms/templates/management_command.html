@@ -1,0 +1,37 @@
+<%inherit file="base.html" />
+<%namespace name='static' file='static_content.html'/>
+<%!
+  from django.utils.translation import ugettext as _
+  import json
+%>
+<%block name="title">  ${command_name} | Management Command
+</%block>
+<%block name="bodyclass">is-signedin course tools view-import</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <a href="/manage/${course_key}">Back to Management Dashboard</a>
+  <header class="mast has-subtitle">
+    <h1 class="page-header">
+      ${command_name}
+    </h1>
+      %if (not commit or commit == 'False') and has_commit:
+        <h4><b>Dry Run</b></h4>
+      %endif
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+        <p>${command_output}</p>
+        %if (not commit or commit == 'False') and has_commit:
+            <a href="?commit=commit">Execute Now</a>
+        %elif has_commit:
+          <a href="?commit=">Dry Run</a>
+        %endif
+    </article>
+  </section>
+</div>
+</%block>
+
