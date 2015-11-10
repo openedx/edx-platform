@@ -189,6 +189,7 @@ class PhotoVerification(StatusModel):
     error_code = models.CharField(blank=True, max_length=50)
 
     class Meta(object):
+        app_label = "verify_student"
         abstract = True
         ordering = ['-created_at']
 
@@ -937,6 +938,8 @@ class VerificationDeadline(TimeStampedModel):
     then that course does not have a deadline.  This means that users
     can submit photos at any time.
     """
+    class Meta(object):
+        app_label = "verify_student"
 
     course_key = CourseKeyField(
         max_length=255,
@@ -1047,6 +1050,7 @@ class VerificationCheckpoint(models.Model):
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
     class Meta(object):
+        app_label = "verify_student"
         unique_together = ('course_id', 'checkpoint_location')
 
     def __unicode__(self):
@@ -1150,6 +1154,7 @@ class VerificationStatus(models.Model):
     error = models.TextField(null=True, blank=True)
 
     class Meta(object):
+        app_label = "verify_student"
         get_latest_by = "timestamp"
         verbose_name = "Verification Status"
         verbose_name_plural = "Verification Statuses"
@@ -1327,6 +1332,7 @@ class SkippedReverification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta(object):
+        app_label = "verify_student"
         unique_together = (('user', 'course_id'),)
 
     @classmethod
