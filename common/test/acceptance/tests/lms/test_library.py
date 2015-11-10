@@ -118,6 +118,7 @@ class LibraryContentTestBase(UniqueCourseTest):
             LogoutPage(self.browser).visit()
             self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self.course_outline.visit()
+
         subsection = self.course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
         return subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
