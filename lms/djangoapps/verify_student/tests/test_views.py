@@ -1870,14 +1870,22 @@ class TestReverifyView(TestCase):
         # Allow the student to reverify
         self._assert_can_reverify()
 
-    def test_reverify_view_cannot_reverify_pending(self):
+    def test_reverify_view_can_reverify_pending(self):
+        """ Test that the user can still re-verify even if the previous photo
+        verification is in pending state.
+
+        A photo verification is considered in pending state when the user has
+        either submitted the photo verification (status in database: 'submitted')
+        or photo verification submission failed (status in database: 'must_retry').
+        """
+
         # User has submitted a verification attempt, but Software Secure has not yet responded
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         attempt.mark_ready()
         attempt.submit()
 
-        # Cannot reverify because an attempt has already been submitted.
-        self._assert_cannot_reverify()
+        # Can re-verify because an attempt has already been submitted.
+        self._assert_can_reverify()
 
     def test_reverify_view_cannot_reverify_approved(self):
         # Submitted attempt has been approved

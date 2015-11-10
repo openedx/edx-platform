@@ -1350,7 +1350,11 @@ class ReverifyView(View):
         Backbone views used in the initial verification flow.
         """
         status, _ = SoftwareSecurePhotoVerification.user_status(request.user)
-        if status in ["must_reverify", "expired"]:
+
+        # If the verification process is still ongoing i.e. the status for photo
+        # verification is either 'submitted' or 'must_retry' then its marked as
+        # 'pending'
+        if status in ["must_reverify", "expired", "pending"]:
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": settings.PLATFORM_NAME,
