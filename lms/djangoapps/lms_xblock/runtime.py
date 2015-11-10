@@ -7,6 +7,8 @@ import xblock.reference.plugins
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
+
+from badges.service import BadgingService
 from request_cache.middleware import RequestCache
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
@@ -211,6 +213,8 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['library_tools'] = LibraryToolsService(modulestore())
         services['fs'] = xblock.reference.plugins.FSService()
         services['settings'] = SettingsService()
+        if settings.FEATURES["ENABLE_OPENBADGES"]:
+            services['badging'] = BadgingService()
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
 
