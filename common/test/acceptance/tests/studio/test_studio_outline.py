@@ -1,6 +1,8 @@
 """
 Acceptance tests for studio related to the outline page.
 """
+from flaky import flaky
+
 import json
 from datetime import datetime, timedelta
 import itertools
@@ -226,6 +228,7 @@ class WarningMessagesTest(CourseOutlineTest):
             self.STAFF_ONLY_WARNING
         )
 
+    @flaky(max_runs=15, min_passes=15)
     def test_released_unpublished_changes_unlocked(self):
         """ Tests that released unpublished changes unlocked units display 'Unpublished changes to live content' """
         self._verify_unit_warning(

@@ -357,6 +357,7 @@ class YouTubeVideoTest(VideoBaseTest):
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
 
+    @flaky(max_runs=15, min_passes=15)
     def test_video_rendering_with_default_response_time(self):
         """
         Scenario: Video is rendered in Youtube mode when the YouTube Server responds quickly
