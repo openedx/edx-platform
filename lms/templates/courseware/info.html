@@ -61,7 +61,7 @@ $(document).ready(function(){
       ${get_course_info_section(request, course, 'updates')}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
-      % if SelfPacedConfiguration.current().enable_course_home_improvements:
+      % if False:
         <h1>${_("Important Course Dates")}</h1>
         ${get_course_date_summary(course, user)}
       % endif
