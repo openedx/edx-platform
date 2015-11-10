@@ -54,7 +54,7 @@ except:
 from django.conf import settings
 from django.template.engine import Engine
 from django.template.loaders.filesystem import Loader
-engine = Engine(dirs=settings.TEMPLATE_DIRS)
+engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source}</%def>
 

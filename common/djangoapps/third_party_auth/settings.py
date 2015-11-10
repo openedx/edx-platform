@@ -75,7 +75,7 @@ def apply_settings(django_settings):
 
     # Context processors required under Django.
     django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
-    django_settings.TEMPLATE_CONTEXT_PROCESSORS += (
+    django_settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
         'social.apps.django_app.context_processors.backends',
         'social.apps.django_app.context_processors.login_redirect',
     )

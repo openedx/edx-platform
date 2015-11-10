@@ -36,10 +36,10 @@ class MakoMiddleware(object):
 
 def get_template_context_processors():
     """
-    Returns the context processors defined in settings.TEMPLATE_CONTEXT_PROCESSORS.
+    Returns the context processors defined in settings.TEMPLATES.
     """
     context_processors = _builtin_context_processors
-    context_processors += tuple(settings.TEMPLATE_CONTEXT_PROCESSORS)
+    context_processors += tuple(settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'])
     return tuple(import_string(path) for path in context_processors)
 
 

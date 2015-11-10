@@ -213,6 +213,7 @@ GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
+# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
 MAKO_TEMPLATES = {}
@@ -228,39 +229,35 @@ for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
     MAKO_TEMPLATES['lms.' + namespace] = template_dirs
 
 # Django templating
-TEMPLATE_DIRS = MAKO_TEMPLATES['main']
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',
-    'dealer.contrib.django.staff.context_processor',  # access git revision
-    'contentstore.context_processors.doc_url',
-)
-
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': TEMPLATE_DIRS,
+        'DIRS': MAKO_TEMPLATES['main'],
         # Options specific to this backend.
         'OPTIONS': {
-            'loaders': TEMPLATE_LOADERS,
-            'context_processors': TEMPLATE_CONTEXT_PROCESSORS
+            'loaders': (
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ),
+            'context_processors': (
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
+                'django.contrib.auth.context_processors.auth',  # this is required for admin
+                'django.template.context_processors.csrf',
+                'dealer.contrib.django.staff.context_processor',  # access git revision
+                'contentstore.context_processors.doc_url',
+            ),
+            # Change 'debug' in your environment settings files - not here.
+            'debug': False
         }
     }
 ]
+DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
 ##############################################################################
 
@@ -402,9 +399,8 @@ MODULESTORE = {
 }
 
 ############################ DJANGO_BUILTINS ################################
-# Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
+# Change DEBUG in your environment settings files, not here
 DEBUG = False
-TEMPLATE_DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'

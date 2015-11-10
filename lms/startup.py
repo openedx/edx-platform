@@ -105,7 +105,7 @@ def enable_stanford_theme():
     theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
 
     # Include the theme's templates in the template search paths
-    settings.TEMPLATE_DIRS.insert(0, theme_root / 'templates')
+    settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].insert(0, theme_root / 'templates')
     edxmako.paths.add_lookup('main', theme_root / 'templates', prepend=True)
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
@@ -153,7 +153,7 @@ def enable_microsites():
 
     # if we have any valid microsites defined, let's wire in the Mako and STATIC_FILES search paths
     if microsite_config_dict:
-        settings.TEMPLATE_DIRS.append(microsites_root)
+        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].append(microsites_root)
         edxmako.paths.add_lookup('main', microsites_root)
 
         settings.STATICFILES_DIRS.insert(0, microsites_root)
