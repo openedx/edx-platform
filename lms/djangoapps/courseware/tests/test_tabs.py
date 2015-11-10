@@ -484,9 +484,10 @@ class TabListTestCase(TabTestCase):
             [{'type': CoursewareTab.type}],
             # missing course_info
             [{'type': CoursewareTab.type}, {'type': 'discussion', 'name': 'fake_name'}],
+            [{'type': 'unknown_type'}],
             # incorrect order
-            [{'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
-            [{'type': 'unknown_type'}]
+            [{'type': 'discussion', 'name': 'fake_name'},
+             {'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
         ]
 
         # tab types that should appear only once

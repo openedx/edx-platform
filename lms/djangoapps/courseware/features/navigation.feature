@@ -24,5 +24,5 @@ Feature: LMS.Navigate Course
        Given I am viewing a course with multiple sections
        When I navigate to a section
         And I see the content of the section
-        And I return to the courseware
+        And I return to the course
         Then I see that I was most recently in the subsection
