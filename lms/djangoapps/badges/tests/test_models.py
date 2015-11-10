@@ -17,19 +17,15 @@ from certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
 
 
-class ImageFetchingMixin(object):
+def get_image(name):
     """
-    Provides the ability to grab a badge image from the test data root.
+    Get one of the test images from the test data directory.
     """
-    def get_image(self, name):
-        """
-        Get one of the test images from the test data directory.
-        """
-        return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png'))
+    return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png'))
 
 
 @attr('shard_1')
-class BadgeImageConfigurationTest(TestCase, ImageFetchingMixin):
+class BadgeImageConfigurationTest(TestCase):
     """
     Test the validation features of BadgeImageConfiguration.
     """
@@ -38,10 +34,10 @@ class BadgeImageConfigurationTest(TestCase, ImageFetchingMixin):
         """
         Verify that creating two configurations as default is not permitted.
         """
-        CourseCompleteImageConfiguration(mode='test', icon=self.get_image('good'), default=True).save()
+        CourseCompleteImageConfiguration(mode='test', icon=get_image('good'), default=True).save()
         self.assertRaises(
             ValidationError,
-            CourseCompleteImageConfiguration(mode='test2', icon=self.get_image('good'), default=True).full_clean
+            CourseCompleteImageConfiguration(mode='test2', icon=get_image('good'), default=True).full_clean
         )
 
     def test_runs_validator(self):
@@ -50,7 +46,7 @@ class BadgeImageConfigurationTest(TestCase, ImageFetchingMixin):
         """
         self.assertRaises(
             ValidationError,
-            CourseCompleteImageConfiguration(mode='test2', icon=self.get_image('unbalanced')).full_clean
+            CourseCompleteImageConfiguration(mode='test2', icon=get_image('unbalanced')).full_clean
         )
 
 
@@ -60,7 +56,7 @@ class DummyBackend(object):
     """
 
 
-class BadgeClassTest(ModuleStoreTestCase, ImageFetchingMixin):
+class BadgeClassTest(ModuleStoreTestCase):
     """
     Test BadgeClass functionality
     """
@@ -80,7 +76,7 @@ class BadgeClassTest(ModuleStoreTestCase, ImageFetchingMixin):
         # Ignore additional parameters. This class already exists.
         badge_class = BadgeClass.get_badge_class(
             slug='test_slug', issuing_component='test_component', description='Attempted override',
-            criteria='test', display_name='Testola', image_file_handle=self.get_image('good')
+            criteria='test', display_name='Testola', image_file_handle=get_image('good')
         )
         # These defaults are set on the factory.
         self.assertEqual(badge_class.criteria, 'https://example.com/syllabus')
@@ -97,11 +93,11 @@ class BadgeClassTest(ModuleStoreTestCase, ImageFetchingMixin):
         premade_badge_class = BadgeClassFactory.create(course_id=course_key)
         badge_class = BadgeClass.get_badge_class(
             slug='test_slug', issuing_component='test_component', description='Attempted override',
-            criteria='test', display_name='Testola', image_file_handle=self.get_image('good')
+            criteria='test', display_name='Testola', image_file_handle=get_image('good')
         )
         course_badge_class = BadgeClass.get_badge_class(
             slug='test_slug', issuing_component='test_component', description='Attempted override',
-            criteria='test', display_name='Testola', image_file_handle=self.get_image('good'),
+            criteria='test', display_name='Testola', image_file_handle=get_image('good'),
             course_id=course_key,
         )
         self.assertNotEqual(badge_class.id, course_badge_class.id)
@@ -114,7 +110,7 @@ class BadgeClassTest(ModuleStoreTestCase, ImageFetchingMixin):
         badge_class = BadgeClass.get_badge_class(
             slug='new_slug', issuing_component='new_component', description='This is a test',
             criteria='https://example.com/test_criteria', display_name='Super Badge',
-            image_file_handle=self.get_image('good')
+            image_file_handle=get_image('good')
         )
         # This should have been saved before being passed back.
         self.assertTrue(badge_class.id)
@@ -152,7 +148,7 @@ class BadgeClassTest(ModuleStoreTestCase, ImageFetchingMixin):
             BadgeClass.get_badge_class,
             slug='new_slug', issuing_component='new_component', description='This is a test',
             criteria='https://example.com/test_criteria', display_name='Super Badge',
-            image_file_handle=self.get_image('unbalanced')
+            image_file_handle=get_image('unbalanced')
         )
 
     def test_get_for_user(self):
@@ -185,7 +181,7 @@ class BadgeClassTest(ModuleStoreTestCase, ImageFetchingMixin):
             ValidationError,
             BadgeClass(
                 slug='test', issuing_component='test2', criteria='test3',
-                description='test4', image=self.get_image('unbalanced')
+                description='test4', image=get_image('unbalanced')
             ).full_clean
         )
 
@@ -221,7 +217,7 @@ class BadgeAssertionTest(ModuleStoreTestCase):
         self.assertEqual(course_scoped_assertions, course_assertions)
 
 
-class ValidBadgeImageTest(TestCase, ImageFetchingMixin):
+class ValidBadgeImageTest(TestCase):
     """
     Tests the badge image field validator.
     """
@@ -229,18 +225,18 @@ class ValidBadgeImageTest(TestCase, ImageFetchingMixin):
         """
         Verify that saving a valid badge image is no problem.
         """
-        validate_badge_image(self.get_image('good'))
+        validate_badge_image(get_image('good'))
 
     def test_unbalanced_image(self):
         """
         Verify that setting an image with an uneven width and height raises an error.
         """
-        unbalanced = ImageFile(self.get_image('unbalanced'))
+        unbalanced = ImageFile(get_image('unbalanced'))
         self.assertRaises(ValidationError, validate_badge_image, unbalanced)
 
     def test_large_image(self):
         """
         Verify that setting an image that is too big raises an error.
         """
-        large = self.get_image('large')
+        large = get_image('large')
         self.assertRaises(ValidationError, validate_badge_image, large)
