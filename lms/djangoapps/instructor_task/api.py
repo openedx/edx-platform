@@ -512,3 +512,27 @@ def generate_certificates_for_students(request, course_key, students=None):  # p
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def regenerate_certificates(request, course_key, statuses_to_regenerate, students=None):
+    """
+    Submits a task to regenerate certificates for given students enrolled in the course or
+    all students if argument 'students' is None.
+    Regenerate Certificate only if the status of the existing generated certificate is in 'statuses_to_regenerate'
+    list passed in the arguments.
+
+    Raises AlreadyRunningError if certificates are currently being generated.
+    """
+    if students:
+        task_type = 'regenerate_certificates_certain_student'
+        students = [student.id for student in students]
+        task_input = {'students': students}
+    else:
+        task_type = 'regenerate_certificates_all_student'
+        task_input = {}
+
+    task_input.update({"statuses_to_regenerate": statuses_to_regenerate})
+    task_class = generate_certificates
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)

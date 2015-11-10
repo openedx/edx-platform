@@ -54,6 +54,7 @@ import os
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -186,6 +187,31 @@ class GeneratedCertificate(models.Model):
             pass
 
         return None
+
+    @classmethod
+    def get_unique_statuses(cls, course_key=None, flat=False):
+        """
+        1 - Return unique statuses as a list of dictionaries containing the following key value pairs
+            [
+            {'status': 'status value from db', 'count': 'occurrence count of the status'},
+            {...},
+            ..., ]
+
+        2 - if flat is 'True' then return unique statuses as a list
+        3 - if course_key is given then return unique statuses associated with the given course
+
+        :param course_key: Course Key identifier
+        :param flat: boolean showing whether to return statuses as a list of values or a list of dictionaries.
+        """
+        query = cls.objects
+
+        if course_key:
+            query = query.filter(course_id=course_key)
+
+        if flat:
+            return query.values_list('status', flat=True).distinct()
+        else:
+            return query.values('status').annotate(count=Count('status'))
 
 
 @receiver(post_save, sender=GeneratedCertificate)
