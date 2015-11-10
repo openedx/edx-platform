@@ -42,7 +42,7 @@ class LmsBlockMixin(XBlockMixin):
         scope=Scope.settings,
     )
     chrome = String(
-        display_name=_("Courseware Chrome"),
+        display_name=_("Course Chrome"),
         help=_("Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
                "\"chromeless\" -- to not use tabs or the accordion; \n"
                "\"tabs\" -- to use tabs only; \n"
@@ -53,7 +53,7 @@ class LmsBlockMixin(XBlockMixin):
     )
     default_tab = String(
         display_name=_("Default Tab"),
-        help=_("Enter the tab that is selected in the XBlock. If not set, the Courseware tab is selected."),
+        help=_("Enter the tab that is selected in the XBlock. If not set, the Course tab is selected."),
         scope=Scope.settings,
         default=None,
     )

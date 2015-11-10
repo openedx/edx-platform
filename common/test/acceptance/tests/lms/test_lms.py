@@ -592,7 +592,7 @@ class HighLevelTabTest(UniqueCourseTest):
 
         # Navigate to the course info page from the progress page
         self.progress_page.visit()
-        self.tab_nav.go_to_tab('Course Info')
+        self.tab_nav.go_to_tab('Home')
 
         # Expect just one update
         self.assertEqual(self.course_info_page.num_updates, 1)
@@ -650,13 +650,13 @@ class HighLevelTabTest(UniqueCourseTest):
 
     def test_courseware_nav(self):
         """
-        Navigate to a particular unit in the courseware.
+        Navigate to a particular unit in the course.
         """
-        # Navigate to the courseware page from the info page
+        # Navigate to the course page from the info page
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
-        # Check that the courseware navigation appears correctly
+        # Check that the course navigation appears correctly
         EXPECTED_SECTIONS = {
             'Test Section': ['Test Subsection'],
             'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
@@ -844,7 +844,7 @@ class TooltipTest(UniqueCourseTest):
         Verify that tooltips are displayed when you hover over the sequence nav bar.
         """
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
         self.assertTrue(self.courseware_page.tooltips_displayed())
 
@@ -993,7 +993,7 @@ class ProblemExecutionTest(UniqueCourseTest):
     def test_python_execution_in_problem(self):
         # Navigate to the problem page
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
         self.course_nav.go_to_section('Test Section', 'Test Subsection')
 
         problem_page = ProblemPage(self.browser)
@@ -1043,14 +1043,14 @@ class EntranceExamTest(UniqueCourseTest):
 
     def test_entrance_exam_section(self):
         """
-         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at courseware
+         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at course
          page.
-            Given that I am on the courseware page
-            When I view the courseware that has an entrance exam
+            Given that I am on the course page
+            When I view the course that has an entrance exam
             Then there should be an "Entrance Exam" chapter.'
         """
         entrance_exam_link_selector = '.accordion .course-navigation .chapter .group-heading'
-        # visit courseware page and make sure there is not entrance exam chapter.
+        # visit course page and make sure there is not entrance exam chapter.
         self.courseware_page.visit()
         self.courseware_page.wait_for_page()
         self.assertFalse(element_has_text(

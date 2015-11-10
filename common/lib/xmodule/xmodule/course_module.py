@@ -621,9 +621,9 @@ class CourseFields(object):
         ],
     )
     info_sidebar_name = String(
-        display_name=_("Course Info Sidebar Name"),
+        display_name=_("Course Home Sidebar Name"),
         help=_(
-            "Enter the heading that you want students to see above your course handouts on the Course Info page. "
+            "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
         scope=Scope.settings, default='Course Handouts')
