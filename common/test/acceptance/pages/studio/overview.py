@@ -530,6 +530,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
+    def select_advanced_settings_tab(self):
+        """
+        Select the advanced settings tab
+        """
+        self.q(css=".advanced-settings-button").first.click()
+        self.wait_for_element_presence('#id_not_timed', 'Advanced settings fields not present.')
+
     def make_exam_proctored(self):
         """
         Makes a Proctored exam.
@@ -575,6 +582,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         returns whether the time allotted field is visible
         """
         return self.q(css="#id_time_limit_div").visible
+
+    def exam_review_rules_field_visible(self):
+        """
+        Returns whether the review rules field is visible
+        """
+        return self.q(css=".exam-review-rules-list-fields").visible
 
     def proctoring_items_are_displayed(self):
         """

@@ -216,7 +216,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     'course-outline', 'xblock-string-field-editor', 'modal-button',
                     'basic-modal', 'course-outline-modal', 'release-date-editor',
                     'due-date-editor', 'grading-editor', 'publish-editor',
-                    'staff-lock-editor', 'timed-examination-preference-editor'
+                    'staff-lock-editor', 'settings-tab-section', 'timed-examination-preference-editor'
                 ]);
                 appendSetFixtures(mockOutlinePage);
                 mockCourseJSON = createMockCourseJSON({}, [
@@ -580,7 +580,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
             describe("Subsection", function() {
                 var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson,
-                    selectDisableSpecialExams, selectTimedExam, selectProctoredExam, selectPracticeExam;
+                    selectDisableSpecialExams, selectGeneralSettings, selectAdvancedSettings,
+                    selectTimedExam, selectProctoredExam, selectPracticeExam;
 
                 getDisplayNameWrapper = function() {
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
@@ -595,6 +596,14 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 selectDisableSpecialExams = function() {
                     this.$("#id_not_timed").prop('checked', true).trigger('change');
+                };
+
+                selectGeneralSettings = function() {
+                   this.$(".modal-section .general-settings-button").click();
+                };
+
+                selectAdvancedSettings = function() {
+                   this.$(".modal-section .advanced-settings-button").click();
                 };
 
                 selectTimedExam = function(time_limit) {
@@ -701,6 +710,22 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     collapseItemsAndVerifyState('subsection');
                     expandItemsAndVerifyState('subsection');
                 });
+               
+                it('can show general settings', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectGeneralSettings();
+                    expect($('.modal-section .general-settings-button')).toHaveClass('active');
+                    expect($('.modal-section .advanced-settings-button')).not.toHaveClass('active');
+                });
+
+                it('can show advanced settings', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectAdvancedSettings();
+                    expect($('.modal-section .general-settings-button')).not.toHaveClass('active');
+                    expect($('.modal-section .advanced-settings-button')).toHaveClass('active');
+                });
 
                 it('can be edited', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
@@ -715,6 +740,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                             "visible_to_staff_only": true,
                             "start":"2014-07-09T00:00:00.000Z",
                             "due":"2014-07-10T00:00:00.000Z",
+                            "exam_review_rules": "",
                             "is_time_limited": true,
                             "is_practice_exam": false,
                             "is_proctored_enabled": true,
