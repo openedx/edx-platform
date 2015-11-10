@@ -17,6 +17,7 @@ from contentstore.utils import delete_course_and_groups
 from labster.course.utils import set_staff
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
+from labster.course.tasks import course_delete
 
 
 log = logging.getLogger(__name__)
@@ -124,7 +125,7 @@ def course_handler(request, course_key_string=None):
                 )
                 return Response({"course_key": unicode(course_key)})
             elif request.method == 'DELETE':
-                delete_course_and_groups(course_key, request.user.id)
+                course_delete.delay(course_key, request.user.id)
                 return Response(status=status.HTTP_204_NO_CONTENT)
     except InvalidKeyError:
         raise Http404
