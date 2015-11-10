@@ -25,18 +25,16 @@ class TestUserSignup(TestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @ddt.data(
-        ('', "Doe", "john@doe.com", "password", "secret_key", status.HTTP_400_BAD_REQUEST),  # no first name
-        ('John', '', "john@doe.com", "password", "secret_key", status.HTTP_400_BAD_REQUEST),  # no last name
-        ('John', 'Doe', "", "password", "secret_key", status.HTTP_400_BAD_REQUEST),  # no email
-        ('John', 'Doe', "john@doe.com", "", "secret_key", status.HTTP_400_BAD_REQUEST),  # no password
-        ('John', 'Doe', "john@doe.com", "password", "", status.HTTP_403_FORBIDDEN),  # no secret key
-        ('John', 'Doe', "john@doe.com", "password", "wrong_secret_key", status.HTTP_403_FORBIDDEN),  # wrong secret key
+        ('', "john@doe.com", "password", "secret_key", status.HTTP_400_BAD_REQUEST),  # no name
+        ('John Doe', "", "password", "secret_key", status.HTTP_400_BAD_REQUEST),  # no email
+        ('John Doe', "john@doe.com", "", "secret_key", status.HTTP_400_BAD_REQUEST),  # no password
+        ('John Doe', "john@doe.com", "password", "", status.HTTP_403_FORBIDDEN),  # no secret key
+        ('John Doe', "john@doe.com", "password", "wrong_secret_key", status.HTTP_403_FORBIDDEN),  # wrong secret key
     )
     @ddt.unpack
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
-    def test_fail_without_required_data(self, first_name, last_name, email, password, secret_key, status_code):
-        payload = {'first_name': first_name,
-                   'last_name': last_name,
+    def test_fail_without_required_data(self, name, email, password, secret_key, status_code):
+        payload = {'name': name,
                    'email': email,
                    'password': password,
                    'secret_key': secret_key}
@@ -45,8 +43,7 @@ class TestUserSignup(TestCase):
 
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_user_without_enrollment(self):
-        payload = {'first_name': 'John',
-                   'last_name': 'Doe',
+        payload = {'name': 'John Doe',
                    'email': 'john@doe.com',
                    'password': 'password',
                    'secret_key': 'secret_key'}
@@ -59,20 +56,17 @@ class TestUserSignup(TestCase):
         self.assertEqual(mail.outbox[0].subject, render_to_string('appsembler/emails/user_welcome_email_subject.txt'))
         self.assertIn('john@doe.com', mail.outbox[0].body)
         self.assertIn('password', mail.outbox[0].body)
-        self.assertIn('John', mail.outbox[0].body)
+        self.assertIn('John Doe', mail.outbox[0].body)
 
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_unique_username_if_already_exists(self):
         User.objects.create(
             username="JohnDoe",
-            first_name="John",
-            last_name="Doe",
             email="test@email.com"
         )
         self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
 
-        payload = {'first_name': 'John',
-                   'last_name': 'Doe',
+        payload = {'name': 'John Doe',
                    'email': 'john@doe.com',
                    'password': 'password',
                    'secret_key': 'secret_key'}
@@ -85,7 +79,7 @@ class TestUserSignup(TestCase):
         self.assertEqual(mail.outbox[0].subject, render_to_string('appsembler/emails/user_welcome_email_subject.txt'))
         self.assertIn('john@doe.com', mail.outbox[0].body)
         self.assertIn('password', mail.outbox[0].body)
-        self.assertIn('John', mail.outbox[0].body)
+        self.assertIn('John Doe', mail.outbox[0].body)
 
 
 @ddt.ddt
@@ -97,8 +91,7 @@ class TestUserEnroll(ModuleStoreTestCase):
 
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_enrolled_user(self):
-        payload = {'first_name': 'John',
-                   'last_name': 'Doe',
+        payload = {'name': 'John Doe',
                    'email': 'john@doe.com',
                    'password': 'password',
                    'secret_key': 'secret_key',
@@ -120,4 +113,4 @@ class TestUserEnroll(ModuleStoreTestCase):
         self.assertIn('Toy Course', mail.outbox[0].body)
         self.assertIn('john@doe.com', mail.outbox[0].body)
         self.assertIn('password', mail.outbox[0].body)
-        self.assertIn('John', mail.outbox[0].body)
+        self.assertIn('John Doe', mail.outbox[0].body)

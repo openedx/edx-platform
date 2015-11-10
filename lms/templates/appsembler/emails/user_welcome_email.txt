@@ -1,4 +1,4 @@
-Hello {{ first_name }},
+Hello {{ name }},
 
 We are delighted to have you on board with us as a student at \
 Appsembler Academy{% if course_name %} in the {{ course_name }} Course{% endif %}!
