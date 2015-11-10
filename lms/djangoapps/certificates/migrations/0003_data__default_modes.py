@@ -26,7 +26,7 @@ def forwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('certificates', '0003_data__certificatehtmlviewconfiguration_data'),
+        ('certificates', '0002_data__certificatehtmlviewconfiguration_data'),
     ]
 
     operations = [

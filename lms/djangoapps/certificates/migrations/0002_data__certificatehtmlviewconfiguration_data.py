@@ -54,7 +54,7 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('certificates', '0002_auto_20151022_1336'),
+        ('certificates', '0001_initial'),
     ]
 
     operations = [
