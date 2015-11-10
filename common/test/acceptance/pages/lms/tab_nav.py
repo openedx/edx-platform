@@ -21,7 +21,7 @@ class TabNavPage(PageObject):
         Navigate to the tab `tab_name`.
         """
 
-        if tab_name not in ['Courseware', 'Course Info', 'Discussion', 'Wiki', 'Progress']:
+        if tab_name not in ['Course', 'Home', 'Discussion', 'Wiki', 'Progress']:
             self.warning("'{0}' is not a valid tab name".format(tab_name))
 
         # The only identifier for individual tabs is the link href

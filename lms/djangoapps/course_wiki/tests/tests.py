@@ -103,8 +103,8 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Ensure that the response has the course navigator.
         """
-        self.assertContains(resp, "Course Info")
-        self.assertContains(resp, "courseware")
+        self.assertContains(resp, "Home")
+        self.assertContains(resp, "Course")
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
     def test_course_navigator(self):
