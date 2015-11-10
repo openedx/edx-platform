@@ -132,7 +132,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.auth_page.visit()
         self.user_info = self.auth_page.user_info
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
     def _navigate_to_courseware_video_and_render(self):
         """ Wait for the video player to render """
