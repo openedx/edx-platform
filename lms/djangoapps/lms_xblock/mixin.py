@@ -12,6 +12,7 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPa
 
 _ = lambda text: text
 
+
 class GroupAccessDict(Dict):
     """Special Dict class for serializing the group_access field"""
     def from_json(self, access_dict):
