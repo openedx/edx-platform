@@ -461,7 +461,7 @@ def _update_badge_context(context, course, user):
     """
     badge = None
     if settings.FEATURES.get('ENABLE_OPENBADGES'):
-        badge = get_completion_badge(course.location.course_key, user).get_for_user(user)
+        badge = get_completion_badge(course.location.course_key, user).get_for_user(user)[0]
     context['badge'] = badge
 
 
