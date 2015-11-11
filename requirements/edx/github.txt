@@ -45,7 +45,7 @@ git+https://github.com/edx/nose.git@99c2aff0ff51bf228bfa5482e97e612c97a23245#egg
 -e git+https://github.com/edx/django-splash.git@ammar/upgrade-to-django1.8#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@ned/django-upgrade-1.8#egg=ora2==0.2.1
--e git+https://github.com/edx/edx-submissions.git@muzaffar/upgrage-django-1.8#egg=edx-submissions==0.1.1
+-e git+https://github.com/edx/edx-submissions.git@django-upgrade/1.8#egg=edx-submissions==0.1.2
 -e git+https://github.com/edx/opaque-keys.git@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 git+https://github.com/edx/i18n-tools.git@v0.1.3#egg=i18n-tools==v0.1.3
