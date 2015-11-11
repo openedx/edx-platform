@@ -582,9 +582,6 @@ class ProviderApiPermissions(models.Model):
 
     It gives permission for a OAuth2 client to access the information under certain IdPs.
     """
-    class Meta(object):
-        app_label = "third_party_auth"
-
     client = models.ForeignKey(Client)
     provider_id = models.CharField(
         max_length=255,
@@ -594,5 +591,6 @@ class ProviderApiPermissions(models.Model):
     )
 
     class Meta(object):  # pylint: disable=missing-docstring
+        app_label = "third_party_auth"
         verbose_name = "Provider API Permission"
         verbose_name_plural = verbose_name + 's'
