@@ -12,8 +12,6 @@ from ...pages.studio.pagination import PaginatedMixin
 from selenium.webdriver.common.keys import Keys
 
 from ..common.utils import confirm_prompt, wait_for_notification
-from selenium.webdriver.common.keys import Keys
-
 
 from . import BASE_URL
 
