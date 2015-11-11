@@ -14,7 +14,8 @@ def create_dark_lang_config(apps, schema_editor):
     dark_lang_model = apps.get_model("dark_lang", "DarkLangConfig")
     db_alias = schema_editor.connection.alias
 
-    dark_lang_model.objects.using(db_alias).get_or_create(enabled=True)
+    if not dark_lang_model.objects.using(db_alias).exists():
+        dark_lang_model.objects.using(db_alias).create(enabled=True)
 
 def remove_dark_lang_config(apps, schema_editor):
     """Write your backwards methods here."""
