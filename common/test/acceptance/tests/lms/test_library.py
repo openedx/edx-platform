@@ -159,7 +159,7 @@ class LibraryContentTest(LibraryContentTestBase):
 
         )
 
-    @ddt.data(2, 2, 3)
+    @ddt.data(2, 3, 3)
     def test_shows_random_xblocks_from_configured(self, count):
         """
         Scenario: Ensures that library content shows {count} random xblocks from library in LMS
