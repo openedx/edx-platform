@@ -454,8 +454,12 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
-        response = self.client.get(test_url)
+        response = self.client.get(test_url + "?preview=honor")
         self.assertIn("Invalid Certificate Configuration", response.content)
+
+        # Verify that Exception is raised when certificate is not in the preview mode
+        with self.assertRaises(Exception):
+            self.client.get(test_url)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):

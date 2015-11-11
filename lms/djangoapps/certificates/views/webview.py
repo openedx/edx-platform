@@ -281,7 +281,10 @@ def _update_certificate_context(context, course, user, user_certificate):
     )
 
 
-@handle_500(template_path="certificates/server-error.html")
+@handle_500(
+    template_path="certificates/server-error.html",
+    test_func=lambda request: request.GET.get('preview', None)
+)
 def render_html_view(request, user_id, course_id):
     """
     This public view generates an HTML representation of the specified student's certificate
