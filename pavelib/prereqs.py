@@ -207,6 +207,11 @@ def uninstall_python_packages():
             sh("pip uninstall -y edxval")
             uninstalled = True
 
+        # Uninstall django-storages
+        if any("django-storages" in line for line in frozen):
+            sh("pip uninstall -y django-storages")
+            uninstalled = True
+
         if not uninstalled:
             break
     else:
