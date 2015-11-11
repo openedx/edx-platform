@@ -156,10 +156,11 @@ class LibraryContentTest(LibraryContentTestBase):
             XBlockFixtureDesc("html", "Html1", data='html1'),
             XBlockFixtureDesc("html", "Html2", data='html2'),
             XBlockFixtureDesc("html", "Html3", data='html3'),
+            XBlockFixtureDesc("html", "Html4", data='html4'),
 
         )
 
-    @ddt.data(2, 3, 3)
+    @ddt.data(2, 3, 4)
     def test_shows_random_xblocks_from_configured(self, count):
         """
         Scenario: Ensures that library content shows {count} random xblocks from library in LMS
