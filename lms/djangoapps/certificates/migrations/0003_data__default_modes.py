@@ -9,11 +9,13 @@ from django.core.files import File
 
 def forwards(apps, schema_editor):
     """Add default modes"""
-    badge_image_configuration_model = apps.get_model("certificates", "BadgeImageConfiguration")
+    BadgeImageConfiguration = apps.get_model("certificates", "BadgeImageConfiguration")
+    db_alias = schema_editor.connection.alias
 
-    for mode in ['honor', 'verified', 'professional']:
-        conf, created = badge_image_configuration_model.objects.get_or_create(mode=mode)
-        if created:
+    objects = BadgeImageConfiguration.objects.using(db_alias)
+    if not objects.exists():
+        for mode in ['honor', 'verified', 'professional']:
+            conf = objects.create(mode=mode)
             file_name = '{0}{1}'.format(mode, '.png')
             conf.icon.save(
                 'badges/{}'.format(file_name),
