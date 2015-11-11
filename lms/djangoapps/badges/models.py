@@ -83,10 +83,7 @@ class BadgeClass(models.Model):
         """
         Get the assertion for this badge class for this user, if it has been awarded.
         """
-        try:
-            return self.badgeassertion_set.get(user=user)
-        except BadgeAssertion.DoesNotExist:
-            return None
+        return self.badgeassertion_set.filter(user=user)
 
     def award(self, user, evidence_url=None):
         """

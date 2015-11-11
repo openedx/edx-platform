@@ -381,8 +381,10 @@ def _track_certificate_events(request, context, course, user, user_certificate):
 
     if 'evidence_visit' in request.GET:
         badge_class = get_completion_badge(course_key, user)
-        badge = badge_class.get_for_user(user)
-        if badge:
+        badges = badge_class.get_for_user(user)
+        if badges:
+            # There should only ever be one of these.
+            badge = badge[0]
             tracker.emit(
                 'edx.badge.assertion.evidence_visited',
                 {

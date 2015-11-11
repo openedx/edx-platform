@@ -143,9 +143,9 @@ class BadgeClassTest(TestCase, ImageFetchingMixin):
         """
         user = UserFactory.create()
         badge_class = BadgeClassFactory.create()
-        self.assertIsNone(badge_class.get_for_user(user))
+        self.assertFalse(badge_class.get_for_user(user))
         assertion = BadgeAssertionFactory.create(badge_class=badge_class, user=user)
-        self.assertEqual(badge_class.get_for_user(user), assertion)
+        self.assertEqual(list(badge_class.get_for_user(user)), [assertion])
 
     @override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.badgr.BadgrBackend', BADGR_API_TOKEN='test')
     @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend.award')
