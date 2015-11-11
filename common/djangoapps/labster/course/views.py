@@ -125,7 +125,7 @@ def course_handler(request, course_key_string=None):
                 )
                 return Response({"course_key": unicode(course_key)})
             elif request.method == 'DELETE':
-                course_delete.delay(course_key, request.user.id)
+                course_delete.delay(unicode(course_key), request.user.id)
                 return Response(status=status.HTTP_204_NO_CONTENT)
     except InvalidKeyError:
         raise Http404

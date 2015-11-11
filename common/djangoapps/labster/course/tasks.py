@@ -4,6 +4,7 @@ Labster Course tasks.
 from celery.task import task
 from django.conf import settings
 
+from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from search.search_engine_base import SearchEngine
 from student.roles import CourseCcxCoachRole
@@ -15,13 +16,14 @@ from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer
 
 
 @task()
-def course_delete(course_key, user_id):  # pylint: disable=unused-argument
+def course_delete(course_key_string, user_id):
     """
     Deletes a course.
     @TODO: It is not the best solution, but helps to avoid changes in edx code.
         It'd be great to send signal from modulestore on course deletion. In this case,
         each app can handle course deletion by itself.
     """
+    course_key = CourseKey.from_string(course_key_string)
     delete_course_and_groups(course_key, user_id)
     if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
         # Remove all CCX Coaches
