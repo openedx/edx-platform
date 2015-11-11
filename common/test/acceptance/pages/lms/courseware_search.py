@@ -29,7 +29,7 @@ class CoursewareSearchPage(CoursePage):
     def search(self):
         """ execute the search """
         self.q(css=self.search_bar_selector + ' [type="submit"]').click()
-        self.wait_for_element_visibility('.search-info', 'Search results are shown')
+        self.wait_for_ajax()
 
     def search_for_term(self, text):
         """
