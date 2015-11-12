@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 from common import course_location
@@ -127,11 +128,12 @@ def then_i_see_the_content_of_the_sequence_item(step):
     wait_for_problem('PROBLEM 6')
 
 
-@step(u'I return to the courseware')
-def and_i_return_to_the_courseware(step):
+@step(u'I return to the course')
+def and_i_return_to_the_course(step):
     world.visit('/')
     world.click_link("View Course")
-    world.click_link("Courseware")
+    course = 'a[href*="/courseware"]'
+    world.css_click(course)
 
 
 @step(u'I see that I was most recently in the subsection')
