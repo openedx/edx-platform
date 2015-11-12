@@ -42,6 +42,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from courseware.models import StudentModuleHistory
 from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
@@ -685,6 +686,26 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
         }
+
+        # Get the URL of the user's last position in order to display the 'where you were last' message
+        context['last_accessed_courseware'] = None
+        if SelfPacedConfiguration.current().enable_course_home_improvements:
+            field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                course.id, request.user, course, depth=2
+            )
+            course_module = get_module_for_descriptor(
+                request.user, request, course, field_data_cache, course.id, course=course
+            )
+            chapter_module = get_current_child(course_module, min_depth=2)
+            if chapter_module is not None:
+                section_module = get_current_child(chapter_module, min_depth=1)
+                if section_module is not None:
+                    context['last_accessed_courseware'] = section_module
+                    context['last_accessed_url'] = reverse('courseware_section', kwargs={
+                        'course_id': unicode(course_key),
+                        'chapter': chapter_module.url_name,
+                        'section': section_module.url_name
+                    })
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)

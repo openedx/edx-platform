@@ -374,10 +374,7 @@
 .date-summary-container {
   .date-summary {
     @include clearfix;
-    margin-top: $baseline/2;
-    margin-bottom: $baseline/2;
     padding: 10px;
-    background-color: $gray-l4;
     @include border-left(3px solid $gray-l3);
 
     .description {
@@ -385,21 +382,21 @@
       margin-bottom: $baseline/2;
       display: inline-block;
       color: $lighter-base-font-color;
-      font-size: 80%;
+      font-size: 12px;
     }
 
     .date-summary-link {
-      @include float(right);
-      font-size: 80%;
+      font-size: 12px;
       font-weight: $font-semibold;
       a {
-        color: $base-font-color;
+        color: $link-color;
+        font-weight: normal;
       }
     }
 
     .date {
       color: $lighter-base-font-color;
-      font-size: 80%;
+      font-size: 10px;
     }
 
     &-todays-date {
@@ -407,7 +404,7 @@
 
       .heading {
         font-weight: $font-regular;
-        font-size: 80%;
+        font-size: 12px;
       }
     }
 
