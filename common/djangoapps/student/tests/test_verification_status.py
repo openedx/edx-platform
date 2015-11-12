@@ -30,8 +30,9 @@ from util.testing import UrlResetMixin
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
-    PAST = datetime.now(UTC) - timedelta(days=5)
-    FUTURE = datetime.now(UTC) + timedelta(days=5)
+    DAYS = 4
+    PAST = datetime.now(UTC) - timedelta(days=DAYS + 1)
+    FUTURE = datetime.now(UTC) + timedelta(days=DAYS + 1)
 
     def setUp(self):
         # Invoke UrlResetMixin
@@ -65,31 +66,31 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # The student is enrolled as verified, so we might as well let them
         # complete verification.  We'd need to change their enrollment mode
         # anyway to ensure that the student is issued the correct kind of certificate.
-        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
+        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY, days_until_deadline='null')
 
     def test_need_to_verify_no_expiration(self):
         self._setup_mode_and_enrollment(None, "verified")
 
         # Since the student has not submitted a photo verification,
         # the student should see a "need to verify" message
-        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
+        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY, days_until_deadline='null')
 
         # Start the photo verification process, but do not submit
         # Since we haven't submitted the verification, we should still
         # see the "need to verify" message
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
+        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY, days_until_deadline='null')
 
         # Upload images, but don't submit to the verification service
         # We should still need to verify
         attempt.mark_ready()
-        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
+        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY, days_until_deadline='null')
 
     def test_need_to_verify_expiration(self):
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
         response = self.client.get(self.dashboard_url)
         self.assertContains(response, self.BANNER_ALT_MESSAGES[VERIFY_STATUS_NEED_TO_VERIFY])
-        self.assertContains(response, "You only have 4 days left to verify for this course.")
+        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
 
     @ddt.data(None, FUTURE)
     def test_waiting_approval(self, expiration):
@@ -100,8 +101,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
 
+        deadline_days = 'null'
+        if expiration:
+            deadline_days = '{}'.format(self.DAYS)
         # Now the student should see a "verification submitted" message
-        self._assert_course_verification_status(VERIFY_STATUS_SUBMITTED)
+        self._assert_course_verification_status(VERIFY_STATUS_SUBMITTED, days_until_deadline=deadline_days)
 
     @ddt.data(None, FUTURE)
     def test_fully_verified(self, expiration):
@@ -113,8 +117,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.submit()
         attempt.approve()
 
+        deadline_days = 'null'
+        if expiration:
+            deadline_days = '{}'.format(self.DAYS)
         # Expect that the successfully verified message is shown
-        self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
+        self._assert_course_verification_status(VERIFY_STATUS_APPROVED, days_until_deadline=deadline_days)
 
         # Check that the "verification good until" date is displayed
         response = self.client.get(self.dashboard_url)
@@ -126,7 +133,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
         # The student does NOT have an approved verification
         # so the status should show that the student missed the deadline.
-        self._assert_course_verification_status(VERIFY_STATUS_MISSED_DEADLINE)
+        self._assert_course_verification_status(VERIFY_STATUS_MISSED_DEADLINE, days_until_deadline='null')
 
     def test_missed_verification_deadline_verification_was_expired(self):
         # Expiration date in the past
@@ -143,7 +150,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
         # The student didn't have an approved verification at the deadline,
         # so we should show that the student missed the deadline.
-        self._assert_course_verification_status(VERIFY_STATUS_MISSED_DEADLINE)
+        self._assert_course_verification_status(VERIFY_STATUS_MISSED_DEADLINE, days_until_deadline='null')
 
     def test_missed_verification_deadline_but_later_verified(self):
         # Expiration date in the past
@@ -159,7 +166,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
         # The student didn't have an approved verification at the deadline,
         # so we should show that the student missed the deadline.
-        self._assert_course_verification_status(VERIFY_STATUS_MISSED_DEADLINE)
+        self._assert_course_verification_status(VERIFY_STATUS_MISSED_DEADLINE, days_until_deadline='null')
 
     def test_verification_denied(self):
         # Expiration date in the future
@@ -219,7 +226,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.submit()
 
         # Expect that the user's displayed enrollment mode is verified.
-        self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
+        self._assert_course_verification_status(VERIFY_STATUS_APPROVED, days_until_deadline='null')
 
     def test_with_two_verifications(self):
         # checking if a user has two verification and but most recent verification course deadline is expired
@@ -295,26 +302,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         VERIFY_STATUS_APPROVED: "ID Verified Ribbon/Badge",
     }
 
-    NOTIFICATION_MESSAGES = {
-        VERIFY_STATUS_NEED_TO_VERIFY: [
-            "You still need to verify for this course.",
-            "Verification not yet complete"
-        ],
-        VERIFY_STATUS_SUBMITTED: ["Thanks for your patience as we process your request."],
-        VERIFY_STATUS_APPROVED: ["You have already verified your ID!"],
-        VERIFY_STATUS_NEED_TO_REVERIFY: ["Your verification will expire soon!"]
-    }
-
-    MODE_CLASSES = {
-        None: "audit",
-        VERIFY_STATUS_NEED_TO_VERIFY: "verified",
-        VERIFY_STATUS_SUBMITTED: "verified",
-        VERIFY_STATUS_APPROVED: "verified",
-        VERIFY_STATUS_MISSED_DEADLINE: "audit",
-        VERIFY_STATUS_NEED_TO_REVERIFY: "audit"
-    }
-
-    def _assert_course_verification_status(self, status):
+    def _assert_course_verification_status(self, status, days_until_deadline='{}'.format(DAYS)):
         """Check whether the specified verification status is shown on the dashboard.
 
         Arguments:
@@ -335,34 +323,9 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         if alt_text:
             self.assertContains(response, alt_text)
 
-        # Verify that the correct banner color is rendered
-        self.assertContains(
-            response,
-            "<article class=\"course {}\">".format(self.MODE_CLASSES[status])
-        )
+        # Verify that the correct status dict is present in response
+        status_dict = '"status": "{}", "days_until_deadline": {}'.format(status, days_until_deadline)
+        if not status:
+            status_dict = '"verification_status": {}'
 
-        # Verify that the correct copy is rendered on the dashboard
-        if status is not None:
-            if status in self.NOTIFICATION_MESSAGES:
-                # Different states might have different messaging
-                # so in some cases we check several possibilities
-                # and fail if none of these are found.
-                found_msg = False
-                for message in self.NOTIFICATION_MESSAGES[status]:
-                    if message in response.content:
-                        found_msg = True
-                        break
-
-                fail_msg = "Could not find any of these messages: {expected}".format(
-                    expected=self.NOTIFICATION_MESSAGES[status]
-                )
-                self.assertTrue(found_msg, msg=fail_msg)
-        else:
-            # Combine all possible messages into a single list
-            all_messages = []
-            for msg_group in self.NOTIFICATION_MESSAGES.values():
-                all_messages.extend(msg_group)
-
-            # Verify that none of the messages are displayed
-            for msg in all_messages:
-                self.assertNotContains(response, msg)
+        self.assertIn(status_dict, response.content)

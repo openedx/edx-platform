@@ -86,8 +86,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
     def test_not_eligible_for_credit(self):
         # The user is not yet eligible for credit, so no additional information should be displayed on the dashboard.
         response = self._load_dashboard()
-        self.assertNotContains(response, "credit-eligibility-msg")
-        self.assertNotContains(response, "purchase-credit-btn")
+        self.assertNotContains(response, '"purchased":')
+        self.assertNotContains(response, '"error":')
 
     def test_eligible_for_credit(self):
         # Simulate that the user has completed the only requirement in the course
@@ -96,8 +96,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
         # The user should have the option to purchase credit
         response = self._load_dashboard()
-        self.assertContains(response, "credit-eligibility-msg")
-        self.assertContains(response, "purchase-credit-btn")
+        self.assertContains(response, '"purchased": false')
+        self.assertContains(response, '"error": false')
 
         # Move the eligibility deadline so it's within 30 days
         eligibility = CreditEligibility.objects.get(username=self.USERNAME)
@@ -107,8 +107,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         # The user should still have the option to purchase credit,
         # but there should also be a message urging the user to purchase soon.
         response = self._load_dashboard()
-        self.assertContains(response, "credit-eligibility-msg")
-        self.assertContains(response, "purchase-credit-btn")
+        self.assertContains(response, '"purchased": false')
+        self.assertContains(response, '"error": false')
 
     def test_purchased_credit(self):
         # Simulate that the user has purchased credit, but has not
@@ -117,7 +117,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         self._purchase_credit()
 
         response = self._load_dashboard()
-        self.assertContains(response, "credit-request-not-started-msg")
+        self.assertContains(response, '"request_status": null')
+        self.assertContains(response, '"error": false')
 
     def test_purchased_credit_and_request_pending(self):
         # Simulate that the user has purchased credit and initiated a request,
@@ -128,7 +129,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
         # Expect that the user's status is "pending"
         response = self._load_dashboard()
-        self.assertContains(response, "credit-request-pending-msg")
+        self.assertContains(response, '"request_status": "pending"')
+        self.assertContains(response, '"error": false')
 
     def test_purchased_credit_and_request_approved(self):
         # Simulate that the user has purchased credit and initiated a request,
@@ -140,7 +142,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
         # Expect that the user's status is "approved"
         response = self._load_dashboard()
-        self.assertContains(response, "credit-request-approved-msg")
+        self.assertContains(response, '"request_status": "approved"')
+        self.assertContains(response, '"error": false')
 
     def test_purchased_credit_and_request_rejected(self):
         # Simulate that the user has purchased credit and initiated a request,
@@ -152,7 +155,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
         # Expect that the user's status is "approved"
         response = self._load_dashboard()
-        self.assertContains(response, "credit-request-rejected-msg")
+        self.assertContains(response, '"request_status": "rejected"')
+        self.assertContains(response, '"error": false')
 
     def test_credit_status_error(self):
         # Simulate an error condition: the user has a credit enrollment
@@ -164,7 +168,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
         # Expect an error message
         response = self._load_dashboard()
-        self.assertContains(response, "credit-error-msg")
+        self.assertContains(response, '"eligible": true')
 
     def _load_dashboard(self):
         """Load the student dashboard and return the HttpResponse. """

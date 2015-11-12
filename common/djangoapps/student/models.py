@@ -1751,8 +1751,8 @@ def enforce_single_login(sender, request, user, signal, **kwargs):    # pylint: 
 class DashboardConfiguration(ConfigurationModel):
     """Dashboard Configuration settings.
 
-    Includes configuration options for the dashboard, which impact behavior and rendering for the application.
-
+    Includes configuration options for the dashboard, which impact behavior
+    and rendering for the application.
     """
     recent_enrollment_time_delta = models.PositiveIntegerField(
         default=0,

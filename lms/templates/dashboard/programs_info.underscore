@@ -1,0 +1,34 @@
+<% if (model.course_program_info && model.course_program_info.category === 'xseries') {
+    var xseries_btn_class = "xseries-border-btn";
+    if (model.course_mode === "verified"){
+        xseries_btn_class = "xseries-base-btn";
+    }
+    %>
+    <div class="message message-status is-shown credit-message">
+        <div class="xseries-action">
+            <div class="message-copy xseries-msg">
+                <p>
+                    <b class="message-copy-bold"><%= _.sprintf(gettext("%(category)s Program: Interested in more courses in this subject?"), {category:model.course_program_info.display_category}) %></b>
+                <p>
+                <p class="message-copy">
+                    <%= _.sprintf(gettext("This course is 1 of %(course_count)s courses in the %(link_start)s %(program_display_name)s %(link_end)s %(program_category)s."),
+                    {
+                        course_count: model.course_program_info.course_count,
+                        link_start:_.sprintf('<a href="%(program_marketing_url)s">',{program_marketing_url:model.course_program_info.program_marketing_url}),
+                        link_end:'</a>',
+                        program_display_name:model.course_program_info.display_name,
+                        program_category:model.course_program_info.display_category,
+                    }) %>
+                </p>
+
+            </div>
+            <a class="btn <%- xseries_btn_class %>" href="<%- model.course_program_info.program_marketing_url %>" target="_blank">
+                <i class="action-xseries-icon"></i>
+                <span>
+                    <%= _.sprintf(gettext("View %(category)s Details"), {category:model.course_program_info.display_category}) %>
+                </span>
+            </a>
+        </div>
+    </div>
+
+<% } %>

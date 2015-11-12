@@ -2,6 +2,7 @@
 // ====================
 
 // Table of Contents
+// * +Dashboard - Resets
 // * +Dashboard - Sidebar
 // * +Dashboard - Course Listing
 // * +Dashboard - Course Item
@@ -9,11 +10,26 @@
 // * +Dashboard - Banner
 
 
+// +Dashboard - Resets
+// ====================
+%button-reset {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  background-image: none;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-shadow: none;
+  text-transform: none;
+}
+
 // +Dashboard - Sidebar
 // ====================
 .dashboard {
   @include clearfix();
-  padding: ($baseline*2) 0 $baseline 0;
+  padding: ($baseline*1.5) 0 ;
 
   .wrapper-find-courses {
     @include float(right);
@@ -38,7 +54,6 @@
     @include margin-left(flex-gutter());
     width: flex-grid(3);
     margin-top: ($baseline*2);
-    border-top: 3px solid $blue;
     padding: $baseline 0;
 
     .user-info {
@@ -199,10 +214,38 @@
       border-bottom: 4px solid $border-color-l4;
       margin-bottom: $baseline;
 
+      .page-content-nav {
+        margin-bottom: $baseline;
+        border-bottom: 3px solid $gray-l5;
+
+        .nav-item {
+            @extend %button-reset;
+            display: inline-block;
+            margin-bottom: -3px; // to match the border
+            border-bottom: 3px solid $gray-l5;
+            padding: ($baseline*.75);
+            color: $gray-d2;
+
+            &.is-active {
+                border-bottom: 3px solid $gray-d2;
+                color: $gray-d2;
+            }
+
+            // STATE: hover and focus
+            &:hover,
+            &:focus {
+                border-bottom: 3px solid $link-color;
+                color: $link-color;
+            }
+        }
+      }
+
+      // CASE: tabbed dashboard disabled
       .header-courses {
         @extend %t-title5;
         @include padding-right($baseline/2);
       }
+
     }
 
     // CASE: empty dashboard
@@ -248,8 +291,6 @@
 
       .course-item {
         margin-bottom: $baseline;
-        border-bottom: 4px solid $border-color-l4;
-        padding-bottom: $baseline;
 
         .course-container{
           border: 1px solid $border-color-l4;

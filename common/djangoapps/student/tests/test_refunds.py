@@ -89,7 +89,8 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.assertFalse(enrollment.refundable())
 
         resp = self.client.post(reverse('student.views.dashboard', args=[]))
-        self.assertIn('You will not be refunded the amount you paid.', resp.content)
+        self.assertContains(resp, '"is_paid_course": true')
+        self.assertContains(resp, '"show_refund_option": false')
 
     def test_refundable_when_certificate_exists(self):
         """ Assert that enrollment is not refundable once a certificat has been generated."""

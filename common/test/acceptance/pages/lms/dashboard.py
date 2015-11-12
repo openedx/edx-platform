@@ -19,7 +19,7 @@ class DashboardPage(PageObject):
         """
         super(DashboardPage, self).__init__(browser)
 
-    url = "{base}/dashboard".format(base=BASE_URL)
+    url = "{base}/dashboard#courses/current".format(base=BASE_URL)
 
     def is_browser_on_page(self):
         return self.q(css='section.my-courses').present
@@ -192,3 +192,16 @@ class DashboardPage(PageObject):
         Click on `Account` link.
         """
         self.q(css='.dropdown-menu li a').nth(2).click()
+
+    def refresh_page(self):
+        """
+        Reload the page.
+        """
+        self.browser.refresh()
+
+    @property
+    def navigation_global_links_text(self):
+        """
+        Return global navigation links text.
+        """
+        return self.q(css='.nav-global li a').text

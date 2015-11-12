@@ -75,7 +75,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Validate the behavior of the social sharing feature
         """
         twitter_widget = self.dashboard_page.get_course_social_sharing_widget('twitter')
-        twitter_url = "https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
+        twitter_url = "https://twitter.com/intent/tweet?text=Testing%20feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
         self.assertEqual(twitter_widget.attrs('title')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('data-tooltip')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('aria-haspopup')[0], 'true')
@@ -117,7 +117,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         expected_course_date = "Ended - {end_date}".format(end_date=end_date)
 
         # reload the page for changes to course date changes to appear in dashboard
-        self.dashboard_page.visit()
+        self.dashboard_page.refresh_page()
 
         course_date = self.dashboard_page.get_course_date()
 
@@ -179,7 +179,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         expected_course_date = "Starts - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
-        self.dashboard_page.visit()
+        self.dashboard_page.refresh_page()
 
         course_date = self.dashboard_page.get_course_date()
 
@@ -211,13 +211,20 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         expected_course_date = "Starts - {start_date} UTC".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
-        self.dashboard_page.visit()
+        self.dashboard_page.refresh_page()
 
         course_date = self.dashboard_page.get_course_date()
 
         # Test that proper course date with 'starts' message is displayed if a course is about to start in future,
         # and course starts within 5 days
         self.assertEqual(course_date, expected_course_date)
+
+    def test_dashboard_header_nav_has_find_courses(self):
+        """
+        Test that 'Find courses' is present in the navigation links
+        And other links are hidden in the navigation.
+        """
+        self.assertEqual(["FIND COURSES"], self.dashboard_page.navigation_global_links_text)
 
 
 @attr('a11y')

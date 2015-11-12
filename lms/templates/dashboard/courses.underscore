@@ -1,0 +1,16 @@
+<% if (courses.length > 0) { %>
+    <ul class="listing-courses" />
+<% } else { %>
+    <section class="empty-dashboard-message">
+      <% if (is_archived) { %>
+        <p><%= gettext("Looks like you haven't completed any courses yet.") %></p>
+      <% } else { %>
+        <p><%= gettext("Looks like you haven't enrolled in any courses yet.") %></p>
+      <% } %>
+      <% if (settings.courses_are_browsable) { %>
+        <a href="<%- settings.courses_url %>">
+          <%= gettext("Find courses now!") %>
+        </a>
+      <% } %>
+    </section>
+<% } %>

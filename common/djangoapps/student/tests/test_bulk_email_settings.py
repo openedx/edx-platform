@@ -38,49 +38,46 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         self.client.login(username=student.username, password="test")
 
         self.url = reverse('dashboard')
-        # URL for email settings modal
-        self.email_modal_link = (
-            '<a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" '
-            'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
-            'data-dashboard-index="0" data-optout="False">Email Settings</a>'
-        ).format(
-            org=self.course.org,
-            num=self.course.number,
-            name=self.course.display_name.replace(' ', '_'),
-        )
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true(self):
-        # Assert that the URL for the email view is in the response
+        """
+        Assert that the email settings link can be visible.
+        """
         response = self.client.get(self.url)
-        self.assertTrue(self.email_modal_link in response.content)
+        self.assertContains(response, '"show_email_settings": true', 1)
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
     def test_email_flag_false(self):
-        # Assert that the URL for the email view is not in the response
+        """
+        Assert that the email settings link can't be visible.
+        """
         response = self.client.get(self.url)
-        self.assertFalse(self.email_modal_link in response.content)
+        self.assertContains(response, '"show_email_settings": false', 1)
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_unauthorized(self):
-        # Assert that instructor email is not enabled for this course
+        """
+        Assert that instructor email is not enabled for this course and
+        the email settings link can't be visible if this course isn't
+        authorized.
+        """
         self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
-        # Assert that the URL for the email view is not in the response
-        # if this course isn't authorized
         response = self.client.get(self.url)
-        self.assertFalse(self.email_modal_link in response.content)
+        self.assertContains(response, '"show_email_settings": false', 1)
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_authorized(self):
-        # Authorize the course to use email
+        """
+        Assert that instructor email is enabled for this course and
+        the email settings link can be visible if this course is
+        authorized.
+        """
         cauth = CourseAuthorization(course_id=self.course.id, email_enabled=True)
         cauth.save()
-        # Assert that instructor email is enabled for this course
         self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
-        # Assert that the URL for the email view is not in the response
-        # if this course isn't authorized
         response = self.client.get(self.url)
-        self.assertTrue(self.email_modal_link in response.content)
+        self.assertContains(response, '"show_email_settings": true', 1)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -104,26 +101,21 @@ class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
 
         self.url = reverse('dashboard')
 
-        # URL for email settings modal
-        self.email_modal_link = (
-            '<a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" '
-            'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
-            'data-dashboard-index="0" data-optout="False">Email Settings</a>'
-        ).format(
-            org='edX',
-            num='toy',
-            name='2012_Fall',
-        )
-
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true_xml_store(self):
-        # The flag is enabled, and since REQUIRE_COURSE_EMAIL_AUTH is False, all courses should
-        # be authorized to use email. But the course is not Mongo-backed (should not work)
+        """
+        The flag is enabled, and since REQUIRE_COURSE_EMAIL_AUTH is False,
+        all courses should be authorized to use email. But the course is
+        not Mongo-backed and the email settings link can't be visible.
+        """
         response = self.client.get(self.url)
-        self.assertFalse(self.email_modal_link in response.content)
+        self.assertContains(response, '"show_email_settings": false', 1)
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_false_xml_store(self):
-        # Email disabled, shouldn't see link.
+        """
+        Assert that instructor email is not enabled for this course and
+        the email settings link can't be visible.
+        """
         response = self.client.get(self.url)
-        self.assertFalse(self.email_modal_link in response.content)
+        self.assertContains(response, '"show_email_settings": false', 1)

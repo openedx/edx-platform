@@ -33,6 +33,7 @@
             'teams/js/teams_tab_factory',
             'support/js/certificates_factory',
             'support/js/enrollment_factory',
+            'js/dashboard/views/dashboard_course_list_factory'
         ]),
 
         /**

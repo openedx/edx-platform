@@ -102,8 +102,9 @@ class CertificateDisplayTest(ModuleStoreTestCase):
 
         response = self.client.get(reverse('dashboard'))
 
-        self.assertContains(response, u'View Test_Certificate')
-        self.assertContains(response, test_url)
+        self.assertContains(response, '"show_cert_web_view": true')
+        self.assertContains(response, '"show_download_url": true')
+        self.assertContains(response, '"cert_web_view_url": "{}"'.format(test_url))
 
     def test_post_to_linkedin_invisibility(self):
         """
@@ -114,7 +115,7 @@ class CertificateDisplayTest(ModuleStoreTestCase):
 
         # until we set up the configuration, the LinkedIn action
         # button should not be visible
-        self._check_linkedin_visibility(False)
+        self._check_linkedin_visibility(False, None)
 
     def test_post_to_linkedin_visibility(self):
         """
@@ -129,8 +130,15 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         )
         config.save()
 
+        linked_in_url = config.add_to_profile_url(
+            self.course.id,
+            self.course.display_name,
+            'honor',
+            self.DOWNLOAD_URL
+        )
+
         # now we should see it
-        self._check_linkedin_visibility(True)
+        self._check_linkedin_visibility(True, linked_in_url)
 
     @mock.patch("microsite_configuration.microsite.is_request_in_microsite", _fake_is_request_in_microsite)
     def test_post_to_linkedin_microsite(self):
@@ -146,18 +154,26 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         )
         config.save()
 
-        # now we should not see it because we are in a microsite
-        self._check_linkedin_visibility(False)
+        linked_in_url = config.add_to_profile_url(
+            self.course.id,
+            self.course.display_name,
+            'honor',
+            self.DOWNLOAD_URL
+        )
 
-    def _check_linkedin_visibility(self, is_visible):
+        # now we should not see it because we are in a microsite
+        self._check_linkedin_visibility(False, linked_in_url)
+
+    def _check_linkedin_visibility(self, is_visible, linked_in_url):
         """
         Performs assertions on the Dashboard
         """
         response = self.client.get(reverse('dashboard'))
         if is_visible:
-            self.assertContains(response, u'Add Certificate to LinkedIn Profile')
+            self.assertContains(response, '"show_download_url": true')
+            self.assertContains(response, '"linked_in_url": "{}"'.format(linked_in_url))
         else:
-            self.assertNotContains(response, u'Add Certificate to LinkedIn Profile')
+            self.assertContains(response, '"linked_in_url": null')
 
     def _create_certificate(self, enrollment_mode):
         """Simulate that the user has a generated certificate. """
@@ -172,9 +188,12 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         )
 
     def _check_can_download_certificate(self):
+        """
+        Verify download certificate url.
+        """
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, u'Download Your ID Verified')
-        self.assertContains(response, self.DOWNLOAD_URL)
+        self.assertContains(response, '"show_download_url": true')
+        self.assertContains(response, '"download_url": "{}"'.format(self.DOWNLOAD_URL))
 
     def _check_can_download_certificate_no_id(self):
         """
@@ -182,16 +201,14 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         is present
         """
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, u'Download')
-        self.assertContains(response, u'(PDF)')
-        self.assertContains(response, self.DOWNLOAD_URL)
+        self.assertContains(response, '"show_download_url": true')
+        self.assertContains(response, '"download_url": "{}"'.format(self.DOWNLOAD_URL))
 
     def _check_can_not_download_certificate(self):
         """
         Make sure response does not have any of the download certificate buttons
         """
         response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, u'View Test_Certificate')
-        self.assertNotContains(response, u'Download Your Test_Certificate (PDF)')
-        self.assertNotContains(response, u'Download Test_Certificate (PDF)')
-        self.assertNotContains(response, self.DOWNLOAD_URL)
+        self.assertContains(response, '"show_download_url": false')
+        self.assertNotContains(response, '"show_cert_web_view":')
+        self.assertNotContains(response, '"download_url": "{}"'.format(self.DOWNLOAD_URL))

@@ -1,0 +1,48 @@
+<%
+var VERIFY_STATUS_NEED_TO_VERIFY = "verify_need_to_verify",
+VERIFY_STATUS_SUBMITTED = "verify_submitted",
+VERIFY_STATUS_APPROVED = "verify_approved",
+VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify";
+
+if (!!model.verification_status.status && $.inArray(model.verification_status.status,[VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY]) && !model.is_course_blocked) { %>
+    <li class="message message-status wrapper-message-primary is-shown">
+        <% if (model.verification_status.status === VERIFY_STATUS_NEED_TO_VERIFY) { %>
+            <div class="verification-reminder">
+                <% if (model.verification_status.days_until_deadline != null) { %>
+                    <h4 class="message-title"><%- gettext('Verification not yet complete.') %></h4>
+
+                    <p class="message-copy">
+                        <%= _.sprintf(gettext('You only have %(days)s day(s) left to verify for this course.'), {days: model.verification_status.days_until_deadline}) %></p>
+                <% } else { %>
+                    <h4 class="message-title"><%- gettext('Almost there!') %></h4>
+                    <p class="message-copy"><%- gettext('You still need to verify for this course.') %></p>
+                <% } %>
+            </div>
+            <div class="verification-cta">
+                <a href="<%- model.student_verify_now_url %>"
+                   class="cta" data-course-id="<%- model.course_key %>"><%- gettext('Verify Now') %></a>
+            </div>
+        <% } else if (model.verification_status.status === VERIFY_STATUS_SUBMITTED) { %>
+            <h4 class="message-title"><%- gettext('You have already verified your ID!') %></h4>
+
+            <p class="message-copy"><%- gettext('Thanks for your patience as we process your request.') %></p>
+        <% } else if (model.verification_status.status === VERIFY_STATUS_APPROVED) { %>
+            <h4 class="message-title"><%- gettext('You have already verified your ID!') %></h4>
+            <% if (model.verification_status.verification_good_until != null){ %>
+                <p class="message-copy"><%= _.sprintf(gettext('Your verification status is good until %(date)s.'), { date: model.verification_status.verification_good_until}) %>
+            <% } %>
+        <% } else if (model.verification_status.status === VERIFY_STATUS_NEED_TO_REVERIFY) { %>
+            <h4 class="message-title"><%- gettext('Your verification will expire soon!') %></h4>
+            <%
+            // Translators: start_link and end_link will be replaced with HTML tags;
+            // please do not translate these.
+            %>
+            <p class="message-copy"><%= _.sprintf(gettext('Your current verification will expire before the verification deadline for this course. %(start_link)s Re-verify your identity now %(end_link)s using a webcam and a government-issued ID.'),
+            {
+                start_link:_.sprintf('<a href="%(href)s">',{href:settings.student_reverify_url}),
+                end_link:'</a>'
+            }) %>
+            </p>
+        <% } %>
+    </li>
+<% } %>

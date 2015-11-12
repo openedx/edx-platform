@@ -2,9 +2,10 @@
 Student Views
 """
 import datetime
-import logging
-import uuid
 import json
+import logging
+import urllib
+import uuid
 import warnings
 from collections import defaultdict
 from urlparse import urljoin
@@ -45,8 +46,8 @@ from social.backends import oauth as social_oauth
 from social.exceptions import AuthException, AuthAlreadyAssociated
 
 from edxmako.shortcuts import render_to_response, render_to_string
-
 from course_modes.models import CourseMode
+from course_modes.helpers import enrollment_mode_display
 from shoppingcart.api import order_history
 from student.models import (
     Registration, UserProfile,
@@ -90,6 +91,7 @@ from lang_pref import LANGUAGE_KEY
 import track.views
 
 import dogstats_wrapper as dog_stats_api
+from util.date_utils import strftime_localized
 
 from util.db import outer_atomic
 from util.json_request import JsonResponse
@@ -126,7 +128,6 @@ from notification_prefs.views import enable_notifications
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
-
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -561,8 +562,6 @@ def dashboard(request):
         course_enrollments, course_modes_by_course
     )
 
-    course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
-
     message = ""
     if not user.is_active:
         message = render_to_string(
@@ -578,16 +577,92 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(
-        enrollment.course_id for enrollment in course_enrollments
-        if has_access(request.user, 'load', enrollment.course_overview)
-        and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
-    )
-
     # Get any programs associated with courses being displayed.
     # This is passed along in the template context to allow rendering of
     # program-related information on the dashboard.
     course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
+
+    # Verification Attempts
+    # Used to generate the "you must reverify for course x" banner
+    verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
+
+    # Populate the Order History for the side-bar.
+    order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
+
+    if 'notlive' in request.GET:
+        redirect_message = _("The course you are looking for does not start until {date}.").format(
+            date=request.GET['notlive']
+        )
+    else:
+        redirect_message = ''
+
+    archived_courses = [
+        course for course in course_enrollments
+        if course.course_overview.get_course_status(
+            cert_info(request.user, course.course_overview, course.mode)
+        ) in ["completed"]
+    ]
+    archived_courses_context = _get_courses_context(
+        request, archived_courses, course_modes_by_course, course_programs
+    )
+
+    current_courses = [
+        course for course in course_enrollments
+        if course.course_overview.get_course_status(
+            cert_info(request.user, course.course_overview, course.mode)
+        ) in ["active", "processing"]
+    ]
+    current_courses_context = _get_courses_context(
+        request, current_courses, course_modes_by_course, course_programs
+    )
+
+    template_settings = {
+        "share_settings": settings.SOCIAL_SHARING_SETTINGS,
+        "courses_are_browsable": settings.FEATURES.get('COURSES_ARE_BROWSABLE'),
+        "cert_name_short": settings.CERT_NAME_SHORT,
+        "cert_name_long": settings.CERT_NAME_LONG,
+        "billing_email": settings.PAYMENT_SUPPORT_EMAIL,
+        "contact_email": settings.CONTACT_EMAIL,
+        "default_feedback_email": settings.DEFAULT_FEEDBACK_EMAIL,
+        "ecoomerce_public_url_root": settings.ECOMMERCE_PUBLIC_URL_ROOT,
+        "enable_verified_certificates": settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'),
+        "custom_course_urls": settings.SOCIAL_SHARING_SETTINGS.get('CUSTOM_COURSE_URLS', False),
+        "dashboard_facebook": settings.SOCIAL_SHARING_SETTINGS.get('DASHBOARD_FACEBOOK', False),
+        "dashboard_twitter": settings.SOCIAL_SHARING_SETTINGS.get('DASHBOARD_TWITTER', False),
+        "dashboard_twitter_text": settings.SOCIAL_SHARING_SETTINGS.get('DASHBOARD_TWITTER_TEXT', False),
+        "platform_name": settings.PLATFORM_NAME,
+        "student_reverify_url": reverse('verify_student_reverify'),
+        "username": user.username,
+        "courses_url": reverse('courses'),
+        "change_enrollment": reverse('change_enrollment'),
+        "change_email_settings": reverse('change_email_settings'),
+        "signin_user": reverse('signin_user'),
+        "dashboard": reverse('dashboard')
+    }
+
+    context = {
+        'template_settings': json.dumps(template_settings),
+        'current_courses': json.dumps(current_courses_context),
+        'archived_courses': json.dumps(archived_courses_context),
+        'enrollment_message': enrollment_message,
+        'redirect_message': redirect_message,
+        'message': message,
+        'staff_access': staff_access,
+        'errored_courses': errored_courses,
+        'verification_status': verification_status,
+        'verification_msg': verification_msg,
+        'platform_name': platform_name,
+        'order_history_list': order_history_list,
+        'nav_hidden': True,
+    }
+
+    return render_to_response('dashboard.html', context)
+
+
+def _get_courses_context(request, course_enrollments, course_modes_by_course, course_programs):
+    """ Get the context needed for the provided course to render it on the
+    learner dashboard.
+    """
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -597,6 +672,11 @@ def dashboard(request):
             enrollment.course_id, enrollment,
             modes=course_modes_by_course[enrollment.course_id]
         )
+        for enrollment in course_enrollments
+    }
+    course_optouts = Optout.objects.filter(user=request.user).values_list('course_id', flat=True)
+    cert_statuses = {
+        enrollment.course_id: cert_info(request.user, enrollment.course_overview, enrollment.mode)
         for enrollment in course_enrollments
     }
 
@@ -614,12 +694,13 @@ def dashboard(request):
     #
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
-    verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
-    cert_statuses = {
-        enrollment.course_id: cert_info(request.user, enrollment.course_overview, enrollment.mode)
-        for enrollment in course_enrollments
-    }
+    verify_status_by_course = check_verify_status_by_course(request.user, course_enrollments)
 
+    show_courseware_links_for = frozenset(
+        enrollment.course_id for enrollment in course_enrollments
+        if has_access(request.user, 'load', enrollment.course_overview)
+        and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
+    )
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments if (
@@ -628,20 +709,16 @@ def dashboard(request):
             CourseAuthorization.instructor_email_enabled(enrollment.course_id)
         )
     )
-
-    # Verification Attempts
-    # Used to generate the "you must reverify for course x" banner
-    verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
-
-    # Gets data for midcourse reverifications, if any are necessary or have failed
-    statuses = ["approved", "denied", "pending", "must_reverify"]
-    reverifications = reverification_info(statuses)
-
     show_refund_option_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if enrollment.refundable()
     )
-
+    # get list of courses having pre-requisites yet to be completed
+    courses_having_prerequisites = frozenset(
+        enrollment.course_id for enrollment in course_enrollments
+        if enrollment.course_overview.pre_requisite_courses
+    )
+    courses_requirements_not_met = get_pre_requisite_courses_not_completed(request.user, courses_having_prerequisites)
     block_courses = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if is_course_blocked(
@@ -653,66 +730,142 @@ def dashboard(request):
             enrollment.course_id
         )
     )
-
     enrolled_courses_either_paid = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if enrollment.is_paid_course()
     )
 
-    # If there are *any* denied reverifications that have not been toggled off,
-    # we'll display the banner
-    denied_banner = any(item.display for item in reverifications["denied"])
+    courses_context = []
+    for course in course_enrollments:
+        course_context = {
+            "course_id": course.id,
+            "course_key": unicode(course.course_id),
+            "course_number": course.course_overview.number,
+            "course_name": course.course_overview.display_name_with_default,
+            "course_image_url": course.course_overview.image_urls,
+            "course_university_about_section": course.course_overview.display_org_with_default,
+            "course_mode": course.mode,
+            "has_course_ended": course.course_overview.has_ended(),
+            "has_course_started": course.course_overview.has_started(),
+            "starts_within_5_days": course.course_overview.starts_within(days=5),
+            "start_date_is_still_default": course.course_overview.start_date_is_still_default,
+            "short_end_date": course.course_overview.end_datetime_text("SHORT_DATE"),
+            "short_start_date": course.course_overview.start_datetime_text("SHORT_DATE"),
+            "day_and_time": course.course_overview.start_datetime_text("DAY_AND_TIME"),
+            "share_url": _get_share_url(request, course.course_overview),
+            "show_courseware_link": course.course_id in show_courseware_links_for,
+            "may_certify": course.course_overview.may_certify(),
+            "cert_status": cert_statuses.get(course.course_id),
+            "can_unenroll": (
+                not cert_statuses.get(course.course_id)
+                or cert_statuses.get(course.course_id).get('can_unenroll')
+            ),
+            "credit_status": _credit_statuses(request.user, course_enrollments).get(course.course_id),
+            "show_email_settings": course.course_id in show_email_settings_for,
+            "course_mode_info": course_mode_info.get(course.course_id),
+            "show_refund_option": course.course_id in show_refund_option_for,
+            "is_paid_course": course.course_id in enrolled_courses_either_paid,
+            "is_course_blocked": course.course_id in block_courses,
+            "verification_status": verify_status_by_course.get(course.course_id, {}),
+            "course_requirements": _get_courses_requirements(courses_requirements_not_met.get(course.course_id)),
+            "course_program_info": course_programs.get(unicode(course.course_id)),
+            "course_verified_certs": _get_course_verified_certs(course, verify_status_by_course),
+            "course_display_mode": _get_course_display_mode(course, verify_status_by_course),
+            "optout": unicode(course.course_overview.id) in course_optouts,
+            "student_verify_now_url": reverse(
+                'verify_student_verify_now',
+                kwargs={'course_id': unicode(course.course_id)}
+            ),
+            "student_upgrade_and_verify_url": reverse(
+                'verify_student_upgrade_and_verify',
+                kwargs={'course_id': unicode(course.course_id)}
+            ),
+            "course_info_url": reverse('info', args=[unicode(course.course_overview.id)]),
+        }
+        courses_context.append(course_context)
 
-    # Populate the Order History for the side-bar.
-    order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
+    return courses_context
 
-    # get list of courses having pre-requisites yet to be completed
-    courses_having_prerequisites = frozenset(
-        enrollment.course_id for enrollment in course_enrollments
-        if enrollment.course_overview.pre_requisite_courses
-    )
-    courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
-    if 'notlive' in request.GET:
-        redirect_message = _("The course you are looking for does not start until {date}.").format(
-            date=request.GET['notlive']
-        )
+def _get_course_display_mode(course, verify_status_by_course):
+    """ Get display mode by course
+
+    Arguments:
+        course ([CourseEnrollment]): an instance of course enrollment.
+        verify_status_by_course: Mapping of course keys verification status dictionaries.
+
+    Returns:
+        Return string contained display mode for course.
+
+    """
+    if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+        course_verified_certs = _get_course_verified_certs(course, verify_status_by_course)
+        display_mode = course_verified_certs.get('display_mode', '')
+
+        if display_mode != '':
+            display_mode = ' ' + display_mode
     else:
-        redirect_message = ''
+        display_mode = ''
 
-    context = {
-        'enrollment_message': enrollment_message,
-        'redirect_message': redirect_message,
-        'course_enrollments': course_enrollments,
-        'course_optouts': course_optouts,
-        'message': message,
-        'staff_access': staff_access,
-        'errored_courses': errored_courses,
-        'show_courseware_links_for': show_courseware_links_for,
-        'all_course_modes': course_mode_info,
-        'cert_statuses': cert_statuses,
-        'credit_statuses': _credit_statuses(user, course_enrollments),
-        'show_email_settings_for': show_email_settings_for,
-        'reverifications': reverifications,
-        'verification_status': verification_status,
-        'verification_status_by_course': verify_status_by_course,
-        'verification_msg': verification_msg,
-        'show_refund_option_for': show_refund_option_for,
-        'block_courses': block_courses,
-        'denied_banner': denied_banner,
-        'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
-        'user': user,
-        'logout_url': reverse(logout_user),
-        'platform_name': platform_name,
-        'enrolled_courses_either_paid': enrolled_courses_either_paid,
-        'provider_states': [],
-        'order_history_list': order_history_list,
-        'courses_requirements_not_met': courses_requirements_not_met,
-        'nav_hidden': True,
-        'course_programs': course_programs,
+    return display_mode
+
+
+def _get_course_verified_certs(course, verify_status_by_course):
+    """ Get dict of verified certificates by course
+
+    Arguments:
+        course ([CourseEnrollment]): an instance of course enrollment.
+        verify_status_by_course: Mapping of course keys verification status dictionaries.
+
+    Returns:
+        Return dict contained verified certs of course enrollment.
+
+    """
+    verification_status = verify_status_by_course.get(course.course_id, {})
+    status = verification_status.get('status')
+
+    course_verified_certs = enrollment_mode_display(course.mode, status, course.course_overview.id)
+
+    return course_verified_certs
+
+
+def _get_courses_requirements(course_requirements):
+    """ Get dict of course_requirements and convert CourseLocator to unicode.
+
+    Arguments:
+        course_requirements (list): a list of course requirements.
+
+    Returns:
+        Return dict contained list of course requirements.
+
+    """
+    if not course_requirements:
+        return
+
+    return {
+        'courses': [
+            {
+                'key': unicode(course['key']),
+                'display': course['display']
+            } for course in course_requirements.get('courses')
+        ]
     }
 
-    return render_to_response('dashboard.html', context)
+
+def _get_share_url(request, course_overview):
+    """
+    Get sharing configuration for a course.
+    """
+    share_url = ''
+    if settings.SOCIAL_SHARING_SETTINGS.get("CUSTOM_COURSE_URLS", False):
+        if course_overview.social_sharing_url:
+            share_url = urllib.quote_plus(course_overview.social_sharing_url)
+    else:
+        share_url = urllib.quote_plus(
+            request.build_absolute_uri(reverse('about_course', args=[unicode(course_overview.id)]))
+        )
+
+    return share_url
 
 
 def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
@@ -892,7 +1045,7 @@ def _credit_statuses(user, course_enrollments):
         status = {
             "course_key": unicode(course_key),
             "eligible": True,
-            "deadline": eligibility["deadline"],
+            "deadline": strftime_localized(eligibility["deadline"], 'DATE_TIME'),
             "purchased": course_key in credit_enrollments,
             "provider_name": None,
             "provider_status_url": None,

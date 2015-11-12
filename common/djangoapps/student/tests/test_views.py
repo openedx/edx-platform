@@ -47,22 +47,28 @@ class TestStudentDashboardUnenrollments(ModuleStoreTestCase):
             return {}
 
     @ddt.data(
-        ('notpassing', 1),
-        ('restricted', 1),
-        ('processing', 1),
-        (None, 1),
-        ('generating', 0),
-        ('ready', 0),
+        ('notpassing', 'true'),
+        ('restricted', 'true'),
+        ('processing', 'true'),
+        (None, 'true'),
+        ('generating', 'false'),
+        ('ready', 'false'),
     )
     @ddt.unpack
-    def test_unenroll_available(self, cert_status, unenroll_action_count):
+    def test_unenroll_available(self, cert_status, can_unenroll):
         """ Assert that the unenroll action is shown or not based on the cert status."""
         self.cert_status = cert_status
+
+        cert_status_dict = '"status": "{cert_status}", "can_unenroll": {can_unenroll}'.format(
+            cert_status=cert_status, can_unenroll=can_unenroll
+        )
+        if not cert_status:
+            cert_status_dict = '"cert_status": {}'
 
         with patch('student.views.cert_info', side_effect=self.mock_cert):
             response = self.client.get(reverse('dashboard'))
 
-            self.assertEqual(pq(response.content)(self.UNENROLL_ELEMENT_ID).length, unenroll_action_count)
+            self.assertIn(cert_status_dict, response.content)
 
     @ddt.data(
         ('notpassing', 200),

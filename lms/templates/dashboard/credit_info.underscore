@@ -1,0 +1,86 @@
+<% if (!!model.credit_status && model.credit_status.eligible) {
+    var provider_link = _.sprintf('<a href="%(href)s" target="_blank">%(name)s</a>', {
+        href: model.credit_status.provider_status_url,
+        name: model.credit_status.provider_name
+    });
+
+    var error = model.credit_status.error;
+
+    // Translators: provider_name is the name of a credit provider or university (e.g. State University)
+    var credit_msg = gettext("You have completed this course and are eligible to purchase course credit. Select <strong>Get Credit</strong> to get started.");
+    var credit_msg_class = "credit-eligibility-msg";
+    var credit_btn_class = "purchase-credit-btn";
+    var credit_btn_label = gettext("Get Credit");
+    var credit_btn_href = _.sprintf('%(root)s/credit/checkout/%(course_id)s/', {
+        root: settings.ECOMMERCE_PUBLIC_URL_ROOT, // TODO: send this url from settings in view
+        course_id: model.credit_status.course_key
+    });
+
+    if (model.credit_status.purchased) {
+        var request_status = model.credit_status.request_status;
+        if (request_status == null) {
+            //# Learner must initiate the credit request
+            //# Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a  credit provider, such as 'State University' or 'Happy Fun Company'.
+            credit_msg = _.sprintf(gettext("Thank you for your payment. To receive course credit, you must now request credit at the %(link_to_provider_site)s  website. Select <b>Request Credit</b> to get started."), {
+                 link_to_provider_site: provider_link
+            });
+            credit_msg_class = "credit-request-not-started-msg";
+            credit_btn_label = gettext("Request Credit");
+            credit_btn_class = 'pending-credit-btn';
+        } else if (request_status == 'pending') {
+            //# Request received but not reviewed
+            //## Translators: provider_name is the name of a credit provider or university (e.g. State University)
+            credit_msg = _.sprintf(gettext("%(provider_name)s has received your course credit request. We will update you when credit processing is complete."),
+            {
+                provider_name: model.credit_status.provider_name
+            });
+
+            credit_msg_class = "credit-request-pending-msg";
+            credit_btn_label = gettext("View Details");
+            credit_btn_class = 'pending-credit-btn';
+        } else if (request_status == 'approved') {
+            //# Credit granted!
+            //# Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a credit provider, such as 'State University' or 'Happy Fun Company'. provider_name is the name of credit provider.
+            credit_msg = _.sprintf(gettext("<b>Congratulations!</b> %(provider_name)s has approved your request for course credit. To see your course credit, visit the %(link_to_provider_site)s website."),
+            {
+                provider_name:model.credit_status.provider_name,
+                link_to_provider_site: provider_link
+            });
+            credit_msg_class = "credit-request-approved-msg";
+            credit_btn_href = model.credit_status.provider_status_url;
+            credit_btn_label = gettext("View Credit");
+        } else if (request_status == 'rejected') {
+            //# REJECTED (by the credit provider)!
+            //## Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a credit provider, such as 'State University' or 'Happy Fun Company'. provider_name is the name of credit provider.
+            credit_msg= _.sprintf(gettext("%(provider_name)s did not approve your request for course credit. For more information, contact %(link_to_provider_site)s directly."),
+            {
+                provider_name: model.credit_status.provider_name,
+                link_to_provider_site: provider_link,
+            });
+            credit_msg_class = "credit-request-rejected-msg";
+            credit_btn_label = null;
+        }
+    }
+%>
+
+<div class="message message-status is-shown credit-message">
+
+    <p class="message-copy is-hidden credit-error-msg" data-credit-error="<%- model.credit_status.error %>">
+        <%= _.sprintf(gettext("An error occurred with this transaction. For help, contact %(support_email)s."),
+        {
+            support_email:_.sprintf('<a href="mailto:%(address)s">%(address)s</a>',{ address:settings.default_feedback_email })
+        }) %>
+    </p>
+
+    <div class="credit-action">
+        <% if (credit_btn_label) { %>
+        <a class="btn credit-btn <%- credit_btn_class %>" href="<%- credit_btn_href %>" target="_blank"
+           data-course-key="<%- model.credit_status.course_key %>" data-user="<%- settings.username %>"
+           data-provider="<%- model.credit_status.provider_id %>">
+            <%- credit_btn_label %>
+        </a>
+        <% } %>
+        <div class="message-copy credit-msg ${credit_msg_class}"><%= credit_msg %></div>
+    </div>
+</div>
+<% } %>

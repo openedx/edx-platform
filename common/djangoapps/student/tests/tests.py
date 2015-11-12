@@ -2,6 +2,7 @@
 """
 Miscellaneous tests for the student app.
 """
+import json
 import logging
 import unittest
 import ddt
@@ -16,7 +17,7 @@ from pyquery import PyQuery as pq
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.test.client import Client
 
 from course_modes.models import CourseMode
@@ -28,8 +29,8 @@ from student.views import (
     process_survey_link,
     _cert_info,
     complete_course_mode_info,
-    _get_course_programs
-)
+    _get_course_programs,
+    is_course_blocked)
 from student.tests.factories import UserFactory, CourseModeFactory
 from util.testing import EventTestMixin
 from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
@@ -236,10 +237,9 @@ class DashboardTest(ModuleStoreTestCase):
             attempt.approve()
 
         response = self.client.get(reverse('dashboard'))
-        if mode in ['professional', 'no-id-professional']:
-            self.assertContains(response, 'class="course professional"')
-        else:
-            self.assertContains(response, 'class="course {0}"'.format(mode))
+        if mode == 'no-id-professional':
+            mode = 'professional'
+        self.assertContains(response, '"course_display_mode": " {}"'.format(mode))
         self.assertContains(response, value)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': True})
@@ -250,12 +250,12 @@ class DashboardTest(ModuleStoreTestCase):
         self.client.login(username="jack", password="test")
         self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
         self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
-        self._check_verification_status_off('audit', '')
+        self._check_verification_status_off('audit', 'true')
         self._check_verification_status_on('professional', 'You\'re enrolled as a professional education student')
         self._check_verification_status_on('no-id-professional', 'You\'re enrolled as a professional education student')
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def _check_verification_status_off(self, mode, value):
+    def _check_verification_status_off(self, mode, value='false'):
         """
         Check that the css class and the status message are not in the dashboard html.
         """
@@ -272,11 +272,8 @@ class DashboardTest(ModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
 
         if mode == 'audit':
-            # Audit mode does not have a banner.  Assert no banner element.
-            self.assertEqual(pq(response.content)(".sts-enrollment").length, 0)
-        else:
-            self.assertNotContains(response, "class=\"course {0}\"".format(mode))
-            self.assertNotContains(response, value)
+            self.assertContains(response, '"enrollment_title": ""')
+        self.assertContains(response, '"enable_verified_certificates": {}'.format(value))
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
     def test_verification_status_invisible(self):
@@ -285,9 +282,9 @@ class DashboardTest(ModuleStoreTestCase):
         if the verified certificates setting is off.
         """
         self.client.login(username="jack", password="test")
-        self._check_verification_status_off('verified', 'You\'re enrolled as a verified student')
-        self._check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
-        self._check_verification_status_off('audit', '')
+        self._check_verification_status_off('verified')
+        self._check_verification_status_off('honor')
+        self._check_verification_status_off('audit')
 
     def test_course_mode_info(self):
         verified_mode = CourseModeFactory.create(
@@ -351,8 +348,18 @@ class DashboardTest(ModuleStoreTestCase):
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        response = self.client.get(reverse('dashboard'))
-        self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
+        request = RequestFactory().request()
+        request.user = self.user
+        self.assertTrue(
+            is_course_blocked(
+                request,
+                shoppingcart.models.CourseRegistrationCode.objects.filter(
+                    course_id=self.course.id,
+                    registrationcoderedemption__redeemed_by=self.user
+                ),
+                self.course.id
+            )
+        )
         optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
         self.assertEqual(len(optout_object), 1)
 
@@ -366,8 +373,16 @@ class DashboardTest(ModuleStoreTestCase):
         invoice.is_valid = True
         invoice.save()
 
-        response = self.client.get(reverse('dashboard'))
-        self.assertNotIn('You can no longer access this course because payment has not yet been received', response.content)
+        self.assertFalse(
+            is_course_blocked(
+                request,
+                shoppingcart.models.CourseRegistrationCode.objects.filter(
+                    course_id=self.course.id,
+                    registrationcoderedemption__redeemed_by=self.user
+                ),
+                self.course.id
+            )
+        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):
@@ -400,10 +415,7 @@ class DashboardTest(ModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
 
         self.assertEquals(response.status_code, 200)
-        self.assertNotIn('Add Certificate to LinkedIn', response.content)
-
-        response_url = 'http://www.linkedin.com/profile/add?_ed='
-        self.assertNotContains(response, response_url)
+        self.assertContains(response, '"linked_in_url": null')
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
@@ -441,9 +453,6 @@ class DashboardTest(ModuleStoreTestCase):
         )
         response = self.client.get(reverse('dashboard'))
 
-        self.assertEquals(response.status_code, 200)
-        self.assertIn('Add Certificate to LinkedIn', response.content)
-
         expected_url = (
             'http://www.linkedin.com/profile/add'
             '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
@@ -451,7 +460,10 @@ class DashboardTest(ModuleStoreTestCase):
             'pfCertificationUrl=www.edx.org&'
             'source=o'
         )
-        self.assertContains(response, expected_url)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, '"show_download_url": true')
+        self.assertContains(response, '"linked_in_url": "{}"'.format(expected_url))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -489,19 +501,6 @@ class DashboardTest(ModuleStoreTestCase):
             self.assertEquals(response_1.status_code, 200)
             response_2 = self.client.get(reverse('dashboard'))
             self.assertEquals(response_2.status_code, 200)
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
-    def test_dashboard_header_nav_has_find_courses(self):
-        self.client.login(username="jack", password="test")
-        response = self.client.get(reverse("dashboard"))
-
-        # "Find courses" is shown in the side panel
-        self.assertContains(response, "Find courses")
-
-        # But other links are hidden in the navigation
-        self.assertNotContains(response, "How it Works")
-        self.assertNotContains(response, "Schools & Partners")
 
     def test_course_mode_info_with_honor_enrollment(self):
         """It will be true only if enrollment mode is honor and course has verified mode."""
@@ -1013,7 +1012,8 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
             response = self.client.get(reverse('dashboard'))
 
             self.assertEquals(response.status_code, 200)
-            self.assertIn('Pursue a Certificate of Achievement to highlight', response.content)
+            self.assertContains(response, '"is_course_blocked": false', 1)
+            self.assertContains(response, '"course_mode_info": {"show_upsell": true, "days_for_upsell": 1}', 1)
             self._assert_responses(response, 0)
 
     @ddt.data('verified', 'honor')
@@ -1033,18 +1033,13 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 [(self.course_1.id, 'active'), (self.course_2.id, 'unpublished')]
             )
             response = self.client.get(reverse('dashboard'))
-            # count total courses appearing on student dashboard
-            self.assertContains(response, 'course-container', 2)
+            # assert only one course appearing on student dashboard
+            self.assertContains(response, '"course_key": "{}"'.format(unicode(self.course_1.id)), 1)
             self._assert_responses(response, 1)
 
-            # for verified enrollment view the program detail button will have
-            # the class 'base-btn'
-            # for other modes view the program detail button will have have the
-            # class border-btn
-            if course_mode == 'verified':
-                self.assertIn('xseries-base-btn', response.content)
-            else:
-                self.assertIn('xseries-border-btn', response.content)
+            # verify course mode.
+            course_mode_dict = '"course_mode": "{}"'.format(course_mode)
+            self.assertContains(response, course_mode_dict, 2)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     @ddt.data((-2, -1), (-1, 1), (1, 2))
@@ -1099,8 +1094,11 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
             )
 
             response = self.client.get(reverse('dashboard'))
-            # count total courses appearing on student dashboard
-            self.assertContains(response, 'course-container', 3)
+            # assert all three courses appearing on student dashboard
+            self.assertContains(response, '"course_key":', 3)
+            self.assertContains(response, '"course_key": "{}"'.format(unicode(self.course_1.id)), 1)
+            self.assertContains(response, '"course_key": "{}"'.format(unicode(self.course_2.id)), 1)
+            self.assertContains(response, '"course_key": "{}"'.format(unicode(self.course_3.id)), 1)
             self._assert_responses(response, program_count)
 
     @patch('student.views.log.warning')
@@ -1137,17 +1135,21 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
 
             # verify that only normal courses (non-programs courses) appear on
             # the student dashboard.
-            self.assertContains(response, 'course-container', 1)
-            self.assertIn('Pursue a Certificate of Achievement to highlight', response.content)
+            self.assertContains(response, '"course_key":', 1)
+            self.assertContains(response, '"course_key": "{}"'.format(unicode(self.course_1.id)), 1)
+            self.assertContains(response, '"show_upsell": true', 1)
+            self.assertContains(response, '"is_course_blocked": false', 1)
 
     def _assert_responses(self, response, count):
-        """Dry method to compare different programs related upsell messages,
-        classes.
-        """
-        self.assertContains(response, 'label-xseries-association', count)
-        self.assertContains(response, 'btn xseries-', count)
-        self.assertContains(response, 'XSeries Program Course', count)
-        self.assertContains(response, 'XSeries Program: Interested in more courses in this subject?', count)
-        self.assertContains(response, 'This course is 1 of 3 courses in the', count)
-        self.assertContains(response, self.program_name, count)
-        self.assertContains(response, 'View XSeries Details', count)
+        """Dry method to compare course programs info related."""
+        course_program_dict = {
+            "category": "xseries",
+            "program_marketing_url": "xseries/fake-marketing-slug-xseries-1",
+            "course_count": 3,
+            "display_name": "Testing Program",
+            "display_category": "XSeries"
+        }
+
+        course_program_dict_dump = '"course_program_info": {}'.format(json.dumps(course_program_dict))
+
+        self.assertContains(response, course_program_dict_dump, count)

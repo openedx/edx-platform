@@ -8,6 +8,7 @@ from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
+from django.utils import timezone
 from django.utils.translation import ugettext
 
 from ccx_keys.locator import CCXLocator
@@ -228,7 +229,7 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    "Error while loading course {} from the module store: {}",
+                    'Error while loading course {} from the module store: {}',
                     unicode(course_id),
                     course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
                 )
@@ -273,6 +274,39 @@ class CourseOverview(TimeStampedModel):
             CourseOverviewImageSet.create_for_course(course_overview)
 
         return course_overview or cls.load_from_module_store(course_id)
+
+    def get_course_status(self, cert_status):
+        """Return the status for a course by checking its certificates status.
+
+        Check if the course is active, completed or the certificate is
+        processing.
+
+        Args:
+            cert_status (Dict): Certificate status for course enrollment
+
+        Returns:
+            Course status with value 'active', 'processing', 'completed' or
+            'inactive'.
+        """
+        from certificates.models import CertificateStatuses  # pylint: disable=import-error
+
+        now = timezone.now()
+        valid_certificate_statuses = [
+            CertificateStatuses.generating,
+            CertificateStatuses.downloadable,
+            CertificateStatuses.notpassing,
+            CertificateStatuses.restricted,
+        ]
+        if self.end is None or self.end > now:
+            return 'active'
+        elif self.end < now and cert_status.get('status') == 'processing':
+            return 'processing'
+        elif self.end is not None and self.end < now and cert_status.get('status') != 'processing':
+            return 'completed'
+        elif self.may_certify() and cert_status.get('status') in valid_certificate_statuses:
+            return 'completed'
+
+        return 'inactive'
 
     def clean_id(self, padding_char='='):
         """
@@ -343,7 +377,7 @@ class CourseOverview(TimeStampedModel):
 
         return course_metadata_utils.course_starts_within(self.start, days)
 
-    def start_datetime_text(self, format_string="SHORT_DATE"):
+    def start_datetime_text(self, format_string='SHORT_DATE'):
         """
         Returns the desired text corresponding the course's start date and
         time in UTC.  Prefers .advertised_start, then falls back to .start.
@@ -367,7 +401,7 @@ class CourseOverview(TimeStampedModel):
             self.advertised_start,
         )
 
-    def end_datetime_text(self, format_string="SHORT_DATE"):
+    def end_datetime_text(self, format_string='SHORT_DATE'):
         """
         Returns the end date or datetime for the course formatted as a string.
         """
@@ -409,7 +443,7 @@ class CourseOverview(TimeStampedModel):
         if self.advertised_start:
             return self.advertised_start
         elif self.start != DEFAULT_START_DATE:
-            return defaultfilters.date(self.start, "DATE_FORMAT")
+            return defaultfilters.date(self.start, 'DATE_FORMAT')
         else:
             return None
 
@@ -494,7 +528,7 @@ class CourseOverview(TimeStampedModel):
         tabs = self.tabs.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
-            if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
+            if tab.tab_id == 'discussion' and django_comment_client.utils.is_discussion_enabled(self.id):
                 return True
         return False
 

@@ -1,0 +1,33 @@
+<% if (model.course_mode_info.show_upsell && !model.is_course_blocked) { %>
+    <li class="message message-upsell has-actions is-shown">
+        <div class="wrapper-extended">
+            <p class="message-copy" align="justify">
+                <b class="message-copy-bold">
+                    <%= _.sprintf(gettext("Pursue a %(cert_name_long)s to highlight the knowledge and skills you gain in this course."), {cert_name_long:settings.cert_name_long}) %>
+                </b>
+                <br>
+                <%= _.sprintf(gettext("It's official. It's easily shareable. It's a proven motivator to complete the course. <br>%(link_start)s Learn more about the verified %(cert_name_long)s %(link_end)s."),
+                {
+                    link_start:_.sprintf('<a href="%(href)s" class="verified-info" data-course-key="%(course_key)s">',
+                                {
+                                    href:'/what_is_verified_cert',
+                                    course_key: model.course_key
+                                }),
+                    link_end:"</a>",
+                    cert_name_long: settings.cert_name_long
+                }) %>
+            </p>
+
+            <div class="action-upgrade-container">
+                <a class="action action-upgrade"
+                   href="<%- model.student_upgrade_and_verify_url %>"
+                   data-course-id="<%- model.course_key %>" data-user="<%- settings.username %>">
+                    <i class="action-upgrade-icon"></i>
+                    <span class="wrapper-copy">
+                      <span class="copy" id="upgrade-to-verified"><%- gettext("Upgrade to Verified") %></span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </li>
+<% } %>

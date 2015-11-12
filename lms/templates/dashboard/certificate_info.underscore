@@ -1,0 +1,111 @@
+<% if (model.may_certify && model.cert_status) {
+    if (model.cert_status.status === 'generating') {
+        status_css_class = 'course-status-certrendering';
+    } else if (model.cert_status.status === 'ready') {
+        status_css_class = 'course-status-certavailable';
+    } else if (model.cert_status.status === 'notpassing') {
+        status_css_class = 'course-status-certnotavailable';
+    } else {
+        status_css_class = 'course-status-processing';
+    }
+%>
+    <li class="message message-status <%- status_css_class %> is-shown">
+
+        <% if (model.cert_status.status === 'processing'){ %>
+            <p class="message-copy"><%- gettext("Final course details are being wrapped up at this time. Your final standing will be available shortly.") %></p>
+        <% } else if ($.inArray(model.cert_status.status, ['generating', 'ready', 'notpassing', 'restricted'])) { %>
+            <p class="message-copy"><%- gettext("Your final grade:")%>
+            <span class="grade-value"><%= _.sprintf("%.0f", model.cert_status.grade * 100) %></span>.
+            <% if (model.cert_status.status === 'notpassing'){ %>
+                <% if (model.course_mode !== 'audit'){ %>
+                    <%= _.sprintf(gettext("Grade required for a %(cert_name_short)s:"), {cert_name_short:settings.cert_name_short}) %> <span class="grade-value">
+                <% } else { %>
+                    <%- gettext("Grade required to pass this course:")%> <span class="grade-value">
+                <% } %>
+                <%= _.sprintf("%.0f", model.course_overview.lowest_passing_grade * 100) %>
+                </span>.
+            <% } else if (model.cert_status.status === 'restricted' && model.course_mode === 'verified'){ %>
+                <p class="message-copy">
+                    <%= _.sprintf(gettext("Your verified %(cert_name_long)s is being held pending confirmation that the issuance of your %(cert_name_short)s is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting %(email)s. If you would like a refund on your %(cert_name_long)s, please contact our billing address %(billing_email)s"),
+                    {
+                        email: _.sprintf('<a class="contact-link" href="mailto:%(email)s">%(email)s</a>.', {email:settings.contact_email}),
+                        billing_email: _.sprintf('<a class="contact-link" href="mailto:%(email)s">%(email)s</a>',{email:settings.billing_email}),
+                        cert_name_short:settings.cert_name_short,
+                        cert_name_long:settings.cert_name_long
+                    }) %>
+                </p>
+
+            <% } else if (model.cert_status.status === 'restricted') { %>
+                <p class="message-copy">
+                    <%= _.sprintf(gettext("Your %(cert_name_long)s is being held pending confirmation that the issuance of your %(cert_name_short)s is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting %(email)s."),
+                    {
+                        email: _.sprintf('<a class="contact-link" href="mailto:%(email)s">%(email)s</a>.', {email:settings.contact_email}),
+                        cert_name_short:settings.cert_name_short,
+                        cert_name_long:settings.cert_name_long
+                    }) %>
+                </p>
+            <% } %>
+            </p>
+        <% } %>
+
+        <% if (model.cert_status.show_disabled_download_button || model.cert_status.show_download_url || model.cert_status.show_survey_button){ %>
+            <div class="wrapper-message-primary">
+                <ul class="actions actions-primary">
+                    <% if (model.cert_status.show_disabled_download_button){ %>
+                        <li class="action"><span class="disabled">
+                            <%= _.sprintf("Your %(cert_name_short)s is Generating", {cert_name_short:settings.cert_name_short}) %></span></li>
+                    <% } else if (model.cert_status.show_download_url && model.cert_status.show_cert_web_view){ %>
+                        <li class="action action-certificate">
+                            <a class="btn" href="<%- model.cert_status.cert_web_view_url %>" target="_blank"
+                               title="<%- gettext('This link will open the certificate web view') %>">
+                                <%= _.sprintf(gettext("View %(cert_name_short)s"), {cert_name_short:settings.cert_name_short}) %></a></li>
+                    <% } else if (model.cert_status.show_download_url && $.inArray(model.course_mode, ["honor", "audit", "no-id-professional"])) { %>
+                        <li class="action action-certificate">
+                            <a class="btn" href="<%- model.cert_status.download_url %>"
+                               title="<%- gettext('This link will open/download a PDF document') %>">
+                                <%= _.sprintf(gettext("Download %(cert_name_short)s (PDF)"), {cert_name_short:settings.cert_name_short}) %></a></li>
+                    <% } else if (model.cert_status.show_download_url && model.course_mode === 'verified' && model.cert_status.mode === 'honor'){ %>
+                        <li class="action">
+                            <a class="btn" href="<%- model.cert_status.download_url %>"
+                               title="<%- gettext('This link will open/download a PDF document') %>">
+                                <%= _.sprintf(gettext("Download Your %(cert_name_short)s (PDF)"), {cert_name_short:settings.cert_name_short}) %></a>
+                        </li>
+                    <% } else if (model.cert_status.show_download_url && $.inArray(model.course_mode, ["verified", "professional"])) { %>
+                        <li class="action">
+                            <a class="btn" href="<%- model.cert_status.download_url %>"
+                               title="<%= _.sprintf(gettext('This link will open/download a PDF document of your verified %(cert_name_long)s.'), {cert_name_long:settings.cert_name_long}) %>">
+                                <%= _.sprintf(gettext("Download Your ID Verified %(cert_name_short)s (PDF)"), {cert_name_short:settings.cert_name_short}) %></a>
+                        </li>
+                    <% }
+
+                    if (model.cert_status.show_survey_button) { %>
+                        <li class="action"><a class="cta" href="<%- model.cert_status.survey_url %>">
+                            <%- gettext("Complete our course feedback survey") %></a></li>
+                    <% } %>
+                </ul>
+            </div>
+
+            <% if (model.cert_status.show_download_url && model.cert_status.linked_in_url){ %>
+                <ul class="actions actions-secondary">
+                    <li class="action action-share">
+                        <a class="action-linkedin-profile" target="_blank" href="<%- model.cert_status.linked_in_url %>"
+                           title="<%- gettext('Add Certificate to LinkedIn Profile') %>"
+                           data-course-id="<%- model.course_key %>"
+                           data-certificate-mode="<%- model.cert_status.mode %>"
+                        >
+                            <img class="action-linkedin-profile-img"
+                                 src="images/linkedin_add_to_profile.png"
+                                 alt="<%- gettext('Share on LinkedIn') %>">
+                        </a>
+                    </li>
+                </ul>
+            <% } %>
+
+            <% if (model.cert_status.show_download_url && model.course_mode === 'verified' && model.cert_status.mode === 'honor'){ %>
+                <div class="certificate-explanation">
+                    <%= _.sprintf(gettext('Since we did not have a valid set of verification photos from you when your %(cert_name_long)s was generated, we could not grant you a verified %(cert_name_short)s. An honor code %(cert_name_short)s has been granted instead.'), {cert_name_short:settings.cert_name_short, cert_name_long:settings.cert_name_long}) %>
+                </div>
+            <% } %>
+        <% } %>
+    </li>
+<% } %>
