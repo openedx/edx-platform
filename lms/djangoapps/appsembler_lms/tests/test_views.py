@@ -1,3 +1,7 @@
+# to run just these tests:
+# ./manage.py lms --settings test test lms/djangoapps/appsembler_lms/tests/test_views.py
+
+
 import ddt
 import mock
 from django.conf import settings
