@@ -208,7 +208,7 @@ def uninstall_python_packages():
             uninstalled = True
 
         # Uninstall django-storages
-        if any("django-storages" in line for line in frozen):
+        if any("django-storages==" in line for line in frozen):
             sh("pip uninstall -y django-storages")
             uninstalled = True
 
