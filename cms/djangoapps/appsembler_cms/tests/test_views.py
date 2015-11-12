@@ -1,3 +1,6 @@
+# to run just these tests:
+# ./manage.py cms --settings test test cms/djangoapps/appsembler_cms/tests/test_views.py
+
 import ddt
 import mock
 from django.conf import settings
