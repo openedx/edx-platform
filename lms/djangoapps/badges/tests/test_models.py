@@ -3,9 +3,10 @@ Tests for the Badges app models.
 """
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
+from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
+from mock import patch, Mock
 from nose.plugins.attrib import attr
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -54,6 +55,7 @@ class DummyBackend(object):
     """
     Dummy badge backend, used for testing.
     """
+    award = Mock()
 
 
 class BadgeClassTest(ModuleStoreTestCase):
@@ -126,9 +128,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         Test returns None if the badge class does not exist.
         """
         badge_class = BadgeClass.get_badge_class(
-            slug='new_slug', issuing_component='new_component', description=None,
-            criteria=None, display_name=None,
-            image_file_handle=None, create=False
+            slug='new_slug', issuing_component='new_component', create=False
         )
         self.assertIsNone(badge_class)
         # Run this twice to verify there wasn't a background creation of the badge.
@@ -139,7 +139,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         )
         self.assertIsNone(badge_class)
 
-    def test_get_badge_class_validate(self):
+    def test_get_badge_class_image_validate(self):
         """
         Verify handing a broken image to get_badge_class raises a validation error upon creation.
         """
@@ -149,6 +149,17 @@ class BadgeClassTest(ModuleStoreTestCase):
             slug='new_slug', issuing_component='new_component', description='This is a test',
             criteria='https://example.com/test_criteria', display_name='Super Badge',
             image_file_handle=get_image('unbalanced')
+        )
+
+    def test_get_badge_class_data_validate(self):
+        """
+        Verify handing incomplete data for required fields when making a badge class raises an Integrity error.
+        """
+        self.assertRaises(
+            IntegrityError,
+            BadgeClass.get_badge_class,
+            slug='new_slug', issuing_component='new_component',
+            image_file_handle=get_image('good')
         )
 
     def test_get_for_user(self):
