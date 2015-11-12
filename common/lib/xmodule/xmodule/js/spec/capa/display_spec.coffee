@@ -145,6 +145,12 @@ describe 'Problem', ->
   describe 'check', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
+      # TODO: This is broken. It does not step through very much of the
+      # logic. It essentially tests just the very last little bit
+      # of the pipeline (setting the URL string directly, as opposed
+      # to all of the logic which generates it. We should be setting
+      # @problem.inputs, and then the tests would be much more
+      # meaningful.
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
@@ -165,7 +171,7 @@ describe 'Problem', ->
           always: (callable) -> callable()
           done: (callable) -> callable()
       @problem.check()
-      expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.id
+      expect(Logger.log).toHaveBeenCalledWith 'problem_graded', { answers : {  }, success : 'correct' }, @problem.id
 
     it 'submit the answer for check', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
