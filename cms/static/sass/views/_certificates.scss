@@ -33,17 +33,30 @@
       @extend %no-content;
     }
 
-    .wrapper-certificate {
+    .wrapper-certificates {
 
       .title {
         @extend %t-title4;
         @extend %t-strong;
-        margin-bottom: ($baseline/2);
       }
 
       .copy {
         @extend %t-copy-sub1;
       }
+
+      .instructions {
+        @extend %t-copy-sub1;
+        margin-bottom: $baseline;
+      }
+    }
+
+    .certificate-settings {
+      margin-bottom: $baseline;
+    }
+
+    .actual-course-title {
+      @extend %t-strong;
+      margin-bottom: $baseline;
     }
   }
 
@@ -205,6 +218,10 @@
 
       .wrapper-form {
         padding: $baseline ($baseline*1.5);
+
+        label {
+          @extend %t-strong;
+        }
       }
 
       .action-add-signatory {
