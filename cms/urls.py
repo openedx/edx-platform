@@ -117,7 +117,7 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    url(r'^labster/api/', include('labster.urls_cms', namespace='labster')),
+    url(r'^labster/api/', include('openedx.core.djangoapps.labster.urls_cms', namespace='labster')),
 )
 
 JS_INFO_DICT = {

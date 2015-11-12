@@ -14,10 +14,10 @@ from opaque_keys import InvalidKeyError
 from util.json_request import JsonResponse, expect_json
 from contentstore.views.course import _create_or_rerun_course
 from contentstore.utils import delete_course_and_groups
-from labster.course.utils import set_staff
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
-from labster.course.tasks import course_delete
+from openedx.core.djangoapps.labster.course.utils import set_staff
+from openedx.core.djangoapps.labster.course.tasks import course_delete
 
 
 log = logging.getLogger(__name__)

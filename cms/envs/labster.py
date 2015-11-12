@@ -15,7 +15,7 @@ for feature, value in ENV_LABSTER_FEATURES.items():
 
 INSTALLED_APPS += (
     'rest_framework.authtoken',
-    'labster',
+    'openedx.core.djangoapps.labster',
 )
 
 LABSTER_WIKI_LINK = LABSTER_SETTINGS.get('LABSTER_WIKI_LINK', 'https://theory.labster.com/')
