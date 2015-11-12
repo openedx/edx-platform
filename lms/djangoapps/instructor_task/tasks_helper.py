@@ -40,7 +40,8 @@ from django.utils.translation import ugettext as _
 from certificates.models import (
     CertificateWhitelist,
     certificate_info_for_user,
-    CertificateStatuses
+    CertificateStatuses,
+    GeneratedCertificate
 )
 from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
@@ -1419,6 +1420,12 @@ def generate_students_certificates(
     statuses_to_regenerate = task_input.get('statuses_to_regenerate', [])
     students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
 
+    if statuses_to_regenerate:
+        # Mark existing generated certificates as 'unavailable' before regenerating
+        # We need to call this method after "students_require_certificate" otherwise "students_require_certificate"
+        # would return no results.
+        invalidate_generated_certificates(course_id, enrolled_students, statuses_to_regenerate)
+
     task_progress.skipped = task_progress.total - len(students_require_certs)
 
     current_step = {'step': 'Generating Certificates'}
@@ -1542,10 +1549,12 @@ def students_require_certificate(course_id, enrolled_students, statuses_to_regen
     if statuses_to_regenerate:
         # Return Students that have Generated Certificates and the generated certificate status
         # lies in 'statuses_to_regenerate'
-        return User.objects.filter(
+        students_require_certificates = enrolled_students.filter(
             generatedcertificate__course_id=course_id,
             generatedcertificate__status__in=statuses_to_regenerate
         )
+        # Fetch results otherwise subsequent operations on table cause wrong data fetch
+        return list(students_require_certificates)
     else:
         # compute those students whose certificates are already generated
         students_already_have_certs = User.objects.filter(
@@ -1554,3 +1563,32 @@ def students_require_certificate(course_id, enrolled_students, statuses_to_regen
 
         # Return all the enrolled student skipping the ones whose certificates have already been generated
         return list(set(enrolled_students) - set(students_already_have_certs))
+
+
+def invalidate_generated_certificates(course_id, enrolled_students, certificate_statuses):  # pylint: disable=invalid-name
+    """
+    Invalidate generated certificates for all enrolled students in the given course having status in
+    'certificate_statuses'.
+
+    Generated Certificates are invalidated by marking its status 'unavailable' and updating verify_uuid, download_uuid,
+    download_url and grade with empty string.
+
+    :param course_id: Course Key for the course whose generated certificates need to be removed
+    :param enrolled_students: (queryset or list) students enrolled in the course
+    :param certificate_statuses: certificates statuses for whom to remove generated certificate
+    """
+    certificates = GeneratedCertificate.objects.filter(
+        user__in=enrolled_students,
+        course_id=course_id,
+        status__in=certificate_statuses,
+    )
+
+    # Mark generated certificates as 'unavailable' and update download_url, download_uui, verify_uuid and
+    # grade with empty string for each row
+    certificates.update(
+        status=CertificateStatuses.unavailable,
+        verify_uuid='',
+        download_uuid='',
+        download_url='',
+        grade='',
+    )
