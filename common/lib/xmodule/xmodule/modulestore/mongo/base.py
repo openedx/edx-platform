@@ -980,6 +980,28 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         return apply_cached_metadata
 
     @autoretry_read()
+    def get_courses_summary(self, **kwargs):
+        '''
+        Returns a list of course information which includes `display_name` and `locator` of a
+        course. This accepts an optional parameter of 'org' which will apply an efficient
+        filter to only get courses with the specified ORG
+        '''
+        course_org_filter = kwargs.get('org')
+
+        if course_org_filter:
+            course_records = self.collection.find({'_id.category': 'course', '_id.org': course_org_filter})
+        else:
+            course_records = self.collection.find({'_id.category': 'course'})
+
+        course_summaries = []
+        for course in course_records:
+            if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates'):
+                display_name = course['metadata'].get('display_name', '')
+                locator = SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
+                course_summaries.append({'display_name': display_name, 'locator': locator})
+        return course_summaries
+
+    @autoretry_read()
     def get_courses(self, **kwargs):
         '''
         Returns a list of course descriptors. This accepts an optional parameter of 'org' which

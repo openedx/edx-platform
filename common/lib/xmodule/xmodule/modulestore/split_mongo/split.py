@@ -933,6 +933,44 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # get the blocks for each course index (s/b the root)
         return self._get_structures_for_branch_and_locator(branch, self._create_course_locator, **kwargs)
 
+    @autoretry_read()
+    def get_courses_summary(self, branch, **kwargs):
+        """
+         Returns a list of course information which includes `display_name` and `locator` of a
+        course which matching any given qualifiers.
+
+        qualifiers should be a dict of keywords matching the db fields or any
+        legal query for mongo to use against the active_versions collection.
+
+        Note, this is to find the current head of the named branch type.
+        To get specific versions via guid use get_course.
+
+        :param branch: the branch for which to return courses.
+        """
+        def extract_course_info(course):
+            """
+            Extract course information from the course block.
+            `display_coursenum` and `display_organization` are used to display course.display_foo_with_default
+            """
+            course_info_fields = ['display_name', 'display_coursenumber', 'display_organization']
+            course_info = {field: course.fields[field] for field in course_info_fields if course.fields.get(field)}
+            return course_info
+
+        course_summaries = []
+        for entry, structure_info in self._get_structures_for_branch(branch, **kwargs):
+            locator = self._create_course_locator(structure_info, branch)
+            course_block = [
+                block_data
+                for block_key, block_data in entry['blocks'].items()
+                if block_key.type == "course"
+            ]
+            if not course_block:
+                raise ItemNotFoundError
+            course_summary = extract_course_info(course_block[0])
+            course_summary['locator'] = locator
+            course_summaries.append(course_summary)
+        return course_summaries
+
     def get_libraries(self, branch="library", **kwargs):
         """
         Returns a list of "library" root blocks matching any given qualifiers.
