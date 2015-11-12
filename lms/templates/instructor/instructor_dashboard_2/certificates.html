@@ -73,7 +73,12 @@ import json
         <div class="start-certificate-generation">
             <h2>${_("Generate Certificates")}</h2>
             <form id="certificates-generating-form" method="post" action="${section_data['urls']['start_certificate_generation']}">
-                <input type="button" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
+                % if section_data['html_cert_enabled'] and section_data['active_certificate'] is None:
+                    <p>${_("Course certificate generation requires an activated web certificate configuration.")}</p>
+                    <input type="button" id="disabled-btn-start-generating-certificates" class="is-disabled" aria-disabled="true" value="${_('Generate Certificates')}"/>
+                % else:
+                    <input type="button" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
+                %endif
             </form>
             <div class="certificate-generation-status"></div>
         </div>

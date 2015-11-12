@@ -299,6 +299,7 @@ def _section_certificates(course):
         'enabled_for_course': certs_api.cert_generation_enabled(course.id),
         'instructor_generation_enabled': instructor_generation_enabled,
         'html_cert_enabled': html_cert_enabled,
+        'active_certificate': certs_api.get_active_web_certificate(course),
         'certificate_statuses': GeneratedCertificate.get_unique_statuses(course_key=course.id),
         'urls': {
             'generate_example_certificates': reverse(
