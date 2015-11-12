@@ -8,13 +8,14 @@ from mock import patch
 
 from opaque_keys.edx.locator import CourseLocator
 
+from badges.events.course_complete import get_completion_badge
 from badges.models import BadgeAssertion
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
-from certificates.models import GeneratedCertificate, CertificateStatuses, get_completion_badge
+from certificates.models import GeneratedCertificate, CertificateStatuses
 
 
 class CertificateManagementTest(ModuleStoreTestCase):

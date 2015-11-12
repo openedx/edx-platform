@@ -62,13 +62,12 @@ from django_extensions.db.fields import CreationDateTimeField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
-from badges.events import course_complete
-from badges.models import BadgeAssertion, CourseCompleteImageConfiguration, BadgeClass
+from badges.events.course_complete import course_badge_check
+from badges.events.course_meta import completion_check, course_group_check
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from instructor_task.models import InstructorTask
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
-from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 LOGGER = logging.getLogger(__name__)
@@ -94,6 +93,11 @@ class CertificateStatuses(object):
         notpassing: "didn't receive",
         error: "error states"
     }
+
+    # If the certificate is in one of these states, the student has passed/completed the course.
+    # This is not truly canonical-- not all instances are generating certificates, and not all
+    # courses currently have certificates generated.
+    PASSED_STATUSES = (generating, regenerating, downloadable)
 
 
 class CertificateSocialNetworks(object):
@@ -888,47 +892,26 @@ class CertificateTemplateAsset(TimeStampedModel):
         app_label = "certificates"
 
 
-def get_completion_badge(course_id, user):
+@receiver(post_save, sender=GeneratedCertificate)
+# pylint: disable=unused-argument
+def create_course_badge(sender, instance, **kwargs):
     """
-    Given a course key and a user, find the user's enrollment mode
-    and get the Course Completion badge.
+    Standard signal hook to create course badges when a certificate has been generated.
     """
-    from student.models import CourseEnrollment
-    mode = CourseEnrollment.objects.filter(
-        user=user, course_id=course_id
-    ).order_by('-is_active')[0].mode
-    course = modulestore().get_course(course_id)
-    return BadgeClass.get_badge_class(
-        slug=course_complete.course_slug(course_id, mode),
-        issuing_component='',
-        criteria=course_complete.criteria(course_id),
-        description=course_complete.badge_description(course, mode),
-        course_id=course_id,
-        mode=mode,
-        display_name=course.display_name,
-        image_file_handle=CourseCompleteImageConfiguration.image_for_mode(mode)
-    )
+    course_badge_check(instance)
 
 
 @receiver(post_save, sender=GeneratedCertificate)
-#pylint: disable=unused-argument
-def create_badge(sender, instance, **kwargs):
+def create_completion_badge(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
-    Standard signal hook to create badges when a certificate has been generated.
+    Standard signal hook to create 'x courses completed' badges when a certificate has been generated.
     """
-    if not settings.FEATURES.get('ENABLE_OPENBADGES', False):
-        return
-    if not modulestore().get_course(instance.course_id).issue_badges:
-        LOGGER.info("Course is not configured to issue badges.")
-        return
-    badge_class = get_completion_badge(instance.course_id, instance.user)
-    if BadgeAssertion.objects.filter(user=instance.user, badge_class=badge_class):
-        LOGGER.info("Completion badge already exists for this user on this course.")
-        # Badge already exists. Skip.
-        return
-    # Don't bake a badge until the certificate is available. Prevents user-facing requests from being paused for this
-    # by making sure it only gets run on the callback during normal workflow.
-    if not instance.status == CertificateStatuses.downloadable:
-        return
-    evidence = course_complete.evidence_url(instance.user.id, instance.course_id)
-    badge_class.award(instance.user, evidence_url=evidence)
+    completion_check(instance.user)
+
+
+@receiver(post_save, sender=GeneratedCertificate)
+def create_course_group_badge(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Standard signal hook to create badges when a user has completed a prespecified set of courses.
+    """
+    course_group_check(instance.user, instance.course_id)
