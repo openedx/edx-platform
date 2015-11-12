@@ -19,6 +19,7 @@ class ProblemPage(PageObject):
         """
         Return the current problem name.
         """
+        self.wait_for_element_presence('.problem-header', 'wait for problem header')
         return self.q(css='.problem-header').text[0]
 
     @property
@@ -81,6 +82,7 @@ class ProblemPage(PageObject):
         Fill in the answer to a numerical problem.
         """
         self.q(css='div.problem section.inputtype input').fill(text)
+        self.wait_for_ajax()
 
     def click_check(self):
         """
@@ -88,6 +90,7 @@ class ProblemPage(PageObject):
         """
         self.q(css='div.problem button.check').click()
         self.wait_for_ajax()
+        self.wait_for_element_visibility('div.problem section.inputtype div .status', 'wait for status icon')
 
     def click_hint(self):
         """
