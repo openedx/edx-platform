@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 
+from badges.events.course_complete import get_completion_badge
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -28,7 +29,7 @@ from certificates.models import (
     CertificateSocialNetworks,
     CertificateTemplate,
     CertificateHtmlViewConfiguration,
-    get_completion_badge)
+)
 
 from certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,

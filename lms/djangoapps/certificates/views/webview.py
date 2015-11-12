@@ -15,6 +15,7 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 from django.core.urlresolvers import reverse
 
+from badges.events.course_complete import get_completion_badge
 from courseware.access import has_access
 from courseware.courses import course_image_url
 from edxmako.shortcuts import render_to_response
@@ -39,8 +40,7 @@ from certificates.api import (
 from certificates.models import (
     GeneratedCertificate,
     CertificateHtmlViewConfiguration,
-    CertificateSocialNetworks,
-    get_completion_badge)
+    CertificateSocialNetworks)
 
 
 log = logging.getLogger(__name__)
