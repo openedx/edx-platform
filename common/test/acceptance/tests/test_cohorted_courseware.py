@@ -19,8 +19,11 @@ from ..tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 
 from bok_choy.promise import EmptyPromise
 
+from flaky import flaky
+
 
 @attr('shard_5')
+@flaky(max_runs=15, min_passes=15)
 class EndToEndCohortedCoursewareTest(ContainerBase):
 
     def setUp(self, is_staff=True):
