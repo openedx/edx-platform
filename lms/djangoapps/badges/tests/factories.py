@@ -8,7 +8,7 @@ from django.core.files.base import ContentFile
 from factory import DjangoModelFactory
 from factory.django import ImageField
 
-from badges.models import BadgeAssertion, CourseCompleteImageConfiguration, BadgeClass
+from badges.models import BadgeAssertion, CourseCompleteImageConfiguration, BadgeClass, CourseEventBadgesConfiguration
 from student.tests.factories import UserFactory
 
 
@@ -69,3 +69,13 @@ class BadgeAssertionFactory(DjangoModelFactory):
     data = {}
     assertion_url = 'http://example.com/example.json'
     image_url = 'http://example.com/image.png'
+
+
+class CourseEventBadgesConfigurationFactory(DjangoModelFactory):
+    """
+    Factory for CourseEventsBadgesConfiguration
+    """
+    class Meta(object):
+        model = CourseEventBadgesConfiguration
+
+    enabled = True

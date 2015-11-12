@@ -9,7 +9,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from certificates.models import get_completion_badge
+from badges.events.course_complete import get_completion_badge
 from xmodule.modulestore.django import modulestore
 from certificates.api import regenerate_user_certificates
 

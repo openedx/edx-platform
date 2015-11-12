@@ -14,7 +14,11 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 
+<<<<<<< HEAD
 from course_modes.models import CourseMode
+=======
+from badges.events.course_complete import get_completion_badge
+>>>>>>> a248c5a... Add completion and enrollment badges.
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -31,7 +35,6 @@ from certificates.models import (
     CertificateTemplate,
     CertificateHtmlViewConfiguration,
     CertificateTemplateAsset,
-    get_completion_badge
 )
 
 from certificates.tests.factories import (
