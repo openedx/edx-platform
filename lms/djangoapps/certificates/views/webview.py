@@ -14,6 +14,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 
+from badges.events.course_complete import get_completion_badge
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
@@ -39,8 +40,7 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
     CertificateHtmlViewConfiguration,
-    CertificateSocialNetworks,
-    get_completion_badge)
+    CertificateSocialNetworks)
 
 
 log = logging.getLogger(__name__)
