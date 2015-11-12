@@ -1887,7 +1887,10 @@ INSTALLED_APPS = (
     'sekizai',
     #'wiki.plugins.attachments',
     'wiki.plugins.links',
-    'wiki.plugins.notifications',
+    # Notifications were enabled, but only 11 people used it in three years. It
+    # got tangled up during the Django 1.8 migration, so we are disabling it.
+    # See TNL-3783 for details.
+    #'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
     # Foldit integration
