@@ -2023,6 +2023,8 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
+SUPPORT_SITE_LINK = ''
+
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
 SOCIAL_SHARING_SETTINGS = {
