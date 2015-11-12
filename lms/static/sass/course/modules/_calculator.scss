@@ -10,6 +10,7 @@
   @include transition(bottom $tmg-avg linear 0s);
   -webkit-appearance: none;
   width: 100%;
+  direction: ltr;
 
   &.open {
     bottom: -36px;
@@ -51,17 +52,6 @@
     max-height: 90px;
     background: $black;
     color: $white;
-
-    // UI: input help table
-    .calculator-input-help-table {
-      margin: ($baseline/2) 0;
-
-      tr th, tr td {
-        vertical-align: top;
-        border: 1px solid $gray-l4;
-        padding: ($baseline/2);
-      }
-    }
 
     form {
       @extend .clearfix;
@@ -157,6 +147,7 @@
             border: none;
             background: url("#{$static-path}/images/info-icon.png") center center no-repeat;
             color: $white;
+            cursor: pointer;
 
             &:focus {
               outline: 5px auto #5b9dd9;
@@ -169,47 +160,85 @@
               color: $white;
             }
           }
-
-          .help {
-            @include transition(none);
-            background: $white;
-            border-radius: 3px;
-            box-shadow: 0 0 3px #999;
-            color: #333;
-            padding: 10px;
-            position: absolute;
-            right: -40px;
-            bottom: 57px;
-            width: 600px;
-            overflow: hidden;
-            pointer-events: none;
-            display: none;
-            margin: 0;
-            list-style: none;
-
-            &.shown {
-              display: block;
-              pointer-events: auto;
-            }
-
-            .bold {
-              font-weight: bold;
-            }
-
-            p, p+p {
-              margin: 0;
-            }
-
-            .calc-postfixes {
-              margin: 10px auto;
-
-              td, th {
-                padding: 2px 15px;
-              }
-            }
-          }
         }
       }
     }
+  }
+}
+
+.calc-help-popup {
+  @include transition(none);
+
+  position: fixed;
+  left: 180px;
+  right: 180px;
+  top: 70px;
+  bottom: 90px;
+  overflow: auto;
+
+  background: $white;
+  border-radius: 3px;
+  box-shadow: // Standard 3px black shadow.
+              0 0 3px #999,
+              // Places a overlay black transparent popup background.
+              0 0 0 4000em rgba(0, 0, 0, 0.20);
+
+  color: #333;
+  padding: 10px;
+
+  pointer-events: none;
+  display: none;
+  margin: 0;
+  list-style: none;
+
+
+
+  // UI: input help table
+  .calculator-input-help-table {
+    margin: ($baseline/2) auto;
+
+    tr th, tr td {
+      vertical-align: top;
+      border: 1px solid $gray-l4;
+      padding: ($baseline/2);
+    }
+  }
+
+  &.shown {
+    display: block;
+    pointer-events: auto;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  p, p+p {
+    margin: 0;
+  }
+
+  .calc-postfixes {
+    margin: 10px auto;
+
+    td, th {
+      padding: 2px 15px;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    left: 20px;
+    right: 20px;
+  }
+
+  @media screen and (min-width: 991px) and (max-width: 1999px) {
+    left: 20%;
+    right: 20%;
+  }
+
+  @media screen and (min-width: 2000px) {
+    left: 35%;
+    right: 35%;
+    padding-bottom: 40px;
+    bottom: auto;
   }
 }
