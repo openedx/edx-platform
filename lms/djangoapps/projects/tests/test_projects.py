@@ -43,6 +43,7 @@ class ProjectsApiTests(TestCase):
         self.test_course_id = 'edx/demo/course'
         self.test_bogus_course_id = 'foo/bar/baz'
         self.test_course_content_id = "i4x://blah"
+        self.test_course_content_id2 = "i4x://blah2"
         self.test_bogus_course_content_id = "14x://foo/bar/baz"
 
         self.test_user = User.objects.create(
@@ -60,6 +61,11 @@ class ProjectsApiTests(TestCase):
         self.test_project = Project.objects.create(
             course_id=self.test_course_id,
             content_id=self.test_course_content_id,
+        )
+
+        self.test_project2 = Project.objects.create(
+            course_id=self.test_course_id,
+            content_id=self.test_course_content_id2,
         )
 
         self.test_workgroup = Workgroup.objects.create(
@@ -107,6 +113,32 @@ class ProjectsApiTests(TestCase):
         }
         response = self.client.delete(uri, headers=headers)
         return response
+
+    def test_projects_list_get(self):
+        """ Tests simple GET request - should return all projects """
+        response = self.do_get(self.test_projects_uri)
+        projects = response.data
+        self.assertEqual(len(projects), 2)
+        project1, project2 = projects[0], projects[1]
+        self.assertEqual(project1['id'], self.test_project.id)
+        self.assertEqual(project1['course_id'], self.test_project.course_id)
+        self.assertEqual(project1['content_id'], self.test_project.content_id)
+
+        self.assertEqual(project2['id'], self.test_project2.id)
+        self.assertEqual(project2['course_id'], self.test_project2.course_id)
+        self.assertEqual(project2['content_id'], self.test_project2.content_id)
+
+    def test_projects_list_get_filter_by_content_id(self):
+        """ Tests GET request with specified content_id - should return single project with matching content_id """
+        response = self.do_get(self.test_projects_uri + "?content_id=" + self.test_project.content_id)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], self.test_project.id)
+        self.assertEqual(response.data[0]['content_id'], self.test_project.content_id)
+
+        response = self.do_get(self.test_projects_uri + "?content_id=" + self.test_project2.content_id)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], self.test_project2.id)
+        self.assertEqual(response.data[0]['content_id'], self.test_project2.content_id)
 
     def test_projects_list_post(self):
         data = {
