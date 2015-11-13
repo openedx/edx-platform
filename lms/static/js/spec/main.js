@@ -316,7 +316,7 @@
             },
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext']
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
