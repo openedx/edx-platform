@@ -49,7 +49,7 @@ class CourseModeModelTest(TestCase):
             min_price=min_price,
             suggested_prices=suggested_prices,
             currency=currency,
-            expiration_datetime=expiration_datetime,
+            _expiration_datetime=expiration_datetime,
         )
 
     def test_save(self):
@@ -403,3 +403,21 @@ class CourseModeModelTest(TestCase):
             return dict(zip(dict_keys, display_values.get('verify_none')))
         else:
             return dict(zip(dict_keys, display_values.get(dict_type)))
+
+    def test_expiration_datetime_explicitly_set(self):
+        """ Verify that setting the expiration_date property sets the explicit flag. """
+        verified_mode, __ = self.create_mode('verified', 'Verified Certificate')
+        now = datetime.now()
+        verified_mode.expiration_datetime = now
+
+        self.assertTrue(verified_mode.expiration_datetime_is_explicit)
+        self.assertEqual(verified_mode.expiration_datetime, now)
+
+    def test_expiration_datetime_not_explicitly_set(self):
+        """ Verify that setting the _expiration_date property does not set the explicit flag. """
+        verified_mode, __ = self.create_mode('verified', 'Verified Certificate')
+        now = datetime.now()
+        verified_mode._expiration_datetime = now  # pylint: disable=protected-access
+
+        self.assertFalse(verified_mode.expiration_datetime_is_explicit)
+        self.assertEqual(verified_mode.expiration_datetime, now)
