@@ -320,6 +320,15 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     model = Project
 
+    def get_queryset(self):
+        target_content_id = self.request.QUERY_PARAMS.get('content_id')
+        queryset = self.model.objects.all()
+
+        if target_content_id:
+            queryset = queryset.filter(content_id=target_content_id)
+
+        return queryset
+
     @action(methods=['get', 'post'])
     def workgroups(self, request, pk):
         """
