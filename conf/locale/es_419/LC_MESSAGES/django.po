@@ -10367,7 +10367,7 @@ msgstr "Navegación del curso"
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Account"
-msgstr ""
+msgstr "Cuenta"
 
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
@@ -11219,7 +11219,7 @@ msgstr "Despliegue de más opciones"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Profile"
-msgstr ""
+msgstr "Perfil"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/shoppingcart/shopping_cart.html
