@@ -2018,6 +2018,7 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'openedx.core.lib.api.paginators.DefaultPagination',
     'PAGE_SIZE': 10,
+    'URL_FORMAT_OVERRIDE': None,
 }
 
 
