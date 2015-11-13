@@ -191,9 +191,9 @@ header.global {
       }
     }
 
-    button.dropdown {
-      font-size: 14px;
-      padding: 0 ($baseline/2);
+    .dropdown {
+      display: inline-block;
+      padding: ($baseline / 5) ($baseline / 2.5);
       color: $base-font-color;
       border: none;
       background: $white;
