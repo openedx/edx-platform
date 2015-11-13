@@ -124,7 +124,10 @@ urlpatterns = patterns(
 
     # spoc gradebook
     url(r'^gradebook$',
-        'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+        'instructor.views.gradebook_api.spoc_gradebook', name='spoc_gradebook'),
+
+    url(r'^gradebook/(?P<offset>[0-9]+)$',
+        'instructor.views.gradebook_api.spoc_gradebook', name='spoc_gradebook'),
 
     # Cohort management
     url(r'add_users_to_cohorts$',

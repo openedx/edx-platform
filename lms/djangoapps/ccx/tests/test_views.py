@@ -80,6 +80,40 @@ def ccx_dummy_request():
     return request
 
 
+def setup_students_and_grades(context):
+    """
+    Create students and set their grades.
+    :param context:  class reference
+    """
+    if context.course:
+        context.student = student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=student, course_id=context.course.id)
+
+        context.student2 = student2 = UserFactory.create()
+        CourseEnrollmentFactory.create(user=student2, course_id=context.course.id)
+
+        # create grades for self.student as if they'd submitted the ccx
+        for chapter in context.course.get_children():
+            for i, section in enumerate(chapter.get_children()):
+                for j, problem in enumerate(section.get_children()):
+                    # if not problem.visible_to_staff_only:
+                    StudentModuleFactory.create(
+                        grade=1 if i < j else 0,
+                        max_grade=1,
+                        student=context.student,
+                        course_id=context.course.id,
+                        module_state_key=problem.location
+                    )
+
+                    StudentModuleFactory.create(
+                        grade=1 if i > j else 0,
+                        max_grade=1,
+                        student=context.student2,
+                        course_id=context.course.id,
+                        module_state_key=problem.location
+                    )
+
+
 @attr('shard_1')
 @ddt.ddt
 class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -696,28 +730,12 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # which emulates how a student would get access.
         self.ccx_key = CCXLocator.from_course_locator(self._course.id, ccx.id)
         self.course = get_course_by_id(self.ccx_key, depth=None)
-
-        self.student = student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
-
-        # create grades for self.student as if they'd submitted the ccx
-        for chapter in self.course.get_children():
-            for i, section in enumerate(chapter.get_children()):
-                for j, problem in enumerate(section.get_children()):
-                    # if not problem.visible_to_staff_only:
-                    StudentModuleFactory.create(
-                        grade=1 if i < j else 0,
-                        max_grade=1,
-                        student=self.student,
-                        course_id=self.course.id,
-                        module_state_key=problem.location
-                    )
-
+        setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
-
         self.addCleanup(RequestCache.clear_request_cache)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True
         RequestCache.clear_request_cache()
@@ -728,6 +746,8 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
+        self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
         student_info = response.mako_context['students'][0]  # pylint: disable=no-member
         self.assertEqual(student_info['grade_summary']['percent'], 0.5)
         self.assertEqual(
@@ -751,12 +771,11 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             response['content-disposition'],
             'attachment'
         )
+        rows = response.content.strip().split('\r')
+        headers = rows[0]
 
-        headers, row = (
-            row.strip().split(',') for row in
-            response.content.strip().split('\n')
-        )
-        data = dict(zip(headers, row))
+        # picking first student records
+        data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
         self.assertNotIn('HW 04', data)
         self.assertEqual(data['HW 01'], '0.75')
         self.assertEqual(data['HW 02'], '0.5')

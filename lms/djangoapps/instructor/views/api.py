@@ -81,7 +81,6 @@ from instructor.enrollment import (
     unenroll_email,
 )
 from instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
-from instructor.offline_gradecalc import student_grades
 import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
@@ -2623,46 +2622,6 @@ def enable_certificate_generation(request, course_id=None):
     is_enabled = (request.POST.get('certificates-enabled', 'false') == 'true')
     certs_api.set_cert_generation_enabled(course_key, is_enabled)
     return redirect(_instructor_dash_url(course_key, section='certificates'))
-
-
-#---- Gradebook (shown to small courses only) ----
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-def spoc_gradebook(request, course_id):
-    """
-    Show the gradebook for this course:
-    - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    - Only displayed to course staff
-    """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-
-    enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1
-    ).order_by('username').select_related("profile")
-
-    # possible extension: implement pagination to show to large courses
-
-    student_info = [
-        {
-            'username': student.username,
-            'id': student.id,
-            'email': student.email,
-            'grade_summary': student_grades(student, request, course),
-            'realname': student.profile.name,
-        }
-        for student in enrolled_students
-    ]
-
-    return render_to_response('courseware/gradebook.html', {
-        'students': student_info,
-        'course': course,
-        'course_id': course_key,
-        # Checked above
-        'staff_access': True,
-        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
-    })
 
 
 @ensure_csrf_cookie

@@ -39,8 +39,8 @@ from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
-from instructor.offline_gradecalc import student_grades
 from instructor.views.api import _split_input_list
+from instructor.views.gradebook_api import get_grade_book_page
 from instructor.views.tools import get_student_from_identifier
 from instructor.enrollment import (
     enroll_email,
@@ -551,24 +551,11 @@ def ccx_gradebook(request, course, ccx=None):
     ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
-
-        enrolled_students = User.objects.filter(
-            courseenrollment__course_id=ccx_key,
-            courseenrollment__is_active=1
-        ).order_by('username').select_related("profile")
-
-        student_info = [
-            {
-                'username': student.username,
-                'id': student.id,
-                'email': student.email,
-                'grade_summary': student_grades(student, request, course),
-                'realname': student.profile.name,
-            }
-            for student in enrolled_students
-        ]
+        student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
 
         return render_to_response('courseware/gradebook.html', {
+            'page': page,
+            'page_url': reverse('ccx_gradebook', kwargs={'course_id': ccx_key}),
             'students': student_info,
             'course': course,
             'course_id': course.id,
