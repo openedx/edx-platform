@@ -15,6 +15,8 @@ from microsite_configuration.models import (
     MicrositeTemplate
 )
 from microsite_configuration.microsite import get_value as microsite_get_value
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
@@ -162,3 +164,12 @@ class DatabaseMicrositeTemplateBackend(BaseMicrositeTemplateBackend):
         return Template(
             text=template_text
         )
+
+    @staticmethod
+    @receiver(post_save, sender=MicrositeTemplate)
+    def clear_cache(sender, instance, **kwargs):
+        """
+        Clear the cached template when the model is saved
+        """
+        cache_key = "template_cache." + instance.microsite.key + '.' + instance.template_uri
+        cache.delete(cache_key)
