@@ -254,7 +254,7 @@ class YouTubeVideoTest(VideoBaseTest):
         Then the "CC" button is hidden
         """
         self.navigate_to_video()
-        self.assertFalse(self.video.is_button_shown('CC'))
+        self.assertFalse(self.video.is_button_shown('transcript_button'))
 
     def test_fullscreen_video_alignment_with_transcript_hidden(self):
         """
@@ -351,8 +351,8 @@ class YouTubeVideoTest(VideoBaseTest):
         # check if video aligned correctly with enabled transcript
         self.assertTrue(self.video.is_aligned(True))
 
-        # click video button "CC"
-        self.video.click_player_button('CC')
+        # click video button "transcript"
+        self.video.click_player_button('transcript_button')
 
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
@@ -459,7 +459,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertTrue(self.video.is_video_rendered('html5'))
         # check if caption button is visible
-        self.assertTrue(self.video.is_button_shown('CC'))
+        self.assertTrue(self.video.is_button_shown('transcript_button'))
         self._verify_caption_text('Welcome to edX.')
 
     def test_download_transcript_button_works_correctly(self):

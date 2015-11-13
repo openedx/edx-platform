@@ -267,11 +267,11 @@ class CMSVideoTest(CMSVideoBaseTest):
         """
         self._create_course_unit(subtitles=True)
 
-        self.video.click_player_button('CC')
+        self.video.click_player_button('transcript_button')
 
         self.assertFalse(self.video.is_captions_visible())
 
-        self.video.click_player_button('CC')
+        self.video.click_player_button('transcript_button')
 
         self.assertTrue(self.video.is_captions_visible())
 
