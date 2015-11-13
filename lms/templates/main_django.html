@@ -20,11 +20,7 @@
   {% endblock %}
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
-    {% if  USE_CUSTOM_THEME %}
-        {% with "theme-head-extra.html" as theme %}
-            {% include theme %}
-        {% endwith %}
-    {% endif %}
+
   {% microsite_css_overrides_file %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
@@ -37,14 +33,7 @@
       {% if IS_EDX_DOMAIN %}
         {% include "navigation-edx.html" %}
       {% else %}
-        {% if USE_CUSTOM_THEME %}
-            {% with "theme-header.html" as theme %}
-                {% include theme %}
-            {% endwith %}
-        {% else %}
-            {% include "navigation.html" %}
-        {% endif %}
-
+        {% include "navigation.html" %}
       {% endif %}
     {% endwith %}
     <div class="content-wrapper" id="content">
@@ -56,17 +45,11 @@
     {% elif IS_EDX_DOMAIN %}
       {% include "footer-edx-v3.html" %}
     {% else %}
-      {% if  USE_CUSTOM_THEME %}
-        {% with "theme-footer.html" as theme %}
-            {% include theme %}
-        {% endwith %}
-      {% else %}
-            {% include "footer.html" %}
-      {% endif %}
-
+      {% include "footer.html" %}
     {% endif %}
 
   </div>
+
     {% javascript 'application' %}
     {% javascript 'module-js' %}
 

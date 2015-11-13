@@ -4,7 +4,7 @@ import logging
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,7 +17,6 @@ from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from openedx.core.djangoapps.labster.course.utils import set_staff
-from openedx.core.djangoapps.labster.course.tasks import course_delete
 
 
 log = logging.getLogger(__name__)
@@ -34,7 +33,7 @@ def setup_course(course_key, staff=None):
 # pylint: disable=unused-argument
 @csrf_exempt
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-@authentication_classes((OAuth2Authentication, SessionAuthentication, TokenAuthentication))
+@authentication_classes((SessionAuthentication, TokenAuthentication))
 @permission_classes((IsAuthenticated,))
 @expect_json
 def course_handler(request, course_key_string=None):
@@ -125,7 +124,7 @@ def course_handler(request, course_key_string=None):
                 )
                 return Response({"course_key": unicode(course_key)})
             elif request.method == 'DELETE':
-                course_delete.delay(unicode(course_key), request.user.id)
+                delete_course_and_groups(course_key, request.user.id)
                 return Response(status=status.HTTP_204_NO_CONTENT)
     except InvalidKeyError:
         raise Http404

@@ -1096,8 +1096,3 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
-
-try:
-    from .labster import *  # pylint: disable=import-error
-except ImportError:
-    pass
