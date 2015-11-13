@@ -2,8 +2,8 @@ $(document).ready(function () {
   'use strict';
 
   // define variables for code legibility
-  var dropdownMenuToggle = $('button.dropdown');
-  var dropdownMenu = $('ul.dropdown-menu');
+  var dropdownMenuToggle = $('.dropdown');
+  var dropdownMenu = $('.dropdown-menu');
   var menuItems = dropdownMenu.find('a');
 
   // bind menu toggle click for later use
@@ -17,8 +17,8 @@ $(document).ready(function () {
 
   //catch keypresses when focused on dropdownMenuToggle (we only care about spacebar keypresses here)
   dropdownMenuToggle.on('keydown', function(event){
-    // if space key pressed
-    if ( event.which == 32) {
+    // if space or enter key pressed
+    if ( event.which == 32 || event.which == 13) {
       dropdownMenuToggle.click();
       event.preventDefault();
     }
@@ -42,8 +42,8 @@ $(document).ready(function () {
     // var to store next focused item index
     var itemToFocusIndex;
 
-    // if space key pressed
-    if ( event.which == 32) {
+    // if space or enter key pressed
+    if ( event.which == 32 || event.which == 13) {
       dropdownMenuToggle.click();
       event.preventDefault();
     }
