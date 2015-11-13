@@ -3,9 +3,10 @@
     define([
             'jquery',
             'underscore',
+            'gettext',
             'js/student_account/views/FormView'
         ],
-        function($, _, FormView) {
+        function($, _, gettext, FormView) {
 
         return FormView.extend({
             el: '#login-form',
@@ -102,7 +103,12 @@
             },
 
             saveError: function( error ) {
-                this.errors = ['<li>' + error.responseText + '</li>'];
+                if (error.status === 0) {
+                    this.errors = ['<li>' + gettext('Please check your internet connection and try again.') + '</li>'];
+                }
+                else {
+                    this.errors = ['<li>' + error.responseText + '</li>'];
+                }
                 this.setErrors();
                 this.element.hide( this.$resetSuccess );
 
