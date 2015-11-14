@@ -138,6 +138,8 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
+    # hack for proof-of-concept
+    sh("pip uninstall nose -y")
     for req_file in PYTHON_REQ_FILES:
         sh("pip install -q --disable-pip-version-check --exists-action w -r {req_file}".format(req_file=req_file))
 
