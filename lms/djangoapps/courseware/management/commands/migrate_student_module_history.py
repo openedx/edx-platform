@@ -4,6 +4,7 @@ from datetime import timedelta
 from textwrap import dedent
 import time
 from optparse import make_option
+from sys import exit
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -25,19 +26,14 @@ class Command(BaseCommand):
             help='number of chunks to use [default: %default]'),
         make_option('-w', '--window', type='int', default=1000, dest='window',
             help='how many rows to migrate per query [default: %default]'),
+        make_option('-s', '--show-range', action='store_true', default=False, dest='show_range',
+            help="show the range that this command would've run over and the max id in that range")
     )
 
     def handle(self, *arguments, **options):
-        opts, args = _parse_args(arguments, options)
         if options['index'] >= options['num_chunks']:
-            self.stdout.write("Index {} is too large for {} chunks".format(options['index'], options['num_chunks']))
-            return
-
-        try:
-            StudentModuleHistory.objects.all().order_by('id')[0]
-        except IndexError:
-            self.stdout.write("No entries found in StudentModuleHistory, aborting migration.\n")
-            return
+            self.stdout.write("Index {} is too large for {} chunks\n".format(options['index'], options['num_chunks']))
+            exit(2)
 
         chunk_size = SQL_MAX_INT / options['num_chunks']
 
@@ -47,6 +43,18 @@ class Command(BaseCommand):
             max_id = SQL_MAX_INT
         else:
             max_id = chunk_size * options['index'] + chunk_size - 1
+
+        try:
+            StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id)[0]
+        except IndexError:
+            self.stdout.write("No entries found in StudentModuleHistory in range {}-{}, aborting migration.\n".format(
+                max_id, min_id))
+            exit(1)
+
+        if options['show_range']:
+            max_id_in_range = StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id).order_by('-id')[0].id
+            print "Range: {}-{}, max id in range: {}".format(max_id, min_id, max_id_in_range)
+            return
 
         self._migrate_range(min_id, max_id, options['window'])
 
