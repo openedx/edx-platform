@@ -44,12 +44,11 @@ class Command(BaseCommand):
         else:
             max_id = chunk_size * options['index'] + chunk_size - 1
 
-        #Start at the max id in the selected range, so the migration is resumable
-        active_range = StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id).order_by('id')
-        if active_range:
-            min_id_already_migrated = active_range[0].id
+        try:
+            #Start at the max id in the selected range, so the migration is resumable
+            min_id_already_migrated = StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id).order_by('id')[0].id
             self.stdout.write("Found min existent id {} in StudentModuleHistory, resuming from there\n".format(min_id_already_migrated))
-        else:
+        except IndexError:
             #Assume we're starting from the top of the range
             min_id_already_migrated = max_id
             self.stdout.write("No entries found in StudentModuleHistory in this range, starting at top of range ({})\n".format(min_id_already_migrated))
@@ -60,6 +59,11 @@ class Command(BaseCommand):
         except:
             self.stdout.write("No entries found in StudentModuleHistoryArchive in range {}-{}, aborting migration.\n".format(
                 min_id_already_migrated, min_id))
+            return
+
+        #If the whole range is migrated, do nothing
+        if min_id_already_migrated == min_id:
+            self.stdout.write("Range {}-{} is already fully migrated, exiting...\n".format(max_id, min_id))
             return
 
         if options['show_range']:
