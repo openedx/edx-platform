@@ -1117,9 +1117,13 @@ class CapaMixin(CapaFields):
 
         if dog_stats_api:
             dog_stats_api.increment(metric_name('checks'), tags=[u'result:success'])
+            if published_grade['max_grade'] == 0:
+                grade_percent = 0
+            else:
+                grade_percent = float(published_grade['grade']) / published_grade['max_grade']
             dog_stats_api.histogram(
                 metric_name('correct_pct'),
-                float(published_grade['grade']) / published_grade['max_grade'],
+                grade_percent,
             )
             dog_stats_api.histogram(
                 metric_name('attempts'),
