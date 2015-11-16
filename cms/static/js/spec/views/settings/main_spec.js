@@ -32,7 +32,7 @@ define([
                 entrance_exam_minimum_score_pct: '50',
                 license: null,
                 language: '',
-                has_cert_config: false
+                has_cert_config: null
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
@@ -73,10 +73,32 @@ define([
         });
 
         it('Changing course start date without active certificate configuration should result in error', function () {
+            this.model.set({'has_cert_config': false});
             this.view.$el.find('#course-start-date')
                 .val('10/06/2014')
                 .trigger('change');
-            expect(this.view.$el.find('span.message-error').text()).toContain("course must have at least one active certificate configuration");
+            expect(this.view.$el.find('span.message-error').text()).toContain("course must have at least one " +
+                "active certificate configuration");
+        });
+
+         it('Changing course end date without active certificate configuration should result in error', function () {
+            this.model.set({'has_cert_config': false});
+            this.view.$el.find('#course-end-date')
+                .val('10/06/2015')
+                .trigger('change');
+            expect(this.view.$el.find('span.message-error').text()).toContain("course must have at least one " +
+                "active certificate configuration");
+
+        });
+
+        it('Changing course start date with active certificate configuration should not result in error', function () {
+            this.model.set({'has_cert_config': true});
+            this.view.$el.find('#course-start-date')
+                .val('10/06/2014')
+                .trigger('change');
+            expect(this.view.$el.find('span.message-error').text()).not.toContain("course must have at least one " +
+                "active certificate configuration");
+
         });
 
         it('Selecting a course in pre-requisite drop down should save it as part of course details', function () {

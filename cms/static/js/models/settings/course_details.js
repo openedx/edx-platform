@@ -35,7 +35,7 @@ var CourseDetails = Backbone.Model.extend({
         if (newattrs.start_date === null) {
             errors.start_date = gettext("The course must have an assigned start date.");
         }
-        if (this.hasChanged("start_date") && this.get("has_cert_config") === false){
+        if (this.get("has_cert_config") === false){
             errors.start_date = gettext("The course must have at least one active certificate configuration before it can be started.");
         }
         if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
