@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from cStringIO import StringIO
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import (
     HttpResponse,
@@ -35,6 +36,7 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
@@ -57,6 +59,13 @@ from .overrides import (
 
 log = logging.getLogger(__name__)
 TODAY = datetime.datetime.today  # for patching in tests
+
+
+class CCXUserValidationException(Exception):
+    """
+    Custom Exception for validation of users in CCX
+    """
+    pass
 
 
 def coach_dashboard(view):
@@ -170,6 +179,9 @@ def create_ccx(request, course, ccx=None):
     start = TODAY().replace(tzinfo=pytz.UTC)
     override_field_for_ccx(ccx, course, 'start', start)
     override_field_for_ccx(ccx, course, 'due', None)
+
+    # Enforce a static limit for the maximum amount of students that can be enrolled
+    override_field_for_ccx(ccx, course, 'max_student_enrollments_allowed', settings.CCX_MAX_STUDENTS_ALLOWED)
 
     # Hide anything that can show up in the schedule
     hidden = 'visible_to_staff_only'
@@ -407,6 +419,90 @@ def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
     return HttpResponse(json_schedule, mimetype='application/json')
 
 
+def get_valid_student_email(identifier):
+    """
+    Helper function to get an user email from an identifier and validate it.
+
+    In the UI a Coach can enroll users using both an email and an username.
+    This function takes care of:
+    - in case the identifier is an username, extracting the user object from
+        the DB and then the associated email
+    - validating the email
+
+    Arguments:
+        identifier (str): Username or email of the user to enroll
+
+    Returns:
+        str: A validated email for the user to enroll
+
+    Raises:
+        CCXUserValidationException: if the username is not found or the email
+            is not valid.
+    """
+    user = email = None
+    try:
+        user = get_student_from_identifier(identifier)
+    except User.DoesNotExist:
+        email = identifier
+    else:
+        email = user.email
+    try:
+        validate_email(email)
+    except ValidationError:
+        raise CCXUserValidationException('Could not find a user with name or email "{0}" '.format(identifier))
+    return email
+
+
+def _ccx_students_enrrolling_center(action, identifiers, email_students, course_key, email_params):
+    """
+    Function to enroll/add or unenroll/revoke students.
+
+    This function exists for backwards compatibility: in CCX there are
+    two different views to manage students that used to implement
+    a different logic. Now the logic has been reconciled at the point that
+    this function can be used by both.
+    The two different views can be merged after some UI refactoring.
+
+    Arguments:
+        action (str): type of action to perform (add, Enroll, revoke, Unenroll)
+        identifiers (list): list of students username/email
+        email_students (bool): Flag to send an email to students
+        course_key (CCXLocator): a CCX course key
+        email_params (dict): dictionary of settings for the email to be sent
+
+    Returns:
+        list: list of error
+    """
+    errors = []
+
+    if action == 'Enroll' or action == 'add':
+        ccx_course_overview = CourseOverview.get_from_id(course_key)
+        for identifier in identifiers:
+            if CourseEnrollment.objects.is_course_full(ccx_course_overview):
+                error = ('The course is full: the limit is {0}'.format(
+                    ccx_course_overview.max_student_enrollments_allowed))
+                log.info("%s", error)
+                errors.append(error)
+                break
+            try:
+                email = get_valid_student_email(identifier)
+            except CCXUserValidationException as exp:
+                log.info("%s", exp)
+                errors.append("{0}".format(exp))
+                continue
+            enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
+    elif action == 'Unenroll' or action == 'revoke':
+        for identifier in identifiers:
+            try:
+                email = get_valid_student_email(identifier)
+            except CCXUserValidationException as exp:
+                log.info("%s", exp)
+                errors.append("{0}".format(exp))
+                continue
+            unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
+    return errors
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
@@ -420,99 +516,36 @@ def ccx_invite(request, course, ccx=None):
     action = request.POST.get('enrollment-button')
     identifiers_raw = request.POST.get('student-ids')
     identifiers = _split_input_list(identifiers_raw)
-    auto_enroll = True
-    email_students = True if 'email-students' in request.POST else False
-    for identifier in identifiers:
-        user = None
-        email = None
-        try:
-            user = get_student_from_identifier(identifier)
-        except User.DoesNotExist:
-            email = identifier
-        else:
-            email = user.email
-        try:
-            validate_email(email)
-            course_key = CCXLocator.from_course_locator(course.id, ccx.id)
-            email_params = get_email_params(course, auto_enroll, course_key=course_key, display_name=ccx.display_name)
-            if action == 'Enroll':
-                enroll_email(
-                    course_key,
-                    email,
-                    auto_enroll=auto_enroll,
-                    email_students=email_students,
-                    email_params=email_params
-                )
-            if action == "Unenroll":
-                unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
-        except ValidationError:
-            log.info('Invalid user name or email when trying to invite students: %s', email)
-    url = reverse(
-        'ccx_coach_dashboard',
-        kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
-    )
+    email_students = 'email-students' in request.POST
+    course_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
+
+    _ccx_students_enrrolling_center(action, identifiers, email_students, course_key, email_params)
+
+    url = reverse('ccx_coach_dashboard', kwargs={'course_id': course_key})
     return redirect(url)
-
-
-def validate_student_email(email):
-    """
-    validate student's email id
-    """
-    error_message = None
-    try:
-        validate_email(email)
-    except ValidationError:
-        log.info(
-            'Invalid user name or email when trying to enroll student: %s',
-            email
-        )
-        if email:
-            error_message = _(
-                'Could not find a user with name or email "{email}" '
-            ).format(email=email)
-        else:
-            error_message = _(
-                'Please enter a valid username or email.'
-            )
-
-    return error_message
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_student_management(request, course, ccx=None):
-    """Manage the enrollment of individual students in a CCX
+    """
+    Manage the enrollment of individual students in a CCX
     """
     if not ccx:
         raise Http404
 
     action = request.POST.get('student-action', None)
     student_id = request.POST.get('student-id', '')
-    user = email = None
-    error_message = ""
+    email_students = 'email-students' in request.POST
+    identifiers = [student_id]
     course_key = CCXLocator.from_course_locator(course.id, ccx.id)
-    try:
-        user = get_student_from_identifier(student_id)
-    except User.DoesNotExist:
-        email = student_id
-        error_message = validate_student_email(email)
-        if email and not error_message:
-            error_message = _(
-                'Could not find a user with name or email "{email}" '
-            ).format(email=email)
-    else:
-        email = user.email
-        error_message = validate_student_email(email)
+    email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
-    if error_message is None:
-        if action == 'add':
-            # by decree, no emails sent to students added this way
-            # by decree, any students added this way are auto_enrolled
-            enroll_email(course_key, email, auto_enroll=True, email_students=False)
-        elif action == 'revoke':
-            unenroll_email(course_key, email, email_students=False)
-    else:
+    errors = _ccx_students_enrrolling_center(action, identifiers, email_students, course_key, email_params)
+
+    for error_message in errors:
         messages.error(request, error_message)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': course_key})

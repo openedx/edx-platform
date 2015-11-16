@@ -15,6 +15,9 @@ from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.core.urlresolvers import reverse, resolve
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
@@ -114,6 +117,17 @@ def setup_students_and_grades(context):
                     )
 
 
+def is_email(identifier):
+    """
+    Checks if an `identifier` string is a valid email
+    """
+    try:
+        validate_email(identifier)
+    except ValidationError:
+        return False
+    return True
+
+
 @attr('shard_1')
 @ddt.ddt
 class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -179,11 +193,12 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(self.coach)
 
-    def make_ccx(self):
+    def make_ccx(self, max_students_allowed=settings.CCX_MAX_STUDENTS_ALLOWED):
         """
         create ccx
         """
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
+        override_field_for_ccx(ccx, self.course, 'max_student_enrollments_allowed', max_students_allowed)
         return ccx
 
     def get_outbox(self):
@@ -269,6 +284,11 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.assertTrue(CourseEnrollment.is_enrolled(self.coach, course_key))
         self.assertTrue(re.search('id="ccx-schedule"', response.content))
+
+        # check if the max amount of student that can be enrolled has been overridden
+        ccx = CustomCourseForEdX.objects.get()
+        course_enrollments = get_override_for_ccx(ccx, self.course, 'max_student_enrollments_allowed')
+        self.assertEqual(course_enrollments, settings.CCX_MAX_STUDENTS_ALLOWED)
 
     @SharedModuleStoreTestCase.modifies_courseware
     @patch('ccx.views.render_to_response', intercept_renderer)
@@ -430,8 +450,20 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_enroll_member_student(self):
-        """enroll a list of students who are members of the class
+    @ddt.data(
+        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Enroll')),
+        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll')),
+        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'add')),
+        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add')),
+    )
+    @ddt.unpack
+    def test_enroll_member_student(self, view_name, send_email, outbox_count, student_form_input_name, button_tuple):
+        """
+        Tests the enrollment of  a list of students who are members
+        of the class.
+
+        It tests 2 different views that use slightly different parameters,
+        but that perform the same task.
         """
         self.make_coach()
         ccx = self.make_ccx()
@@ -441,28 +473,123 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(outbox, [])
 
         url = reverse(
-            'ccx_invite',
+            view_name,
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)}
         )
         data = {
-            'enrollment-button': 'Enroll',
-            'student-ids': u','.join([student.email, ]),  # pylint: disable=no-member
-            'email-students': 'Notify-students-by-email',
+            button_tuple[0]: button_tuple[1],
+            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
         }
+        if send_email:
+            data['email-students'] = 'Notify-students-by-email'
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertIn(302, response.redirect_chain[0])
-        self.assertEqual(len(outbox), 1)
-        self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
+        self.assertEqual(len(outbox), outbox_count)
+        if send_email:
+            self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
         # a CcxMembership exists for this student
         self.assertTrue(
             CourseEnrollment.objects.filter(course_id=self.course.id, user=student).exists()
         )
 
-    def test_unenroll_member_student(self):
-        """unenroll a list of students who are members of the class
+    def test_ccx_invite_enroll_up_to_limit(self):
+        """
+        Enrolls a list of students up to the enrollment limit.
+
+        This test is specific to one of the enrollment views: the reason is because
+        the view used in this test can perform bulk enrollments.
+        """
+        self.make_coach()
+        # create ccx and limit the maximum amount of students that can be enrolled to 2
+        ccx = self.make_ccx(max_students_allowed=2)
+        ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        # create some users
+        students = [
+            UserFactory.create(is_staff=False) for _ in range(3)
+        ]
+        url = reverse(
+            'ccx_invite',
+            kwargs={'course_id': ccx_course_key}
+        )
+        data = {
+            'enrollment-button': 'Enroll',
+            'student-ids': u','.join([student.email for student in students]),  # pylint: disable=no-member
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # a CcxMembership exists for the first two students but not the third
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
+        )
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[1]).exists()
+        )
+        self.assertFalse(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[2]).exists()
+        )
+
+    def test_manage_student_enrollment_limit(self):
+        """
+        Enroll students up to the enrollment limit.
+
+        This test is specific to one of the enrollment views: the reason is because
+        the view used in this test cannot perform bulk enrollments.
+        """
+        students_limit = 1
+        self.make_coach()
+        ccx = self.make_ccx(max_students_allowed=students_limit)
+        ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        students = [
+            UserFactory.create(is_staff=False) for _ in range(2)
+        ]
+        url = reverse(
+            'ccx_manage_student',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)}
+        )
+        # enroll the first student
+        data = {
+            'student-action': 'add',
+            'student-id': u','.join([students[0].email, ]),  # pylint: disable=no-member
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # a CcxMembership exists for this student
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
+        )
+        # try to enroll the second student without success
+        # enroll the first student
+        data = {
+            'student-action': 'add',
+            'student-id': u','.join([students[1].email, ]),  # pylint: disable=no-member
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # a CcxMembership does not exist for this student
+        self.assertFalse(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[1]).exists()
+        )
+        error_message = 'The course is full: the limit is {students_limit}'.format(
+            students_limit=students_limit
+        )
+        self.assertContains(response, error_message, status_code=200)
+
+    @ddt.data(
+        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Unenroll')),
+        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll')),
+        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'revoke')),
+        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'revoke')),
+    )
+    @ddt.unpack
+    def test_unenroll_member_student(self, view_name, send_email, outbox_count, student_form_input_name, button_tuple):
+        """
+        Tests the unenrollment of a list of students who are members of the class.
+
+        It tests 2 different views that use slightly different parameters,
+        but that perform the same task.
         """
         self.make_coach()
         ccx = self.make_ccx()
@@ -473,26 +600,47 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(outbox, [])
 
         url = reverse(
-            'ccx_invite',
+            view_name,
             kwargs={'course_id': course_key}
         )
         data = {
-            'enrollment-button': 'Unenroll',
-            'student-ids': u','.join([student.email, ]),  # pylint: disable=no-member
-            'email-students': 'Notify-students-by-email',
+            button_tuple[0]: button_tuple[1],
+            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
         }
+        if send_email:
+            data['email-students'] = 'Notify-students-by-email'
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertIn(302, response.redirect_chain[0])
-        self.assertEqual(len(outbox), 1)
-        self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
+        self.assertEqual(len(outbox), outbox_count)
+        if send_email:
+            self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
+        # a CcxMembership does not exists for this student
+        self.assertFalse(
+            CourseEnrollment.objects.filter(course_id=self.course.id, user=student).exists()
+        )
 
-    def test_enroll_non_user_student(self):
-        """enroll a list of students who are not users yet
+    @ddt.data(
+        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
+        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
+        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
+        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
+        ('ccx_manage_student', True, 0, 'student-id', ('student-action', 'add'), 'dummy_student_id'),
+        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add'), 'dummy_student_id'),
+        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'add'), 'xyz@gmail.com'),
+        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add'), 'xyz@gmail.com'),
+    )
+    @ddt.unpack
+    def test_enroll_non_user_student(
+            self, view_name, send_email, outbox_count, student_form_input_name, button_tuple, identifier):
         """
-        test_email = "nobody@nowhere.com"
+        Tests the enrollment of a list of students who are not users yet.
+
+        It tests 2 different views that use slightly different parameters,
+        but that perform the same task.
+        """
         self.make_coach()
         ccx = self.make_ccx()
         course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
@@ -500,145 +648,81 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(outbox, [])
 
         url = reverse(
-            'ccx_invite',
+            view_name,
             kwargs={'course_id': course_key}
         )
         data = {
-            'enrollment-button': 'Enroll',
-            'student-ids': u','.join([test_email, ]),
-            'email-students': 'Notify-students-by-email',
+            button_tuple[0]: button_tuple[1],
+            student_form_input_name: u','.join([identifier, ]),
         }
+        if send_email:
+            data['email-students'] = 'Notify-students-by-email'
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertIn(302, response.redirect_chain[0])
-        self.assertEqual(len(outbox), 1)
-        self.assertIn(test_email, outbox[0].recipients())
-        self.assertTrue(
-            CourseEnrollmentAllowed.objects.filter(
-                course_id=course_key, email=test_email
-            ).exists()
-        )
+        self.assertEqual(len(outbox), outbox_count)
 
-    def test_unenroll_non_user_student(self):
-        """unenroll a list of students who are not users yet
+        # some error messages are returned for one of the views only
+        if view_name == 'ccx_manage_student' and not is_email(identifier):
+            error_message = 'Could not find a user with name or email "{identifier}" '.format(
+                identifier=identifier
+            )
+            self.assertContains(response, error_message, status_code=200)
+
+        if is_email(identifier):
+            if send_email:
+                self.assertIn(identifier, outbox[0].recipients())
+            self.assertTrue(
+                CourseEnrollmentAllowed.objects.filter(course_id=course_key, email=identifier).exists()
+            )
+        else:
+            self.assertFalse(
+                CourseEnrollmentAllowed.objects.filter(course_id=course_key, email=identifier).exists()
+            )
+
+    @ddt.data(
+        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
+        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
+        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
+        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
+    )
+    @ddt.unpack
+    def test_unenroll_non_user_student(
+            self, view_name, send_email, outbox_count, student_form_input_name, button_tuple, identifier):
         """
-        test_email = "nobody@nowhere.com"
+        Unenroll a list of students who are not users yet
+        """
         self.make_coach()
         course = CourseFactory.create()
         ccx = self.make_ccx()
         course_key = CCXLocator.from_course_locator(course.id, ccx.id)
         outbox = self.get_outbox()
-        CourseEnrollmentAllowed(course_id=course_key, email=test_email)
+        CourseEnrollmentAllowed(course_id=course_key, email=identifier)
         self.assertEqual(outbox, [])
 
         url = reverse(
-            'ccx_invite',
+            view_name,
             kwargs={'course_id': course_key}
         )
         data = {
-            'enrollment-button': 'Unenroll',
-            'student-ids': u','.join([test_email, ]),
-            'email-students': 'Notify-students-by-email',
+            button_tuple[0]: button_tuple[1],
+            student_form_input_name: u','.join([identifier, ]),
         }
+        if send_email:
+            data['email-students'] = 'Notify-students-by-email'
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertIn(302, response.redirect_chain[0])
+        self.assertEqual(len(outbox), outbox_count)
         self.assertFalse(
             CourseEnrollmentAllowed.objects.filter(
-                course_id=course_key, email=test_email
+                course_id=course_key, email=identifier
             ).exists()
         )
-
-    @ddt.data("dummy_student_id", "xyz@gmail.com")
-    def test_manage_add_single_invalid_student(self, student_id):
-        """enroll a single non valid student
-        """
-        self.make_coach()
-        ccx = self.make_ccx()
-        course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
-        url = reverse(
-            'ccx_manage_student',
-            kwargs={'course_id': course_key}
-        )
-        redirect_url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={'course_id': course_key}
-        )
-        data = {
-            'student-action': 'add',
-            'student-id': u','.join([student_id, ]),  # pylint: disable=no-member
-        }
-        response = self.client.post(url, data=data, follow=True)
-
-        error_message = 'Could not find a user with name or email "{student_id}" '.format(
-            student_id=student_id
-        )
-        self.assertContains(response, error_message, status_code=200)
-
-        # we were redirected to our current location
-        self.assertRedirects(response, redirect_url, status_code=302)
-
-    def test_manage_add_single_student(self):
-        """enroll a single student who is a member of the class already
-        """
-        self.make_coach()
-        ccx = self.make_ccx()
-        course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
-        enrollment = CourseEnrollmentFactory(course_id=course_key)
-        student = enrollment.user
-        # no emails have been sent so far
-        outbox = self.get_outbox()
-        self.assertEqual(outbox, [])
-
-        url = reverse(
-            'ccx_manage_student',
-            kwargs={'course_id': course_key}
-        )
-        data = {
-            'student-action': 'add',
-            'student-id': u','.join([student.email, ]),  # pylint: disable=no-member
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # we were redirected to our current location
-        self.assertEqual(len(response.redirect_chain), 1)
-        self.assertIn(302, response.redirect_chain[0])
-        self.assertEqual(outbox, [])
-        # a CcxMembership exists for this student
-        self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=course_key, user=student).exists()
-        )
-
-    def test_manage_remove_single_student(self):
-        """unenroll a single student who is a member of the class already
-        """
-        self.make_coach()
-        ccx = self.make_ccx()
-        course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
-        enrollment = CourseEnrollmentFactory(course_id=course_key)
-        student = enrollment.user
-        # no emails have been sent so far
-        outbox = self.get_outbox()
-        self.assertEqual(outbox, [])
-
-        url = reverse(
-            'ccx_manage_student',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)}
-        )
-        data = {
-            'student-action': 'revoke',
-            'student-id': u','.join([student.email, ]),  # pylint: disable=no-member
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # we were redirected to our current location
-        self.assertEqual(len(response.redirect_chain), 1)
-        self.assertIn(302, response.redirect_chain[0])
-        self.assertEqual(outbox, [])
 
 
 GET_CHILDREN = XModuleMixin.get_children

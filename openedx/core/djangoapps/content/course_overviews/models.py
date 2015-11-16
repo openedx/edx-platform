@@ -109,12 +109,14 @@ class CourseOverview(TimeStampedModel):
         display_name = course.display_name
         start = course.start
         end = course.end
+        max_student_enrollments_allowed = course.max_student_enrollments_allowed
         if isinstance(course.id, CCXLocator):
             from ccx.utils import get_ccx_from_ccx_locator  # pylint: disable=import-error
             ccx = get_ccx_from_ccx_locator(course.id)
             display_name = ccx.display_name
             start = ccx.start
             end = ccx.due
+            max_student_enrollments_allowed = ccx.max_student_enrollments_allowed
 
         return cls(
             version=cls.VERSION,
@@ -150,7 +152,7 @@ class CourseOverview(TimeStampedModel):
             enrollment_end=course.enrollment_end,
             enrollment_domain=course.enrollment_domain,
             invitation_only=course.invitation_only,
-            max_student_enrollments_allowed=course.max_student_enrollments_allowed,
+            max_student_enrollments_allowed=max_student_enrollments_allowed,
         )
 
     @classmethod
