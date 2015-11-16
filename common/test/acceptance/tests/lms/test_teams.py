@@ -297,6 +297,7 @@ class TeamsTabTest(TeamsTabBase):
                 ))
         )
         self.teams_page.wait_for_ajax()
+        self.teams_page.wait_for_element_visibility(selector, 'wait for selector')
         self.assertTrue(self.teams_page.q(css=selector).present)
         self.assertTrue(self.teams_page.q(css=selector).visible)
 
