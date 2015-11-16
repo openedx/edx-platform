@@ -34,15 +34,6 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
-<%block name="js_extra">
-<script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
-<script type="text/javascript" charset="utf-8">
- $(document).ready(function(){
-     $(".handouts").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
- });
-</script>
-</%block>
-
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
 <section class="container">
   <div class="home">
@@ -59,37 +50,42 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
     % endif
   </div>
   <div class="info-wrapper">
+    <div class="course-updates">
+      % if user.is_authenticated():
+        <section class="updates">
+          % if studio_url is not None and masquerade and masquerade.role == 'staff':
+            <div class="wrap-instructor-info studio-view">
+              <a class="instructor-info-action" href="${studio_url}">
+                ${_("View Updates in Studio")}
+              </a>
+            </div>
+          % endif
+          <h1 class="course-info-heading">${_("Course Updates and News")}</h1>
+          ${get_course_info_section(request, course, 'updates')}
+        </section>
+        % if SelfPacedConfiguration.current().enable_course_home_improvements:
+          <section aria-label="${_('Important Course Dates')}" class="course-dates">
+            <h1 class="course-info-heading">${_("Important Course Dates")}</h1>
+            ${get_course_date_summary(course, user)}
+          </section>
+        % endif
+        % else:
+        <section class="updates">
+          <h1 class="course-info-heading">${_("Course Updates and News")}</h1>
+          ${get_course_info_section(request, course, 'guest_updates')}
+        </section>
+      % endif
+    </div>
     % if user.is_authenticated():
-    <section class="updates">
-      % if studio_url is not None and masquerade and masquerade.role == 'staff':
-      <div class="wrap-instructor-info studio-view">
-        <a class="instructor-info-action" href="${studio_url}">
-          ${_("View Updates in Studio")}
-        </a>
-      </div>
-      % endif
-
-      <h1>${_("Course Updates and News")}</h1>
-      ${get_course_info_section(request, course, 'updates')}
-    </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      % if SelfPacedConfiguration.current().enable_course_home_improvements:
-        <h1>${_("Important Course Dates")}</h1>
-        ${get_course_date_summary(course, user)}
-      % endif
-
-      <h1>${_(course.info_sidebar_name)}</h1>
-      ${get_course_info_section(request, course, 'handouts')}
-    </section>
+      <section aria-label="${_('Handout Navigation')}" class="handouts">
+          <h1 class="course-info-heading">${_(course.info_section_name)}</h1>
+          ${get_course_info_section(request, course, 'handouts')}
+      </section>
     % else:
-    <section class="updates">
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'guest_updates')}
-    </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      <h1>${_("Course Handouts")}</h1>
-      ${get_course_info_section(request, course, 'guest_handouts')}
-    </section>
+      <section aria-label="${_('Handout Navigation')}" class="handouts">
+          <h1 class='course-info-heading'>${_("Course Handouts")}</h1>
+          ${get_course_info_section(request, course, 'guest_handouts')}
+      </section>
     % endif
   </div>
 </section>
