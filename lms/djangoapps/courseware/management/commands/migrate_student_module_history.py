@@ -47,26 +47,26 @@ class Command(BaseCommand):
         #Start at the max id in the selected range, so the migration is resumable
         active_range = StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id).order_by('id')
         if active_range:
-            min_id_found = active_range[0].id
-            self.stdout.write("Found min existent id {} in StudentModuleHistory, resuming from there\n".format(min_id_found))
+            min_id_already_migrated = active_range[0].id
+            self.stdout.write("Found min existent id {} in StudentModuleHistory, resuming from there\n".format(min_id_already_migrated))
         else:
             #Assume we're starting from the top of the range
-            min_id_found = max_id
-            self.stdout.write("No entries found in StudentModuleHistory in this range, starting at top of range ({})\n".format(min_id_found))
+            min_id_already_migrated = max_id
+            self.stdout.write("No entries found in StudentModuleHistory in this range, starting at top of range ({})\n".format(min_id_already_migrated))
 
         #Make sure there's entries to migrate in StudentModuleHistoryArchive in this range
         try:
-            StudentModuleHistoryArchive.objects.filter(id__lt=min_id_found, id__gte=min_id)[0]
+            StudentModuleHistoryArchive.objects.filter(id__lt=min_id_already_migrated, id__gte=min_id)[0]
         except:
             self.stdout.write("No entries found in StudentModuleHistoryArchive in range {}-{}, aborting migration.\n".format(
-                min_id_found, min_id))
-            exit(1)
-
-        if options['show_range']:
-            self.stdout.write("Range: {}-{}, min id in range: {}\n".format(max_id, min_id, min_id_found))
+                min_id_already_migrated, min_id))
             return
 
-        self._migrate_range(min_id, min_id_found, options['window'])
+        if options['show_range']:
+            self.stdout.write("Range: {}-{}, min id in range: {}\n".format(max_id, min_id, min_id_already_migrated))
+            return
+
+        self._migrate_range(min_id, min_id_already_migrated, options['window'])
 
 
     @transaction.commit_manually
