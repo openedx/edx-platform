@@ -17,6 +17,15 @@ from branding import api as branding_api
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    ## We override this template to:
+    ## - insert the RSS feed
+    ## - add the platform node name
+    ## - remove the google-site-verification meta name
+    <%! from django.core.urlresolvers import reverse %>
+    <%! import platform %>
+    <meta name="platform.node" CONTENT="${platform.node()}">
+    <link rel="alternate" type="application/rss+xml" title="${_('FUN courses RSS feed')}" href="${reverse('fun-courses:feed')}" />
+
 ## Define a couple of helper functions to make life easier when
 ## embedding theme conditionals into templates. All inheriting
 ## templates have access to these functions, and we can import these
@@ -103,7 +112,6 @@ from branding import api as branding_api
   <%include file="widgets/segment-io.html" />
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
-  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
 <% ga_acct = microsite.get_value("GOOGLE_ANALYTICS_ACCOUNT", settings.GOOGLE_ANALYTICS_ACCOUNT) %>
 % if ga_acct:
