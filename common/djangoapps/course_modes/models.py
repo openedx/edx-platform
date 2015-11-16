@@ -1,15 +1,15 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+from datetime import datetime, timedelta
 import pytz
-from datetime import datetime
 
+from collections import namedtuple, defaultdict
+from config_models.models import ConfigurationModel
 from django.core.exceptions import ValidationError
 from django.db import models
-from collections import namedtuple, defaultdict
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
-
+from django.utils.translation import ugettext_lazy as _
 from xmodule_django.models import CourseKeyField
 
 Mode = namedtuple('Mode',
@@ -62,6 +62,11 @@ class CourseMode(models.Model):
             u"Leave this blank if users can enroll in this mode until enrollment closes for the course."
         ),
     )
+
+    # The system prefers to set this automatically based on default settings. But
+    # if the field is set manually we want a way to indicate that so we don't
+    # overwrite the manual setting of the field.
+    expiration_datetime_is_explicit = models.BooleanField(default=True)
 
     # DEPRECATED: the `expiration_date` field has been replaced by `expiration_datetime`
     expiration_date = models.DateField(default=None, null=True, blank=True)
@@ -692,3 +697,38 @@ class CourseModesArchive(models.Model):
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
+
+
+class CourseModeAutoExpirationConfiguration(ConfigurationModel):
+    """
+    Configuration for time period from end of course to auto-expire a course mode.
+    """
+
+    # TODO: Django 1.8 introduces a DurationField
+    # (https://docs.djangoproject.com/en/1.8/ref/models/fields/#durationfield)
+    # for storing timedeltas which uses MySQL's bigint for backing
+    # storage. After we've completed the Django upgrade we should be
+    # able to replace this field with a DurationField named
+    # `verification_window` without having to run a migration or change
+    # other code.
+    _verification_window = models.BigIntegerField(
+        # default to 10 days
+        default=864000000000,
+        help_text=_(
+            "The time period before a course ends in which a course mode will expire"
+        )
+    )
+
+    @property
+    def verification_window(self):
+        """Return the configured course mode expiration time period as a `datetime.timedelta`."""
+        return timedelta(microseconds=self._verification_window)
+
+    @verification_window.setter
+    def verification_window(self, verification_window):
+        """Set the current course mode expiration time period to the given timedelta."""
+        self._verification_window = int(verification_window.total_seconds() * 1000000)
+
+    def __unicode__(self):
+        """ Returns the unicode date of the verification window. """
+        return u"{}".format(self._verification_window)
