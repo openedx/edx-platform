@@ -317,15 +317,29 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     """
     Django Rest Framework ViewSet for the Project model.
     """
+
+    def list(self, request, *args, **kwargs):
+        target_course_id = self.request.QUERY_PARAMS.get('course_id')
+        target_content_id = self.request.QUERY_PARAMS.get('content_id')
+        has_target_course, has_target_content = bool(target_course_id), bool(target_content_id)
+
+        if has_target_course != has_target_content:
+            message = "Both course_id and content_id should be present for filtering"
+            return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+
+        return super(ProjectsViewSet, self).list(request, *args, **kwargs)
+
     serializer_class = ProjectSerializer
     model = Project
 
     def get_queryset(self):
+        target_course_id = self.request.QUERY_PARAMS.get('course_id')
         target_content_id = self.request.QUERY_PARAMS.get('content_id')
+
         queryset = self.model.objects.all()
 
         if target_content_id:
-            queryset = queryset.filter(content_id=target_content_id)
+            queryset = queryset.filter(content_id=target_content_id, course_id=target_course_id)
 
         return queryset
 
