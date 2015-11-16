@@ -1,5 +1,11 @@
 """
 Implementation of "Analytics" service
+
+This file will expose an in-proc callback endpoint so that pip installed libraries (e.g. edx-proctoring) 
+can call from their code base up into the LMS/Studio runtimes. This approach is taken so that dependent 
+libraries does not need to import LMS/Studio code in their code.
+
+This "service" is registered in lms/cms startup.py file.
 """
 
 from eventtracking import tracker
