@@ -20,11 +20,11 @@ class Command(BaseCommand):
     help = dedent(__doc__).strip()
     option_list = BaseCommand.option_list + (
         make_option('-i', '--index', type='int', default=0, dest='index',
-            help='chunk index to sync (0-indexed)'),
+            help='chunk index to sync (0-indexed) [default: %default]'),
         make_option('-n', '--num-chunks', type='int', default=1, dest='num_chunks',
-            help='number of chunks to use'),
+            help='number of chunks to use [default: %default]'),
         make_option('-w', '--window', type='int', default=1000, dest='window',
-            help='how many rows to migrate per query'),
+            help='how many rows to migrate per query [default: %default]'),
     )
 
     def handle(self, *arguments, **options):
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         else:
             max_id = chunk_size * options['index'] + chunk_size - 1
 
-        self.migrate_range(min_id, max_id, options['window'])
+        self._migrate_range(min_id, max_id, options['window'])
 
 
     @transaction.commit_manually
