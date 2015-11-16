@@ -44,6 +44,7 @@
 div.info-wrapper {
 
   background-color: $homepage-background;
+  border-top: none;
 
   section.updates {
     @extend .content;
@@ -54,7 +55,8 @@ div.info-wrapper {
       @include text-align(left);
       @extend %t-strong;
       @extend %t-title6;
-      margin-bottom: $baseline;
+      margin-bottom: 0;
+      @include padding(12px, 26px, 20px, 0);
       font-style: normal;
     }
 
@@ -72,7 +74,6 @@ div.info-wrapper {
         padding: $baseline;
         list-style-type: none;
         margin-bottom: lh(1.5);
-        background-color: $white;
 
         ol, ul {
           ol,ul {
@@ -128,24 +129,20 @@ div.info-wrapper {
     }
   }
 
-  section.handouts {
-    padding: 20px 30px;
+  section.course-dates {
+    @include padding(32px, 30px, 20px, 30px);
     margin: 0;
     @extend .sidebar;
     background: rgba(0, 0, 0, 0);
     box-shadow: none;
     font-size: 14px;
 
-    a {
-      color: $link-color;
-    }
-
     &:after {
       left: -1px;
       right: auto;
     }
 
-    h1 {
+    .course-info-heading {
       @include text-align(left);
       @extend %t-strong;
       @extend %t-title6;
@@ -154,146 +151,60 @@ div.info-wrapper {
       font-style: normal;
     }
 
+    @media print {
+      background: transparent !important;
+    }
+  }
+
+  section.handouts {
+    margin: $baseline;
+    border-top: ($baseline/4) solid $gray-l5;
+
+    .course-info-heading {
+      @include text-align(left);
+      @extend %t-strong;
+      @extend %t-title6;
+      margin-top: $baseline;
+      margin-bottom: ($baseline/2);
+      padding: 0;
+      font-style: normal;
+    }
+
+    h1 {
+      @include text-align(left);
+      @extend %t-strong;
+      @extend %t-title7;
+      margin-bottom: 0;
+    }
+
+    a {
+      color: $link-color;
+    }
+
     ul {
-      margin-bottom: 14px;
+      margin: ($baseline/2) 0;
+      padding: 0;
+      list-style: none;
+
+      > li {
+        margin: ($baseline/4) 0;
+      }
     }
 
     ol {
-      margin-bottom: 14px;
-      li {
-        @include text-align(left);
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+      list-style: none;
+      @include font-size(14);
 
-        a {
-          display: block;
-          padding: 0;
-          color: $link-color;
+      > li {
+        margin: ($baseline/4) 0;
+        border-bottom: 2px solid $gray-l4;
+      }
 
-          &:hover,
-          &:focus {
-            background: transparent;
-          }
-        }
-
-        &.expandable,
-        &.collapsable {
-          margin: 0 16px 14px 16px;
-          @include transition(all .2s linear 0s);
-
-          h4 {
-            color: $link-color;
-            font-size: 1em;
-            font-weight: normal;
-            padding-left: 30px;
-          }
-        }
-
-        &.collapsable {
-          background: $white;
-          border-radius: 3px;
-          padding: 14px 0;
-          box-shadow: 0 0 1px 1px $shadow-l1, 0 1px 3px rgba(0, 0, 0, .25);
-
-          h4 {
-            margin-bottom: 16px;
-          }
-        }
-
-        &.multiple {
-
-          a {
-            display: inline-block;
-            padding: 0;
-
-            &:hover,
-            &:focus {
-              background: transparent;
-            }
-          }
-        }
-
-        ul {
-          background: none;
-          margin: 0;
-
-          li {
-            border-bottom: 0;
-            border-top: 1px solid #e6e6e6;
-            font-size: 0.9em;
-            margin: 0;
-            padding: 15px 30px;
-
-            a {
-              display: inline-block;
-              padding: 0;
-
-              &:hover,
-              &:focus {
-                background: transparent;
-              }
-            }
-          }
-        }
-
-        div.hitarea {
-          background-image: url('#{$static-path}/images/treeview-default.gif') no-repeat;
-          display: block;
-          height: 100%;
-          margin-left: 0;
-          max-height: 20px;
-          position: absolute;
-          width: 100%;
-
-          &:hover,
-          &:focus {
-            opacity: 0.6;
-            filter: alpha(opacity=60);
-
-            + h4 {
-              @extend a:hover;
-              text-decoration: underline;
-            }
-          }
-
-          &.expandable-hitarea {
-            background-position: -72px 0px;
-          }
-
-          &.collapsable-hitarea {
-            background-position: -55px -23px;
-          }
-        }
-
-        h3 {
-          border-bottom: 0;
-          box-shadow: none;
-          color: #888;
-          font-size: 1em;
-          margin-bottom: 0;
-        }
-
-        p {
-          letter-spacing: 0;
-          margin: 0;
-          text-transform: none;
-
-          a {
-            padding-right: 8px;
-
-            &:before {
-              color: $gray-l3;
-              content: "•";
-              display: inline-block;
-              padding-right: 8px;
-            }
-
-            &:first-child {
-              &:before {
-                content: "";
-                padding-right: 0;
-              }
-            }
-          }
-        }
+      li:last-child {
+        border: none;
       }
     }
 
