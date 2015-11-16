@@ -35,8 +35,8 @@ class Command(BaseCommand):
             self.stdout.write("Index {} is too large for {} chunks\n".format(options['index'], options['num_chunks']))
             exit(2)
 
+        #Set max and min id from the number of chunks and the selected index
         chunk_size = SQL_MAX_INT / options['num_chunks']
-
         min_id = chunk_size * options['index']
 
         if options['index'] == options['num_chunks'] - 1:
@@ -44,19 +44,29 @@ class Command(BaseCommand):
         else:
             max_id = chunk_size * options['index'] + chunk_size - 1
 
+        #Start at the max id in the selected range, so the migration is resumable
+        active_range = StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id).order_by('id')
+        if active_range:
+            min_id_found = active_range[0].id
+            self.stdout.write("Found min existent id {} in StudentModuleHistory, resuming from there\n".format(min_id_found))
+        else:
+            #Assume we're starting from the top of the range
+            min_id_found = max_id
+            self.stdout.write("No entries found in StudentModuleHistory in this range, starting at top of range ({})\n".format(min_id_found))
+
+        #Make sure there's entries to migrate in StudentModuleHistoryArchive in this range
         try:
-            StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id)[0]
-        except IndexError:
-            self.stdout.write("No entries found in StudentModuleHistory in range {}-{}, aborting migration.\n".format(
-                max_id, min_id))
+            StudentModuleHistoryArchive.objects.filter(id__lt=min_id_found, id__gte=min_id)[0]
+        except:
+            self.stdout.write("No entries found in StudentModuleHistoryArchive in range {}-{}, aborting migration.\n".format(
+                min_id_found, min_id))
             exit(1)
 
         if options['show_range']:
-            max_id_in_range = StudentModuleHistory.objects.filter(id__lt=max_id, id__gte=min_id).order_by('-id')[0].id
-            print "Range: {}-{}, max id in range: {}".format(max_id, min_id, max_id_in_range)
+            self.stdout.write("Range: {}-{}, min id in range: {}\n".format(max_id, min_id, min_id_found))
             return
 
-        self._migrate_range(min_id, max_id, options['window'])
+        self._migrate_range(min_id, min_id_found, options['window'])
 
 
     @transaction.commit_manually
