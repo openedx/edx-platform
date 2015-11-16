@@ -11,9 +11,11 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
+from django.utils.http import urlencode
 
 from projects.models import Project, Workgroup
 from projects.scope_resolver import GroupProjectParticipantsScopeResolver
+
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -96,12 +98,14 @@ class ProjectsApiTests(TestCase):
             uri, headers=headers, content_type='application/json', data=json_data)
         return response
 
-    def do_get(self, uri):
+    def do_get(self, uri, query_parameters=None):
         """Submit an HTTP GET request"""
         headers = {
             'Content-Type': 'application/json',
             'X-Edx-Api-Key': str(TEST_API_KEY),
         }
+        if query_parameters:
+            uri += "?" + urlencode(query_parameters)
         response = self.client.get(uri, headers=headers)
         return response
 
@@ -130,15 +134,35 @@ class ProjectsApiTests(TestCase):
 
     def test_projects_list_get_filter_by_content_id(self):
         """ Tests GET request with specified content_id - should return single project with matching content_id """
-        response = self.do_get(self.test_projects_uri + "?content_id=" + self.test_project.content_id)
+        filter1 = {'course_id': self.test_project.course_id, 'content_id': self.test_project.content_id}
+        response = self.do_get(self.test_projects_uri, filter1)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], self.test_project.id)
         self.assertEqual(response.data[0]['content_id'], self.test_project.content_id)
+        self.assertEqual(response.data[0]['course_id'], self.test_project.course_id)
 
-        response = self.do_get(self.test_projects_uri + "?content_id=" + self.test_project2.content_id)
+        filter2 = {'course_id': self.test_project2.course_id, 'content_id': self.test_project2.content_id}
+        response = self.do_get(self.test_projects_uri, filter2)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], self.test_project2.id)
         self.assertEqual(response.data[0]['content_id'], self.test_project2.content_id)
+        self.assertEqual(response.data[0]['course_id'], self.test_project2.course_id)
+
+    def test_projects_list_incorrect_filter_request(self):
+        """ Tests that GET requests with invalid filter returns BAD REQUEST response """
+        def assert_request_failed(response):
+            """ Assertion helper """
+            self.assertEqual(response.status_code, 400)
+            self.assertIn("detail", response.data)
+
+        assert_request_failed(self.do_get(self.test_projects_uri, {'course_id': self.test_project.course_id}))
+        assert_request_failed(self.do_get(self.test_projects_uri, {'content_id': self.test_project.content_id}))
+        assert_request_failed(
+            self.do_get(self.test_projects_uri, {'content_id': "", 'course_id': self.test_project.course_id})
+        )
+        assert_request_failed(
+            self.do_get(self.test_projects_uri, {'content_id': self.test_project.content_id, 'course_id': ""})
+        )
 
     def test_projects_list_post(self):
         data = {
