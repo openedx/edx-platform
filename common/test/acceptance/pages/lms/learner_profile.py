@@ -1,13 +1,13 @@
 """
 Bok-Choy PageObject class for learner profile page.
 """
-from . import BASE_URL
 from bok_choy.page_object import PageObject
-from .fields import FieldsMixin
 from bok_choy.promise import EmptyPromise
-from .instructor_dashboard import InstructorDashboardPage
 from selenium.webdriver import ActionChains
 
+from . import BASE_URL
+from .fields import FieldsMixin
+from .instructor_dashboard import InstructorDashboardPage
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
 FIELD_ICONS = {
@@ -43,7 +43,10 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Check if browser is showing correct page.
         """
-        return self.q(css='body.view-profile').present
+        return all([
+            self.q(css='body.view-profile').present,
+            not self.q(css='ui-loading-indicator').visible
+        ])
 
     @property
     def privacy(self):
