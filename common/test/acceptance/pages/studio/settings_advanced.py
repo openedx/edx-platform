@@ -176,7 +176,7 @@ class AdvancedSettingsPage(CoursePage):
             'advertised_start',
             'announcement',
             'display_name',
-            'info_sidebar_name',
+            'info_section_name',
             'is_new',
             'ispublic',
             'issue_badges',
