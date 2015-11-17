@@ -34,6 +34,10 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
+<%static:require_module module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+        ToggleElementVisibility();
+</%static:require_module>
+
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
 <section class="container">
   <div class="home">
