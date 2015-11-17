@@ -20,6 +20,7 @@ from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -77,6 +78,8 @@ def split_by_comma_and_whitespace(a_str):
     return re.split(r'[\s,]', a_str)
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
@@ -129,7 +132,7 @@ def instructor_dashboard(request, course_id):
     def return_csv(func, datatable, file_pointer=None):
         """Outputs a CSV file from the contents of a datatable."""
         if file_pointer is None:
-            response = HttpResponse(mimetype='text/csv')
+            response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = (u'attachment; filename={0}'.format(func)).encode('utf-8')
         else:
             response = file_pointer

@@ -126,6 +126,7 @@ class ApiPermissionsAdminForm(forms.ModelForm):
     """ Django admin form for ApiPermissions model """
     class Meta(object):  # pylint: disable=missing-docstring
         model = ProviderApiPermissions
+        fields = ['client', 'provider_id']
 
     provider_id = forms.ChoiceField(choices=[], required=True)
 

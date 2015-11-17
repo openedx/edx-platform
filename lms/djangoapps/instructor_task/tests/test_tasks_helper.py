@@ -29,7 +29,7 @@ from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistratio
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from instructor_task.models import ReportStore
@@ -1614,7 +1614,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         current_task.update_state = Mock()
         instructor_task = Mock()
         instructor_task.task_input = json.dumps({'students': None})
-        with self.assertNumQueries(125):
+        with self.assertNumQueries(213):
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:

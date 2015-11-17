@@ -25,6 +25,9 @@ class CustomCourseForEdX(models.Model):
     display_name = models.CharField(max_length=255)
     coach = models.ForeignKey(User, db_index=True)
 
+    class Meta(object):
+        app_label = 'ccx'
+
     @lazy
     def course(self):
         """Return the CourseDescriptor of the course related to this CCX"""
@@ -104,6 +107,7 @@ class CcxFieldOverride(models.Model):
     field = models.CharField(max_length=255)
 
     class Meta(object):
+        app_label = 'ccx'
         unique_together = (('ccx', 'location', 'field'),)
 
     value = models.TextField(default='null')

@@ -71,7 +71,7 @@ class TestPostMigrationFix(ModuleStoreTestCase):
         self.assertEqual(user2_cohorts, ['Course1AutoGroup2'])  # CourseUserGroup and CohortMembership disagree
 
         # run the post-CohortMembership command, and commit it
-        call_command('post_cohort_membership_fix', 'commit')
+        call_command('post_cohort_membership_fix', commit='commit')
 
         # verify that both databases agree about the (corrected) state of the memberships
         self.assertEqual(self.user1.course_groups.count(), 1)

@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from edxmako.shortcuts import render_to_response
 from microsite_configuration import microsite
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
 from django.utils.translation import ugettext as _
 

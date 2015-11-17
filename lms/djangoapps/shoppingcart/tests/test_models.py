@@ -253,13 +253,13 @@ class OrderTest(ModuleStoreTestCase):
             {
                 'orderId': 1,
                 'currency': 'usd',
-                'total': '40',
+                'total': '40.00',
                 'products': [
                     {
                         'sku': u'CertificateItem.honor',
                         'name': unicode(self.course_key),
                         'category': unicode(self.course_key.org),
-                        'price': '40',
+                        'price': '40.00',
                         'id': 1,
                         'quantity': 1
                     }
@@ -848,13 +848,13 @@ class CertificateItemTest(ModuleStoreTestCase):
             {
                 'orderId': 1,
                 'currency': 'usd',
-                'total': '40',
+                'total': '40.00',
                 'products': [
                     {
                         'sku': u'CertificateItem.verified',
                         'name': unicode(self.course_key),
                         'category': unicode(self.course_key.org),
-                        'price': '40',
+                        'price': '40.00',
                         'id': 1,
                         'quantity': 1
                     }

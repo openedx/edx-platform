@@ -242,7 +242,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
 
     def test_set_due_date_extension_num_queries(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             tools.set_due_date_extension(self.course, self.week1, self.user, extended)
             self._clear_field_data_cache()
 

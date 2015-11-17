@@ -427,7 +427,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         user = UserFactory.create(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
 
         # Satisfy one of the requirements, but not the other
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(11):
             api.set_credit_requirement_status(
                 user.username,
                 self.course_key,
@@ -439,7 +439,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit("bob", self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(15):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -479,7 +479,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Delete the eligibility entries and satisfy the user's eligibility
         # requirement again to trigger eligibility notification
         CreditEligibility.objects.all().delete()
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(13):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -726,15 +726,16 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # - 2 queries: Get-or-create the credit request.
         # - 1 query: Retrieve user account and profile information from the user API.
         # - 1 query: Look up the user's final grade from the credit requirements table.
-        # - 2 queries: Update the request.
+        # - 1 query: Update the request.
         # - 2 queries: Update the history table for the request.
-        with self.assertNumQueries(10):
+        # - 4 Django savepoints
+        with self.assertNumQueries(13):
             request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
-        # - 3 queries: Retrieve and update the request
+        # - 2 queries: Retrieve and update the request
         # - 1 query: Update the history table for the request.
         uuid = request["parameters"]["request_uuid"]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             api.update_credit_request_status(uuid, self.PROVIDER_ID, "approved")
 
         with self.assertNumQueries(1):
@@ -771,11 +772,11 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
             api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
     @ddt.data("pending", "failed")
-    def test_user_is_not_eligible(self, status):
+    def test_user_is_not_eligible(self, requirement_status):
         # Simulate a user who is not eligible for credit
         CreditEligibility.objects.all().delete()
         status = CreditRequirementStatus.objects.get(username=self.USER_INFO['username'])
-        status.status = status
+        status.status = requirement_status
         status.reason = {}
         status.save()
 
@@ -810,7 +811,6 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # coerces None values to empty strings.
         query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
-        transaction.commit_unless_managed()
 
         # Request should include an empty country field
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO["username"])

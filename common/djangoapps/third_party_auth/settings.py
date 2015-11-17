@@ -24,12 +24,6 @@ def apply_settings(django_settings):
     # Params not in this whitelist will be silently dropped.
     django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
 
-    # Register and configure python-social-auth with Django.
-    django_settings.INSTALLED_APPS += (
-        'social.apps.django_app.default',
-        'third_party_auth',
-    )
-
     # Inject exception middleware to make redirects fire.
     django_settings.MIDDLEWARE_CLASSES += _MIDDLEWARE_CLASSES
 
@@ -81,7 +75,7 @@ def apply_settings(django_settings):
 
     # Context processors required under Django.
     django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
-    django_settings.TEMPLATE_CONTEXT_PROCESSORS += (
+    django_settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
         'social.apps.django_app.context_processors.backends',
         'social.apps.django_app.context_processors.login_redirect',
     )
