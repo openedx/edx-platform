@@ -19,6 +19,11 @@
                     'click #add-exception': 'addException'
                 },
 
+                initialize: function(){
+                    this.on('removeException', this.removeException);
+                },
+
+
                 render: function(){
                     var template = this.loadTemplate('certificate-white-list-editor');
                     this.$el.html(template());
@@ -45,20 +50,55 @@
                     }
 
                     var certificate_exception = new CertificateExceptionModel({
+                        url: this.collection.url,
                         user_name: user_name,
                         user_email: user_email,
-                        notes: notes
+                        notes: notes,
+                        new: true
                     });
 
                     if(this.collection.findWhere(model)){
                         this.showMessage("username/email already in exception list", 'msg-error');
                     }
                     else if(certificate_exception.isValid()){
-                        this.collection.add(certificate_exception, {validate: true});
-                        this.showMessage("Student Added to exception list", 'msg-success');
+                        certificate_exception.save(
+                            null,
+                            {
+                                success: this.showSuccess(
+                                    this,
+                                    true,
+                                    'Students added to Certificate white list successfully'
+                                ),
+                                error: this.showError(this)
+                            }
+                        );
+
                     }
                     else{
                         this.showMessage(certificate_exception.validationError, 'msg-error');
+                    }
+                },
+
+                removeException: function(certificate){
+                    var model = this.collection.findWhere(certificate);
+                    if(model){
+                        model.destroy(
+                            {
+                                success: this.showSuccess(
+                                    this,
+                                    false,
+                                    'Student Removed from certificate white list successfully.'
+                                ),
+                                error: this.showError(this),
+                                wait: true,
+                                //emulateJSON: true,
+                                data: JSON.stringify(model.attributes)
+                            }
+                        );
+                        this.showMessage('Exception is being removed from server.', 'msg-success');
+                    }
+                    else{
+                        this.showMessage('Could not find Certificate Exception in white list.', 'msg-error');
                     }
                 },
 
@@ -73,6 +113,27 @@
                     $('html, body').animate({
                         scrollTop: this.$el.offset().top - 20
                     }, 1000);
+                },
+
+                showSuccess: function(caller, add_model, message){
+                    return function(model){
+                        if(add_model){
+                            caller.collection.add(model);
+                        }
+                        caller.showMessage(message, 'msg-success');
+                    };
+                },
+
+                showError: function(caller){
+                    return function(model, response){
+                        try{
+                            var response_data = JSON.parse(response.responseText);
+                            caller.showMessage(response_data.message, 'msg-error');
+                        }
+                        catch(exception){
+                            caller.showMessage("Server Error, Please try again later.", 'msg-error');
+                        }
+                    };
                 }
             });
         }

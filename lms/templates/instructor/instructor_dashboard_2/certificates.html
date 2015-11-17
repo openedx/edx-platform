@@ -5,7 +5,7 @@ import json
 %>
 
 <%static:require_module module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
-        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${certificate_exception_url}");
+        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${generate_certificate_exceptions_url}", "${certificate_exception_view_url}");
 </%static:require_module>
 
 <%page args="section_data"/>
@@ -123,10 +123,7 @@ import json
             <p>${_("Use this to generate certificates for users who did not pass the course but have been given an exception by the Course Team to earn a certificate.")} </p>
             <br />
             <div id="certificate-white-list-editor"></div>
-            <br/>
-            <br/>
             <div class="white-listed-students" id="white-listed-students"></div>
-            <br/>
             <br/>
         </div>
         <div class="no-pending-tasks-message"></div>

@@ -116,7 +116,7 @@ class CertificateWhitelist(models.Model):
     notes = models.TextField(default=None, null=True)
 
     @classmethod
-    def get_certificate_white_list(cls, course_id):
+    def get_certificate_white_list(cls, course_id, student=None):
         """
         Return certificate white list for the given course as dict object,
         returned dictionary will have the following key-value pairs
@@ -133,6 +133,8 @@ class CertificateWhitelist(models.Model):
 
         """
         white_list = cls.objects.filter(course_id=course_id, whitelist=True)
+        if student:
+            white_list = white_list.filter(user=student)
         result = []
 
         for item in white_list:
@@ -213,6 +215,25 @@ class GeneratedCertificate(models.Model):
             return query.values_list('status', flat=True).distinct()
         else:
             return query.values('status').annotate(count=Count('status'))
+
+    def invalidate(self):
+        """
+        Invalidate Generated Certificate by  marking it 'unavailable'.
+
+        Following is the list of fields with their defaults
+            1 - verify_uuid = '',
+            2 - download_uuid = '',
+            3 - download_url = '',
+            4 - grade = ''
+            5 - status = 'unavailable'
+        """
+        self.verify_uuid = ''
+        self.download_uuid = ''
+        self.download_url = ''
+        self.grade = ''
+        self.status = CertificateStatuses.unavailable
+
+        self.save()
 
 
 @receiver(post_save, sender=GeneratedCertificate)
