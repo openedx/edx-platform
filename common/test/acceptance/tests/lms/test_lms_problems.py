@@ -393,7 +393,6 @@ class LogoutDuringAnswering(ProblemsTest):
         # now we should be able to
         problem_page.fill_answer_numerical('1')
         problem_page.click_check()
-        problem_page.wait_for_ajax()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
     @flaky(max_runs=15, min_passes=15)
