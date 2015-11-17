@@ -73,8 +73,14 @@ def apply_settings(django_settings):
     django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
     # Allow users to login using social auth even if their account is not verified yet
-    # Otherwise users who use social auth to register with an invalid email address
-    # can become "stuck". We control this in a more fine-grained manner in pipeline.py
+    # This is required since we [ab]use django's 'is_active' flag to indicate verified
+    # accounts; without this set to True, python-social-auth won't allow us to link the
+    # user's account to the third party account during registration (since the user is
+    # not verified at that point).
+    # We also generally allow unverified third party auth users to login (see the logic
+    # in ensure_user_information in pipeline.py) because otherwise users who use social
+    # auth to register with an invalid email address can become "stuck".
+    # TODO: Remove the following if/when email validation is separated from the is_active flag.
     django_settings.SOCIAL_AUTH_INACTIVE_USER_LOGIN = True
     django_settings.SOCIAL_AUTH_INACTIVE_USER_URL = '/auth/inactive'
 

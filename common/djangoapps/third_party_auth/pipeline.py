@@ -511,6 +511,9 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             pass
         else:
             # This is an existing account, linked to a third party provider but not activated.
+            # Double-check these criteria:
+            assert user is not None
+            assert social is not None
             # We now also allow them to login again, because if they had entered their email
             # incorrectly then there would be no way for them to recover the account, nor
             # register anew via SSO. See SOL-1324 in JIRA.
