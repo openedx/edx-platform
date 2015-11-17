@@ -386,17 +386,15 @@ class LogoutDuringAnswering(ProblemsTest):
 
         login_page.login(self.EMAIL, self.PASSWORD)
 
-        problem_page = ProblemPage(self.browser)
         problem_page.wait_for_page()
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
 
-        # now we should be able to
         problem_page.fill_answer_numerical('1')
         problem_page.click_check()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
     @flaky(max_runs=15, min_passes=15)
-    def test_logout_after_click_no_redirect(self):
+    def test_logout_cancel_no_redirect(self):
         """
         1) User goes to a problem page.
         2) User fills out an answer to the problem.
