@@ -114,7 +114,6 @@ def get_consumer_secret(user, license):
     Raises: LabsterApiError
     """
     data = {
-        'user_id': user.id,
         'user_email': user.email,
         'license': license,
         'source': 'EDX',
