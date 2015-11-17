@@ -29,8 +29,10 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         super(CourseInfoTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.page = ItemFactory.create(
-            category="course_info", parent_location=self.course.location,
-            data="OOGIE BLOOGIE", display_name="updates"
+            category="course_info",
+            parent_location=self.course.location,
+            display_name="updates",
+            data="OGGIE BLOOGIE",
         )
 
     def test_logged_in_unenrolled(self):
@@ -38,7 +40,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
+        self.assertIn("OGGIE BLOOGIE", resp.content)
         self.assertIn("You are not currently enrolled in this course", resp.content)
 
     def test_logged_in_enrolled(self):
@@ -51,7 +53,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertNotIn("OOGIE BLOOGIE", resp.content)
+        self.assertNotIn("Happy Pi Day!", resp.content)
 
     def test_logged_in_not_enrolled(self):
         self.setup_user()
@@ -134,6 +136,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.setup_user()
         url = reverse('info', args=[self.xml_course_key.to_deprecated_string()])
         resp = self.client.get(url)
+        print resp.content
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 

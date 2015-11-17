@@ -35,12 +35,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
 <%block name="js_extra">
-<script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
-<script type="text/javascript" charset="utf-8">
- $(document).ready(function(){
-     $(".handouts").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
- });
-</script>
+<script type="text/javascript" src="${static.url('js/courseware/toggle_element_visibility.js')}"></script>
 </%block>
 
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
