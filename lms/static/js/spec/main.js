@@ -698,6 +698,7 @@
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
         'lms/include/js/spec/navigation_spec.js',
+        'lms/include/js/spec/courseware/updates_visibility.js',
         'lms/include/js/spec/discovery/collections/filters_spec.js',
         'lms/include/js/spec/discovery/models/course_card_spec.js',
         'lms/include/js/spec/discovery/models/course_directory_spec.js',

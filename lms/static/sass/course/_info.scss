@@ -50,6 +50,8 @@ div.info-wrapper {
     @extend .content;
     @include padding-left($baseline);
     line-height: lh();
+    width: 100%;
+    display: block;
 
     h1 {
       @include text-align(left);
@@ -69,6 +71,25 @@ div.info-wrapper {
       margin-bottom: lh();
       padding-left: 0;
 
+      .updates-article {
+        border-radius:3px;
+        background-color: $white;
+        border:1px solid transparent;
+        &:hover {
+          border: 1px solid $gray-l3;
+        }
+      }
+
+      .show-older-updates {
+        @extend %btn-pl-white-base;
+        padding: ($baseline/2);
+        @include font-size(14);
+        width: 100%;
+        display: block;
+        text-align: center;
+        cursor: pointer;
+      }
+
       > li,article {
         @extend .clearfix;
         padding: $baseline;
@@ -81,12 +102,25 @@ div.info-wrapper {
           }
         }
 
-        h2 {
+        h2.date {
           @extend %t-title9;
           margin-bottom: ($baseline/4);
           text-transform: none;
           background: url('#{$static-path}/images/calendar-icon.png') 0 center no-repeat;
           @include padding-left($baseline);
+          @include float(left);
+        }
+
+        .toggle-visibility-button {
+          @extend %t-title9;
+          @include float(right);
+          cursor: pointer;
+        }
+
+        .toggle-visibility-element {
+          content:'';
+          display:block;
+          clear: both;
         }
 
         section.update-description {
