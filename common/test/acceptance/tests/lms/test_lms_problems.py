@@ -5,6 +5,7 @@ Bok choy acceptance tests for problems in the LMS
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
+from flaky import flaky
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -357,6 +358,7 @@ class LogoutDuringAnswering(ProblemsTest):
         """
         self.browser.delete_cookie('sessionid')
 
+    @flaky(max_runs=15, min_passes=15)
     def test_logout_after_click_redirect(self):
         """
         1) User goes to a problem page.
@@ -394,6 +396,7 @@ class LogoutDuringAnswering(ProblemsTest):
         problem_page.wait_for_ajax()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
+    @flaky(max_runs=15, min_passes=15)
     def test_logout_after_click_no_redirect(self):
         """
         1) User goes to a problem page.
