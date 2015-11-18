@@ -6,6 +6,7 @@ import math
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.views.decorators.cache import cache_control
 
 from opaque_keys.edx.keys import CourseKey
@@ -96,6 +97,7 @@ def get_grade_book_page(request, course, course_key):
     return student_info, page
 
 
+@transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def spoc_gradebook(request, course_id):
