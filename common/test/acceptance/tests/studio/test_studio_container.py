@@ -397,6 +397,7 @@ class EditVisibilityModalTest(ContainerBase):
         # Re-open the modal and inspect its selected inputs
         visibility_editor = self.edit_component_visibility(component)
         self.verify_selected_labels(visibility_editor, expected_labels)
+        visibility_editor.save()
 
     def verify_component_validation_error(self, component):
         """
@@ -427,14 +428,13 @@ class EditVisibilityModalTest(ContainerBase):
         self.browser.refresh()
         self.container_page.wait_for_page()
 
-    def remove_missing_groups(self, component):
+    def remove_missing_groups(self, visibility_editor, component):
         """
         Deselect the missing groups for a component.  After save,
         verify that there are no missing group messages in the modal
         and that there is no validation error on the component.
         """
-        visibility_editor = self.edit_component_visibility(component)
-        for option in self.edit_component_visibility(component).selected_options:
+        for option in visibility_editor.selected_options:
             if option.text == self.MISSING_GROUP_LABEL:
                 option.click()
         visibility_editor.save()
@@ -541,7 +541,7 @@ class EditVisibilityModalTest(ContainerBase):
         self.verify_component_validation_error(self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_selected_labels(visibility_editor, [self.MISSING_GROUP_LABEL] * 2)
-        self.remove_missing_groups(self.html_component)
+        self.remove_missing_groups(visibility_editor, self.html_component)
         self.verify_visibility_set(self.html_component, False)
 
     def test_found_and_missing_groups(self):
@@ -565,7 +565,7 @@ class EditVisibilityModalTest(ContainerBase):
         self.verify_component_validation_error(self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2)
-        self.remove_missing_groups(self.html_component)
+        self.remove_missing_groups(visibility_editor, self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'])
         self.verify_visibility_set(self.html_component, True)
