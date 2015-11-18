@@ -13,7 +13,7 @@ from django.core.urlresolvers import reverse
 from request_cache.middleware import RequestCache
 from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from lms.lib.comment_client import Thread
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
@@ -1733,7 +1733,7 @@ class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         self.assertNotIn("users", content)
 
     def test_course_does_not_exist(self):
-        course_id = SlashSeparatedCourseKey.from_deprecated_string("does/not/exist")
+        course_id = CourseKey.from_string("does/not/exist")
         response = self.make_request(course_id=course_id, username="other")
 
         self.assertEqual(response.status_code, 404)
