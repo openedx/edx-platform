@@ -27,7 +27,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         errstring = "force_publish requires 1 or more argument: <course_id> |commit"
         with self.assertRaisesRegexp(CommandError, errstring):
-            call_command()
+            call_command('force_publish')
 
     def test_invalid_course_key(self):
         """
@@ -35,7 +35,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         errstring = "Invalid course key."
         with self.assertRaisesRegexp(CommandError, errstring):
-            call_command('TestX/TS01')
+            call_command('force_publish', 'TestX/TS01')
 
     def test_too_many_arguments(self):
         """
@@ -43,7 +43,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         errstring = "force_publish requires 1 or more argument: <course_id> |commit"
         with self.assertRaisesRegexp(CommandError, errstring):
-            call_command(unicode(self.course.id), '--commit', 'invalid-arg')
+            call_command('force_publish', unicode(self.course.id), '--commit', 'invalid-arg')
 
     def test_course_key_not_found(self):
         """
@@ -51,7 +51,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         errstring = "Course not found."
         with self.assertRaisesRegexp(CommandError, errstring):
-            call_command(unicode('course-v1:org+course+run'))
+            call_command('force_publish', unicode('course-v1:org+course+run'))
 
     def test_force_publish_non_split(self):
         """
@@ -60,7 +60,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         errstring = 'The owning modulestore does not support this command.'
         with self.assertRaisesRegexp(CommandError, errstring):
-            call_command(unicode(course.id))
+            call_command('force_publish', unicode(course.id))
 
     @SharedModuleStoreTestCase.modifies_courseware
     def test_force_publish(self):
@@ -91,7 +91,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
             patched_yes_no.return_value = True
 
             # force publish course
-            call_command(unicode(self.course.id), '--commit')
+            call_command('force_publish', unicode(self.course.id), '--commit')
 
             # verify that course has no changes
             self.assertFalse(self.store.has_changes(self.store.get_item(self.course.location)))
