@@ -4,7 +4,7 @@ Models providing Programs support for the LMS and Studio.
 
 from urlparse import urljoin
 
-from django.db.models import BooleanField, IntegerField, URLField
+from django.db.models import NullBooleanField, IntegerField, URLField
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
@@ -20,7 +20,7 @@ class ProgramsApiConfig(ConfigurationModel):
     internal_service_url = URLField(verbose_name=_("Internal Service URL"))
     public_service_url = URLField(verbose_name=_("Public Service URL"))
     api_version_number = IntegerField(verbose_name=_("API Version"))
-    enable_student_dashboard = BooleanField(verbose_name=_("Enable Student Dashboard Displays"))
+    enable_student_dashboard = NullBooleanField(verbose_name=_("Enable Student Dashboard Displays"))
     cache_ttl = models.PositiveIntegerField(
         verbose_name=_("Cache Time To Live"),
         default=0,

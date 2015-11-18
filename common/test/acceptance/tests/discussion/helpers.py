@@ -81,6 +81,7 @@ class CohortTestMixin(object):
         """
         url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + "/cohorts/{}/add".format(cohort_id)
         data = {"users": username}
+        course_fixture.headers['Content-type'] = 'application/x-www-form-urlencoded'
         response = course_fixture.session.post(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to add user to cohort")
 
