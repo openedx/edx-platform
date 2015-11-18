@@ -312,6 +312,7 @@ class EditContainerTest(NestedVerticalTest):
         self.assertEqual(component.student_content, "modified content")
 
 
+@attr('shard_3')
 class EditVisibilityModalTest(ContainerBase):
     """
     Tests of the visibility settings modal for components on the unit
@@ -1041,6 +1042,7 @@ class UnitPublishingTest(ContainerBase):
     #     self.assertEqual('discussion', self.courseware.xblock_component_type(1))
 
 
+@attr('shard_3')
 class DisplayNameTest(ContainerBase):
     """
     Test consistent use of display_name_with_default
@@ -1077,6 +1079,7 @@ class DisplayNameTest(ContainerBase):
         self.assertEqual(container.name, title_on_unit_page)
 
 
+@attr('shard_3')
 class ProblemCategoryTabsTest(ContainerBase):
     """
     Test to verify tabs in problem category.
