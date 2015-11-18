@@ -23,6 +23,8 @@ define('video/09_play_pause_control.js', [], function() {
         return $.Deferred().resolve().promise();
     };
 
+    var unusedVar = "something";
+
     PlayPauseControl.prototype = {
         template: [
             '<button class="control video_control play" aria-disabled="false">',
