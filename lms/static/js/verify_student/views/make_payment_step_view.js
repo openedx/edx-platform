@@ -108,7 +108,7 @@ var edx = edx || {};
             if (processors.length === 0) {
                 // No payment processors are enabled at the moment, so show an error message
                 this.errorModel.set({
-                    errorTitle: gettext("We're currently experiencing technical problems."),
+                    errorTitle: gettext('All payment options are currently unavailable.'),
                     errorMsg: gettext('Try the transaction again in a few minutes.'),
                     shown: true
                 })
