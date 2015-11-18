@@ -21,8 +21,8 @@ from courseware.date_summary import (
 )
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from verify_student.models import VerificationDeadline
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

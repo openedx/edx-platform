@@ -7,27 +7,27 @@ import unittest
 
 from django.contrib.auth.models import User
 from django.db import connection, IntegrityError
-from django.db.transaction import commit_on_success, TransactionManagementError
+from django.db.transaction import atomic, TransactionManagementError
 from django.test import TestCase, TransactionTestCase
 
-from util.db import commit_on_success_with_read_committed, generate_int_id
+from util.db import commit_on_success, generate_int_id, outer_atomic
 
 
 @ddt.ddt
-class TransactionIsolationLevelsTestCase(TransactionTestCase):
+class TransactionManagersTestCase(TransactionTestCase):
     """
-    Tests the effects of changing transaction isolation level to READ COMMITTED instead of REPEATABLE READ.
+    Tests commit_on_success and outer_atomic.
 
     Note: This TestCase only works with MySQL.
 
-    To run it on devstack:
-    1. Add TEST_RUNNER = 'django_nose.NoseTestSuiteRunner' to envs/devstack.py
-    2. Run "./manage.py lms --settings=devstack test util.tests.test_db"
+    To test do: "./manage.py lms --settings=test_with_mysql test util.tests.test_db"
     """
 
     @ddt.data(
-        (commit_on_success, IntegrityError, None, True),
-        (commit_on_success_with_read_committed, type(None), False, True),
+        (outer_atomic(), IntegrityError, None, True),
+        (outer_atomic(read_committed=True), type(None), False, True),
+        (commit_on_success(), IntegrityError, None, True),
+        (commit_on_success(read_committed=True), type(None), False, True),
     )
     @ddt.unpack
     def test_concurrent_requests(self, transaction_decorator, exception_class, created_in_1, created_in_2):
@@ -80,8 +80,11 @@ class TransactionIsolationLevelsTestCase(TransactionTestCase):
         self.assertIsNone(thread2.status.get('exception'))
         self.assertEqual(thread2.status.get('created'), created_in_2)
 
-    def test_transaction_nesting(self):
-        """Test that the decorator raises an error if there are already more than 1 levels of nested transactions."""
+    def test_outer_atomic_nesting(self):
+        """
+        Test that outer_atomic raises an error if it is nested inside
+        another atomic.
+        """
 
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
@@ -90,15 +93,46 @@ class TransactionIsolationLevelsTestCase(TransactionTestCase):
             """Just return."""
             return
 
-        commit_on_success_with_read_committed(do_nothing)()
+        outer_atomic()(do_nothing)()
 
-        with commit_on_success():
-            commit_on_success_with_read_committed(do_nothing)()
+        with atomic():
+            atomic()(do_nothing)()
 
-        with self.assertRaises(TransactionManagementError):
+        with outer_atomic():
+            atomic()(do_nothing)()
+
+        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with atomic():
+                outer_atomic()(do_nothing)()
+
+        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with outer_atomic():
+                outer_atomic()(do_nothing)()
+
+    def test_commit_on_success_nesting(self):
+        """
+        Test that commit_on_success raises an error if it is nested inside
+        atomic or if the isolation level is changed when it is nested
+        inside another commit_on_success.
+        """
+        # pylint: disable=not-callable
+
+        if connection.vendor != 'mysql':
+            raise unittest.SkipTest('Only works on MySQL.')
+
+        def do_nothing():
+            """Just return."""
+            return
+
+        commit_on_success(read_committed=True)(do_nothing)()
+
+        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot change isolation level when nested.'):
             with commit_on_success():
-                with commit_on_success():
-                    commit_on_success_with_read_committed(do_nothing)()
+                commit_on_success(read_committed=True)(do_nothing)()
+
+        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with atomic():
+                commit_on_success(read_committed=True)(do_nothing)()
 
 
 @ddt.ddt

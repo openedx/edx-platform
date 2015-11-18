@@ -37,4 +37,4 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
         raise Http404
 
     mimetype, _ = mimetypes.guess_type(uri)
-    return HttpResponse(content, mimetype=mimetype)
+    return HttpResponse(content, content_type=mimetype)

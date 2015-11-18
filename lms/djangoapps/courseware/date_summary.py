@@ -14,7 +14,7 @@ from lazy import lazy
 import pytz
 
 from course_modes.models import CourseMode
-from verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from student.models import CourseEnrollment
 
 

@@ -2,7 +2,7 @@
 Django admin commands related to verify_student
 """
 
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from django.core.management.base import BaseCommand
 
 

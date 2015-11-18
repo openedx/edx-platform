@@ -223,7 +223,7 @@ def _err_response(msg):
     Return a HttpResponse with a json dump with success=False, and the given error message.
     """
     return HttpResponse(json.dumps({'success': False, 'error': msg}),
-                        mimetype="application/json")
+                        content_type="application/json")
 
 
 def _check_access(user, course_id):
@@ -274,7 +274,7 @@ def get_next(request, course_id):
     location = course_key.make_usage_key_from_deprecated_string(p['location'])
 
     return HttpResponse(json.dumps(_get_next(course_key, grader_id, location)),
-                        mimetype="application/json")
+                        content_type="application/json")
 
 
 def get_problem_list(request, course_id):
@@ -330,8 +330,7 @@ def get_problem_list(request, course_id):
         response['problem_list'] = valid_problem_list
         response = json.dumps(response)
 
-        return HttpResponse(response,
-                            mimetype="application/json")
+        return HttpResponse(response, content_type="application/json")
     except GradingServiceError:
         #This is a dev_facing_error
         log.exception(
@@ -432,7 +431,7 @@ def save_grade(request, course_id):
 
     # Ok, save_grade seemed to work.  Get the next submission to grade.
     return HttpResponse(json.dumps(_get_next(course_id, grader_id, location)),
-                        mimetype="application/json")
+                        content_type="application/json")
 
 
 def check_feedback_length(data):
