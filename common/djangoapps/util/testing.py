@@ -100,7 +100,6 @@ class EventTestMixin(object):
         self.mock_tracker.reset_mock()
 
 
-<<<<<<< HEAD
 class PatchMediaTypeMixin(object):
     """
     Generic mixin for verifying unsupported media type in PATCH
@@ -112,7 +111,8 @@ class PatchMediaTypeMixin(object):
             content_type=self.unsupported_media_type
         )
         self.assertEqual(response.status_code, 415)
-=======
+
+
 def patch_testcase():
     """
     Disable commit_on_success decorators for tests in TestCase subclasses.
@@ -159,4 +159,3 @@ def patch_testcase():
     # pylint: disable=protected-access
     TestCase._enter_atomics = enter_atomics_wrapper(TestCase._enter_atomics)
     TestCase._rollback_atomics = rollback_atomics_wrapper(TestCase._rollback_atomics)
->>>>>>> origin/release

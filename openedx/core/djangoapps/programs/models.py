@@ -20,8 +20,7 @@ class ProgramsApiConfig(ConfigurationModel):
     internal_service_url = URLField(verbose_name=_("Internal Service URL"))
     public_service_url = URLField(verbose_name=_("Public Service URL"))
     api_version_number = IntegerField(verbose_name=_("API Version"))
-<<<<<<< HEAD
-    enable_student_dashboard = BooleanField(verbose_name=_("Enable Student Dashboard Displays"))
+    enable_student_dashboard = NullBooleanField(verbose_name=_("Enable Student Dashboard Displays"))
     cache_ttl = models.PositiveIntegerField(
         verbose_name=_("Cache Time To Live"),
         default=0,
@@ -31,9 +30,6 @@ class ProgramsApiConfig(ConfigurationModel):
     )
 
     PROGRAMS_API_CACHE_KEY = "programs.api.data"
-=======
-    enable_student_dashboard = NullBooleanField(verbose_name=_("Enable Student Dashboard Displays"))
->>>>>>> origin/release
 
     @property
     def internal_api_url(self):

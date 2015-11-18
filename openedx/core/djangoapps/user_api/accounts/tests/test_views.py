@@ -306,11 +306,7 @@ class TestAccountAPI(UserAPITestCase):
             """
             Internal helper to perform the actual assertions
             """
-<<<<<<< HEAD
-            with self.assertNumQueries(7):
-=======
-            with self.assertNumQueries(10):
->>>>>>> origin/release
+            with self.assertNumQueries(9):
                 response = self.send_get(self.client)
             data = response.data
             self.assertEqual(16, len(data))
@@ -349,11 +345,7 @@ class TestAccountAPI(UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=self.test_password)
-<<<<<<< HEAD
-        with self.assertNumQueries(7):
-=======
-        with self.assertNumQueries(10):
->>>>>>> origin/release
+        with self.assertNumQueries(9):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])
