@@ -1091,6 +1091,7 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
             'Enrollment Date': _('Enrollment Date'),
             'Currently Enrolled': _('Currently Enrolled'),
             'Enrollment Source': _('Enrollment Source'),
+            'Manual (Un)Enrollment Reason': _('Manual (Un)Enrollment Reason'),
             'Enrollment Role': _('Enrollment Role'),
             'List Price': _('List Price'),
             'Payment Amount': _('Payment Amount'),
