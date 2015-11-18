@@ -10,17 +10,20 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
+from collections import defaultdict, OrderedDict
 from datetime import datetime, timedelta
+from functools import total_ordering
 import hashlib
+from importlib import import_module
 import json
 import logging
 from pytz import UTC
-import uuid
-from collections import defaultdict, OrderedDict
-import dogstats_wrapper as dog_stats_api
 from urllib import urlencode
+import uuid
 
-from django.utils.translation import ugettext as _, ugettext_lazy
+import analytics
+from config_models.models import ConfigurationModel
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -35,31 +38,47 @@ from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
-from config_models.models import ConfigurationModel
-from track import contexts
+import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
-from importlib import import_module
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-import lms.lib.comment_client as cc
-from util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from util.query import use_read_replica_if_available
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
-from functools import total_ordering
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from simple_history.models import HistoricalRecords
+from south.modelsinspector import add_introspection_rules
+from track import contexts
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
+import lms.lib.comment_client as cc
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from util.query import use_read_replica_if_available
 
-import analytics
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
+
+UNENROLLED_TO_ALLOWEDTOENROLL = 'from unenrolled to allowed to enroll'
+ALLOWEDTOENROLL_TO_ENROLLED = 'from allowed to enroll to enrolled'
+ENROLLED_TO_ENROLLED = 'from enrolled to enrolled'
+ENROLLED_TO_UNENROLLED = 'from enrolled to unenrolled'
+UNENROLLED_TO_ENROLLED = 'from unenrolled to enrolled'
+ALLOWEDTOENROLL_TO_UNENROLLED = 'from allowed to enroll to enrolled'
+UNENROLLED_TO_UNENROLLED = 'from unenrolled to unenrolled'
+DEFAULT_TRANSITION_STATE = 'N/A'
+
+TRANSITION_STATES = (
+    (UNENROLLED_TO_ALLOWEDTOENROLL, UNENROLLED_TO_ALLOWEDTOENROLL),
+    (ALLOWEDTOENROLL_TO_ENROLLED, ALLOWEDTOENROLL_TO_ENROLLED),
+    (ENROLLED_TO_ENROLLED, ENROLLED_TO_ENROLLED),
+    (ENROLLED_TO_UNENROLLED, ENROLLED_TO_UNENROLLED),
+    (UNENROLLED_TO_ENROLLED, UNENROLLED_TO_ENROLLED),
+    (ALLOWEDTOENROLL_TO_UNENROLLED, ALLOWEDTOENROLL_TO_UNENROLLED),
+    (UNENROLLED_TO_UNENROLLED, UNENROLLED_TO_UNENROLLED),
+    (DEFAULT_TRANSITION_STATE, DEFAULT_TRANSITION_STATE)
+)
 
 
 class AnonymousUserId(models.Model):
@@ -196,7 +215,7 @@ class UserProfile(models.Model):
     MITx fall prototype.
     """
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         db_table = "auth_userprofile"
 
     # CRITICAL TODO/SECURITY
@@ -355,7 +374,7 @@ class UserProfile(models.Model):
             return default_requires_consent
         if date is None:
             date = datetime.now(UTC)
-        return date.year - year_of_birth <= age_limit    # pylint: disable=maybe-no-member
+        return date.year - year_of_birth <= age_limit
 
 
 @receiver(pre_save, sender=UserProfile)
@@ -451,7 +470,7 @@ class Registration(models.Model):
         registration profile is created when the user creates an
         account, but that account is inactive. Once the user clicks
         on the activation key, it becomes active. '''
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         db_table = "auth_registration"
 
     user = models.ForeignKey(User, unique=True)
@@ -773,6 +792,66 @@ class AlreadyEnrolledError(CourseEnrollmentException):
     pass
 
 
+class CourseEnrollmentManager(models.Manager):
+    """
+    Custom manager for CourseEnrollment with Table-level filter methods.
+    """
+
+    def num_enrolled_in(self, course_id):
+        """
+        Returns the count of active enrollments in a course.
+
+        'course_id' is the course_id to return enrollments
+        """
+
+        enrollment_number = super(CourseEnrollmentManager, self).get_query_set().filter(
+            course_id=course_id,
+            is_active=1
+        ).count()
+
+        return enrollment_number
+
+    def is_course_full(self, course):
+        """
+        Returns a boolean value regarding whether a course has already reached it's max enrollment
+        capacity
+        """
+        is_course_full = False
+        if course.max_student_enrollments_allowed is not None:
+            is_course_full = self.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
+        return is_course_full
+
+    def users_enrolled_in(self, course_id):
+        """Return a queryset of User for every user enrolled in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=True
+        )
+
+    def enrollment_counts(self, course_id):
+        """
+        Returns a dictionary that stores the total enrollment count for a course, as well as the
+        enrollment count for each individual mode.
+        """
+        # Unfortunately, Django's "group by"-style queries look super-awkward
+        query = use_read_replica_if_available(
+            super(CourseEnrollmentManager, self).get_query_set().filter(course_id=course_id, is_active=True).values(
+                'mode').order_by().annotate(Count('mode')))
+        total = 0
+        enroll_dict = defaultdict(int)
+        for item in query:
+            enroll_dict[item['mode']] = item['mode__count']
+            total += item['mode__count']
+        enroll_dict['total'] = total
+        return enroll_dict
+
+    def enrolled_and_dropped_out_users(self, course_id):
+        """Return a queryset of Users in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id
+        )
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -799,9 +878,21 @@ class CourseEnrollment(models.Model):
     # list of possible values.
     mode = models.CharField(default="honor", max_length=100)
 
-    class Meta:
+    objects = CourseEnrollmentManager()
+
+    # Maintain a history of requirement status updates for auditing purposes
+    history = HistoricalRecords()
+
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
         ordering = ('user', 'course_id')
+
+    def __init__(self, *args, **kwargs):
+        super(CourseEnrollment, self).__init__(*args, **kwargs)
+
+        # Private variable for storing course_overview to minimize calls to the database.
+        # When the property .course_overview is accessed for the first time, this variable will be set.
+        self._course_overview = None
 
     def __unicode__(self):
         return (
@@ -831,7 +922,7 @@ class CourseEnrollment(models.Model):
         # save it to the database so that it can have an ID that we can throw
         # into our CourseEnrollment object. Otherwise, we'll get an
         # IntegrityError for having a null user_id.
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
 
         if user.id is None:
             user.save()
@@ -894,17 +985,6 @@ class CourseEnrollment(models.Model):
         from courseware.access import has_access  # pylint: disable=import-error
         return not has_access(user, 'enroll', course)
 
-    @classmethod
-    def is_course_full(cls, course):
-        """
-        Returns a boolean value regarding whether a course has already reached it's max enrollment
-        capacity
-        """
-        is_course_full = False
-        if course.max_student_enrollments_allowed is not None:
-            is_course_full = cls.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
-        return is_course_full
-
     def update_enrollment(self, mode=None, is_active=None, skip_refund=False):
         """
         Updates an enrollment for a user in a class.  This includes options
@@ -966,7 +1046,7 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
-            assert(isinstance(self.course_id, CourseKey))
+            assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
                 'course_id': self.course_id.to_deprecated_string(),
@@ -1039,18 +1119,15 @@ class CourseEnrollment(models.Model):
         """
         # All the server-side checks for whether a user is allowed to enroll.
         try:
-            course = modulestore().get_course(course_key)
-        except ItemNotFoundError:
-            log.warning(
-                u"User %s failed to enroll in non-existent course %s",
-                user.username,
-                course_key.to_deprecated_string(),
-            )
-            raise NonExistentCourseError
+            course = CourseOverview.get_from_id(course_key)
+        except CourseOverview.DoesNotExist:
+            # This is here to preserve legacy behavior which allowed enrollment in courses
+            # announced before the start of content creation.
+            if check_access:
+                log.warning(u"User %s failed to enroll in non-existent course %s", user.username, unicode(course_key))
+                raise NonExistentCourseError
 
         if check_access:
-            if course is None:
-                raise NonExistentCourseError
             if CourseEnrollment.is_enrollment_closed(user, course):
                 log.warning(
                     u"User %s failed to enroll in course %s because enrollment is closed",
@@ -1059,7 +1136,7 @@ class CourseEnrollment(models.Model):
                 )
                 raise EnrollmentClosedError
 
-            if CourseEnrollment.is_course_full(course):
+            if CourseEnrollment.objects.is_course_full(course):
                 log.warning(
                     u"User %s failed to enroll in full course %s",
                     user.username,
@@ -1175,6 +1252,9 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
+        if not user.is_authenticated():
+            return False
+
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active
@@ -1231,30 +1311,6 @@ class CourseEnrollment(models.Model):
     def enrollments_for_user(cls, user):
         return CourseEnrollment.objects.filter(user=user, is_active=1)
 
-    @classmethod
-    def users_enrolled_in(cls, course_id):
-        """Return a queryset of User for every user enrolled in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id,
-            courseenrollment__is_active=True
-        )
-
-    @classmethod
-    def enrollment_counts(cls, course_id):
-        """
-        Returns a dictionary that stores the total enrollment count for a course, as well as the
-        enrollment count for each individual mode.
-        """
-        # Unfortunately, Django's "group by"-style queries look super-awkward
-        query = use_read_replica_if_available(cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode')))
-        total = 0
-        enroll_dict = defaultdict(int)
-        for item in query:
-            enroll_dict[item['mode']] = item['mode__count']
-            total += item['mode__count']
-        enroll_dict['total'] = total
-        return enroll_dict
-
     def is_paid_course(self):
         """
         Returns True, if course is paid
@@ -1310,13 +1366,79 @@ class CourseEnrollment(models.Model):
 
     @property
     def course(self):
-        return modulestore().get_course(self.course_id)
+        # Deprecated. Please use the `course_overview` property instead.
+        return self.course_overview
+
+    @property
+    def course_overview(self):
+        """
+        Returns a CourseOverview of the course to which this enrollment refers.
+        Returns None if an error occurred while trying to load the course.
+
+        Note:
+            If the course is re-published within the lifetime of this
+            CourseEnrollment object, then the value of this property will
+            become stale.
+       """
+        if not self._course_overview:
+            try:
+                self._course_overview = CourseOverview.get_from_id(self.course_id)
+            except (CourseOverview.DoesNotExist, IOError):
+                self._course_overview = None
+        return self._course_overview
 
     def is_verified_enrollment(self):
         """
         Check the course enrollment mode is verified or not
         """
         return CourseMode.is_verified_slug(self.mode)
+
+
+class ManualEnrollmentAudit(models.Model):
+    """
+    Table for tracking which enrollments were performed through manual enrollment.
+    """
+    enrollment = models.ForeignKey(CourseEnrollment, null=True)
+    enrolled_by = models.ForeignKey(User, null=True)
+    enrolled_email = models.CharField(max_length=255, db_index=True)
+    time_stamp = models.DateTimeField(auto_now_add=True, null=True)
+    state_transition = models.CharField(max_length=255, choices=TRANSITION_STATES)
+    reason = models.TextField(null=True)
+
+    @classmethod
+    def create_manual_enrollment_audit(cls, user, email, state_transition, reason, enrollment=None):
+        """
+        saves the student manual enrollment information
+        """
+        cls.objects.create(
+            enrolled_by=user,
+            enrolled_email=email,
+            state_transition=state_transition,
+            reason=reason,
+            enrollment=enrollment
+        )
+
+    @classmethod
+    def get_manual_enrollment_by_email(cls, email):
+        """
+        if matches returns the most recent entry in the table filtered by email else returns None.
+        """
+        try:
+            manual_enrollment = cls.objects.filter(enrolled_email=email).latest('time_stamp')
+        except cls.DoesNotExist:
+            manual_enrollment = None
+        return manual_enrollment
+
+    @classmethod
+    def get_manual_enrollment(cls, enrollment):
+        """
+        if matches returns the most recent entry in the table filtered by enrollment else returns None,
+        """
+        try:
+            manual_enrollment = cls.objects.filter(enrollment=enrollment).latest('time_stamp')
+        except cls.DoesNotExist:
+            manual_enrollment = None
+        return manual_enrollment
 
 
 class CourseEnrollmentAllowed(models.Model):
@@ -1331,11 +1453,24 @@ class CourseEnrollmentAllowed(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('email', 'course_id'),)
 
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
+
+    @classmethod
+    def may_enroll_and_unenrolled(cls, course_id):
+        """
+        Return QuerySet of students who are allowed to enroll in a course.
+
+        Result excludes students who have already enrolled in the
+        course.
+
+        `course_id` identifies the course for which to compute the QuerySet.
+        """
+        enrolled = CourseEnrollment.objects.users_enrolled_in(course_id=course_id).values_list('email', flat=True)
+        return CourseEnrollmentAllowed.objects.filter(course_id=course_id).exclude(email__in=enrolled)
 
 
 @total_ordering
@@ -1355,7 +1490,7 @@ class CourseAccessRole(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
     role = models.CharField(max_length=64, db_index=True)
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('user', 'org', 'course_id', 'role')
 
     @property
@@ -1564,16 +1699,16 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     """
 
     MODE_TO_CERT_NAME = {
-        "honor": ugettext_lazy(u"{platform_name} Honor Code Certificate for {course_name}"),
-        "verified": ugettext_lazy(u"{platform_name} Verified Certificate for {course_name}"),
-        "professional": ugettext_lazy(u"{platform_name} Professional Certificate for {course_name}"),
-        "no-id-professional": ugettext_lazy(
+        "honor": _(u"{platform_name} Honor Code Certificate for {course_name}"),
+        "verified": _(u"{platform_name} Verified Certificate for {course_name}"),
+        "professional": _(u"{platform_name} Professional Certificate for {course_name}"),
+        "no-id-professional": _(
             u"{platform_name} Professional Certificate for {course_name}"
         ),
     }
 
     company_identifier = models.TextField(
-        help_text=ugettext_lazy(
+        help_text=_(
             u"The company identifier for the LinkedIn Add-to-Profile button "
             u"e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
         )
@@ -1586,7 +1721,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         max_length=10,
         default="",
         blank=True,
-        help_text=ugettext_lazy(
+        help_text=_(
             u"Short identifier for the LinkedIn partner used in the tracking code.  "
             u"(Example: 'edx')  "
             u"If no value is provided, tracking codes will not be sent to LinkedIn."
@@ -1709,6 +1844,33 @@ class EntranceExamConfiguration(models.Model):
         return can_skip
 
 
+class LanguageField(models.CharField):
+    """Represents a language from the ISO 639-1 language set."""
+
+    def __init__(self, *args, **kwargs):
+        """Creates a LanguageField.
+
+        Accepts all the same kwargs as a CharField, except for max_length and
+        choices. help_text defaults to a description of the ISO 639-1 set.
+        """
+        kwargs.pop('max_length', None)
+        kwargs.pop('choices', None)
+        help_text = kwargs.pop(
+            'help_text',
+            _("The ISO 639-1 language code for this language."),
+        )
+        super(LanguageField, self).__init__(
+            max_length=16,
+            choices=settings.ALL_LANGUAGES,
+            help_text=help_text,
+            *args,
+            **kwargs
+        )
+
+
+add_introspection_rules([], [r"^student\.models\.LanguageField"])
+
+
 class LanguageProficiency(models.Model):
     """
     Represents a user's language proficiency.
@@ -1719,7 +1881,7 @@ class LanguageProficiency(models.Model):
     /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
     (update_account_settings) so that the events are emitted.
     """
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('code', 'user_profile'),)
 
     user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')
@@ -1727,5 +1889,76 @@ class LanguageProficiency(models.Model):
         max_length=16,
         blank=False,
         choices=settings.ALL_LANGUAGES,
-        help_text=ugettext_lazy("The ISO 639-1 language code for this language.")
+        help_text=_("The ISO 639-1 language code for this language.")
     )
+
+
+class CourseEnrollmentAttribute(models.Model):
+    """
+    Provide additional information about the user's enrollment.
+    """
+    enrollment = models.ForeignKey(CourseEnrollment, related_name="attributes")
+    namespace = models.CharField(
+        max_length=255,
+        help_text=_("Namespace of enrollment attribute")
+    )
+    name = models.CharField(
+        max_length=255,
+        help_text=_("Name of the enrollment attribute")
+    )
+    value = models.CharField(
+        max_length=255,
+        help_text=_("Value of the enrollment attribute")
+    )
+
+    def __unicode__(self):
+        """Unicode representation of the attribute. """
+        return u"{namespace}:{name}, {value}".format(
+            namespace=self.namespace,
+            name=self.name,
+            value=self.value,
+        )
+
+    @classmethod
+    def add_enrollment_attr(cls, enrollment, data_list):
+        """Delete all the enrollment attributes for the given enrollment and
+        add new attributes.
+
+        Args:
+            enrollment(CourseEnrollment): 'CourseEnrollment' for which attribute is to be added
+            data(list): list of dictionaries containing data to save
+        """
+        cls.objects.filter(enrollment=enrollment).delete()
+        attributes = [
+            cls(enrollment=enrollment, namespace=data['namespace'], name=data['name'], value=data['value'])
+            for data in data_list
+        ]
+        cls.objects.bulk_create(attributes)
+
+    @classmethod
+    def get_enrollment_attributes(cls, enrollment):
+        """Retrieve list of all enrollment attributes.
+
+        Args:
+            enrollment(CourseEnrollment): 'CourseEnrollment' for which list is to retrieve
+
+        Returns: list
+
+        Example:
+        >>> CourseEnrollmentAttribute.get_enrollment_attributes(CourseEnrollment)
+        [
+            {
+                "namespace": "credit",
+                "name": "provider_id",
+                "value": "hogwarts",
+            },
+        ]
+        """
+        return [
+            {
+                "namespace": attribute.namespace,
+                "name": attribute.name,
+                "value": attribute.value,
+            }
+            for attribute in cls.objects.filter(enrollment=enrollment)
+        ]

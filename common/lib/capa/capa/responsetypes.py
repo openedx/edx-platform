@@ -145,9 +145,9 @@ class LoncapaResponse(object):
     required_attributes = []
 
     # Overridable field that specifies whether this capa response type has support for
-    # responsive UI, for rendering on devices of different sizes and shapes.
+    # for rendering on devices of different sizes and shapes.
     # By default, we set this to False, allowing subclasses to override as appropriate.
-    has_responsive_ui = False
+    multi_device_support = False
 
     def __init__(self, xml, inputfields, context, system, capa_module):
         """
@@ -808,6 +808,7 @@ class ChoiceResponse(LoncapaResponse):
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
     correct_choices = None
+    multi_device_support = True
 
     def setup_response(self):
         self.assign_choice_names()
@@ -859,7 +860,7 @@ class ChoiceResponse(LoncapaResponse):
         The hint information goes into the msg= in new_cmap for display.
         Each choice in the checkboxgroup can have 2 extended hints, matching the
         case that the student has or has not selected that choice:
-          <checkboxgroup label="Select the best snack" direction="vertical">
+          <checkboxgroup label="Select the best snack">
              <choice correct="true">Donut
                <choicehint selected="tRuE">A Hint!</choicehint>
                <choicehint selected="false">Another hint!</choicehint>
@@ -985,13 +986,14 @@ class MultipleChoiceResponse(LoncapaResponse):
     to translate back to choice_0 name style for recording in the logs, so
     the logging is in terms of the regular names.
     """
-    # TODO: handle direction and randomize
+    # TODO: randomize
 
     human_name = _('Multiple Choice')
     tags = ['multiplechoiceresponse']
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
     correct_choices = None
+    multi_device_support = True
 
     def setup_response(self):
         # call secondary setup for MultipleChoice questions, to set name
@@ -1321,9 +1323,11 @@ class TrueFalseResponse(MultipleChoiceResponse):
 
     def get_score(self, student_answers):
         correct = set(self.correct_choices)
-        answers = set(student_answers.get(self.answer_id, []))
+        answers = student_answers.get(self.answer_id, [])
+        if not isinstance(answers, list):
+            answers = [answers]
 
-        if correct == answers:
+        if correct == set(answers):
             return CorrectMap(self.answer_id, 'correct')
 
         return CorrectMap(self.answer_id, 'incorrect')
@@ -1334,7 +1338,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
 @registry.register
 class OptionResponse(LoncapaResponse):
     """
-    TODO: handle direction and randomize
+    TODO: handle randomize
     """
 
     human_name = _('Dropdown')
@@ -1342,6 +1346,7 @@ class OptionResponse(LoncapaResponse):
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
     answer_fields = None
+    multi_device_support = True
 
     def setup_response(self):
         self.answer_fields = self.inputfields
@@ -1416,6 +1421,7 @@ class NumericalResponse(LoncapaResponse):
     allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer']
     max_inputfields = 1
+    multi_device_support = True
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
@@ -1639,6 +1645,7 @@ class StringResponse(LoncapaResponse):
     required_attributes = ['answer']
     max_inputfields = 1
     correct_answer = []
+    multi_device_support = True
 
     def setup_response_backward(self):
         self.correct_answer = [
@@ -2717,7 +2724,7 @@ class ExternalResponse(LoncapaResponse):
                 exans = [''] * len(self.answer_ids)
                 exans[0] = msg
 
-        if not (len(exans) == len(self.answer_ids)):
+        if not len(exans) == len(self.answer_ids):
             log.error('Expected %s answers from external server, only got %s!',
                       len(self.answer_ids), len(exans))
             raise Exception('Short response from external server')

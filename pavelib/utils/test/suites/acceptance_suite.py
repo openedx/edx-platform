@@ -3,7 +3,7 @@ Acceptance test suite
 """
 from paver.easy import sh, call_task
 from pavelib.utils.test import utils as test_utils
-from pavelib.utils.test.suites import TestSuite
+from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 
 __test__ = False  # do not collect
@@ -91,7 +91,7 @@ class AcceptanceTestSuite(TestSuite):
 
     def __enter__(self):
         super(AcceptanceTestSuite, self).__enter__()
-        if not self.skip_clean:
+        if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
 
         if not self.fasttest:

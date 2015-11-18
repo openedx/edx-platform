@@ -1,4 +1,7 @@
-$title-left-margin: grid-width(2) + $gw-gutter;
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+$title-left-margin: grid-width(3);
 $button-size: ($baseline*2.75);
 $course-search-input-height: ($button-size);
 
@@ -12,14 +15,11 @@ $course-search-input-height: ($button-size);
 
   > header {
     @include linear-gradient($homepage__header--gradient__color--alpha, $homepage__header--gradient__color--bravo);
+    @include clearfix();
     background-size: cover;
     background-image: $homepage-bg-image;
-    border-bottom: 1px solid $border-color-3;
     box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 $shadow-l1;
-    @include clearfix();
-    height: 460px;
     overflow: hidden;
-    margin-top: $header_image_margin;
     padding: 0;
     width: flex-grid(12);
 
@@ -27,20 +27,18 @@ $course-search-input-height: ($button-size);
       @include clearfix();
       @extend .animation-home-header-pop-up;
       position: relative;
-      margin: 0 auto ($baseline);
-      padding: ($baseline*5) ($baseline/2);
-      min-width: ($baseline*38);
+      margin: 0 auto;
+      padding: ($baseline*3);
       max-width: ($baseline*60);
     }
 
     .title {
-      @include margin-left($title-left-margin);
-      @include float(left);
+      @include span-columns(8);
+      @include shift(2);
       @include box-sizing(border-box);
       @include transition(all 0.2s linear 0s);
       position: relative;
-      border: 1px solid $border-color-3;
-      box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.5);
       background: $white;
       padding: ($baseline) ($baseline*1.5);
       min-height: ($baseline*6);
@@ -51,6 +49,24 @@ $course-search-input-height: ($button-size);
         .actions {
           display: none;
         }
+      }
+
+      // 8 column layout
+      @include media($bp-medium) {
+        @include span-columns(6);
+        @include shift(1);
+      }
+
+      // 4 column layout
+      @include media($bp-small) {
+        @include fill-parent();
+        @include shift(0);
+      }
+
+      // 4 column layout
+      @include media($bp-tiny) {
+        @include fill-parent();
+        @include shift(0);
       }
 
       > hgroup {
@@ -85,15 +101,15 @@ $course-search-input-height: ($button-size);
           @include padding-right($button-size);
           @include padding-left($baseline*0.5);
           @extend %ui-depth1;
-          @extend %t-icon4;
-          @extend %t-demi-strong;
+          @extend %t-title5;
           border: 2px solid $gray-l3;
           border-radius: 3px;
           box-shadow: none;
           width: 100%;
           height: $course-search-input-height;
           color: $black;
-          font-style: $sans-serif;
+          font-style: normal;
+          font-weight: normal;
 
           // STATE: focus
           &:focus {
@@ -342,7 +358,7 @@ $course-search-input-height: ($button-size);
 
           > span {
             color: $base-font-color;
-            font: 800 italic 1.4em/1.4em $sans-serif;
+            font: 700 italic 1.4em/1.4em $sans-serif;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
             @include transition(all 0.15s ease-in-out 0s);
 

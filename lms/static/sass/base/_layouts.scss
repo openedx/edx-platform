@@ -1,0 +1,90 @@
+// base layout styles to support early responsive lms
+// may be discarded later once sass breakpoints are wired in
+
+// overriding existing styles on the body element
+// .view-incourse scopes these rules to be specific to student being in a course
+body.view-incourse {
+  background-color: $body-bg;
+
+  // keep application of widths to window-wrap
+  .window-wrap {
+    min-width: 760px;
+  }
+
+  // courseware header
+  header.global,
+  header.global.slim {
+    width: auto;
+
+    .nav-wrapper {
+      min-width: auto;
+      padding-right: 2%;
+      padding-left: 2%;
+    }
+  }
+
+  // courseware tabs and staff preview bar
+  .wrapper-course-material,
+  .wrapper-preview-menu {
+    padding: 0;
+  }
+
+  .wrapper-course-material .course-material,
+  .wrapper-preview-menu .preview-menu  {
+    width: auto;
+    padding: 15px 2%;
+  }
+
+  .wrapper-course-material .course-material .course-tabs {
+    padding: 0;
+  }
+
+  // content area wrapper
+  .container {
+    max-width: none;
+    min-width: initial;
+    width: auto;
+    padding: 0 2%;
+  }
+
+  // course info page
+  .info-wrapper {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  // courseware and progress page
+  .course-wrapper,
+  .profile-wrapper,
+  .instructor-dashboard-wrapper-2,
+  .wiki-wrapper {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  // post-container footer (creative commons)
+  .container-footer {
+    max-width: none;
+    min-width: none;
+    width: auto;
+  }
+
+  .course-license {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-right: 2%;
+    padding-left: 2%;
+  }
+
+  // site footer
+  .wrapper-footer {
+    margin-top: $baseline;
+    padding-right: 2%;
+    padding-left: 2%;
+
+    footer#footer-openedx { // TODO check edX footer when it launches
+      min-width: auto;
+    }
+  }
+}

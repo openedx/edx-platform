@@ -1,6 +1,7 @@
 """
     Test split modulestore w/o using any django stuff.
 """
+from mock import patch
 import datetime
 from importlib import import_module
 from path import path
@@ -11,6 +12,7 @@ import uuid
 
 from contracts import contract
 from nose.plugins.attrib import attr
+from django.core.cache import get_cache, InvalidCacheBackendError
 
 from openedx.core.lib import tempdir
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
@@ -28,7 +30,9 @@ from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.utils import mock_tab_from_json
 from xmodule.modulestore.edit_info import EditInfoMixin
 
 
@@ -558,7 +562,8 @@ class SplitModuleTest(unittest.TestCase):
 class TestHasChildrenAtDepth(SplitModuleTest):
     """Test the has_children_at_depth method of XModuleMixin. """
 
-    def test_has_children_at_depth(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_has_children_at_depth(self, _from_json):
         course_locator = CourseLocator(
             org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT
         )
@@ -596,7 +601,8 @@ class SplitModuleCourseTests(SplitModuleTest):
     Course CRUD operation tests
     '''
 
-    def test_get_courses(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_courses(self, _from_json):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         # should have gotten 3 draft courses
         self.assertEqual(len(courses), 3, "Wrong number of courses")
@@ -618,7 +624,8 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
-    def test_get_org_courses(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_org_courses(self, _from_json):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='guestx')
 
         # should have gotten 1 draft courses
@@ -635,7 +642,8 @@ class SplitModuleCourseTests(SplitModuleTest):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         self.assertEqual(len(courses), 3)
 
-    def test_branch_requests(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_branch_requests(self, _from_json):
         # query w/ branch qualifier (both draft and published)
         def _verify_published_course(courses_published):
             """ Helper function for verifying published course. """
@@ -665,7 +673,8 @@ class SplitModuleCourseTests(SplitModuleTest):
             locator_key_fields=['org', 'course', 'run']
         )
 
-    def test_get_course(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_course(self, _from_json):
         '''
         Test the various calling forms for get_course
         '''
@@ -718,7 +727,8 @@ class SplitModuleCourseTests(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_course(CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_PUBLISHED))
 
-    def test_cache(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_cache(self, _from_json):
         """
         Test that the mechanics of caching work.
         """
@@ -730,7 +740,8 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertIn(BlockKey('chapter', 'chapter1'), block_map)
         self.assertIn(BlockKey('problem', 'problem3_2'), block_map)
 
-    def test_course_successors(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_course_successors(self, _from_json):
         """
         get_course_successors(course_locator, version_history_depth=1)
         """
@@ -762,12 +773,86 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
 
 
+class TestCourseStructureCache(SplitModuleTest):
+    """Tests for the CourseStructureCache"""
+
+    def setUp(self):
+        # use the default cache, since the `course_structure_cache`
+        # is a dummy cache during testing
+        self.cache = get_cache('default')
+
+        # make sure we clear the cache before every test...
+        self.cache.clear()
+        # ... and after
+        self.addCleanup(self.cache.clear)
+
+        # make a new course:
+        self.user = random.getrandbits(32)
+        self.new_course = modulestore().create_course(
+            'org', 'course', 'test_run', self.user, BRANCH_NAME_DRAFT,
+        )
+
+        super(TestCourseStructureCache, self).setUp()
+
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache(self, mock_get_cache):
+        # force get_cache to return the default cache so we can test
+        # its caching behavior
+        mock_get_cache.return_value = self.cache
+
+        with check_mongo_calls(1):
+            not_cached_structure = self._get_structure(self.new_course)
+
+        # when cache is warmed, we should have one fewer mongo call
+        with check_mongo_calls(0):
+            cached_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(cached_structure, not_cached_structure)
+
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache_no_cache_configured(self, mock_get_cache):
+        mock_get_cache.side_effect = InvalidCacheBackendError
+
+        with check_mongo_calls(1):
+            not_cached_structure = self._get_structure(self.new_course)
+
+        # if the cache isn't configured, we expect to have to make
+        # another mongo call here if we want the same course structure
+        with check_mongo_calls(1):
+            cached_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(cached_structure, not_cached_structure)
+
+    def test_dummy_cache(self):
+        with check_mongo_calls(1):
+            not_cached_structure = self._get_structure(self.new_course)
+
+        # Since the test is using the dummy cache, it's not actually caching
+        # anything
+        with check_mongo_calls(1):
+            cached_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(cached_structure, not_cached_structure)
+
+    def _get_structure(self, course):
+        """
+        Helper function to get a structure from a course.
+        """
+        return modulestore().db_connection.get_structure(
+            course.location.as_object_id(course.location.version_guid)
+        )
+
+
 class SplitModuleItemTests(SplitModuleTest):
     '''
     Item read tests including inheritance
     '''
 
-    def test_has_item(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_has_item(self, _from_json):
         '''
         has_item(BlockUsageLocator)
         '''
@@ -831,7 +916,8 @@ class SplitModuleItemTests(SplitModuleTest):
         )
         self.assertFalse(modulestore().has_item(locator))
 
-    def test_get_item(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_item(self, _from_json):
         '''
         get_item(blocklocator)
         '''
@@ -989,7 +1075,8 @@ class SplitModuleItemTests(SplitModuleTest):
         parent = modulestore().get_parent_location(locator)
         self.assertIsNone(parent)
 
-    def test_get_children(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_children(self, _from_json):
         """
         Test the existing get_children method on xdescriptors
         """
@@ -1342,7 +1429,8 @@ class TestItemCrud(SplitModuleTest):
         other_updated = modulestore().update_item(other_block, self.user_id)
         self.assertIn(moved_child.version_agnostic(), version_agnostic(other_updated.children))
 
-    def test_update_definition(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_update_definition(self, _from_json):
         """
         test updating an item's definition: ensure it gets versioned as well as the course getting versioned
         """
@@ -1613,7 +1701,8 @@ class TestCourseCreation(SplitModuleTest):
             fields['grading_policy']['GRADE_CUTOFFS']
         )
 
-    def test_update_course_index(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_update_course_index(self, _from_json):
         """
         Test the versions pointers. NOTE: you can change the org, course, or other things, but
         it's not clear how you'd find them again or associate them w/ existing student history since
@@ -1668,7 +1757,8 @@ class TestCourseCreation(SplitModuleTest):
                 dupe_course_key.org, dupe_course_key.course, dupe_course_key.run, user, BRANCH_NAME_DRAFT
             )
 
-    def test_bulk_ops_get_courses(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_bulk_ops_get_courses(self, _from_json):
         """
         Test get_courses when some are created, updated, and deleted w/in a bulk operation
         """
@@ -1707,7 +1797,8 @@ class TestInheritance(SplitModuleTest):
     """
     Test the metadata inheritance mechanism.
     """
-    def test_inheritance(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_inheritance(self, _from_json):
         """
         The actual test
         """
@@ -1787,7 +1878,8 @@ class TestPublish(SplitModuleTest):
     def tearDown(self):
         SplitModuleTest.tearDown(self)
 
-    def test_publish_safe(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_publish_safe(self, _from_json):
         """
         Test the standard patterns: publish to new branch, revise and publish
         """
@@ -1856,7 +1948,8 @@ class TestPublish(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().copy(self.user_id, source_course, destination_course, [problem1], [])
 
-    def test_move_delete(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_move_delete(self, _from_json):
         """
         Test publishing moves and deletes.
         """

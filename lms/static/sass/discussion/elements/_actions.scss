@@ -121,7 +121,7 @@
       @extend %t-copy-sub2;
       display: inline-block;
       vertical-align: middle;
-      padding: 0 8px;
+      padding: 2px 8px;
       color: $gray-l1;
       opacity: 0;
     }
@@ -196,6 +196,7 @@
 
       &:hover, &:focus {
         border-color: $blue-d2;
+        background-color: $white;
 
         .action-label {
           color: $blue-d2;
@@ -216,6 +217,7 @@
 
       &:hover, &:focus {
         border-color: $green-d1;
+        background-color: $white;
 
         .action-label {
           color: $green-d2;
@@ -229,6 +231,7 @@
 
       &:hover, &:focus {
         border-color: $gray;
+        background-color: $white;
 
         .action-icon {
           border: 1px solid $gray;
@@ -295,6 +298,7 @@
 
   .action-button, .action-list-item {
     .action-label {
+      @include float(left);
       .label-checked {
         display: none;
       }

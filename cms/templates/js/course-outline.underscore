@@ -142,8 +142,19 @@ if (xblockInfo.get('graded')) {
                     </p>
                 </div>
             <% } %>
+            <% if (xblockInfo.get('is_time_limited')) { %>
+                <div class="status-timed-proctored-exam">
+                    <p>
+                        <span class="sr status-proctored-exam-label"> <%= gettext('Proctored Exam') %> </span>
+                        <i class="icon fa fa-check"></i>
+                        <span class="status-proctored-exam-value"> <%= gettext('Timed and Proctored Exam') %> </span>
+                        <% if (xblockInfo.get('due_date')) { %>
+                            <span class="status-due-date"> <%= gettext('Due Date') %> <%= xblockInfo.get('due_date') %> </span>
+                        <% } %>
+                    </p>
+                </div>
+            <% } %>
         <% } %>
-
         <% if (statusMessage) { %>
         <div class="status-message">
             <i class="icon fa <%= statusIconClass %>"></i>

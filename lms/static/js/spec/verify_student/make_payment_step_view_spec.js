@@ -2,8 +2,8 @@ define([
         'jquery',
         'underscore',
         'backbone',
-        'js/common_helpers/ajax_helpers',
-        'js/common_helpers/template_helpers',
+        'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/verify_student/views/make_payment_step_view'
     ],
     function( $, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView ) {
@@ -29,7 +29,6 @@ define([
             var createView = function( stepDataOverrides ) {
                 var view = new MakePaymentStepView({
                     el: $( '#current-step-container' ),
-                    templateName: 'make_payment_step',
                     stepData: _.extend( _.clone( STEP_DATA ), stepDataOverrides ),
                     errorModel: new ( Backbone.Model.extend({}) )()
                 }).render();
@@ -103,10 +102,15 @@ define([
                 expect($el.length).toEqual(_.size(buttons));
                 _.each(buttons, function( expectedText, expectedId ) {
                     var buttonEl = $( '#' + expectedId );
+
+                    buttonEl.removeAttr('disabled');
                     expect( buttonEl.length ).toEqual( 1 );
                     expect( buttonEl[0] ).toHaveClass( 'payment-button' );
-                    expect( buttonEl[0].text ).toEqual( expectedText );
+                    expect( buttonEl[0] ).toHaveText( expectedText );
+
                     buttonEl[0].click();
+                    expect( buttonEl[0] ).toHaveClass( 'is-selected' );
+                    expectPaymentButtonEnabled( false );
                     expect(requests[requests.length - 1].requestBody.split('&')).toContain('processor=' + expectedId);
                 });
             };
@@ -135,15 +139,15 @@ define([
 
             it( 'provides working payment buttons for a single processor', function() {
                 createView({processors: ['cybersource']});
-                checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: "Pay with Credit Card"});
+                checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: "Checkout"});
             });
 
             it( 'provides working payment buttons for multiple processors', function() {
                 createView({processors: ['cybersource', 'paypal', 'other']});
                 checkPaymentButtons( AjaxHelpers.requests(this), {
-                    cybersource: "Pay with Credit Card",
-                    paypal: "Pay with PayPal",
-                    other: "Pay with other"
+                    cybersource: "Checkout",
+                    paypal: "Checkout with PayPal",
+                    other: "Checkout with other"
                 });
             });
 

@@ -1,12 +1,14 @@
 """
 Acceptance tests for studio related to the outline page.
 """
+import json
 from datetime import datetime, timedelta
 import itertools
 from pytz import UTC
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
 
+from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
 from ...pages.studio.utils import add_discussion, drag, verify_ordering
 from ...pages.lms.courseware import CoursewarePage
@@ -35,6 +37,9 @@ class CourseOutlineTest(StudioCourseTest):
         """
         super(CourseOutlineTest, self).setUp()
         self.course_outline_page = CourseOutlinePage(
+            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
+        self.advanced_settings = AdvancedSettingsPage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
 
@@ -136,13 +141,16 @@ class WarningMessagesTest(CourseOutlineTest):
     FUTURE_UNPUBLISHED_WARNING = 'Unpublished changes to content that will release in the future'
     NEVER_PUBLISHED_WARNING = 'Unpublished units will not be released'
 
-    class PublishState:
+    class PublishState(object):
+        """
+        Default values for representing the published state of a unit
+        """
         NEVER_PUBLISHED = 1
         UNPUBLISHED_CHANGES = 2
         PUBLISHED = 3
         VALUES = [NEVER_PUBLISHED, UNPUBLISHED_CHANGES, PUBLISHED]
 
-    class UnitState:
+    class UnitState(object):
         """ Represents the state of a unit """
 
         def __init__(self, is_released, publish_state, is_locked):
@@ -1578,3 +1586,169 @@ class PublishSectionTest(CourseOutlineTest):
         unit = subsection.expand_subsection().unit(UNIT_NAME)
 
         return (section, subsection, unit)
+
+
+@attr('shard_3')
+class DeprecationWarningMessageTest(CourseOutlineTest):
+    """
+    Feature: Verify deprecation warning message.
+    """
+    HEADING_TEXT = 'This course uses features that are no longer supported.'
+    COMPONENT_LIST_HEADING = 'You must delete or replace the following components.'
+    ADVANCE_MODULES_REMOVE_TEXT = ('To avoid errors, edX strongly recommends that you remove unsupported features '
+                                   'from the course advanced settings. To do this, go to the Advanced Settings '
+                                   'page, locate the "Advanced Module List" setting, and then delete the following '
+                                   'modules from the list.')
+    DEFAULT_DISPLAYNAME = "Deprecated Component"
+
+    def _add_deprecated_advance_modules(self, block_types):
+        """
+        Add `block_types` into `Advanced Module List`
+
+        Arguments:
+            block_types (list): list of block types
+        """
+        self.advanced_settings.visit()
+        self.advanced_settings.set_values({"Advanced Module List": json.dumps(block_types)})
+
+    def _create_deprecated_components(self):
+        """
+        Create deprecated components.
+        """
+        parent_vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+
+        self.course_fixture.create_xblock(
+            parent_vertical.locator,
+            XBlockFixtureDesc('combinedopenended', "Open", data=load_data_str('ora_peer_problem.xml'))
+        )
+        self.course_fixture.create_xblock(parent_vertical.locator, XBlockFixtureDesc('peergrading', 'Peer'))
+
+    def _verify_deprecation_warning_info(
+            self,
+            deprecated_blocks_present,
+            components_present,
+            components_display_name_list=None,
+            deprecated_modules_list=None
+    ):
+        """
+        Verify deprecation warning
+
+        Arguments:
+            deprecated_blocks_present (bool): deprecated blocks remove text and
+                is list is visible if True else False
+            components_present (bool): components list shown if True else False
+            components_display_name_list (list): list of components display name
+            deprecated_modules_list (list): list of deprecated advance modules
+        """
+        self.assertTrue(self.course_outline_page.deprecated_warning_visible)
+        self.assertEqual(self.course_outline_page.warning_heading_text, self.HEADING_TEXT)
+        self.assertEqual(self.course_outline_page.modules_remove_text_shown, deprecated_blocks_present)
+        if deprecated_blocks_present:
+            self.assertEqual(self.course_outline_page.modules_remove_text, self.ADVANCE_MODULES_REMOVE_TEXT)
+            self.assertEqual(self.course_outline_page.deprecated_advance_modules, deprecated_modules_list)
+
+        self.assertEqual(self.course_outline_page.components_visible, components_present)
+        if components_present:
+            self.assertEqual(self.course_outline_page.components_list_heading, self.COMPONENT_LIST_HEADING)
+            self.assertItemsEqual(self.course_outline_page.components_display_names, components_display_name_list)
+
+    def test_no_deprecation_warning_message_present(self):
+        """
+        Scenario: Verify that deprecation warning message is not shown if ORA1
+            advance modules are not present and also no ORA1 component exist in
+            course outline.
+
+        When I goto course outline
+        Then I don't see ORA1 deprecated warning
+        """
+        self.course_outline_page.visit()
+        self.assertFalse(self.course_outline_page.deprecated_warning_visible)
+
+    def test_deprecation_warning_message_present(self):
+        """
+        Scenario: Verify deprecation warning message if ORA1 advance modules
+            and ORA1 components are present.
+
+        Given I have ORA1 advance modules present in `Advanced Module List`
+        And I have created 2 ORA1 components
+        When I go to course outline
+        Then I see ORA1 deprecated warning
+        And I see correct ORA1 deprecated warning heading text
+        And I see correct ORA1 deprecated warning advance modules remove text
+        And I see list of ORA1 components with correct display names
+        """
+        self._add_deprecated_advance_modules(block_types=['peergrading', 'combinedopenended'])
+        self._create_deprecated_components()
+        self.course_outline_page.visit()
+        self._verify_deprecation_warning_info(
+            deprecated_blocks_present=True,
+            components_present=True,
+            components_display_name_list=['Open', 'Peer'],
+            deprecated_modules_list=['peergrading', 'combinedopenended']
+        )
+
+    def test_deprecation_warning_with_no_displayname(self):
+        """
+        Scenario: Verify deprecation warning message if  ORA1 components are present.
+
+        Given I have created 1 ORA1 deprecated component
+        When I go to course outline
+        Then I see ORA1 deprecated warning
+        And I see correct ORA1 deprecated warning heading text
+        And I see list of ORA1 components with correct message
+        """
+        parent_vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+
+        # Create a deprecated ORA1 component with display_name to be empty and make sure
+        # the deprecation warning is displayed with
+        self.course_fixture.create_xblock(
+            parent_vertical.locator,
+            XBlockFixtureDesc(category='combinedopenended', display_name="", data=load_data_str('ora_peer_problem.xml'))
+        )
+        self.course_outline_page.visit()
+
+        self._verify_deprecation_warning_info(
+            deprecated_blocks_present=False,
+            components_present=True,
+            components_display_name_list=[self.DEFAULT_DISPLAYNAME],
+        )
+
+    def test_warning_with_ora1_advance_modules_only(self):
+        """
+        Scenario: Verify that deprecation warning message is shown if only
+            ORA1 advance modules are present and no ORA1 component exist.
+
+        Given I have ORA1 advance modules present in `Advanced Module List`
+        When I go to course outline
+        Then I see ORA1 deprecated warning
+        And I see correct ORA1 deprecated warning heading text
+        And I see correct ORA1 deprecated warning advance modules remove text
+        And I don't see list of ORA1 components
+        """
+        self._add_deprecated_advance_modules(block_types=['peergrading', 'combinedopenended'])
+        self.course_outline_page.visit()
+        self._verify_deprecation_warning_info(
+            deprecated_blocks_present=True,
+            components_present=False,
+            deprecated_modules_list=['peergrading', 'combinedopenended']
+        )
+
+    def test_warning_with_ora1_components_only(self):
+        """
+        Scenario: Verify that deprecation warning message is shown if only
+            ORA1 component exist and no ORA1 advance modules are present.
+
+        Given I have created two ORA1 components
+        When I go to course outline
+        Then I see ORA1 deprecated warning
+        And I see correct ORA1 deprecated warning heading text
+        And I don't see ORA1 deprecated warning advance modules remove text
+        And I see list of ORA1 components with correct display names
+        """
+        self._create_deprecated_components()
+        self.course_outline_page.visit()
+        self._verify_deprecation_warning_info(
+            deprecated_blocks_present=False,
+            components_present=True,
+            components_display_name_list=['Open', 'Peer']
+        )

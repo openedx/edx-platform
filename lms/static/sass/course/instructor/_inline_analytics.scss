@@ -1,0 +1,146 @@
+/***********************************************
+* Inline Analytics Style
+***********************************************/
+.analytics_close_button {
+    .close {
+        position: relative;
+        top: 25px;
+        right: 0;
+        float: right;
+    }
+}
+
+.inline-analytics-item {
+    clear: both;
+
+    .grid-wrapper {
+        position: relative;
+        float: left;
+        clear: both;
+        margin: 0 25px 50px 25px;
+
+        &.radio .graph {
+            height: 150px;
+        }
+
+        &.checkbox .graph {
+            height: 250px;
+        }
+    }
+
+    .grid-block {
+        position: relative;
+        float: left;
+        margin: 0 25px 0 0;
+
+        .analytics-table {
+            border-collapse: separate;
+            border-spacing: 1px;
+        }
+
+        .graph {
+            float: left;
+            width: 300px;
+            margin-left: 50px;
+            border-left: 2px solid #444;
+            border-bottom: 2px solid #444;
+
+            .y-label {
+                position: absolute;
+                width: 45px;
+                top: -8px;
+                left: 0;
+                text-align: right;
+            }
+
+            .column {
+                position: relative;
+                height: 100%;
+                width: 45px;
+                margin: 0 15px;
+                float: left;
+
+                .block {
+                    position: absolute;
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+        }
+
+        .legend {
+            float: left;
+            clear: both;
+            height: 28px;
+            width: 300px;
+            margin-left: 50px;
+
+            .label {
+                float: left;
+                width: 75px;
+                padding: 5px 0;
+                text-align: center;
+            }
+        }
+    }
+
+    td {
+        vertical-align: middle;
+        padding: 0 10px;
+    }
+
+    .answer-box {
+        padding: 5px 0;
+        background-color: #efefef;
+        text-align: center;
+    }
+
+    .instructor-analytics-action {
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .checkbox-first-attempt {
+        background-color:#dedede;
+    }
+
+    .checkbox-last-attempt {
+        background-color:#c2c2c2;
+    }
+
+    .inline-analytics-incorrect {
+        background-color:#ffa4a2;
+    }
+
+    .inline-analytics-correct {
+        background-color:#96ec9c;
+    }
+
+    .dot {
+        position: relative;
+        top: 2px;
+        display: inline-block;
+        height:20px;
+        width: 20px;
+        border-radius: 10px;
+        background-color: #444;
+        margin: 0;
+    }
+
+    .plus {
+        font-size:36px;
+        font-weight:bold;
+        padding-bottom: 5px;
+    }
+
+    .header {
+        width:65px;
+    }
+
+    .not-displayed {
+        width:400px;
+    }
+}
+
+/**********************************************/

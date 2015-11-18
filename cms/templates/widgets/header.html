@@ -1,5 +1,6 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
+  from django.conf import settings
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore.context_processors import doc_url
@@ -35,6 +36,9 @@
             advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
             utilities_url = reverse('contentstore.views.utility_handler', kwargs={'course_key_string': unicode(course_key)})
+            certificates_url = ''
+            if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
+                certificates_url = reverse('contentstore.views.certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -99,6 +103,11 @@
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
+                  % if certificates_url:
+                  <li class="nav-item nav-course-settings-certificates">
+                    <a href="${certificates_url}">${_("Certificates")}</a>
+                  </li>
+                  % endif
                 </ul>
               </div>
             </div>

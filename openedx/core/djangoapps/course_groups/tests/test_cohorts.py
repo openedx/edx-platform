@@ -9,13 +9,12 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, mixed_store_config, ModuleStoreTestCase
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, ModuleStoreTestCase
 
 from ..models import CourseUserGroup, CourseCohort, CourseUserGroupPartitionGroup
 from .. import cohorts
@@ -469,95 +468,6 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertEqual(
             cohorts.get_cohort_names(course),
             {cohort1.id: cohort1.name, cohort2.id: cohort2.name}
-        )
-
-    def test_is_commentable_cohorted(self):
-        course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(cohorts.is_course_cohorted(course.id))
-
-        def to_id(name):
-            return topic_name_to_id(course, name)
-
-        # no topics
-        self.assertFalse(
-            cohorts.is_commentable_cohorted(course.id, to_id("General")),
-            "Course doesn't even have a 'General' topic"
-        )
-
-        # not cohorted
-        config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
-
-        self.assertFalse(
-            cohorts.is_commentable_cohorted(course.id, to_id("General")),
-            "Course isn't cohorted"
-        )
-
-        # cohorted, but top level topics aren't
-        config_course_cohorts(course, is_cohorted=True, discussion_topics=["General", "Feedback"])
-
-        self.assertTrue(cohorts.is_course_cohorted(course.id))
-        self.assertFalse(
-            cohorts.is_commentable_cohorted(course.id, to_id("General")),
-            "Course is cohorted, but 'General' isn't."
-        )
-
-        # cohorted, including "Feedback" top-level topics aren't
-        config_course_cohorts(
-            course,
-            is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback"]
-        )
-
-        self.assertTrue(cohorts.is_course_cohorted(course.id))
-        self.assertFalse(
-            cohorts.is_commentable_cohorted(course.id, to_id("General")),
-            "Course is cohorted, but 'General' isn't."
-        )
-        self.assertTrue(
-            cohorts.is_commentable_cohorted(course.id, to_id("Feedback")),
-            "Feedback was listed as cohorted.  Should be."
-        )
-
-    def test_is_commentable_cohorted_inline_discussion(self):
-        course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(cohorts.is_course_cohorted(course.id))
-
-        def to_id(name):  # pylint: disable=missing-docstring
-            return topic_name_to_id(course, name)
-
-        config_course_cohorts(
-            course,
-            is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback", "random_inline"]
-        )
-        self.assertTrue(
-            cohorts.is_commentable_cohorted(course.id, to_id("random")),
-            "By default, Non-top-level discussion is always cohorted in cohorted courses."
-        )
-
-        # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
-        # non cohorted unless they are explicitly set in cohorted_discussions
-        config_course_cohorts(
-            course,
-            is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback", "random_inline"],
-            always_cohort_inline_discussions=False
-        )
-        self.assertFalse(
-            cohorts.is_commentable_cohorted(course.id, to_id("random")),
-            "Non-top-level discussion is not cohorted if always_cohort_inline_discussions is False."
-        )
-        self.assertTrue(
-            cohorts.is_commentable_cohorted(course.id, to_id("random_inline")),
-            "If always_cohort_inline_discussions set to False, Non-top-level discussion is "
-            "cohorted if explicitly set in cohorted_discussions."
-        )
-        self.assertTrue(
-            cohorts.is_commentable_cohorted(course.id, to_id("Feedback")),
-            "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
         )
 
     def test_get_cohorted_commentables(self):

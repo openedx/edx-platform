@@ -1,63 +1,75 @@
 <%!
+  import json
   from django.utils.translation import ugettext as _
   from microsite_configuration import microsite
+  from openedx.core.lib.json_utils import EscapedEdxJSONEncoder
 %>
 <%inherit file="../main.html" />
+<%
+  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
+%>
 
 <%namespace name='static' file='../static_content.html'/>
 
+% if course_discovery_enabled:
+<%block name="header_extras">
+  % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
+  <script type="text/template" id="${template_name}-tpl">
+      <%static:include path="discovery/${template_name}.underscore" />
+  </script>
+  % endfor
+  <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
+    DiscoveryFactory(
+      ${json.dumps(course_discovery_meanings, cls=EscapedEdxJSONEncoder)},
+      getParameterByName('search_query')
+    );
+  </%static:require_module>
+</%block>
+% endif
+
 <%block name="pagetitle">${_("Courses")}</%block>
-<%
-  platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-
-  if self.is_non_microsite_theme():
-    course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="Stanford University")
-    logo_file = settings.STATIC_URL + 'themes/stanford/images/seal.png'
-    logo_alt_text = "Stanford Seal Logo"
-
-  else:
-    course_index_overlay_text = microsite.get_value('course_index_overlay_text', _("Explore courses from {platform_name}.").format(platform_name=platform_name))
-
-    if settings.FEATURES.get('IS_EDX_DOMAIN', False):
-      # For some reason, `static.url('images/edx-theme/edx-logo-bw.png')` breaks template rendering.
-      default_image_url = settings.STATIC_URL + 'images/edx-theme/edx-logo-bw.png'
-    else:
-      default_image_url = settings.STATIC_URL + 'images/default-theme/logo-large.png'
-
-    logo_file = microsite.get_value(
-      'course_index_overlay_logo_file', default_image_url
-    )
-
-    logo_alt_text = _("{platform_name} Logo").format(platform_name=platform_name)
-%>
 
 <section class="find-courses">
-
-  <header class="search">
-    <div class="inner-wrapper main-search">
-      <hgroup>
-        % if self.course_index_overlay_file:
-          <%include file="${self.course_index_overlay_file}" />
-        % else:
-        <div class="logo">
-          <img src="${logo_file}" alt="${logo_alt_text}" />
-        </div>
-        <h2>${course_index_overlay_text}</h2>
-        % endif
-      </hgroup>
-    </div>
-  </header>
-
   <section class="courses-container">
-    <section class="courses">
+    % if course_discovery_enabled:
+    <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
+      <div id="discovery-message" class="search-status-label"></div>
+      <form class="wrapper-search-input">
+        <input class="discovery-input" placeholder="${_('Search for a course')}" type="text"/>
+        <button type="submit" class="button postfix discovery-submit" aria-label="${_('Search')}">
+          <i class="icon fa fa-search" aria-hidden="true"></i>
+          <div aria-live="polite" aria-relevant="all">
+            <div id="loading-indicator" class="loading-spinner hidden">
+              <i class="icon fa fa-spinner fa-spin"></i>
+              <span class="sr">${_('Loading')}</span>
+            </div>
+          </div>
+        </button>
+      </form>
+    </div>
+
+    <div id="filter-bar" class="filters hide-phone is-collapsed">
+    </div>
+    % endif
+
+    <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
       <ul class="courses-listing">
-	%for course in courses:
+        %for course in courses:
         <li class="courses-listing-item">
           <%include file="../course.html" args="course=course" />
         </li>
         %endfor
       </ul>
-    </section>
-  </section>
+    </div>
 
+
+    % if course_discovery_enabled:
+    <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
+      <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
+      <section class="search-facets-lists">
+      </section>
+    </aside>
+    % endif
+
+  </section>
 </section>

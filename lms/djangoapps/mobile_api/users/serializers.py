@@ -4,16 +4,19 @@ Serializer for user API
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from courseware.courses import course_image_url
+from django.template import defaultfilters
+
+from courseware.access import has_access
 from student.models import CourseEnrollment, User
 from certificates.models import certificate_status_for_student, CertificateStatuses
+from xmodule.course_module import DEFAULT_START_DATE
 
 
-class CourseField(serializers.RelatedField):
+class CourseOverviewField(serializers.RelatedField):
     """Custom field to wrap a CourseDescriptor object. Read-only."""
 
-    def to_native(self, course):
-        course_id = unicode(course.id)
+    def to_native(self, course_overview):
+        course_id = unicode(course_overview.id)
         request = self.context.get('request', None)
         if request:
             video_outline_url = reverse(
@@ -31,27 +34,33 @@ class CourseField(serializers.RelatedField):
                 kwargs={'course_id': course_id},
                 request=request
             )
-            course_about_url = reverse(
-                'course-about-detail',
-                kwargs={'course_id': course_id},
-                request=request
-            )
         else:
             video_outline_url = None
             course_updates_url = None
             course_handouts_url = None
-            course_about_url = None
+
+        if course_overview.advertised_start is not None:
+            start_type = "string"
+            start_display = course_overview.advertised_start
+        elif course_overview.start != DEFAULT_START_DATE:
+            start_type = "timestamp"
+            start_display = defaultfilters.date(course_overview.start, "DATE_FORMAT")
+        else:
+            start_type = "empty"
+            start_display = None
 
         return {
             "id": course_id,
-            "name": course.display_name,
-            "number": course.display_number_with_default,
-            "org": course.display_org_with_default,
-            "start": course.start,
-            "end": course.end,
-            "course_image": course_image_url(course),
+            "name": course_overview.display_name,
+            "number": course_overview.display_number_with_default,
+            "org": course_overview.display_org_with_default,
+            "start": course_overview.start,
+            "start_display": start_display,
+            "start_type": start_type,
+            "end": course_overview.end,
+            "course_image": course_overview.course_image_url,
             "social_urls": {
-                "facebook": course.facebook_url,
+                "facebook": course_overview.facebook_url,
             },
             "latest_updates": {
                 "video": None
@@ -59,8 +68,8 @@ class CourseField(serializers.RelatedField):
             "video_outline": video_outline_url,
             "course_updates": course_updates_url,
             "course_handouts": course_handouts_url,
-            "course_about": course_about_url,
-            "subscription_id": course.clean_id(padding_char='_'),
+            "subscription_id": course_overview.clean_id(padding_char='_'),
+            "courseware_access": has_access(request.user, 'load_mobile', course_overview).to_json() if request else None
         }
 
 
@@ -68,7 +77,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     Serializes CourseEnrollment models
     """
-    course = CourseField()
+    course = CourseOverviewField(source="course_overview")
     certificate = serializers.SerializerMethodField('get_certificate')
 
     def get_certificate(self, model):

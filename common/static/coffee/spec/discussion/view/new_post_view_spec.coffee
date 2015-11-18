@@ -180,7 +180,7 @@ describe "NewPostView", ->
         eventSpy = jasmine.createSpy('eventSpy')
         view.listenTo(view, "newPost:cancel", eventSpy)
         view.$(".post-errors").html("<li class='post-error'>Title can't be empty</li>")
-        view.$("label[for$='post-type-discussion']").click()
+        view.$("label[for$='post-type-question']").click()
         view.$(".js-post-title").val("Test Title")
         view.$(".js-post-body textarea").val("Test body")
         view.$(".wmd-preview p").html("Test body")
@@ -192,8 +192,8 @@ describe "NewPostView", ->
         view.$(".cancel").click()
         expect(eventSpy).toHaveBeenCalled()
         expect(view.$(".post-errors").html()).toEqual("");
-        expect($("input[id$='post-type-question']")).toBeChecked()
-        expect($("input[id$='post-type-discussion']")).not.toBeChecked()
+        expect($("input[id$='post-type-discussion']")).toBeChecked()
+        expect($("input[id$='post-type-question']")).not.toBeChecked()
         expect(view.$(".js-post-title").val()).toEqual("");
         expect(view.$(".js-post-body textarea").val()).toEqual("");
         expect(view.$(".js-follow")).toBeChecked()

@@ -4,12 +4,10 @@ This file contains implementation override of SearchResultProcessor which will a
     * Confirms user access to object
 """
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from search.result_processor import SearchResultProcessor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location, navigation_index
 
 from courseware.access import has_access
 
@@ -62,9 +60,10 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def should_remove(self, user):
         """ Test to see if this result should be removed due to access restriction """
-        return not has_access(
+        user_has_access = has_access(
             user,
             "load",
             self.get_item(self.get_usage_key()),
             self.get_course_key()
         )
+        return not user_has_access

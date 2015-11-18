@@ -14,12 +14,17 @@ $sm-btn-linkedin: #0077b5;
     background: $white;
     min-height: 100%;
     width: 100%;
+    $third-party-button-height: ($baseline*1.75);
 
     h2 {
         @extend %t-title5;
         margin: 0;
         letter-spacing: normal;
         font-family: $sans-serif;
+    }
+
+    .instructions {
+        @extend %t-copy-base;
     }
 
     /* Temp. fix until applied globally */
@@ -67,10 +72,11 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
-    form {
+    form,
+    .wrapper-other-login {
         border: 1px solid $gray-l4;
-        border-radius: 5px;
-        padding: 0px 25px 20px 25px;
+        border-radius: ($baseline/4);
+        padding: 0 ($baseline*1.25) $baseline ($baseline*1.25);
     }
 
     .section-title {
@@ -106,14 +112,18 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
-    .nav-btn {
+    %nav-btn-base {
         @extend %btn-secondary-blue-outline;
         width: 100%;
         height: ($baseline*2);
         text-transform: none;
         text-shadow: none;
-        font-weight: 600;
         letter-spacing: normal;
+    }
+
+    .nav-btn {
+        @extend %nav-btn-base;
+        @extend %t-strong;
     }
 
     .form-type,
@@ -339,8 +349,8 @@ $sm-btn-linkedin: #0077b5;
     .action-primary {
         @extend %btn-primary-blue;
         width: 100%;
-        height: ($baseline*2);
-        margin-top: 1em; // Breathing room above (CR)
+        margin-top: 1em;
+        padding: ($baseline/2);
         text-transform: none;
         font-weight: 600;
         letter-spacing: normal;
@@ -348,45 +358,49 @@ $sm-btn-linkedin: #0077b5;
 
     .login-provider {
         @extend %btn-secondary-grey-outline;
-        width: 130px;
-        padding: 0 0 0 ($baseline*2);
-        height: 34px;
-        text-align: left;
+        @extend %t-action4;
+
+        @include padding(0, 0, 0, $baseline*2);
+        @include text-align(left);
+
+        position: relative;
+        margin-right: ($baseline/4);
+        margin-bottom: $baseline;
+        border-color: $lightGrey1;
+        width: $baseline*6.5;
+        height: $third-party-button-height;
         text-shadow: none;
         text-transform: none;
-        position: relative;
-        font-size: 0.8em;
-        border-color: $lightGrey1;
-
-        &:nth-of-type(odd) {
-            margin-right: 13px;
-        }
 
         .icon {
-            color: white;
+            @include left(0);
+
             position: absolute;
             top: -1px;
-            left: 0;
             width: 30px;
-            height: 34px;
-            line-height: 34px;
+            bottom: -1px;
+            background: $m-blue-d3;
+            line-height: $third-party-button-height;
             text-align: center;
+            color: $white;
+        }
+
+        span {
+            color: inherit;
         }
 
         &:hover,
         &:focus {
+            background-image: none;
+
             .icon {
-                height: 32px;
-                line-height: 32px;
                 top: 0;
+                bottom: 0;
+                line-height: ($third-party-button-height - 2px);
             }
         }
 
-        &:last-child {
-            margin-bottom: $baseline;
-        }
-
-        &.button-Google {
+        &.button-oa2-google-oauth2 {
             color: $sm-btn-google;
 
             .icon {
@@ -405,7 +419,7 @@ $sm-btn-linkedin: #0077b5;
             }
         }
 
-        &.button-Facebook {
+        &.button-oa2-facebook {
             color: $sm-btn-facebook;
 
             .icon {
@@ -424,7 +438,7 @@ $sm-btn-linkedin: #0077b5;
             }
         }
 
-        &.button-LinkedIn {
+        &.button-oa2-linkedin-oauth2 {
             color: $sm-btn-linkedin;
 
             .icon {
@@ -445,6 +459,19 @@ $sm-btn-linkedin: #0077b5;
 
     }
 
+    .button-secondary-login {
+        @extend %nav-btn-base;
+        @extend %t-action4;
+        @extend %t-regular;
+        border-color: $lightGrey1;
+        padding: 0;
+        height: $third-party-button-height;
+
+        &:hover {
+            border-color: $m-blue-d3;
+        }
+    }
+
     /** Error Container - from _account.scss **/
     .status {
         @include box-sizing(border-box);
@@ -454,11 +481,10 @@ $sm-btn-linkedin: #0077b5;
         background: tint($yellow,20%);
 
         .message-title {
-            @extend %t-title4;
+            @extend %t-title5;
             font-family: $sans-serif;
             margin: 0 0 ($baseline/4) 0;
             font-weight: 600;
-            text-transform: uppercase;
         }
 
         .message-copy,
@@ -502,6 +528,13 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
+    .institution-list {
+
+        .institution {
+            @extend %t-copy-base;
+        }
+    }
+
     @include media( max-width 330px) {
         .form-type {
             width: 98%;
@@ -512,5 +545,28 @@ $sm-btn-linkedin: #0077b5;
             width: 100%;
             margin: 10px 0;
         }
+    }
+}
+
+.finish-auth {
+    @include box-sizing(border-box);
+    @include outer-container;
+    $grid-columns: 12;
+    background: $white;
+    min-height: 100%;
+    width: 100%;
+
+    .finish-auth-inner {
+        @include box-sizing(border-box);
+        max-width: 650px;
+        margin: 1em auto;
+    }
+
+    #finish-auth-status {
+        padding-top: 30px; // Make room for the absolutely positioned loading animation
+    }
+
+    #finish-auth-status li:last-child {
+        font-weight: bold;
     }
 }

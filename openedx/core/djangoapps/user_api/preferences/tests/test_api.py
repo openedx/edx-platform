@@ -324,7 +324,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
         profile = UserProfile.objects.get(user=user)
-        year_of_birth = datetime.datetime.now().year - age  # pylint: disable=maybe-no-member
+        year_of_birth = datetime.datetime.now().year - age
         profile.year_of_birth = year_of_birth
         profile.save()
 
@@ -374,7 +374,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
         profile = UserProfile.objects.get(user=user)
-        year_of_birth = datetime.datetime.now(UTC).year - age  # pylint: disable=maybe-no-member
+        year_of_birth = datetime.datetime.now(UTC).year - age
         profile.year_of_birth = year_of_birth
         profile.save()
 

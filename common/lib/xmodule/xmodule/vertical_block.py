@@ -29,6 +29,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
     has_children = True
 
+    show_in_read_only_mode = True
+
     def student_view(self, context):
         """
         Renders the student view of the block in the LMS.
@@ -75,7 +77,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         Returns the progress on this block and all children.
         """
         # TODO: Cache progress or children array?
-        children = self.get_children()  # pylint: disable=no-member
+        children = self.get_children()
         progresses = [child.get_progress() for child in children]
         progress = reduce(Progress.add_counts, progresses, None)
         return progress
@@ -84,7 +86,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         Returns the highest priority icon class.
         """
-        child_classes = set(child.get_icon_class() for child in self.get_children())  # pylint: disable=no-member
+        child_classes = set(child.get_icon_class() for child in self.get_children())
         new_class = 'other'
         for higher_class in CLASS_PRIORITY:
             if higher_class in child_classes:
@@ -107,7 +109,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('vertical')  # pylint: disable=no-member
-        for child in self.get_children():  # pylint: disable=no-member
+        for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
 

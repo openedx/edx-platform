@@ -116,7 +116,7 @@ class ImportTestCase(CourseTestCase):
         Check that course is imported successfully in existing course and users have their access roles
         """
         # Create a non_staff user and add it to course staff only
-        __, nonstaff_user = self.create_non_staff_authed_user_client(authenticate=False)
+        __, nonstaff_user = self.create_non_staff_authed_user_client()
         auth.add_users(self.user, CourseStaffRole(self.course.id), nonstaff_user)
 
         course = self.store.get_course(self.course.id)
@@ -209,6 +209,19 @@ class ImportTestCase(CourseTestCase):
 
         return outside_tar
 
+    def _edx_platform_tar(self):
+        """
+        Tarfile with file that extracts to edx-platform directory.
+
+        Extracting this tarfile in directory <dir> will also put its contents
+        directly in <dir> (rather than <dir/tarname>).
+        """
+        outside_tar = self.unsafe_common_dir / "unsafe_file.tar.gz"
+        with tarfile.open(outside_tar, "w:gz") as tar:
+            tar.addfile(tarfile.TarInfo(os.path.join(os.path.abspath("."), "a_file")))
+
+        return outside_tar
+
     def test_unsafe_tar(self):
         """
         Check that safety measure work.
@@ -233,6 +246,12 @@ class ImportTestCase(CourseTestCase):
         try_tar(self._symlink_tar())
         try_tar(self._outside_tar())
         try_tar(self._outside_tar2())
+        try_tar(self._edx_platform_tar())
+
+        # test trying to open a tar outside of the normal data directory
+        with self.settings(DATA_DIR='/not/the/data/dir'):
+            try_tar(self._edx_platform_tar())
+
         # Check that `import_status` returns the appropriate stage (i.e.,
         # either 3, indicating all previous steps are completed, or 0,
         # indicating no upload in progress)
@@ -294,13 +313,19 @@ class ImportTestCase(CourseTestCase):
         self.assertIn(test_block3.url_name, children)
         self.assertIn(test_block4.url_name, children)
 
-        extract_dir = path(tempfile.mkdtemp())
+        extract_dir = path(tempfile.mkdtemp(dir=settings.DATA_DIR))
+        # the extract_dir needs to be passed as a relative dir to
+        # import_library_from_xml
+        extract_dir_relative = path.relpath(extract_dir, settings.DATA_DIR)
+
         try:
-            tar = tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz')
-            safetar_extractall(tar, extract_dir)
+            with tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz') as tar:
+                safetar_extractall(tar, extract_dir)
             library_items = import_library_from_xml(
-                self.store, self.user.id,
-                settings.GITHUB_REPO_ROOT, [extract_dir / 'library'],
+                self.store,
+                self.user.id,
+                settings.GITHUB_REPO_ROOT,
+                [extract_dir_relative / 'library'],
                 load_error_modules=False,
                 static_content_store=contentstore(),
                 target_id=lib_key
@@ -414,14 +439,12 @@ class ExportTestCase(CourseTestCase):
         root_dir = path(tempfile.mkdtemp())
         try:
             export_library_to_xml(self.store, contentstore(), lib_key, root_dir, name)
-            # pylint: disable=no-member
             lib_xml = lxml.etree.XML(open(root_dir / name / LIBRARY_ROOT).read())
             self.assertEqual(lib_xml.get('org'), lib_key.org)
             self.assertEqual(lib_xml.get('library'), lib_key.library)
             block = lib_xml.find('video')
             self.assertIsNotNone(block)
             self.assertEqual(block.get('url_name'), video_block.url_name)
-            # pylint: disable=no-member
             video_xml = lxml.etree.XML(open(root_dir / name / 'video' / video_block.url_name + '.xml').read())
             self.assertEqual(video_xml.tag, 'video')
             self.assertEqual(video_xml.get('youtube_id_1_0'), youtube_id)

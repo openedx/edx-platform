@@ -12,9 +12,17 @@ the SessionMiddleware.
 """
 from django.conf import settings
 
-from django.utils.translation.trans_real import parse_accept_lang_header
-
+from dark_lang import DARK_LANGUAGE_KEY
 from dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.user_api.preferences.api import (
+    delete_user_preference, get_user_preference, set_user_preference
+)
+from lang_pref import LANGUAGE_KEY
+
+# TODO re-import this once we're on Django 1.5 or greater. [PLAT-671]
+# from django.utils.translation.trans_real import parse_accept_lang_header
+# from django.utils.translation import LANGUAGE_SESSION_KEY
+from django_locale.trans_real import parse_accept_lang_header, LANGUAGE_SESSION_KEY
 
 
 def dark_parse_accept_lang_header(accept):
@@ -81,11 +89,17 @@ class DarkLangMiddleware(object):
         self._clean_accept_headers(request)
         self._activate_preview_language(request)
 
-    def _is_released(self, lang_code):
-        """
-        ``True`` iff one of the values in ``self.released_langs`` is a prefix of ``lang_code``.
-        """
-        return any(lang_code.lower().startswith(released_lang.lower()) for released_lang in self.released_langs)
+    def _fuzzy_match(self, lang_code):
+        """Returns a fuzzy match for lang_code"""
+        if lang_code in self.released_langs:
+            return lang_code
+
+        lang_prefix = lang_code.partition('-')[0]
+        for released_lang in self.released_langs:
+            released_prefix = released_lang.partition('-')[0]
+            if lang_prefix == released_prefix:
+                return released_lang
+        return None
 
     def _format_accept_value(self, lang, priority=1.0):
         """
@@ -102,12 +116,13 @@ class DarkLangMiddleware(object):
         if accept is None or accept == '*':
             return
 
-        new_accept = ", ".join(
-            self._format_accept_value(lang, priority)
-            for lang, priority
-            in dark_parse_accept_lang_header(accept)
-            if self._is_released(lang)
-        )
+        new_accept = []
+        for lang, priority in dark_parse_accept_lang_header(accept):
+            fuzzy_code = self._fuzzy_match(lang.lower())
+            if fuzzy_code:
+                new_accept.append(self._format_accept_value(fuzzy_code, priority))
+
+        new_accept = ", ".join(new_accept)
 
         request.META['HTTP_ACCEPT_LANGUAGE'] = new_accept
 
@@ -115,18 +130,38 @@ class DarkLangMiddleware(object):
         """
         If the request has the get parameter ``preview-lang``,
         and that language doesn't appear in ``self.released_langs``,
-        then set the session ``django_language`` to that language.
+        then set the session LANGUAGE_SESSION_KEY to that language.
         """
+        auth_user = request.user.is_authenticated()
         if 'clear-lang' in request.GET:
-            if 'django_language' in request.session:
-                del request.session['django_language']
+            # delete the session language key (if one is set)
+            if LANGUAGE_SESSION_KEY in request.session:
+                del request.session[LANGUAGE_SESSION_KEY]
 
+            if auth_user:
+                # Reset user's dark lang preference to null
+                delete_user_preference(request.user, DARK_LANGUAGE_KEY)
+                # Get & set user's preferred language
+                user_pref = get_user_preference(request.user, LANGUAGE_KEY)
+                if user_pref:
+                    request.session[LANGUAGE_SESSION_KEY] = user_pref
+            return
+
+        # Get the user's preview lang - this is either going to be set from a query
+        # param `?preview-lang=xx`, or we may have one already set as a dark lang preference.
         preview_lang = request.GET.get('preview-lang', None)
+        if not preview_lang and auth_user:
+            # Get the request user's dark lang preference
+            preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
 
+        # User doesn't have a dark lang preference, so just return
         if not preview_lang:
             return
 
-        if preview_lang in self.released_langs:
-            return
+        # Set the session key to the requested preview lang
+        request.session[LANGUAGE_SESSION_KEY] = preview_lang
 
-        request.session['django_language'] = preview_lang
+        # Make sure that we set the requested preview lang as the dark lang preference for the
+        # user, so that the lang_pref middleware doesn't clobber away the dark lang preview.
+        if auth_user:
+            set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)

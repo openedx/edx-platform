@@ -159,10 +159,15 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         Verify age limit messages for a user.
         """
-        self.set_birth_year(birth_year=birth_year if birth_year is not None else "")
+        if birth_year is None:
+            birth_year = ""
+        self.set_birth_year(birth_year=birth_year)
         profile_page = self.visit_profile_page(username)
         self.assertTrue(profile_page.privacy_field_visible)
-        self.assertEqual(profile_page.age_limit_message_present, message is not None)
+        if message:
+            self.assertTrue(profile_page.age_limit_message_present)
+        else:
+            self.assertFalse(profile_page.age_limit_message_present)
         self.assertIn(message, profile_page.profile_forced_private_message)
 
     def test_profile_defaults_to_public(self):
@@ -237,15 +242,15 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Given that I am a registered user.
         When I go to Dashboard page.
         And I click on username dropdown.
-        Then I see My Profile link in the dropdown menu.
-        When I click on My Profile link.
-        Then I will be navigated to My Profile page.
+        Then I see Profile link in the dropdown menu.
+        When I click on Profile link.
+        Then I will be navigated to Profile page.
         """
         username, user_id = self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
-        self.assertTrue('My Profile' in dashboard_page.username_dropdown_link_text)
+        self.assertIn('Profile', dashboard_page.username_dropdown_link_text)
         dashboard_page.click_my_profile_link()
         my_profile_page = LearnerProfilePage(self.browser, username)
         my_profile_page.wait_for_page()
@@ -255,7 +260,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Scenario: Verify that desired fields are shown when looking at her own private profile.
 
         Given that I am a registered user.
-        And I visit My Profile page.
+        And I visit my Profile page.
         And I set the profile visibility to private.
         And I reload the page.
         Then I should see the profile visibility selector dropdown.
@@ -271,7 +276,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Scenario: Verify that desired fields are shown when looking at her own public profile.
 
         Given that I am a registered user.
-        And I visit My Profile page.
+        And I visit my Profile page.
         And I set the profile visibility to public.
         And I reload the page.
         Then I should see the profile visibility selector dropdown.
@@ -316,7 +321,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Test behaviour of `Country` field.
 
         Given that I am a registered user.
-        And I visit My Profile page.
+        And I visit my Profile page.
         And I set the profile visibility to public and set default values for public fields.
         Then I set country value to `Pakistan`.
         Then displayed country should be `Pakistan` and country field mode should be `display`
@@ -331,7 +336,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self._test_dropdown_field(profile_page, 'country', 'Pakistan', 'Pakistan', 'display')
 
         profile_page.make_field_editable('country')
-        self.assertTrue(profile_page.mode_for_field('country'), 'edit')
+        self.assertEqual(profile_page.mode_for_field('country'), 'edit')
 
         self.assertTrue(profile_page.field_icon_present('country'))
 
@@ -340,7 +345,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Test behaviour of `Language` field.
 
         Given that I am a registered user.
-        And I visit My Profile page.
+        And I visit my Profile page.
         And I set the profile visibility to public and set default values for public fields.
         Then I set language value to `Urdu`.
         Then displayed language should be `Urdu` and language field mode should be `display`
@@ -369,7 +374,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Test behaviour of `About Me` field.
 
         Given that I am a registered user.
-        And I visit My Profile page.
+        And I visit my Profile page.
         And I set the profile visibility to public and set default values for public fields.
         Then I set about me value to `Eat Sleep Code`.
         Then displayed about me should be `Eat Sleep Code` and about me field mode should be `display`
@@ -468,6 +473,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
+    @flaky  # TODO fix this, see TNL-2704
     def test_user_can_upload_the_profile_image_with_success(self):
         """
         Scenario: Upload profile image works correctly.

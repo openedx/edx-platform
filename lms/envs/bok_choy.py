@@ -1,5 +1,13 @@
 """
-Settings for bok choy tests
+Settings for Bok Choy tests that are used when running LMS.
+
+Bok Choy uses two different settings files:
+1. test_static_optimized is used when invoking collectstatic
+2. bok_choy is used when running the tests
+
+Note: it isn't possible to have a single settings file, because Django doesn't
+support both generating static assets to a directory and also serving static
+from the same directory.
 """
 
 import os
@@ -11,7 +19,7 @@ from tempfile import mkdtemp
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=no-value-for-parameter
+CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################
@@ -39,7 +47,7 @@ LOG_DIR = (TEST_ROOT / "log").abspath()
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=no-value-for-parameter
+        'fs_root': (TEST_ROOT / "data").abspath(),
     },
     xml_store_options={
         'data_dir': (TEST_ROOT / "data").abspath(),
@@ -48,6 +56,20 @@ update_module_store_settings(
 )
 
 ############################ STATIC FILES #############################
+
+# Enable debug so that static assets are served by Django
+DEBUG = True
+
+# Serve static files at /static directly from the staticfiles directory under test root
+# Note: optimized files for testing are generated with settings from test_static_optimized
+STATIC_URL = "/static/"
+STATICFILES_FINDERS = (
+    'staticfiles.finders.FileSystemFinder',
+)
+STATICFILES_DIRS = (
+    (TEST_ROOT / "staticfiles" / "lms").abspath(),
+)
+
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
@@ -71,10 +93,8 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 
 # Configure the LMS to use our stub EdxNotes implementation
-EDXNOTES_INTERFACE['url'] = 'http://localhost:8042/api/v1'
-
-# Enable django-pipeline and staticfiles
-STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
+EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
+EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
 # Silence noisy logs
 import logging
@@ -93,18 +113,23 @@ FEATURES['MILESTONES_APP'] = True
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 
+# Enable Course Discovery
+FEATURES['ENABLE_COURSE_DISCOVERY'] = True
+
 # Enable student notes
 FEATURES['ENABLE_EDXNOTES'] = True
 
 # Enable teams feature
 FEATURES['ENABLE_TEAMS'] = True
 
-# Unfortunately, we need to use debug mode to serve staticfiles
-DEBUG = True
+# Enable custom content licensing
+FEATURES['LICENSING'] = True
 
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
+
+FEATURES['ENABLE_PROCTORED_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
@@ -120,6 +145,11 @@ FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
 FEATURES['ADVANCED_SECURITY'] = False
+
+FEATURES['ENABLE_MOBILE_REST_API'] = True  # Show video bumper in LMS
+FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Show video bumper in LMS
+FEATURES['SHOW_BUMPER_PERIODICITY'] = 1
+
 PASSWORD_MIN_LENGTH = None
 PASSWORD_COMPLEXITY = {}
 
@@ -133,7 +163,7 @@ FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
 MOCK_SEARCH_BACKING_FILE = (
-    TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
+    TEST_ROOT / "index_file.dat"
 ).abspath()
 
 # Generate a random UUID so that different runs of acceptance tests don't break each other

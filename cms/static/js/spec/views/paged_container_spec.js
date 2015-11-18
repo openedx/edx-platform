@@ -1,5 +1,6 @@
-define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/models/xblock_info",
-    "js/views/paged_container", "js/views/paging_header", "js/views/paging_footer", "js/views/xblock"],
+define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "js/models/xblock_info",
+        "js/views/paged_container", "js/views/paging_header",
+        "common/js/components/views/paging_footer", "js/views/xblock"],
     function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {
 
         var htmlResponseTpl = _.template('' +
@@ -175,11 +176,6 @@ define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/mo
             });
 
             describe("PagingHeader", function () {
-                beforeEach(function () {
-                    var pagingFooterTpl = readFixtures('paging-header.underscore');
-                    appendSetFixtures($("<script>", { id: "paging-header-tpl", type: "text/template" }).text(pagingFooterTpl));
-                });
-
                 describe("Next page button", function () {
                     beforeEach(function () {
                         pagingContainer.render();
@@ -331,11 +327,6 @@ define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/mo
             });
 
             describe("PagingFooter", function () {
-                beforeEach(function () {
-                    var pagingFooterTpl = readFixtures('paging-footer.underscore');
-                    appendSetFixtures($("<script>", { id: "paging-footer-tpl", type: "text/template" }).text(pagingFooterTpl));
-                });
-
                 describe("Next page button", function () {
                     beforeEach(function () {
                         // Render the page and header so that they can react to events

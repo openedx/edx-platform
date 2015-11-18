@@ -1,8 +1,11 @@
 """
 Acceptance tests for the Import and Export pages
 """
+from datetime import datetime
+
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
+
 from .base_studio_test import StudioLibraryTest, StudioCourseTest
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.import_export import ExportLibraryPage, ExportCoursePage, ImportLibraryPage, ImportCoursePage
@@ -11,7 +14,6 @@ from ...pages.studio.container import ContainerPage
 from ...pages.studio.overview import CourseOutlinePage
 
 
-# pylint: disable=no-member
 class ExportTestMixin(object):
     """
     Tests to run both for course and library export pages.
@@ -73,7 +75,6 @@ class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
         self.assertEqual(self.export_page.header_text, 'Library Export')
 
 
-# pylint: disable=no-member
 class BadExportMixin(object):
     """
     Test mixin for bad exports.
@@ -154,7 +155,6 @@ class TestCourseBadExport(BadExportMixin, StudioCourseTest):
         )
 
 
-# pylint: disable=no-member
 class ImportTestMixin(object):
     """
     Tests to run for both course and library import pages.
@@ -182,6 +182,45 @@ class ImportTestMixin(object):
         """
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
+
+    def test_import_timestamp(self):
+        """
+        Scenario: I perform a course / library import
+            On import success, the page displays a UTC timestamp previously not visible
+            And if I refresh the page, the timestamp is still displayed
+        """
+        self.assertFalse(self.import_page.is_timestamp_visible())
+
+        # Get the time when the import has started.
+        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        upload_start_time = datetime.utcnow().replace(microsecond=0, second=0)
+        self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
+
+        # Get the time when the import has finished.
+        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        upload_finish_time = datetime.utcnow().replace(microsecond=0, second=0)
+
+        import_timestamp = self.import_page.parsed_timestamp
+        self.import_page.wait_for_timestamp_visible()
+
+        # Verify that 'import_timestamp' is between start and finish upload time
+        self.assertLessEqual(
+            upload_start_time,
+            import_timestamp,
+            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
+        )
+        self.assertGreaterEqual(
+            upload_finish_time,
+            import_timestamp,
+            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
+        )
+
+        self.import_page.visit()
+        self.import_page.wait_for_tasks(completed=True)
+        self.import_page.wait_for_timestamp_visible()
 
     def test_landing_url(self):
         """

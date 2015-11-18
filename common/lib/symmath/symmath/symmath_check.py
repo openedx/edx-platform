@@ -86,7 +86,7 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
         threshold = float(st)
         numerical = True
 
-    if str(given) == '' and not (str(expect) == ''):
+    if str(given) == '' and not str(expect) == '':
         return {'ok': False, 'msg': ''}
 
     try:
@@ -125,12 +125,12 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
             #msg += "dm = " + to_latex(dm) + " diff = " + str(abs(dm.vec().norm().evalf()))
             #msg += "expect = " + to_latex(xexpect)
     elif dosimplify:
-        if (sympy.simplify(xexpect) == sympy.simplify(xgiven)):
+        if sympy.simplify(xexpect) == sympy.simplify(xgiven):
             return {'ok': True, 'msg': msg}
     elif numerical:
-        if (abs((xexpect - xgiven).evalf(chop=True)) < threshold):
+        if abs((xexpect - xgiven).evalf(chop=True)) < threshold:
             return {'ok': True, 'msg': msg}
-    elif (xexpect == xgiven):
+    elif xexpect == xgiven:
         return {'ok': True, 'msg': msg}
 
     #msg += "<p/>expect='%s', given='%s'" % (expect,given)	# debugging
@@ -149,9 +149,9 @@ def make_error_message(msg):
 
 def is_within_tolerance(expected, actual, tolerance):
     if expected == 0:
-        return (abs(actual) < tolerance)
+        return abs(actual) < tolerance
     else:
-        return (abs(abs(actual - expected) / expected) < tolerance)
+        return abs(abs(actual - expected) / expected) < tolerance
 
 #-----------------------------------------------------------------------------
 # Check function interface, which takes pmathml input
@@ -198,10 +198,11 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
             DEBUG = False
 
     # options
-    do_matrix = 'matrix' in (options or '')
-    do_qubit = 'qubit' in (options or '')
-    do_imaginary = 'imaginary' in (options or '')
-    do_numerical = 'numerical' in (options or '')
+    if options is None:
+        options = ''
+    do_matrix = 'matrix' in options
+    do_qubit = 'qubit' in options
+    do_numerical = 'numerical' in options
 
     # parse expected answer
     try:
@@ -254,7 +255,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         fsym = f.sympy
         msg += '<p>You entered: %s</p>' % to_latex(f.sympy)
     except Exception, err:
-        log.exception("Error evaluating expression '%s' as a valid equation" % ans)
+        log.exception("Error evaluating expression '%s' as a valid equation", ans)
         msg += "<p>Error in evaluating your expression '%s' as a valid equation</p>" % (ans)
         if "Illegal math" in str(err):
             msg += "<p>Illegal math expression</p>"

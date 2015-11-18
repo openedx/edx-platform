@@ -40,7 +40,8 @@ define([
                 itemCategoryDisplayName: this.itemCategoryDisplayName,
                 emptyMessage: this.emptyMessage,
                 length: this.collection.length,
-                isEditing: model && model.get('editing')
+                isEditing: model && model.get('editing'),
+                canCreateNewItem: this.canCreateItem(this.collection)
             }));
 
             this.collection.each(function(model) {
@@ -81,6 +82,17 @@ define([
             }
 
             view.$el.focus();
+        },
+
+        canCreateItem: function(collection) {
+            var canCreateNewItem = true;
+            if (collection.length > 0) {
+                var maxAllowed = collection.maxAllowed;
+                if (!_.isUndefined(maxAllowed) && collection.length >= maxAllowed) {
+                    canCreateNewItem = false;
+                }
+            }
+            return canCreateNewItem;
         },
 
         onAddItem: function(event) {

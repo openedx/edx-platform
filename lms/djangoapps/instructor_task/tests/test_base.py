@@ -314,7 +314,7 @@ class TestReportMixin(object):
             ignore_other_columns (boolean): When True, we verify that `expected_rows`
                 contain data which is the subset of actual csv rows.
         """
-        report_store = ReportStore.from_config()
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
         with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
             # Expand the dict reader generator so we don't lose it's content

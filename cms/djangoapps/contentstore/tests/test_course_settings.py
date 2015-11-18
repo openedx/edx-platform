@@ -14,11 +14,12 @@ from django.conf import settings
 
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
-from contentstore.utils import EXTRA_TAB_PANELS, reverse_course_url, reverse_usage_url
+from contentstore.utils import reverse_course_url, reverse_usage_url
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.fields import Date
+from xmodule.tabs import InvalidTabsException
 
 from .utils import CourseTestCase
 from xmodule.modulestore.django import modulestore
@@ -51,6 +52,8 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
         self.assertFalse(details.enable_enrollment_email, "Enrollment Email should be initialized as false")
+        self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
+        self.assertIsNone(details.has_cert_config)
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -63,6 +66,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
+        self.assertIsNone(jsondetails['language'], "language somehow initialized")
 
     def test_ooc_encoder(self):
         """
@@ -121,6 +125,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).course_image_name,
             jsondetails.course_image_name
+        )
+        jsondetails.language = "hr"
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).language,
+            jsondetails.language
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -325,6 +334,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
         self.alter_field(url, details, 'course_image_name', "course_image_name")
+        self.alter_field(url, details, 'language', "en")
 
     def compare_details_with_encoding(self, encoded, details, context):
         """
@@ -340,6 +350,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
         self.assertEqual(details['course_image_name'], encoded['course_image_name'], context + " images not ==")
+        self.assertEqual(details['language'], encoded['language'], context + " languages not ==")
 
     def compare_date_fields(self, details, encoded, context, field):
         """
@@ -618,6 +629,7 @@ class CourseGradingTest(CourseTestCase):
         self.assertEqual(json.loads(response.content).get('graderType'), u'notgraded')
 
 
+@ddt.ddt
 class CourseMetadataEditingTest(CourseTestCase):
     """
     Tests for CourseMetadata.
@@ -627,6 +639,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
+        self.notes_tab = {"type": "notes", "name": "My Notes"}
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
@@ -789,7 +802,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
-    def test_validate_and_update_from_json_correct_inputs(self):
+    def test_validate_from_json_correct_inputs(self):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
             {
@@ -803,16 +816,11 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertTrue(len(errors) == 0)
         self.update_check(test_model)
 
-        # fresh fetch to ensure persistence
-        fresh = modulestore().get_course(self.course.id)
-        test_model = CourseMetadata.fetch(fresh)
-        self.update_check(test_model)
-
         # Tab gets tested in test_advanced_settings_munge_tabs
         self.assertIn('advanced_modules', test_model, 'Missing advanced_modules')
         self.assertEqual(test_model['advanced_modules']['value'], ['combinedopenended'], 'advanced_module is not updated')
 
-    def test_validate_and_update_from_json_wrong_inputs(self):
+    def test_validate_from_json_wrong_inputs(self):
         # input incorrectly formatted data
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
@@ -934,36 +942,116 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         Test that adding and removing specific advanced components adds and removes tabs.
         """
-        self.assertNotIn(EXTRA_TAB_PANELS.get("open_ended"), self.course.tabs)
-        self.assertNotIn(EXTRA_TAB_PANELS.get("notes"), self.course.tabs)
+        open_ended_tab = {"type": "open_ended", "name": "Open Ended Panel"}
+        peer_grading_tab = {"type": "peer_grading", "name": "Peer grading"}
+
+        # First ensure that none of the tabs are visible
+        self.assertNotIn(open_ended_tab, self.course.tabs)
+        self.assertNotIn(peer_grading_tab, self.course.tabs)
+        self.assertNotIn(self.notes_tab, self.course.tabs)
+
+        # Now add the "combinedopenended" component and verify that the tab has been added
         self.client.ajax_post(self.course_setting_url, {
             ADVANCED_COMPONENT_POLICY_KEY: {"value": ["combinedopenended"]}
         })
         course = modulestore().get_course(self.course.id)
-        self.assertIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)
-        self.assertNotIn(EXTRA_TAB_PANELS.get("notes"), course.tabs)
-        self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": []}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertNotIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)
+        self.assertIn(open_ended_tab, course.tabs)
+        self.assertIn(peer_grading_tab, course.tabs)
+        self.assertNotIn(self.notes_tab, course.tabs)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
-    def test_course_settings_munge_tabs(self):
-        """
-        Test that adding and removing specific course settings adds and removes tabs.
-        """
-        self.assertNotIn(EXTRA_TAB_PANELS.get("edxnotes"), self.course.tabs)
+        # Now enable student notes and verify that the "My Notes" tab has also been added
         self.client.ajax_post(self.course_setting_url, {
-            "edxnotes": {"value": True}
+            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["combinedopenended", "notes"]}
         })
         course = modulestore().get_course(self.course.id)
-        self.assertIn(EXTRA_TAB_PANELS.get("edxnotes"), course.tabs)
+        self.assertIn(open_ended_tab, course.tabs)
+        self.assertIn(peer_grading_tab, course.tabs)
+        self.assertIn(self.notes_tab, course.tabs)
+
+        # Now remove the "combinedopenended" component and verify that the tab is gone
         self.client.ajax_post(self.course_setting_url, {
-            "edxnotes": {"value": False}
+            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
         })
         course = modulestore().get_course(self.course.id)
-        self.assertNotIn(EXTRA_TAB_PANELS.get("edxnotes"), course.tabs)
+        self.assertNotIn(open_ended_tab, course.tabs)
+        self.assertNotIn(peer_grading_tab, course.tabs)
+        self.assertIn(self.notes_tab, course.tabs)
+
+        # Finally disable student notes and verify that the "My Notes" tab is gone
+        self.client.ajax_post(self.course_setting_url, {
+            ADVANCED_COMPONENT_POLICY_KEY: {"value": [""]}
+        })
+        course = modulestore().get_course(self.course.id)
+        self.assertNotIn(open_ended_tab, course.tabs)
+        self.assertNotIn(peer_grading_tab, course.tabs)
+        self.assertNotIn(self.notes_tab, course.tabs)
+
+    def test_advanced_components_munge_tabs_validation_failure(self):
+        with patch('contentstore.views.course._refresh_course_tabs', side_effect=InvalidTabsException):
+            resp = self.client.ajax_post(self.course_setting_url, {
+                ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+            })
+            self.assertEqual(resp.status_code, 400)
+
+            error_msg = [
+                {
+                    'message': 'An error occurred while trying to save your tabs',
+                    'model': {'display_name': 'Tabs Exception'}
+                }
+            ]
+            self.assertEqual(json.loads(resp.content), error_msg)
+
+            # verify that the course wasn't saved into the modulestore
+            course = modulestore().get_course(self.course.id)
+            self.assertNotIn("notes", course.advanced_modules)
+
+    @ddt.data(
+        [{'type': 'courseware'}, {'type': 'course_info'}, {'type': 'wiki', 'is_hidden': True}],
+        [{'type': 'courseware', 'name': 'Courses'}, {'type': 'course_info', 'name': 'Info'}],
+    )
+    def test_course_tab_configurations(self, tab_list):
+        self.course.tabs = tab_list
+        modulestore().update_item(self.course, self.user.id)
+        self.client.ajax_post(self.course_setting_url, {
+            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+        })
+        course = modulestore().get_course(self.course.id)
+        tab_list.append(self.notes_tab)
+        self.assertEqual(tab_list, course.tabs)
+
+    @override_settings(FEATURES={'CERTIFICATES_HTML_VIEW': True})
+    def test_web_view_certifcate_configuration_settings(self):
+        """
+        Test that has_cert_config is updated based on cert_html_view_enabled setting.
+        """
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                "cert_html_view_enabled": {"value": "true"}
+            },
+            user=self.user
+        )
+        self.assertIn('cert_html_view_enabled', test_model)
+        url = get_url(self.course.id)
+        response = self.client.get_json(url)
+        course_detail_json = json.loads(response.content)
+        self.assertFalse(course_detail_json['has_cert_config'])
+
+        # Now add a certificate configuration
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Certificate Config Name',
+                'course_title': 'Title override',
+                'signatories': [],
+                'is_active': True
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        modulestore().update_item(self.course, self.user.id)
+        response = self.client.get_json(url)
+        course_detail_json = json.loads(response.content)
+        self.assertTrue(course_detail_json['has_cert_config'])
 
 
 class CourseGraderUpdatesTest(CourseTestCase):

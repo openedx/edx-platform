@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container", "js/utils/module", "gettext",
-        "js/views/feedback_notification", "js/views/paging_header", "js/views/paging_footer", "js/views/paging_mixin"],
-    function ($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter, PagingMixin) {
-        var PagedContainerView = ContainerView.extend(PagingMixin).extend({
+        "js/views/feedback_notification", "js/views/paging_header", "common/js/components/views/paging_footer"],
+    function ($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter) {
+        var PagedContainerView = ContainerView.extend({
             initialize: function(options){
                 var self = this;
                 ContainerView.prototype.initialize.call(this);
@@ -26,7 +26,33 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     // of paginator, on the current page.
                     size: function() { return self.collection._size; },
                     // Toggles the functionality for showing and hiding child previews.
-                    showChildrenPreviews: true
+                    showChildrenPreviews: true,
+
+                    // PagingFooter expects to be able to control paging through the collection instead of the view,
+                    // so we just make these functions act as pass-throughs
+                    setPage: function (page) {
+                        self.setPage(page - 1);
+                    },
+
+                    nextPage: function () {
+                        self.nextPage();
+                    },
+
+                    previousPage: function() {
+                        self.previousPage();
+                    },
+
+                    getPage: function () {
+                        return self.collection.currentPage + 1;
+                    },
+
+                    hasPreviousPage: function () {
+                        return self.collection.currentPage > 0;
+                    },
+
+                    hasNextPage: function () {
+                        return self.collection.currentPage < self.collection.totalPages - 1;
+                    }
                 };
             },
 
@@ -86,6 +112,23 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                 this.render(options);
             },
 
+            nextPage: function() {
+                var collection = this.collection,
+                    currentPage = collection.currentPage,
+                    lastPage = collection.totalPages - 1;
+                if (currentPage < lastPage) {
+                    this.setPage(currentPage + 1);
+                }
+            },
+
+            previousPage: function() {
+                var collection = this.collection,
+                    currentPage = collection.currentPage;
+                if (currentPage > 0) {
+                    this.setPage(currentPage - 1);
+                }
+            },
+
             processPaging: function(options){
                 // We have the Django template sneak us the pagination information,
                 // and we load it from a div here.
@@ -118,7 +161,7 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     el: this.$el.find('.container-paging-header')
                 });
                 this.pagingFooter = new PagingFooter({
-                    view: this,
+                    collection: this.collection,
                     el: this.$el.find('.container-paging-footer')
                 });
 

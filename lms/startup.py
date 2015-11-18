@@ -9,12 +9,16 @@ from django.conf import settings
 # Force settings to run so that the python path is modified
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
+from instructor.services import InstructorService
+
 from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
 from monkey_patch import django_utils_translation
 import analytics
 
+from edx_proctoring.runtime import set_runtime_service
+from openedx.core.djangoapps.credit.services import CreditService
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +46,13 @@ def run():
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
+
+    # register any dependency injections that we need to support in edx_proctoring
+    # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
+    # as well as the instructor dashboard (for deleting student attempts)
+    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+        set_runtime_service('credit', CreditService())
+        set_runtime_service('instructor', InstructorService())
 
 
 def add_mimetypes():
@@ -117,11 +128,11 @@ def enable_microsites():
             ms_config['template_dir'] = template_dir
 
             ms_config['microsite_name'] = ms_name
-            log.info('Loading microsite {0}'.format(ms_root))
+            log.info('Loading microsite %s', ms_root)
         else:
             # not sure if we have application logging at this stage of
             # startup
-            log.error('Error loading microsite {0}. Directory does not exist'.format(ms_root))
+            log.error('Error loading microsite %s. Directory does not exist', ms_root)
             # remove from our configuration as it is not valid
             del microsite_config_dict[ms_name]
 
@@ -141,4 +152,4 @@ def enable_third_party_auth():
     """
 
     from third_party_auth import settings as auth_settings
-    auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
+    auth_settings.apply_settings(settings)

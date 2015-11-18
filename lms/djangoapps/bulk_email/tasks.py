@@ -169,7 +169,8 @@ def _get_course_email_context(course):
         'course_image_url': image_url,
         'course_start_date': get_default_time_display(course.start),
         'course_end_date': get_default_time_display(course.end),
-        'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
+        'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('account_settings')),
+        'email_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
         'platform_name': settings.PLATFORM_NAME,
     }
     return email_context
@@ -489,7 +490,6 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         subtask_status.increment(skipped=num_optout)
 
     course_title = global_email_context['course_title']
-    subject = "[" + course_title + "] " + course_email.subject
 
     # use the email from address in the CourseEmail, if it is present, otherwise compute it
     from_addr = course_email.from_addr if course_email.from_addr else \
@@ -525,7 +525,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
             # Create email:
             email_msg = EmailMultiAlternatives(
-                subject,
+                course_email.subject,
                 plaintext_msg,
                 from_addr,
                 [email],

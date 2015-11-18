@@ -35,9 +35,11 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/require.js
     - js/RequireJS-namespace-undefine.js
+    - xmodule_js/common_static/js/vendor/requirejs/text.js
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
+    - xmodule_js/common_static/js/vendor/jquery.timeago.js
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/URI.min.js
@@ -56,6 +58,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
+    - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/date.js
@@ -64,11 +67,17 @@ lib_paths:
 # Paths to source JavaScript files
 src_paths:
     - js
-    - js/common_helpers
+    - coffee/src
+    - common/js
+    - teams/js
+    - xmodule_js/common_static/coffee
+    - support/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - js/spec
+    - teams/js/spec
+    - support/js/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -89,9 +98,16 @@ fixture_paths:
     - templates/student_profile
     - templates/verify_student
     - templates/file-upload.underscore
+    - templates/components/header
+    - templates/components/tabbed
+    - templates/components/card
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
+    - templates/discovery
+    - common/templates
+    - teams/templates
+    - support/templates
 
 requirejs:
   paths:

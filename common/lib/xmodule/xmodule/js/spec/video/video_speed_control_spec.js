@@ -12,6 +12,7 @@
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
+            state.videoPlayer.destroy();
         });
 
         describe('constructor', function () {
@@ -246,6 +247,14 @@
                     .toHaveClass('is-active');
                 expect($('.speeds .value')).toHaveHtml('0.75x');
             });
+        });
+
+        it('can destroy itself', function () {
+            state = jasmine.initializePlayer();
+            state.videoSpeedControl.destroy();
+            expect(state.videoSpeedControl).toBeUndefined();
+            expect($('.video-speeds')).not.toExist();
+            expect($('.speed-button')).not.toExist();
         });
     });
 }).call(this);

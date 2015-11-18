@@ -17,8 +17,8 @@ from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 import dogstats_wrapper as dog_stats_api
 from xmodule.modulestore.django import modulestore
-from xmodule.tabs import StaticTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
+from xmodule.tabs import StaticTab
 
 from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
 from models.settings.course_grading import CourseGradingModel
@@ -299,3 +299,17 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
             store.update_item(course, user.id)
 
         return created_block
+
+
+def is_item_in_course_tree(item):
+    """
+    Check that the item is in the course tree.
+
+    It's possible that the item is not in the course tree
+    if its parent has been deleted and is now an orphan.
+    """
+    ancestor = item.get_parent()
+    while ancestor is not None and ancestor.location.category != "course":
+        ancestor = ancestor.get_parent()
+
+    return ancestor is not None

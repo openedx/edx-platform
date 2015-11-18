@@ -19,7 +19,7 @@ from ...pages.studio.settings_group_configurations import GroupConfigurationsPag
 import uuid
 
 
-@attr('shard_5')
+@attr('shard_6')
 class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin):
     """
     Tests for cohort management on the LMS Instructor Dashboard
@@ -616,7 +616,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.assertEquals(expected_message, messages[0])
 
 
-@attr('shard_5')
+@attr('shard_6')
 class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
     """
     Tests for cohorting the inline and course-wide discussion topics.
@@ -907,7 +907,7 @@ class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
         self.verify_discussion_topics_after_reload(self.inline_key, cohorted_topics_after)
 
 
-@attr('shard_5')
+@attr('shard_6')
 class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
     """
     Tests for linking between content groups and cohort in the instructor dashboard.

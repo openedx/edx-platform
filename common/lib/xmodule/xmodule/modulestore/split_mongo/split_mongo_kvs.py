@@ -18,6 +18,8 @@ class SplitMongoKVS(InheritanceKeyValueStore):
     known to the MongoModuleStore (data, children, and metadata)
     """
 
+    VALID_SCOPES = (Scope.parent, Scope.children, Scope.settings, Scope.content)
+
     @contract(parent="BlockUsageLocator | None")
     def __init__(self, definition, initial_values, default_values, parent, field_decorator=None):
         """
@@ -59,7 +61,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
                 else:
                     raise KeyError()
             else:
-                raise InvalidScopeError(key)
+                raise InvalidScopeError(key, self.VALID_SCOPES)
 
         if key.field_name in self._fields:
             field_value = self._fields[key.field_name]
@@ -71,8 +73,8 @@ class SplitMongoKVS(InheritanceKeyValueStore):
 
     def set(self, key, value):
         # handle any special cases
-        if key.scope not in [Scope.children, Scope.settings, Scope.content]:
-            raise InvalidScopeError(key)
+        if key.scope not in self.VALID_SCOPES:
+            raise InvalidScopeError(key, self.VALID_SCOPES)
         if key.scope == Scope.content:
             self._load_definition()
 
@@ -90,8 +92,8 @@ class SplitMongoKVS(InheritanceKeyValueStore):
 
     def delete(self, key):
         # handle any special cases
-        if key.scope not in [Scope.children, Scope.settings, Scope.content]:
-            raise InvalidScopeError(key)
+        if key.scope not in self.VALID_SCOPES:
+            raise InvalidScopeError(key, self.VALID_SCOPES)
         if key.scope == Scope.content:
             self._load_definition()
 

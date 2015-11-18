@@ -1,13 +1,15 @@
-<%! from django.utils.translation import ugettext as _ %>
-
 <%namespace name='static' file='static_content.html'/>
-<%! from datetime import datetime %>
-<%! import pytz %>
-<%! from django.conf import settings %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from xmodule.tabs import CourseTabList %>
-<%! from microsite_configuration import microsite %>
-<%! platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME) %>
+
+<%!
+from datetime import datetime
+import pytz
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from xmodule.tabs import CourseTabList
+from microsite_configuration import microsite
+platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+%>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
@@ -37,7 +39,7 @@
 
 <%
   discussion_tab = CourseTabList.get_discussion(course) if course else None
-  discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.can_display(course, settings, True, True, True)) else None
+  discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.is_enabled(course, user=user)) else None
 %>
 
 % if discussion_link:

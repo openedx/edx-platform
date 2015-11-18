@@ -321,11 +321,12 @@ class TestAccountAPI(UserAPITestCase):
         legacy_profile.country = ""
         legacy_profile.level_of_education = ""
         legacy_profile.gender = ""
+        legacy_profile.bio = ""
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
-        for empty_field in ("level_of_education", "gender", "country"):
+        for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])
 
     @ddt.data(
@@ -609,7 +610,6 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
-        # pylint: disable=no-member
         self.assertEqual(
             response.data["profile_image"],
             {

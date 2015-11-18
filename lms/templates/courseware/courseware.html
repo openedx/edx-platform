@@ -1,17 +1,21 @@
-<%!
-  from django.utils.translation import ugettext as _
-  from student.models import UserProfile
-%>
-<%! from django.template.defaultfilters import escapejs %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
-<%! from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from microsite_configuration import page_title_breadcrumbs
+from django.conf import settings
+from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+from student.models import UserProfile
+%>
+<%
+  include_proctoring = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and course.enable_proctored_exams
+%>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
 
-<%block name="bodyclass">courseware ${course.css_class or ''}</%block>
+<%block name="bodyclass">view-incourse view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
@@ -23,15 +27,25 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="header_extras">
 % for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
-    <%static:include path="js/${template_name}.underscore" />
+    <%static:include path="common/templates/${template_name}.underscore" />
 </script>
 % endfor
 
-% for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="search/${template_name}.underscore" />
-</script>
-% endfor
+% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="search/${template_name}.underscore" />
+        </script>
+    % endfor
+% endif
+
+% if include_proctoring:
+  % for template_name in ["proctored-exam-status"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="courseware/${template_name}.underscore" />
+    </script>
+  % endfor
+% endif
 
 </%block>
 
@@ -67,6 +81,12 @@ ${page_title_breadcrumbs(course_name())}
 
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
+  % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
+        var courseId = $('#courseware-search-results').data('courseId');
+        CourseSearchFactory(courseId);
+    </%static:require_module>
+  % endif
 
   <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:
@@ -80,7 +100,7 @@ ${page_title_breadcrumbs(course_name())}
     var $$course_id = "${course.id | escapejs}";
 
     $(function(){
-        $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {
+        $(".ui-accordion-header a, .ui-accordion-content .subtitle-name").each(function() {
           var elemText = $(this).text().replace(/^\s+|\s+$/g,''); // Strip leading and trailing whitespace
           var wordArray = elemText.split(" ");
           var finalTitle = "";
@@ -182,7 +202,6 @@ ${fragment.foot_html()}
 
 </%block>
 
-<%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />
 % else:
@@ -224,6 +243,7 @@ ${fragment.foot_html()}
           % endif
         </nav>
       </div>
+
     </div>
 % endif
     <section class="course-content" id="course-content" role="main" aria-label=“Content”>
@@ -261,6 +281,18 @@ ${fragment.foot_html()}
         privacy_link_start='<a href="/tos#privacy">',
         link_end='</a>'
       )}
+    </div>
+  % endif
+</div>
+<div class="container-footer">
+  % if settings.FEATURES.get("LICENSING", False):
+    <div class="course-license">
+    % if getattr(course, "license", None):
+      <%include file="../license.html" args="license=course.license" />
+    % else:
+      ## Default course license: All Rights Reserved, if none is explicitly set.
+      <%include file="../license.html" args="license='all-rights-reserved'" />
+    % endif
     </div>
   % endif
 </div>

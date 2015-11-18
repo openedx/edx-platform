@@ -1,7 +1,5 @@
 <%!
-import json
 from django.utils.translation import ugettext as _
-from verify_student.views import PayAndVerifyView
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -20,12 +18,9 @@ from verify_student.views import PayAndVerifyView
     % endfor
 </%block>
 <%block name="js_extra">
-  <%static:js group='rwd_header_footer'/>
-  <script src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
-  <script src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
-  <%static:js group='reverify'/>
+  <%static:js group='incourse_reverify'/>
 </%block>
 
 <%block name="content">
@@ -43,9 +38,9 @@ from verify_student.views import PayAndVerifyView
     <div id="incourse-reverify-container"
     class="incourse-reverify"
     data-course-key='${course_key}'
-    data-checkpoint-name='${checkpoint_name}'
     data-platform-name='${platform_name}'
     data-usage-id='${usage_id}'
+    data-capture-sound='${capture_sound}'
   ></div>
   </section>
 </div>

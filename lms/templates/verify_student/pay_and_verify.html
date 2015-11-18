@@ -10,13 +10,13 @@ from verify_student.views import PayAndVerifyView
 
 <%block name="pagetitle">
   % if message_key == PayAndVerifyView.UPGRADE_MSG:
-    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name)}
+    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name) | h}
   % elif message_key == PayAndVerifyView.PAYMENT_CONFIRMATION_MSG:
-    ${_("Receipt For {course_name}").format(course_name=course.display_name)}
+    ${_("Receipt For {course_name}").format(course_name=course.display_name) | h}
   % elif message_key in [PayAndVerifyView.VERIFY_NOW_MSG, PayAndVerifyView.VERIFY_LATER_MSG]:
-    ${_("Verify For {course_name}").format(course_name=course.display_name)}
+    ${_("Verify For {course_name}").format(course_name=course.display_name) | h}
   % else:
-    ${_("Enroll In {course_name}").format(course_name=course.display_name)}
+    ${_("Enroll In {course_name}").format(course_name=course.display_name) | h}
   % endif
 </%block>
 
@@ -24,7 +24,8 @@ from verify_student.views import PayAndVerifyView
     <%
       template_names = (
           ["webcam_photo", "image_input", "error"] +
-          [step['templateName'] for step in display_steps]
+          ["intro_step", "make_payment_step", "payment_confirmation_step"] +
+          ["face_photo_step", "id_photo_step", "review_photos_step", "enrollment_confirmation_step"]
       )
     %>
     % for template_name in template_names:
@@ -34,10 +35,7 @@ from verify_student.views import PayAndVerifyView
     % endfor
 </%block>
 <%block name="js_extra">
-  <%static:js group='rwd_header_footer'/>
-  <script src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
-  <script src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='verify_student'/>
 </%block>
@@ -76,6 +74,14 @@ from verify_student.views import PayAndVerifyView
       data-is-active='${is_active}'
       data-already-verified='${already_verified}'
       data-verification-good-until='${verification_good_until}'
+      data-capture-sound='${capture_sound}'
+
+      # If we reached the verification flow from an in-course checkpoint,
+      # then pass the checkpoint location in so that we can associate
+      # the attempt with the checkpoint on submission.
+      % if checkpoint_location is not None:
+        data-checkpoint-location='${checkpoint_location}'
+      % endif
     ></div>
 
     % if is_active:

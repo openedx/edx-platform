@@ -46,7 +46,7 @@ class WikiAccessMiddleware(object):
 
         # wiki pages are login required
         if not request.user.is_authenticated():
-            return redirect(reverse('accounts_login'), next=request.path)
+            return redirect(reverse('signin_user'), next=request.path)
 
         course_id = course_id_from_url(request.path)
         wiki_path = request.path.partition('/wiki/')[2]

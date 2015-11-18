@@ -14,6 +14,7 @@ import json
 from bson.son import SON
 from opaque_keys.edx.keys import AssetKey
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
+from xmodule.util.misc import escape_invalid_characters
 
 
 class MongoContentStore(ContentStore):
@@ -26,6 +27,10 @@ class MongoContentStore(ContentStore):
         :param collection: ignores but provided for consistency w/ other doc_store_config patterns
         """
         logging.debug('Using MongoDB for static content serving at host={0} port={1} db={2}'.format(host, port, db))
+
+        # Remove the replicaSet parameter.
+        kwargs.pop('replicaSet', None)
+
         _db = pymongo.database.Database(
             pymongo.MongoClient(
                 host=host,
@@ -127,15 +132,19 @@ class MongoContentStore(ContentStore):
     def export(self, location, output_directory):
         content = self.find(location)
 
+        filename = content.name
         if content.import_path is not None:
             output_directory = output_directory + '/' + os.path.dirname(content.import_path)
 
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
 
+        # Escape invalid char from filename.
+        export_name = escape_invalid_characters(name=filename, invalid_char_list=['/', '\\'])
+
         disk_fs = OSFS(output_directory)
 
-        with disk_fs.open(content.name, 'wb') as asset_file:
+        with disk_fs.open(export_name, 'wb') as asset_file:
             asset_file.write(content.data)
 
     def export_all_for_course(self, course_key, output_directory, assets_policy_file):
@@ -393,7 +402,8 @@ class MongoContentStore(ContentStore):
             sparse=True
         )
         self.fs_files.create_index(
-            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('content_son.name', pymongo.ASCENDING)],
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING),
+             ('content_son.name', pymongo.ASCENDING)],
             sparse=True
         )
         self.fs_files.create_index(
@@ -405,11 +415,13 @@ class MongoContentStore(ContentStore):
             sparse=True
         )
         self.fs_files.create_index(
-            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('uploadDate', pymongo.ASCENDING)],
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING),
+             ('uploadDate', pymongo.ASCENDING)],
             sparse=True
         )
         self.fs_files.create_index(
-            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('display_name', pymongo.ASCENDING)],
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING),
+             ('display_name', pymongo.ASCENDING)],
             sparse=True
         )
 

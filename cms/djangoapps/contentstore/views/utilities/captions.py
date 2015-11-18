@@ -5,12 +5,12 @@ import json
 import logging
 import os
 
-from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 from opaque_keys import InvalidKeyError

@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.generic.base import TemplateView
 from django.views.decorators.http import condition
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
 from path import path
@@ -43,14 +43,14 @@ from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
 from instructor_task.models import InstructorTask
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, UserProfile, Registration
 from student.roles import CourseStaffRole, CourseInstructorRole
 import track.views
 from util.json_request import JsonResponse
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml import XMLModuleStore
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 
 log = logging.getLogger(__name__)
 
@@ -67,8 +67,9 @@ class SysadminDashboardView(TemplateView):
         """
 
         self.def_ms = modulestore()
+
         self.is_using_mongo = True
-        if isinstance(self.def_ms, XMLModuleStore):
+        if self.def_ms.get_modulestore_type(None) == 'xml':
             self.is_using_mongo = False
         self.msg = u''
         self.datatable = []
@@ -475,7 +476,7 @@ class Courses(SysadminDashboardView):
 
         msg = u''
 
-        log.debug('Adding course using git repo {0}'.format(gitloc))
+        log.debug('Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
         output = StringIO.StringIO()
@@ -812,7 +813,7 @@ class GitLogs(TemplateView):
             try:
                 course = get_course_by_id(course_id)
             except Exception:  # pylint: disable=broad-except
-                log.info('Cannot find course {0}'.format(course_id))
+                log.info('Cannot find course %s', course_id)
                 raise Http404
 
             # Allow only course team, instructors, and staff
@@ -820,11 +821,11 @@ class GitLogs(TemplateView):
                     CourseInstructorRole(course.id).has_user(request.user) or
                     CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
-            log.debug('course_id={0}'.format(course_id))
+            log.debug('course_id=%s', course_id)
             cilset = CourseImportLog.objects.filter(
                 course_id=course_id
             ).order_by('-created')
-            log.debug('cilset length={0}'.format(len(cilset)))
+            log.debug('cilset length=%s', len(cilset))
 
         # Paginate the query set
         paginator = Paginator(cilset, page_size)

@@ -310,7 +310,8 @@ class SplitTestPosition(ModuleStoreTestCase):
             MagicMock(name='request'),
             self.course,
             mock_field_data_cache,
-            self.course.id
+            self.course.id,
+            course=self.course
         )
 
         # Now that we have the course, change the position and save, nothing should explode!

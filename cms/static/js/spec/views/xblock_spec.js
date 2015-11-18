@@ -1,4 +1,4 @@
-define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/xblock", "js/models/xblock_info",
+define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/xblock", "js/models/xblock_info",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function ($, AjaxHelpers, URI, XBlockView, XBlockInfo) {
 

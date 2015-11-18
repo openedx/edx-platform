@@ -200,6 +200,53 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
+    def test_course_discovery_off(self):
+        """
+        Asserts that the Course Discovery UI elements follow the
+        feature flag settings
+        """
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        # assert that the course discovery UI is not present
+        self.assertNotIn('Search for a course', response.content)
+
+        # check the /courses view
+        response = self.client.get(reverse('branding.views.courses'))
+        self.assertEqual(response.status_code, 200)
+
+        # assert that the course discovery UI is not present
+        self.assertNotIn('Search for a course', response.content)
+        self.assertNotIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
+
+        # make sure we have the special css class on the section
+        self.assertIn('<div class="courses no-course-discovery"', response.content)
+
+    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
+    def test_course_discovery_on(self):
+        """
+        Asserts that the Course Discovery UI elements follow the
+        feature flag settings
+        """
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        # assert that the course discovery UI is not present
+        self.assertIn('Search for a course', response.content)
+
+        # check the /courses view
+        response = self.client.get(reverse('branding.views.courses'))
+        self.assertEqual(response.status_code, 200)
+
+        # assert that the course discovery UI is present
+        self.assertIn('Search for a course', response.content)
+        self.assertIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
+        self.assertIn('<div class="courses"', response.content)
+
+    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     @patch.dict(settings.FEATURES, {'ENABLE_COURSE_SORTING_BY_START_DATE': True})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
@@ -226,6 +273,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_start_date_disabled(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)

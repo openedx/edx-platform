@@ -250,9 +250,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
         # policy to be loaded.  For now, just add the course_id here...
-        def load_item(usage_key):
+        def load_item(usage_key, for_parent=None):
             """Return the XBlock for the specified location"""
-            return xmlstore.get_item(usage_key)
+            return xmlstore.get_item(usage_key, for_parent=for_parent)
 
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
@@ -866,7 +866,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         :return: list of course locations
         """
         courses = self.get_courses()
-        return [course.location.course_key for course in courses if (course.wiki_slug == wiki_slug)]
+        return [course.location.course_key for course in courses if course.wiki_slug == wiki_slug]
 
     def heartbeat(self):
         """

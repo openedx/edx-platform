@@ -10,24 +10,26 @@ import requests
 from datetime import datetime
 import dateutil.parser
 from lazy import lazy
-from base64 import b32encode
 
+from xmodule import course_metadata_utils
+from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.exceptions import UndefinedContext
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
+from xmodule.mixin import LicenseMixin
 import json
 
+from xblock.core import XBlock
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
+
 
 log = logging.getLogger(__name__)
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
-
-DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
@@ -116,7 +118,7 @@ class Textbook(object):
             pass
 
         # Get the table of contents from S3
-        log.info("Retrieving textbook table of contents from %s" % toc_url)
+        log.info("Retrieving textbook table of contents from %s", toc_url)
         try:
             r = requests.get(toc_url)
         except Exception as err:
@@ -174,17 +176,22 @@ class CourseFields(object):
         help=_('Enter the passports for course LTI tools in the following format: "id:client_key:client_secret".'),
         scope=Scope.settings
     )
-    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
-                             default=[], scope=Scope.content)
+    textbooks = TextbookList(
+        help=_("List of pairs of (title, url) for textbooks used in this course"),
+        default=[],
+        scope=Scope.content
+    )
 
-    wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
+    wiki_slug = String(help=_("Slug that points to the wiki for this course"), scope=Scope.content)
     enable_enrollment_email = Boolean(help="Whether to send notification email upon enrollment or not", default=False, scope=Scope.settings)
-    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
-    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
-    start = Date(help="Start time when this module is visible",
-                 default=DEFAULT_START_DATE,
-                 scope=Scope.settings)
-    end = Date(help="Date that this class ends", scope=Scope.settings)
+    enrollment_start = Date(help=_("Date that enrollment for this class is opened"), scope=Scope.settings)
+    enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
+    start = Date(
+        help=_("Start time when this module is visible"),
+        default=DEFAULT_START_DATE,
+        scope=Scope.settings
+    )
+    end = Date(help=_("Date that this class ends"), scope=Scope.settings)
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
         help=_(
@@ -208,7 +215,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     grading_policy = Dict(
-        help="Grading policy definition for this class",
+        help=_("Grading policy definition for this class"),
         default={
             "GRADER": [
                 {
@@ -378,6 +385,21 @@ class CourseFields(object):
             "Enter the remote gradebook mapping. Only use this setting when "
             "REMOTE_GRADEBOOK_URL has been specified."
         ),
+        scope=Scope.settings
+    )
+    enable_ccx = Boolean(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+        # his students.
+        display_name=_("Enable CCX"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+        # his students.
+        help=_(
+            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
+            " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
+        ),
+        default=False,
         scope=Scope.settings
     )
     allow_anonymous = Boolean(
@@ -698,10 +720,18 @@ class CourseFields(object):
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
-
+    issue_badges = Boolean(
+        display_name=_("Issue Open Badges"),
+        help=_(
+            "Issue Open Badges badges for this course. Badges are generated when certificates are created."
+        ),
+        scope=Scope.settings,
+        default=True
+    )
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the short name of the course to use on the certificate that "
             "students receive when they complete the course."
         ),
@@ -711,6 +741,7 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the long name of the course to use on the certificate that students "
             "receive when they complete the course."
         ),
@@ -718,11 +749,26 @@ class CourseFields(object):
         scope=Scope.settings,
         default=""
     )
+    cert_html_view_enabled = Boolean(
+        display_name=_("Certificate Web/HTML View Enabled"),
+        help=_("If true, certificate Web/HTML views are enabled for the course."),
+        scope=Scope.settings,
+        default=False,
+    )
     cert_html_view_overrides = Dict(
         # Translators: This field is the container for course-specific certifcate configuration values
         display_name=_("Certificate Web/HTML View Overrides"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific overrides for the Web/HTML template parameters here (JSON format)"),
+        scope=Scope.settings,
+    )
+
+    # Specific certificate information managed via Studio (should eventually fold other cert settings into this)
+    certificates = Dict(
+        # Translators: This field is the container for course-specific certifcate configuration values
+        display_name=_("Certificate Configuration"),
+        # Translators: These overrides allow for an alternative configuration of the certificate web view
+        help=_("Enter course-specific configuration information here (JSON format)"),
         scope=Scope.settings,
     )
 
@@ -881,6 +927,12 @@ class CourseFields(object):
         default=None,
         scope=Scope.settings,
     )
+    language = String(
+        display_name=_("Course Language"),
+        help=_("Specify the language of your course."),
+        default=None,
+        scope=Scope.settings
+    )
 
     teams_configuration = Dict(
         display_name=_("Teams Configuration"),
@@ -888,7 +940,27 @@ class CourseFields(object):
             "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
             "topics is a list of topics."
         ),
+        scope=Scope.settings,
+        deprecated=True,  # Deprecated until the teams feature is made generally available
+    )
+
+    enable_proctored_exams = Boolean(
+        display_name=_("Enable Proctored Exams"),
+        help=_(
+            "Enter true or false. If this value is true, timed and proctored exams are enabled in your course."
+        ),
+        default=False,
         scope=Scope.settings
+    )
+
+    minimum_grade_credit = Float(
+        display_name=_("Minimum Grade for Credit"),
+        help=_(
+            "The minimum grade that a learner must earn to receive credit in the course, "
+            "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
+        ),
+        default=0.8,
+        scope=Scope.settings,
     )
 
 
@@ -900,7 +972,10 @@ class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-me
     """
 
 
-class CourseDescriptor(CourseFields, SequenceDescriptor):
+class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
+    """
+    The descriptor for the course XModule
+    """
     module_class = CourseModule
 
     def __init__(self, *args, **kwargs):
@@ -980,7 +1055,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     policy_str = grading_policy_file.read()
                     # if we successfully read the file, stop looking at backups
                     break
-            except (IOError):
+            except IOError:
                 msg = "Unable to load course settings file from '{0}'".format(policy_path)
                 log.warning(msg)
 
@@ -1031,9 +1106,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             xml_object.remove(wiki_tag)
 
         definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
-
         definition['textbooks'] = textbooks
         definition['wiki_slug'] = wiki_slug
+
+        # load license if it exists
+        definition = LicenseMixin.parse_license_from_xml(definition, xml_object)
 
         return definition, children
 
@@ -1053,6 +1130,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             wiki_xml_object.set('slug', self.wiki_slug)
             xml_object.append(wiki_xml_object)
 
+        # handle license specifically. Default the course to have a license
+        # of "All Rights Reserved", if a license is not explicitly set.
+        self.add_license_to_xml(xml_object, default="all-rights-reserved")
+
         return xml_object
 
     def has_ended(self):
@@ -1060,20 +1141,20 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Returns True if the current time is after the specified course end date.
         Returns False if there is no end date specified.
         """
-        if self.end is None:
-            return False
-
-        return datetime.now(UTC()) > self.end
+        return course_metadata_utils.has_course_ended(self.end)
 
     def may_certify(self):
         """
-        Return True if it is acceptable to show the student a certificate download link
+        Return whether it is acceptable to show the student a certificate download link.
         """
-        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
-        return show_early or self.has_ended()
+        return course_metadata_utils.may_certify_for_course(
+            self.certificates_display_behavior,
+            self.certificates_show_before_end,
+            self.has_ended()
+        )
 
     def has_started(self):
-        return datetime.now(UTC()) > self.start
+        return course_metadata_utils.has_course_started(self.start)
 
     @property
     def grader(self):
@@ -1287,11 +1368,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         except UndefinedContext:
             module = self
 
+        def possibly_scored(usage_key):
+            """Can this XBlock type can have a score or children?"""
+            return usage_key.block_type in self.block_types_affecting_grading
+
         all_descriptors = []
         graded_sections = {}
 
         def yield_descriptor_descendents(module_descriptor):
-            for child in module_descriptor.get_children():
+            for child in module_descriptor.get_children(usage_key_filter=possibly_scored):
                 yield child
                 for module_descriptor in yield_descriptor_descendents(child):
                     yield module_descriptor
@@ -1317,6 +1402,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return {'graded_sections': graded_sections,
                 'all_descriptors': all_descriptors, }
 
+    @lazy
+    def block_types_affecting_grading(self):
+        """Return all block types that could impact grading (i.e. scored, or having children)."""
+        return frozenset(
+            cat for (cat, xblock_class) in XBlock.load_classes() if (
+                getattr(xblock_class, 'has_score', False) or getattr(xblock_class, 'has_children', False)
+            )
+        )
+
     @staticmethod
     def make_id(org, course, url_name):
         return '/'.join([org, course, url_name])
@@ -1332,36 +1426,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         then falls back to .start
         """
         i18n = self.runtime.service(self, "i18n")
-        _ = i18n.ugettext
-        strftime = i18n.strftime
-
-        def try_parse_iso_8601(text):
-            try:
-                result = Date().from_json(text)
-                if result is None:
-                    result = text.title()
-                else:
-                    result = strftime(result, format_string)
-                    if format_string == "DATE_TIME":
-                        result = self._add_timezone_string(result)
-            except ValueError:
-                result = text.title()
-
-            return result
-
-        if isinstance(self.advertised_start, basestring):
-            return try_parse_iso_8601(self.advertised_start)
-        elif self.start_date_is_still_default:
-            # Translators: TBD stands for 'To Be Determined' and is used when a course
-            # does not yet have an announced start date.
-            return _('TBD')
-        else:
-            when = self.advertised_start or self.start
-
-            if format_string == "DATE_TIME":
-                return self._add_timezone_string(strftime(when, format_string))
-
-            return strftime(when, format_string)
+        return course_metadata_utils.course_start_datetime_text(
+            self.start,
+            self.advertised_start,
+            format_string,
+            i18n.ugettext,
+            i18n.strftime
+        )
 
     @property
     def start_date_is_still_default(self):
@@ -1369,47 +1440,69 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Checks if the start date set for the course is still default, i.e. .start has not been modified,
         and .advertised_start has not been set.
         """
-        return self.advertised_start is None and self.start == CourseFields.start.default
+        return course_metadata_utils.course_start_date_is_default(
+            self.start,
+            self.advertised_start
+        )
 
     def end_datetime_text(self, format_string="SHORT_DATE"):
         """
         Returns the end date or date_time for the course formatted as a string.
+        """
+        return course_metadata_utils.course_end_datetime_text(
+            self.end,
+            format_string,
+            self.runtime.service(self, "i18n").strftime
+        )
 
-        If the course does not have an end date set (course.end is None), an empty string will be returned.
+    def get_discussion_blackout_datetimes(self):
         """
-        if self.end is None:
-            return ''
-        else:
-            strftime = self.runtime.service(self, "i18n").strftime
-            date_time = strftime(self.end, format_string)
-            return date_time if format_string == "SHORT_DATE" else self._add_timezone_string(date_time)
-
-    def _add_timezone_string(self, date_time):
+        Get a list of dicts with start and end fields with datetime values from
+        the discussion_blackouts setting
         """
-        Adds 'UTC' string to the end of start/end date and time texts.
-        """
-        return date_time + u" UTC"
+        date_proxy = Date()
+        try:
+            ret = [
+                {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
+                for start, end
+                in filter(None, self.discussion_blackouts)
+            ]
+            for blackout in ret:
+                if not blackout["start"] or not blackout["end"]:
+                    raise ValueError
+            return ret
+        except (TypeError, ValueError):
+            log.exception(
+                "Error parsing discussion_blackouts %s for course %s",
+                self.discussion_blackouts,
+                self.id
+            )
+            return []
 
     @property
     def forum_posts_allowed(self):
-        date_proxy = Date()
-        try:
-            blackout_periods = [(date_proxy.from_json(start),
-                                 date_proxy.from_json(end))
-                                for start, end
-                                in filter(None, self.discussion_blackouts)]
-            now = datetime.now(UTC())
-            for start, end in blackout_periods:
-                if start <= now <= end:
-                    return False
-        except:
-            log.exception("Error parsing discussion_blackouts %s for course %s", self.discussion_blackouts, self.id)
-
+        """
+        Return whether forum posts are allowed by the discussion_blackouts
+        setting
+        """
+        blackouts = self.get_discussion_blackout_datetimes()
+        now = datetime.now(UTC())
+        for blackout in blackouts:
+            if blackout["start"] <= now <= blackout["end"]:
+                return False
         return True
 
     @property
     def number(self):
-        return self.location.course
+        """
+        Returns this course's number.
+
+        This is a "number" in the sense of the "course numbers" that you see at
+        lots of universities. For example, given a course
+        "Intro to Computer Science" with the course key "edX/CS-101/2014", the
+        course number would be "CS-101"
+        """
+        return course_metadata_utils.number_for_course_location(self.location)
 
     @property
     def display_number_with_default(self):
@@ -1450,9 +1543,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Returns a unique deterministic base32-encoded ID for the course.
         The optional padding_char parameter allows you to override the "=" character used for padding.
         """
-        return "course_{}".format(
-            b32encode(unicode(self.location.course_key)).replace('=', padding_char)
-        )
+        return course_metadata_utils.clean_course_key(self.location.course_key, padding_char)
 
     @property
     def teams_enabled(self):

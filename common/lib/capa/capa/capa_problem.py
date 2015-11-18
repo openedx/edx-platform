@@ -574,6 +574,15 @@ class LoncapaProblem(object):
             log.warning("Could not find matching input for id: %s", input_id)
             return {}
 
+    @property
+    def has_multi_device_support(self):
+        """
+        Returns whether this capa problem has multi-device support.
+        """
+        return all(
+            responder.multi_device_support for responder in self.responders.values()
+        )
+
     # ======= Private Methods Below ========
 
     def _process_includes(self):
@@ -624,7 +633,7 @@ class LoncapaProblem(object):
                 parent = inc.getparent()
                 parent.insert(parent.index(inc), incxml)
                 parent.remove(inc)
-                log.debug('Included %s into %s' % (filename, self.problem_id))
+                log.debug('Included %s into %s', filename, self.problem_id)
 
     def _extract_system_path(self, script):
         """
@@ -846,7 +855,7 @@ class LoncapaProblem(object):
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
             inputfields = tree.xpath(
-                "|".join(['//' + response.tag + '[@id=$id]//' + x for x in (input_tags + solution_tags)]),
+                "|".join(['//' + response.tag + '[@id=$id]//' + x for x in input_tags + solution_tags]),
                 id=response_id_str
             )
 

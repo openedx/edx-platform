@@ -84,7 +84,7 @@ PROBLEM_DICT = {
             'answer': 'correct string'},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'numerical': {
         'factory': NumericalResponseXMLFactory(),
@@ -95,7 +95,7 @@ PROBLEM_DICT = {
             'math_display': True},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'formula': {
         'factory': FormulaResponseXMLFactory(),
@@ -108,7 +108,7 @@ PROBLEM_DICT = {
             'answer': 'x^2+2*x+y'},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'script': {
         'factory': CustomResponseXMLFactory(),
@@ -129,7 +129,7 @@ PROBLEM_DICT = {
             """)},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'code': {
         'factory': CodeResponseXMLFactory(),
@@ -356,7 +356,7 @@ def add_problem_to_course(course, problem_type, extra_meta=None):
     Add a problem to the course we have created using factories.
     '''
 
-    assert(problem_type in PROBLEM_DICT)
+    assert problem_type in PROBLEM_DICT
 
     # Generate the problem XML using capa.tests.response_xml_factory
     factory_dict = PROBLEM_DICT[problem_type]

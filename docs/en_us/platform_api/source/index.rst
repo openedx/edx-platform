@@ -24,6 +24,7 @@ Supported APIs
 
     enrollment/index
     mobile/index
+    profile_images/index
     user/index
 
 ******************

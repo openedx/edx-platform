@@ -7,7 +7,6 @@ import logging
 from dogapi import dog_stats_api
 import datetime
 
-from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.contrib.auth.models import User
@@ -17,7 +16,9 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.core.mail import send_mail
+from django.views.decorators.csrf import ensure_csrf_cookie
 
+from student.helpers import get_next_url_for_login_page
 from student.models import Registration
 import student
 from cme_registration.models import CmeUserProfile
@@ -171,7 +172,7 @@ def cme_create_account(request, post_override=None):
     login(request, login_user)
     request.session.set_expiry(0)
 
-    redirect_url = student.views.try_change_enrollment(request)
+    redirect_url = get_next_url_for_login_page(request)
     dog_stats_api.increment("common.student.successful_login")
 
     json_string = {'success': True,
@@ -327,7 +328,7 @@ def validate_birth_date_format(post_vars):
         error['field'] = 'birth_date'
         return error
 
-    dummy_year = 2013
+    dummy_year = 2012 # Set to 2012 as it was a leap year, which allows people to be born on Feb 29
     try:
         dateobj = datetime.date(dummy_year, int(date_parts[0]), int(date_parts[1]))
     except ValueError, e:

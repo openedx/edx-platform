@@ -1,20 +1,22 @@
-define(["backbone", "underscore", "gettext", "js/models/validation_helpers"],
-    function(Backbone, _, gettext, ValidationHelpers) {
+define(["backbone", "underscore", "gettext", "js/models/validation_helpers", "js/utils/date_utils"],
+    function(Backbone, _, gettext, ValidationHelpers, DateUtils) {
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
         org : '',
         course_id: '',
         run: '',
-        start_date: null,   // maps to 'start'
-        end_date: null,     // maps to 'end'
+        language: '',
+        start_date: null,	// maps to 'start'
+        end_date: null,		// maps to 'end'
         enrollment_start: null,
         enrollment_end: null,
         syllabus: null,
         short_description: "",
         overview: "",
         intro_video: null,
-        effort: null,   // an int or null,
+        effort: null,	// an int or null,
+        license: null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
         enable_enrollment_email: false,
@@ -27,14 +29,21 @@ var CourseDetails = Backbone.Model.extend({
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
         var errors = {};
+        newattrs = DateUtils.convertDateStringsToObjects(
+            newattrs, ["start_date", "end_date", "enrollment_start", "enrollment_end"]
+        );
+
         if (newattrs.start_date === null) {
             errors.start_date = gettext("The course must have an assigned start date.");
         }
+        if (this.hasChanged("start_date") && this.get("has_cert_config") === false){
+            errors.start_date = gettext("The course must have at least one active certificate configuration before it can be started.");
+        }
         if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
-            errors.end_date = gettext("The course end date cannot be before the course start date.");
+            errors.end_date = gettext("The course end date must be later than the course start date.");
         }
         if (newattrs.start_date && newattrs.enrollment_start && newattrs.start_date < newattrs.enrollment_start) {
-            errors.enrollment_start = gettext("The course start date cannot be before the enrollment start date.");
+            errors.enrollment_start = gettext("The course start date must be later than the enrollment start date.");
         }
         if (newattrs.enrollment_start && newattrs.enrollment_end && newattrs.enrollment_start >= newattrs.enrollment_end) {
             errors.enrollment_end = gettext("The enrollment start date cannot be after the enrollment end date.");

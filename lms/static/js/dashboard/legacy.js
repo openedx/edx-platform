@@ -37,7 +37,6 @@
             notifications.focus();
         }
 
-        $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
         $('.action-more').bind('click', toggleCourseActionsDropdown);
 
         // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
@@ -78,19 +77,6 @@
             properties.label = $el.data('course-id');
 
             return properties;
-        }
-
-        function toggleExpandMessage(event) {
-            var course = $(event.target).closest('.message-upsell').find('.action-upgrade').data('course-id');
-
-            event.preventDefault();
-
-            $(this).closest('.message.is-expandable').toggleClass('is-expanded');
-
-            window.analytics.track('edx.bi.dashboard.upgrade_copy.expanded', {
-                category: 'upgrade',
-                label: course
-            });
         }
 
         function toggleCourseActionsDropdown(event) {

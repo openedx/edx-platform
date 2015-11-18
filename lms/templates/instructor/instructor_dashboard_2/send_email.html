@@ -9,9 +9,12 @@
     <li class="field">
       <label for="id_to">${_("Send to:")}</label><br/>
       <select id="id_to" name="send_to">
-      % for to_option in section_data['to_options']:
-        <option value="${to_option[0]}">${_(to_option[1])}</option>
-      % endfor
+        <option value="myself">${_("Myself")}</option>
+        <option value="staff">${_("Staff and admins")}</option>
+      <option value="all">${_("All (students, staff, and admins)")}</option>
+        % for to_option in section_data['to_options']:
+          <option value="${to_option[0]}">${_(to_option[1])}</option>
+        % endfor
       </select>
     </li>
   <br/>
@@ -52,7 +55,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <h2> ${_("Pending Tasks")} </h2>
     <div class="running-tasks-section">
       <p>${_("Email actions run in the background. The status for any active tasks - including email tasks - appears in a table below.")} </p>
       <br />

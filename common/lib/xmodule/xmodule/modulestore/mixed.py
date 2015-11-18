@@ -281,6 +281,21 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return courses.values()
 
     @strip_key
+    def get_courses_keys(self, **kwargs):
+        '''
+        Returns a list containing the top level XModuleDescriptors keys of the courses in this modulestore.
+        '''
+        courses = {}
+        for store in self.modulestores:
+            # filter out ones which were fetched from earlier stores but locations may not be ==
+            for course in store.get_courses(**kwargs):
+                course_id = self._clean_locator_for_mapping(course.id)
+                if course_id not in courses:
+                    # course is indeed unique. save it in result
+                    courses[course_id] = course
+        return courses.keys()
+
+    @strip_key
     def get_libraries(self, **kwargs):
         """
         Returns a list containing the top level XBlock of the libraries (LibraryRoot) in this modulestore.
@@ -586,7 +601,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         # first make sure an existing course doesn't already exist in the mapping
         course_key = self.make_course_key(org, course, run)
-        if course_key in self.mappings:
+        if course_key in self.mappings and self.mappings[course_key].has_course(course_key):
             raise DuplicateCourseError(course_key, course_key)
 
         # create the course

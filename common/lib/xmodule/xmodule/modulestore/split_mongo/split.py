@@ -127,6 +127,7 @@ class SplitBulkWriteRecord(BulkOpsRecord):
         self.modules = defaultdict(dict)
         self.definitions = {}
         self.definitions_in_db = set()
+        self.course_key = None
 
     # TODO: This needs to track which branches have actually been modified/versioned,
     # so that copying one branch to another doesn't update the original branch.
@@ -228,8 +229,9 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
         # Ensure that any edits to the index don't pollute the initial_index
         bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
+        bulk_write_record.course_key = course_key
 
-    def _end_outermost_bulk_operation(self, bulk_write_record, structure_key, emit_signals=True):
+    def _end_outermost_bulk_operation(self, bulk_write_record, structure_key):
         """
         End the active bulk write operation on structure_key (course or library key).
         """
@@ -241,7 +243,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             dirty = True
 
             try:
-                self.db_connection.insert_structure(bulk_write_record.structures[_id])
+                self.db_connection.insert_structure(bulk_write_record.structures[_id], bulk_write_record.course_key)
             except DuplicateKeyError:
                 # We may not have looked up this structure inside this bulk operation, and thus
                 # didn't realize that it was already in the database. That's OK, the store is
@@ -252,7 +254,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             dirty = True
 
             try:
-                self.db_connection.insert_definition(bulk_write_record.definitions[_id])
+                self.db_connection.insert_definition(bulk_write_record.definitions[_id], bulk_write_record.course_key)
             except DuplicateKeyError:
                 # We may not have looked up this definition inside this bulk operation, and thus
                 # didn't realize that it was already in the database. That's OK, the store is
@@ -263,13 +265,15 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             dirty = True
 
             if bulk_write_record.initial_index is None:
-                self.db_connection.insert_course_index(bulk_write_record.index)
+                self.db_connection.insert_course_index(bulk_write_record.index, bulk_write_record.course_key)
             else:
-                self.db_connection.update_course_index(bulk_write_record.index, from_index=bulk_write_record.initial_index)
+                self.db_connection.update_course_index(
+                    bulk_write_record.index,
+                    from_index=bulk_write_record.initial_index,
+                    course_context=bulk_write_record.course_key
+                )
 
-        if dirty and emit_signals:
-            self.send_bulk_published_signal(bulk_write_record, structure_key)
-            self.send_bulk_library_updated_signal(bulk_write_record, structure_key)
+        return dirty
 
     def get_course_index(self, course_key, ignore_case=False):
         """
@@ -294,7 +298,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if bulk_write_record.active:
             bulk_write_record.index = index_entry
         else:
-            self.db_connection.insert_course_index(index_entry)
+            self.db_connection.insert_course_index(index_entry, course_key)
 
     def update_course_index(self, course_key, updated_index_entry):
         """
@@ -308,7 +312,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
         else:
-            self.db_connection.update_course_index(updated_index_entry)
+            self.db_connection.update_course_index(updated_index_entry, course_key)
 
     def get_structure(self, course_key, version_guid):
         bulk_write_record = self._get_bulk_ops_record(course_key)
@@ -317,7 +321,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
             # The structure hasn't been loaded from the db yet, so load it
             if structure is None:
-                structure = self.db_connection.get_structure(version_guid)
+                structure = self.db_connection.get_structure(version_guid, course_key)
                 bulk_write_record.structures[version_guid] = structure
                 if structure is not None:
                     bulk_write_record.structures_in_db.add(version_guid)
@@ -326,7 +330,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         else:
             # cast string to ObjectId if necessary
             version_guid = course_key.as_object_id(version_guid)
-            return self.db_connection.get_structure(version_guid)
+            return self.db_connection.get_structure(version_guid, course_key)
 
     def update_structure(self, course_key, structure):
         """
@@ -338,7 +342,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if bulk_write_record.active:
             bulk_write_record.structures[structure['_id']] = structure
         else:
-            self.db_connection.insert_structure(structure)
+            self.db_connection.insert_structure(structure, course_key)
 
     def get_cached_block(self, course_key, version_guid, block_id):
         """
@@ -387,7 +391,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
             # The definition hasn't been loaded from the db yet, so load it
             if definition is None:
-                definition = self.db_connection.get_definition(definition_guid)
+                definition = self.db_connection.get_definition(definition_guid, course_key)
                 bulk_write_record.definitions[definition_guid] = definition
                 if definition is not None:
                     bulk_write_record.definitions_in_db.add(definition_guid)
@@ -396,7 +400,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         else:
             # cast string to ObjectId if necessary
             definition_guid = course_key.as_object_id(definition_guid)
-            return self.db_connection.get_definition(definition_guid)
+            return self.db_connection.get_definition(definition_guid, course_key)
 
     def get_definitions(self, course_key, ids):
         """
@@ -424,7 +428,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         if len(ids):
             # Query the db for the definitions.
-            defs_from_db = self.db_connection.get_definitions(list(ids))
+            defs_from_db = self.db_connection.get_definitions(list(ids), course_key)
             # Add the retrieved definitions to the cache.
             bulk_write_record.definitions.update({d.get('_id'): d for d in defs_from_db})
             definitions.extend(defs_from_db)
@@ -439,7 +443,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if bulk_write_record.active:
             bulk_write_record.definitions[definition['_id']] = definition
         else:
-            self.db_connection.insert_definition(definition)
+            self.db_connection.insert_definition(definition, course_key)
 
     def version_structure(self, course_key, structure, user_id):
         """
@@ -664,6 +668,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         if user_service is not None:
             self.services["user"] = user_service
+
+        if self.request_cache is not None:
+            self.services["request_cache"] = self.request_cache
 
         self.signal_handler = signal_handler
 
@@ -1206,7 +1213,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': course['edited_on']
         }
 
-    def get_definition_history_info(self, definition_locator):
+    def get_definition_history_info(self, definition_locator, course_context=None):
         """
         Because xblocks doesn't give a means to separate the definition's meta information from
         the usage xblock's, this method will get that info for the definition
@@ -1220,7 +1227,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
             raise ItemNotFoundError(definition_locator)
 
-        definition = self.db_connection.get_definition(definition_locator.definition_id)
+        definition = self.db_connection.get_definition(definition_locator.definition_id, course_context)
         if definition is None:
             return None
         return definition['edit_info']
@@ -1488,7 +1495,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             partitioned_fields = self.partition_fields_by_scope(block_type, fields)
             new_def_data = partitioned_fields.get(Scope.content, {})
             # persist the definition if persisted != passed
-            if (definition_locator is None or isinstance(definition_locator.definition_id, LocalId)):
+            if definition_locator is None or isinstance(definition_locator.definition_id, LocalId):
                 definition_locator = self.create_definition_from_data(course_key, new_def_data, block_type, user_id)
             elif new_def_data:
                 definition_locator, _ = self.update_definition_from_data(course_key, definition_locator, new_def_data, user_id)
@@ -1868,6 +1875,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 block_data.fields = settings
 
                 new_id = new_structure['_id']
+
+                # source_version records which revision a block was copied from. In this method, we're updating
+                # the block, so it's no longer a direct copy, and we can remove the source_version reference.
+                block_data.edit_info.source_version = None
+
                 self.version_block(block_data, user_id, new_id)
                 self.update_structure(course_key, new_structure)
                 # update the index entry if appropriate
@@ -2270,8 +2282,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         Returns the new set of BlockKeys that are the new descendants of the block with key 'block_key'
         """
-        # pylint: disable=no-member
-        # ^-- Until pylint gets namedtuple support, it will give warnings about BlockKey attributes
         new_blocks = set()
 
         new_children = list()  # ordered list of the new children of new_parent_block_key
@@ -2385,6 +2395,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 parent_block.edit_info.edited_by = user_id
                 parent_block.edit_info.previous_version = parent_block.edit_info.update_version
                 parent_block.edit_info.update_version = new_id
+                # remove the source_version reference
+                parent_block.edit_info.source_version = None
                 self.decache_block(usage_locator.course_key, new_id, parent_block_key)
 
             self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_blocks)
@@ -2428,6 +2440,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # We do NOT call the super class here since we need to keep the assets
         # in case the course is later restored.
         # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
+
+        self._emit_course_deleted_signal(course_key)
 
     @contract(block_map="dict(BlockKey: dict)", block_key=BlockKey)
     def inherit_settings(
@@ -2756,7 +2770,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 course_key.version_guid is None or
                 index_entry['versions'][course_key.branch] == course_key.version_guid
             )
-            if (is_head or force):
+            if is_head or force:
                 return index_entry
             else:
                 raise VersionConflictError(
@@ -2962,8 +2976,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 if getattr(destination_block.edit_info, key) is None:
                     setattr(destination_block.edit_info, key, val)
 
-        # introduce new edit info field for tracing where copied/published blocks came
-        destination_block.edit_info.source_version = new_block.edit_info.update_version
+        # If the block we are copying from was itself a copy, then just
+        # reference the original source, rather than the copy.
+        destination_block.edit_info.source_version = (
+            new_block.edit_info.source_version or new_block.edit_info.update_version
+        )
 
         if blacklist != EXCLUDE_ALL:
             for child in destination_block.fields.get('children', []):
@@ -3084,6 +3101,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             render_template=self.render_template,
             mixins=self.xblock_mixins,
             select=self.xblock_select,
+            disabled_xblock_types=self.disabled_xblock_types,
             services=self.services,
         )
 

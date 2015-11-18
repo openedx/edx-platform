@@ -13,7 +13,25 @@ def create_tracking_context(user):
     }
 
 
+def is_commerce_service_configured():
+    """
+    Return a Boolean indicating whether or not configuration is present to use
+    the external commerce service.
+    """
+    return bool(settings.ECOMMERCE_API_URL and settings.ECOMMERCE_API_SIGNING_KEY)
+
+
 def ecommerce_api_client(user):
     """ Returns an E-Commerce API client setup with authentication for the specified user. """
-    return EcommerceApiClient(settings.ECOMMERCE_API_URL, settings.ECOMMERCE_API_SIGNING_KEY, user.username,
-                              user.email, tracking_context=create_tracking_context(user))
+    return EcommerceApiClient(settings.ECOMMERCE_API_URL,
+                              settings.ECOMMERCE_API_SIGNING_KEY,
+                              user.username,
+                              user.profile.name,
+                              user.email,
+                              tracking_context=create_tracking_context(user),
+                              issuer=settings.JWT_ISSUER,
+                              expires_in=settings.JWT_EXPIRATION)
+
+
+# this is here to support registering the signals in signals.py
+from commerce import signals  # pylint: disable=unused-import

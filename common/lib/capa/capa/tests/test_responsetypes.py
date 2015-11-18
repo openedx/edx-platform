@@ -152,6 +152,11 @@ class TrueFalseResponseTest(ResponseTest):
         self.assert_grade(problem, 'choice_foil_4', 'incorrect')
         self.assert_grade(problem, 'not_a_choice', 'incorrect')
 
+    def test_single_correct_response(self):
+        problem = self.build_problem(choices=[True, False])
+        self.assert_grade(problem, 'choice_0', 'correct')
+        self.assert_grade(problem, ['choice_0'], 'correct')
+
 
 class ImageResponseTest(ResponseTest):
     xml_factory_class = ImageResponseXMLFactory

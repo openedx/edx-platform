@@ -79,7 +79,7 @@ def send_request(user, course_id, path="", query_string=None):
     """
     Sends a request with appropriate parameters and headers.
     """
-    url = get_endpoint(path)
+    url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
         "course_id": unicode(course_id).encode("utf-8"),
@@ -139,11 +139,14 @@ def preprocess_collection(user, course, collection):
     cache = {}
     with store.bulk_operations(course.id):
         for model in collection:
-            model.update({
+            update = {
                 u"text": sanitize_html(model["text"]),
                 u"quote": sanitize_html(model["quote"]),
                 u"updated": dateutil_parse(model["updated"]),
-            })
+            }
+            if "tags" in model:
+                update[u"tags"] = [sanitize_html(tag) for tag in model["tags"]]
+            model.update(update)
             usage_id = model["usage_id"]
             if usage_id in cache:
                 model.update(cache[usage_id])
@@ -283,14 +286,19 @@ def get_notes(user, course):
     return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
 
 
-def get_endpoint(path=""):
+def get_endpoint(api_url, path=""):
     """
     Returns edx-notes-api endpoint.
+
+    Arguments:
+        api_url (str): base url to the notes api
+        path (str): path to the resource
+    Returns:
+        str: full endpoint to the notes api
     """
     try:
-        url = settings.EDXNOTES_INTERFACE['url']
-        if not url.endswith("/"):
-            url += "/"
+        if not api_url.endswith("/"):
+            api_url += "/"
 
         if path:
             if path.startswith("/"):
@@ -298,9 +306,19 @@ def get_endpoint(path=""):
             if not path.endswith("/"):
                 path += "/"
 
-        return url + path
+        return api_url + path
     except (AttributeError, KeyError):
         raise ImproperlyConfigured(_("No endpoint was provided for EdxNotes."))
+
+
+def get_public_endpoint(path=""):
+    """Get the full path to a resource on the public notes API."""
+    return get_endpoint(settings.EDXNOTES_PUBLIC_API, path)
+
+
+def get_internal_endpoint(path=""):
+    """Get the full path to a resource on the private notes API."""
+    return get_endpoint(settings.EDXNOTES_INTERNAL_API, path)
 
 
 def get_course_position(course_module):

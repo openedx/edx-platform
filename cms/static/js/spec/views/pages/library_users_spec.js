@@ -1,5 +1,5 @@
 define([
-    "jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helpers",
+    "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/view_helpers",
     "js/factories/manage_users_lib", "js/views/utils/view_utils"
 ],
 function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {

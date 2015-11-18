@@ -58,7 +58,7 @@ class CapaFactoryWithDelay(object):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + cls.answer_key(input_num))
+        return "input_" + cls.answer_key(input_num)
 
     @classmethod
     def answer_key(cls, input_num=2):
@@ -188,9 +188,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (module, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 18, 36)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 18, 36, tzinfo=UTC)
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -202,9 +202,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (module, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 35)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 35, tzinfo=UTC)
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -216,9 +216,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (module, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 36)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 36, tzinfo=UTC)
         )
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
@@ -230,9 +230,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (module, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=UTC)
         )
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
@@ -246,17 +246,17 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         with self.assertRaises(xmodule.exceptions.NotFoundError):
             (module, unused_result) = self.create_and_check(
                 num_attempts=num_attempts,
-                last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+                last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
                 submission_wait_seconds=180,
-                considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0)
+                considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=UTC)
             )
 
         # Now try it without the check_problem
         (module, unused_result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0),
+            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=UTC),
             skip_check_problem=True
         )
         # Expect that number of attempts NOT incremented
@@ -267,9 +267,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (module, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=60 * 60 * 2,
-            considered_now=datetime.datetime(2013, 12, 6, 2, 15, 35)
+            considered_now=datetime.datetime(2013, 12, 6, 2, 15, 35, tzinfo=UTC)
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -281,9 +281,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (module, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=60 * 60 * 2 + 63,
-            considered_now=datetime.datetime(2013, 12, 6, 1, 15, 40)
+            considered_now=datetime.datetime(2013, 12, 6, 1, 15, 40, tzinfo=UTC)
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -295,9 +295,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (module, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=60,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 17, 36)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC)
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented

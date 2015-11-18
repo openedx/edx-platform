@@ -2,6 +2,7 @@
 Tests for paver quality tasks
 """
 import os
+from path import path  # pylint: disable=no-name-in-module
 import tempfile
 import unittest
 from mock import patch, MagicMock, mock_open
@@ -54,6 +55,104 @@ class TestPaverQualityViolations(unittest.TestCase):
             f.write("hello\nhithere")
         num, _violations = pavelib.quality._pep8_violations(f.name)  # pylint: disable=protected-access
         self.assertEqual(num, 2)
+
+
+class TestPaverReportViolationsCounts(unittest.TestCase):
+    """
+    For testing run_jshint and run_complexity utils
+    """
+
+    def setUp(self):
+        super(TestPaverReportViolationsCounts, self).setUp()
+
+        # Mock the paver @needs decorator
+        self._mock_paver_needs = patch.object(pavelib.quality.run_quality, 'needs').start()
+        self._mock_paver_needs.return_value = 0
+
+        # Temporary file infrastructure
+        self.f = tempfile.NamedTemporaryFile(delete=False)
+        self.f.close()
+
+        # Cleanup various mocks and tempfiles
+        self.addCleanup(self._mock_paver_needs.stop)
+        self.addCleanup(os.remove, self.f.name)
+
+    def test_get_jshint_violations_count(self):
+        with open(self.f.name, 'w') as f:
+            f.write("3000 violations found")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, 3000)
+
+    def test_get_violations_no_number_found(self):
+        with open(self.f.name, 'w') as f:
+            f.write("Not expected string regex")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+    def test_get_violations_count_truncated_report(self):
+        """
+        A truncated report (i.e. last line is just a violation)
+        """
+        with open(self.f.name, 'w') as f:
+            f.write("foo/bar/js/fizzbuzz.js: line 45, col 59, Missing semicolon.")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+    def test_complexity_value(self):
+        with open(self.f.name, 'w') as f:
+            f.write("Average complexity: A (1.93953443446)")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, 1.93953443446)
+
+    def test_truncated_complexity_report(self):
+        with open(self.f.name, 'w') as f:
+            f.write("M 110:4 FooBar.default - A")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+    def test_no_complexity_report(self):
+        with self.assertRaises(BuildFailure):
+            pavelib.quality._get_count_from_last_line("non-existent-file", "python_complexity")  # pylint: disable=protected-access
+
+    def test_generic_value(self):
+        """
+        Default behavior is to look for an integer appearing at head of line
+        """
+        with open(self.f.name, 'w') as f:
+            f.write("5.777 good to see you")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, 5)
+
+    def test_generic_value_none_found(self):
+        """
+        Default behavior is to look for an integer appearing at head of line
+        """
+        with open(self.f.name, 'w') as f:
+            f.write("hello 5.777 good to see you")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+
+class TestPrepareReportDir(unittest.TestCase):
+    """
+    Tests the report directory preparation
+    """
+
+    def setUp(self):
+        super(TestPrepareReportDir, self).setUp()
+        self.test_dir = tempfile.mkdtemp()
+        self.test_file = tempfile.NamedTemporaryFile(delete=False, dir=self.test_dir)
+        self.addCleanup(os.removedirs, self.test_dir)
+
+    def test_report_dir_with_files(self):
+        self.assertTrue(os.path.exists(self.test_file.name))
+        pavelib.quality._prepare_report_dir(path(self.test_dir))  # pylint: disable=protected-access
+        self.assertFalse(os.path.exists(self.test_file.name))
+
+    def test_report_dir_without_files(self):
+        os.remove(self.test_file.name)
+        pavelib.quality._prepare_report_dir(path(self.test_dir))  # pylint: disable=protected-access
+        self.assertEqual(os.listdir(path(self.test_dir)), [])
 
 
 class TestPaverRunQuality(unittest.TestCase):

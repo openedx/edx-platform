@@ -299,6 +299,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
     js_module_name = "VerticalDescriptor"
 
+    show_in_read_only_mode = True
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(LibraryContentDescriptor, self).non_editable_metadata_fields
@@ -375,7 +377,6 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         # exactly the same children-- someone may be duplicating an out of date block, after all.
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        # pylint: disable=no-member
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
         self.tools.update_children(self, user_id, user_perms, version=self.source_library_version)

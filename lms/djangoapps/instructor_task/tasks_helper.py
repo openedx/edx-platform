@@ -6,6 +6,7 @@ running state of a course.
 import json
 from collections import OrderedDict
 from datetime import datetime
+from django.conf import settings
 from eventtracking import tracker
 from itertools import chain
 from time import time
@@ -18,21 +19,36 @@ from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
 from django.db import transaction, reset_queries
+from django.db.models import Q
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
+from StringIO import StringIO
+from edxmako.shortcuts import render_to_string
+from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from shoppingcart.models import (
+    PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
+    Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
+)
 
 from track.views import task_track
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
+from xblock.runtime import KvsFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
-
-from certificates.models import CertificateWhitelist, certificate_info_for_user
+from django.utils.translation import ugettext as _
+from certificates.models import (
+    CertificateWhitelist,
+    certificate_info_for_user,
+    CertificateStatuses
+)
+from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
-from courseware.model_data import FieldDataCache
+from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-from instructor_analytics.basic import student_response_rows, enrolled_students_features
+from instructor_analytics.basic import student_response_rows
+from instructor_analytics.basic import enrolled_students_features, list_may_enroll, get_proctored_exam_results
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
@@ -41,17 +57,16 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
-from student.models import CourseEnrollment
 from instructor.utils import collect_anonymous_ora2_data, collect_email_ora2_data, collect_course_forums_data, collect_student_forums_data
+from student.models import CourseEnrollment, CourseAccessRole
 from verify_student.models import SoftwareSecurePhotoVerification
-
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
-
+FILTERED_OUT_ROLES = ['staff', 'instructor', 'finance_admin', 'sales_admin']
 # define values for update functions to use to return status to perform_module_state_update
 UPDATE_STATUS_SUCCEEDED = 'succeeded'
 UPDATE_STATUS_FAILED = 'failed'
@@ -415,7 +430,7 @@ def _get_track_function_for_task(student, xmodule_instance_args=None, source_pag
 
 
 def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args=None,
-                                  grade_bucket_type=None):
+                                  grade_bucket_type=None, course=None):
     """
     Fetches a StudentModule instance for a given `course_id`, `student` object, and `module_descriptor`.
 
@@ -425,6 +440,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     """
     # reconstitute the problem's corresponding XModule:
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
+    student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
 
     # get request-related tracking information from args passthrough, and supplement with task-specific
     # information:
@@ -447,13 +463,15 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     return get_module_for_descriptor_internal(
         user=student,
         descriptor=module_descriptor,
-        field_data_cache=field_data_cache,
+        student_data=student_data,
         course_id=course_id,
         track_function=make_track_function(),
         xqueue_callback_url_prefix=xqueue_callback_url_prefix,
         grade_bucket_type=grade_bucket_type,
         # This module isn't being used for front-end rendering
         request_token=None,
+        # pass in a loaded course for override enabling
+        course=course
     )
 
 
@@ -474,37 +492,76 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
     course_id = student_module.course_id
     student = student_module.student
     usage_key = student_module.module_state_key
-    instance = _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args, grade_bucket_type='rescore')
 
-    if instance is None:
-        # Either permissions just changed, or someone is trying to be clever
-        # and load something they shouldn't have access to.
-        msg = "No module {loc} for student {student}--access denied?".format(loc=usage_key,
-                                                                             student=student)
-        TASK_LOG.debug(msg)
-        raise UpdateProblemModuleStateError(msg)
+    with modulestore().bulk_operations(course_id):
+        course = get_course_by_id(course_id)
+        # TODO: Here is a call site where we could pass in a loaded course.  I
+        # think we certainly need it since grading is happening here, and field
+        # overrides would be important in handling that correctly
+        instance = _get_module_instance_for_task(
+            course_id,
+            student,
+            module_descriptor,
+            xmodule_instance_args,
+            grade_bucket_type='rescore',
+            course=course
+        )
 
-    if not hasattr(instance, 'rescore_problem'):
-        # This should also not happen, since it should be already checked in the caller,
-        # but check here to be sure.
-        msg = "Specified problem does not support rescoring."
-        raise UpdateProblemModuleStateError(msg)
+        if instance is None:
+            # Either permissions just changed, or someone is trying to be clever
+            # and load something they shouldn't have access to.
+            msg = "No module {loc} for student {student}--access denied?".format(
+                loc=usage_key,
+                student=student
+            )
+            TASK_LOG.debug(msg)
+            raise UpdateProblemModuleStateError(msg)
 
-    result = instance.rescore_problem()
-    instance.save()
-    if 'success' not in result:
-        # don't consider these fatal, but false means that the individual call didn't complete:
-        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"unexpected response {msg}".format(msg=result, course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_FAILED
-    elif result['success'] not in ['correct', 'incorrect']:
-        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_FAILED
-    else:
-        TASK_LOG.debug(u"successfully processed rescore call for course {course}, problem {loc} and student {student}: "
-                       u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_SUCCEEDED
+        if not hasattr(instance, 'rescore_problem'):
+            # This should also not happen, since it should be already checked in the caller,
+            # but check here to be sure.
+            msg = "Specified problem does not support rescoring."
+            raise UpdateProblemModuleStateError(msg)
+
+        result = instance.rescore_problem()
+        instance.save()
+        if 'success' not in result:
+            # don't consider these fatal, but false means that the individual call didn't complete:
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: unexpected response %(msg)s",
+                dict(
+                    msg=result,
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_FAILED
+        elif result['success'] not in ['correct', 'incorrect']:
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: %(msg)s",
+                dict(
+                    msg=result['success'],
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_FAILED
+        else:
+            TASK_LOG.debug(
+                u"successfully processed rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: %(msg)s",
+                dict(
+                    msg=result['success'],
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_SUCCEEDED
 
 
 @transaction.autocommit
@@ -549,7 +606,7 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     return UPDATE_STATUS_SUCCEEDED
 
 
-def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
+def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD'):
     """
     Upload data as a CSV using ReportStore.
 
@@ -563,7 +620,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
         csv_name: Name of the resulting CSV
         course_id: ID of the course
     """
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name)
     report_store.store_rows(
         course_id,
         u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
@@ -574,6 +631,36 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
         rows
     )
     tracker.emit(REPORT_REQUESTED_EVENT_NAME, {"report_type": csv_name, })
+
+
+def upload_exec_summary_to_store(data_dict, report_name, course_id, generated_at, config_name='FINANCIAL_REPORTS'):
+    """
+    Upload Executive Summary Html file using ReportStore.
+
+    Arguments:
+        data_dict: containing executive report data.
+        report_name: Name of the resulting Html File.
+        course_id: ID of the course
+    """
+    report_store = ReportStore.from_config(config_name)
+
+    # Use the data dict and html template to generate the output buffer
+    output_buffer = StringIO(render_to_string("instructor/instructor_dashboard_2/executive_summary.html", data_dict))
+
+    report_store.store(
+        course_id,
+        u"{course_prefix}_{report_name}_{timestamp_str}.html".format(
+            course_prefix=course_filename_prefix_generator(course_id),
+            report_name=report_name,
+            timestamp_str=generated_at.strftime("%Y-%m-%d-%H%M")
+        ),
+        output_buffer,
+        config={
+            'content_type': 'text/html',
+            'content_encoding': None,
+        }
+    )
+    tracker.emit(REPORT_REQUESTED_EVENT_NAME, {"report_type": report_name})
 
 
 def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=too-many-statements
@@ -592,7 +679,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
@@ -754,7 +841,7 @@ def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _
     course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
 
     # Perform the actual upload
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
     report_store.store_rows(
         course_id,
         u"{}_responses_report_{}.csv".format(course_id_prefix, timestamp_str),
@@ -910,7 +997,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     # This struct encapsulates both the display names of each static item in the
@@ -936,8 +1023,11 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
         student_fields = [getattr(student, field_name) for field_name in header_row]
         task_progress.attempted += 1
 
-        if err_msg:
+        if 'percent' not in gradeset or 'raw_scores' not in gradeset:
             # There was an error grading this student.
+            # Generally there will be a non-empty err_msg, but that is not always the case.
+            if not err_msg:
+                err_msg = u"Unknown error"
             error_rows.append(student_fields + [err_msg])
             task_progress.failed += 1
             continue
@@ -981,7 +1071,9 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     """
     start_time = time()
     start_date = datetime.now(UTC)
-    task_progress = TaskProgress(action_name, CourseEnrollment.num_enrolled_in(course_id), start_time)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+
     current_step = {'step': 'Calculating Profile Info'}
     task_progress.update_task_state(extra_meta=current_step)
 
@@ -1000,6 +1092,373 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
 
     # Perform the upload
     upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    For a given `course_id`, generate a CSV file containing profile
+    information for all students that are enrolled, and store using a
+    `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+    status_interval = 100
+    students_in_course = CourseEnrollment.objects.enrolled_and_dropped_out_users(course_id)
+    task_progress = TaskProgress(action_name, students_in_course.count(), start_time)
+
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+
+    # Loop over all our students and build our CSV lists in memory
+    rows = []
+    header = None
+    current_step = {'step': 'Gathering Profile Information'}
+    enrollment_report_provider = PaidCourseEnrollmentReportProvider()
+    total_students = students_in_course.count()
+    student_counter = 0
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, generating detailed enrollment report for total students: %s',
+        task_info_string,
+        action_name,
+        current_step,
+        total_students
+    )
+
+    for student in students_in_course:
+        # Periodically update task status (this is a cache write)
+        if task_progress.attempted % status_interval == 0:
+            task_progress.update_task_state(extra_meta=current_step)
+        task_progress.attempted += 1
+
+        # Now add a log entry after certain intervals to get a hint that task is in progress
+        student_counter += 1
+        if student_counter % 100 == 0:
+            TASK_LOG.info(
+                u'%s, Task type: %s, Current step: %s, gathering enrollment profile for students in progress: %s/%s',
+                task_info_string,
+                action_name,
+                current_step,
+                student_counter,
+                total_students
+            )
+
+        user_data = enrollment_report_provider.get_user_profile(student.id)
+        course_enrollment_data = enrollment_report_provider.get_enrollment_info(student, course_id)
+        payment_data = enrollment_report_provider.get_payment_info(student, course_id)
+
+        # display name map for the column headers
+        enrollment_report_headers = {
+            'User ID': _('User ID'),
+            'Username': _('Username'),
+            'Full Name': _('Full Name'),
+            'First Name': _('First Name'),
+            'Last Name': _('Last Name'),
+            'Company Name': _('Company Name'),
+            'Title': _('Title'),
+            'Language': _('Language'),
+            'Year of Birth': _('Year of Birth'),
+            'Gender': _('Gender'),
+            'Level of Education': _('Level of Education'),
+            'Mailing Address': _('Mailing Address'),
+            'Goals': _('Goals'),
+            'City': _('City'),
+            'Country': _('Country'),
+            'Enrollment Date': _('Enrollment Date'),
+            'Currently Enrolled': _('Currently Enrolled'),
+            'Enrollment Source': _('Enrollment Source'),
+            'Enrollment Role': _('Enrollment Role'),
+            'List Price': _('List Price'),
+            'Payment Amount': _('Payment Amount'),
+            'Coupon Codes Used': _('Coupon Codes Used'),
+            'Registration Code Used': _('Registration Code Used'),
+            'Payment Status': _('Payment Status'),
+            'Transaction Reference Number': _('Transaction Reference Number')
+        }
+
+        if not header:
+            header = user_data.keys() + course_enrollment_data.keys() + payment_data.keys()
+            display_headers = []
+            for header_element in header:
+                # translate header into a localizable display string
+                display_headers.append(enrollment_report_headers.get(header_element, header_element))
+            rows.append(display_headers)
+
+        rows.append(user_data.values() + course_enrollment_data.values() + payment_data.values())
+        task_progress.succeeded += 1
+
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, Detailed enrollment report generated for students: %s/%s',
+        task_info_string,
+        action_name,
+        current_step,
+        student_counter,
+        total_students
+    )
+
+    # By this point, we've got the rows we're going to stuff into our CSV files.
+    current_step = {'step': 'Uploading CSVs'}
+    task_progress.update_task_state(extra_meta=current_step)
+    TASK_LOG.info(u'%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
+
+    # Perform the actual upload
+    upload_csv_to_report_store(rows, 'enrollment_report', course_id, start_date, config_name='FINANCIAL_REPORTS')
+
+    # One last update before we close out...
+    TASK_LOG.info(u'%s, Task type: %s, Finalizing detailed enrollment task', task_info_string, action_name)
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def upload_may_enroll_csv(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+    """
+    For a given `course_id`, generate a CSV file containing
+    information about students who may enroll but have not done so
+    yet, and store using a `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+    num_reports = 1
+    task_progress = TaskProgress(action_name, num_reports, start_time)
+    current_step = {'step': 'Calculating info about students who may enroll'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Compute result table and format it
+    query_features = task_input.get('features')
+    student_data = list_may_enroll(course_id, query_features)
+    header, rows = format_dictlist(student_data, query_features)
+
+    task_progress.attempted = task_progress.succeeded = len(rows)
+    task_progress.skipped = task_progress.total - task_progress.attempted
+
+    rows.insert(0, header)
+
+    current_step = {'step': 'Uploading CSV'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Perform the upload
+    upload_csv_to_report_store(rows, 'may_enroll_info', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def get_executive_report(course_id):
+    """
+    Returns dict containing information about the course executive summary.
+    """
+    single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(course_id)
+    bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(course_id)
+    paid_invoices_total = InvoiceTransaction.get_total_amount_of_paid_course_invoices(course_id)
+    gross_paid_revenue = single_purchase_total + bulk_purchase_total + paid_invoices_total
+
+    all_invoices_total = Invoice.get_invoice_total_amount_for_course(course_id)
+    gross_pending_revenue = all_invoices_total - float(paid_invoices_total)
+
+    gross_revenue = float(gross_paid_revenue) + float(gross_pending_revenue)
+
+    refunded_self_purchased_seats = PaidCourseRegistration.get_self_purchased_seat_count(
+        course_id, status='refunded'
+    )
+    refunded_bulk_purchased_seats = CourseRegCodeItem.get_bulk_purchased_seat_count(
+        course_id, status='refunded'
+    )
+    total_seats_refunded = refunded_self_purchased_seats + refunded_bulk_purchased_seats
+
+    self_purchased_refunds = PaidCourseRegistration.get_total_amount_of_purchased_item(
+        course_id,
+        status='refunded'
+    )
+    bulk_purchase_refunds = CourseRegCodeItem.get_total_amount_of_purchased_item(course_id, status='refunded')
+    total_amount_refunded = self_purchased_refunds + bulk_purchase_refunds
+
+    top_discounted_codes = CouponRedemption.get_top_discount_codes_used(course_id)
+    total_coupon_codes_purchases = CouponRedemption.get_total_coupon_code_purchases(course_id)
+
+    bulk_purchased_codes = CourseRegistrationCode.order_generated_registration_codes(course_id)
+
+    unused_registration_codes = 0
+    for registration_code in bulk_purchased_codes:
+        if not RegistrationCodeRedemption.is_registration_code_redeemed(registration_code.code):
+            unused_registration_codes += 1
+
+    self_purchased_seat_count = PaidCourseRegistration.get_self_purchased_seat_count(course_id)
+    bulk_purchased_seat_count = CourseRegCodeItem.get_bulk_purchased_seat_count(course_id)
+    total_invoiced_seats = CourseRegistrationCode.invoice_generated_registration_codes(course_id).count()
+
+    total_seats = self_purchased_seat_count + bulk_purchased_seat_count + total_invoiced_seats
+
+    self_purchases_percentage = 0.0
+    bulk_purchases_percentage = 0.0
+    invoice_purchases_percentage = 0.0
+    avg_price_paid = 0.0
+
+    if total_seats != 0:
+        self_purchases_percentage = (float(self_purchased_seat_count) / float(total_seats)) * 100
+        bulk_purchases_percentage = (float(bulk_purchased_seat_count) / float(total_seats)) * 100
+        invoice_purchases_percentage = (float(total_invoiced_seats) / float(total_seats)) * 100
+        avg_price_paid = gross_revenue / total_seats
+
+    course = get_course_by_id(course_id, depth=0)
+    currency = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
+
+    return {
+        'display_name': course.display_name,
+        'start_date': course.start.strftime("%Y-%m-%d") if course.start is not None else 'N/A',
+        'end_date': course.end.strftime("%Y-%m-%d") if course.end is not None else 'N/A',
+        'total_seats': total_seats,
+        'currency': currency,
+        'gross_revenue': float(gross_revenue),
+        'gross_paid_revenue': float(gross_paid_revenue),
+        'gross_pending_revenue': gross_pending_revenue,
+        'total_seats_refunded': total_seats_refunded,
+        'total_amount_refunded': float(total_amount_refunded),
+        'average_paid_price': float(avg_price_paid),
+        'discount_codes_data': top_discounted_codes,
+        'total_seats_using_discount_codes': total_coupon_codes_purchases,
+        'total_self_purchase_seats': self_purchased_seat_count,
+        'total_bulk_purchase_seats': bulk_purchased_seat_count,
+        'total_invoiced_seats': total_invoiced_seats,
+        'unused_bulk_purchase_code_count': unused_registration_codes,
+        'self_purchases_percentage': self_purchases_percentage,
+        'bulk_purchases_percentage': bulk_purchases_percentage,
+        'invoice_purchases_percentage': invoice_purchases_percentage,
+    }
+
+
+def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+    """
+    For a given `course_id`, generate a html report containing information,
+    which provides a snapshot of how the course is doing.
+    """
+    start_time = time()
+    report_generation_date = datetime.now(UTC)
+    status_interval = 100
+
+    enrolled_users = CourseEnrollment.objects.users_enrolled_in(course_id)
+    true_enrollment_count = 0
+    for user in enrolled_users:
+        if not user.is_staff and not CourseAccessRole.objects.filter(
+                user=user, course_id=course_id, role__in=FILTERED_OUT_ROLES
+        ).exists():
+            true_enrollment_count += 1
+
+    task_progress = TaskProgress(action_name, true_enrollment_count, start_time)
+
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+    current_step = {'step': 'Gathering executive summary report information'}
+
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, generating executive summary report',
+        task_info_string,
+        action_name,
+        current_step
+    )
+
+    if task_progress.attempted % status_interval == 0:
+        task_progress.update_task_state(extra_meta=current_step)
+    task_progress.attempted += 1
+
+    # get the course executive summary report information.
+    data_dict = get_executive_report(course_id)
+    data_dict.update(
+        {
+            'total_enrollments': true_enrollment_count,
+            'report_generation_date': report_generation_date.strftime("%Y-%m-%d"),
+        }
+    )
+
+    # By this point, we've got the data that we need to generate html report.
+    current_step = {'step': 'Uploading executive summary report HTML file'}
+    task_progress.update_task_state(extra_meta=current_step)
+    TASK_LOG.info(u'%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
+
+    # Perform the actual upload
+    upload_exec_summary_to_store(data_dict, 'executive_report', course_id, report_generation_date)
+    task_progress.succeeded += 1
+    # One last update before we close out...
+    TASK_LOG.info(u'%s, Task type: %s, Finalizing executive summary report task', task_info_string, action_name)
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+    """
+    For a given `course_id`, generate a CSV file containing
+    information about proctored exam results, and store using a `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+    num_reports = 1
+    task_progress = TaskProgress(action_name, num_reports, start_time)
+    current_step = {'step': 'Calculating info about proctored exam results in a course'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Compute result table and format it
+    query_features = _task_input.get('features')
+    student_data = get_proctored_exam_results(course_id, query_features)
+    header, rows = format_dictlist(student_data, query_features)
+
+    task_progress.attempted = task_progress.succeeded = len(rows)
+    task_progress.skipped = task_progress.total - task_progress.attempted
+
+    rows.insert(0, header)
+
+    current_step = {'step': 'Uploading CSV'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Perform the upload
+    upload_csv_to_report_store(rows, 'proctored_exam_results_report', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def generate_students_certificates(
+        _xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # pylint: disable=unused-argument
+    """
+    For a given `course_id`, generate certificates for all students
+    that are enrolled.
+    """
+    start_time = time()
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+
+    current_step = {'step': 'Calculating students already have certificates'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    students_require_certs = students_require_certificate(course_id, enrolled_students)
+
+    task_progress.skipped = task_progress.total - len(students_require_certs)
+
+    current_step = {'step': 'Generating Certificates'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    course = modulestore().get_course(course_id, depth=0)
+    # Generate certificate for each student
+    for student in students_require_certs:
+        task_progress.attempted += 1
+        status = generate_user_certificates(
+            student,
+            course_id,
+            course=course
+        )
+
+        if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+            task_progress.succeeded += 1
+        else:
+            task_progress.failed += 1
 
     return task_progress.update_task_state(extra_meta=current_step)
 
@@ -1087,3 +1546,17 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)
 
     return task_progress.update_task_state(extra_meta=current_step)
+
+
+def students_require_certificate(course_id, enrolled_students):
+    """ Returns list of students where certificates needs to be generated.
+    Removing those students who have their certificate already generated
+    from total enrolled students for given course.
+    :param course_id:
+    :param enrolled_students:
+    """
+    # compute those students where certificates already generated
+    students_already_have_certs = User.objects.filter(
+        ~Q(generatedcertificate__status=CertificateStatuses.unavailable),
+        generatedcertificate__course_id=course_id)
+    return list(set(enrolled_students) - set(students_already_have_certs))
