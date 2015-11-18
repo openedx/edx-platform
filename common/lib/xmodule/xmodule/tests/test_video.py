@@ -26,7 +26,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
-from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
+from xmodule.video_module import VideoDescriptor, create_youtube_string, rewrite_video_url
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
 from . import LogicTest
 from .test_import import DummySystem
@@ -695,30 +695,26 @@ class VideoCdnTest(unittest.TestCase):
     """
     Tests for Video CDN.
     """
-    @patch('requests.get')
-    def test_get_video_success(self, cdn_response):
+    def test_rewrite_video_url_success(self, cdn_response):
         """
         Test successful CDN request.
         """
         original_video_url = "http://www.original_video.com/original_video.mp4"
-        cdn_response_video_url = "http://www.cdn_video.com/cdn_video.mp4"
-        cdn_response_content = '{{"sources":["{cdn_url}"]}}'.format(cdn_url=cdn_response_video_url)
-        cdn_response.return_value = Mock(status_code=200, content=cdn_response_content)
         fake_cdn_url = 'http://fake_cdn.com/'
+        cdn_response_video_url = fake_cdn_url + "original_video.mp4"
+
         self.assertEqual(
-            get_video_from_cdn(fake_cdn_url, original_video_url),
+            rewrite_video_url(fake_cdn_url, original_video_url),
             cdn_response_video_url
         )
 
-    @patch('requests.get')
-    def test_get_no_video_exists(self, cdn_response):
+    def test_rewrite_video_url_invalid_url(self, cdn_response):
         """
         Test if no alternative video in CDN exists.
         """
         original_video_url = "http://www.original_video.com/original_video.mp4"
-        cdn_response.return_value = Mock(status_code=404)
-        fake_cdn_url = 'http://fake_cdn.com/'
-        self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
+        fake_cdn_url = 'http://http://fake_cdn.com/'
+        self.assertIsNone(rewrite_video_url(fake_cdn_url, original_video_url))
 
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):

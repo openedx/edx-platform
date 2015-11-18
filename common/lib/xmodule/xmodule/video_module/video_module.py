@@ -36,7 +36,7 @@ from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_fie
 from xmodule.exceptions import NotFoundError
 
 from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
-from .video_utils import create_youtube_string, get_video_from_cdn, get_poster
+from .video_utils import create_youtube_string, get_video_from_cdn, get_poster, rewrite_video_url
 from .bumper_utils import bumperize
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -234,7 +234,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
             for index, source_url in enumerate(sources):
-                new_url = get_video_from_cdn(cdn_url, source_url)
+                new_url = rewrite_video_url(cdn_url, source_url)
                 if new_url:
                     sources[index] = new_url
 
