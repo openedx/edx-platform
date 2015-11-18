@@ -346,7 +346,6 @@ class TestAccountAPI(UserAPITestCase):
 
         self.client.login(username=self.user.username, password=self.test_password)
         with self.assertNumQueries(10):
-        with self.assertNumQueries(7):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])
