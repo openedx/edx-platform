@@ -25,13 +25,7 @@ from discussion_api.permissions import (
     get_initializable_thread_fields,
 )
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
-from django_comment_client.base.views import (
-    THREAD_CREATED_EVENT_NAME,
-    get_comment_created_event_data,
-    get_comment_created_event_name,
-    get_thread_created_event_data,
-    track_forum_event,
-)
+from django_comment_client.base.views import track_comment_created_event, track_thread_created_event
 from django_comment_common.signals import (
     thread_created,
     thread_edited,
@@ -566,13 +560,7 @@ def create_thread(request, thread_data):
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
 
-    track_forum_event(
-        request,
-        THREAD_CREATED_EVENT_NAME,
-        course,
-        cc_thread,
-        get_thread_created_event_data(cc_thread, followed=actions_form.cleaned_data["following"])
-    )
+    track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
 
     return api_thread
 
@@ -616,13 +604,7 @@ def create_comment(request, comment_data):
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context)
 
-    track_forum_event(
-        request,
-        get_comment_created_event_name(cc_comment),
-        context["course"],
-        cc_comment,
-        get_comment_created_event_data(cc_comment, cc_thread["commentable_id"], followed=False)
-    )
+    track_comment_created_event(request, context["course"], cc_comment, cc_thread["commentable_id"], followed=False)
 
     return api_comment
 
