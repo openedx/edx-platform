@@ -688,7 +688,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     # pylint: disable=invalid-name
     @patch('xmodule.video_module.video_module.BrandingInfoConfig')
-    @patch('xmodule.video_module.video_module.get_video_from_cdn')
+    @patch('xmodule.video_module.video_module.rewrite_video_url')
     def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
         """
         Test if sources got from CDN.

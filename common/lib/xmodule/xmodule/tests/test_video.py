@@ -695,7 +695,7 @@ class VideoCdnTest(unittest.TestCase):
     """
     Tests for Video CDN.
     """
-    def test_rewrite_video_url_success(self, cdn_response):
+    def test_rewrite_video_url_success(self):
         """
         Test successful CDN request.
         """
@@ -708,7 +708,7 @@ class VideoCdnTest(unittest.TestCase):
             cdn_response_video_url
         )
 
-    def test_rewrite_video_url_invalid_url(self, cdn_response):
+    def test_rewrite_video_url_invalid_url(self):
         """
         Test if no alternative video in CDN exists.
         """
