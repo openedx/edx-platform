@@ -28,6 +28,13 @@ from ccx.overrides import get_override_for_ccx, override_field_for_ccx
 log = logging.getLogger(__name__)
 
 
+class ItemNotFoundError(Exception):
+    """
+    This exception is raised in the case where items is not found in Labster API.
+    """
+    pass
+
+
 class LabsterApiError(Exception):
     """
     This exception is raised in the case where problems with Labster API appear.
@@ -101,8 +108,11 @@ def _send_request(url, data):
         response.raise_for_status()
         return response.json()
     except RequestException as ex:
-        log.exception("Labster API is unavailable:\n%r", ex)
-        raise LabsterApiError(_("Labster API is unavailable."))
+        if getattr(response, 'status_code', None) == 404:
+            raise ItemNotFoundError
+        else:
+            log.exception("Labster API is unavailable:\n%r", ex)
+            raise LabsterApiError(_("Labster API is unavailable."))
     except ValueError as ex:
         log.error("Invalid JSON:\n%r", ex)
         raise LabsterApiError(_("Invalid JSON."))
@@ -169,6 +179,9 @@ def set_license(request, course, ccx):
             request, _('There are some issues with applying your license. Please try again in a few minutes.')
         )
         return redirect(url)
+    except ItemNotFoundError:
+        messages.error(request, _('Ensure you are using correct License code.'))
+        return redirect(url)
 
     # Update passports
     passports = get_override_for_ccx(ccx, course, 'lti_passports', course.lti_passports)[:]
@@ -193,7 +206,7 @@ def set_license(request, course, ccx):
     consumer_keys = [LtiPassport(passport_str).consumer_key for passport_str in passports]
     try:
         licensed_simulations = get_licensed_simulations(consumer_keys)
-    except LabsterApiError:
+    except (LabsterApiError, ItemNotFoundError):
         messages.error(
             request, _('Your license is successfully applied, but there was an error with updating your course.')
         )
