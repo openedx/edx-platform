@@ -2,11 +2,11 @@
 SOLA: Would you mind writing a docstring for this file?
 """
 from textwrap import dedent
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.crowdsourcehinter_problem import CrowdsourcehinterProblemPage
-from ...pages.studio.auto_auth import AutoAuthPage
-from ..helpers import UniqueCourseTest
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from openedx.tests.xblock_integration.pages.crowdsourcehinter_problem import CrowdsourcehinterProblemPage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
 class CrowdsourcehinterProblemTest(UniqueCourseTest):
