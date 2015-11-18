@@ -50,7 +50,7 @@ git+https://github.com/edx/edx-oauth2-provider.git@django1.8-upgrade#egg=edx-oau
 git+https://github.com/edx/edx-val.git@ammar/upgrade-django-1.8#egg=edxval==0.0.8
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 -e git+https://github.com/pmitros/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
--e git+https://github.com/edx/edx-search.git@ammar/upgrade-django-1.8#egg=edx-search==0.1.1
+-e git+https://github.com/edx/edx-search.git@release-2015-11-17#egg=edx-search==0.1.1
 -e git+https://github.com/edx/edx-milestones.git@release-2015-11-17#egg=edx-milestones==0.1.5
 git+https://github.com/edx/edx-lint.git@v0.3.2#egg=edx_lint==0.3.2
 -e git+https://github.com/edx/xblock-utils.git@213a97a50276d6a2504d8133650b2930ead357a0#egg=xblock-utils
