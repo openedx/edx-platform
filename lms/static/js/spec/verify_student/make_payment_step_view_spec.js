@@ -206,6 +206,16 @@ define([
                 expectPaymentButtonEnabled( true );
             });
 
+            it('displays an error if no payment processors are available', function () {
+                var view = createView({processors: []});
+                expect(view.errorModel.get('shown')).toBe(true);
+                expect(view.errorModel.get('errorTitle')).toEqual(
+                    "We're currently experiencing technical problems."
+                );
+                expect(view.errorModel.get('errorMsg')).toEqual(
+                    'Try the transaction again in a few minutes.'
+                );
+            });
         });
     }
 );
