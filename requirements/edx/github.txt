@@ -32,7 +32,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 # Used for testing
-git+https://github.com/edx/lettuce.git@django1.8/upgrade#egg=lettuce==0.2.20.002
+git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@django1.8-upgrade#egg=XBlock
