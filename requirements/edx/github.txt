@@ -25,7 +25,7 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
 # fs==0.4.0
-git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0band is
+git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 # custom opaque-key implementations for ccx
