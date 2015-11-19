@@ -273,8 +273,8 @@ def run_jshint(options):
     _prepare_report_dir(jshint_report_dir)
 
     sh(
-        "jshint {root} --config .jshintrc >> {jshint_report}".format(
-            root=Env.REPO_ROOT, jshint_report=jshint_report
+        "jshint . --config .jshintrc >> {jshint_report}".format(
+            jshint_report=jshint_report
         ),
         ignore_error=True
     )
