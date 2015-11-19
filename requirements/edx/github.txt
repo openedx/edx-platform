@@ -25,7 +25,7 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
 # fs==0.4.0
-git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
+git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0band is
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 # custom opaque-key implementations for ccx
@@ -41,7 +41,7 @@ git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@ammar/upgrade-to-django1.8#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2015-11-17#egg=ora2==0.2.2
+-e git+https://github.com/edx/edx-ora2.git@mzfr/django18-from-release#egg=ora2==0.2.2
 -e git+https://github.com/edx/edx-submissions.git@django-upgrade/1.8#egg=edx-submissions==0.1.2
 -e git+https://github.com/edx/opaque-keys.git@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
