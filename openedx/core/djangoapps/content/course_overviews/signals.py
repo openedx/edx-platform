@@ -24,3 +24,7 @@ def _listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=
     invalidates the corresponding CourseOverview cache entry if one exists.
     """
     CourseOverview.objects.filter(id=course_key).delete()
+    # import CourseAboutSearchIndexer inline due to cyclic import
+    from cms.djangoapps.contentstore.courseware_index import CourseAboutSearchIndexer
+    # Delete course entry from Course About Search_index
+    CourseAboutSearchIndexer.remove_deleted_items(course_key)

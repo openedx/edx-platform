@@ -380,10 +380,6 @@
     background-color: $gray-l4;
     @include border-left(3px solid $gray-l3);
 
-    .heading {
-      @include float(left);
-    }
-
     .description {
       margin-top: $baseline/2;
       margin-bottom: $baseline/2;
@@ -402,13 +398,17 @@
     }
 
     .date {
-      @include float(right);
       color: $lighter-base-font-color;
       font-size: 80%;
     }
 
     &-todays-date {
       @include border-left(3px solid $blue);
+
+      .heading {
+        font-weight: $font-regular;
+        font-size: 80%;
+      }
     }
 
     &-verified-upgrade-deadline {

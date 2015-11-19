@@ -1,3 +1,4 @@
+# pylint: disable=bad-continuation
 """
 Certificate HTML webview.
 """
@@ -26,6 +27,7 @@ from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.views import handle_500
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from certificates.api import (
     get_active_web_certificate,
@@ -42,13 +44,6 @@ from certificates.models import (
 )
 
 log = logging.getLogger(__name__)
-
-
-class CourseDoesNotExist(Exception):
-    """
-    This exception is raised in the case where None is returned from the modulestore
-    """
-    pass
 
 
 def get_certificate_description(mode, certificate_type, platform_name):
@@ -81,63 +76,13 @@ def get_certificate_description(mode, certificate_type, platform_name):
     return certificate_type_description
 
 
-# pylint: disable=bad-continuation
-# pylint: disable=too-many-statements
-def _update_certificate_context(context, course, user, user_certificate):
+def _update_certificate_context(context, user_certificate, platform_name):
     """
     Build up the certificate web view context using the provided values
     (Helper method to keep the view clean)
     """
     # Populate dynamic output values using the course/certificate data loaded above
-    user_fullname = user.profile.name
-    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     certificate_type = context.get('certificate_type')
-    partner_short_name = course.display_organization if course.display_organization else course.org
-    partner_long_name = None
-    organizations = organization_api.get_course_organizations(course_id=course.id)
-    if organizations:
-        #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
-        organization = organizations[0]
-        partner_long_name = organization.get('name', partner_long_name)
-        partner_short_name = organization.get('short_name', partner_short_name)
-        context['organization_long_name'] = partner_long_name
-        context['organization_short_name'] = partner_short_name
-        context['organization_logo'] = organization.get('logo', None)
-
-    context['username'] = user.username
-    context['course_mode'] = user_certificate.mode
-    context['accomplishment_user_id'] = user.id
-    context['accomplishment_copy_name'] = user_fullname
-    context['accomplishment_copy_username'] = user.username
-    context['accomplishment_copy_course_org'] = partner_short_name
-    course_title_from_cert = context['certificate_data'].get('course_title', '')
-    accomplishment_copy_course_name = course_title_from_cert if course_title_from_cert else course.display_name
-    context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
-    share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
-    context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
-    context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
-    context['facebook_share_text'] = share_settings.get(
-        'CERTIFICATE_FACEBOOK_TEXT',
-        _("I completed the {course_title} course on {platform_name}.").format(
-            course_title=accomplishment_copy_course_name,
-            platform_name=platform_name
-        )
-    )
-    context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
-    context['twitter_share_text'] = share_settings.get(
-        'CERTIFICATE_TWITTER_TEXT',
-        _("I completed a course on {platform_name}. Take a look at my certificate.").format(
-            platform_name=platform_name
-        )
-    )
-
-    course_number = course.display_coursenumber if course.display_coursenumber else course.number
-    context['course_number'] = course_number
-    try:
-        badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
-    except BadgeAssertion.DoesNotExist:
-        badge = None
-    context['badge'] = badge
 
     # Override the defaults with any mode-specific static values
     context['certificate_id_number'] = user_certificate.verify_uuid
@@ -154,39 +99,33 @@ def _update_certificate_context(context, course, user, user_certificate):
         year=user_certificate.modified_date.year
     )
 
-    if partner_long_name:
-        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, an '
-                                                              'online learning initiative of {partner_long_name} '
-                                                              'through {platform_name}.').format(
-            partner_short_name=partner_short_name,
-            partner_long_name=partner_long_name,
-            platform_name=platform_name
-        )
-    else:
-        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
-                                                              'through {platform_name}.').format(
-            partner_short_name=partner_short_name,
-            platform_name=platform_name
-        )
+    # Translators:  This text represents the verification of the certificate
+    context['document_meta_description'] = _('This is a valid {platform_name} certificate for {user_name}, '
+                                             'who participated in {partner_short_name} {course_number}').format(
+        platform_name=platform_name,
+        user_name=context['accomplishment_copy_name'],
+        partner_short_name=context['organization_short_name'],
+        course_number=context['course_number']
+    )
 
-    # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
-    context['accomplishment_copy_about'] = _('About {platform_name} Accomplishments').format(
+    # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
+    context['document_title'] = _("{partner_short_name} {course_number} Certificate | {platform_name}").format(
+        partner_short_name=context['organization_short_name'],
+        course_number=context['course_number'],
         platform_name=platform_name
     )
 
-    context['accomplishment_more_title'] = _("More Information About {user_name}'s Certificate:").format(
-        user_name=user_fullname
-    )
+    # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
+    # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
+    context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
+                                                        "awarded a {platform_name} {certificate_type} "
+                                                        "Certificate of Completion in ").format(
+        platform_name=platform_name,
+        certificate_type=context.get("certificate_type"))
 
-    # Translators:  This line appears on the page just before the generation date for the certificate
-    context['certificate_date_issued_title'] = _("Issued On:")
-
-    # Translators:  The Certificate ID Number is an alphanumeric value unique to each individual certificate
-    context['certificate_id_number_title'] = _('Certificate ID Number')
-
-    context['certificate_info_title'] = _('About {platform_name} Certificates').format(
-        platform_name=platform_name
-    )
+    certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
+    if certificate_type_description:
+        context['certificate_type_description'] = certificate_type_description
 
     # Translators: This text describes the purpose (and therefore, value) of a course certificate
     # 'verifying your identity' refers to the process for establishing the authenticity of the student
@@ -197,7 +136,54 @@ def _update_certificate_context(context, course, user, user_certificate):
                                                 "<a href='{verified_cert_url}'> verifying your identity</a>.").format(
         platform_name=platform_name,
         tos_url=context.get('company_tos_url'),
-        verified_cert_url=context.get('company_verified_certificate_url')
+        verified_cert_url=context.get('company_verified_certificate_url'))
+
+
+def _update_context_with_basic_info(context, course_id, platform_name, configuration):
+    """
+    Updates context dictionary with basic info required before rendering simplest
+    certificate templates.
+    """
+    context['platform_name'] = platform_name
+    context['course_id'] = course_id
+
+    # Update the view context with the default ConfigurationModel settings
+    context.update(configuration.get('default', {}))
+
+    # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
+    reserved = _("All rights reserved")
+    context['copyright_text'] = '&copy; {year} {platform_name}. {reserved}.'.format(
+        year=settings.COPYRIGHT_YEAR,
+        platform_name=platform_name,
+        reserved=reserved
+    )
+
+    # Translators:  This text is bound to the HTML 'title' element of the page and appears
+    # in the browser title bar when a requested certificate is not found or recognized
+    context['document_title'] = _("Invalid Certificate")
+
+    # Translators: The &amp; characters represent an ampersand character and can be ignored
+    context['company_tos_urltext'] = _("Terms of Service &amp; Honor Code")
+
+    # Translators: A 'Privacy Policy' is a legal document/statement describing a website's use of personal information
+    context['company_privacy_urltext'] = _("Privacy Policy")
+
+    # Translators: This line appears as a byline to a header image and describes the purpose of the page
+    context['logo_subtitle'] = _("Certificate Validation")
+
+    # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
+    context['accomplishment_copy_about'] = _('About {platform_name} Accomplishments').format(
+        platform_name=platform_name
+    )
+
+    # Translators:  This line appears on the page just before the generation date for the certificate
+    context['certificate_date_issued_title'] = _("Issued On:")
+
+    # Translators:  The Certificate ID Number is an alphanumeric value unique to each individual certificate
+    context['certificate_id_number_title'] = _('Certificate ID Number')
+
+    context['certificate_info_title'] = _('About {platform_name} Certificates').format(
+        platform_name=platform_name
     )
 
     context['certificate_verify_title'] = _("How {platform_name} Validates Student Certificates").format(
@@ -218,8 +204,7 @@ def _update_certificate_context(context, course, user, user_certificate):
                                              "world's best universities, including MIT, Harvard, Berkeley, University "
                                              "of Texas, and many others.  {platform_name} is a non-profit online "
                                              "initiative created by founding partners Harvard and MIT.").format(
-        platform_name=platform_name
-    )
+        platform_name=platform_name)
 
     context['company_about_title'] = _("About {platform_name}").format(platform_name=platform_name)
 
@@ -236,184 +221,59 @@ def _update_certificate_context(context, course, user, user_certificate):
         platform_name=platform_name
     )
 
-    # Translators:  This text represents the verification of the certificate
-    context['document_meta_description'] = _('This is a valid {platform_name} certificate for {user_name}, '
-                                             'who participated in {partner_short_name} {course_number}').format(
-        platform_name=platform_name,
-        user_name=user_fullname,
-        partner_short_name=partner_short_name,
-        course_number=course_number
-    )
 
-    # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
-    context['document_title'] = _("{partner_short_name} {course_number} Certificate | {platform_name}").format(
-        partner_short_name=partner_short_name,
-        course_number=course_number,
-        platform_name=platform_name
-    )
-
-    # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
-    # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
-    context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
-                                                        "awarded a {platform_name} {certificate_type} "
-                                                        "Certificate of Completion in ").format(
-        platform_name=platform_name,
-        certificate_type=context.get("certificate_type")
-    )
-
-    certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
-    if certificate_type_description:
-        context['certificate_type_description'] = certificate_type_description
-
-    # Translators: This line is displayed to a user who has completed a course and achieved a certification
-    context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
-        fullname=user_fullname
-    )
-
-    # Translators: This line congratulates the user and instructs them to share their accomplishment on social networks
-    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes all of the details of what "
-                                                  "you've accomplished. Show it off to family, friends, and colleagues "
-                                                  "in your social and professional networks.")
-
-    # Translators: This line leads the reader to understand more about the certificate that a student has been awarded
-    context['accomplishment_copy_more_about'] = _("More about {fullname}'s accomplishment").format(
-        fullname=user_fullname
-    )
-
-
-@handle_500(template_path="certificates/server-error.html")
-def render_html_view(request, user_id, course_id):
+def _update_course_context(request, context, course, platform_name):
     """
-    This public view generates an HTML representation of the specified student's certificate
-    If a certificate is not available, we display a "Sorry!" screen instead
+    Updates context dictionary with course info.
     """
-
-    # Create the initial view context, bootstrapping with Django settings and passed-in values
-    context = {}
-    context['platform_name'] = microsite.get_value("platform_name", settings.PLATFORM_NAME)
-    context['course_id'] = course_id
-    preview_mode = request.GET.get('preview', None)
-
-    # Update the view context with the default ConfigurationModel settings
-    configuration = CertificateHtmlViewConfiguration.get_config()
-    # if we are in a microsite, then let's first see if there is an override
-    # section in our config
-    config_key = microsite.get_value('microsite_config_key', 'default')
-    # if there is no special microsite override, then let's use default
-    if config_key not in configuration:
-        config_key = 'default'
-    context.update(configuration.get(config_key, {}))
-
-    # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
-    reserved = _("All rights reserved")
-    context['copyright_text'] = '&copy; {year} {platform_name}. {reserved}.'.format(
-        year=settings.COPYRIGHT_YEAR,
-        platform_name=context.get('platform_name'),
-        reserved=reserved
-    )
-
-    # Translators:  This text is bound to the HTML 'title' element of the page and appears
-    # in the browser title bar when a requested certificate is not found or recognized
-    context['document_title'] = _("Invalid Certificate")
-
-    # Translators: The &amp; characters represent an ampersand character and can be ignored
-    context['company_tos_urltext'] = _("Terms of Service &amp; Honor Code")
-
-    # Translators: A 'Privacy Policy' is a legal document/statement describing a website's use of personal information
-    context['company_privacy_urltext'] = _("Privacy Policy")
-
-    # Translators: This line appears as a byline to a header image and describes the purpose of the page
-    context['logo_subtitle'] = _("Certificate Validation")
-    invalid_template_path = 'certificates/invalid.html'
-
-    # Kick the user back to the "Invalid" screen if the feature is disabled
-    if not has_html_certificates_enabled(course_id):
-        return render_to_response(invalid_template_path, context)
-
-    # Load the core building blocks for the view context
-    try:
-        course_key = CourseKey.from_string(course_id)
-        user = User.objects.get(id=user_id)
-        course = modulestore().get_course(course_key)
-
-        if not course:
-            raise CourseDoesNotExist
-
-        # Attempt to load the user's generated certificate data
-        if preview_mode:
-            user_certificate = GeneratedCertificate.objects.get(
-                user=user,
-                course_id=course_key,
-                mode=preview_mode
-            )
-        else:
-            user_certificate = GeneratedCertificate.objects.get(
-                user=user,
-                course_id=course_key
-            )
-
-    # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...
-    # If we are, we'll need to create a mock version of the user_certificate container for previewing
-    except GeneratedCertificate.DoesNotExist:
-        if preview_mode and (
-            has_access(request.user, 'instructor', course)
-            or has_access(request.user, 'staff', course)
-        ):
-            user_certificate = GeneratedCertificate(
-                mode=preview_mode,
-                verify_uuid=unicode(uuid4().hex),
-                modified_date=datetime.now().date()
-            )
-        else:
-            return render_to_response(invalid_template_path, context)
-
-    # For any other expected exceptions, kick the user back to the "Invalid" screen
-    except (InvalidKeyError, CourseDoesNotExist, User.DoesNotExist):
-        return render_to_response(invalid_template_path, context)
-
-    # Badge Request Event Tracking Logic
-    if 'evidence_visit' in request.GET:
-        try:
-            badge = BadgeAssertion.objects.get(user=user, course_id=course_key)
-            tracker.emit(
-                'edx.badge.assertion.evidence_visited',
-                {
-                    'user_id': user.id,
-                    'course_id': unicode(course_key),
-                    'enrollment_mode': badge.mode,
-                    'assertion_id': badge.id,
-                    'assertion_image_url': badge.data['image'],
-                    'assertion_json_url': badge.data['json']['id'],
-                    'issuer': badge.data['issuer'],
-                }
-            )
-        except BadgeAssertion.DoesNotExist:
-            log.warn(
-                "Could not find badge for %s on course %s.",
-                user.id,
-                course_key,
-            )
-
-    # Okay, now we have all of the pieces, time to put everything together
-
-    # Get the active certificate configuration for this course
-    # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
-    # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
-    active_configuration = get_active_web_certificate(course, preview_mode)
-    if active_configuration is None:
-        return render_to_response(invalid_template_path, context)
+    context['full_course_image_url'] = request.build_absolute_uri(course_image_url(course))
+    course_title_from_cert = context['certificate_data'].get('course_title', '')
+    accomplishment_copy_course_name = course_title_from_cert if course_title_from_cert else course.display_name
+    context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
+    course_number = course.display_coursenumber if course.display_coursenumber else course.number
+    context['course_number'] = course_number
+    if context['organization_long_name']:
+        # Translators:  This text represents the description of course
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
+                                                              'an online learning initiative of {partner_long_name} '
+                                                              'through {platform_name}.').format(
+            partner_short_name=context['organization_short_name'],
+            partner_long_name=context['organization_long_name'],
+            platform_name=platform_name)
     else:
-        context['certificate_data'] = active_configuration
+        # Translators:  This text represents the description of course
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
+                                                              'through {platform_name}.').format(
+            partner_short_name=context['organization_short_name'],
+            platform_name=platform_name)
 
-    # Append/Override the existing view context values with any mode-specific ConfigurationModel values
-    context.update(configuration.get(user_certificate.mode, {}))
 
-    # Append/Override the existing view context values with request-time values
-    _update_certificate_context(context, course, user, user_certificate)
+def _update_social_context(request, context, course, user, user_certificate, platform_name):
+    """
+    Updates context dictionary with info required for social sharing.
+    """
+    share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+    context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
+    context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
+    context['facebook_share_text'] = share_settings.get(
+        'CERTIFICATE_FACEBOOK_TEXT',
+        _("I completed the {course_title} course on {platform_name}.").format(
+            course_title=context['accomplishment_copy_course_name'],
+            platform_name=platform_name
+        )
+    )
+    context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
+    context['twitter_share_text'] = share_settings.get(
+        'CERTIFICATE_TWITTER_TEXT',
+        _("I completed a course on {platform_name}. Take a look at my certificate.").format(
+            platform_name=platform_name
+        )
+    )
+
     share_url = request.build_absolute_uri(
         reverse(
             'certificates:html_view',
-            kwargs=dict(user_id=str(user_id), course_id=unicode(course_id))
+            kwargs=dict(user_id=str(user.id), course_id=unicode(course.id))
         )
     )
     context['share_url'] = share_url
@@ -424,8 +284,7 @@ def render_html_view(request, user_id, course_id):
             share_url=urllib.quote_plus(smart_str(share_url))
         )
     context['twitter_url'] = twitter_url
-    context['full_course_image_url'] = request.build_absolute_uri(course_image_url(course))
-
+    context['linked_in_url'] = None
     # If enabled, show the LinkedIn "add to profile" button
     # Clicking this button sends the user to LinkedIn where they
     # can add the certificate information to their profile.
@@ -443,39 +302,110 @@ def render_html_view(request, user_id, course_id):
                 course_id=unicode(course.id)
             )))
         )
-    else:
-        context['linked_in_url'] = None
 
-    # Microsites will need to be able to override any hard coded
-    # content that was put into the context in the
-    # _update_certificate_context() call above. For example the
-    # 'company_about_description' talks about edX, which we most likely
-    # do not want to keep in a microsite
-    #
-    # So we need to re-apply any configuration/content that
-    # we are sourceing from the database. This is somewhat duplicative of
-    # the code at the beginning of this method, but we
-    # need the configuration at the top as some error code paths
-    # require that to be set up early on in the pipeline
-    #
-    microsite_config_key = microsite.get_value('microsite_config_key')
-    if microsite_config_key:
-        context.update(configuration.get(microsite_config_key, {}))
+
+def _update_context_with_user_info(context, user, user_certificate):
+    """
+    Updates context dictionary with user related info.
+    """
+    user_fullname = user.profile.name
+    context['username'] = user.username
+    context['course_mode'] = user_certificate.mode
+    context['accomplishment_user_id'] = user.id
+    context['accomplishment_copy_name'] = user_fullname
+    context['accomplishment_copy_username'] = user.username
+
+    context['accomplishment_more_title'] = _("More Information About {user_name}'s Certificate:").format(
+        user_name=user_fullname
+    )
+    # Translators: This line is displayed to a user who has completed a course and achieved a certification
+    context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
+        fullname=user_fullname
+    )
+
+    # Translators: This line congratulates the user and instructs them to share their accomplishment on social networks
+    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes all of the details of what "
+                                                  "you've accomplished. Show it off to family, friends, and colleagues "
+                                                  "in your social and professional networks.")
+
+    # Translators: This line leads the reader to understand more about the certificate that a student has been awarded
+    context['accomplishment_copy_more_about'] = _("More about {fullname}'s accomplishment").format(
+        fullname=user_fullname
+    )
+
+
+def _get_user_certificate(request, user, course_key, course, preview_mode=None):
+    """
+    Retrieves user's certificate from db. Creates one in case of preview mode.
+    Returns None if there is no certificate generated for given user
+    otherwise returns `GeneratedCertificate` instance.
+    """
+    try:
+        # Attempt to load the user's generated certificate data
+        if preview_mode:
+            user_certificate = GeneratedCertificate.objects.get(
+                user=user,
+                course_id=course_key,
+                mode=preview_mode
+            )
+        else:
+            user_certificate = GeneratedCertificate.objects.get(
+                user=user,
+                course_id=course_key
+            )
+
+    # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...
+    # If we are, we'll need to create a mock version of the user_certificate container for previewing
+    except GeneratedCertificate.DoesNotExist:
+        if preview_mode and (
+                has_access(request.user, 'instructor', course) or
+                has_access(request.user, 'staff', course)):
+            user_certificate = GeneratedCertificate(
+                mode=preview_mode,
+                verify_uuid=unicode(uuid4().hex),
+                modified_date=datetime.now().date()
+            )
+        else:
+            return None
+
+    return user_certificate
+
+
+def _track_certificate_events(request, context, course, user, user_certificate):
+    """
+    Tracks web certificate view related events.
+    """
+    badge = context['badge']
+    # Badge Request Event Tracking Logic
+    if 'evidence_visit' in request.GET and badge:
+        tracker.emit(
+            'edx.badge.assertion.evidence_visited',
+            {
+                'user_id': user.id,
+                'course_id': unicode(course.id),
+                'enrollment_mode': badge.mode,
+                'assertion_id': badge.id,
+                'assertion_image_url': badge.data['image'],
+                'assertion_json_url': badge.data['json']['id'],
+                'issuer': badge.data['issuer'],
+            }
+        )
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
-        emit_certificate_event('evidence_visited', user, course_id, course, {
+        emit_certificate_event('evidence_visited', user, unicode(course.id), course, {
             'certificate_id': user_certificate.verify_uuid,
             'enrollment_mode': user_certificate.mode,
             'social_network': CertificateSocialNetworks.linkedin
         })
 
-    # Append/Override the existing view context values with any course-specific static values from Advanced Settings
-    context.update(course.cert_html_view_overrides)
 
-    # FINALLY, generate and send the output the client
+def _render_certificate_template(request, context, course, user_certificate):
+    """
+    Picks appropriate certificate templates and renders it.
+    """
     if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
-        custom_template = get_certificate_template(course_key, user_certificate.mode)
+        custom_template = get_certificate_template(course.id, user_certificate.mode)
         if custom_template:
             template = Template(
                 custom_template,
@@ -488,3 +418,134 @@ def render_html_view(request, user_id, course_id):
             return HttpResponse(template.render(context))
 
     return render_to_response("certificates/valid.html", context)
+
+
+def _update_microsite_context(context, configuration):
+    """
+    Updates context with microsites data.
+    Microsites will need to be able to override any hard coded
+    content that was put into the context in the
+    _update_certificate_context() call above. For example the
+    'company_about_description' talks about edX, which we most likely
+    do not want to keep in a microsite
+
+    So we need to re-apply any configuration/content that
+    we are sourcing from the database. This is somewhat duplicative of
+    the code at the beginning of this method, but we
+    need the configuration at the top as some error code paths
+    require that to be set up early on in the pipeline
+    """
+
+    microsite_config_key = microsite.get_value('domain_prefix')
+    microsites_config = configuration.get("microsites", {})
+    if microsite_config_key and microsites_config:
+        context.update(microsites_config.get(microsite_config_key, {}))
+
+
+def _update_badge_context(context, course, user):
+    """
+    Updates context with badge info.
+    """
+    try:
+        badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
+    except BadgeAssertion.DoesNotExist:
+        badge = None
+    context['badge'] = badge
+
+
+def _update_organization_context(context, course):
+    """
+    Updates context with organization related info.
+    """
+    partner_long_name, organization_logo = None, None
+    partner_short_name = course.display_organization if course.display_organization else course.org
+    organizations = organization_api.get_course_organizations(course_id=course.id)
+    if organizations:
+        #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
+        organization = organizations[0]
+        partner_long_name = organization.get('name', partner_long_name)
+        partner_short_name = organization.get('short_name', partner_short_name)
+        organization_logo = organization.get('logo', None)
+
+    context['organization_long_name'] = partner_long_name
+    context['organization_short_name'] = partner_short_name
+    context['accomplishment_copy_course_org'] = partner_short_name
+    context['organization_logo'] = organization_logo
+
+
+@handle_500(
+    template_path="certificates/server-error.html",
+    test_func=lambda request: request.GET.get('preview', None)
+)
+def render_html_view(request, user_id, course_id):
+    """
+    This public view generates an HTML representation of the specified student's certificate
+    If a certificate is not available, we display a "Sorry!" screen instead
+    """
+    preview_mode = request.GET.get('preview', None)
+    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+    configuration = CertificateHtmlViewConfiguration.get_config()
+    # Create the initial view context, bootstrapping with Django settings and passed-in values
+    context = {}
+    _update_context_with_basic_info(context, course_id, platform_name, configuration)
+    invalid_template_path = 'certificates/invalid.html'
+
+    # Kick the user back to the "Invalid" screen if the feature is disabled
+    if not has_html_certificates_enabled(course_id):
+        return render_to_response(invalid_template_path, context)
+
+    # Load the course and user objects
+    try:
+        course_key = CourseKey.from_string(course_id)
+        user = User.objects.get(id=user_id)
+        course = modulestore().get_course(course_key)
+
+    # For any other expected exceptions, kick the user back to the "Invalid" screen
+    except (InvalidKeyError, ItemNotFoundError, User.DoesNotExist):
+        return render_to_response(invalid_template_path, context)
+
+    # Load user's certificate
+    user_certificate = _get_user_certificate(request, user, course_key, course, preview_mode)
+    if not user_certificate:
+        return render_to_response(invalid_template_path, context)
+
+    # Get the active certificate configuration for this course
+    # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
+    # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
+    active_configuration = get_active_web_certificate(course, preview_mode)
+    if active_configuration is None:
+        return render_to_response(invalid_template_path, context)
+    context['certificate_data'] = active_configuration
+
+    # Append/Override the existing view context values with any mode-specific ConfigurationModel values
+    context.update(configuration.get(user_certificate.mode, {}))
+
+    # Append organization info
+    _update_organization_context(context, course)
+
+    # Append course info
+    _update_course_context(request, context, course, platform_name)
+
+    # Append user info
+    _update_context_with_user_info(context, user, user_certificate)
+
+    # Append social sharing info
+    _update_social_context(request, context, course, user, user_certificate, platform_name)
+
+    # Append/Override the existing view context values with certificate specific values
+    _update_certificate_context(context, user_certificate, platform_name)
+
+    # Append badge info
+    _update_badge_context(context, course, user)
+
+    # Append microsite overrides
+    _update_microsite_context(context, configuration)
+
+    # Append/Override the existing view context values with any course-specific static values from Advanced Settings
+    context.update(course.cert_html_view_overrides)
+
+    # Track certificate view events
+    _track_certificate_events(request, context, course, user, user_certificate)
+
+    # FINALLY, render appropriate certificate
+    return _render_certificate_template(request, context, course, user_certificate)
