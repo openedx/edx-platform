@@ -9,7 +9,7 @@
 
 # Third-party:
 -e git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline
-git+https://github.com/edx/django-wiki.git@ned/dj18#egg=django-wiki==0.0.4
+git+https://github.com/edx/django-wiki.git@v0.0.4#egg=django-wiki==0.0.4
 -e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-6a#egg=django-oauth2-provider==0.2.7-fork-edx-6
 git+https://github.com/edx/django-openid-auth.git@0.8#egg=django-openid-auth==0.8
 -e git+https://github.com/edx/django-rest-framework-oauth.git@f0b503fda8c254a38f97fef802ded4f5fe367f7a#egg=djangorestframework-oauth==1.0.1
