@@ -21,6 +21,7 @@ from django.http import (
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
@@ -49,8 +50,9 @@ from instructor.enrollment import (
     unenroll_email,
     get_email_params,
 )
-from .models import CustomCourseForEdX
-from .overrides import (
+
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
     override_field_for_ccx,
     clear_ccx_field_info_from_ccx_map,
@@ -416,7 +418,7 @@ def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
 
     schedule = get_ccx_schedule(course, ccx)
     json_schedule = json.dumps(schedule, indent=4)
-    return HttpResponse(json_schedule, mimetype='application/json')
+    return HttpResponse(json_schedule, content_type='application/json')
 
 
 def get_valid_student_email(identifier):
@@ -572,6 +574,8 @@ def prep_course_for_grading(course, request):
     course.set_grading_policy(course.grading_policy)
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_gradebook(request, course, ccx=None):
@@ -598,6 +602,8 @@ def ccx_gradebook(request, course, ccx=None):
         })
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_grades_csv(request, course, ccx=None):

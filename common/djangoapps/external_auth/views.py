@@ -195,7 +195,7 @@ def _external_login_or_signup(request,
         if settings.AUTHENTICATION_BACKENDS:
             auth_backend = settings.AUTHENTICATION_BACKENDS[0]
         else:
-            auth_backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_backend = 'ratelimitbackend.backends.RateLimitModelBackend'
         user.backend = auth_backend
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.info(u'Linked user.id: {0} logged in via Shibboleth'.format(user.id))
@@ -204,7 +204,7 @@ def _external_login_or_signup(request,
     elif uses_certs:
         # Certificates are trusted, so just link the user and log the action
         user = internal_user
-        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        user.backend = 'ratelimitbackend.backends.RateLimitModelBackend'
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.info(u'Linked user_id {0} logged in via SSL certificate'.format(user.id))
         else:
@@ -923,7 +923,7 @@ def provider_identity(request):
 
     response = render_to_response('identity.xml',
                                   {'url': get_xrds_url('login', request)},
-                                  mimetype='text/xml')
+                                  content_type='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('identity', request)
@@ -937,7 +937,7 @@ def provider_xrds(request):
 
     response = render_to_response('xrds.xml',
                                   {'url': get_xrds_url('login', request)},
-                                  mimetype='text/xml')
+                                  content_type='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)

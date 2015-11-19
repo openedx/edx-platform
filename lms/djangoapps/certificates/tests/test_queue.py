@@ -29,7 +29,7 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
 )
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 
 
 @ddt.ddt

@@ -27,8 +27,9 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
+from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
-from django.utils.http import base36_to_int
+from django.utils.http import base36_to_int, urlsafe_base64_encode
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
@@ -55,7 +56,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
-from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
@@ -90,7 +91,7 @@ import track.views
 
 import dogstats_wrapper as dog_stats_api
 
-from util.db import commit_on_success_with_read_committed
+from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.milestones_helpers import (
@@ -923,8 +924,9 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
+@transaction.non_atomic_requests
 @require_POST
-@commit_on_success_with_read_committed
+@outer_atomic(read_committed=True)
 def change_enrollment(request, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
@@ -1441,7 +1443,8 @@ def _do_create_account(form):
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
-        user.save()
+        with transaction.atomic():
+            user.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=user.username)) > 0:
@@ -1573,7 +1576,7 @@ def create_account_with_params(request, params):
     )
 
     # Perform operations within a transaction that are critical to account creation
-    with transaction.commit_on_success():
+    with transaction.atomic():
         # first, create the account
         (user, profile, registration) = _do_create_account(form)
 
@@ -2055,12 +2058,19 @@ def password_reset_confirm_wrapper(
         # we also want to pass settings.PLATFORM_NAME in as extra_context
         extra_context = {"platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)}
 
+        # Support old password reset URLs that used base36 encoded user IDs.
+        # https://github.com/django/django/commit/1184d077893ff1bc947e45b00a4d565f3df81776#diff-c571286052438b2e3190f8db8331a92bR231
+        try:
+            uidb64 = force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36))))
+        except ValueError:
+            uidb64 = '1'    # dummy invalid ID (incorrect padding for base64)
+
         if request.method == 'POST':
             # remember what the old password hash is before we call down
             old_password_hash = user.password
 
             result = password_reset_confirm(
-                request, uidb36=uidb36, token=token, extra_context=extra_context
+                request, uidb64=uidb64, token=token, extra_context=extra_context
             )
 
             # get the updated user
@@ -2074,7 +2084,7 @@ def password_reset_confirm_wrapper(
             return result
         else:
             return password_reset_confirm(
-                request, uidb36=uidb36, token=token, extra_context=extra_context
+                request, uidb64=uidb64, token=token, extra_context=extra_context
             )
 
 
@@ -2182,18 +2192,17 @@ def do_email_change_request(user, new_email, activation_key=None):
 
 
 @ensure_csrf_cookie
-@transaction.commit_manually
 def confirm_email_change(request, key):  # pylint: disable=unused-argument
     """
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
-    try:
+    with transaction.atomic():
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)
         except PendingEmailChange.DoesNotExist:
             response = render_to_response("invalid_email_key.html", {})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         user = pec.user
@@ -2204,7 +2213,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
 
         if len(User.objects.filter(email=pec.new_email)) != 0:
             response = render_to_response("email_exists.html", {})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         subject = render_to_string('emails/email_change_subject.txt', address_context)
@@ -2223,7 +2232,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         user.email = pec.new_email
@@ -2235,16 +2244,11 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})
-            transaction.rollback()
+            transaction.set_rollback(True)
             return response
 
         response = render_to_response("email_change_successful.html", address_context)
-        transaction.commit()
         return response
-    except Exception:  # pylint: disable=broad-except
-        # If we get an unexpected exception, be sure to rollback the transaction
-        transaction.rollback()
-        raise
 
 
 @require_POST
