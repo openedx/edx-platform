@@ -55,7 +55,7 @@ def rewrite_video_url(cdn_base_url, original_video_url):
     """
     parsed = urlparse(original_video_url)
     rewritten_url = cdn_base_url + parsed.path
-    validator = URLValidator(verify_exists=False)
+    validator = URLValidator()
     try:
         validator(rewritten_url)
         return rewritten_url
