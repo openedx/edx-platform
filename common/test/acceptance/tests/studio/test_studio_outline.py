@@ -1755,6 +1755,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
         )
 
 
+@attr('shard_4')
 class SelfPacedOutlineTest(CourseOutlineTest):
     """Test the course outline for a self-paced course."""
 
