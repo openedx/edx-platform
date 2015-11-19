@@ -24,10 +24,10 @@ class ComprehensiveThemingAwareMixin(object):
 
         PROJECT_ROOT = getattr(settings, "PROJECT_ROOT", "")  # pylint: disable=invalid-name
         if PROJECT_ROOT.endswith("cms"):
-            system = "studio"
+            component = "studio"
         else:
-            system = "lms"
-        self.theme_location = os.path.join(COMP_THEME_DIR, system, "static")
+            component = "lms"
+        self.theme_location = os.path.join(COMP_THEME_DIR, component, "static")
 
     @property
     def prefix(self):
