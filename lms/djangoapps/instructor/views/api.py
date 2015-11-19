@@ -2732,6 +2732,99 @@ def start_certificate_regeneration(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_POST
+def create_bulk_certificate_exceptions(request, course_id):  # pylint: disable=invalid-name
+    """
+    Add Students to certificate white list from the uploaded csv file.
+    """
+    course_key = CourseKey.from_string(course_id)
+    students, warnings, errors, success = ([] for __ in range(4))
+    if 'students_list' in request.FILES:
+        try:
+            upload_file = request.FILES.get('students_list')
+            if upload_file.name.endswith('.csv'):
+                students = [row for row in csv.reader(upload_file.read().splitlines())]
+            else:
+                errors.append({
+                    'response': _('-- Make sure that the file you upload is in CSV format with no '
+                                  'extraneous characters or rows.')
+                })
+
+        except Exception:  # pylint: disable=broad-except
+            errors.append({
+                'response': _('-- Could not read uploaded file.')
+            })
+        finally:
+            upload_file.close()
+
+        row_num = 0
+        for student in students:
+            row_num += 1
+            # verify that we have exactly one column in every row either email or username but allow for blank lines
+            if len(student) != 1:
+                if len(student) > 0:
+                    errors.append({
+                        'response': _('-- Data in row# {num} must have exactly one column, '
+                                      'either an email or a username.').format(num=row_num)
+                    })
+                    log.info(u'invalid data/format in csv row# %s', row_num)
+                continue
+            user = student[0]
+            try:
+                db_user = get_user_by_username_or_email(user)
+            except ObjectDoesNotExist:
+                errors.append({'response': _('-- user (username/email={user}) does not exist.').format(user=user)})
+                log.info(u'student %s does not exist', user)
+            else:
+                if CertificateWhitelist.objects.filter(
+                        user=db_user,
+                        course_id=course_key,
+                        whitelist=True).count() > 0:
+                    warnings.append({
+                        'response': _("-- user '{username}' in row# {row} is already in certificate exceptions "
+                                      "list.").format(username=db_user.username, row=row_num)
+                    })
+                    log.warning(u'student %s already exist.', db_user.username)
+
+                # make sure user is enrolled in course
+                elif not CourseEnrollment.is_enrolled(db_user, course_key):
+                    warnings.append({
+                        'response': _("-- user '{username}' in row# {row} is not enrolled in course.").format(
+                            username=db_user.username, row=row_num
+                        )
+                    })
+                    log.warning(u'student %s is not enrolled in course.', db_user.username)
+
+                else:
+                    CertificateWhitelist.objects.create(
+                        user=db_user,
+                        course_id=course_key,
+                        whitelist=True,
+                        notes=''
+                    )
+                    success.append({
+                        'response': _("-- user '{username}' successfully added to exception list.").format(
+                            username=db_user.username
+                        )
+                    })
+
+    else:
+        errors.append({
+            'response': _('-- File is not attached.')
+        })
+
+    results = {
+        'errors': errors,
+        'warnings': warnings,
+        'success': success
+    }
+
+    return JsonResponse(results)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
 def create_certificate_exception(request, course_id, white_list_student=None):
     """
     Add Students to certificate white list.

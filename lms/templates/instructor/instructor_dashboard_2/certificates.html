@@ -5,7 +5,7 @@ import json
 %>
 
 <%static:require_module module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
-        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${certificate_exception_url}");
+        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${certificate_exception_url}", "${bulk_certificate_exceptions_url}");
 </%static:require_module>
 
 <%page args="section_data"/>
@@ -114,22 +114,21 @@ import json
             <input type="button" id="btn-start-regenerating-certificates" value="${_('Regenerate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_regeneration']}"/>
         </form>
         <div class="message certificate-regeneration-status"></div>
-    </div>
-
-    <div class="certificate_exception-container">
+    <div class="certificate-exception-container">
         <hr>
         <h2> ${_("Certificate Exceptions")} </h2>
+        <p class="under-heading-text">
+            ${_("Use this to generate certificates for users who did not pass the course but have been given an exception by the Course Team to earn a certificate.")}
+        </p>
         <div class="certificate-exception-section">
-            <p>${_("Use this to generate certificates for users who did not pass the course but have been given an exception by the Course Team to earn a certificate.")} </p>
+          <div class="bulk-white-list-exception"></div>
             <br />
             <div id="certificate-white-list-editor"></div>
             <br/>
-            <br/>
             <div class="white-listed-students" id="white-listed-students"></div>
-            <br/>
             <br/>
         </div>
         <div class="no-pending-tasks-message"></div>
     </div>
-
 </div>
+
