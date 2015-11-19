@@ -35,6 +35,16 @@ urlpatterns = patterns(
         }
     ),
 
+    # This URL is for A/B testing
+    url(
+        r'^upgrade_1/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
+        views.PayAndVerifyView.as_view(),
+        name="verify_student_upgrade_and_verify",
+        kwargs={
+            'message': views.PayAndVerifyView.UPGRADE_MSG
+        }
+    ),
+
     # The user has paid and still needs to verify.
     # Since the user has "just paid", we display *all* steps
     # including payment.  The user resumes the flow
