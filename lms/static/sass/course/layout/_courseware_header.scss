@@ -35,7 +35,7 @@
       a {
         @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
         @extend %t-title7;
-        @extend %t-strong;
+        @extend %t-regular;
         border-bottom: 3px solid transparent;
         color: $gray-d1;
         display: block;
