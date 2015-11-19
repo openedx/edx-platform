@@ -1,5 +1,5 @@
 """
-SOLA: Would you mind writing a docstring for this file?
+Javascript tests for the crowdsourcehinter xblock
 """
 from textwrap import dedent
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -11,7 +11,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 class CrowdsourcehinterProblemTest(UniqueCourseTest):
     """
-    SOLA: Would you mind writing a docstring for this class?
+    Test scenario for the hinter.
     """
     USERNAME = "STAFF_TESTER"
     EMAIL = "johndoe@example.com"

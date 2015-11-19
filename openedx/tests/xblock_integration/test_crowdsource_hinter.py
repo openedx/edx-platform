@@ -17,7 +17,7 @@ from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    SOLA: Please write a docstring here
+    Create the test environment with the crowdsourcehinter xblock.
     """
     STUDENTS = [
         {'email': 'view@test.com', 'password': 'foo'},
@@ -115,7 +115,9 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 class TestHinterFunctions(TestCrowdsourceHinter):
     """
-    Sola: Please write a docstring for this
+    Check that the essential functions of the hinter work as expected.
+    Tests cover the basic process of receiving a hint, adding a new hint,
+    and rating/reporting hints.
     """
     def test_get_hint_with_no_hints(self):
         """
@@ -133,8 +135,10 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'])
         data = {'new_hint_submission': 'new hint for answer 1', 'answer': 'incorrect answer 1'}
         self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
-        #result = self.call_event('add_new_hint', data)
-        # SOLA: We need something here to check if the result is correct.
+        result = self.call_event('add_new_hint', data)
+        expected = {'success':True,
+                    'result': 'Hint added'}
+        self.assertEqual(result, expected)
 
     def test_get_hint(self):
         """
