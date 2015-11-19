@@ -1057,6 +1057,13 @@ class CertificatesPage(PageObject):
         return self.get_selector('#btn-start-generating-certificates')
 
     @property
+    def generate_certificates_disabled_button(self):  # pylint: disable=invalid-name
+        """
+        Returns the disabled state of button
+        """
+        return self.get_selector('#disabled-btn-start-generating-certificates')
+
+    @property
     def certificate_generation_status(self):
         """
         Returns certificate generation status message container.

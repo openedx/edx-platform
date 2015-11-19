@@ -22,6 +22,7 @@ from ...pages.lms.problem import ProblemPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
 from common.test.acceptance.tests.helpers import disable_animations
+from ...fixtures.certificates import CertificateConfigFixture
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -589,11 +590,36 @@ class CertificatesTest(BaseInstructorDashboardTest):
 
     def setUp(self):
         super(CertificatesTest, self).setUp()
-        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.test_certificate_config = {
+            'id': 1,
+            'name': 'Certificate name',
+            'description': 'Certificate description',
+            'course_title': 'Course title override',
+            'signatories': [],
+            'version': 1,
+            'is_active': True
+        }
+        CourseFixture(**self.course_info).install()
+        self.cert_fixture = CertificateConfigFixture(self.course_id, self.test_certificate_config)
+        self.cert_fixture.install()
         self.user_name, self.user_id = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
         disable_animations(self.certificates_section)
+
+    def test_generate_certificates_buttons_is_disable(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Generate Certificates button is disable.
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            The instructor-generation and cert_html_view_enabled feature flags have been enabled
+            But the certificate is not active in settings.
+            Then I see a 'Generate Certificates' button disabled
+        """
+        self.test_certificate_config['is_active'] = False
+        self.cert_fixture.update_certificate(1)
+        self.browser.refresh()
+        self.assertFalse(self.certificates_section.generate_certificates_button.visible)
+        self.assertTrue(self.certificates_section.generate_certificates_disabled_button.visible)
 
     def test_generate_certificates_buttons_is_visible(self):
         """

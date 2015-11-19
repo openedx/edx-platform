@@ -73,7 +73,12 @@ import json
         <div class="start-certificate-generation">
             <h2>${_("Generate Certificates")}</h2>
             <form id="certificates-generating-form" method="post" action="${section_data['urls']['start_certificate_generation']}">
-                <input type="button" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
+                % if section_data['html_cert_enabled'] and section_data['active_certificate'] is None:
+                    <p>${_("Course certificate generation requires an activated web certificate configuration.")}</p>
+                    <input type="button" id="disabled-btn-start-generating-certificates" class="is-disabled" aria-disabled="true" value="${_('Generate Certificates')}"/>
+                % else:
+                    <input type="button" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
+                %endif
             </form>
             <div class="certificate-generation-status"></div>
         </div>
@@ -91,6 +96,25 @@ import json
             </div>
         %endif
     % endif
+
+    <hr>
+    <p class="start-certificate-regeneration">
+        <h2>${_("Regenerate Certificates")}</h2>
+        <form id="certificate-regenerating-form" method="post" action="${section_data['urls']['start_certificate_regeneration']}">
+            <p id='status-multi-select-tip'>${_('Select one or more certificate statuses below using your mouse and ctrl or command key.')}</p>
+            <select class="multi-select" multiple id="certificate-statuses" name="certificate_statuses" aria-describedby="status-multi-select-tip">
+                %for status in section_data['certificate_statuses']:
+                    <option value="${status['status']}">${status['status'].title() + " ({})".format(status['count'])}</option>
+                %endfor
+            </select>
+            <label for="certificate-statuses">
+                ${_("Select certificate statuses that need regeneration and click Regenerate Certificates button.")}
+            </label>
+
+            <input type="button" id="btn-start-regenerating-certificates" value="${_('Regenerate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_regeneration']}"/>
+        </form>
+        <div class="message certificate-regeneration-status"></div>
+    </div>
 
     <div class="certificate_exception-container">
         <hr>

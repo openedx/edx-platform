@@ -1,3 +1,8 @@
+"""
+Utility Mixins for unit tests
+"""
+
+import json
 import sys
 
 from mock import patch
@@ -93,6 +98,19 @@ class EventTestMixin(object):
         Reset the mock tracker in order to forget about old events.
         """
         self.mock_tracker.reset_mock()
+
+
+class PatchMediaTypeMixin(object):
+    """
+    Generic mixin for verifying unsupported media type in PATCH
+    """
+    def test_patch_unsupported_media_type(self):
+        response = self.client.patch(  # pylint: disable=no-member
+            self.url,
+            json.dumps({}),
+            content_type=self.unsupported_media_type
+        )
+        self.assertEqual(response.status_code, 415)
 
 
 def patch_testcase():

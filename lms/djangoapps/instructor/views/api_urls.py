@@ -124,7 +124,10 @@ urlpatterns = patterns(
 
     # spoc gradebook
     url(r'^gradebook$',
-        'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+        'instructor.views.gradebook_api.spoc_gradebook', name='spoc_gradebook'),
+
+    url(r'^gradebook/(?P<offset>[0-9]+)$',
+        'instructor.views.gradebook_api.spoc_gradebook', name='spoc_gradebook'),
 
     # Cohort management
     url(r'add_users_to_cohorts$',
@@ -142,6 +145,10 @@ urlpatterns = patterns(
     url(r'^start_certificate_generation',
         'instructor.views.api.start_certificate_generation',
         name='start_certificate_generation'),
+
+    url(r'^start_certificate_regeneration',
+        'instructor.views.api.start_certificate_regeneration',
+        name='start_certificate_regeneration'),
 
     url(r'^create_certificate_exception/(?P<white_list_student>[^/]*)',
         'instructor.views.api.create_certificate_exception',

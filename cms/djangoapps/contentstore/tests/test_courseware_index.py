@@ -17,7 +17,7 @@ from django.conf import settings
 from course_modes.models import CourseMode
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -335,6 +335,25 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 5)
 
+    def _test_delete_course_from_search_index_after_course_deletion(self, store):  # pylint: disable=invalid-name
+        """
+        Test that course will also be delete from search_index after course deletion.
+        """
+        self.DOCUMENT_TYPE = 'course_info'  # pylint: disable=invalid-name
+        response = self.search()
+        self.assertEqual(response["total"], 0)
+
+        # index the course in search_index
+        self.reindex_course(store)
+        response = self.search()
+        self.assertEqual(response["total"], 1)
+
+        # delete the course and look course in search_index
+        modulestore().delete_course(self.course.id, self.user_id)
+        self.assertIsNone(modulestore().get_course(self.course.id))
+        response = self.search()
+        self.assertEqual(response["total"], 0)
+
     def _test_deleting_item(self, store):
         """ test deleting an item """
         # Publish the vertical to start with
@@ -603,6 +622,11 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(*WORKS_WITH_STORES)
     def test_course_location_null(self, store_type):
         self._perform_test_using_store(store_type, self._test_course_location_null)
+
+    @ddt.data(*WORKS_WITH_STORES)
+    def test_delete_course_from_search_index_after_course_deletion(self, store_type):
+        """ Test for removing course from CourseAboutSearchIndexer """
+        self._perform_test_using_store(store_type, self._test_delete_course_from_search_index_after_course_deletion)
 
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')

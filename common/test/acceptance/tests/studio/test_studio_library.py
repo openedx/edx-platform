@@ -656,7 +656,13 @@ class StudioLibraryA11yTest(StudioLibraryTest):
         # There are several existing color contrast errors on this page,
         # we will ignore this error in the test until we fix them.
         lib_page.a11y_audit.config.set_rules({
-            "ignore": ['color-contrast'],
+            "ignore": [
+                'color-contrast',  # TODO: AC-225
+                'link-href',  # TODO: AC-226
+                'nav-aria-label',  # TODO: AC-227
+                'skip-link',  # TODO: AC-228
+                'icon-aria-hidden',  # TODO: AC-229
+            ],
         })
 
         lib_page.a11y_audit.check_for_accessibility_errors()

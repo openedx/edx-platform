@@ -25,6 +25,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "DEFAULT_STORE={default_store} "
             "SCREENSHOT_DIR='{repo_dir}/test_root/log{shard_str}' "
             "BOK_CHOY_HAR_DIR='{repo_dir}/test_root/log{shard_str}/hars' "
+            "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{repo_dir}/{a11y_custom_file}' "
             "SELENIUM_DRIVER_LOG_DIR='{repo_dir}/test_root/log{shard_str}' "
             "nosetests {repo_dir}/common/test/acceptance/{exp_text} "
             "--with-xunit "
@@ -35,6 +36,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             repo_dir=REPO_DIR,
             shard_str='/shard_' + self.shard if self.shard else '',
             exp_text=name,
+            a11y_custom_file='node_modules/edx-custom-a11y-rules/lib/custom_a11y_rules.js',
         )
         return expected_statement
 
