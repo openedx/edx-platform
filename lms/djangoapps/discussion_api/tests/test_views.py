@@ -301,7 +301,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
             "read": False,
             "has_endorsed": False,
         }]
@@ -524,7 +524,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             "read": False,
             "has_endorsed": False,
             "response_count": 0,
@@ -619,7 +619,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
     def test_basic(self):
         self.register_get_user_response(self.user)
-        self.register_thread({"created_at": "Test Date", "updated_at": "Test Date"})
+        self.register_thread({"created_at": "Test Created Date", "updated_at": "Test Updated Date"})
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
@@ -629,9 +629,11 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             self.expected_response_data({
                 "raw_body": "Edited body",
                 "rendered_body": "<p>Edited body</p>",
-                "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
-                "created_at": "Test Date",
-                "updated_at": "Test Date",
+                "editable_fields": [
+                    "abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
+                ],
+                "created_at": "Test Created Date",
+                "updated_at": "Test Updated Date",
             })
         )
         self.assertEqual(
@@ -647,6 +649,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "anonymous_to_peers": ["False"],
                 "closed": ["False"],
                 "pinned": ["False"],
+                "read": ["False"],
             }
         )
 
@@ -680,7 +683,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             self.expected_response_data({
                 "closed": True,
                 "abuse_flagged": value,
-                "editable_fields": ["abuse_flagged"],
+                "editable_fields": ["abuse_flagged", "read"],
             })
         )
 
@@ -1036,7 +1039,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
 
     def test_basic(self):
         self.register_thread()
-        self.register_comment({"created_at": "Test Date", "updated_at": "Test Date"})
+        self.register_comment({"created_at": "Test Created Date", "updated_at": "Test Updated Date"})
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
@@ -1047,8 +1050,8 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
                 "raw_body": "Edited body",
                 "rendered_body": "<p>Edited body</p>",
                 "editable_fields": ["abuse_flagged", "raw_body", "voted"],
-                "created_at": "Test Date",
-                "updated_at": "Test Date",
+                "created_at": "Test Created Date",
+                "updated_at": "Test Updated Date",
             })
         )
         self.assertEqual(
@@ -1142,7 +1145,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase)
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,

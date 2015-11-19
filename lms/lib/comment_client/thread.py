@@ -25,7 +25,7 @@ class Thread(models.Model):
 
     # updateable_fields are sent in PUT requests
     updatable_fields = [
-        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
+        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type'
     ]
 

@@ -649,7 +649,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
                 "endorsed_comment_list_url": None,
                 "non_endorsed_comment_list_url": None,
-                "editable_fields": ["abuse_flagged", "following", "voted"],
+                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
                 "has_endorsed": True,
                 "read": True,
             },
@@ -682,7 +682,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "non_endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
-                "editable_fields": ["abuse_flagged", "following", "voted"],
+                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
                 "has_endorsed": False,
                 "read": False,
             },
@@ -1402,7 +1402,7 @@ class CreateThreadTest(
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             'read': False,
             'has_endorsed': False,
             'response_count': 0,
@@ -1948,7 +1948,7 @@ class UpdateThreadTest(
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             'read': False,
             'has_endorsed': False,
             'response_count': 0
@@ -1967,6 +1967,7 @@ class UpdateThreadTest(
                 "anonymous_to_peers": ["False"],
                 "closed": ["False"],
                 "pinned": ["False"],
+                "read": ["False"],
             }
         )
 
@@ -2989,7 +2990,7 @@ class RetrieveThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
@@ -3029,7 +3030,7 @@ class RetrieveThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,

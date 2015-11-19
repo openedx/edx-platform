@@ -104,12 +104,14 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
     """
     **Use Cases**
 
-        Retrieve the list of threads for a course, post a new thread, or modify
-        or delete an existing thread.
+        Retrieve the list of threads for a course, retrieve thread details,
+        post a new thread, or modify or delete an existing thread.
 
     **Example Requests**:
 
         GET /api/discussion/v1/threads/?course_id=ExampleX/Demo/2015
+
+        GET /api/discussion/v1/threads/thread_id
 
         POST /api/discussion/v1/threads
         {
@@ -126,7 +128,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         DELETE /api/discussion/v1/threads/thread_id
 
-    **GET Parameters**:
+    **GET Thread List Parameters**:
 
         * course_id (required): The course to retrieve threads for
 
@@ -176,13 +178,19 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
     **PATCH Parameters**:
 
-        topic_id, type, title, and raw_body are accepted with the same meaning
+        * abuse_flagged (optional): A boolean to mark thread as abusive
+
+        * voted (optional): A boolean to vote for thread
+
+        * read (optional): A boolean to mark thread as read
+
+        * topic_id, type, title, and raw_body are accepted with the same meaning
         as in a POST request
 
         If "application/merge-patch+json" is not the specified content type,
         a 415 error is returned.
 
-    **GET Response Values**:
+    **GET Thread List Response Values**:
 
         * results: The list of threads; each item in the list has the same
             fields as the POST/PATCH response below
@@ -194,6 +202,10 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         * text_search_rewrite: The search string to which the text_search
             parameter was rewritten in order to match threads (e.g. for spelling
             correction)
+
+    **GET Thread Details Response Values**:
+
+        Same response fields as the POST/PATCH response below
 
     **POST/PATCH response values**:
 
@@ -300,7 +312,8 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
     """
     **Use Cases**
 
-        Retrieve the list of comments in a thread, create a comment, or modify
+        Retrieve the list of comments in a thread, retrieve the list of
+        child comments for a response comment, create a comment, or modify
         or delete an existing comment.
 
     **Example Requests**:
@@ -332,9 +345,6 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         * page: The (1-indexed) page to retrieve (default is 1)
 
         * page_size: The number of items per page (default is 10, max is 100)
-
-        * mark_as_read: Will mark the thread of the comments as read. (default
-            is False)
 
     **GET Child Comment List Parameters**:
 
@@ -439,8 +449,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["thread_id"],
                 form.cleaned_data["endorsed"],
                 form.cleaned_data["page"],
-                form.cleaned_data["page_size"],
-                form.cleaned_data["mark_as_read"]
+                form.cleaned_data["page_size"]
             )
         )
 
