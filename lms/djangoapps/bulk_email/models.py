@@ -45,6 +45,7 @@ class Email(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     class Meta(object):
+        app_label = "bulk_email"
         abstract = True
 
 
@@ -52,6 +53,9 @@ class CourseEmail(Email):
     """
     Stores information for an email to a course.
     """
+    class Meta(object):
+        app_label = "bulk_email"
+
     # Three options for sending that we provide from the instructor dashboard:
     # * Myself: This sends an email to the staff member that is composing the email.
     #
@@ -80,13 +84,6 @@ class CourseEmail(Email):
             text_message=None, template_name=None, from_addr=None):
         """
         Create an instance of CourseEmail.
-
-        The CourseEmail.save_now method makes sure the CourseEmail entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, an autocommit buried within here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
         """
         # automatically generate the stripped version of the text from the HTML markup:
         if text_message is None:
@@ -109,23 +106,9 @@ class CourseEmail(Email):
             template_name=template_name,
             from_addr=from_addr,
         )
-        course_email.save_now()
+        course_email.save()
 
         return course_email
-
-    @transaction.autocommit
-    def save_now(self):
-        """
-        Writes CourseEmail immediately, ensuring the transaction is committed.
-
-        Autocommit annotation makes sure the database entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, this autocommit here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
-        """
-        self.save()
 
     def get_template(self):
         """
@@ -145,6 +128,7 @@ class Optout(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta(object):
+        app_label = "bulk_email"
         unique_together = ('user', 'course_id')
 
 
@@ -162,6 +146,9 @@ class CourseEmailTemplate(models.Model):
     The admin console interface disables add and delete operations.
     Validation is handled in the CourseEmailTemplateForm class.
     """
+    class Meta(object):
+        app_label = "bulk_email"
+
     html_template = models.TextField(null=True, blank=True)
     plain_template = models.TextField(null=True, blank=True)
     name = models.CharField(null=True, max_length=255, unique=True, blank=True)
@@ -235,6 +222,9 @@ class CourseAuthorization(models.Model):
     """
     Enable the course email feature on a course-by-course basis.
     """
+    class Meta(object):
+        app_label = "bulk_email"
+
     # The course that these features are attached to.
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True)
 

@@ -2,8 +2,9 @@
 """
 Test cases to cover Accounts-related behaviors of the User API application
 """
-import datetime
+from collections import OrderedDict
 from copy import deepcopy
+import datetime
 import ddt
 import hashlib
 import json
@@ -239,7 +240,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=self.test_password)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(11):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -254,7 +255,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=self.test_password)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(11):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
 
@@ -305,7 +306,7 @@ class TestAccountAPI(UserAPITestCase):
             """
             Internal helper to perform the actual assertions
             """
-            with self.assertNumQueries(7):
+            with self.assertNumQueries(10):
                 response = self.send_get(self.client)
             data = response.data
             self.assertEqual(16, len(data))
@@ -344,7 +345,7 @@ class TestAccountAPI(UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=self.test_password)
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(10):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])
@@ -383,14 +384,14 @@ class TestAccountAPI(UserAPITestCase):
         ("level_of_education", "none", u"ȻħȺɍłɇs", u'"ȻħȺɍłɇs" is not a valid choice.'),
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
-        ("name", "bob", "z" * 256, u"Ensure this field has no more than 255 characters."),
-        ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
+        ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
+        ("name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
         # Note that we store the raw data, so it is up to client to escape the HTML.
         (
             "bio", u"<html>Lacrosse-playing superhero 壓是進界推日不復女</html>",
-            "z" * 3001, u"Ensure this field has no more than 3000 characters."
+            "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."
         ),
         ("account_privacy", ALL_USERS_VISIBILITY),
         ("account_privacy", PRIVATE_VISIBILITY),
@@ -604,11 +605,14 @@ class TestAccountAPI(UserAPITestCase):
     @ddt.data(
         (u"not_a_list", {u'non_field_errors': [u'Expected a list of items but got type "unicode".']}),
         ([u"not_a_JSON_object"], [{u'non_field_errors': [u'Invalid data. Expected a dictionary, but got unicode.']}]),
-        ([{}], [{"code": [u"This field is required."]}]),
-        ([{u"code": u"invalid_language_code"}], [{'code': [u'"invalid_language_code" is not a valid choice.']}]),
+        ([{}], [OrderedDict([('code', [u'This field is required.'])])]),
+        (
+            [{u"code": u"invalid_language_code"}],
+            [OrderedDict([('code', [u'"invalid_language_code" is not a valid choice.'])])]
+        ),
         (
             [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
-            [u'The language_proficiencies field must consist of unique languages']
+            ['The language_proficiencies field must consist of unique languages']
         ),
     )
     @ddt.unpack

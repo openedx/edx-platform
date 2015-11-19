@@ -66,7 +66,7 @@ class BokChoyTestSuite(TestSuite):
         self.log_dir.makedirs_p()
         self.har_dir.makedirs_p()
         self.report_dir.makedirs_p()
-        test_utils.clean_reports_dir()
+        test_utils.clean_reports_dir()      # pylint: disable=no-value-for-parameter
 
         if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()

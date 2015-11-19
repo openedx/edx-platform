@@ -5,7 +5,7 @@ import json
 import ddt
 
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.test.client import Client, RequestFactory
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -24,7 +24,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
-from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -360,7 +360,7 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
     def clear_caches(self):
         """Clears caches so that query count numbers are accurate."""
         for cache in settings.CACHES:
-            get_cache(cache).clear()
+            caches[cache].clear()
         RequestCache.clear_request_cache()
 
     def count_queries(func):  # pylint: disable=no-self-argument
@@ -378,10 +378,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 22),
-        (ModuleStoreEnum.Type.mongo, 20, 4, 22),
-        (ModuleStoreEnum.Type.split, 3, 13, 22),
-        (ModuleStoreEnum.Type.split, 20, 13, 22),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 26),
+        (ModuleStoreEnum.Type.mongo, 20, 4, 26),
+        (ModuleStoreEnum.Type.split, 3, 13, 26),
+        (ModuleStoreEnum.Type.split, 20, 13, 26),
     )
     @ddt.unpack
     @count_queries
@@ -389,10 +389,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 16),
-        (ModuleStoreEnum.Type.mongo, 20, 3, 16),
-        (ModuleStoreEnum.Type.split, 3, 10, 16),
-        (ModuleStoreEnum.Type.split, 20, 10, 16),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 20),
+        (ModuleStoreEnum.Type.mongo, 20, 3, 20),
+        (ModuleStoreEnum.Type.split, 3, 10, 20),
+        (ModuleStoreEnum.Type.split, 20, 10, 20),
     )
     @ddt.unpack
     @count_queries

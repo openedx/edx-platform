@@ -5,7 +5,7 @@ Admin site configurations for verify_student.
 
 from config_models.admin import ConfigurationModelAdmin
 from ratelimitbackend import admin
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     IcrvStatusEmailsConfiguration,
     SkippedReverification,
     SoftwareSecurePhotoVerification,

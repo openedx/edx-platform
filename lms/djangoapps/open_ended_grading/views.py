@@ -373,7 +373,7 @@ def take_action_on_flags(request, course_id):
                 'success': False,
                 'error': STAFF_ERROR_MESSAGE + error_message
             }
-            return HttpResponse(json.dumps(response), mimetype="application/json")
+            return HttpResponse(json.dumps(response), content_type="application/json")
 
     p = request.POST
     submission_id = p['submission_id']
@@ -387,7 +387,7 @@ def take_action_on_flags(request, course_id):
     controller_qs = create_controller_query_service()
     try:
         response = controller_qs.take_action_on_flags(course_key, student_id, submission_id, action_type)
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")
     except GradingServiceError:
         log.exception(
             u"Error taking action on flagged peer grading submissions, "
@@ -398,4 +398,4 @@ def take_action_on_flags(request, course_id):
             'success': False,
             'error': STAFF_ERROR_MESSAGE
         }
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")

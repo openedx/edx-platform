@@ -22,7 +22,7 @@ from commerce.tests.mocks import mock_order_endpoint
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
 from student.tests.factories import UserFactory
-from verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.models import VerificationDeadline
 
 PASSWORD = 'test'
 JSON_CONTENT_TYPE = 'application/json'

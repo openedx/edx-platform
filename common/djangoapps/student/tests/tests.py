@@ -39,7 +39,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, ModuleSt
 from bulk_email.models import Optout  # pylint: disable=import-error
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
