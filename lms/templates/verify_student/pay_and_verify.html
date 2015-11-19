@@ -24,9 +24,15 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
     <%
       template_names = (
           ["webcam_photo", "image_input", "error"] +
-          ["intro_step", "make_payment_step", "payment_confirmation_step"] +
+          ["intro_step", "payment_confirmation_step"] +
           ["face_photo_step", "id_photo_step", "review_photos_step", "enrollment_confirmation_step"]
       )
+
+      if not is_ab_testing:
+        template_names.append("make_payment_step")
+      else:
+        template_names.append("make_payment_step_ab_testing")
+
     %>
     % for template_name in template_names:
         <script type="text/template" id="${template_name}-tpl">
@@ -76,6 +82,7 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
       data-already-verified='${already_verified}'
       data-verification-good-until='${verification_good_until}'
       data-capture-sound='${capture_sound}'
+      data-is-ab-testing='${json.dumps(is_ab_testing)}'
 
       ## If we reached the verification flow from an in-course checkpoint,
       ## then pass the checkpoint location in so that we can associate

@@ -674,6 +674,7 @@
         'lms/include/js/spec/verify_student/image_input_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
         'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
+        'lms/include/js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
         'lms/include/js/spec/edxnotes/utils/logger_spec.js',
         'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/views/shim_spec.js',
