@@ -592,7 +592,7 @@ class HighLevelTabTest(UniqueCourseTest):
 
         # Navigate to the course info page from the progress page
         self.progress_page.visit()
-        self.tab_nav.go_to_tab('Course Info')
+        self.tab_nav.go_to_tab('Home')
 
         # Expect just one update
         self.assertEqual(self.course_info_page.num_updates, 1)
@@ -650,13 +650,13 @@ class HighLevelTabTest(UniqueCourseTest):
 
     def test_courseware_nav(self):
         """
-        Navigate to a particular unit in the courseware.
+        Navigate to a particular unit in the course.
         """
-        # Navigate to the courseware page from the info page
+        # Navigate to the course page from the info page
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
-        # Check that the courseware navigation appears correctly
+        # Check that the course navigation appears correctly
         EXPECTED_SECTIONS = {
             'Test Section': ['Test Subsection'],
             'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
@@ -717,6 +717,77 @@ class PDFTextBooksTabTest(UniqueCourseTest):
         # Verify each PDF textbook tab by visiting, it will fail if correct tab is not loaded.
         for i in range(1, 3):
             self.tab_nav.go_to_tab("PDF Book {}".format(i))
+
+
+@attr('shard_1')
+class VideoTest(UniqueCourseTest):
+    """
+    Navigate to a video in the course and play it.
+    """
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(VideoTest, self).setUp()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.course_nav = CourseNavPage(self.browser)
+        self.tab_nav = TabNavPage(self.browser)
+        self.video = VideoPage(self.browser)
+
+        # Install a course fixture with a video component
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('video', 'Video')
+                    )))).install()
+
+        # Auto-auth register for the course
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    @skip("BLD-563: Video Player Stuck on Pause")
+    def test_video_player(self):
+        """
+        Play a video in the course.
+        """
+
+        # Navigate to a video
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Course')
+
+        # The video should start off paused
+        # Since the video hasn't loaded yet, it's elapsed time is 0
+        self.assertFalse(self.video.is_playing)  # pylint: disable=no-member
+        self.assertEqual(self.video.elapsed_time, 0)  # pylint: disable=no-member
+
+        # Play the video
+        self.video.play()  # pylint: disable=no-member
+
+        # Now we should be playing
+        self.assertTrue(self.video.is_playing)  # pylint: disable=no-member
+
+        # Commented the below EmptyPromise, will move to its page once this test is working and stable
+        # Also there is should be no Promise check in any test as this should be done in Page Object
+        # Wait for the video to load the duration
+        # EmptyPromise(
+        #     lambda: self.video.duration > 0,
+        #     'video has duration', timeout=20
+        # ).fulfill()
+
+        # Pause the video
+        self.video.pause()  # pylint: disable=no-member
+
+        # Expect that the elapsed time and duration are reasonable
+        # Again, we can't expect the video to actually play because of
+        # latency through the ssh tunnel
+        self.assertGreaterEqual(self.video.elapsed_time, 0)  # pylint: disable=no-member
+        self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)  # pylint: disable=no-member
 
 
 @attr('shard_1')
@@ -844,7 +915,7 @@ class TooltipTest(UniqueCourseTest):
         Verify that tooltips are displayed when you hover over the sequence nav bar.
         """
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
         self.assertTrue(self.courseware_page.tooltips_displayed())
 
@@ -993,7 +1064,7 @@ class ProblemExecutionTest(UniqueCourseTest):
     def test_python_execution_in_problem(self):
         # Navigate to the problem page
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
         self.course_nav.go_to_section('Test Section', 'Test Subsection')
 
         problem_page = ProblemPage(self.browser)
@@ -1043,14 +1114,14 @@ class EntranceExamTest(UniqueCourseTest):
 
     def test_entrance_exam_section(self):
         """
-         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at courseware
+         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at course
          page.
-            Given that I am on the courseware page
-            When I view the courseware that has an entrance exam
+            Given that I am on the course page
+            When I view the course that has an entrance exam
             Then there should be an "Entrance Exam" chapter.'
         """
         entrance_exam_link_selector = '.accordion .course-navigation .chapter .group-heading'
-        # visit courseware page and make sure there is not entrance exam chapter.
+        # visit course page and make sure there is not entrance exam chapter.
         self.courseware_page.visit()
         self.courseware_page.wait_for_page()
         self.assertFalse(element_has_text(
