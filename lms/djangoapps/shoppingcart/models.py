@@ -1984,7 +1984,10 @@ class CertificateItem(OrderItem):
 
     def additional_instruction_text(self):
         verification_reminder = ""
+        refund_reminder_msg = _("You can unenroll in the course and receive a full refund for 14 days after the course "
+                                "start date. ")
         is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()
+        is_professional_mode_verified = self.course_enrollment.is_professional_enrollment()
 
         if is_enrollment_mode_verified:
             domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
@@ -1995,12 +1998,17 @@ class CertificateItem(OrderItem):
                 "If you haven't verified your identity yet, please start the verification process ({verification_url})."
             ).format(verification_url=verification_url)
 
+        if is_professional_mode_verified:
+            refund_reminder_msg = _("You can unenroll in the course and receive a full refund for 2 days after the "
+                                    "course start date. ")
+
         refund_reminder = _(
-            "You have up to two weeks into the course to unenroll and receive a full refund."
+            "{refund_reminder_msg}"
             "To receive your refund, contact {billing_email}. "
             "Please include your order number in your email. "
             "Please do NOT include your credit card information."
         ).format(
+            refund_reminder_msg=refund_reminder_msg,
             billing_email=settings.PAYMENT_SUPPORT_EMAIL
         )
 
