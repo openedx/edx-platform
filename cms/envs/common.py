@@ -62,7 +62,7 @@ from xmodule.mixin import LicenseMixin
 
 
 # Dummy secret key for dev/test
-SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+SECRET_KEY = 'dev key'
 
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
