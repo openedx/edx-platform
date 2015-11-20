@@ -4,7 +4,6 @@ Tests for Blocks Views
 
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
-from rest_framework.exceptions import NotFound
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -121,7 +120,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         self.verify_response(params={'username': self.honor_user.username})
 
     def test_as_anonymous_user(self):
-        self.verify_response(expected_status_code=401)
+        self.verify_response(expected_status_code=200)
 
     def test_hidden_course_as_honor(self):
         self.setup_user(self.honor_user)
@@ -142,5 +141,5 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         request = request_factory.get('/')
         request.query_params = {}
         request.user = self.staff_user
-        with self.assertRaises(NotFound):
-            CourseDetailView().get(request, 'a:b:c')
+        response = CourseDetailView().dispatch(request, course_key_string='a:b:c')
+        self.assertEqual(404, response.status_code)
