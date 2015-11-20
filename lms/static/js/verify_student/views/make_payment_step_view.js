@@ -11,14 +11,14 @@ var edx = edx || {};
     edx.verify_student.MakePaymentStepView = edx.verify_student.StepView.extend({
 
         templateName: "make_payment_step",
+        btn_class: 'action-primary',
 
         initialize: function( obj ) {
             _.extend( this, obj );
-           if (this.templateContext().isABTesting)
-            this.templateName = "make_payment_step_ab_testing";
-           else
-            this.templateName = "make_payment_step";
-
+           if (this.templateContext().isABTesting) {
+               this.templateName = "make_payment_step_ab_testing";
+               this.btn_class = 'action-primary-blue';
+           }
         },
 
         defaultContext: function() {
@@ -71,8 +71,8 @@ var edx = edx || {};
         _getPaymentButtonHtml: function(processorName) {
             var self = this;
             return _.template(
-                '<button class="next action-primary payment-button" id="<%- name %>" ><%- text %></button> '
-            )({name: processorName, text: self._getPaymentButtonText(processorName)});
+                '<button class="next <%- btn_class %> payment-button" id="<%- name %>" ><%- text %></button> '
+            )({name: processorName, text: self._getPaymentButtonText(processorName), btn_class: this.btn_class});
         },
 
         postRender: function() {
