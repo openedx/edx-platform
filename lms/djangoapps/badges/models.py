@@ -1,11 +1,12 @@
 """
 Database models for the badges app
 """
+from importlib import import_module
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.importlib import import_module
 from django.utils.translation import ugettext_lazy as _
 from lazy import lazy
 
@@ -91,6 +92,9 @@ class BadgeClass(models.Model):
         """
         return self.backend.award(self, user, evidence_url=evidence_url)
 
+    class Meta(object):
+        app_label = "badges"
+
 
 class BadgeAssertion(models.Model):
     """
@@ -117,6 +121,9 @@ class BadgeAssertion(models.Model):
         if course_id:
             return cls.objects.filter(user=user, badge_class__course_id=course_id)
         return cls.objects.filter(user=user)
+
+    class Meta(object):
+        app_label = "badges"
 
 
 class CourseCompleteImageConfiguration(models.Model):
@@ -168,3 +175,6 @@ class CourseCompleteImageConfiguration(models.Model):
         except cls.DoesNotExist:
             # Fall back to default, if there is one.
             return cls.objects.get(default=True).icon
+
+    class Meta(object):
+        app_label = "badges"
