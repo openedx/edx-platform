@@ -630,6 +630,7 @@ def students_update_enrollment(request, course_id):
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_allowed = before.to_dict()['allowed']
+                enrollment_obj = CourseEnrollment.get_enrollment(user, course_id)
 
                 if before_enrollment:
                     state_transition = ENROLLED_TO_UNENROLLED
