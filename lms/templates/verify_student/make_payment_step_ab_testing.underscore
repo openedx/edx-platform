@@ -1,5 +1,5 @@
 <div id="wrapper-review" tab-index="0" class="wrapper-view make-payment-step">
- Checkout
+ <h3>Checkout</h3>
   <div class="review view">
     <% if ( !upgrade ) { %>
       <h2 class="title center-col">
@@ -17,28 +17,11 @@
       </h2>
     <% } %>
 
-   <div class="purchase">
-      <p class="product-info">
-        <span class="product-name"></span> <%- gettext( "Total" ) %>: <span class="price">$<%- minPrice %> USD</span>
-      </p>
-    </div>
-
-  <% if ( isActive ) { %>
-  <div class="payment-buttons nav-wizard is-ready center">
-    <input type="hidden" name="contribution" value="<%- minPrice %>" />
-    <input type="hidden" name="sku" value="<%- sku %>" />
     <div class="purchase">
       <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
     </div>
-    <div class="pay-options">
-      <%
-      // payment buttons will go here
-      %>
-    </div>
-  </div>
-  <% } %>
 
-  <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
+    <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
       <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
       <p>
         <% if ( verificationDeadline ) { %>
@@ -55,13 +38,62 @@
       <% } %>
     </div>
 
-    <div class="wrapper-content-supplementary">
-        <strong><%- gettext("Your Photo ID") %></strong>
+    <% if ( requirements['account-activation-required'] || requirements['photo-id-required'] || requirements['webcam-required']) { %>
+    <div class="requirements-container">
+      <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
+        <% if ( requirements['account-activation-required'] ) { %>
+          <li class="req req-0 req-activate">
+            <div class="copy">
+              <p>
+                <span class="copy-super"><%- gettext( "Check Your Email" ) %></span>
+              </p>
+            </div>
+          </li>
+        <% } %>
+      </ul>
     </div>
-    <div class="instruction"><%- gettext("Chearing rarely happens, but we need to make sure you are who you say you are.") %></div>
+    <% } %>
 
-    <strong><%- gettext("Enable Your Webcam") %></strong>
-    <div class="instruction"><%- gettext("Similar to your ID, we verify that when you take exams, you are who say you are.") %></div>
+    <% if ( courseModeSlug === 'no-id-professional') { %>
+    <div class="container register is-verified">
+      <h3 class="title"><%- gettext( "ID-Verification is not required for this Professional Education course." ) %></h3>
+      <p><%- gettext( "All professional education courses are fee-based, and require payment to complete the enrollment process." ) %></p>
+    </div>
+    <% } else if ( alreadyVerified && verificationGoodUntil ) { %>
+    <div class="container register is-verified">
+      <h3 class="title"><%- gettext( "You have already verified your ID!" ) %></h3>
+      <p>
+        <%= _.sprintf(
+        gettext( "Your verification status is good until %(verificationGoodUntil)s." ),
+         { verificationGoodUntil: verificationGoodUntil }
+        ) %>
+      </p>
+    </div>
+    <% } %>
+
+  <% if ( isActive ) { %>
+  <div class="payment-buttons is-ready center">
+    <input type="hidden" name="contribution" value="<%- minPrice %>" />
+    <input type="hidden" name="sku" value="<%- sku %>" />
+    <div class="pay-options">
+      <%
+      // payment buttons will go here
+      %>
+    </div>
+  </div>
+  <% } %>
+
+
+
+  <div class="container">
+    <p>
+        <strong><%- gettext("Your Photo ID") %></strong>
+        <%- gettext("Chearing rarely happens, but we need to make sure you are who you say you are.") %>
+        <strong><%- gettext("Enable Your Webcam") %></strong>
+        <%- gettext("Similar to your ID, we verify that when you take exams, you are who say you are.") %>
+    </p>
+  </div>
+
 
   <form id="payment-processor-form"></form>
 </div>

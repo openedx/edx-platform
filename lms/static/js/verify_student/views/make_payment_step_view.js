@@ -17,7 +17,7 @@ var edx = edx || {};
             _.extend( this, obj );
            if (this.templateContext().isABTesting) {
                this.templateName = "make_payment_step_ab_testing";
-               this.btn_class = 'action-primary-blue';
+               this.btnClass = 'action-primary-blue';
            }
         },
 
@@ -71,8 +71,8 @@ var edx = edx || {};
         _getPaymentButtonHtml: function(processorName) {
             var self = this;
             return _.template(
-                '<button class="next <%- btn_class %> payment-button" id="<%- name %>" ><%- text %></button> '
-            )({name: processorName, text: self._getPaymentButtonText(processorName), btn_class: this.btn_class});
+                '<button class="next <%- btnClass %> payment-button" id="<%- name %>" ><%- text %></button> '
+            )({name: processorName, text: self._getPaymentButtonText(processorName), btnClass: this.btnClass});
         },
 
         postRender: function() {
