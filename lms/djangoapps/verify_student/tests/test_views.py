@@ -1875,6 +1875,12 @@ class TestReverifyView(TestCase):
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(success, msg="Could not log in")
 
+    def test_reverify_view_can_do_initial_verification(self):
+        """
+        Test that a User can use reverify link for initial verification.
+        """
+        self._assert_can_reverify()
+
     def test_reverify_view_can_reverify_denied(self):
         # User has a denied attempt, so can reverify
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
