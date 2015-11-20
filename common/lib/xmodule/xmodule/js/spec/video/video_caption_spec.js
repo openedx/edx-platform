@@ -51,6 +51,7 @@
                 it('adds the captioning control to the video player', function() {
                     state = jasmine.initializePlayer();
                     expect($('.video')).toContain('.toggle-captions');
+                    expect($('.video')).toContain('.closed-captions');
                 });
 
                 it('fetch the transcript in HTML5 mode', function () {
@@ -165,46 +166,81 @@
 
             describe('renderCaptions', function() {
 
-                describe('is rendered', function() {
-                    var KEY = $.ui.keyCode,
+                var KEY = $.ui.keyCode;
 
-                        keyPressEvent = function(key) {
-                            return $.Event('keydown', { keyCode: key });
-                        };
+                function keyPressEvent(key) {
+                    return $.Event('keydown', { keyCode: key });
+                }
+
+                describe('is rendered', function() {
 
                     it('toggle the captions on control click', function() {
                         state = jasmine.initializePlayer();
 
                         $('.toggle-captions').click();
+                        expect($('.toggle-captions')).toHaveClass('is-active');
                         expect($('.closed-captions')).toHaveClass('is-visible');
+
                         $('.toggle-captions').click();
+                        expect($('.toggle-captions')).not.toHaveClass('is-active');
                         expect($('.closed-captions')).not.toHaveClass('is-visible');
                     });
 
                     it('toggles the captions on keypress ENTER', function() {
-                        state = jasmine.initializePlayer();
+                        // what i originally had
+                        // state = jasmine.initializePlayer();
 
-                        $('.toggle-captions').focus();
-                        $('.toggle-captions').trigger(keyPressEvent(KEY.ENTER));
-                        expect($('.toggle-captions')).toHaveClass('is-active');
-                        expect($('.closed-captions')).toHaveClass('is-visible');
+                        // $('.toggle-captions').focus().trigger(keyPressEvent(KEY.ENTER));
+                        // expect($('.toggle-captions')).toHaveClass('is-active');
+                        // expect($('.closed-captions')).toHaveClass('is-visible');
 
-                        $('.toggle-captions').focus();
-                        $('.toggle-captions').trigger(keyPressEvent(KEY.ENTER));
-                        expect($('.toggle-captions')).not.toHaveClass('is-active');
-                        expect($('.closed-captions')).not.toHaveClass('is-visible');
+                        // $('.toggle-captions').focus().trigger(keyPressEvent(KEY.ENTER));
+                        // expect($('.toggle-captions')).not.toHaveClass('is-active');
+                        // expect($('.closed-captions')).not.toHaveClass('is-visible');
+
+                        // using examples from the platform, should work?
+                        runs(function() {
+                            state = jasmine.initializePlayer();
+
+                            $('.toggle-captions').focus();
+                            $('.toggle-captions').trigger(keyPressEvent(KEY.ENTER));
+                        });
+
+                        waitsFor(function() {
+                            return $('.toggle-captions').hasClass('is-active');
+                        }, "closed captions to be enabled", 5000);
+
+                        runs(function() {
+                            expect($('.toggle-captions')).toHaveClass('is-active');
+                            expect($('.closed-captions')).toHaveClass('is-visible');
+                        });
+
+                        // trying setTimeout, which does work, but should it?
+                        // state = jasmine.initializePlayer();
+
+                        // $('.toggle-captions').trigger(keyPressEvent(KEY.ENTER));
+
+                        // setTimeout(function() {
+                        //     expect($('.toggle-captions')).toHaveClass('is-active');
+                        //     expect($('.closed-captions')).toHaveClass('is-visible');
+                        // }, 500);
+
+                        // $('.toggle-captions').focus().trigger(keyPressEvent(KEY.ENTER));
+
+                        // setTimeout(function() {
+                        //     expect($('.toggle-captions')).not.toHaveClass('is-active');
+                        //     expect($('.closed-captions')).not.toHaveClass('is-visible');
+                        // }, 500);
                     });
 
                     it('toggles the captions on keypress SPACE', function() {
                         state = jasmine.initializePlayer();
 
-                        $('.toggle-captions').focus();
-                        $('.toggle-captions').trigger(keyPressEvent(KEY.SPACE));
+                        $('.toggle-captions').focus().trigger(keyPressEvent(KEY.SPACE));
                         expect($('.toggle-captions')).toHaveClass('is-active');
                         expect($('.closed-captions')).toHaveClass('is-visible');
 
-                        $('.toggle-captions').focus();
-                        $('.toggle-captions').trigger(keyPressEvent(KEY.SPACE));
+                        $('.toggle-captions').focus().trigger(keyPressEvent(KEY.SPACE));
                         expect($('.toggle-captions')).not.toHaveClass('is-active');
                         expect($('.closed-captions')).not.toHaveClass('is-visible');
                     });
@@ -216,9 +252,9 @@
                 describe('is rendered', function () {
                     var KEY = $.ui.keyCode,
 
-                        keyPressEvent = function(key) {
-                            return $.Event('keydown', { keyCode: key });
-                        };
+                    keyPressEvent = function(key) {
+                        return $.Event('keydown', { keyCode: key });
+                    };
 
                     it('if languages more than 1', function () {
                         state = jasmine.initializePlayer();

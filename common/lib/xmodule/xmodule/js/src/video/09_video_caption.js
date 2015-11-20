@@ -205,8 +205,8 @@
                     keyCode = event.keyCode;
 
                 switch(keyCode) {
+                    // KEY.ENTER works inherently so we don't need to script it explicitly
                     case KEY.SPACE:
-                    case KEY.ENTER:
                         event.preventDefault();
                         this.toggleClosedCaptions();
                 }
@@ -1081,6 +1081,11 @@
 
             showClosedCaptions: function() {
                 this.state.el.addClass('has-captions');
+
+                this.captionDisplayEl
+                    .show()
+                    .addClass('is-visible');
+
                 this.captionControlEl
                     .addClass('is-active')
                     .find('.control-text')
@@ -1093,22 +1098,19 @@
                     this.captionDisplayEl
                         .text(gettext('(Captions will appear here once the video plays.)'));
                 }
-
-                this.captionDisplayEl
-                    .show()
-                    .addClass('is-visible');
             },
 
             hideClosedCaptions: function() {
                 this.state.el.removeClass('has-captions');
-                this.captionControlEl
-                    .removeClass('is-active')
-                    .find('.control-text')
-                        .text(gettext('Turn on closed captioning'));
 
                 this.captionDisplayEl
                     .hide()
                     .removeClass('is-visible');
+
+                this.captionControlEl
+                    .removeClass('is-active')
+                    .find('.control-text')
+                        .text(gettext('Turn on closed captioning'));
             },
 
             updateCaptioningCookie: function(method) {
