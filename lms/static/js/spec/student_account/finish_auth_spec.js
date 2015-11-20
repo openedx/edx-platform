@@ -95,7 +95,7 @@
                 );
             });
 
-            it('sends the user to the payment flow when the course mode is not honor', function() {
+            it('sends the user to the payment flow for a paid course mode', function() {
                 // Simulate providing enrollment query string params
                 // AND specifying a course mode.
                 setFakeQueryParams({
@@ -114,13 +114,13 @@
                 );
             });
 
-            it('sends the user to the student dashboard when the course mode is honor', function() {
+            it('sends the user to the student dashboard for an unpaid course mode', function() {
                 // Simulate providing enrollment query string params
                 // AND specifying a course mode.
                 setFakeQueryParams({
                     '?enrollment_action': 'enroll',
                     '?course_id': COURSE_KEY,
-                    '?course_mode': 'honor'
+                    '?course_mode': 'audit'
                 });
 
                 ajaxSpyAndInitialize(this);

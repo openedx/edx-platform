@@ -476,7 +476,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG
         )
         course_registration_code.save()
 
@@ -517,7 +517,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG
         )
         course_registration_code.save()
 

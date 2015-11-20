@@ -339,8 +339,11 @@ def register_code_redemption(request, registration_code):
         }
         return render_to_response(template_to_render, context)
     elif request.method == "POST":
-        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
-                                                                                                  request, limiter)
+        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(
+            registration_code,
+            request,
+            limiter
+        )
         course = get_course_by_id(course_registration.course_id, depth=0)
 
         # Restrict the user from enrolling based on country access rules

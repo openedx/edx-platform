@@ -18,6 +18,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
 
+from course_modes.models import CourseMode
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
     unique_id_for_user, LinkedInAddToProfileConfiguration
@@ -321,7 +322,12 @@ class DashboardTest(ModuleStoreTestCase):
             course_id=self.course.id
         )
         course_reg_code = shoppingcart.models.CourseRegistrationCode(
-            code="abcde", course_id=self.course.id, created_by=self.user, invoice=sale_invoice_1, invoice_item=invoice_item, mode_slug='honor'
+            code="abcde",
+            course_id=self.course.id,
+            created_by=self.user,
+            invoice=sale_invoice_1,
+            invoice_item=invoice_item,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG
         )
         course_reg_code.save()
 
@@ -339,7 +345,6 @@ class DashboardTest(ModuleStoreTestCase):
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-
         response = self.client.get(reverse('dashboard'))
         self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
         optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
@@ -566,7 +571,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
             {
                 'course_id': course_key.to_deprecated_string(),
                 'user_id': user.pk,
-                'mode': 'honor'
+                'mode': CourseMode.DEFAULT_MODE_SLUG
             }
         )
         self.mock_tracker.reset_mock()
@@ -578,7 +583,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
             {
                 'course_id': course_key.to_deprecated_string(),
                 'user_id': user.pk,
-                'mode': 'honor'
+                'mode': CourseMode.DEFAULT_MODE_SLUG
             }
         )
         self.mock_tracker.reset_mock()
@@ -754,18 +759,18 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, TestCase):
         user = User.objects.create(username="justin", email="jh@fake.edx.org")
         course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
 
-        CourseEnrollment.enroll(user, course_id)
+        CourseEnrollment.enroll(user, course_id, "audit")
         self.assert_enrollment_event_was_emitted(user, course_id)
-
-        CourseEnrollment.enroll(user, course_id, "audit")
-        self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "audit")
-
-        # same enrollment mode does not emit an event
-        CourseEnrollment.enroll(user, course_id, "audit")
-        self.assert_no_events_were_emitted()
 
         CourseEnrollment.enroll(user, course_id, "honor")
         self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "honor")
+
+        # same enrollment mode does not emit an event
+        CourseEnrollment.enroll(user, course_id, "honor")
+        self.assert_no_events_were_emitted()
+
+        CourseEnrollment.enroll(user, course_id, "audit")
+        self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "audit")
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -789,7 +794,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         )
         return response
 
-    def test_enroll_as_honor(self):
+    def test_enroll_as_default(self):
         """Tests that a student can successfully enroll through this view"""
         response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 200)
@@ -797,7 +802,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             self.user, self.course.id
         )
         self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, u'honor')
+        self.assertEqual(enrollment_mode, CourseMode.DEFAULT_MODE_SLUG)
 
     def test_cannot_enroll_if_already_enrolled(self):
         """
@@ -810,14 +815,14 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 400)
 
-    def test_change_to_honor_if_verified(self):
+    def test_change_to_default_if_verified(self):
         """
         Tests that a student that is a currently enrolled verified student cannot
-        accidentally change their enrollment to verified
+        accidentally change their enrollment mode
         """
         CourseEnrollment.enroll(self.user, self.course.id, mode=u'verified')
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        # now try to enroll the student in the honor mode:
+        # now try to enroll the student in the default mode:
         response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 400)
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
@@ -826,7 +831,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.assertTrue(is_active)
         self.assertEqual(enrollment_mode, u'verified')
 
-    def test_change_to_honor_if_verified_not_active(self):
+    def test_change_to_default_if_verified_not_active(self):
         """
         Tests that one can renroll for a course if one has already unenrolled
         """
@@ -847,7 +852,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             self.user, self.course.id
         )
         self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, u'honor')
+        self.assertEqual(enrollment_mode, CourseMode.DEFAULT_MODE_SLUG)
 
 
 class AnonymousLookupTable(ModuleStoreTestCase):
