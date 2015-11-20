@@ -1,0 +1,42 @@
+<div id="wrapper-review" tab-index="0" class="wrapper-view make-payment-step">
+ Checkout
+  <div class="review view">
+    <% if ( !upgrade ) { %>
+      <h2 class="title center-col">
+        <%= _.sprintf(
+            gettext( "Verified Certificate for %(courseName)s"),
+            { courseName: '<span class="course-title">' + courseName + '</span>' }
+          ) %>
+      </h2>
+    <% } else { %>
+      <h2 class="title">
+        <%= _.sprintf(
+            gettext( "Verified Certificate for %(courseName)s"),
+            { courseName: '<span class="course-title">' + courseName + '</span>' }
+          ) %>
+      </h2>
+    <% } %>
+
+   <div class="purchase">
+      <p class="product-info">
+        <span class="product-name"></span> <%- gettext( "Total" ) %>: <span class="price">$<%- minPrice %> USD</span>
+      </p>
+    </div>
+
+  <% if ( isActive ) { %>
+  <div class="payment-buttons nav-wizard is-ready center">
+    <input type="hidden" name="contribution" value="<%- minPrice %>" />
+    <input type="hidden" name="sku" value="<%- sku %>" />
+    <div class="purchase">
+      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
+    </div>
+    <div class="pay-options">
+      <%
+      // payment buttons will go here
+      %>
+    </div>
+  </div>
+  <% } %>
+
+  <form id="payment-processor-form"></form>
+</div>

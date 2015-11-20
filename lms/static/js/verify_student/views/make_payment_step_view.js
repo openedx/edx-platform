@@ -12,6 +12,15 @@ var edx = edx || {};
 
         templateName: "make_payment_step",
 
+        initialize: function( obj ) {
+            _.extend( this, obj );
+           if (this.templateContext().isABTesting)
+            this.templateName = "make_payment_step_ab_testing";
+           else
+            this.templateName = "make_payment_step";
+
+        },
+
         defaultContext: function() {
             return {
                 isActive: true,

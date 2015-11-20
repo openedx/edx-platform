@@ -25,7 +25,8 @@ from verify_student.views import PayAndVerifyView
       template_names = (
           ["webcam_photo", "image_input", "error"] +
           ["intro_step", "make_payment_step", "payment_confirmation_step"] +
-          ["face_photo_step", "id_photo_step", "review_photos_step", "enrollment_confirmation_step"]
+          ["face_photo_step", "id_photo_step", "review_photos_step", "enrollment_confirmation_step"] +
+          ["make_payment_step_ab_testing"]
       )
     %>
     % for template_name in template_names:
