@@ -201,8 +201,8 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         course_mode = CourseMode(
             course_id=self.course_with_visibility.id,
-            mode_slug="honor",
-            mode_display_name="honor cert",
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
             min_price=10,
         )
         course_mode.save()

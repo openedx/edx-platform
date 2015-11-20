@@ -105,7 +105,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @ddt.data("verified", "professional")
     def test_start_flow_not_verified(self, course_mode):
         course = self._create_course(course_mode)
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_displayed_mode(response, course_mode)
         self._assert_steps_displayed(
@@ -123,8 +123,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @ddt.data("no-id-professional")
     def test_start_flow_with_no_id_professional(self, course_mode):
         course = self._create_course(course_mode)
-        # by default enrollment is honor
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_displayed_mode(response, course_mode)
         self._assert_steps_displayed(
@@ -164,7 +163,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @ddt.unpack
     def test_start_flow_already_verified(self, course_mode, verification_status):
         course = self._create_course(course_mode)
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
         self._set_verification_status(verification_status)
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_displayed_mode(response, course_mode)
@@ -323,7 +322,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     def test_verify_now_not_paid(self, page_name):
         course = self._create_course("verified")
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
         response = self._get_page(page_name, course.id, expected_status_code=302)
         self._assert_redirects_to_upgrade(response, course.id)
 
@@ -440,7 +439,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @ddt.data("verified", "professional")
     def test_upgrade(self, course_mode):
         course = self._create_course(course_mode)
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
 
         response = self._get_page('verify_student_upgrade_and_verify', course.id)
         self._assert_displayed_mode(response, course_mode)
@@ -459,7 +458,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     def test_upgrade_already_verified(self):
         course = self._create_course("verified")
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
         self._set_verification_status("submitted")
 
         response = self._get_page('verify_student_upgrade_and_verify', course.id)
@@ -746,7 +745,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         return course
 
-    def _enroll(self, course_key, mode):
+    def _enroll(self, course_key, mode=CourseMode.DEFAULT_MODE_SLUG):
         """Enroll the user in a course. """
         CourseEnrollmentFactory.create(
             user=self.user,
@@ -923,8 +922,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         """Check the course information on the page. """
         mode_display_name = u"Introduction à l'astrophysique"
         course = CourseFactory.create(display_name=mode_display_name)
-        for course_mode in ["honor", "verified"]:
-            min_price = (self.MIN_PRICE if course_mode != "honor" else 0)
+        for course_mode in [CourseMode.DEFAULT_MODE_SLUG, "verified"]:
+            min_price = (self.MIN_PRICE if course_mode != CourseMode.DEFAULT_MODE_SLUG else 0)
             CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
@@ -932,7 +931,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
                 min_price=min_price
             )
 
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
         response_dict = self._get_page_data(self._get_page('verify_student_start_flow', course.id))
 
         self.assertEqual(response_dict['course_name'], mode_display_name)
@@ -948,7 +947,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # setting a nonempty sku on the course will a trigger calls to
         # the ecommerce api to get payment processors.
         course = self._create_course("verified", sku='nonempty-sku')
-        self._enroll(course.id, "honor")
+        self._enroll(course.id)
 
         # mock out the payment processors endpoint
         httpretty.register_uri(

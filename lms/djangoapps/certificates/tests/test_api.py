@@ -305,6 +305,7 @@ class GenerateExampleCertificatesTest(TestCase):
 
     def test_generate_example_certs(self):
         # Generate certificates for the course
+        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
         with self._mock_xqueue() as mock_queue:
             certs_api.generate_example_certificates(self.COURSE_KEY)
 

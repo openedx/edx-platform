@@ -1,5 +1,5 @@
 """
-    Test utils for Facebook functionality
+Test utils for Facebook functionality
 """
 
 import httpretty
@@ -182,4 +182,4 @@ class SocialFacebookTestCase(ModuleStoreTestCase, APITestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(user, course.id))
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course.id)
         self.assertTrue(is_active)
-        self.assertEqual(course_mode, 'honor')
+        self.assertEqual(course_mode, CourseMode.DEFAULT_MODE_SLUG)
