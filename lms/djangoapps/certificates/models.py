@@ -48,7 +48,6 @@ Eligibility:
 import json
 import logging
 import uuid
-from datetime import datetime
 
 import os
 from django.conf import settings

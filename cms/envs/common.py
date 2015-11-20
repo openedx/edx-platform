@@ -816,8 +816,6 @@ INSTALLED_APPS = (
     # by installed apps.
     'lms.djangoapps.verify_student',
 
-    # Badging app, needed even if not used for migrations
-    'badges',
 )
 
 

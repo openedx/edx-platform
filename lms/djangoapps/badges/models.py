@@ -118,9 +118,6 @@ class BadgeAssertion(models.Model):
             return cls.objects.filter(user=user, badge_class__course_id=course_id)
         return cls.objects.filter(user=user)
 
-    class Meta(object):
-        unique_together = (('badge_class', 'user'),)
-
 
 class CourseCompleteImageConfiguration(models.Model):
     """
@@ -143,7 +140,8 @@ class CourseCompleteImageConfiguration(models.Model):
         help_text=_(
             u"Set this value to True if you want this image to be the default image for any course modes "
             u"that do not have a specified badge image. You can have only one default image."
-        )
+        ),
+        default=False,
     )
 
     def __unicode__(self):

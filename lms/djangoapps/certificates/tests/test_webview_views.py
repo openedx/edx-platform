@@ -33,7 +33,6 @@ from certificates.models import (
 from certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     LinkedInAddToProfileConfigurationFactory,
-    BadgeAssertionFactory,
 )
 from util import organizations_helpers as organizations_api
 from django.test.client import RequestFactory
@@ -41,6 +40,8 @@ import urllib
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
+FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
+FEATURES_WITH_BADGES_ENABLED['ENABLE_OPENBADGES'] = True
 
 FEATURES_WITH_CERTS_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
@@ -96,7 +97,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         CourseEnrollmentFactory.create(
             user=self.user,
-            course_id=self.course_id
+            course_id=self.course_id,
         )
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
@@ -223,7 +224,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         self.assertIn('logo_test1.png', response.content)
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
         "CERTIFICATE_TWITTER": True,
         "CERTIFICATE_FACEBOOK": True,
@@ -245,8 +246,9 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
         organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        badge_class = get_completion_badge(course_id=self.course_id, user=self.user)
         BadgeAssertionFactory.create(
-            user=self.user, course_id=self.course_id,
+            user=self.user, badge_class=badge_class,
         )
         self.course.cert_html_view_overrides = {
             "logo_src": "/static/certificates/images/course_override_logo.png"

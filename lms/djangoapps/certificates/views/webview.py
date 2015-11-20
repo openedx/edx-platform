@@ -375,7 +375,6 @@ def _track_certificate_events(request, context, course, user, user_certificate):
     """
     Tracks web certificate view related events.
     """
-    badge = context['badge']
     # Badge Request Event Tracking Logic
     course_key = course.location.course_key
 
@@ -384,7 +383,7 @@ def _track_certificate_events(request, context, course, user, user_certificate):
         badges = badge_class.get_for_user(user)
         if badges:
             # There should only ever be one of these.
-            badge = badge[0]
+            badge = badges[0]
             tracker.emit(
                 'edx.badge.assertion.evidence_visited',
                 {
@@ -461,7 +460,10 @@ def _update_badge_context(context, course, user):
     """
     badge = None
     if settings.FEATURES.get('ENABLE_OPENBADGES'):
-        badge = get_completion_badge(course.location.course_key, user).get_for_user(user)[0]
+        print "==FEATURE ENABLED!"
+        badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
+        if badges:
+            badge = badges[0]
     context['badge'] = badge
 
 
