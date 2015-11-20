@@ -1,5 +1,6 @@
 """ Paginatator methods for edX API implementations."""
 
+from collections import OrderedDict
 from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage
 
@@ -27,6 +28,38 @@ class DefaultPagination(pagination.PageNumberPagination):
             'num_pages': self.page.paginator.num_pages,
             'results': data
         })
+
+
+class NamespacedPageNumberPagination(pagination.PageNumberPagination):
+    """
+    Pagination scheme that returns results with pagination metadata
+    embedded in a "pagination" attribute.  Can be used with data
+    that comes as a list of items, or as a dict with a "results"
+    attribute that contains the code.
+    """
+
+    page_size_query_param = "page_size"
+
+    def get_paginated_response(self, data):
+        """
+        Annotate the response with pagination information
+        """
+        metadata = OrderedDict([
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('count', self.page.paginator.count),
+            ('num_pages', self.page.paginator.count),
+        ])
+        if isinstance(data, dict):
+            if 'results' not in data:
+                raise TypeError(u'Malformed result dict')
+            data['pagination'] = metadata
+        else:
+            data = OrderedDict([
+                ('results', data),
+                ('pagination', metadata)
+            ])
+        return Response(data)
 
 
 def paginate_search_results(object_class, search_results, page_size, page):

@@ -7,6 +7,7 @@ from django.http import Http404
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 from lms.djangoapps.courseware.courses import get_courses, get_course_with_access
+from openedx.core.lib.api import paginators
 
 from .permissions import can_view_courses_for_username
 from .serializers import CourseSerializer
@@ -73,4 +74,8 @@ def list_courses(request, username):
     """
     user = get_effective_user(request.user, username)
     courses = get_courses(user)
-    return CourseSerializer(courses, context={'request': request}, many=True).data
+    paginator = paginators.NamespacedPageNumberPagination()
+    page = paginator.paginate_queryset(courses, request)
+    return paginator.get_paginated_response(
+        CourseSerializer(page, context={'request': request}, many=True).data
+    ).data
