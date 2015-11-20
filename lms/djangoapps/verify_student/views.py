@@ -421,7 +421,7 @@ class PayAndVerifyView(View):
             'verification_good_until': verification_good_until,
             'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
             'nav_hidden': True,
-            'is_ab_testing': 'upgrade_1' in request.path,
+            'is_ab_testing': 'upgrade_ab' in request.path,
         }
 
         return render_to_response("verify_student/pay_and_verify.html", context)

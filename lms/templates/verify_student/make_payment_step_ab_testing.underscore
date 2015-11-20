@@ -38,5 +38,30 @@
   </div>
   <% } %>
 
+  <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
+      <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
+      <p>
+        <% if ( verificationDeadline ) { %>
+          <%- _.sprintf(
+            gettext( "After payment and before %(date)s, you'll need to verify your identity successfully using a webcam and a photo id." ),
+            { date: verificationDeadline }
+          ) %>
+        <% } else if ( !isActive ) { %>
+          <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
+        <% } else { %>
+            <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
+        <% } %>
+      </p>
+      <% } %>
+    </div>
+
+    <div class="wrapper-content-supplementary">
+        <strong><%- gettext("Your Photo ID") %></strong>
+    </div>
+    <div class="instruction"><%- gettext("Chearing rarely happens, but we need to make sure you are who you say you are.") %></div>
+
+    <strong><%- gettext("Enable Your Webcam") %></strong>
+    <div class="instruction"><%- gettext("Similar to your ID, we verify that when you take exams, you are who say you are.") %></div>
+
   <form id="payment-processor-form"></form>
 </div>

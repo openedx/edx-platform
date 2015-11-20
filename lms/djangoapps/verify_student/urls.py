@@ -34,10 +34,9 @@ urlpatterns = patterns(
             'message': views.PayAndVerifyView.UPGRADE_MSG
         }
     ),
-
-    # This URL is for A/B testing
+    # This URL is for A/B testing ( New Checkout Page )
     url(
-        r'^upgrade_1/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
+        r'^upgrade_ab/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
         views.PayAndVerifyView.as_view(),
         name="verify_student_upgrade_and_verify",
         kwargs={
