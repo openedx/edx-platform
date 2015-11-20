@@ -111,6 +111,12 @@ class Command(BaseCommand):
                 course_id
             )
 
+            badge_class = get_completion_badge(course_id, student)
+            badge = badge_class.get_for_user(student)
+            if badge:
+                badge.delete()
+                LOGGER.info(u"Cleared badge for student %s.", student.id)
+
             # Add the certificate request to the queue
             ret = regenerate_user_certificates(
                 student, course_id, course=course,
@@ -118,11 +124,6 @@ class Command(BaseCommand):
                 template_file=options['template_file'],
                 insecure=options['insecure']
             )
-            badge_class = get_completion_badge(course_id, student)
-            badge = badge_class.get_for_user(student)
-            if badge:
-                badge.delete()
-                LOGGER.info(u"Cleared badge for student %s.", student.id)
 
             LOGGER.info(
                 (
