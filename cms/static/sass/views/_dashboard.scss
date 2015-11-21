@@ -55,7 +55,7 @@
 
         }
 
-        .action-create-course, .action-create-library {
+        .action-create-course, .action-create-library, .action-create-program {
           @extend %btn-primary-green;
           @extend %t-action3;
         }
@@ -318,7 +318,7 @@
   }
 
   // ELEM: course listings
-  .courses-tab, .libraries-tab {
+  .courses-tab, .libraries-tab, .programs-tab {
     display: none;
 
     &.active {
@@ -326,7 +326,7 @@
     }
   }
 
-  .courses, .libraries {
+  .courses, .libraries, .programs {
     .title {
       @extend %t-title6;
       margin-bottom: $baseline;
