@@ -3050,7 +3050,7 @@ class RetrieveThreadTest(
             "type": "discussion",
             "response_count": 0,
         }
-        non_author_user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
+        non_author_user = UserFactory.create()
         self.register_get_user_response(non_author_user)
         CourseEnrollmentFactory.create(user=non_author_user, course_id=self.course.id)
         self.register_thread()

@@ -59,7 +59,7 @@ class InstructorDashboardTab(CourseTab):
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument,redefined-outer-name
+    def is_enabled(cls, course, user=None):
         """
         Returns true if the specified user has staff access.
         """

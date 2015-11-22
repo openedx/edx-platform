@@ -603,7 +603,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 'name': 'edx.badge.assertion.evidence_visited',
                 'data': {
                     'course_id': 'testorg/run1/refundable_course',
-                    # pylint: disable=no-member
                     'assertion_id': assertion.id,
                     'assertion_json_url': 'http://www.example.com/assertion.json',
                     'assertion_image_url': 'http://www.example.com/image.png',

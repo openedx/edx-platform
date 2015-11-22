@@ -22,7 +22,7 @@ class TestDjangoUserStateClient(UserStateClientTestBase, TestCase):
     def _user(self, user_idx):
         return self.users[user_idx].username
 
-    def _block_type(self, block):  # pylint: disable=unused-argument
+    def _block_type(self, block):
         # We only record block state history in DjangoUserStateClient
         # when the block type is 'problem'
         return 'problem'

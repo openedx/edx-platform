@@ -41,7 +41,7 @@ urlpatterns = patterns(
         'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
     url(r'^reset_student_attempts$',
         'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
-    url(  # pylint: disable=bad-continuation
+    url(
         r'^rescore_problem$',
         'instructor.views.api.rescore_problem',
         name="rescore_problem"

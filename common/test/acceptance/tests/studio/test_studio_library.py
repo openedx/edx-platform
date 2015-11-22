@@ -19,7 +19,7 @@ class LibraryEditPageTest(StudioLibraryTest):
     """
     Test the functionality of the library edit page.
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """
         Ensure a library exists and navigate to the library edit page.
         """
@@ -192,7 +192,7 @@ class LibraryNavigationTest(StudioLibraryTest):
     """
     Test common Navigation actions
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """
         Ensure a library exists and navigate to the library edit page.
         """
@@ -206,7 +206,6 @@ class LibraryNavigationTest(StudioLibraryTest):
         Create four pages worth of XBlocks, and offset by one so each is named
         after the number they should be in line by the user's perception.
         """
-        # pylint: disable=attribute-defined-outside-init
         self.blocks = [XBlockFixtureDesc('html', str(i)) for i in xrange(1, 41)]
         library_fixture.add_children(*self.blocks)
 

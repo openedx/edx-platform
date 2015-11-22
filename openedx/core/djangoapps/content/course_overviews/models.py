@@ -41,7 +41,7 @@ class CourseOverview(TimeStampedModel):
     version = IntegerField()
 
     # Course identification
-    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)  # pylint: disable=invalid-name
+    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
     display_name = TextField(null=True)
     display_number_with_default = TextField()
@@ -375,7 +375,7 @@ class CourseOverview(TimeStampedModel):
         """
         Returns True if course has discussion tab and is enabled
         """
-        tabs = self.tabs.all()  # pylint: disable=E1101
+        tabs = self.tabs.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
             if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):

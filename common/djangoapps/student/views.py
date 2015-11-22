@@ -131,7 +131,7 @@ from openedx.core.djangoapps.programs.utils import is_student_dashboard_programs
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
-ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
+ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
 
@@ -1632,7 +1632,7 @@ def create_account_with_params(request, params):
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         identity_args = [
-            user.id,  # pylint: disable=no-member
+            user.id,
             {
                 'email': user.email,
                 'username': user.username,
@@ -1895,13 +1895,13 @@ def auto_auth(request):
             'username': username,
             'email': email,
             'password': password,
-            'user_id': user.id,  # pylint: disable=no-member
+            'user_id': user.id,
             'anonymous_id': anonymous_id_for_user(user, None),
         })
     else:
         success_msg = u"{} user {} ({}) with password {} and user_id {}".format(
             u"Logged in" if login_when_done else "Created",
-            username, email, password, user.id  # pylint: disable=no-member
+            username, email, password, user.id
         )
         response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])
@@ -2285,7 +2285,7 @@ def change_email_settings(request):
     return JsonResponse({"success": True})
 
 
-def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invalid-name
+def _get_course_programs(user, user_enrolled_courses):
     """ Returns a dictionary of programs courses data require for the student
     dashboard.
 

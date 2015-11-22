@@ -3,7 +3,7 @@ import json
 import logging
 import random
 import re
-import string       # pylint: disable=deprecated-module
+import string
 import fnmatch
 import unicodedata
 import urllib

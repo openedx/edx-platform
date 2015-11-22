@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from request_cache.middleware import RequestCache
 from mock import patch, ANY, Mock
-from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_equal
 from opaque_keys.edx.keys import CourseKey
 from lms.lib.comment_client import Thread
 

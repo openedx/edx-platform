@@ -105,7 +105,7 @@ class PatchMediaTypeMixin(object):
     Generic mixin for verifying unsupported media type in PATCH
     """
     def test_patch_unsupported_media_type(self):
-        response = self.client.patch(  # pylint: disable=no-member
+        response = self.client.patch(
             self.url,
             json.dumps({}),
             content_type=self.unsupported_media_type

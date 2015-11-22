@@ -398,7 +398,7 @@ _COURSE_OVERVIEW_CHECKERS = {
     ),
     'view_courseware_with_prerequisites': _can_view_courseware_with_prerequisites
 }
-COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()  # pylint: disable=invalid-name
+COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()
 
 
 def _has_access_course_overview(user, action, course_overview):
@@ -669,7 +669,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint: disable=invalid-name,unused-argument
+def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.

@@ -51,7 +51,7 @@ def xdomain_proxy(request):  # pylint: disable=unused-argument
         return HttpResponseNotFound()
 
     allowed_domains = []
-    for domain in config.whitelist.split("\n"):  # pylint: disable=no-member
+    for domain in config.whitelist.split("\n"):
         if domain.strip():
             allowed_domains.append(domain.strip())
 

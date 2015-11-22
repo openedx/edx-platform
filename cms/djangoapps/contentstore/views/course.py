@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 import json
 import random
 import logging
-import string  # pylint: disable=deprecated-module
+import string
 from django.utils.translation import ugettext as _
 import django.utils
 from django.contrib.auth.decorators import login_required
@@ -219,7 +219,6 @@ def _dismiss_notification(request, course_action_state_id):  # pylint: disable=u
     return JsonResponse({'success': True})
 
 
-# pylint: disable=unused-argument
 @login_required
 def course_handler(request, course_key_string=None):
     """
@@ -806,7 +805,6 @@ def _rerun_course(request, org, number, run, fields):
     })
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
@@ -839,7 +837,6 @@ def course_info_handler(request, course_key_string):
             return HttpResponseBadRequest("Only supports html requests")
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))

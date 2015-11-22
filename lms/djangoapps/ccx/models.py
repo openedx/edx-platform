@@ -9,7 +9,7 @@ from django.db import models
 from django.utils.timezone import UTC
 
 from lazy import lazy
-from xmodule_django.models import CourseKeyField, LocationKeyField  # pylint: disable=import-error
+from xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 

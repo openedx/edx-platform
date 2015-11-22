@@ -691,7 +691,7 @@ class PayAndVerifyView(View):
             return render_to_response("verify_student/missed_deadline.html", context)
 
 
-def checkout_with_ecommerce_service(user, course_key, course_mode, processor):     # pylint: disable=invalid-name
+def checkout_with_ecommerce_service(user, course_key, course_mode, processor):
     """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
     course_id = unicode(course_key)
     try:
@@ -1437,7 +1437,7 @@ class InCourseReverifyView(View):
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
 
-    def _track_reverification_events(self, event_name, user_id, course_id, checkpoint):  # pylint: disable=invalid-name
+    def _track_reverification_events(self, event_name, user_id, course_id, checkpoint):
         """Track re-verification events for a user against a reverification
         checkpoint of a course.
 

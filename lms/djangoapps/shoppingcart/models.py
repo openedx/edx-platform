@@ -87,7 +87,7 @@ ORDER_STATUS_MAP = {
 }
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
-OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=invalid-name
+OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])
 
 
 class OrderTypes(object):
@@ -202,7 +202,7 @@ class Order(models.Model):
         Return the total cost of the cart.  If the order has been purchased, returns total of
         all purchased and not refunded items.
         """
-        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=no-member
+        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))
 
     def has_items(self, item_type=None):
         """
@@ -210,9 +210,9 @@ class Order(models.Model):
         If an item_type is passed in then we check to see if there are any items of that class type
         """
         if not item_type:
-            return self.orderitem_set.exists()  # pylint: disable=no-member
+            return self.orderitem_set.exists()
         else:
-            items = self.orderitem_set.all().select_subclasses()  # pylint: disable=no-member
+            items = self.orderitem_set.all().select_subclasses()
             for item in items:
                 if isinstance(item, item_type):
                     return True
@@ -222,7 +222,7 @@ class Order(models.Model):
         """
         Reset the items price state in the user cart
         """
-        for item in self.orderitem_set.all():  # pylint: disable=no-member
+        for item in self.orderitem_set.all():
             if item.is_discounted:
                 item.unit_cost = item.list_price
                 item.save()
@@ -231,7 +231,7 @@ class Order(models.Model):
         """
         Clear out all the items in the cart
         """
-        self.orderitem_set.all().delete()  # pylint: disable=no-member
+        self.orderitem_set.all().delete()
 
     @transaction.atomic
     def start_purchase(self):
@@ -259,7 +259,7 @@ class Order(models.Model):
         The UI/UX may change in the future to make the switching between PaidCourseRegistration
         and CourseRegCodeItems a more explicit UI gesture from the purchaser
         """
-        cart_items = self.orderitem_set.all()  # pylint: disable=no-member
+        cart_items = self.orderitem_set.all()
         is_order_type_business = False
         for cart_item in cart_items:
             if cart_item.qty > 1:
@@ -314,7 +314,7 @@ class Order(models.Model):
 
         PDFInvoice(
             items_data=items_data,
-            item_id=str(self.id),  # pylint: disable=no-member
+            item_id=str(self.id),
             date=self.purchase_time,
             is_invoice=False,
             total_cost=self.total_cost,
@@ -412,7 +412,7 @@ class Order(models.Model):
                     email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
-            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=no-member
+            log.error('Failed sending confirmation e-mail for order %d', self.id)
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
@@ -514,8 +514,8 @@ class Order(models.Model):
         try:
             if settings.LMS_SEGMENT_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()
-                analytics.track(self.user.id, event_name, {  # pylint: disable=no-member
-                    'orderId': self.id,  # pylint: disable=no-member
+                analytics.track(self.user.id, event_name, {
+                    'orderId': self.id,
                     'total': str(self.total_cost),
                     'currency': self.currency,
                     'products': [item.analytics_data() for item in orderitems]
@@ -532,7 +532,7 @@ class Order(models.Model):
             # errors in the logs.
             log.exception(
                 u'Unable to emit {event} event for user {user} and order {order}'.format(
-                    event=event_name, user=self.user.id, order=self.id)  # pylint: disable=no-member
+                    event=event_name, user=self.user.id, order=self.id)
             )
 
     def add_billing_details(self, company_name='', company_contact_name='', company_contact_email='', recipient_name='',
@@ -597,7 +597,7 @@ class Order(models.Model):
                 )
             )
 
-        for item in self.orderitem_set.all():  # pylint: disable=no-member
+        for item in self.orderitem_set.all():
             if item.status != self.status:
                 raise UnexpectedOrderItemStatus(
                     "order_item status is different from order status"
@@ -606,7 +606,7 @@ class Order(models.Model):
         self.status = ORDER_STATUS_MAP[self.status]
         self.save()
 
-        for item in self.orderitem_set.all():  # pylint: disable=no-member
+        for item in self.orderitem_set.all():
             item.retire()
 
     def find_item_by_course_id(self, course_id):
@@ -785,7 +785,7 @@ class OrderItem(TimeStampedModel):
 
         """
         return {
-            'id': self.id,  # pylint: disable=no-member
+            'id': self.id,
             'sku': type(self).__name__,
             'name': 'N/A',
             'price': str(self.unit_cost),
@@ -880,7 +880,7 @@ class Invoice(TimeStampedModel):
         pdf_buffer = BytesIO()
         PDFInvoice(
             items_data=items_data,
-            item_id=str(self.id),  # pylint: disable=no-member
+            item_id=str(self.id),
             date=datetime.now(pytz.utc),
             is_invoice=True,
             total_cost=float(self.total_amount),
@@ -940,7 +940,7 @@ class Invoice(TimeStampedModel):
         )
 
         created = (
-            self.created.strftime("%Y-%m-%d")  # pylint: disable=no-member
+            self.created.strftime("%Y-%m-%d")
             if self.created
             else u"No date"
         )
@@ -1056,8 +1056,8 @@ class InvoiceTransaction(TimeStampedModel):
             'currency': self.currency,
             'comments': self.comments,
             'status': self.status,
-            'created_by': self.created_by.username,  # pylint: disable=no-member
-            'last_modified_by': self.last_modified_by.username  # pylint: disable=no-member
+            'created_by': self.created_by.username,
+            'last_modified_by': self.last_modified_by.username
         }
 
 
@@ -1304,7 +1304,6 @@ class RegistrationCodeRedemption(models.Model):
 
 class SoftDeleteCouponManager(models.Manager):
     """ Use this manager to get objects that have a is_active=True """
-    # pylint: disable=super-on-old-class
     def get_active_coupons_queryset(self):
         """
         filter the is_active = True Coupons only
@@ -1602,7 +1601,7 @@ class PaidCourseRegistration(OrderItem):
         self.save()
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
-                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member
+                 .format(self.user.email, self.course_id, self.line_cost))
 
     def generate_receipt_instructions(self):
         """
@@ -1781,7 +1780,7 @@ class CourseRegCodeItem(OrderItem):
             save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
-                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member
+                 .format(self.user.email, self.course_id, self.line_cost))
 
     @property
     def csv_report_comments(self):
@@ -1983,7 +1982,7 @@ class CertificateItem(OrderItem):
 
     def additional_instruction_text(self):
         verification_reminder = ""
-        is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()  # pylint: disable=E1101
+        is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()
 
         if is_enrollment_mode_verified:
             domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
@@ -2153,7 +2152,7 @@ class Donation(OrderItem):
         """
         return self.pk_with_subclass, set([self._tax_deduction_msg()])
 
-    def additional_instruction_text(self, **kwargs):  # pylint: disable=unused-argument
+    def additional_instruction_text(self, **kwargs):
         """Provide information about tax-deductible donations in the confirmation email.
 
         Returns:

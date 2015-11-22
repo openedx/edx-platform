@@ -29,7 +29,7 @@ class XBlockDisableConfig(ConfigurationModel):
         if not config.enabled:
             return False
 
-        return block_type in config.disabled_blocks.split()  # pylint: disable=no-member
+        return block_type in config.disabled_blocks.split()
 
     @classmethod
     def disabled_block_types(cls):
@@ -39,4 +39,4 @@ class XBlockDisableConfig(ConfigurationModel):
         if not config.enabled:
             return ()
 
-        return config.disabled_blocks.split()  # pylint: disable=no-member
+        return config.disabled_blocks.split()

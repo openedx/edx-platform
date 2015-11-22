@@ -512,7 +512,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         data = {
             'enrollment-button': 'Enroll',
-            'student-ids': u','.join([student.email for student in students]),  # pylint: disable=no-member
+            'student-ids': u','.join([student.email for student in students]),
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -548,7 +548,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # enroll the first student
         data = {
             'student-action': 'add',
-            'student-id': u','.join([students[0].email, ]),  # pylint: disable=no-member
+            'student-id': u','.join([students[0].email, ]),
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -560,7 +560,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # enroll the first student
         data = {
             'student-action': 'add',
-            'student-id': u','.join([students[1].email, ]),  # pylint: disable=no-member
+            'student-id': u','.join([students[1].email, ]),
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)

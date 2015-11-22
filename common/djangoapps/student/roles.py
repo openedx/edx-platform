@@ -62,7 +62,7 @@ class AccessRole(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def has_user(self, user):  # pylint: disable=unused-argument
+    def has_user(self, user):
         """
         Return whether the supplied django user has access to this role.
         """

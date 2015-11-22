@@ -89,7 +89,6 @@ def generate_replace_result_xml(result_sourcedid, score):
     consumer. The format of this message is defined in the LTI 1.1 spec.
     """
     # Pylint doesn't recognize members in the LXML module
-    # pylint: disable=no-member
     elem = ElementMaker(nsmap={None: 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'})
     xml = elem.imsx_POXEnvelopeRequest(
         elem.imsx_POXHeader(
@@ -215,7 +214,6 @@ def check_replace_result_response(response):
     False if not. The format of this message is defined in the LTI 1.1 spec.
     """
     # Pylint doesn't recognize members in the LXML module
-    # pylint: disable=no-member
     if response.status_code != 200:
         log.error(
             "Outcome service response: Unexpected status code %s",

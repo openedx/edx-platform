@@ -216,7 +216,7 @@ class GeneratedCertificate(models.Model):
 
 
 @receiver(post_save, sender=GeneratedCertificate)
-def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Handles post_save signal of GeneratedCertificate, and mark user collected
     course milestone entry if user has passed the course.
@@ -742,7 +742,6 @@ class BadgeImageConfiguration(models.Model):
         """
         Make sure there's not more than one default.
         """
-        # pylint: disable=no-member
         if self.default and BadgeImageConfiguration.objects.filter(default=True).exclude(id=self.id):
             raise ValidationError(_(u"There can be only one default image."))
 
@@ -860,7 +859,7 @@ class CertificateTemplateAsset(TimeStampedModel):
         super(CertificateTemplateAsset, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return u'%s' % (self.asset.url, )  # pylint: disable=no-member
+        return u'%s' % (self.asset.url, )
 
     class Meta(object):
         get_latest_by = 'created'

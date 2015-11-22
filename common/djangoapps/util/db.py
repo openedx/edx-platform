@@ -164,7 +164,6 @@ class OuterAtomic(transaction.Atomic):
         # The inner atomic starts a savepoint around the test.
         # So, for tests only, there should be exactly one savepoint_id and two atomic_for_testcase_calls.
         # atomic_for_testcase_calls below is added in a monkey-patch for tests only.
-        # pylint: disable=no-member
         if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:
             raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
 
