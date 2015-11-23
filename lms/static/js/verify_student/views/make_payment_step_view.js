@@ -11,7 +11,7 @@ var edx = edx || {};
     edx.verify_student.MakePaymentStepView = edx.verify_student.StepView.extend({
 
         templateName: "make_payment_step",
-        btn_class: 'action-primary',
+        btnClass: 'action-primary',
 
         initialize: function( obj ) {
             _.extend( this, obj );
