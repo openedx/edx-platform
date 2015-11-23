@@ -32,12 +32,12 @@ ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
 SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_name', 'company_contact_email', 'recipient_name',
-                 'recipient_email', 'customer_reference_number', 'internal_reference')
+                 'recipient_email', 'customer_reference_number', 'internal_reference', 'created')
 
 SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_contact_email', 'purchase_time',
                        'customer_reference_number', 'recipient_name', 'recipient_email', 'bill_to_street1',
                        'bill_to_street2', 'bill_to_city', 'bill_to_state', 'bill_to_postalcode',
-                       'bill_to_country', 'order_type',)
+                       'bill_to_country', 'order_type', 'created')
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
@@ -154,9 +154,13 @@ def sale_record_features(course_id, features):
         codes = [reg_code.code for reg_code in sale.courseregistrationcode_set.all()]
 
         # Extracting registration code information
-        obj_course_reg_code = sale.courseregistrationcode_set.all()[:1].get()
-        course_reg_dict = dict((feature, getattr(obj_course_reg_code, feature))
-                               for feature in course_reg_features)
+        if len(codes) > 0:
+            obj_course_reg_code = sale.courseregistrationcode_set.all()[:1].get()
+            course_reg_dict = dict((feature, getattr(obj_course_reg_code, feature))
+                                   for feature in course_reg_features)
+        else:
+            course_reg_dict = dict((feature, None)
+                                   for feature in course_reg_features)
 
         course_reg_dict['course_id'] = course_id.to_deprecated_string()
         course_reg_dict.update({'codes': ", ".join(codes)})
