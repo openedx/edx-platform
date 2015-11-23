@@ -129,6 +129,13 @@ define([
                 TemplateHelpers.installTemplate( 'templates/verify_student/make_payment_step_ab_testing' );
             });
 
+            it( 'A/B Testing: check Initialize method with AB testing enable ', function() {
+                var view = createView();
+                expect( view.templateName ).toEqual("make_payment_step_ab_testing");
+                expect( view.btnClass ).toEqual("action-primary-blue");
+
+            });
+
             it( 'shows users only minimum price', function() {
                 var view = createView({}),
                     requests = AjaxHelpers.requests(this);

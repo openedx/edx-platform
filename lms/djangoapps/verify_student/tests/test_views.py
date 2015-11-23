@@ -437,12 +437,18 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             courseware_url
         )
 
-    @ddt.data("verified", "professional")
-    def test_upgrade(self, course_mode):
+    @ddt.data(
+        ("verified", "verify_student_upgrade_and_verify"),
+        ("professional", "verify_student_upgrade_and_verify"),
+        ("verified", "verify_student_upgrade_and_verify_ab"),
+        ("professional", "verify_student_upgrade_and_verify_ab")
+    )
+    @ddt.unpack
+    def test_upgrade(self, course_mode, payment_url):
         course = self._create_course(course_mode)
         self._enroll(course.id, "honor")
 
-        response = self._get_page('verify_student_upgrade_and_verify', course.id)
+        response = self._get_page(payment_url, course.id)
         self._assert_displayed_mode(response, course_mode)
         self._assert_steps_displayed(
             response,
@@ -450,10 +456,13 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.UPGRADE_MSG)
-        self._assert_requirements_displayed(response, [
-            PayAndVerifyView.PHOTO_ID_REQ,
-            PayAndVerifyView.WEBCAM_REQ,
-        ])
+
+        if payment_url == "verify_student_upgrade_and_verify":
+            self._assert_requirements_displayed(response, [
+                PayAndVerifyView.PHOTO_ID_REQ,
+                PayAndVerifyView.WEBCAM_REQ,
+            ])
+
         self._assert_upgrade_session_flag(True)
         self.assert_xss(response, '<script>alert("XSS")</script>')
 
@@ -526,6 +535,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             'verify_student_start_flow',
             'verify_student_verify_now',
             'verify_student_upgrade_and_verify',
+            'verify_student_upgrade_and_verify_ab',
         ]
 
         for page_name in pages:
@@ -547,6 +557,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         "verify_student_start_flow",
         "verify_student_verify_now",
         "verify_student_upgrade_and_verify",
+        "verify_student_upgrade_and_verify_ab",
     )
     def test_require_login(self, url_name):
         self.client.logout()
@@ -563,7 +574,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @ddt.data(
         "verify_student_start_flow",
         "verify_student_verify_now",
-        "verify_student_upgrade_and_verify",
+        "verify_student_upgrade_and_verify_ab",
     )
     def test_no_such_course(self, url_name):
         non_existent_course = CourseLocator(course="test", org="test", run="test")
@@ -662,7 +673,11 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         # Try to pay or upgrade.
         # We should get an error message since the deadline has passed.
-        for page_name in ["verify_student_start_flow", "verify_student_upgrade_and_verify"]:
+        for page_name in [
+            "verify_student_start_flow",
+            "verify_student_upgrade_and_verify",
+            "verify_student_upgrade_and_verify_ab"
+        ]:
             response = self._get_page(page_name, course.id)
             self.assertContains(response, "Upgrade Deadline Has Passed")
 

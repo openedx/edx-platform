@@ -207,6 +207,13 @@ define([
                 expectPaymentButtonEnabled( true );
             });
 
+            it( 'check Initialize method without AB testing ', function() {
+                var view = createView();
+                expect( view.templateName ).toEqual("make_payment_step");
+                expect( view.btnClass ).toEqual("action-primary");
+
+            });
+
         });
     }
 );
