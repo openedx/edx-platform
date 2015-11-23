@@ -236,7 +236,7 @@ class LmsDashboardA11yTest(BaseLmsDashboardTest):
         self.dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'skip-link',  # TODO: AC-179
-                'link-href',  # TODO: AC-230
+                'link-href',  # TODO: AC-238, AC-179
             ],
         })
 
