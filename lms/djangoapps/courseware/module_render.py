@@ -497,7 +497,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         """
         Manages the workflow for recording and updating of student module grade state
         """
-        user_id = event.get('user_id', user.id)
+        user_id = user.id
 
         grade = event.get('value')
         max_grade = event.get('max_value')
