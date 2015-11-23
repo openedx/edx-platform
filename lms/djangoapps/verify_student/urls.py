@@ -38,7 +38,7 @@ urlpatterns = patterns(
     url(
         r'^upgrade_ab/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
         views.PayAndVerifyView.as_view(),
-        name="verify_student_upgrade_and_verify",
+        name="verify_student_upgrade_and_verify_ab",
         kwargs={
             'message': views.PayAndVerifyView.UPGRADE_MSG
         }
