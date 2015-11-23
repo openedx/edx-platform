@@ -998,19 +998,28 @@ class VerificationDeadline(TimeStampedModel):
             dict: Map of course keys to datetimes (verification deadlines)
 
         """
-        all_deadlines = cache.get(cls.ALL_DEADLINES_CACHE_KEY)
-        if all_deadlines is None:
-            all_deadlines = {
+        all_override_deadlines = cache.get(cls.ALL_DEADLINES_CACHE_KEY)
+        if all_override_deadlines is None:
+            all_override_deadlines = {
                 deadline.course_key: deadline.deadline
                 for deadline in VerificationDeadline.objects.all()
             }
-            cache.set(cls.ALL_DEADLINES_CACHE_KEY, all_deadlines)
+            cache.set(cls.ALL_DEADLINES_CACHE_KEY, all_override_deadlines)
 
-        return {
-            course_key: all_deadlines[course_key]
-            for course_key in course_keys
-            if course_key in all_deadlines
+        default_deadlines = {
+            course.id: course.end
+            for course in modulestore().get_courses()
+            if course.id in course_keys
         }
+
+        override_deadlines = {
+            course_key: all_override_deadlines[course_key]
+            for course_key in course_keys
+            if course_key in all_override_deadlines
+        }
+
+        default_deadlines.update(override_deadlines)
+        return default_deadlines
 
     @classmethod
     def deadline_for_course(cls, course_key):
@@ -1021,14 +1030,15 @@ class VerificationDeadline(TimeStampedModel):
             course_key (CourseKey): The identifier for the course.
 
         Returns:
-            datetime or None
+            datetime
 
         """
         try:
             deadline = cls.objects.get(course_key=course_key)
             return deadline.deadline
         except cls.DoesNotExist:
-            return None
+            course = modulestore().get_course(course_key)
+            return course.end
 
 
 @receiver(models.signals.post_save, sender=VerificationDeadline)
