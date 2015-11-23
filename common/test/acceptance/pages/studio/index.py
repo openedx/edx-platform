@@ -154,7 +154,7 @@ class DashboardPageWithPrograms(DashboardPage):
         Determine if the "new program" button is visible in the top "nav
         actions" section of the page.
         """
-        return self.q(css='.nav-actions button.new-program-button').present
+        return self.q(css='.nav-actions a.new-program-button').present
 
     def is_empty_list_create_button_present(self):
         """
@@ -162,7 +162,7 @@ class DashboardPageWithPrograms(DashboardPage):
         the programs tab (when the program list result is empty).
         """
         self._click_programs_tab()
-        return self.q(css='div.programs-tab.active button.new-program-button').present
+        return self.q(css='div.programs-tab.active a.new-program-button').present
 
     def get_program_list(self):
         """
