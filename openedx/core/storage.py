@@ -13,7 +13,7 @@ class ProductionStorage(
         PipelineMixin,
         CachedFilesMixin,
         StaticFilesStorage
-    ):
+    ):  # noqa
     """
     This class combines Django's StaticFilesStorage class with several mixins
     that provide additional functionality. We use this version on production.
@@ -26,7 +26,7 @@ class DevelopmentStorage(
         NonPackagingMixin,
         PipelineMixin,
         StaticFilesStorage
-    ):
+    ):  # noqa
     """
     This class combines Django's StaticFilesStorage class with several mixins
     that provide additional functionality. We use this version for development,

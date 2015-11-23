@@ -1,5 +1,8 @@
-import os
-import urlparse
+"""
+Comprehensive Theming support for Django's collectstatic functionality.
+See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
+"""
+import os.path
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
@@ -56,6 +59,9 @@ class ComprehensiveThemingAwareMixin(object):
         return os.path.exists(os.path.normpath(path))
 
     def path(self, name):
+        """
+        Get the path to the real asset on disk
+        """
         if self.themed(name):
             base = self.theme_location
         else:
@@ -67,6 +73,9 @@ class ComprehensiveThemingAwareMixin(object):
         return os.path.normpath(path)
 
     def url(self, name, *args, **kwargs):
+        """
+        Add the theme prefix the the asset URL
+        """
         if self.themed(name):
             name = self.prefix + name
         return super(ComprehensiveThemingAwareMixin, self).url(name, *args, **kwargs)
@@ -76,5 +85,9 @@ class CachedComprehensiveThemingStorage(
         ComprehensiveThemingAwareMixin,
         CachedFilesMixin,
         StaticFilesStorage
-    ):
+    ):  # noqa
+    """
+    Used by the ComprehensiveThemeFinder class. Mixes in support for cached
+    files and comprehensive theming in static files.
+    """
     pass
