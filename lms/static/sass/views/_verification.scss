@@ -175,6 +175,14 @@
     color: $white !important;
   }
 
+  // elements - controls
+  .action-primary-blue {
+    @extend %btn-primary-blue;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
+  }
+
   .action-confirm {
     @extend %btn-verify-primary;
     // needed for override due to .register a:link styling
