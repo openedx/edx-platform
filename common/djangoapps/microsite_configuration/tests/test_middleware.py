@@ -36,10 +36,9 @@ class MicroSiteSessionCookieTests(TestCase):
         """
         Tests that non-microsite behaves according to default behavior
         """
-
         response = self.client.get('/')
-        self.assertNotIn('test_microsite.localhost', str(getattr(response, 'cookies')['sessionid']))
-        self.assertNotIn('Domain', str(getattr(response, 'cookies')['sessionid']))
+        self.assertNotIn('test_microsite.localhost', str(response.cookies['sessionid']))    # pylint: disable=no-member
+        self.assertNotIn('Domain', str(response.cookies['sessionid']))                      # pylint: disable=no-member
 
     def test_session_cookie_domain(self):
         """
@@ -47,9 +46,8 @@ class MicroSiteSessionCookieTests(TestCase):
         is the one specially overridden in configuration,
         in this case in test.py
         """
-
         response = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertIn('test_microsite.localhost', str(getattr(response, 'cookies')['sessionid']))
+        self.assertIn('test_microsite.localhost', str(response.cookies['sessionid']))       # pylint: disable=no-member
 
     @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {'test_microsite': {'SESSION_COOKIE_DOMAIN': None}})
     def test_microsite_none_cookie_domain(self):
@@ -57,7 +55,6 @@ class MicroSiteSessionCookieTests(TestCase):
         Tests to make sure that a Microsite that specifies None for 'SESSION_COOKIE_DOMAIN' does not
         set a domain on the session cookie
         """
-
         response = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertNotIn('test_microsite.localhost', str(getattr(response, 'cookies')['sessionid']))
-        self.assertNotIn('Domain', str(getattr(response, 'cookies')['sessionid']))
+        self.assertNotIn('test_microsite.localhost', str(response.cookies['sessionid']))    # pylint: disable=no-member
+        self.assertNotIn('Domain', str(response.cookies['sessionid']))                      # pylint: disable=no-member

@@ -27,7 +27,7 @@ def register_access_role(cls):
 
     """
     try:
-        role_name = getattr(cls, 'ROLE')
+        role_name = cls.ROLE
         REGISTERED_ACCESS_ROLES[role_name] = cls
     except AttributeError:
         log.exception(u"Unable to register Access Role with attribute 'ROLE'.")

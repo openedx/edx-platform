@@ -177,7 +177,7 @@ def _get_entrance_exam(request, course_key):  # pylint: disable=W0613
     course = modulestore().get_course(course_key)
     if course is None:
         return HttpResponse(status=400)
-    if not getattr(course, 'entrance_exam_id'):
+    if not course.entrance_exam_id:
         return HttpResponse(status=404)
     try:
         exam_key = UsageKey.from_string(course.entrance_exam_id)
@@ -228,7 +228,7 @@ def _delete_entrance_exam(request, course_key):
     # Reset the entrance exam flags on the course
     # Reload the course so we have the latest state
     course = store.get_course(course_key)
-    if getattr(course, 'entrance_exam_id'):
+    if course.entrance_exam_id:
         metadata = {
             'entrance_exam_enabled': False,
             'entrance_exam_minimum_score_pct': None,

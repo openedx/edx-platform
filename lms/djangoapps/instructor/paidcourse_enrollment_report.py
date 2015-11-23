@@ -111,12 +111,12 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
             if registration_code_redemption is not None:
                 registration_code = registration_code_redemption.registration_code
                 registration_code_used = registration_code.code
-                if getattr(registration_code, 'invoice_item_id'):
+                if registration_code.invoice_item_id:
                     list_price, payment_amount, payment_status, transaction_reference_number =\
                         self._get_invoice_data(registration_code_redemption)
                     coupon_codes_used = 'N/A'
 
-                elif getattr(registration_code_redemption.registration_code, 'order_id'):
+                elif registration_code_redemption.registration_code.order_id:
                     list_price, payment_amount, coupon_codes_used, payment_status, transaction_reference_number = \
                         self._get_order_data(registration_code_redemption, course_id)
 
@@ -168,7 +168,7 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
         Returns the Invoice data
         """
         registration_code = registration_code_redemption.registration_code
-        list_price = getattr(registration_code.invoice_item, 'unit_price')
+        list_price = registration_code.invoice_item.unit_price
         total_amount = registration_code_redemption.registration_code.invoice.total_amount
         qty = registration_code_redemption.registration_code.invoice_item.qty
         payment_amount = total_amount / qty

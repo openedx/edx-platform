@@ -333,7 +333,7 @@ class Order(models.Model):
         csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
         for item in orderitems:
             course_id = item.course_id
-            course = get_course_by_id(getattr(item, 'course_id'), depth=0)
+            course = get_course_by_id(item.course_id, depth=0)
             registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id, order=self)
             course_info.append((course.display_name, ' (' + course.start_datetime_text() + '-' + course.end_datetime_text() + ')'))
             for registration_code in registration_codes:
@@ -347,7 +347,7 @@ class Order(models.Model):
         """
         send confirmation e-mail
         """
-        recipient_list = [(self.user.username, getattr(self.user, 'email'), 'user')]  # pylint: disable=no-member
+        recipient_list = [(self.user.username, self.user.email, 'user')]  # pylint: disable=no-member
         if self.company_contact_email:
             recipient_list.append((self.company_contact_name, self.company_contact_email, 'company_contact'))
         joined_course_names = ""
@@ -385,7 +385,9 @@ class Order(models.Model):
                         'course_names': ", ".join([course_info[0] for course_info in courses_info]),
                         'dashboard_url': dashboard_url,
                         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=no-member
+                        'order_placed_by': '{username} ({email})'.format(
+                            username=self.user.username, email=self.user.email
+                        ),
                         'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
                         'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
                         'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
@@ -1364,7 +1366,7 @@ class CouponRedemption(models.Model):
         If an item removed from shopping cart then we will remove
         the corresponding redemption info of coupon code
         """
-        order_item_course_id = getattr(item, 'course_id')
+        order_item_course_id = item.course_id
         try:
             # Try to remove redemption information of coupon code, If exist.
             coupon_redemption = cls.objects.get(
@@ -1417,7 +1419,7 @@ class CouponRedemption(models.Model):
                 raise MultipleCouponsNotAllowedException
 
         for item in cart_items:
-            if getattr(item, 'course_id'):
+            if item.course_id:
                 if item.course_id == coupon.course_id:
                     coupon_redemption = cls(order=order, user=order.user, coupon=coupon)
                     coupon_redemption.save()

@@ -80,8 +80,8 @@ def sale_order_record_features(course_id, features):
         sale_order_dict = dict((feature, getattr(purchased_course.order, feature))
                                for feature in sale_order_features)
 
-        quantity = int(getattr(purchased_course, 'qty'))
-        unit_cost = float(getattr(purchased_course, 'unit_cost'))
+        quantity = int(purchased_course.qty)
+        unit_cost = float(purchased_course.unit_cost)
         sale_order_dict.update({"quantity": quantity})
         sale_order_dict.update({"total_amount": quantity * unit_cost})
 
@@ -147,7 +147,7 @@ def sale_record_features(course_id, features):
         total_used_codes = RegistrationCodeRedemption.objects.filter(
             registration_code__in=sale.courseregistrationcode_set.all()
         ).count()
-        sale_dict.update({"invoice_number": getattr(invoice, 'id')})
+        sale_dict.update({"invoice_number": invoice.id})
         sale_dict.update({"total_codes": sale.courseregistrationcode_set.all().count()})
         sale_dict.update({'total_used_codes': total_used_codes})
 
@@ -379,7 +379,7 @@ def list_problem_responses(course_key, problem_location):
     """
     problem_key = UsageKey.from_string(problem_location)
     # Are we dealing with an "old-style" problem location?
-    run = getattr(problem_key, 'run')
+    run = problem_key.run
     if not run:
         problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
     if problem_key.course_key != course_key:
@@ -420,7 +420,7 @@ def course_registration_features(features, registration_codes, csv_type):
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
         course_registration_dict['company_name'] = None
         if registration_code.invoice_item:
-            course_registration_dict['company_name'] = getattr(registration_code.invoice_item.invoice, 'company_name')
+            course_registration_dict['company_name'] = registration_code.invoice_item.invoice.company_name
         course_registration_dict['redeemed_by'] = None
         if registration_code.invoice_item:
             sale_invoice = registration_code.invoice_item.invoice
@@ -439,8 +439,9 @@ def course_registration_features(features, registration_codes, csv_type):
         #  They have not been redeemed yet
         if csv_type is not None:
             try:
-                redeemed_by = getattr(registration_code.registrationcoderedemption_set.get(registration_code=registration_code), 'redeemed_by')
-                course_registration_dict['redeemed_by'] = getattr(redeemed_by, 'email')
+                redemption_set = registration_code.registrationcoderedemption_set
+                redeemed_by = redemption_set.get(registration_code=registration_code).redeemed_by
+                course_registration_dict['redeemed_by'] = redeemed_by.email
             except ObjectDoesNotExist:
                 pass
 

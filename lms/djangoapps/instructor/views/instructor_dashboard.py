@@ -352,7 +352,7 @@ def set_course_mode_price(request, course_id):
 
     CourseModesArchive.objects.create(
         course_id=course_id, mode_slug='honor', mode_display_name='Honor Code Certificate',
-        min_price=getattr(course_honor_mode[0], 'min_price'), currency=getattr(course_honor_mode[0], 'currency'),
+        min_price=course_honor_mode[0].min_price, currency=course_honor_mode[0].currency,
         expiration_datetime=datetime.datetime.now(pytz.utc), expiration_date=datetime.date.today()
     )
     course_honor_mode.update(
