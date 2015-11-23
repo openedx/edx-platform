@@ -473,7 +473,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(
                 course_registration['company_name'],
                 [
-                    getattr(registration_code.invoice_item.invoice, 'company_name')
+                    registration_code.invoice_item.invoice.company_name
                     for registration_code in registration_codes
                 ]
             )

@@ -589,7 +589,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
             {
                 'category': "conversion",
                 'label': None,
-                'provider': getattr(kwargs['backend'], 'name')
+                'provider': kwargs['backend'].name
             },
             context={
                 'ip': tracking_context.get('ip'),

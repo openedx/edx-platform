@@ -914,7 +914,7 @@ def get_problem_responses(request, course_id):
     try:
         problem_key = UsageKey.from_string(problem_location)
         # Are we dealing with an "old-style" problem location?
-        run = getattr(problem_key, 'run')
+        run = problem_key.run
         if not run:
             problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
         if problem_key.course_key != course_key:

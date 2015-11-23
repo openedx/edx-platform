@@ -1871,8 +1871,9 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
             course=self.course
         )
 
-        self.assertFalse(getattr(runtime, u'user_is_beta_tester'))
-        self.assertEqual(getattr(runtime, u'days_early_for_beta'), 5)
+        # pylint: disable=no-member
+        self.assertFalse(runtime.user_is_beta_tester)
+        self.assertEqual(runtime.days_early_for_beta, 5)
 
 
 class PureXBlockWithChildren(PureXBlock):
