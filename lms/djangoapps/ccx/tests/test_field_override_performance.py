@@ -7,19 +7,19 @@ import itertools
 import mock
 from nose.plugins.skip import SkipTest
 
-from courseware.views import progress  # pylint: disable=import-error
+from courseware.views import progress
 from courseware.field_overrides import OverrideFieldData
 from datetime import datetime
 from django.conf import settings
 from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edxmako.middleware import MakoMiddleware  # pylint: disable=import-error
+from edxmako.middleware import MakoMiddleware
 from nose.plugins.attrib import attr
 from pytz import UTC
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory  # pylint: disable=import-error
+from student.tests.factories import UserFactory
 from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \

@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from django.utils.timezone import UTC
 from mock import patch
 from nose.plugins.attrib import attr
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
-from student.tests.factories import (  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import (
     AdminFactory,
 )
 from util.tests.test_date_utils import fake_ugettext

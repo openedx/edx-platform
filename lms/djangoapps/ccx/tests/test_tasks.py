@@ -5,8 +5,8 @@ Tests for celery tasks defined in tasks module
 from mock_django import mock_signal_receiver
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
-from student.tests.factories import (  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import (
     AdminFactory,
 )
 from xmodule.modulestore.django import SignalHandler

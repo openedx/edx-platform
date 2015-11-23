@@ -509,7 +509,6 @@ class SignatorySectionPage(CertificatesPage):
         """
         Delete the signatory
         """
-        # pylint: disable=pointless-statement
         self.wait_for_signatory_delete_icon()
         self.click_signatory_delete_icon()
         self.wait_for_signatory_delete_prompt()

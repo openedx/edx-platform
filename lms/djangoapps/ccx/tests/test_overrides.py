@@ -7,11 +7,11 @@ import mock
 import pytz
 from nose.plugins.attrib import attr
 
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from courseware.field_overrides import OverrideFieldData
 from django.test.utils import override_settings
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
 from request_cache.middleware import RequestCache
-from student.tests.factories import AdminFactory  # pylint: disable=import-error
+from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE)

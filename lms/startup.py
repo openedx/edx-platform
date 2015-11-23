@@ -2,8 +2,6 @@
 Module for code that should run during LMS startup
 """
 
-# pylint: disable=unused-argument
-
 import django
 from django.conf import settings
 

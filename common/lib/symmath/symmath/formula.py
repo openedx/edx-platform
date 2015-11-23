@@ -12,7 +12,7 @@ Provides sympy representation.
 #
 
 import os
-import string       # pylint: disable=deprecated-module
+import string
 import re
 import logging
 import operator

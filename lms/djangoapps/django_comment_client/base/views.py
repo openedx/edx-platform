@@ -379,7 +379,7 @@ def create_comment(request, course_id, thread_id):
 @require_POST
 @login_required
 @permitted
-def delete_thread(request, course_id, thread_id):  # pylint: disable=unused-argument
+def delete_thread(request, course_id, thread_id):
     """
     given a course_id and thread_id, delete this thread
     this is ajax only

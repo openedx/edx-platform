@@ -53,7 +53,7 @@ class Command(TrackedCommand):
     )
 
     @transaction.atomic
-    def handle(self, *args, **options):  # pylint: disable=unused-argument
+    def handle(self, *args, **options):
         source_key = CourseKey.from_string(options.get('source_course', ''))
         dest_keys = []
         for course_key in options.get('dest_course_list', '').split(','):

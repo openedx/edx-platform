@@ -305,7 +305,7 @@ class CommentsServiceMockMixin(object):
         """
         make a request to PATCH endpoint and return response
         """
-        return self.client.patch(  # pylint: disable=no-member
+        return self.client.patch(
             self.url,
             json.dumps(request_data),
             content_type="application/merge-patch+json"

@@ -285,7 +285,7 @@ class LoginTest(TestCase):
         self._assert_response(response, success=True)
 
         # Reload the user from the database
-        self.user = User.objects.get(pk=self.user.pk)       # pylint: disable=no-member
+        self.user = User.objects.get(pk=self.user.pk)
 
         self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
 

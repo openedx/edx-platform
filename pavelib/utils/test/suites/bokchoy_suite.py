@@ -14,7 +14,7 @@ from pavelib.utils.test import utils as test_utils
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable=invalid-name
+    colorize = lambda color, text: text
 
 __test__ = False  # do not collect
 

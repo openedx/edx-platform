@@ -126,7 +126,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # expect the javascript is still present in the rendered html
         self.assertIn(
             "<script type=\"text/javascript\">function(){}</script>",
-            etree.tostring(rendered_html)  # pylint: disable=no-member
+            etree.tostring(rendered_html)
         )
 
     def test_render_response_xml(self):

@@ -141,7 +141,6 @@ class SampleCourseFactory(CourseFactory):
     """
     Factory for sample courses using block_info_tree definitions.
     """
-    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
         """
@@ -181,7 +180,6 @@ class ToyCourseFactory(SampleCourseFactory):
     run = '2012_Fall'
     display_name = 'Toy Course'
 
-    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
         """

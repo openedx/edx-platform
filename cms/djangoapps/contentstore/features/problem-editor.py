@@ -3,7 +3,7 @@
 
 import json
 from lettuce import world, step
-from nose.tools import assert_equal, assert_true  # pylint: disable=no-name-in-module
+from nose.tools import assert_equal, assert_true
 from common import type_in_codemirror, open_new_course
 from advanced_settings import change_value, ADVANCED_MODULES_KEY
 from course_import import import_file

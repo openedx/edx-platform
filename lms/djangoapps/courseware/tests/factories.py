@@ -6,9 +6,7 @@ import factory
 from factory.django import DjangoModelFactory
 
 # Imported to re-export
-# pylint: disable=unused-import
 from student.tests.factories import UserFactory  # Imported to re-export
-# pylint: enable=unused-import
 
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField

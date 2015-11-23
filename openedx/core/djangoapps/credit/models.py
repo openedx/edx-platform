@@ -708,6 +708,6 @@ class CreditRequest(TimeStampedModel):
         """Unicode representation of a credit request."""
         return u"{course}, {provider}, {status}".format(
             course=self.course.course_key,
-            provider=self.provider.provider_id,  # pylint: disable=no-member
+            provider=self.provider.provider_id,
             status=self.status,
         )

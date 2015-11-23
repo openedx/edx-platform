@@ -75,7 +75,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Validate the behavior of the social sharing feature
         """
         twitter_widget = self.dashboard_page.get_course_social_sharing_widget('twitter')
-        twitter_url = "https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"  # pylint: disable=line-too-long
+        twitter_url = "https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
         self.assertEqual(twitter_widget.attrs('title')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('data-tooltip')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('aria-haspopup')[0], 'true')

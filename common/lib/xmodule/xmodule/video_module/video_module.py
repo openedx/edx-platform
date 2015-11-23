@@ -1,6 +1,4 @@
-
 # -*- coding: utf-8 -*-
-# pylint: disable=abstract-method
 """Video is ungraded Xmodule for support video content.
 It's new improved video module, which support additional feature:
 - Can play non-YouTube video sources via in-browser HTML5 video player.

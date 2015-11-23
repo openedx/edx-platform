@@ -75,7 +75,7 @@ def get_course_programs_for_dashboard(user, course_keys):   # pylint: disable=in
     return _get_user_course_programs(programs, course_keys)
 
 
-def _get_user_course_programs(programs, users_enrolled_course_keys):  # pylint: disable=invalid-name
+def _get_user_course_programs(programs, users_enrolled_course_keys):
     """ Parse the raw programs according to the users enrolled courses and
     return the matched course runs.
 

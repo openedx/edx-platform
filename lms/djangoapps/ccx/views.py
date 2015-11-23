@@ -194,7 +194,7 @@ def create_ccx(request, course, ccx=None):
             for vertical in sequential.get_children():
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
-    ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)  # pylint: disable=no-member
+    ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
 

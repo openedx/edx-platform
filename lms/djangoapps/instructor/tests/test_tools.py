@@ -11,9 +11,9 @@ from django.utils.timezone import utc
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
-from student.tests.factories import UserFactory  # pylint: disable=import-error
+from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

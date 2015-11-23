@@ -58,7 +58,7 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
 
 import random
-import string  # pylint: disable=deprecated-module
+import string
 from collections import OrderedDict
 import urllib
 import analytics

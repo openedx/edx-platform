@@ -79,7 +79,7 @@ class CohortMembership(models.Model):
         super(CohortMembership, self).clean_fields(*args, **kwargs)
 
     def clean(self):
-        if self.course_user_group.group_type != CourseUserGroup.COHORT:  # pylint: disable=E1101
+        if self.course_user_group.group_type != CourseUserGroup.COHORT:
             raise ValidationError("CohortMembership cannot be used with CourseGroup types other than COHORT")
         if self.course_user_group.course_id != self.course_id:
             raise ValidationError("Non-matching course_ids provided")
@@ -103,7 +103,7 @@ class CohortMembership(models.Model):
                 try:
                     with transaction.atomic():
                         saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
-                            user__id=self.user.id,  # pylint: disable=E1101
+                            user__id=self.user.id,
                             course_id=self.course_id,
                             defaults={
                                 'course_user_group': self.course_user_group,
@@ -116,7 +116,7 @@ class CohortMembership(models.Model):
                 if not created:
                     if saved_membership.course_user_group == self.course_user_group:
                         raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                            user_name=self.user.username,  # pylint: disable=E1101
+                            user_name=self.user.username,
                             cohort_name=self.course_user_group.name
                         ))
                     self.previous_cohort = saved_membership.course_user_group
@@ -125,7 +125,7 @@ class CohortMembership(models.Model):
                     self.previous_cohort.users.remove(self.user)
 
                 saved_membership.course_user_group = self.course_user_group
-                self.course_user_group.users.add(self.user)  # pylint: disable=E1101
+                self.course_user_group.users.add(self.user)
 
                 super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
 

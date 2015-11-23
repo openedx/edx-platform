@@ -89,7 +89,7 @@ class LocationMixin(XBlockMixin):
     def location(self, value):
         """ Set the UsageKey of this block. """
         assert isinstance(value, UsageKey)
-        self.scope_ids = self.scope_ids._replace(  # pylint: disable=attribute-defined-outside-init,protected-access
+        self.scope_ids = self.scope_ids._replace(
             def_id=value,
             usage_id=value,
         )
@@ -295,7 +295,6 @@ class MongoModulestoreBuilder(StoreBuilderBase):
         # Set up a temp directory for storing filesystem content created during import
         fs_root = mkdtemp()
 
-        # pylint: disable=attribute-defined-outside-init
         modulestore = DraftModuleStore(
             contentstore,
             doc_store_config,
@@ -334,7 +333,6 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
             contentstore: The contentstore that this modulestore should use to store
                 all of its assets.
         """
-        # pylint: disable=unreachable
         doc_store_config = dict(
             db='modulestore{}'.format(random.randint(0, 10000)),
             collection='split_module',

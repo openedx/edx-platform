@@ -1249,7 +1249,7 @@ def get_executive_report(course_id):
     }
 
 
-def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a html report containing information,
     which provides a snapshot of how the course is doing.
@@ -1312,7 +1312,7 @@ def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _ta
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a html report containing the survey results for a course.
     """
@@ -1402,7 +1402,7 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
 
 
 def generate_students_certificates(
-        _xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # pylint: disable=unused-argument
+        _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
     """
     For a given `course_id`, generate certificates for only students present in 'students' key in task_input
     json column, otherwise generate certificates for all enrolled students.

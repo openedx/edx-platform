@@ -115,7 +115,7 @@ class StudioLibraryTest(WebAppTest):
     """
     as_staff = True
 
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """
         Install a library with no content using a fixture.
         """

@@ -23,7 +23,7 @@ def programs_api_client(api_url, jwt_access_token):
     )
 
 
-def is_cache_enabled_for_programs():    # pylint: disable=invalid-name
+def is_cache_enabled_for_programs():
     """Returns a Boolean indicating whether responses from the Programs API
     will be cached.
     """

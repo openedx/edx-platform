@@ -62,7 +62,7 @@ class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
     """
     Export tests for libraries.
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """
         Ensure a library exists and navigate to the library edit page.
         """
