@@ -1,6 +1,7 @@
 # Custom requirements to be customized by individual OpenEdX instances
 
 # When updating a hash of an XBlock that uses xblock-utils, please update its version hash in github.txt.
+-e git+https://github.com/edx/xblock-utils.git@08e5a5a9fc8ab46b627435427fd7e04c20809009#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@bd0b3f413ae7e8274985555adfd7de7af3eca84c#egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@21b9bcc4f2c7917463ab18a596161ac6c58c9c4a#egg=xblock-image-explorer
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
