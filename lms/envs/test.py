@@ -337,13 +337,13 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
-    'FAQ': 'help',
+    'HELP_CENTER': 'help-center',
     'COURSES': 'courses',
     'ROOT': 'root',
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy',
-    'JOBS': 'jobs',
+    'CAREERS': 'careers',
     'NEWS': 'news',
     'PRESS': 'press',
     'BLOG': 'blog',
@@ -353,6 +353,7 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
+SUPPORT_SITE_LINK = 'https://support.example.com'
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
