@@ -132,6 +132,11 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     )
 
+if settings.FEATURES["ENABLE_OPENBADGES"]:
+    urlpatterns += (
+        url(r'^api/badges/v1/', include('badges.api.urls')),
+    )
+
 js_info_dict = {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.

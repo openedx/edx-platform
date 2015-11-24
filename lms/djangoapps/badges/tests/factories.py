@@ -54,7 +54,7 @@ class RandomBadgeClassFactory(BadgeClassFactory):
     """
     Same as BadgeClassFactory, but randomize the slug.
     """
-    slug = factory.lazy_attribute(lambda _: 'test_slug_' + str(random()))
+    slug = factory.lazy_attribute(lambda _: 'test_slug_' + str(random()).replace('.', '_'))
 
 
 class BadgeAssertionFactory(DjangoModelFactory):
