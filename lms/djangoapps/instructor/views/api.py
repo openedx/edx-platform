@@ -1405,6 +1405,7 @@ def get_proctored_exam_results(request, course_id):
     query_features = [
         'user_email',
         'exam_name',
+        'attempt_code',
         'allowed_time_limit_mins',
         'is_sample_attempt',
         'started_at',
