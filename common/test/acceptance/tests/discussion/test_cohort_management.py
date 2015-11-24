@@ -16,8 +16,8 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 
-import csv
 import os
+import unicodecsv
 import uuid
 
 
@@ -323,16 +323,18 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         filename = self.instructor_dashboard_page.get_asset_path(filename)
         with open(filename, 'w+') as csv_file:
-            writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+            writer = unicodecsv.writer(csv_file)
             for line in csv_text_as_lists:
                 writer.writerow(line)
         self.addCleanup(os.remove, filename)
 
     def _generate_unique_user_data(self):
+        """
+        Produce unique username and e-mail.
+        """
         unique_username = 'user' + str(uuid.uuid4().hex)[:12]
         unique_email = unique_username + "@example.com"
         return unique_username, unique_email
-
 
     def test_add_new_cohort(self):
         """
@@ -504,7 +506,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         filename = "cohort_csv_both_columns_1.csv"
         self._create_csv_file(filename, csv_contents)
         self._verify_csv_upload_acceptable_file(filename)
-        # self._verify_csv_upload_acceptable_file("cohort_users_both_columns.csv")
 
     def test_cohort_by_csv_only_email(self):
         """
@@ -546,9 +547,36 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self._create_csv_file(filename, csv_contents)
         self._verify_csv_upload_acceptable_file(filename)
 
-    def _verify_csv_upload_acceptable_file(self, filename):
+    def test_cohort_by_csv_unicode(self):
+        """
+        Scenario: the instructor can upload a file with user and cohort assignments, using both emails and usernames.
+
+        Given I have a course with two cohorts defined
+        And I add another cohort with a unicode name
+        When I go to the cohort management section of the instructor dashboard
+        I can upload a CSV file with assignments of users to the unicode cohort via both usernames and emails
+        Then I can download a file with results
+
+        TODO: refactor events verification to handle this scenario. Events verification assumes movements
+        between other cohorts (manual and auto).
+        """
+        unicode_hello_in_korean = u'안녕하세요'
+        self._verify_cohort_settings(cohort_name=unicode_hello_in_korean, assignment_type=None)
+        csv_contents = [
+            ['username', 'email', 'cohort'],
+            [self.instructor_name, '', unicode_hello_in_korean],
+            ['', self.student_email, unicode_hello_in_korean],
+            [self.other_student_name, '', unicode_hello_in_korean]
+        ]
+        filename = "cohort_unicode_name.csv"
+        self._create_csv_file(filename, csv_contents)
+        self._verify_csv_upload_acceptable_file(filename, skip_events=True)
+
+    def _verify_csv_upload_acceptable_file(self, filename, skip_events=None):
         """
         Helper method to verify cohort assignments after a successful CSV upload.
+
+        When skip_events is specified, no assertions are made on events.
         """
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
@@ -556,45 +584,46 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
             "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
-        # student_user is moved from manual cohort to auto cohort
-        self.assertEqual(
-            self.event_collection.find({
-                "name": "edx.cohort.user_added",
-                "time": {"$gt": start_time},
-                "event.user_id": {"$in": [int(self.student_id)]},
-                "event.cohort_name": self.auto_cohort_name,
-            }).count(),
-            1
-        )
-        self.assertEqual(
-            self.event_collection.find({
-                "name": "edx.cohort.user_removed",
-                "time": {"$gt": start_time},
-                "event.user_id": int(self.student_id),
-                "event.cohort_name": self.manual_cohort_name,
-            }).count(),
-            1
-        )
-        # instructor_user (previously unassigned) is added to manual cohort
-        self.assertEqual(
-            self.event_collection.find({
-                "name": "edx.cohort.user_added",
-                "time": {"$gt": start_time},
-                "event.user_id": {"$in": [int(self.instructor_id)]},
-                "event.cohort_name": self.manual_cohort_name,
-            }).count(),
-            1
-        )
-        # other_student_user (previously unassigned) is added to manual cohort
-        self.assertEqual(
-            self.event_collection.find({
-                "name": "edx.cohort.user_added",
-                "time": {"$gt": start_time},
-                "event.user_id": {"$in": [int(self.other_student_id)]},
-                "event.cohort_name": self.manual_cohort_name,
-            }).count(),
-            1
-        )
+        if not skip_events:
+            # student_user is moved from manual cohort to auto cohort
+            self.assertEqual(
+                self.event_collection.find({
+                    "name": "edx.cohort.user_added",
+                    "time": {"$gt": start_time},
+                    "event.user_id": {"$in": [int(self.student_id)]},
+                    "event.cohort_name": self.auto_cohort_name,
+                }).count(),
+                1
+            )
+            self.assertEqual(
+                self.event_collection.find({
+                    "name": "edx.cohort.user_removed",
+                    "time": {"$gt": start_time},
+                    "event.user_id": int(self.student_id),
+                    "event.cohort_name": self.manual_cohort_name,
+                }).count(),
+                1
+            )
+            # instructor_user (previously unassigned) is added to manual cohort
+            self.assertEqual(
+                self.event_collection.find({
+                    "name": "edx.cohort.user_added",
+                    "time": {"$gt": start_time},
+                    "event.user_id": {"$in": [int(self.instructor_id)]},
+                    "event.cohort_name": self.manual_cohort_name,
+                }).count(),
+                1
+            )
+            # other_student_user (previously unassigned) is added to manual cohort
+            self.assertEqual(
+                self.event_collection.find({
+                    "name": "edx.cohort.user_added",
+                    "time": {"$gt": start_time},
+                    "event.user_id": {"$in": [int(self.other_student_id)]},
+                    "event.cohort_name": self.manual_cohort_name,
+                }).count(),
+                1
+            )
 
         # Verify the results can be downloaded.
         data_download = self.instructor_dashboard_page.select_data_download()
