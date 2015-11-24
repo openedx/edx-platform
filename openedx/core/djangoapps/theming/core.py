@@ -2,17 +2,19 @@
 Core logic for Comprehensive Theming.
 """
 
+from os.path import basename
+
 from django.conf import settings
 
 import edxmako
 
 
-def comprehensive_theme_changes(theme_dir):
+def comprehensive_theme_changes(path_theme):
     """
     Calculate the set of changes needed to enable a comprehensive theme.
 
     Arguments:
-        theme_dir (path.path): the full path to the theming directory to use.
+        path_theme (path.path): the full path to the theming directory to use.
 
     Returns:
         A dict indicating the changes to make:
@@ -28,29 +30,21 @@ def comprehensive_theme_changes(theme_dir):
         'settings': {},
         'mako_paths': [],
     }
-
-    if settings.PROJECT_ROOT.endswith("cms"):
-        theme_subdir = theme_dir / "studio"
-    else:
-        theme_subdir = theme_dir / "lms"
-
-    templates_dir = theme_subdir / "templates"
-    if templates_dir.isdir():
-        changes['settings']['TEMPLATE_DIRS'] = [templates_dir] + settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
-        changes['mako_paths'].append(templates_dir)
-
-    staticfiles_dir = theme_subdir / "static"
-    if staticfiles_dir.isdir():
-        changes['settings']['STATICFILES_DIRS'] = [staticfiles_dir] + settings.STATICFILES_DIRS
-
-    locale_dir = theme_subdir / "conf" / "locale"
-    if locale_dir.isdir():
-        changes['settings']['LOCALE_PATHS'] = [locale_dir] + settings.LOCALE_PATHS
-
-    favicon = theme_subdir / "static" / "images" / "favicon.ico"
-    if favicon.isfile():
-        changes['settings']['FAVICON_PATH'] = str(favicon)
-
+    path_project = path_theme / basename(settings.PROJECT_ROOT)
+    path_templates = path_project / 'templates'
+    path_static = path_project / 'static'
+    path_locale = path_project / 'conf' / 'locale'
+    path_favicon = path_project / 'static' / 'images' / 'favicon.ico'
+    if path_templates.isdir():
+        changes['settings']['TEMPLATE_DIRS'] = [path_templates] + settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
+        changes['mako_paths'].append(path_templates)
+    if path_static.isdir():
+        changes['settings']['STATICFILES_DIRS'] = [path_static] + settings.STATICFILES_DIRS
+    if path_locale.isdir():
+        changes['settings']['LOCALE_PATHS'] = [path_locale] + settings.LOCALE_PATHS
+    if path_favicon.isfile():
+        # TODO: Should this be unicode?
+        changes['settings']['FAVICON_PATH'] = str(path_favicon)
     return changes
 
 
