@@ -258,6 +258,16 @@ def save_ccx(request, course, ccx=None):
                 graded[block.format] = graded.get(block.format, 0) + 1
 
             children = unit.get('children', None)
+            # For a vertical, override start and due dates of all its problems.
+            if unit.get('category', None) == u'vertical':
+                for component in block.get_children():
+                    # override start and due date of problem (Copy dates of vertical into problems)
+                    if start:
+                        override_field_for_ccx(ccx, component, 'start', start)
+
+                    if due:
+                        override_field_for_ccx(ccx, component, 'due', due)
+
             if children:
                 override_fields(block, children, graded, earliest, ccx_ids_to_delete)
         return earliest, ccx_ids_to_delete

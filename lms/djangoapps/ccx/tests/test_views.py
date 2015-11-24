@@ -156,7 +156,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.verticals = flatten([
             [
                 ItemFactory.create(
-                    due=due, parent=sequential, graded=True, format='Homework'
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
                 ) for _ in xrange(2)
             ] for sequential in cls.sequentials
         ])
@@ -363,6 +363,9 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         unhide(schedule[0])
         schedule[0]['start'] = u'2014-11-20 00:00'
         schedule[0]['children'][0]['due'] = u'2014-12-25 00:00'  # what a jerk!
+        schedule[0]['children'][0]['children'][0]['start'] = u'2014-12-20 00:00'
+        schedule[0]['children'][0]['children'][0]['due'] = u'2014-12-25 00:00'
+
         response = self.client.post(
             url, json.dumps(schedule), content_type='application/json'
         )
@@ -372,6 +375,13 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(schedule[0]['start'], u'2014-11-20 00:00')
         self.assertEqual(
             schedule[0]['children'][0]['due'], u'2014-12-25 00:00'
+        )
+
+        self.assertEqual(
+            schedule[0]['children'][0]['children'][0]['due'], u'2014-12-25 00:00'
+        )
+        self.assertEqual(
+            schedule[0]['children'][0]['children'][0]['start'], u'2014-12-20 00:00'
         )
 
         # Make sure start date set on course, follows start date of earliest
