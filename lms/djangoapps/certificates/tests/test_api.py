@@ -31,8 +31,57 @@ FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 
+class WebCertificateTestMixin(object):
+    """
+    Mixin with helpers for testing Web Certificates.
+    """
+    @contextmanager
+    def _mock_passing_grade(self):
+        """
+        Mock the grading function to always return a passing grade.
+        """
+        symbol = 'courseware.grades.grade'
+        with patch(symbol) as mock_grade:
+            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
+            yield
+
+    @contextmanager
+    def _mock_queue(self, is_successful=True):
+        """
+        Mock the "send to XQueue" method to return either success or an error.
+        """
+        symbol = 'capa.xqueue_interface.XQueueInterface.send_to_queue'
+        with patch(symbol) as mock_send_to_queue:
+            if is_successful:
+                mock_send_to_queue.return_value = (0, "Successfully queued")
+            else:
+                mock_send_to_queue.side_effect = XQueueAddToQueueError(1, self.ERROR_REASON)
+
+            yield mock_send_to_queue
+
+    def _setup_course_certificate(self):
+        """
+        Creates certificate configuration for course
+        """
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Test Certificate Name',
+                'description': 'Test Certificate Description',
+                'course_title': 'tes_course_title',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+
 @attr('shard_1')
-class CertificateDownloadableStatusTests(ModuleStoreTestCase):
+class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
 
     def setUp(self):
@@ -48,7 +97,7 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
 
         self.request_factory = RequestFactory()
 
-    def test_user_cert_status_with_generating(self):
+    def test_cert_status_with_generating(self):
         GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course.id,
@@ -65,7 +114,7 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
             }
         )
 
-    def test_user_cert_status_with_error(self):
+    def test_cert_status_with_error(self):
         GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course.id,
@@ -82,7 +131,7 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
             }
         )
 
-    def test_user_with_out_cert(self):
+    def test_without_cert(self):
         self.assertEqual(
             certs_api.certificate_downloadable_status(self.student_no_cert, self.course.id),
             {
@@ -92,7 +141,7 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
             }
         )
 
-    def test_user_with_downloadable_cert(self):
+    def test_with_downloadable_pdf_cert(self):
         GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course.id,
@@ -110,10 +159,29 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
             }
         )
 
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_with_downloadable_web_cert(self):
+        CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
+        self._setup_course_certificate()
+        with self._mock_passing_grade():
+            certs_api.generate_user_certificates(self.student, self.course.id)
+
+        self.assertEqual(
+            certs_api.certificate_downloadable_status(self.student, self.course.id),
+            {
+                'is_downloadable': True,
+                'is_generating': False,
+                'download_url': '/certificates/user/{user_id}/course/{course_id}'.format(
+                    user_id=self.student.id,  # pylint: disable=no-member
+                    course_id=self.course.id,
+                ),
+            }
+        )
+
 
 @attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
-class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
+class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for generating certificates for students. """
 
     ERROR_REASON = "Kaboom!"
@@ -184,46 +252,6 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
         """
         url = certs_api.get_certificate_url(self.student.id, self.course.id)
         self.assertEqual(url, "")
-
-    @contextmanager
-    def _mock_passing_grade(self):
-        """Mock the grading function to always return a passing grade. """
-        symbol = 'courseware.grades.grade'
-        with patch(symbol) as mock_grade:
-            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
-            yield
-
-    @contextmanager
-    def _mock_queue(self, is_successful=True):
-        """Mock the "send to XQueue" method to return either success or an error. """
-        symbol = 'capa.xqueue_interface.XQueueInterface.send_to_queue'
-        with patch(symbol) as mock_send_to_queue:
-            if is_successful:
-                mock_send_to_queue.return_value = (0, "Successfully queued")
-            else:
-                mock_send_to_queue.side_effect = XQueueAddToQueueError(1, self.ERROR_REASON)
-
-            yield mock_send_to_queue
-
-    def _setup_course_certificate(self):
-        """
-        Creates certificate configuration for course
-        """
-        certificates = [
-            {
-                'id': 1,
-                'name': 'Test Certificate Name',
-                'description': 'Test Certificate Description',
-                'course_title': 'tes_course_title',
-                'signatories': [],
-                'version': 1,
-                'is_active': True
-            }
-        ]
-        self.course.certificates = {'certificates': certificates}
-        self.course.cert_html_view_enabled = True
-        self.course.save()
-        self.store.update_item(self.course, self.user.id)
 
 
 @attr('shard_1')
