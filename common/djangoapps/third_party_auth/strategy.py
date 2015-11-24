@@ -51,7 +51,7 @@ class ConfigurationModelStrategy(DjangoStrategy):
         """
         # TODO: this override is a temporary measure until upstream python-social-auth patch is merged:
         # https://github.com/omab/python-social-auth/pull/741
-        if self.setting('RESPECT_X_FORWARDED_HEADERS', False):
+        if self.setting('RESPECT_X_FORWARDED_HEADERS', True):
             forwarded_host = self.request.META.get('HTTP_X_FORWARDED_HOST')
             if forwarded_host:
                 return forwarded_host
@@ -64,7 +64,7 @@ class ConfigurationModelStrategy(DjangoStrategy):
         """
         # TODO: this override is a temporary measure until upstream python-social-auth patch is merged:
         # https://github.com/omab/python-social-auth/pull/741
-        if self.setting('RESPECT_X_FORWARDED_HEADERS', False):
+        if self.setting('RESPECT_X_FORWARDED_HEADERS', True):
             forwarded_port = self.request.META.get('HTTP_X_FORWARDED_PORT')
             if forwarded_port:
                 return forwarded_port

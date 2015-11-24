@@ -18,6 +18,22 @@ class TestStrategy(TestCase):
         self.request_mock = mock.Mock()
         self.strategy = ConfigurationModelStrategy(mock.Mock(), request=self.request_mock)
 
+    def test_request_host_no_setting(self):
+        get_host_value, x_forwarded_value = 'get_host_value', 'x_forwarded_value'
+        expected_value = x_forwarded_value
+
+        self.request_mock.META = {}
+        self.request_mock.get_host.return_value = get_host_value
+        self.request_mock.META['HTTP_X_FORWARDED_HOST'] = x_forwarded_value
+        self.assertEqual(self.strategy.request_host(), expected_value)
+
+    def test_request_port_no_setting(self):
+        server_port_value, x_forwarded_value = 'server_port_value', 'x_forwarded_value'
+        expected_value = x_forwarded_value
+
+        self.request_mock.META = {'SERVER_PORT': server_port_value, 'HTTP_X_FORWARDED_PORT': x_forwarded_value}
+        self.assertEqual(self.strategy.request_port(), expected_value)
+
     @ddt.data(
         (True, None, 'host', 'host'),
         (True, "", 'other_host', 'other_host'),
