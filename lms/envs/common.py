@@ -428,8 +428,7 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
 
-# comprehensive theming system
-COMP_THEME_DIR = ""
+COMPREHENSIVE_THEMING_DIRECTORY = ''
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)

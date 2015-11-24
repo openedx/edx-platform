@@ -3,6 +3,8 @@ Static file finders for Django.
 https://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-STATICFILES_FINDERS
 Yes, this interface is private and undocumented, but we need to access it anyway.
 """
+from os.path import basename
+
 from path import Path
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -14,28 +16,19 @@ from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingSt
 class ComprehensiveThemeFinder(BaseFinder):
     """
     A static files finder that searches the active comprehensive theme
-    for static files. If the ``COMP_THEME_DIR`` setting is unset, or the
-    ``COMP_THEME_DIR`` does not exist on the file system, this finder will
+    for static files. If the ``COMPREHENSIVE_THEMING_DIRECTORY`` setting
+    is unset or does not exist on the file system, this finder will
     never find any files.
     """
     def __init__(self, *args, **kwargs):
         super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
-
-        COMP_THEME_DIR = getattr(settings, "COMP_THEME_DIR", "")  # pylint: disable=invalid-name
-        if not COMP_THEME_DIR:
+        path_theme = Path(settings.COMPREHENSIVE_THEMING_DIRECTORY)
+        if not path_theme:
             self.storage = None
             return
-
-        if not isinstance(COMP_THEME_DIR, basestring):
-            raise ImproperlyConfigured("Your COMP_THEME_DIR setting must be a string")
-
-        PROJECT_ROOT = getattr(settings, "PROJECT_ROOT", "")  # pylint: disable=invalid-name
-        if PROJECT_ROOT.endswith("cms"):
-            THEME_STATIC_DIR = Path(COMP_THEME_DIR) / "studio" / "static"  # pylint: disable=invalid-name
-        else:
-            THEME_STATIC_DIR = Path(COMP_THEME_DIR) / "lms" / "static"  # pylint: disable=invalid-name
-
-        self.storage = CachedComprehensiveThemingStorage(location=THEME_STATIC_DIR)
+        path_project = path_theme / basename(settings.PROJECT_ROOT)
+        path_static = path_project / 'static'
+        self.storage = CachedComprehensiveThemingStorage(location=path_static)
 
     def find(self, path, all=False):  # pylint: disable=redefined-builtin
         """

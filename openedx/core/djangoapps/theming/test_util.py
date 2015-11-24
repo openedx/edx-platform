@@ -34,7 +34,7 @@ def with_comp_theme(theme_dir):
     def _decorator(func):                       # pylint: disable=missing-docstring
         @wraps(func)
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
-            with override_settings(COMP_THEME_DIR=theme_dir, **changes['settings']):
+            with override_settings(COMPREHENSIVE_THEMING_DIRECTORY=theme_dir, **changes['settings']):
                 with edxmako.save_lookups():
                     for template_dir in changes['mako_paths']:
                         edxmako.paths.add_lookup('main', template_dir, prepend=True)
