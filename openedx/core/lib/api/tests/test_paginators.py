@@ -140,8 +140,8 @@ class NamespacedPaginationTestCase(TestCase):
             {'username': 'user_9', 'email': 'user_9@example.com'},
         ],
         'pagination': {
-            'next': '/endpoint?page=3&page_size=5',
-            'previous': '/endpoint?page=1&page_size=5',
+            'next': 'http://testserver/endpoint?page=3&page_size=5',
+            'previous': 'http://testserver/endpoint?page_size=5',
             'count': 25,
             'num_pages': 5,
         }

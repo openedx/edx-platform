@@ -48,7 +48,7 @@ class NamespacedPageNumberPagination(pagination.PageNumberPagination):
             ('next', self.get_next_link()),
             ('previous', self.get_previous_link()),
             ('count', self.page.paginator.count),
-            ('num_pages', self.page.paginator.count),
+            ('num_pages', self.page.paginator.num_pages),
         ])
         if isinstance(data, dict):
             if 'results' not in data:
