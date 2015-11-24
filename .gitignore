@@ -107,3 +107,13 @@ autodeploy.properties
 .ws_migrations_complete
 dist
 *.nfs*
+###xblock
+chapter/
+course/
+discussion/
+html/
+problem/
+randomize/
+sequential/
+vertical/
+video/
