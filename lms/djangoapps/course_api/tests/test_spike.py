@@ -19,13 +19,10 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
                 "name": "Toy Course",
                 "number": "toy",
                 "org": "edX",
-                "short_description": "A course about toys.",
+                "description": "A course about toys.",
                 "media": {
                     "course_image": {
                         "uri": "/c4x/edX/toy/asset/just_a_test.jpg",
-                        "name": "Course Image",
-                        "description": "",
-                        "type": "logo"
                     }
                 },
                 "start": "2015-07-17T12:00:00Z",
