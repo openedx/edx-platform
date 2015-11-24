@@ -316,7 +316,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
 
     def test_page_scroll_on_thread_change_view(self):
         """
-        Check switching between threads changes the page to scroll to bottom
+        Check switching between threads changes the page focus
         """
         # verify threads are rendered on the page
         self.assertTrue(
@@ -327,8 +327,8 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
         self.assertTrue(self.thread_page_2.is_browser_on_page())
 
-        # Verify that window is on top of page.
-        self.thread_page_2.check_window_is_on_top()
+        # Verify that the focus is changed
+        self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
 
 @attr('shard_2')
