@@ -9,6 +9,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
 from django.utils._os import safe_join
 
+from pipeline.storage import PipelineMixin, NonPackagingMixin
+from require.storage import OptimizedFilesMixin
+
 
 class ComprehensiveThemingAwareMixin(object):
     """
@@ -76,5 +79,33 @@ class CachedComprehensiveThemingStorage(
     """
     Used by the ComprehensiveThemeFinder class. Mixes in support for cached
     files and comprehensive theming in static files.
+    """
+    pass
+
+
+class ProductionStorage(
+        ComprehensiveThemingAwareMixin,
+        OptimizedFilesMixin,
+        PipelineMixin,
+        CachedFilesMixin,
+        StaticFilesStorage
+    ):  # nopep8
+    """
+    This class combines Django's StaticFilesStorage class with several mixins
+    that provide additional functionality. We use this version on production.
+    """
+    pass
+
+
+class DevelopmentStorage(
+        ComprehensiveThemingAwareMixin,
+        NonPackagingMixin,
+        PipelineMixin,
+        StaticFilesStorage
+    ):  # nopep8
+    """
+    This class combines Django's StaticFilesStorage class with several mixins
+    that provide additional functionality. We use this version for development,
+    so that we can skip packaging and optimization.
     """
     pass

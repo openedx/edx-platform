@@ -1199,7 +1199,7 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 PIPELINE_ENABLED = True
 
-STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+STATICFILES_STORAGE = 'openedx.core.djangoapps.theming.storage.DevelopmentStorage'
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
