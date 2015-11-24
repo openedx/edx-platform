@@ -32,7 +32,7 @@ def validate_lowercase(string):
     """
     Validates that a string is lowercase.
     """
-    if not string == string.lower():
+    if not string.islower():
         raise ValidationError(_(u"This value must be all lowercase."))
 
 
