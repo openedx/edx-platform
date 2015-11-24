@@ -124,10 +124,16 @@ class PaginateSearchResultsTestCase(TestCase):
 
 
 class NamespacedPaginationTestCase(TestCase):
+    """
+    Test behavior of `NamespacedPageNumberPagination`
+    """
 
     TestUser = namedtuple('TestUser', ['username', 'email'])
 
-    class TestUserSerializer(serializers.Serializer):
+    class TestUserSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+        """
+        Simple serializer to paginate results from
+        """
         username = serializers.CharField()
         email = serializers.CharField()
 
@@ -152,7 +158,6 @@ class NamespacedPaginationTestCase(TestCase):
         self.paginator = NamespacedPageNumberPagination()
         self.users = [self.TestUser('user_{}'.format(idx), 'user_{}@example.com'.format(idx)) for idx in xrange(25)]
         self.request_factory = RequestFactory()
-
 
     def test_basic_pagination(self):
         request = self.request_factory.get('/endpoint', data={'page': 2, 'page_size': 5})
