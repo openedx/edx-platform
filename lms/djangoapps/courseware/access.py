@@ -302,10 +302,6 @@ def _has_access_course_desc(user, action, course):
         """
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
         it's past the enrollment period, they should still see it.
-
-        TODO (vshnayder): This means that courses with limited enrollment periods will not appear
-        to non-staff visitors after the enrollment period is over.  If this is not what we want, will
-        need to change this logic.
         """
         # VS[compat] -- this setting should go away once all courses have
         # properly configured enrollment_start times (if course should be
