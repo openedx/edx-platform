@@ -86,6 +86,7 @@ git+https://github.com/edx/edx-oauth2-provider.git@0.5.8#egg=edx-oauth2-provider
 git+https://github.com/edx/edx-val.git@0.0.8#egg=edxval==0.0.8
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 -e git+https://github.com/pmitros/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
+-e git+https://github.com/pmitros/DoneXBlock.git@857bf365f19c904d7e48364428f6b93ff153fabd#egg=done-xblock
 -e git+https://github.com/edx/edx-search.git@release-2015-11-17#egg=edx-search==0.1.1
 -e git+https://github.com/edx/edx-milestones.git@release-2015-11-17#egg=edx-milestones==0.1.5
 git+https://github.com/edx/edx-lint.git@v0.3.2#egg=edx_lint==0.3.2

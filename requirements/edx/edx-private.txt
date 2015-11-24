@@ -20,7 +20,6 @@
 # edX.
 
 -e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
--e git+https://github.com/pmitros/DoneXBlock.git@1ce0ac14d9f3df3083b951262ec82e84b58d16d1#egg=done-xblock
 -e git+https://github.com/pmitros/AudioXBlock.git@1fbf19cc21613aead62799469e1593adb037fdd9#egg=audio-xblock
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
