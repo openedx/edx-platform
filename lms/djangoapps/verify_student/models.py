@@ -955,6 +955,11 @@ class VerificationDeadline(TimeStampedModel):
         )
     )
 
+    # The system prefers to set this automatically based on default settings. But
+    # if the field is set manually we want a way to indicate that so we don't
+    # overwrite the manual setting of the field.
+    deadline_is_explicit = models.BooleanField(default=True)
+
     # Maintain a history of changes to deadlines for auditing purposes
     history = HistoricalRecords()
 
