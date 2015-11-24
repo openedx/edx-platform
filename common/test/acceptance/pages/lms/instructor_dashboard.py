@@ -1001,7 +1001,7 @@ class CertificatesPage(PageObject):
         Wait for Certificate Exceptions to be rendered on page
         """
         self.wait_for_element_visibility(
-            'div.certificate_exception-container',
+            'div.certificate-exception-container',
             'Certificate Exception Section is visible'
         )
         self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
@@ -1082,7 +1082,7 @@ class CertificatesPage(PageObject):
         """
         Returns the "Certificate Exceptions" section.
         """
-        return self.get_selector('div.certificate_exception-container')
+        return self.get_selector('div.certificate-exception-container')
 
     @property
     def last_certificate_exception(self):

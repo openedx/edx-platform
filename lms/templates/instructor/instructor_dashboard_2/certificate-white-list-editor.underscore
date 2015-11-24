@@ -1,9 +1,8 @@
+<h3><%= gettext("Individual Exceptions") %></h3>
+<p class="under-heading-text"> <%= gettext("You can upload a CSV file of usernames or email addresses to be added to the certificate exceptions white list.") %></p>
 <div class='certificate-exception-inputs'>
     <input class='student-username-or-email' id="certificate-exception" type="text" placeholder="Student email or username" aria-describedby='student-user-name-or-email-tip'>
     <textarea class='notes-field' id="notes" rows="10" placeholder="Free text notes" aria-describedby='notes-field-tip'></textarea>
     <input type="button" id="add-exception" value="Add Exception">
-
-    <p id='student-user-name-or-email-tip'><%- gettext("Specify either Student's username or email for whom to create certificate exception") %></p>
-    <p id='notes-field-tip'><%- gettext("Enter Notes associated with this certificate exception") %></p>
     <div class='message'></div>
 </div>

@@ -471,43 +471,6 @@
     .enrollment_signup_button {
       @include margin-right($baseline/4);
     }
-    // Custom File upload
-    .customBrowseBtn {
-      margin: ($baseline/2) 0;
-      display: inline-block;
-      .file-browse {
-        position:relative;
-        overflow:hidden;
-        display: inline;
-        @include margin-left(-5px);
-        span.browse{
-          @include button(simple, $blue);
-          @include margin-right($baseline);
-          padding: 6px ($baseline/2);
-          font-size: 12px;
-          border-radius: 0 3px 3px 0;
-        }
-        input.file_field {
-          position:absolute;
-          @include right(0);
-          top:0;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          opacity:0;
-          filter:alpha(opacity=0);
-        }
-      }
-      & > span, & input[disabled]{
-        vertical-align: middle;
-      }
-      input[disabled] {
-        @include border-radius(4px 0 0 4px);
-        @include padding(6px 6px 5px);
-        border: 1px solid $lightGrey1;
-        cursor: not-allowed;
-      }
-    }
   }
 
   .enroll-option {
@@ -1838,7 +1801,15 @@ input[name="subject"] {
   .example-certificate-status-wrapper {
     width: 75%;
   }
-
+  .certificate-exception-container {
+    h3 {
+      border-bottom: 1px groove black;
+      display: inline-block;
+    }
+    p.under-heading-text {
+      margin: 12px 0 12px 0;
+    }
+  }
 }
 
 input[name="subject"] {
@@ -2212,3 +2183,41 @@ input[name="subject"] {
     }
   }
 }
+
+// Custom File upload
+.customBrowseBtn {
+  margin: ($baseline/2) 0;
+  display: inline-block;
+  .file-browse {
+    position:relative;
+    overflow:hidden;
+    display: inline;
+    @include margin-left(-5px);
+    span.browse{
+      @include button(simple, $blue);
+      @include margin-right($baseline);
+      padding: 6px ($baseline/2);
+      font-size: 12px;
+      border-radius: 0 3px 3px 0;
+    }
+    input.file_field {
+      position:absolute;
+      @include right(0);
+      top:0;
+      margin:0;
+      padding:0;
+      cursor:pointer;
+      opacity:0;
+      filter:alpha(opacity=0);
+    }
+  }
+  & > span, & input[disabled]{
+    vertical-align: middle;
+  }
+  input[disabled] {
+    @include border-radius(4px 0 0 4px);
+    @include padding(6px 6px 5px);
+    border: 1px solid $lightGrey1;
+    cursor: not-allowed;
+  }
+ }

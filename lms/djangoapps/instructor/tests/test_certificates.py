@@ -13,8 +13,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
 from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from certificates.tests.factories import GeneratedCertificateFactory
-from certificates.models import CertificateGenerationConfiguration, CertificateStatuses
+from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist
 from certificates import api as certs_api
+from django.core.files.uploadedfile import SimpleUploadedFile
+from student.models import CourseEnrollment
+import io
 
 
 @attr('shard_1')
@@ -562,3 +565,159 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert Error Message
         self.assertEqual(res_json['message'], u'Please select certificate statuses from the list only.')
+
+
+@attr('shard_1')
+@ddt.ddt
+class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTestCase):
+    """
+    Test Bulk certificates white list exceptions from csv file
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCertificatesInstructorApiBulkWhiteListExceptions, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.url = reverse('create_bulk_certificate_exceptions',
+                          kwargs={'course_id': cls.course.id})
+
+    def setUp(self):
+        super(TestCertificatesInstructorApiBulkWhiteListExceptions, self).setUp()
+        self.global_staff = GlobalStaffFactory()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.enrolled_user = UserFactory(
+            username='TestStudent',
+            email='test_student@example.com',
+            first_name='NotEnrolled',
+            last_name='Student'
+        )
+
+        self.not_enrolled_student = UserFactory(
+            username='NotEnrolledStudent',
+            email='nonenrolled@test.com',
+            first_name='NotEnrolled',
+            last_name='Student'
+        )
+        CourseEnrollment.enroll(self.enrolled_user, self.course.id)
+
+        # Global staff can see the certificates section
+        self.client.login(username=self.global_staff.username, password="test")
+
+    def test_create_white_list_exception_record(self):
+        """
+        Happy path test to create a single new white listed record
+        """
+        csv_content = "test_student@example.com"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['success']), 1)
+        self.assertEquals(len(CertificateWhitelist.objects.all()), 1)
+
+    def test_invalid_data_format_in_csv(self):
+        """
+        Try uploading a CSV file with invalid data formats and verify the errors.
+        """
+        csv_content = "test_student@example.com,test,1,USA\n" \
+                      "test_student@example.com,test,1"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['errors']), 2)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['success']), 0)
+        self.assertEqual(data['errors'][0].get('response'), u'-- Data in row# 1 must have exactly one column, either '
+                                                            u'an email or a username.')
+
+    def test_file_upload_type_not_csv(self):
+        """
+        Try uploading some non-CSV file and verify that it is rejected
+        """
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['errors']), 0)
+        self.assertEquals(data['errors'][0]['response'], '-- Make sure that the file you upload is in CSV format with '
+                                                         'no extraneous characters or rows.')
+
+    def test_bad_file_upload_type(self):
+        """
+        Try uploading some non-CSV file and verify that it is rejected
+        """
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['errors']), 0)
+        self.assertEquals(data['errors'][0]['response'], '-- Could not read uploaded file.')
+
+    def test_invalid_email_in_csv(self):
+        """
+        Test failure case of a poorly formatted email field
+        """
+        csv_content = "test_student.example.com"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEquals(len(data['errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(data['errors'][0]['response'], u'-- user (username/email={0}) does not exist.'.
+                          format('test_student.example.com'))
+
+    def test_csv_user_not_enrolled(self):
+        """
+        If the user is not enrolled in the course then there should be a warning.
+        """
+        csv_content = "nonenrolled@test.com"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['warnings']), 1)
+        self.assertEquals(len(data['success']), 0)
+        self.assertEqual(data['warnings'][0].get('response'), u"-- user 'NotEnrolledStudent' in row# 1 is not enrolled "
+                                                              u"in course.")
+
+    def test_certificate_exception_already_exist(self):
+        """
+        Test warnings if existing user is already in certificates exception list.
+        """
+        CertificateWhitelist.objects.create(
+            user=self.enrolled_user,
+            course_id=self.course.id,
+            whitelist=True,
+            notes=''
+        )
+        csv_content = "test_student@example.com"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['errors']), 0)
+        self.assertEquals(len(data['warnings']), 1)
+        self.assertEquals(len(data['success']), 0)
+        self.assertEqual(data['warnings'][0].get('response'), u"-- user 'TestStudent' in row# 1 is already in "
+                                                              u"certificate exceptions list.")
+
+    def test_csv_file_not_attached(self):
+        """
+        Test when the user does not attach a file
+        """
+        csv_content = "test_student1@example.com\n" \
+                      "test_student2@example.com,"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+
+        response = self.client.post(self.url, {'file_not_found': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['errors']), 1)
+        self.assertEquals(data['errors'][0]['response'], '-- File is not attached.')
