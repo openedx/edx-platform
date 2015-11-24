@@ -17,7 +17,7 @@ following tasks.
 Upload a Profile Image
 **************************************************
 
-.. autoclass:: profile_images.views.ProfileImageUploadView
+.. .. autoclass:: profile_images.views.ProfileImageUploadView
 
 **Example Response**
 
@@ -33,7 +33,7 @@ Upload a Profile Image
 Remove a Profile Image
 **************************************************
 
-.. autoclass:: profile_images.views.ProfileImageRemoveView
+.. .. autoclass:: profile_images.views.ProfileImageRemoveView
 
 **Example Response**
 

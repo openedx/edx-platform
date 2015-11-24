@@ -17,7 +17,7 @@ following tasks.
 Get and Update the User's Preferences Information
 **************************************************
 
-.. autoclass:: user_api.preferences.views.PreferencesView
+.. .. autoclass:: user_api.preferences.views.PreferencesView
 
 **Example response showing the user's preference information**
 
@@ -29,9 +29,9 @@ Get and Update the User's Preferences Information
     Allow: GET, HEAD, OPTIONS, PATCH
 
     {
-      "pref-lang": "en", 
-      "account_privacy": "private"    
-    } 
+      "pref-lang": "en",
+      "account_privacy": "private"
+    }
 
 .. _Get Update or Delete a Specific Preference:
 
@@ -39,7 +39,7 @@ Get and Update the User's Preferences Information
 Get, Update, or Delete a Specific Preference
 **************************************************
 
-.. autoclass:: user_api.preferences.views.PreferencesDetailView
+.. .. autoclass:: user_api.preferences.views.PreferencesDetailView
 
 **Example response to a request for the user's account_privacy setting**
 
