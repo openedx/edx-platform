@@ -7,6 +7,9 @@
 # Oppia XBlock
 -e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
 
+# Microsoft's Office Mix XBlock:
+-e git+https://github.com/OfficeDev/xblock-officemix.git@3f876b5f0267b017812620239533a29c7d562d24#egg=officemix
+
 # This repository contains schoolyourself-xblock, which is used in
 # edX's "AlgebraX" and "GeometryX" courses.
 -e git+https://github.com/schoolyourself/schoolyourself-xblock.git@5e4d37716e3e72640e832e961f7cc0d38d4ec47b#egg=schoolyourself-xblock
