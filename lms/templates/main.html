@@ -61,7 +61,11 @@ from branding import api as branding_api
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  ## route around the overwhelmingly complicated static:css nonsense
+  ## We could do <%static:css group='style-main'/>, but that's only useful
+  ## if the group contains multiple files, and the 'style-main' group doesn't.
+  ## Instead, we'll construct this <link> element manually, to improve clarity.
+  ## When nothing in the system is referencing the 'style-main' group, it can
+  ## be removed from the environment file.
   <%
   application_css_path = "css/lms-main{rtl}.css".format(
     rtl="-rtl" if get_language_bidi() else "",
