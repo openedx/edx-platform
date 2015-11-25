@@ -1,7 +1,7 @@
 """
 Django models related to course groups functionality.
 """
-
+import time
 import json
 import logging
 
@@ -92,6 +92,8 @@ class CohortMembership(models.Model):
 
         self.full_clean(validate_unique=False)
 
+        print "entering loop"
+
         # This loop has been created to allow for optimistic locking, and retrial in case of losing a race condition.
         # The limit is 2, since select_for_update ensures atomic updates. Creation is the only possible race condition.
         max_retries = 2
@@ -99,7 +101,7 @@ class CohortMembership(models.Model):
         for __ in range(max_retries):
 
             with transaction.atomic():
-
+                print "loop start"
                 try:
                     with transaction.atomic():
                         saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
@@ -110,10 +112,13 @@ class CohortMembership(models.Model):
                                 'user': self.user
                             }
                         )
+                        print "got a valid result from get_or_create"
                 except IntegrityError:  # This can happen if simultaneous requests try to create a membership
+                    print "integrityerror in get_or_create"
                     continue
 
                 if not created:
+                    print "not created, updating previous"
                     if saved_membership.course_user_group == self.course_user_group:
                         raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
                             user_name=self.user.username,  # pylint: disable=E1101
@@ -123,13 +128,19 @@ class CohortMembership(models.Model):
                     self.previous_cohort_name = saved_membership.course_user_group.name
                     self.previous_cohort_id = saved_membership.course_user_group.id
                     self.previous_cohort.users.remove(self.user)
+                    self.previous_cohort.save()
 
                 saved_membership.course_user_group = self.course_user_group
                 self.course_user_group.users.add(self.user)  # pylint: disable=E1101
 
+                if created:
+                    time.sleep(10)
                 super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
+                self.course_user_group.save()
+                print "save succeeded"
 
             success = True
+            print "exiting loop"
             break
 
         if not success:
