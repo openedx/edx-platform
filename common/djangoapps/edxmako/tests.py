@@ -14,6 +14,8 @@ from edxmako.middleware import get_template_request_context
 from edxmako import add_lookup, LOOKUP
 from edxmako.shortcuts import (
     marketing_link,
+    is_marketing_link_set,
+    is_any_marketing_link_set,
     render_to_string,
     open_source_footer_context_processor
 )
@@ -40,6 +42,32 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             expected_link = reverse('login')
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
+
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
+    def test_is_marketing_link_set(self):
+        # test marketing site on
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            self.assertTrue(is_marketing_link_set('ABOUT'))
+            self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
+        # test marketing site off
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            self.assertTrue(is_marketing_link_set('ABOUT'))
+            self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
+
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
+    def test_is_any_marketing_link_set(self):
+        # test marketing site on
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            self.assertTrue(is_any_marketing_link_set(['ABOUT']))
+            self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
+            self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
+        # test marketing site off
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            self.assertTrue(is_any_marketing_link_set(['ABOUT']))
+            self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
+            self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
 
     @ddt.data((True, None), (False, None))
     @ddt.unpack
