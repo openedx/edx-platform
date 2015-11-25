@@ -128,7 +128,7 @@ class CohortMembership(models.Model):
                     self.previous_cohort_name = saved_membership.course_user_group.name
                     self.previous_cohort_id = saved_membership.course_user_group.id
                     self.previous_cohort.users.remove(self.user)
-                    time.sleep(5)
+                    self.previous_cohort.save()
 
                 saved_membership.course_user_group = self.course_user_group
                 self.course_user_group.users.add(self.user)  # pylint: disable=E1101
@@ -136,6 +136,7 @@ class CohortMembership(models.Model):
                 if created:
                     time.sleep(10)
                 super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
+                self.course_user_group.save()
                 print "save succeeded"
 
             success = True
