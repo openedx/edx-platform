@@ -9,9 +9,11 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 
+from openedx.core.lib.api import paginators
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from .api import course_detail, list_courses
+from .serializers import CourseSerializer
 
 
 @view_auth_classes()
@@ -99,8 +101,8 @@ class CourseDetailView(APIView):
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError:
             raise NotFound()
-        content = course_detail(request, username, course_key)
-        return Response(content)
+        course = course_detail(request, username, course_key)
+        return Response(CourseSerializer(course, context={'request': request}).data)
 
 
 class CourseListView(APIView):
@@ -164,5 +166,11 @@ class CourseListView(APIView):
         """
         username = request.query_params.get('username', request.user.username)
 
-        content = list_courses(request, username)
+        courses = list_courses(request, username)
+
+        paginator = paginators.NamespacedPageNumberPagination()
+        page = paginator.paginate_queryset(courses, request)
+        content = paginator.get_paginated_response(
+            CourseSerializer(page, context={'request': request}, many=True).data
+        ).data
         return Response(content)
