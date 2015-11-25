@@ -4,7 +4,7 @@ See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
 import os.path
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
 from django.utils._os import safe_join
 
@@ -52,11 +52,8 @@ class ComprehensiveThemingAwareMixin(object):
         if not self.theme_location:
             return False
 
-        try:
-            path = safe_join(self.theme_location, name)
-        except ValueError:
-            raise SuspiciousOperation("Attempted access to '%s' denied." % name)
-        return os.path.exists(os.path.normpath(path))
+        path = safe_join(self.theme_location, name)
+        return os.path.exists(path)
 
     def path(self, name):
         """
@@ -66,10 +63,7 @@ class ComprehensiveThemingAwareMixin(object):
             base = self.theme_location
         else:
             base = self.location
-        try:
-            path = safe_join(base, name)
-        except ValueError:
-            raise SuspiciousOperation("Attempted access to '%s' denied." % name)
+        path = safe_join(base, name)
         return os.path.normpath(path)
 
     def url(self, name, *args, **kwargs):
