@@ -19,6 +19,8 @@ class ComprehensiveThemeFinder(BaseFinder):
     never find any files.
     """
     def __init__(self, *args, **kwargs):
+        super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
+
         COMP_THEME_DIR = getattr(settings, "COMP_THEME_DIR", "")  # pylint: disable=invalid-name
         if not COMP_THEME_DIR:
             self.storage = None
@@ -34,8 +36,6 @@ class ComprehensiveThemeFinder(BaseFinder):
             THEME_STATIC_DIR = Path(COMP_THEME_DIR) / "lms" / "static"  # pylint: disable=invalid-name
 
         self.storage = CachedComprehensiveThemingStorage(location=THEME_STATIC_DIR)
-
-        super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
 
     def find(self, path, all=False):  # pylint: disable=redefined-builtin
         """
