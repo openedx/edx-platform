@@ -1,11 +1,14 @@
 import logging
 import unicodedata
 
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
@@ -17,6 +20,12 @@ from student.forms import AccountCreationForm
 from student.views import _do_create_account
 from .permissions import SecretKeyPermission
 from .serializers import UserSignupSerializer
+
+from django.core import cache
+try:
+    cache = cache.get_cache('general')
+except Exception:
+    cache = cache.cache
 
 logger = logging.getLogger(__name__)
 # TODO: put this into settings
@@ -101,3 +110,13 @@ class UserSignupAPIView(GenericAPIView):
 
 
 user_signup_endpoint = UserSignupAPIView.as_view()
+
+
+@require_POST
+def nuke_cache(request):
+    if request.user.is_authenticated() and request.user.is_superuser:
+        messages.success(request, 'cache successfully cleared!')
+        cache.clear()
+    else:
+        messages.error(request, 'ERROR ERRROR ERRRRRROOOOORRR!')
+    return redirect('/')
