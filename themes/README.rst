@@ -201,6 +201,19 @@ other templates:
   template include has been adjusted so that it is included at the *end* of
   the ``<body>`` element, rather than at the start.
 
+* What is the connection between these two files/names?
+
+* What is the shared functionality here?
+
+* It's worth nothing that this is actually a much larger change than
+  "just moving stuff around". By moving this declaration from the
+  beginning to the end of the BODY, you risk breaking any JavaScript in
+  the BODY that had previously assumed the DOM/global namespace had
+  already been modified. It's possible it's a non-issue, but it's not
+  apparent that this has been taken into consideration.
+
+* Which microsites did you test this with?
+
 In addition, there are some other changes you'll need to make:
 
 * The ``google_analytics_file`` config value is now ignored. If your Open edX
