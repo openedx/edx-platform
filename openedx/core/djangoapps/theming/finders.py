@@ -2,6 +2,14 @@
 Static file finders for Django.
 https://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-STATICFILES_FINDERS
 Yes, this interface is private and undocumented, but we need to access it anyway.
+
+A little explanation would go a long way here.. I'm sure the rationale
+is obvious to you already, but it's not to me now. A future developer
+likely won't understand why either.
+For these kinds of decisions, it's important to know _why_ you arrived at
+your conclusion, not just that you did. The lack of explanation now
+means additional/redundant discovery work on behalf of a future
+developer who audits this functionality.
 """
 from os.path import basename
 
