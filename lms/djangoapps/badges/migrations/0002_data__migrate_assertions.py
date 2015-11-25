@@ -39,10 +39,14 @@ def forwards(apps, schema_editor):
             badge_class.image.save(icon.name, file_content)
             badge_class.save()
             classes[(badge.course_id, badge.mode)] = badge_class
+        if isinstance(badge.data, basestring):
+            data = badge.data
+        else:
+            data = json.dumps(badge.data)
         BadgeAssertion(
             user_id=badge.user_id,
             badge_class=classes[(badge.course_id, badge.mode)],
-            data=json.loads(badge.data),
+            data=data,
             backend='BadgrBackend',
             image_url=badge.data['image'],
             assertion_url=badge.data['json']['id'],
@@ -68,11 +72,15 @@ def backwards(apps, schema_editor):
         if not badge.badge_class.mode:
             # Can't preserve old badges without modes.
             continue
+        if isinstance(badge.data, basestring):
+            data = badge.data
+        else:
+            data = json.dumps(badge.data)
         OldBadgeAssertion(
             user_id=badge.user_id,
             course_id=badge.badge_class.course_id,
             mode=badge.badge_class.mode,
-            data=badge.data,
+            data=data,
         ).save()
 
     for configuration in CourseCompleteImageConfiguration.objects.all():
