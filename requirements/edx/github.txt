@@ -2,8 +2,7 @@
 #
 # If you open a pull request that adds a new dependency, you should notify:
 #   * @mollydb to check licensing
-#   * One of @e0d, @feanil, @fredsmith, @maxrothman, or @jibsheet
-#     to check system requirements
+#   * @edx/devops to check system requirements
 #
 # A correct GitHub reference looks like this:
 #
