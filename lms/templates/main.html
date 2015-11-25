@@ -94,6 +94,8 @@ from branding import api as branding_api
 
   <%block name="headextra"/>
 
+  ## Why is this unconditionally being set to true?
+  ## What if I don't run microsites?
   <%static:optional_include_mako file="head-extra.html" with_microsite="True" />
 
   <%include file="widgets/optimizely.html" />
