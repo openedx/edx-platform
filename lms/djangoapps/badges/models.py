@@ -24,12 +24,20 @@ def validate_badge_image(image):
         raise ValidationError(_(u"The badge image file size must be less than 250KB."))
 
 
+def validate_lowercase(string):
+    """
+    Validates that a string is lowercase.
+    """
+    if not string == string.lower():
+        raise ValidationError(_(u"This value must be all lowercase."))
+
+
 class BadgeClass(models.Model):
     """
     Specifies a badge class to be registered with a backend.
     """
-    slug = models.SlugField(max_length=255)
-    issuing_component = models.SlugField(max_length=50, default='', blank=True)
+    slug = models.SlugField(max_length=255, validators=[validate_lowercase])
+    issuing_component = models.SlugField(max_length=50, default='', blank=True, validators=[validate_lowercase])
     display_name = models.CharField(max_length=255)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     description = models.TextField()
@@ -52,6 +60,8 @@ class BadgeClass(models.Model):
         Looks up a badge class by its slug, issuing component, and course_id and returns it should it exist.
         If it does not exist, and create is True, creates it according to the arguments. Otherwise, returns None.
         """
+        slug = slug.lower()
+        issuing_component = issuing_component.lower()
         if not course_id:
             course_id = CourseKeyField.Empty
         try:
@@ -93,6 +103,14 @@ class BadgeClass(models.Model):
         Contacts the backend to have a badge assertion created for this badge class for this user.
         """
         return self.backend.award(self, user, evidence_url=evidence_url)
+
+    def save(self, **kwargs):
+        """
+        Slugs must always be lowercase.
+        """
+        self.slug = self.slug and self.slug.lower()
+        self.issuing_component = self.issuing_component and self.issuing_component.lower()
+        super(BadgeClass, self).save(**kwargs)
 
     class Meta(object):
         app_label = "badges"
