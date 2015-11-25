@@ -66,13 +66,14 @@ from bson.objectid import ObjectId
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+from xmodule.course_module import CourseSummary
 from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
-    DuplicateCourseError
+    DuplicateCourseError, MultipleCourseBlocksFound
 from xmodule.modulestore import (
     inheritance, ModuleStoreWriteBase, ModuleStoreEnum,
     BulkOpsRecord, BulkOperationsMixin, SortedAssetList, BlockData
@@ -539,6 +540,17 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         return indexes
 
+    def find_course_blocks_by_id(self, ids):
+        """
+        Find all structures that specified in `ids`. Filter the course blocks to only return whose
+        `block_type` is `course`
+
+        Arguments:
+            ids (list): A list of structure ids
+        """
+        ids = set(ids)
+        return self.db_connection.find_course_blocks_by_id(list(ids))
+
     def find_structures_by_id(self, ids):
         """
         Return all structures that specified in ``ids``.
@@ -849,15 +861,39 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
+    def _get_course_blocks_for_branch(self, branch, **kwargs):
+        """
+        Internal generator for fetching lists of courses without loading them.
+        """
+        version_guids, id_version_map = self.collect_ids_from_matching_indexes(branch, **kwargs)
+
+        if not version_guids:
+            return
+
+        for entry in self.find_course_blocks_by_id(version_guids):
+            for course_index in id_version_map[entry['_id']]:
+                yield entry, course_index
+
     def _get_structures_for_branch(self, branch, **kwargs):
         """
         Internal generator for fetching lists of courses, libraries, etc.
         """
+        version_guids, id_version_map = self.collect_ids_from_matching_indexes(branch, **kwargs)
 
-        # if we pass in a 'org' parameter that means to
-        # only get the course which match the passed in
-        # ORG
+        if not version_guids:
+            return
 
+        for entry in self.find_structures_by_id(version_guids):
+            for course_index in id_version_map[entry['_id']]:
+                yield entry, course_index
+
+    def collect_ids_from_matching_indexes(self, branch, **kwargs):
+        """
+        Find the course_indexes which have the specified branch. if `kwargs` contains `org`
+        to apply an ORG filter to return only the courses that are part of that ORG. Extract `version_guids`
+        from the course_indexes.
+
+        """
         matching_indexes = self.find_matching_course_indexes(
             branch,
             search_targets=None,
@@ -871,13 +907,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             version_guid = course_index['versions'][branch]
             version_guids.append(version_guid)
             id_version_map[version_guid].append(course_index)
-
-        if not version_guids:
-            return
-
-        for entry in self.find_structures_by_id(version_guids):
-            for course_index in id_version_map[entry['_id']]:
-                yield entry, course_index
+        return version_guids, id_version_map
 
     def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
 
@@ -932,6 +962,50 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         # get the blocks for each course index (s/b the root)
         return self._get_structures_for_branch_and_locator(branch, self._create_course_locator, **kwargs)
+
+    @autoretry_read()
+    def get_course_summaries(self, branch, **kwargs):
+        """
+        Returns a list of `CourseSummary` which matching any given qualifiers.
+
+        qualifiers should be a dict of keywords matching the db fields or any
+        legal query for mongo to use against the active_versions collection.
+
+        Note, this is to find the current head of the named branch type.
+        To get specific versions via guid use get_course.
+
+        :param branch: the branch for which to return courses.
+        """
+        def extract_course_summary(course):
+            """
+            Extract course information from the course block for split.
+            """
+            return {
+                field: course.fields[field]
+                for field in CourseSummary.course_info_fields
+                if field in course.fields
+            }
+
+        courses_summaries = []
+        for entry, structure_info in self._get_course_blocks_for_branch(branch, **kwargs):
+            course_locator = self._create_course_locator(structure_info, branch=None)
+            course_block = [
+                block_data
+                for block_key, block_data in entry['blocks'].items()
+                if block_key.type == "course"
+            ]
+            if not course_block:
+                raise ItemNotFoundError
+
+            if len(course_block) > 1:
+                raise MultipleCourseBlocksFound(
+                    "Expected 1 course block to be found in the course, but found {0}".format(len(course_block))
+                )
+            course_summary = extract_course_summary(course_block[0])
+            courses_summaries.append(
+                CourseSummary(course_locator, **course_summary)
+            )
+        return courses_summaries
 
     def get_libraries(self, branch="library", **kwargs):
         """
