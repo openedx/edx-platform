@@ -78,6 +78,7 @@ class CachedComprehensiveThemingStorage(
         CachedFilesMixin,
         StaticFilesStorage
     ):  # nopep8
+    # What quality violations are we silencing here?
     """
     Used by the ComprehensiveThemeFinder class. Mixes in support for cached
     files and comprehensive theming in static files.
