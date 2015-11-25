@@ -12,6 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
 
+from openedx.core.djangoapps.theming.core import get_paths
 from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingStorage
 
 
@@ -28,9 +29,8 @@ class ComprehensiveThemeFinder(BaseFinder):
         if not path_theme:
             self.storage = None
             return
-        path_project = path_theme / basename(settings.PROJECT_ROOT)
-        path_static = path_project / 'static'
-        self.storage = CachedComprehensiveThemingStorage(location=path_static)
+        paths = get_paths(path_theme)
+        self.storage = CachedComprehensiveThemingStorage(location=paths['static'])
 
     def find(self, path, all=False):  # pylint: disable=redefined-builtin
         """

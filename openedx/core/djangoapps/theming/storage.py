@@ -12,6 +12,8 @@ from django.utils._os import safe_join
 from pipeline.storage import PipelineMixin, NonPackagingMixin
 from require.storage import OptimizedFilesMixin
 
+from openedx.core.djangoapps.theming.core import get_paths
+
 
 class ComprehensiveThemingAwareMixin(object):
     """
@@ -25,8 +27,8 @@ class ComprehensiveThemingAwareMixin(object):
         if not path_theme:
             self.theme_location = None
             return
-        path_project = path_theme / basename(settings.PROJECT_ROOT)
-        self.theme_location = path_project / 'static'
+        paths = get_paths(path_theme)
+        self.theme_location = paths['static']
 
     @property
     def prefix(self):

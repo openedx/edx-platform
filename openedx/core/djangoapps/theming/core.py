@@ -6,6 +6,8 @@ from os.path import basename
 
 from django.conf import settings
 
+from path import Path
+
 import edxmako
 
 
@@ -23,35 +25,46 @@ def get_configuration(path_theme):
 
             * 'mako_paths': a list of directories to prepend to the edxmako
                 template lookup path.
-
     """
-
     configuration = {
         'settings': {},
         'mako_paths': [],
     }
-    path_project = path_theme / basename(settings.PROJECT_ROOT)
-    path_templates = path_project / 'templates'
-    path_static = path_project / 'static'
-    path_locale = path_project / 'conf' / 'locale'
-    path_favicon = path_project / 'static' / 'images' / 'favicon.ico'
-    if path_templates.isdir():
+    paths = get_paths(path_theme)
+    if paths['templates'].isdir():
         configuration['settings']['TEMPLATE_DIRS'] = (
-            [path_templates] + settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
+            [paths['templates']] + settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
         )
-        configuration['mako_paths'].append(path_templates)
-    if path_static.isdir():
+        configuration['mako_paths'].append(paths['templates'])
+    if paths['static'].isdir():
         configuration['settings']['STATICFILES_DIRS'] = (
-            [path_static] + settings.STATICFILES_DIRS
+            [paths['static']] + settings.STATICFILES_DIRS
         )
-    if path_locale.isdir():
+    if paths['locale'].isdir():
         configuration['settings']['LOCALE_PATHS'] = (
-            [path_locale] + settings.LOCALE_PATHS
+            [paths['locale']] + settings.LOCALE_PATHS
         )
-    if path_favicon.isfile():
+    if paths['favicon'].isfile():
         # TODO: Should this be unicode?
-        configuration['settings']['FAVICON_PATH'] = str(path_favicon)
+        configuration['settings']['FAVICON_PATH'] = str(paths['favicon'])
     return configuration
+
+
+def get_paths(path_theme, name_project=None):
+    """
+    Get list of relevant paths within a theme
+    """
+        name_project = name_project or basename(settings.PROJECT_ROOT)
+        path_project: path_theme / name_project
+        paths = {
+            'locale': path_project / 'conf' / 'locale',
+            'tempates': path_project / 'templates',
+            'static': path_project / 'static',
+            'sass': path_project / 'static' / 'sass',
+            'css': path_project / 'static' / 'css',
+            'favicon': path_project / 'static' / 'images' / 'favicon.ico',
+        }
+        return paths
 
 
 def try_enable_theme():
