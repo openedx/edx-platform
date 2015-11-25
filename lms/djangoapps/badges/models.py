@@ -131,7 +131,7 @@ class BadgeAssertion(models.Model):
 
 class CourseCompleteImageConfiguration(models.Model):
     """
-    Contains the configuration for badges for a specific mode. The mode
+    Contains the icon configuration for badges for a specific course mode.
     """
     mode = models.CharField(
         max_length=125,

@@ -7,6 +7,7 @@ import mimetypes
 
 import requests
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from lazy import lazy
 from requests.packages.urllib3.exceptions import HTTPError
 
@@ -26,7 +27,9 @@ class BadgrBackend(BadgeBackend):
     badges = []
 
     def __init__(self):
-        assert settings.BADGR_API_TOKEN
+        super(BadgrBackend, self).__init__()
+        if not settings.BADGR_API_TOKEN:
+            raise ImproperlyConfigured("BADGR_API_TOKEN not set.")
 
     @lazy
     def _base_url(self):
@@ -76,11 +79,11 @@ class BadgrBackend(BadgeBackend):
             response.raise_for_status()
         except HTTPError:
             LOGGER.error(
-                u"Encountered an error when contacting the Badgr-Server. Request sent to %s with headers %s.\n"
-                u"and data values %s\n"
+                u"Encountered an error when contacting the Badgr-Server. Request sent to %r with headers %r.\n"
+                u"and data values %r\n"
                 u"Response status was %s.\n%s",
-                repr(response.request.url), repr(response.request.headers),
-                repr(data),
+                response.request.url, response.request.headers,
+                data,
                 response.status_code, response.content
             )
             raise
@@ -95,7 +98,8 @@ class BadgrBackend(BadgeBackend):
         content_type, __ = mimetypes.guess_type(image.name)
         if not content_type:
             raise ValueError(
-                "Could not determine content-type of image! Make sure it is a properly named .png file."
+                u"Could not determine content-type of image! Make sure it is a properly named .png file. "
+                u"Filename was: {}".format(image.name)
             )
         files = {'image': (image.name, image, content_type)}
         data = {
@@ -107,7 +111,7 @@ class BadgrBackend(BadgeBackend):
         result = requests.post(self._badge_create_url, headers=self._get_headers(), data=data, files=files)
         self._log_if_raised(result, data)
 
-    def send_assertion_created_event(self, user, assertion):
+    def _send_assertion_created_event(self, user, assertion):
         """
         Send an analytics event to record the creation of a badge assertion.
         """
@@ -144,7 +148,7 @@ class BadgrBackend(BadgeBackend):
         assertion.image_url = assertion.data['image']
         assertion.assertion_url = assertion.data['json']['id']
         assertion.save()
-        self.send_assertion_created_event(user, assertion)
+        self._send_assertion_created_event(user, assertion)
         return assertion
 
     @staticmethod
