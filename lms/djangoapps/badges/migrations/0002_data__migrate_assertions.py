@@ -65,6 +65,9 @@ def backwards(apps, schema_editor):
     BadgeImageConfiguration = apps.get_model("certificates", "BadgeImageConfiguration")
     CourseCompleteImageConfiguration = apps.get_model("badges", "CourseCompleteImageConfiguration")
     for badge in BadgeAssertion.objects.all():
+        if not badge.badge_class.mode:
+            # Can't preserve old badges without modes.
+            continue
         OldBadgeAssertion(
             user_id=badge.user_id,
             course_id=badge.badge_class.course_id,
@@ -86,6 +89,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('badges', '0001_initial'),
+        ('certificates', '0003_data__default_modes')
     ]
 
     operations = [

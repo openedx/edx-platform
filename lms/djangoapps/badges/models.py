@@ -49,11 +49,13 @@ class BadgeClass(models.Model):
             mode='', course_id=None, create=True
     ):
         """
-        Looks up a badge class by its slug and issuing component, and returns it should it exist.
+        Looks up a badge class by its slug, issuing component, and course_id and returns it should it exist.
         If it does not exist, and create is True, creates it according to the arguments. Otherwise, returns None.
         """
+        if not course_id:
+            course_id = CourseKeyField.Empty
         try:
-            return cls.objects.get(slug=slug, issuing_component=issuing_component)
+            return cls.objects.get(slug=slug, issuing_component=issuing_component, course_id=course_id)
         except cls.DoesNotExist:
             if not create:
                 return None
@@ -94,6 +96,7 @@ class BadgeClass(models.Model):
 
     class Meta(object):
         app_label = "badges"
+        unique_together = (('slug', 'issuing_component', 'course_id'),)
 
 
 class BadgeAssertion(models.Model):

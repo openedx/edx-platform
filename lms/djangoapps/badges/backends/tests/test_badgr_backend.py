@@ -3,6 +3,7 @@ Tests for BadgrBackend
 """
 from datetime import datetime
 
+import ddt
 from django.db.models.fields.files import ImageFieldFile
 from django.test.utils import override_settings
 from lazy.lazy import lazy
@@ -25,6 +26,7 @@ BADGR_SETTINGS = {
 
 
 # pylint: disable=protected-access
+@ddt.ddt
 @override_settings(**BADGR_SETTINGS)
 class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
     """
@@ -46,6 +48,10 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         # Need to empty this on each run.
         BadgrBackend.badges = []
         self.badge_class = BadgeClassFactory.create(course_id=self.course.location.course_key)
+        self.legacy_badge_class = BadgeClassFactory.create(
+            course_id=self.course.location.course_key, issuing_component=''
+        )
+        self.no_course_badge_class = BadgeClassFactory.create()
 
     @lazy
     def handler(self):
@@ -98,7 +104,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             kwargs['data'],
             {
                 'name': 'Test Badge',
-                'slug': 'test_componenttest_slug',
+                'slug': '15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a',
                 'criteria': 'https://example.com/syllabus',
                 'description': "Yay! It's a test badge.",
             }
@@ -108,10 +114,19 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Make sure ensure_badge_created doesn't call create_badge if we know the badge is already there.
         """
-        BadgrBackend.badges.append('test_componenttest_slug')
+        BadgrBackend.badges.append('15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a')
         self.handler._create_badge = Mock()
         self.handler._ensure_badge_created(self.badge_class)
         self.assertFalse(self.handler._create_badge.called)
+
+    @ddt.unpack
+    @ddt.data(
+        ('badge_class', '15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a'),
+        ('legacy_badge_class', 'test_slug'),
+        ('no_course_badge_class', 'test_componenttest_slug')
+    )
+    def test_slugs(self, badge_class_type, slug):
+        self.assertEqual(self.handler._slugify(getattr(self, badge_class_type)), slug)
 
     @patch('requests.get')
     def test_ensure_badge_created_checks(self, get):
@@ -125,10 +140,11 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         args, kwargs = get.call_args
         self.assertEqual(
             args[0],
-            'https://example.com/v1/issuer/issuers/test-issuer/badges/test_componenttest_slug'
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/'
+            '15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a'
         )
         self.check_headers(kwargs['headers'])
-        self.assertIn('test_componenttest_slug', BadgrBackend.badges)
+        self.assertIn('15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a', BadgrBackend.badges)
         self.assertFalse(self.handler._create_badge.called)
 
     @patch('requests.get')
@@ -136,12 +152,12 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         response = Mock()
         response.status_code = 404
         get.return_value = response
-        self.assertNotIn('test_componenttest_slug', BadgrBackend.badges)
+        self.assertNotIn('15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a', BadgrBackend.badges)
         self.handler._create_badge = Mock()
         self.handler._ensure_badge_created(self.badge_class)
         self.assertTrue(self.handler._create_badge.called)
         self.assertEqual(self.handler._create_badge.call_args, call(self.badge_class))
-        self.assertIn('test_componenttest_slug', BadgrBackend.badges)
+        self.assertIn('15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a', BadgrBackend.badges)
 
     @patch('requests.post')
     def test_badge_creation_event(self, post):
@@ -160,7 +176,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertEqual(
             args[0],
             'https://example.com/v1/issuer/issuers/test-issuer/badges/'
-            'test_componenttest_slug/assertions'
+            '15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a/assertions'
         )
         self.check_headers(kwargs['headers'])
         assertion = BadgeAssertion.objects.get(user=self.user, badge_class__course_id=self.course.location.course_key)

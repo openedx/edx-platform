@@ -60,7 +60,7 @@ class DummyBackend(object):
     """
 
 
-class BadgeClassTest(TestCase, ImageFetchingMixin):
+class BadgeClassTest(ModuleStoreTestCase, ImageFetchingMixin):
     """
     Test BadgeClass functionality
     """
@@ -88,6 +88,24 @@ class BadgeClassTest(TestCase, ImageFetchingMixin):
         self.assertEqual(badge_class.description, "Yay! It's a test badge.")
         # File name won't always be the same.
         self.assertEqual(badge_class.image.path, premade_badge_class.image.path)
+
+    def test_unique_for_course(self):
+        """
+        Verify that the course_id is used in fetching existing badges or creating new ones.
+        """
+        course_key = CourseFactory.create().location.course_key
+        premade_badge_class = BadgeClassFactory.create(course_id=course_key)
+        badge_class = BadgeClass.get_badge_class(
+            slug='test_slug', issuing_component='test_component', description='Attempted override',
+            criteria='test', display_name='Testola', image_file_handle=self.get_image('good')
+        )
+        course_badge_class = BadgeClass.get_badge_class(
+            slug='test_slug', issuing_component='test_component', description='Attempted override',
+            criteria='test', display_name='Testola', image_file_handle=self.get_image('good'),
+            course_id=course_key,
+        )
+        self.assertNotEqual(badge_class.id, course_badge_class.id)
+        self.assertEqual(course_badge_class.id, premade_badge_class.id)
 
     def test_get_badge_class_create(self):
         """

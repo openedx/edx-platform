@@ -59,6 +59,10 @@ class BadgrBackend(BadgeBackend):
         Get a compatible badge slug from the specification.
         """
         slug = badge_class.issuing_component + badge_class.slug
+        if badge_class.issuing_component and badge_class.course_id:
+            # Make this unique to the course, and down to 64 characters.
+            # We don't do this to badges without issuing_component set for backwards compatibility.
+            slug = hashlib.sha256(slug + unicode(badge_class.course_id)).hexdigest()
         if len(slug) > MAX_SLUG_LENGTH:
             # Will be 64 characters.
             slug = hashlib.sha256(slug).hexdigest()
@@ -83,7 +87,7 @@ class BadgrBackend(BadgeBackend):
 
     def _create_badge(self, badge_class):
         """
-        Create the badge spec for a course's mode.
+        Create the badge class on Badgr.
         """
         image = badge_class.image
         # We don't want to bother validating the file any further than making sure we can detect its MIME type,
@@ -121,8 +125,7 @@ class BadgrBackend(BadgeBackend):
 
     def _create_assertion(self, badge_class, user, evidence_url):
         """
-        Register an assertion with the Badgr server for a particular user in a particular course mode for
-        this course.
+        Register an assertion with the Badgr server for a particular user for a specific class.
         """
         data = {
             'email': user.email,
@@ -150,7 +153,7 @@ class BadgrBackend(BadgeBackend):
 
     def _ensure_badge_created(self, badge_class):
         """
-        Verify a badge has been created for this mode of the course, and, if not, create it
+        Verify a badge has been created for this badge class, and create it if not.
         """
         slug = self._slugify(badge_class)
         if slug in BadgrBackend.badges:
