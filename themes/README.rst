@@ -140,6 +140,11 @@ directory. There are two ways to do this.
 Restart your site.  Your changes should now be visible.
 
 
+Comprehensive Theming
+=====================
+* The ``PROFILE_IMAGE_DEFAULT_FILENAME`` Django setting is now ignored.
+
+
 "Stanford" theming
 ==================
 
