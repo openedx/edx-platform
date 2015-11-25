@@ -217,6 +217,36 @@ In addition, there are some other changes you'll need to make:
   Google Analytics yourself (with whatever customizations you want) in your
   ``head-extra.html`` template.
 
+
+    If you want to customize the way that Google Analytics is loaded, [...]
+    then load Google Analytics yourself
+
+Why go to all of this work to allow instances to selectively theme
+content if we're going to turn right around and force them to edit less
+intuitively labeled locations?
+
+Of particular frustration is the idea that if I want/need to override
+the GA code, I can no longer use `settings.GOOGLE_ANALYTICS_ACCOUNT`
+variable, as doing so would implicitly enable the SCRIPT tag in multiple
+locations. This not only fails to follow the principle of least
+surprise, but it also imposes additional work on the implementations'
+behalf; now I have to create _another_ setting, with a different name,
+to do the same thing, just to avoid hard-coding a theme. Worse yet, this
+also prevents me from parameterizing the setting via Ansible/JSON,
+_unless_ I also fork the platform code. If you're going to make me fork
+platform code just to override a variable, you're doing something wrong.
+
+It's unclear why this change was deemed necessary, particularly when it
+causes a regression in customization.
+
+That all said, while some generalization may be in order, I think there
+is a common enough use-case for including a generalized "analytics"
+file. Many instances may use Google Analytics, but many be chose (or
+even be legally required!) to use some other analytics backend. This
+could range from Piwik to in-house analytics to benchmarking libraries.
+But this could configured/overridden from the single
+`head-analytics.html` file.
+
 * The ``css_overrides_file`` config value is now ignored. To add a CSS override
   file to your microsite, create a ``head-extra.html`` template with the
   following content:
