@@ -14,7 +14,7 @@ from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingSt
 class ComprehensiveThemeFinder(BaseFinder):
     """
     A static files finder that searches the active comprehensive theme
-    for locate files. If the ``COMP_THEME_DIR`` setting is unset, or the
+    for static files. If the ``COMP_THEME_DIR`` setting is unset, or the
     ``COMP_THEME_DIR`` does not exist on the file system, this finder will
     never find any files.
     """
