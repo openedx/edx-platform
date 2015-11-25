@@ -103,6 +103,27 @@ You should **not** use the following names in your comprehensive theme:
 
 * ``themable-footer.html``
 
+
+Why the term "themable"? That implies something _could_ be themed, but
+in this context, the footer _always_ _is_ themed. As is, the name is
+misleading. Further, we now have at least 3 different files that may
+need changed in order to theme a footer; ugh..
+- themable-footer.html
+- theme-footer.html
+- footer.html
+
+It's worth considering that if we're already imposing breaking changes
+on site operators, then we should just jump in and skip half-measure
+work-arounds. As a theme maintainer, I _really_ don't want to be
+auditing and updating my theme each and every merge from upstream. If
+I'm going to devote a sprint to bringing our theme into compliance, I
+don't want to make it a regular habit. But once I'm already in there,
+this shouldn't be anything more than renaming a file to avoid the naming
+conflict with ``footer.html``, right?
+
+Can we just call this ``footer.html`` and be done with it?
+
+
 If you look at the ``main.html`` template file, you will notice that it includes
 ``header.html`` and ``themable-footer.html``, rather than ``footer.html``.
 You might be inclined to override ``themable-footer.html`` as a result. DO NOT
