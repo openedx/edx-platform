@@ -54,7 +54,7 @@ def get_configuration(path_theme):
     return configuration
 
 
-def enable_comprehensive_theme(theme_dir):
+def try_enable_theme():
     """
     Add directories to relevant paths for comprehensive theming.
     """
