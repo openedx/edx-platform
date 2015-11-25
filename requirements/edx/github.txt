@@ -58,7 +58,7 @@ git+https://github.com/edx/edx-lint.git@v0.3.2#egg=edx_lint==0.3.2
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
-git+https://github.com/edx/edx-organizations.git@release-2015-11-17-with-django-18#egg=edx-organizations==0.1.8
+git+https://github.com/edx/edx-organizations.git@release-2015-11-25#egg=edx-organizations==0.1.9
 git+https://github.com/edx/edx-proctoring.git@0.11.6#egg=edx-proctoring==0.11.6
 
 # Oppia XBlock
