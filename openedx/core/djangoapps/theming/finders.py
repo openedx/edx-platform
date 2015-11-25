@@ -24,14 +24,14 @@ class ComprehensiveThemeFinder(BaseFinder):
             self.storage = None
             return
 
-        if not isinstance(settings.COMP_THEME_DIR, basestring):
+        if not isinstance(COMP_THEME_DIR, basestring):
             raise ImproperlyConfigured("Your COMP_THEME_DIR setting must be a string")
 
         PROJECT_ROOT = getattr(settings, "PROJECT_ROOT", "")  # pylint: disable=invalid-name
         if PROJECT_ROOT.endswith("cms"):
-            THEME_STATIC_DIR = Path(settings.COMP_THEME_DIR) / "studio" / "static"  # pylint: disable=invalid-name
+            THEME_STATIC_DIR = Path(COMP_THEME_DIR) / "studio" / "static"  # pylint: disable=invalid-name
         else:
-            THEME_STATIC_DIR = Path(settings.COMP_THEME_DIR) / "lms" / "static"  # pylint: disable=invalid-name
+            THEME_STATIC_DIR = Path(COMP_THEME_DIR) / "lms" / "static"  # pylint: disable=invalid-name
 
         self.storage = CachedComprehensiveThemingStorage(location=THEME_STATIC_DIR)
 
