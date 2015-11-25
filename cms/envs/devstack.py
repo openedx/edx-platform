@@ -115,6 +115,9 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
 
+########################### OAUTH2 #################################
+OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
+
 ###############################################################################
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):

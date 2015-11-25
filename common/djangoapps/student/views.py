@@ -125,13 +125,12 @@ from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.programs.views import get_course_programs_for_dashboard
-from openedx.core.djangoapps.programs.utils import is_student_dashboard_programs_enabled
+from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
 
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
-ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')
+ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
 
@@ -583,12 +582,10 @@ def dashboard(request):
         and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
     )
 
-    # get the programs associated with courses being displayed.
-    # pass this along in template context in order to render additional
-    # program-related information on the dashboard view.
-    course_programs = {}
-    if is_student_dashboard_programs_enabled():
-        course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
+    # Get any programs associated with courses being displayed.
+    # This is passed along in the template context to allow rendering of
+    # program-related information on the dashboard.
+    course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -1632,7 +1629,7 @@ def create_account_with_params(request, params):
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         identity_args = [
-            user.id,
+            user.id,  # pylint: disable=no-member
             {
                 'email': user.email,
                 'username': user.username,
@@ -1895,13 +1892,13 @@ def auto_auth(request):
             'username': username,
             'email': email,
             'password': password,
-            'user_id': user.id,
+            'user_id': user.id,  # pylint: disable=no-member
             'anonymous_id': anonymous_id_for_user(user, None),
         })
     else:
         success_msg = u"{} user {} ({}) with password {} and user_id {}".format(
             u"Logged in" if login_when_done else "Created",
-            username, email, password, user.id
+            username, email, password, user.id  # pylint: disable=no-member
         )
         response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])
@@ -2285,24 +2282,23 @@ def change_email_settings(request):
     return JsonResponse({"success": True})
 
 
-def _get_course_programs(user, user_enrolled_courses):
-    """ Returns a dictionary of programs courses data require for the student
-    dashboard.
+def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invalid-name
+    """Build a dictionary of program data required for display on the student dashboard.
 
-    Given a user and an iterable of course keys, find all
-    the programs relevant to the user and return them in a
-    dictionary keyed by the course_key.
+    Given a user and an iterable of course keys, find all programs relevant to the
+    user and return them in a dictionary keyed by course key.
 
     Arguments:
-        user (user object): Currently logged-in User
-        user_enrolled_courses (list): List of course keys in which user is
-            enrolled
+        user (User): The user to authenticate as when requesting programs.
+        user_enrolled_courses (list): List of course keys representing the courses in which
+            the given user has active enrollments.
 
     Returns:
-        Dictionary response containing programs or {}
+        dict, containing programs keyed by course. Empty if programs cannot be retrieved.
     """
-    course_programs = get_course_programs_for_dashboard(user, user_enrolled_courses)
+    course_programs = get_programs_for_dashboard(user, user_enrolled_courses)
     programs_data = {}
+
     for course_key, program in course_programs.viewitems():
         if program.get('status') == 'active' and program.get('category') == 'xseries':
             try:
