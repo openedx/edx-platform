@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 
 import edxmako
 
-from .core import comprehensive_theme_changes
+from .core import get_configuration
 
 
 def with_theme(theme_dir):
@@ -25,18 +25,21 @@ def with_theme(theme_dir):
             This will likely use `settings.REPO_ROOT` to get the full path.
 
     """
-    # This decorator gets the settings changes needed for a theme, and applies
-    # them using the override_settings and edxmako.paths.add_lookup context
-    # managers.
+    # This decorator gets the settings configuration needed for a theme,
+    # and applies them using the override_settings and
+    # edxmako.paths.add_lookup context managers.
 
-    changes = comprehensive_theme_changes(theme_dir)
+    configuration = get_configuration()
 
     def _decorator(func):                       # pylint: disable=missing-docstring
         @wraps(func)
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
-            with override_settings(COMPREHENSIVE_THEMING_DIRECTORY=theme_dir, **changes['settings']):
+            with override_settings(
+                COMPREHENSIVE_THEMING_DIRECTORY=theme_dir,
+                **configuration['settings']
+            ):
                 with edxmako.save_lookups():
-                    for template_dir in changes['mako_paths']:
+                    for template_dir in configuration['mako_paths']:
                         edxmako.paths.add_lookup('main', template_dir, prepend=True)
 
                     return func(*args, **kwargs)
