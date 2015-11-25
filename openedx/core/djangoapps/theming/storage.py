@@ -74,7 +74,7 @@ class ComprehensiveThemingAwareMixin(object):
 
     def url(self, name, *args, **kwargs):
         """
-        Add the theme prefix the the asset URL
+        Add the theme prefix to the asset URL
         """
         if self.themed(name):
             name = self.prefix + name
@@ -85,7 +85,7 @@ class CachedComprehensiveThemingStorage(
         ComprehensiveThemingAwareMixin,
         CachedFilesMixin,
         StaticFilesStorage
-    ):  # noqa
+    ):  # nopep8
     """
     Used by the ComprehensiveThemeFinder class. Mixes in support for cached
     files and comprehensive theming in static files.
