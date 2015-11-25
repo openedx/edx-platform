@@ -9,8 +9,11 @@ from mock import patch, Mock
 import ddt
 
 from django.test import RequestFactory
+from xmodule.course_module import CourseSummary
 
-from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups, AccessListFallback
+from contentstore.views.course import (_accessible_courses_list, _accessible_courses_list_from_groups,
+                                       AccessListFallback, get_courses_accessible_to_user,
+                                       _staff_accessible_course_list)
 from contentstore.utils import delete_course_and_groups
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
@@ -46,7 +49,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password='test')
 
-    def _create_course_with_access_groups(self, course_location, user=None):
+    def _create_course_with_access_groups(self, course_location, user=None, store=ModuleStoreEnum.Type.mongo):
         """
         Create dummy course with 'CourseFactory' and role (instructor/staff) groups
         """
@@ -54,7 +57,7 @@ class TestCourseListing(ModuleStoreTestCase):
             org=course_location.org,
             number=course_location.course,
             run=course_location.run,
-            default_store=ModuleStoreEnum.Type.mongo
+            default_store=store
         )
 
         if user is not None:
@@ -106,6 +109,37 @@ class TestCourseListing(ModuleStoreTestCase):
             # get courses by reversing group name formats
             courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
             self.assertEqual(courses_list_by_groups, [])
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.split, 5),
+        (ModuleStoreEnum.Type.mongo, 3)
+    )
+    @ddt.unpack
+    def test_staff_course_listing(self, default_store, mongo_calls):
+        """
+        Create courses and verify they take certain amount of mongo calls to call get_courses_accessible_to_user.
+        Also verify that fetch accessible courses list for staff user returns CourseSummary instances.
+        """
+
+        # Assign & verify staff role to the user
+        GlobalStaff().add_users(self.user)
+        self.assertTrue(GlobalStaff().has_user(self.user))
+
+        # Create few courses
+        for num in xrange(TOTAL_COURSES_COUNT):
+            course_location = CourseLocator('Org', 'CreatedCourse' + str(num), 'Run')
+            self._create_course_with_access_groups(course_location, self.user, default_store)
+
+        # Fetch accessible courses list & verify their count
+        courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
+        self.assertEqual(len(courses_list_by_staff), TOTAL_COURSES_COUNT)
+
+        # Verify fetched accessible courses list is a list of CourseSummery instances
+        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list_by_staff))
+
+        # Now count the db queries for staff
+        with check_mongo_calls(mongo_calls):
+            _staff_accessible_course_list(self.request)
 
     def test_errored_course_regular_access(self):
         """
