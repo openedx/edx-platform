@@ -2169,9 +2169,22 @@ input[name="subject"] {
       text-align: left;
       color: $gray;
 
-      &.date-column{
+      &.date, &.email{
         width: 230px;
       }
+
+      &.user-id{
+        width: 60px;
+      }
+
+     &.user-name{
+        width: 150px;
+      }
+
+      &.action{
+        width: 150px;
+      }
+
     }
 
     td {

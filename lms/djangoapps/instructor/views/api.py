@@ -13,7 +13,7 @@ import time
 import requests
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
@@ -2731,10 +2731,140 @@ def start_certificate_regeneration(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
-@require_POST
-def create_certificate_exception(request, course_id, white_list_student=None):
+@require_http_methods(['POST', 'DELETE'])
+def certificate_exception_view(request, course_id):
     """
-    Add Students to certificate white list.
+    Add/Remove students to/from certificate white list.
+
+    :param request: HttpRequest object
+    :param course_id: course identifier of the course for whom to add/remove certificates exception.
+    :return: JsonResponse object with success/error message or certificate exception data.
+    """
+    course_key = CourseKey.from_string(course_id)
+    # Validate request data and return error response in case of invalid data
+    try:
+        certificate_exception, student = parse_request_data_and_get_user(request)
+    except ValueError as error:
+        return JsonResponse({'success': False, 'message': error.message}, status=400)
+
+    # Add new Certificate Exception for the student passed in request data
+    if request.method == 'POST':
+        try:
+            exception = add_certificate_exception(course_key, student, certificate_exception)
+        except ValueError as error:
+            return JsonResponse({'success': False, 'message': error.message}, status=400)
+        return JsonResponse(exception)
+
+    # Remove Certificate Exception for the student passed in request data
+    elif request.method == 'DELETE':
+        try:
+            remove_certificate_exception(course_key, student)
+        except ValueError as error:
+            return JsonResponse({'success': False, 'message': error.message}, status=400)
+
+        return JsonResponse({}, status=204)
+
+
+def add_certificate_exception(course_key, student, certificate_exception):
+    """
+    Add a certificate exception to CertificateWhitelist table.
+    Raises ValueError in case Student is already white listed.
+
+    :param course_key: identifier of the course whose certificate exception will be added.
+    :param student: User object whose certificate exception will be added.
+    :param certificate_exception: A dict object containing certificate exception info.
+    :return: CertificateWhitelist item in dict format containing certificate exception info.
+    """
+    if len(CertificateWhitelist.get_certificate_white_list(course_key, student)) > 0:
+        raise ValueError(
+            _("Student (username/email={user}) already in certificate exception list.").format(user=student.username)
+        )
+
+    certificate_white_list, __ = CertificateWhitelist.objects.get_or_create(
+        user=student,
+        course_id=course_key,
+        defaults={
+            'whitelist': True,
+            'notes': certificate_exception.get('notes', '')
+        }
+    )
+
+    exception = dict({
+        'id': certificate_white_list.id,
+        'user_email': student.email,
+        'user_name': student.username,
+        'user_id': student.id,
+        'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
+    })
+
+    return exception
+
+
+def remove_certificate_exception(course_key, student):
+    """
+    Remove certificate exception for given course and student from CertificateWhitelist table and
+    invalidate its GeneratedCertificate if present.
+    Raises ValueError in case no exception exists for the student in the given course.
+
+    :param course_key: identifier of the course whose certificate exception needs to be removed.
+    :param student: User object whose certificate exception needs to be removed.
+    :return:
+    """
+    try:
+        certificate_exception = CertificateWhitelist.objects.get(user=student, course_id=course_key)
+    except ObjectDoesNotExist:
+        raise ValueError(
+            _('Certificate exception [user={}] does not exist in '
+              'certificate white list.').format(student.username)
+        )
+
+    try:
+        generated_certificate = GeneratedCertificate.objects.get(user=student, course_id=course_key)
+        generated_certificate.invalidate()
+    except ObjectDoesNotExist:
+        # Certificate has not been generated yet, so just remove the certificate exception from white list
+        pass
+    certificate_exception.delete()
+
+
+def parse_request_data_and_get_user(request):
+    """
+        Parse request data into Certificate Exception and User object.
+        Certificate Exception is the dict object containing information about certificate exception.
+
+    :param request:
+    :return: key-value pairs containing certificate exception data and User object
+    """
+    try:
+        certificate_exception = json.loads(request.body or '{}')
+    except ValueError:
+        raise ValueError(_('Invalid Json data'))
+
+    user = certificate_exception.get('user_name', '') or certificate_exception.get('user_email', '')
+    if not user:
+        raise ValueError(_('Student username/email is required.'))
+    try:
+        db_user = get_user_by_username_or_email(user)
+    except ObjectDoesNotExist:
+        raise ValueError(_('Student (username/email={user}) does not exist').format(user=user))
+
+    return certificate_exception, db_user
+
+
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def generate_certificate_exceptions(request, course_id, generate_for=None):
+    """
+    Generate Certificate for students in the Certificate White List.
+
+    :param request: HttpRequest object,
+    :param course_id: course identifier of the course for whom to generate certificates
+    :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
+            additions to the certificate white-list
+    :return: JsonResponse object containing success/failure message and certificate exception data
     """
     course_key = CourseKey.from_string(course_id)
 
@@ -2746,18 +2876,26 @@ def create_certificate_exception(request, course_id, white_list_student=None):
             'message': _('Invalid Json data')
         }, status=400)
 
-    with outer_atomic():
-        try:
-            certificate_white_list, students = process_certificate_exceptions(certificate_white_list, course_key)
-        except ValueError as error:
-            return JsonResponse(
-                {'success': False, 'message': error.message, 'data': json.dumps(certificate_white_list)},
-                status=400
-            )
+    users = [exception.get('user_id', False) for exception in certificate_white_list]
 
-    if white_list_student == 'all':
+    if generate_for == 'all':
         # Generate Certificates for all white listed students
         students = User.objects.filter(
+            certificatewhitelist__course_id=course_key,
+            certificatewhitelist__whitelist=True
+        )
+    elif not all(users):
+        # Invalid data, user_id must be present for all certificate exceptions
+        return JsonResponse(
+            {
+                'success': False,
+                'message': _('Invalid data, user_id must be present for all certificate exceptions.'),
+            },
+            status=400
+        )
+    else:
+        students = User.objects.filter(
+            id__in=users,
             certificatewhitelist__course_id=course_key,
             certificatewhitelist__whitelist=True
         )
@@ -2768,60 +2906,7 @@ def create_certificate_exception(request, course_id, white_list_student=None):
 
     response_payload = {
         'success': True,
-        'message': _('Students added to Certificate white list successfully'),
-        'data': json.dumps(certificate_white_list)
+        'message': _('Certificate generation started for white listed students.'),
     }
 
     return JsonResponse(response_payload)
-
-
-def process_certificate_exceptions(data_list, course_key):
-    """
-    Validate user data for certificate exceptions, raise ValueError in case of invalid data and create
-    'CertificateWhitelist' record for students in data_list.
-
-    return updated data_list after creating 'CertificateWhitelist' records in db.
-    """
-    students = []
-    users = [data.get('user_name', False) or data.get('user_email', False) for data in data_list]
-
-    if not all(users):
-        # Username and email can not both be empty
-        raise ValueError(_('Student username/email is required.'))
-
-    if len(users) != len(set(users)):
-        # Duplicate Student username/email is not allowed
-        raise ValueError(_('Duplicate Student Username/password.'))
-
-    for data in data_list:
-        user = data.get('user_name', '') or data.get('user_email', '')
-        try:
-            db_user = get_user_by_username_or_email(user)
-        except ObjectDoesNotExist:
-            raise ValueError(_('Student (username/email={user}) does not exist').format(user=user))
-        except MultipleObjectsReturned:
-            raise ValueError(_('Multiple Students found with username/email={user}').format(user=user))
-
-        if CertificateWhitelist.objects.filter(user=db_user, course_id=course_key, whitelist=True).count() > 0:
-            raise ValueError(
-                _("Student (username/email={user_id} already in certificate exception  list)").format(user_id=user)
-            )
-
-        certificate_white_list = CertificateWhitelist.objects.create(
-            user=db_user,
-            course_id=course_key,
-            whitelist=True,
-            notes=data.get('notes', '')
-        )
-
-        data.update({
-            'id': certificate_white_list.id,
-            'user_email': db_user.email,
-            'user_name': db_user.username,
-            'user_id': db_user.id,
-            'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
-        })
-
-        students.append(db_user)
-
-    return data_list, students
