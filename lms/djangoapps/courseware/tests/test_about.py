@@ -58,10 +58,12 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
         )
 
         self.purchase_course = CourseFactory.create(org='MITx', number='buyme', display_name='Course To Buy')
-        self.course_mode = CourseMode(course_id=self.purchase_course.id,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=10)
+        self.course_mode = CourseMode(
+            course_id=self.purchase_course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
+            min_price=10
+        )
         self.course_mode.save()
 
     def test_anonymous_user(self):
@@ -248,8 +250,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTes
         self.email = 'foo_second@test.com'
         self.password = 'bar'
         self.username = 'test_second'
-        self.create_account(self.username,
-                            self.email, self.password)
+        self.create_account(self.username, self.email, self.password)
         self.activate_user(self.email)
         self.login(self.email, self.password)
 
@@ -417,8 +418,8 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         course_mode = CourseMode(
             course_id=course.id,
-            mode_slug="honor",
-            mode_display_name="honor cert",
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
             min_price=10,
         )
         course_mode.save()

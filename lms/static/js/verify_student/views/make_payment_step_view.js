@@ -26,7 +26,7 @@ var edx = edx || {};
                 hasVisibleReqs: false,
                 platformName: '',
                 alreadyVerified: false,
-                courseModeSlug: 'honor',
+                courseModeSlug: 'audit',
                 verificationGoodUntil: ''
             };
         },

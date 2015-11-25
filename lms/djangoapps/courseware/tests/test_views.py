@@ -708,7 +708,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             )
 
         # Enroll student into course
-        CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
+        CourseEnrollment.enroll(self.user, self.course.id)
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string(), student_id=self.user.id)
         # Assert that valid 'student_id' returns 200 status
         self.assertEqual(resp.status_code, 200)
