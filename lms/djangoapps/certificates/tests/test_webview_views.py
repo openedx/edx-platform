@@ -600,9 +600,10 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         badge_class = get_completion_badge(self.course_id, self.user)
         assertion = BadgeAssertionFactory.create(
             user=self.user, badge_class=badge_class,
+            backend='DummyBackend',
+            image_url='http://www.example.com/image.png',
+            assertion_url='http://www.example.com/assertion.json',
             data={
-                'image': 'http://www.example.com/image.png',
-                'json': {'id': 'http://www.example.com/assertion.json'},
                 'issuer': 'http://www.example.com/issuer.json',
             }
         )
@@ -615,6 +616,10 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                     'course_id': 'testorg/run1/refundable_course',
                     # pylint: disable=no-member
                     'assertion_id': assertion.id,
+                    'badge_generator': u'DummyBackend',
+                    'badge_name': u'refundable course',
+                    'issuing_component': u'',
+                    'badge_slug': u'testorgrun1refundable_course_honor_432f164',
                     'assertion_json_url': 'http://www.example.com/assertion.json',
                     'assertion_image_url': 'http://www.example.com/image.png',
                     'user_id': self.user.id,

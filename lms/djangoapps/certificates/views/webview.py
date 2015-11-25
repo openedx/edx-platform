@@ -389,7 +389,7 @@ def _track_certificate_events(request, context, course, user, user_certificate):
                 {
                     'badge_name': badge.badge_class.display_name,
                     'badge_slug': badge.badge_class.slug,
-                    'badge_generator': badge.badge_class.backend,
+                    'badge_generator': badge.backend,
                     'issuing_component': badge.badge_class.issuing_component,
                     'user_id': user.id,
                     'course_id': unicode(course_key),
