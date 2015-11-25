@@ -114,12 +114,15 @@ class BadgrBackend(BadgeBackend):
         tracker.emit(
             'edx.badge.assertion.created', {
                 'user_id': user.id,
+                'badge_slug': assertion.badge_class.slug,
+                'badge_name': assertion.badge_class.display_name,
+                'issuing_component': assertion.badge_class.issuing_component,
                 'course_id': unicode(assertion.badge_class.course_id),
                 'enrollment_mode': assertion.badge_class.mode,
                 'assertion_id': assertion.id,
                 'assertion_image_url': assertion.image_url,
                 'assertion_json_url': assertion.assertion_url,
-                'issuer': assertion.data['issuer'],
+                'issuer': assertion.data.get('issuer'),
             }
         )
 

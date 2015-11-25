@@ -164,7 +164,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         result = {
             'json': {'id': 'http://www.example.com/example'},
             'image': 'http://www.example.com/example.png',
-            'slug': 'test_assertion_slug',
+            'badge': 'test_assertion_slug',
             'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
         }
         response = Mock()
@@ -194,6 +194,9 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
                 'course_id': unicode(self.course.location.course_key),
                 'enrollment_mode': 'honor',
                 'assertion_id': assertion.id,
+                'badge_name': 'Test Badge',
+                'badge_slug': 'test_slug',
+                'issuing_component': 'test_component',
                 'assertion_image_url': 'http://www.example.com/example.png',
                 'assertion_json_url': 'http://www.example.com/example',
                 'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',

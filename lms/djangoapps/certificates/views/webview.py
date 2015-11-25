@@ -387,13 +387,17 @@ def _track_certificate_events(request, context, course, user, user_certificate):
             tracker.emit(
                 'edx.badge.assertion.evidence_visited',
                 {
+                    'badge_name': badge.badge_class.display_name,
+                    'badge_slug': badge.badge_class.slug,
+                    'badge_generator': badge.badge_class.backend,
+                    'issuing_component': badge.badge_class.issuing_component,
                     'user_id': user.id,
                     'course_id': unicode(course_key),
                     'enrollment_mode': badge.badge_class.mode,
                     'assertion_id': badge.id,
-                    'assertion_image_url': badge.data['image'],
-                    'assertion_json_url': badge.data['json']['id'],
-                    'issuer': badge.data['issuer'],
+                    'assertion_image_url': badge.image_url,
+                    'assertion_json_url': badge.assertion_url,
+                    'issuer': badge.data.get('issuer'),
                 }
             )
         else:
