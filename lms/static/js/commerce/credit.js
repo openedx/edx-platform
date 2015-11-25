@@ -16,6 +16,8 @@ var edx = edx || {};
             headers: {
                 'X-CSRFToken': $.cookie('csrftoken')
             },
+            dataType: 'json',
+            contentType: 'application/json',
             data: JSON.stringify({
                 'course_key': courseKey,
                 'username': username
