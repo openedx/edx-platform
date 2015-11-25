@@ -296,8 +296,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "abuse_flagged": False,
             "voted": True,
             "vote_count": 4,
-            "comment_count": 5,
-            "unread_comment_count": 3,
+            "comment_count": 6,
+            "unread_comment_count": 4,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -519,8 +519,8 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -634,6 +634,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 ],
                 "created_at": "Test Created Date",
                 "updated_at": "Test Updated Date",
+                "comment_count": 1,
             })
         )
         self.assertEqual(
@@ -684,6 +685,8 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "closed": True,
                 "abuse_flagged": value,
                 "editable_fields": ["abuse_flagged", "read"],
+                "comment_count": 1,
+                "unread_comment_count": 1,
             })
         )
 
@@ -1154,8 +1157,8 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase)
             "pinned": False,
             "closed": False,
             "following": False,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
