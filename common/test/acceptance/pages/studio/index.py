@@ -51,7 +51,8 @@ class DashboardPage(PageObject):
         """
         Click on the "New Library" button
         """
-        self.q(css='.new-library-button').click()
+        self.q(css='.new-library-button').first.click()
+        self.wait_for_ajax()
 
     def is_new_library_form_visible(self):
         """
