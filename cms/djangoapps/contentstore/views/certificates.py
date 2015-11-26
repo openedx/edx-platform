@@ -354,9 +354,11 @@ def certificates_list_handler(request, course_key_string):
                 handler_name='certificates.certificate_activation_handler',
                 course_key=course_key
             )
-            course_modes = [mode.slug for mode in CourseMode.modes_for_course(
-                course_id=course.id, include_expired=True
-            )]
+            course_modes = [
+                mode.slug for mode in CourseMode.modes_for_course(
+                    course_id=course.id, include_expired=True
+                ) if mode.slug != 'audit'
+            ]
             certificate_web_view_url = get_lms_link_for_certificate_web_view(
                 user_id=request.user.id,
                 course_key=course_key,
