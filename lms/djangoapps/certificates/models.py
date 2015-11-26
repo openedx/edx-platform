@@ -54,6 +54,7 @@ import os
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -115,7 +116,7 @@ class CertificateWhitelist(models.Model):
     notes = models.TextField(default=None, null=True)
 
     @classmethod
-    def get_certificate_white_list(cls, course_id):
+    def get_certificate_white_list(cls, course_id, student=None):
         """
         Return certificate white list for the given course as dict object,
         returned dictionary will have the following key-value pairs
@@ -132,6 +133,8 @@ class CertificateWhitelist(models.Model):
 
         """
         white_list = cls.objects.filter(course_id=course_id, whitelist=True)
+        if student:
+            white_list = white_list.filter(user=student)
         result = []
 
         for item in white_list:
@@ -188,9 +191,53 @@ class GeneratedCertificate(models.Model):
 
         return None
 
+    @classmethod
+    def get_unique_statuses(cls, course_key=None, flat=False):
+        """
+        1 - Return unique statuses as a list of dictionaries containing the following key value pairs
+            [
+            {'status': 'status value from db', 'count': 'occurrence count of the status'},
+            {...},
+            ..., ]
+
+        2 - if flat is 'True' then return unique statuses as a list
+        3 - if course_key is given then return unique statuses associated with the given course
+
+        :param course_key: Course Key identifier
+        :param flat: boolean showing whether to return statuses as a list of values or a list of dictionaries.
+        """
+        query = cls.objects
+
+        if course_key:
+            query = query.filter(course_id=course_key)
+
+        if flat:
+            return query.values_list('status', flat=True).distinct()
+        else:
+            return query.values('status').annotate(count=Count('status'))
+
+    def invalidate(self):
+        """
+        Invalidate Generated Certificate by  marking it 'unavailable'.
+
+        Following is the list of fields with their defaults
+            1 - verify_uuid = '',
+            2 - download_uuid = '',
+            3 - download_url = '',
+            4 - grade = ''
+            5 - status = 'unavailable'
+        """
+        self.verify_uuid = ''
+        self.download_uuid = ''
+        self.download_url = ''
+        self.grade = ''
+        self.status = CertificateStatuses.unavailable
+
+        self.save()
+
 
 @receiver(post_save, sender=GeneratedCertificate)
-def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Handles post_save signal of GeneratedCertificate, and mark user collected
     course milestone entry if user has passed the course.
@@ -716,7 +763,6 @@ class BadgeImageConfiguration(models.Model):
         """
         Make sure there's not more than one default.
         """
-        # pylint: disable=no-member
         if self.default and BadgeImageConfiguration.objects.filter(default=True).exclude(id=self.id):
             raise ValidationError(_(u"There can be only one default image."))
 
@@ -834,7 +880,7 @@ class CertificateTemplateAsset(TimeStampedModel):
         super(CertificateTemplateAsset, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return u'%s' % (self.asset.url, )  # pylint: disable=no-member
+        return u'%s' % (self.asset.url, )
 
     class Meta(object):
         get_latest_by = 'created'

@@ -202,12 +202,12 @@ class CourseTeamMembership(models.Model):
             self.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
         super(CourseTeamMembership, self).save(*args, **kwargs)
         if should_reset_team_size:
-            self.team.reset_team_size()  # pylint: disable=no-member
+            self.team.reset_team_size()
 
     def delete(self, *args, **kwargs):
         """Recompute the related team's team_size after deleting a membership"""
         super(CourseTeamMembership, self).delete(*args, **kwargs)
-        self.team.reset_team_size()  # pylint: disable=no-member
+        self.team.reset_team_size()
 
     @classmethod
     def get_memberships(cls, username=None, course_ids=None, team_id=None):

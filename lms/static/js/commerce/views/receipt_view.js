@@ -140,7 +140,11 @@ var edx = edx || {};
             return $.ajax({
                 url: _.sprintf(providerUrl, providerId),
                 type: 'GET',
-                dataType: 'json'
+                dataType: 'json',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': $.cookie('csrftoken')
+                }
             }).retry({times: 5, timeout: 2000, statusCodes: [404]});
         },
         /**

@@ -24,4 +24,4 @@ class MobileApiConfig(ConfigurationModel):
         """
         Get the list of profiles in priority order when requesting from VAL
         """
-        return [profile.strip() for profile in cls.current().video_profiles.split(",") if profile]  # pylint: disable=no-member
+        return [profile.strip() for profile in cls.current().video_profiles.split(",") if profile]

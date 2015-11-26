@@ -6,14 +6,18 @@ import json
 
 from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.test.utils import override_settings
 from django.conf import settings
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
 from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
-from certificates.models import CertificateGenerationConfiguration
+from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
+from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist, \
+    GeneratedCertificate
 from certificates import api as certs_api
+from student.models import CourseEnrollment
 
 
 @attr('shard_1')
@@ -205,18 +209,9 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.user = UserFactory()
+        CourseEnrollment.enroll(self.user, self.course.id)
 
         # Enable certificate generation
-        self.certificate_exception_data = [
-            dict(
-                created="Wednesday, October 28, 2015",
-                notes="Test Notes for Test Certificate Exception",
-                user_email='',
-                user_id='',
-                user_name=unicode(self.user.username)
-            ),
-        ]
-
         cache.clear()
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
@@ -313,35 +308,143 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.assertIsNotNone(res_json['message'])
         self.assertIsNotNone(res_json['task_id'])
 
+    def test_certificate_regeneration_success(self):
+        """
+        Test certificate regeneration is successful when accessed with 'certificate_statuses'
+        present in GeneratedCertificate table.
+        """
+
+        # Create a generated Certificate of some user with status 'downloadable'
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        # Login the client and access the url with 'certificate_statuses'
+        self.client.login(username=self.global_staff.username, password='test')
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url, data={'certificate_statuses': [CertificateStatuses.downloadable]})
+
+        # Assert 200 status code in response
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+
+        # Assert request is successful
+        self.assertTrue(res_json['success'])
+
+        # Assert success message
+        self.assertEqual(
+            res_json['message'],
+            u'Certificate regeneration task has been started. You can view the status of the generation task in '
+            u'the "Pending Tasks" section.'
+        )
+
+    def test_certificate_regeneration_error(self):
+        """
+        Test certificate regeneration errors out when accessed with either empty list of 'certificate_statuses' or
+        the 'certificate_statuses' that are not present in GeneratedCertificate table.
+        """
+        # Create a dummy course and GeneratedCertificate with the same status as the one we will use to access
+        # 'start_certificate_regeneration' but their error message should be displayed as GeneratedCertificate
+        # belongs to a different course
+        dummy_course = CourseFactory.create()
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=dummy_course.id,
+            status=CertificateStatuses.generating,
+            mode='honor'
+        )
+
+        # Login the client and access the url without 'certificate_statuses'
+        self.client.login(username=self.global_staff.username, password='test')
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url)
+
+        # Assert 400 status code in response
+        self.assertEqual(response.status_code, 400)
+        res_json = json.loads(response.content)
+
+        # Assert Error Message
+        self.assertEqual(
+            res_json['message'],
+            u'Please select one or more certificate statuses that require certificate regeneration.'
+        )
+
+        # Access the url passing 'certificate_statuses' that are not present in db
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url, data={'certificate_statuses': [CertificateStatuses.generating]})
+
+        # Assert 400 status code in response
+        self.assertEqual(response.status_code, 400)
+        res_json = json.loads(response.content)
+
+        # Assert Error Message
+        self.assertEqual(res_json['message'], u'Please select certificate statuses from the list only.')
+
+
+@attr('shard_1')
+@override_settings(CERT_QUEUE='certificates')
+@ddt.ddt
+class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
+    """Tests for the generate certificates end-points in the instructor dash API. """
+    @classmethod
+    def setUpClass(cls):
+        super(CertificateExceptionViewInstructorApiTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(CertificateExceptionViewInstructorApiTest, self).setUp()
+        self.global_staff = GlobalStaffFactory()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.user = UserFactory()
+        self.user2 = UserFactory()
+        CourseEnrollment.enroll(self.user, self.course.id)
+        CourseEnrollment.enroll(self.user2, self.course.id)
+        self.url = reverse('certificate_exception_view', kwargs={'course_id': unicode(self.course.id)})
+
+        certificate_white_list_item = CertificateWhitelistFactory.create(
+            user=self.user2,
+            course_id=self.course.id,
+        )
+
+        self.certificate_exception = dict(
+            created="",
+            notes="Test Notes for Test Certificate Exception",
+            user_email='',
+            user_id='',
+            user_name=unicode(self.user.username)
+        )
+
+        self.certificate_exception_in_db = dict(
+            id=certificate_white_list_item.id,
+            user_name=certificate_white_list_item.user.username,
+            notes=certificate_white_list_item.notes,
+            user_email=certificate_white_list_item.user.email,
+            user_id=certificate_white_list_item.user.id,
+        )
+
+        # Enable certificate generation
+        cache.clear()
+        CertificateGenerationConfiguration.objects.create(enabled=True)
+        self.client.login(username=self.global_staff.username, password='test')
+
     def test_certificate_exception_added_successfully(self):
         """
         Test certificates exception addition api endpoint returns success status and updated certificate exception data
         when called with valid course key and certificate exception data
         """
-        self.client.login(username=self.global_staff.username, password='test')
-        url = reverse(
-            'create_certificate_exception',
-            kwargs={'course_id': unicode(self.course.id), 'white_list_student': ''}
-        )
-
         response = self.client.post(
-            url,
-            data=json.dumps(self.certificate_exception_data),
+            self.url,
+            data=json.dumps(self.certificate_exception),
             content_type='application/json'
         )
-
         # Assert successful request processing
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-
-        # Assert Request was successful
-        self.assertTrue(res_json['success'])
-
-        # Assert Success Message
-        self.assertEqual(res_json['message'], u'Students added to Certificate white list successfully')
+        certificate_exception = json.loads(response.content)
 
         # Assert Certificate Exception Updated data
-        certificate_exception = json.loads(res_json['data'])[0]
         self.assertEqual(certificate_exception['user_email'], self.user.email)
         self.assertEqual(certificate_exception['user_name'], self.user.username)
         self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
@@ -352,18 +455,12 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         invalid username.
         """
         invalid_user = 'test_invalid_user_name'
-        self.certificate_exception_data[0].update({'user_name': invalid_user})
-
-        self.client.login(username=self.global_staff.username, password='test')
-        url = reverse(
-            'create_certificate_exception',
-            kwargs={'course_id': unicode(self.course.id), 'white_list_student': ''}
-        )
-
+        self.certificate_exception.update({'user_name': invalid_user})
         response = self.client.post(
-            url,
-            data=json.dumps(self.certificate_exception_data),
-            content_type='application/json')
+            self.url,
+            data=json.dumps(self.certificate_exception),
+            content_type='application/json'
+        )
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
@@ -383,18 +480,12 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         Test certificates exception addition api endpoint returns failure when called with
         missing username/email.
         """
-        self.certificate_exception_data[0].update({'user_name': '', 'user_email': ''})
-
-        self.client.login(username=self.global_staff.username, password='test')
-        url = reverse(
-            'create_certificate_exception',
-            kwargs={'course_id': unicode(self.course.id), 'white_list_student': ''}
-        )
-
+        self.certificate_exception.update({'user_name': '', 'user_email': ''})
         response = self.client.post(
-            url,
-            data=json.dumps(self.certificate_exception_data),
-            content_type='application/json')
+            self.url,
+            data=json.dumps(self.certificate_exception),
+            content_type='application/json'
+        )
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
@@ -414,23 +505,9 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         Test certificates exception addition api endpoint returns failure when called with
         username/email that already exists in 'CertificateWhitelist' table.
         """
-
-        self.client.login(username=self.global_staff.username, password='test')
-        url = reverse(
-            'create_certificate_exception',
-            kwargs={'course_id': unicode(self.course.id), 'white_list_student': ''}
-        )
-
-        self.client.post(
-            url,
-            data=json.dumps(self.certificate_exception_data),
-            content_type='application/json'
-        )
-
-        # Make some request again to simulate duplicate user scenario
         response = self.client.post(
-            url,
-            data=json.dumps(self.certificate_exception_data),
+            self.url,
+            data=json.dumps(self.certificate_exception_in_db),
             content_type='application/json'
         )
 
@@ -441,11 +518,11 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Request not successful
         self.assertFalse(res_json['success'])
 
-        user = self.certificate_exception_data[0]['user_name']
+        user = self.certificate_exception_in_db['user_name']
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u"Student (username/email={user_id} already in certificate exception  list)".format(user_id=user)
+            u"Student (username/email={user_name}) already in certificate exception list.".format(user_name=user)
         )
 
     def test_certificate_exception_same_user_in_two_different_courses(self):
@@ -453,36 +530,207 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         Test certificates exception addition api endpoint in scenario when same
         student is added to two different courses.
         """
-
-        self.client.login(username=self.global_staff.username, password='test')
-
-        url_course1 = reverse(
-            'create_certificate_exception',
-            kwargs={'course_id': unicode(self.course.id), 'white_list_student': ''}
-        )
-
         response = self.client.post(
-            url_course1,
-            data=json.dumps(self.certificate_exception_data),
+            self.url,
+            data=json.dumps(self.certificate_exception),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertTrue(res_json['success'])
+        certificate_exception = json.loads(response.content)
+
+        # Assert Certificate Exception Updated data
+        self.assertEqual(certificate_exception['user_email'], self.user.email)
+        self.assertEqual(certificate_exception['user_name'], self.user.username)
+        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
 
         course2 = CourseFactory.create()
         url_course2 = reverse(
-            'create_certificate_exception',
-            kwargs={'course_id': unicode(course2.id), 'white_list_student': ''}
+            'certificate_exception_view',
+            kwargs={'course_id': unicode(course2.id)}
         )
 
         # add certificate exception for same user in a different course
         self.client.post(
             url_course2,
-            data=json.dumps(self.certificate_exception_data),
+            data=json.dumps(self.certificate_exception),
             content_type='application/json'
         )
 
         self.assertEqual(response.status_code, 200)
+        certificate_exception = json.loads(response.content)
+
+        # Assert Certificate Exception Updated data
+        self.assertEqual(certificate_exception['user_email'], self.user.email)
+        self.assertEqual(certificate_exception['user_name'], self.user.username)
+        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
+
+    def test_certificate_exception_removed_successfully(self):
+        """
+        Test certificates exception removal api endpoint returns success status
+        when called with valid course key and certificate exception id
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user2,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            grade='1.0'
+        )
+        response = self.client.post(
+            self.url,
+            data=json.dumps(self.certificate_exception_in_db),
+            content_type='application/json',
+            REQUEST_METHOD='DELETE'
+        )
+        # Assert successful request processing
+        self.assertEqual(response.status_code, 204)
+
+        # Verify that certificate exception successfully removed from CertificateWhitelist and GeneratedCertificate
+        with self.assertRaises(ObjectDoesNotExist):
+            CertificateWhitelist.objects.get(user=self.user2, course_id=self.course.id)
+            GeneratedCertificate.objects.get(
+                user=self.user2, course_id=self.course.id, status__not=CertificateStatuses.unavailable
+            )
+
+    def test_remove_certificate_exception_invalid_request_error(self):
+        """
+        Test certificates exception removal api endpoint returns error
+        when called without certificate exception id
+        """
+        # Try to delete certificate exception without passing valid data
+        response = self.client.post(
+            self.url,
+            data='Test Invalid data',
+            content_type='application/json',
+            REQUEST_METHOD='DELETE'
+        )
+        # Assert error on request
+        self.assertEqual(response.status_code, 400)
+
         res_json = json.loads(response.content)
+
+        # Assert Request not successful
+        self.assertFalse(res_json['success'])
+        # Assert Error Message
+        self.assertEqual(
+            res_json['message'],
+            u"Invalid Json data"
+        )
+
+    def test_remove_certificate_exception_non_existing_error(self):
+        """
+        Test certificates exception removal api endpoint returns error
+        when called with non existing certificate exception id
+        """
+        response = self.client.post(
+            self.url,
+            data=json.dumps(self.certificate_exception),
+            content_type='application/json',
+            REQUEST_METHOD='DELETE'
+        )
+        # Assert error on request
+        self.assertEqual(response.status_code, 400)
+
+        res_json = json.loads(response.content)
+
+        # Assert Request not successful
+        self.assertFalse(res_json['success'])
+        # Assert Error Message
+        self.assertEqual(
+            res_json['message'],
+            u"Certificate exception [user={}] does not exist in "
+            u"certificate white list.".format(self.certificate_exception['user_name'])
+        )
+
+
+@attr('shard_1')
+@override_settings(CERT_QUEUE='certificates')
+@ddt.ddt
+class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
+    """Tests for the generate certificates end-points in the instructor dash API. """
+    @classmethod
+    def setUpClass(cls):
+        super(GenerateCertificatesInstructorApiTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(GenerateCertificatesInstructorApiTest, self).setUp()
+        self.global_staff = GlobalStaffFactory()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.user = UserFactory()
+        CourseEnrollment.enroll(self.user, self.course.id)
+        certificate_exception = CertificateWhitelistFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+        )
+
+        self.certificate_exception = dict(
+            id=certificate_exception.id,
+            user_name=certificate_exception.user.username,
+            notes=certificate_exception.notes,
+            user_email=certificate_exception.user.email,
+            user_id=certificate_exception.user.id,
+        )
+
+        # Enable certificate generation
+        cache.clear()
+        CertificateGenerationConfiguration.objects.create(enabled=True)
+        self.client.login(username=self.global_staff.username, password='test')
+
+    def test_generate_certificate_exceptions_all_students(self):
+        """
+        Test generate certificates exceptions api endpoint returns success
+        when called with existing certificate exception
+        """
+        url = reverse(
+            'generate_certificate_exceptions',
+            kwargs={'course_id': unicode(self.course.id), 'generate_for': 'all'}
+        )
+
+        response = self.client.post(
+            url,
+            data=json.dumps([self.certificate_exception]),
+            content_type='application/json'
+        )
+        # Assert Success
+        self.assertEqual(response.status_code, 200)
+
+        res_json = json.loads(response.content)
+
+        # Assert Request is successful
         self.assertTrue(res_json['success'])
+        # Assert Message
+        self.assertEqual(
+            res_json['message'],
+            u"Certificate generation started for white listed students."
+        )
+
+    def test_generate_certificate_exceptions_invalid_user_list_error(self):
+        """
+        Test generate certificates exceptions api endpoint returns error
+        when called with certificate exceptions with empty 'user_id' field
+        """
+        url = reverse(
+            'generate_certificate_exceptions',
+            kwargs={'course_id': unicode(self.course.id), 'generate_for': 'new'}
+        )
+
+        # assign empty user_id
+        self.certificate_exception.update({'user_id': ''})
+
+        response = self.client.post(
+            url,
+            data=json.dumps([self.certificate_exception]),
+            content_type='application/json'
+        )
+        # Assert Failure
+        self.assertEqual(response.status_code, 400)
+
+        res_json = json.loads(response.content)
+
+        # Assert Request is not successful
+        self.assertFalse(res_json['success'])
+        # Assert Message
+        self.assertEqual(
+            res_json['message'],
+            u"Invalid data, user_id must be present for all certificate exceptions."
+        )

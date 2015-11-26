@@ -178,9 +178,9 @@ def _footer_navigation_links():
             ("about", marketing_link("ABOUT"), _("About")),
             ("blog", marketing_link("BLOG"), _("Blog")),
             ("news", marketing_link("NEWS"), _("News")),
-            ("faq", marketing_link("FAQ"), _("FAQs")),
+            ("help-center", settings.SUPPORT_SITE_LINK, _("Help Center")),
             ("contact", marketing_link("CONTACT"), _("Contact")),
-            ("jobs", marketing_link("JOBS"), _("Jobs")),
+            ("careers", marketing_link("CAREERS"), _("Careers")),
             ("donate", marketing_link("DONATE"), _("Donate")),
             ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
         ]

@@ -3,7 +3,7 @@ import json
 import random
 import logging
 import lxml.html
-from lxml.etree import XMLSyntaxError, ParserError  # pylint:disable=no-name-in-module
+from lxml.etree import XMLSyntaxError, ParserError
 from uuid import uuid4
 
 from django.test.client import RequestFactory

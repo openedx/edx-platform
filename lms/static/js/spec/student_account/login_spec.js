@@ -265,6 +265,21 @@
                 expect(view.$errors).toHaveClass('hidden');
                 expect(authComplete).toBe(true);
             });
+
+            it('displays an error if there is no internet connection', function () {
+                createLoginView(this);
+
+                // Submit the form, with successful validation
+                submitForm(true);
+
+                // Simulate an error from the LMS servers
+                AjaxHelpers.respondWithError(requests, 0);
+
+                // Expect that an error is displayed and that auth complete is not triggered
+                expect(view.$errors).not.toHaveClass('hidden');
+                expect(authComplete).toBe(false);
+                expect(view.$errors.text()).toContain('Please check your internet connection and try again.');
+            });
         });
     });
 }).call(this, define || RequireJS.define);

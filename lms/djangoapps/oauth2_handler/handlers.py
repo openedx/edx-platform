@@ -73,7 +73,7 @@ class ProfileHandler(object):
 
         # If the user has no language specified, return the default one.
         if not language:
-            language = getattr(settings, 'LANGUAGE_CODE')
+            language = settings.LANGUAGE_CODE
 
         return language
 

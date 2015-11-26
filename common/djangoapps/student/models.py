@@ -1085,7 +1085,7 @@ class CourseEnrollment(models.Model):
                 log.exception(
                     u'Unable to emit event %s for user %s and course %s',
                     event_name,
-                    self.user.username,  # pylint: disable=no-member
+                    self.user.username,
                     self.course_id,
                 )
 
@@ -1373,7 +1373,7 @@ class CourseEnrollment(models.Model):
     def refund_cutoff_date(self):
         """ Calculate and return the refund window end date. """
         try:
-            attribute = self.attributes.get(namespace='order', name='order_number')  # pylint: disable=no-member
+            attribute = self.attributes.get(namespace='order', name='order_number')
         except ObjectDoesNotExist:
             return None
 
@@ -1418,6 +1418,12 @@ class CourseEnrollment(models.Model):
         Check the course enrollment mode is verified or not
         """
         return CourseMode.is_verified_slug(self.mode)
+
+    def is_professional_enrollment(self):
+        """
+        Check the course enrollment mode is professional or not
+        """
+        return CourseMode.is_professional_slug(self.mode)
 
     @classmethod
     def is_enrolled_as_verified(cls, user, course_key):
@@ -1716,10 +1722,11 @@ def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=un
 @receiver(user_logged_out)
 def log_successful_logout(sender, request, user, **kwargs):  # pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
-    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
-    else:
-        AUDIT_LOG.info(u"Logout - {0}".format(request.user))
+    if hasattr(request, 'user'):
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))  # pylint: disable=logging-format-interpolation
+        else:
+            AUDIT_LOG.info(u"Logout - {0}".format(request.user))  # pylint: disable=logging-format-interpolation
 
 
 @receiver(user_logged_in)

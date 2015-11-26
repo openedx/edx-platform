@@ -109,7 +109,6 @@ class CommentListGetForm(_PaginationForm):
     # TODO: should we use something better here? This only accepts "True",
     # "False", "1", and "0"
     endorsed = NullBooleanField(required=False)
-    mark_as_read = BooleanField(required=False)
 
 
 class CommentActionsForm(Form):

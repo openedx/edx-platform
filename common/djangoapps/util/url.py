@@ -18,5 +18,5 @@ def reload_django_url_config():
     if urlconf and urlconf in sys.modules:
         reload(sys.modules[urlconf])
     reloaded = import_module(urlconf)
-    reloaded_urls = getattr(reloaded, 'urlpatterns')
+    reloaded_urls = reloaded.urlpatterns
     set_urlconf(tuple(reloaded_urls))

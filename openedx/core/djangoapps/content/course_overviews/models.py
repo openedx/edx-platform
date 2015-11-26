@@ -41,7 +41,7 @@ class CourseOverview(TimeStampedModel):
     version = IntegerField()
 
     # Course identification
-    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)  # pylint: disable=invalid-name
+    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
     display_name = TextField(null=True)
     display_number_with_default = TextField()
@@ -112,12 +112,14 @@ class CourseOverview(TimeStampedModel):
         display_name = course.display_name
         start = course.start
         end = course.end
+        max_student_enrollments_allowed = course.max_student_enrollments_allowed
         if isinstance(course.id, CCXLocator):
             from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
             ccx = get_ccx_from_ccx_locator(course.id)
             display_name = ccx.display_name
             start = ccx.start
             end = ccx.due
+            max_student_enrollments_allowed = ccx.max_student_enrollments_allowed
 
         return cls(
             version=cls.VERSION,
@@ -153,7 +155,7 @@ class CourseOverview(TimeStampedModel):
             enrollment_end=course.enrollment_end,
             enrollment_domain=course.enrollment_domain,
             invitation_only=course.invitation_only,
-            max_student_enrollments_allowed=course.max_student_enrollments_allowed,
+            max_student_enrollments_allowed=max_student_enrollments_allowed,
         )
 
     @classmethod
@@ -373,7 +375,7 @@ class CourseOverview(TimeStampedModel):
         """
         Returns True if course has discussion tab and is enabled
         """
-        tabs = self.tabs.all()  # pylint: disable=E1101
+        tabs = self.tabs.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
             if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):

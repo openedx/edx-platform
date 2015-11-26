@@ -459,7 +459,7 @@ class LTIModuleTest(LogicTest):
         LTI 1.1 will be used. Otherwise fake namespace will be added to XML.
         """
         mock_request = Mock()
-        mock_request.headers = {  # pylint: disable=no-space-before-operator
+        mock_request.headers = {
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': u'OAuth oauth_nonce="135685044251684026041377608307", \

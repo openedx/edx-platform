@@ -20,7 +20,7 @@ from courseware.courses import course_image_url, get_course_about_section
         <img class="item-image" src="${course_image_url(course)}"
             alt="${_("{course_number} {course_title} Cover Image").format(
               course_number=course.display_number_with_default,
-              course_title=get_course_about_section(course, 'title'),
+              course_title=get_course_about_section(request, course, 'title'),
             )}" />
       </div>
       <div class="enrollment-details">
