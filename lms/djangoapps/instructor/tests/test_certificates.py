@@ -472,7 +472,8 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u'Student (username/email={user}) does not exist'.format(user=invalid_user)
+            u"We can't find the user (username/email={user}) you've entered. "
+            u"Make sure the username or email address is correct, then try again.".format(user=invalid_user)
         )
 
     def test_certificate_exception_missing_username_and_email_error(self):
@@ -497,7 +498,8 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u'Student username/email is required.'
+            u'Student username/email field is required and can not be empty. '
+            u'Kindly fill in username/email and then press "Add Exception" button.'
         )
 
     def test_certificate_exception_duplicate_user_error(self):
@@ -564,6 +566,35 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         self.assertEqual(certificate_exception['user_name'], self.user.username)
         self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
 
+    def test_certificate_exception_user_not_enrolled_error(self):
+        """
+        Test certificates exception addition api endpoint returns failure when called with
+        username/email that is not enrolled in the given course.
+        """
+        # Un-enroll student from the course
+        CourseEnrollment.unenroll(self.user, self.course.id)
+        response = self.client.post(
+            self.url,
+            data=json.dumps(self.certificate_exception),
+            content_type='application/json'
+        )
+
+        # Assert 400 status code in response
+        self.assertEqual(response.status_code, 400)
+        res_json = json.loads(response.content)
+
+        # Assert Request not successful
+        self.assertFalse(res_json['success'])
+
+        # Assert Error Message
+        self.assertEqual(
+            res_json['message'],
+            "The user (username/email={user}) you have entered is not enrolled in this course. "
+            "Make sure the username or email address is correct, then try again.".format(
+                user=self.certificate_exception['user_name']
+            )
+        )
+
     def test_certificate_exception_removed_successfully(self):
         """
         Test certificates exception removal api endpoint returns success status
@@ -613,7 +644,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u"Invalid Json data"
+            u"Invalid Json data, Please refresh the page and then try again."
         )
 
     def test_remove_certificate_exception_non_existing_error(self):
@@ -637,8 +668,8 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u"Certificate exception [user={}] does not exist in "
-            u"certificate white list.".format(self.certificate_exception['user_name'])
+            u"Certificate exception (user={user}) does not exist in certificate white list. "
+            u"Please refresh the page and try again.".format(user=self.certificate_exception['user_name'])
         )
 
 

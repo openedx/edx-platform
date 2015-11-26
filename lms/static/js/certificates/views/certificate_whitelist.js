@@ -77,7 +77,9 @@
                             caller_object.showMessage(response.message, 'msg-error');
                         }
                         catch(exception){
-                            caller_object.showMessage("Server Error, Please try again later.", 'msg-error');
+                            caller_object.showMessage(
+                                "Server Error, Please refresh the page and try again.", 'msg-error'
+                            );
                         }
                     };
                 }

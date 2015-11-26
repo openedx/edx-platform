@@ -58,7 +58,10 @@
                     });
 
                     if(this.collection.findWhere(model)){
-                        this.showMessage("username/email already in exception list", 'msg-error');
+                        this.showMessage(
+                            "User (username/email=" + (user_name || user_email) + ") already in exception list.",
+                            'msg-error'
+                        );
                     }
                     else if(certificate_exception.isValid()){
                         certificate_exception.save(
@@ -67,7 +70,7 @@
                                 success: this.showSuccess(
                                     this,
                                     true,
-                                    'Students added to Certificate white list successfully'
+                                    'Student added to Certificate white list successfully.'
                                 ),
                                 error: this.showError(this)
                             }
@@ -98,7 +101,11 @@
                         this.showMessage('Exception is being removed from server.', 'msg-success');
                     }
                     else{
-                        this.showMessage('Could not find Certificate Exception in white list.', 'msg-error');
+                        this.showMessage(
+                            'Could not find Certificate Exception in white list. ' +
+                            'Please refresh the page and try again',
+                            'msg-error'
+                        );
                     }
                 },
 
@@ -131,7 +138,9 @@
                             caller.showMessage(response_data.message, 'msg-error');
                         }
                         catch(exception){
-                            caller.showMessage("Server Error, Please try again later.", 'msg-error');
+                            caller.showMessage("" +
+                                "Server Error, Please refresh the page and try again.", 'msg-error'
+                            );
                         }
                     };
                 }
