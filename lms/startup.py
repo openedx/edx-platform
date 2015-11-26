@@ -89,6 +89,7 @@ def enable_theme():
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
     # avoid collisions with default edX static files
+    settings.STATICFILES_DIRS.insert(0, theme_root / 'static/override')
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
