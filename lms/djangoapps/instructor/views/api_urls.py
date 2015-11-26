@@ -157,4 +157,8 @@ urlpatterns = patterns(
     url(r'^generate_certificate_exceptions/(?P<generate_for>[^/]*)',
         'instructor.views.api.generate_certificate_exceptions',
         name='generate_certificate_exceptions'),
+
+    url(r'^generate_bulk_certificate_exceptions',
+        'instructor.views.api.generate_bulk_certificate_exceptions',
+        name='generate_bulk_certificate_exceptions'),
 )
