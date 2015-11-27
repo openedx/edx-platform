@@ -360,7 +360,7 @@ class RegistrationView(APIView):
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"Needed for any certificates you may earn")
+        name_instructions = _(u"Your legal name, used for any certificates you earn.")
 
         form_desc.add_field(
             "name",
