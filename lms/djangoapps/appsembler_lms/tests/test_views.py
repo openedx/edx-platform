@@ -9,13 +9,12 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from rest_framework import status
 
-from courseware.courses import get_course_by_id
-from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
 @ddt.ddt
@@ -90,7 +89,7 @@ class TestUserSignup(TestCase):
 class TestUserEnroll(ModuleStoreTestCase):
     def setUp(self):
         super(TestUserEnroll, self).setUp()
-        self.course = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.url = reverse('user_signup_endpoint')
 
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
@@ -107,7 +106,7 @@ class TestUserEnroll(ModuleStoreTestCase):
         self.assertEqual(User.objects.filter(email="john@doe.com").count(), 1)
 
         user = User.objects.get(email=payload['email'])
-        self.assertTrue(CourseEnrollment.is_enrolled(user=user, course_key=self.course))
+        self.assertTrue(CourseEnrollment.is_enrolled(user=user, course_key=self.course_key))
         self.assertIn(payload['email'], response.content)
         self.assertIn('JohnDoe', response.content)
         self.assertIn('Toy Course', response.content)
