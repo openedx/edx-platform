@@ -22,7 +22,7 @@ class CreateCourseAPIView(GenericAPIView):
     serializer_class = CreateCourseSerializer
 
     def post(self, *args, **kwargs):
-        serializer = self.get_serializer(data=self.request.DATA)
+        serializer = self.get_serializer(data=self.request.data)
         if serializer.is_valid():
             try:
                 user = User.objects.get(email=serializer.data.get('email'))
