@@ -37,7 +37,7 @@ class UserSignupAPIView(GenericAPIView):
     serializer_class = UserSignupSerializer
 
     def post(self, *args, **kwargs):
-        serializer = self.get_serializer(data=self.request.DATA)
+        serializer = self.get_serializer(data=self.request.data)
         if serializer.is_valid():
             try:
                 user = self._create_user(serializer.data)
