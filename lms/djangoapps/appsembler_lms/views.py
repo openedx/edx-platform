@@ -3,6 +3,7 @@ import unicodedata
 
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.core.cache import caches, InvalidCacheBackendError
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.http import HttpResponse
@@ -21,11 +22,7 @@ from student.views import _do_create_account
 from .permissions import SecretKeyPermission
 from .serializers import UserSignupSerializer
 
-from django.core import cache
-try:
-    cache = cache.get_cache('general')
-except Exception:
-    cache = cache.cache
+
 
 logger = logging.getLogger(__name__)
 # TODO: put this into settings
@@ -115,8 +112,12 @@ user_signup_endpoint = UserSignupAPIView.as_view()
 @require_POST
 def nuke_cache(request):
     if request.user.is_authenticated() and request.user.is_superuser:
-        messages.success(request, 'cache successfully cleared!')
-        cache.clear()
+        try:
+            cache = caches['general']
+            cache.clear()
+            messages.success(request, 'cache successfully cleared!')
+        except InvalidCacheBackendError:
+            messages.error(request, 'cache is not set correctly!')
     else:
-        messages.error(request, 'ERROR ERRROR ERRRRRROOOOORRR!')
+        messages.error(request, 'Only the admin can clear the cache!')
     return redirect('/')
