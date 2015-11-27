@@ -13,6 +13,7 @@ from xmodule.course_module import DEFAULT_START_DATE
 from ..serializers import CourseSerializer
 from .mixins import CourseApiFactoryMixin
 
+
 class TestCourseSerializerFields(CourseApiFactoryMixin, ModuleStoreTestCase):
     """
     Test variations of start_date field responses
@@ -25,6 +26,9 @@ class TestCourseSerializerFields(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.request_factory = APIRequestFactory()
 
     def _get_request(self, user=None):
+        """
+        Build a Request object for the specified user
+        """
         if user is None:
             user = self.honor_user
         request = Request(self.request_factory.get('/'))

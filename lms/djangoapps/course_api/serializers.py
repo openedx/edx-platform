@@ -55,7 +55,6 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
     blocks_url = serializers.SerializerMethodField()
-    effort = serializers.SerializerMethodField()
 
     def get_start_type(self, course):
         """
@@ -84,9 +83,6 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         Get the representation for SerializerMethodField `description`
         """
         return get_course_about_section(self.context['request'], course, 'short_description').strip()
-
-    def get_effort(self, course):
-        return get_course_about_section(self.context['request'], course, 'effort')
 
     def get_blocks_url(self, course):
         """
