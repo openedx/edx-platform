@@ -42,6 +42,9 @@ def marketing_link(name):
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
 
+    if enable_mktg_site and name == 'COURSES':
+        return reverse('courses')
+
     if enable_mktg_site and name in settings.MKTG_URLS:
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
