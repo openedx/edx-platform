@@ -290,6 +290,13 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.display_name_with_default(self)
 
+    @property
+    def display_name_with_default_unescaped(self):
+        """
+        Return reasonable display name for the course; don't escape <> characters.
+        """
+        return course_metadata_utils.display_name_with_default_unescaped(self)
+
     def has_started(self):
         """
         Returns whether the the course has started.

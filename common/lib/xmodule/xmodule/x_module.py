@@ -349,6 +349,14 @@ class XModuleMixin(XModuleFields, XBlock):
         return course_metadata_utils.display_name_with_default(self)
 
     @property
+    def display_name_with_default_unescaped(self):
+        """
+        Return a display name for the module: use display_name if defined in
+        metadata, otherwise convert the url name; don't escape <> characters.
+        """
+        return course_metadata_utils.display_name_with_default_unescaped(self)
+
+    @property
     def xblock_kvs(self):
         """
         Retrieves the internal KeyValueStore for this XModule.

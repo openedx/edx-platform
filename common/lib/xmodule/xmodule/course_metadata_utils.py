@@ -61,10 +61,26 @@ def display_name_with_default(course):
             said course.
     """
     # TODO: Consider changing this to use something like xml.sax.saxutils.escape
+    return course.display_name_with_default_unescaped.replace('<', '&lt;').replace('>', '&gt;')
+
+
+def display_name_with_default_unescaped(course):
+    """
+    Calculates the display name for a course.
+
+    Default to the display_name if it isn't None, else fall back to creating
+    a name based on the URL.
+
+    As per display_name_with_default(), but without messing with '<' and '>'.
+
+    Arguments:
+        course (CourseDescriptor|CourseOverview): descriptor or overview of
+            said course.
+    """
     return (
         course.display_name if course.display_name is not None
         else course.url_name.replace('_', ' ')
-    ).replace('<', '&lt;').replace('>', '&gt;')
+    )
 
 
 def number_for_course_location(location):

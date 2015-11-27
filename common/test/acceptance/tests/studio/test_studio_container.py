@@ -1080,6 +1080,35 @@ class DisplayNameTest(ContainerBase):
 
 
 @attr('shard_3')
+class DisplayNameUnescapedTest(ContainerBase):
+    """
+    Test display_name_with_default_unescaped
+    """
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure with nested verticals, with names containing <> characters.
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section <angle brackets>').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection <angle brackets>').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit <angle brackets>')
+                )
+            )
+        )
+
+    def test_display_name_default_unescaped(self):
+        """
+        Scenario: Verify that Unit names containing <> characters
+        are rendered correctly on the unit page.  This tests for TNL-3429.
+        """
+        unit = self.go_to_unit_page('Test Section <angle brackets>', 'Test Subsection <angle brackets>', 'Test Unit <angle brackets>')
+        test_block = unit.xblocks[0]
+        container = test_block.go_to_container()
+        self.assertEqual(container.name, 'Test Unit <angle brackets>')
+        # TODO: how does one check the section and subsection name?
+
+
+@attr('shard_3')
 class ProblemCategoryTabsTest(ContainerBase):
     """
     Test to verify tabs in problem category.
