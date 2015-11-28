@@ -28,7 +28,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         return self.q(css=self.thread_selector + " " + selector)
 
     def is_browser_on_page(self):
-        return self.q(css=self.thread_selector).present
+        return self.q(css=self.thread_selector).visible
 
     def _get_element_text(self, selector):
         """
