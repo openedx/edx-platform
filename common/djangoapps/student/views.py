@@ -574,7 +574,7 @@ def dashboard(request):
     if has_access(user, 'staff', 'global'):
         # Show any courses that errored on load
         staff_access = True
-        errored_courses = modulestore().get_errored_courses()
+        # errored_courses = modulestore().get_errored_courses()
 
     show_courseware_links_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments

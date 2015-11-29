@@ -34,16 +34,16 @@ SASS_CACHE_PATH = '/tmp/sass-cache'
 def configure_paths():
     """Configure our paths based on settings.  Called immediately."""
     edxapp_env = Env()
-    if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
-        theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
-        parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
-        theme_root = parent_dir / "themes" / theme_name
-        COFFEE_DIRS.append(theme_root)
-        sass_dir = theme_root / "static" / "sass"
-        css_dir = theme_root / "static" / "css"
-        if sass_dir.isdir():
-            css_dir.mkdir_p()
-            SASS_DIRS.append(sass_dir)
+    # if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
+    theme_name = "default"
+    parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
+    theme_root = parent_dir / "themes" / theme_name
+    COFFEE_DIRS.append(theme_root)
+    sass_dir = theme_root / "static" / "sass"
+    css_dir = theme_root / "static" / "css"
+    if sass_dir.isdir():
+        css_dir.mkdir_p()
+        SASS_DIRS.append(sass_dir)
 
     if edxapp_env.env_tokens.get("COMP_THEME_DIR", ""):
         theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
@@ -228,7 +228,7 @@ def compile_templated_sass(systems, settings):
         if sys == "studio":
             sys = "cms"
         sh(django_cmd(
-            sys, settings, 'preprocess_assets',
+            sys, 'dev', 'preprocess_assets',
             '{sys}/static/sass/*.scss'.format(sys=sys),
             '{sys}/static/themed_sass'.format(sys=sys)
         ))
@@ -312,7 +312,7 @@ def update_assets(args):
         help="lms or studio",
     )
     parser.add_argument(
-        '--settings', type=str, default="devstack",
+        '--settings', type=str, default="dev",
         help="Django settings module",
     )
     parser.add_argument(

@@ -185,10 +185,10 @@ def run_all_servers(options):
         settings = OPTIMIZED_SETTINGS
         asset_settings = OPTIMIZED_ASSETS_SETTINGS
 
-    settings_lms = getattr(options, 'settings_lms', settings)
-    settings_cms = getattr(options, 'settings_cms', settings)
-    asset_settings_lms = getattr(options, 'asset_settings_lms', asset_settings)
-    asset_settings_cms = getattr(options, 'asset_settings_cms', asset_settings)
+    settings_lms = 'cms.dev'
+    settings_cms = 'dev'
+    asset_settings_lms = 'cms.dev'
+    asset_settings_cms = 'dev'
 
     if not fast:
         # First update assets for both LMS and Studio but don't collect static yet
