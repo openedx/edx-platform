@@ -1082,7 +1082,7 @@ class DisplayNameTest(ContainerBase):
 @attr('shard_3')
 class DisplayNameUnescapedTest(ContainerBase):
     """
-    Test display_name_with_default_unescaped
+    Test display_name_unescaped
     """
     def populate_course_fixture(self, course_fixture):
         """
@@ -1096,7 +1096,7 @@ class DisplayNameUnescapedTest(ContainerBase):
             )
         )
 
-    def test_display_name_default_unescaped(self):
+    def test_display_name_unescaped(self):
         """
         Scenario: Verify that Unit names containing <> characters
         are rendered correctly on the unit page.  This tests for TNL-3429.
