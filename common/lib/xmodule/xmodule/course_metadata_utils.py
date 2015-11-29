@@ -61,10 +61,10 @@ def display_name_with_default(course):
             said course.
     """
     # TODO: Consider changing this to use something like xml.sax.saxutils.escape
-    return course.display_name_with_default_unescaped.replace('<', '&lt;').replace('>', '&gt;')
+    return course.display_name_unescaped.replace('<', '&lt;').replace('>', '&gt;')
 
 
-def display_name_with_default_unescaped(course):
+def display_name_unescaped(course):
     """
     Calculates the display name for a course.
 

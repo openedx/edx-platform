@@ -1101,11 +1101,12 @@ class DisplayNameUnescapedTest(ContainerBase):
         Scenario: Verify that Unit names containing <> characters
         are rendered correctly on the unit page.  This tests for TNL-3429.
         """
-        unit = self.go_to_unit_page('Test Section <angle brackets>', 'Test Subsection <angle brackets>', 'Test Unit <angle brackets>')
+        unit = self.go_to_unit_page('Test Section <angle brackets>',
+                                    'Test Subsection <angle brackets>',
+                                    'Test Unit <angle brackets>')
         test_block = unit.xblocks[0]
         container = test_block.go_to_container()
         self.assertEqual(container.name, 'Test Unit <angle brackets>')
-        # TODO: how does one check the section and subsection name?
 
 
 @attr('shard_3')
