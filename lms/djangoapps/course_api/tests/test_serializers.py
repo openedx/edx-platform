@@ -58,5 +58,10 @@ class TestCourseSerializerFields(CourseApiFactoryMixin, ModuleStoreTestCase):
         result = CourseSerializer(course, context={'request': self._get_request()}).data
         self.assertEqual(result['description'], u'A course about toys.')
 
-    def test_other(self):
-        pass
+    def test_blocks_url(self):
+        course = self.create_course()
+        result = CourseSerializer(course, context={'request': self._get_request()}).data
+        self.assertEqual(
+            result['blocks_url'],
+            u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall'
+        )

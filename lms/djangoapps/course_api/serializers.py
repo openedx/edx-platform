@@ -88,7 +88,8 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         """
         Get the representation for SerializerMethodField `blocks_url`
         """
-        return '?'.join([
+        base_url = '?'.join([
             reverse('blocks_in_course'),
             urllib.urlencode({'course_id': course.id}),
         ])
+        return self.context['request'].build_absolute_uri(base_url)
