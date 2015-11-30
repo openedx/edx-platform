@@ -195,22 +195,12 @@ def uninstall_python_packages():
     # to really really get rid of it.
     for _ in range(3):
         uninstalled = False
-        frozen = sh("pip freeze", capture=True).splitlines()
+        frozen = sh("pip freeze", capture=True)
 
-        # Uninstall South
-        if any(line.startswith("South") for line in frozen):
-            sh("pip uninstall --disable-pip-version-check -y South")
-            uninstalled = True
-
-        # Uninstall edx-val
-        if any("edxval" in line for line in frozen):
-            sh("pip uninstall --disable-pip-version-check -y edxval")
-            uninstalled = True
-
-        # Uninstall django-storages
-        if any("django-storages==" in line for line in frozen):
-            sh("pip uninstall --disable-pip-version-check -y django-storages")
-            uninstalled = True
+        for package in ("South", "edxval", "django-storages", "django-oauth2-provider"):
+            if "{}==".format(package) in frozen:
+                sh("pip uninstall --disable-pip-version-check -y {}".format(package))
+                uninstalled = True
 
         if not uninstalled:
             break

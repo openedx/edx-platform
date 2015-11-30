@@ -32,6 +32,7 @@ django-method-override==0.1.0
 #djangorestframework>=3.1,<3.2
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
 django==1.8.5
+edx-oauth2-provider==0.5.9
 edx-rest-api-client==1.2.1
 elasticsearch==0.4.5
 facebook-sdk==0.4.0
@@ -59,7 +60,6 @@ polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1
-PyJWT==1.0.1
 pymongo==2.9.1
 pyparsing==2.0.1
 python-memcached==1.48
