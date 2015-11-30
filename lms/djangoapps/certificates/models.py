@@ -304,22 +304,18 @@ def certificate_info_for_user(user, course_id, grade, user_is_whitelisted=None):
             user=user, course_id=course_id, whitelist=True
         ).exists()
 
-    eligible_for_certificate = (user_is_whitelisted or grade is not None) and user.profile.allow_certificate
+    certificate_is_delivered = 'N'
+    certificate_type = 'N/A'
+    eligible_for_certificate = 'Y' if (user_is_whitelisted or grade is not None) and user.profile.allow_certificate \
+        else 'N'
 
-    if eligible_for_certificate:
-        user_is_eligible = 'Y'
+    certificate_status = certificate_status_for_student(user, course_id)
+    certificate_generated = certificate_status['status'] == CertificateStatuses.downloadable
+    if certificate_generated:
+        certificate_is_delivered = 'Y'
+        certificate_type = certificate_status['mode']
 
-        certificate_status = certificate_status_for_student(user, course_id)
-        certificate_generated = certificate_status['status'] == CertificateStatuses.downloadable
-        certificate_is_delivered = 'Y' if certificate_generated else 'N'
-
-        certificate_type = certificate_status['mode'] if certificate_generated else 'N/A'
-    else:
-        user_is_eligible = 'N'
-        certificate_is_delivered = 'N'
-        certificate_type = 'N/A'
-
-    return [user_is_eligible, certificate_is_delivered, certificate_type]
+    return [eligible_for_certificate, certificate_is_delivered, certificate_type]
 
 
 class ExampleCertificateSet(TimeStampedModel):
