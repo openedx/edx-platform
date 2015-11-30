@@ -23,7 +23,7 @@ def get_effective_user(requesting_user, target_username):
         raise PermissionDenied()
 
 
-def course_detail(request, username, course_key):
+def course_detail(user, course_key):
     """
     Return a single course identified by `course_key`.
 
@@ -42,7 +42,6 @@ def course_detail(request, username, course_key):
     Return value:
         CourseSerializer object representing the requested course
     """
-    user = get_effective_user(request.user, username)
     try:
         course = get_course_with_access(user, 'see_exists', course_key)
     except Http404:
@@ -50,7 +49,7 @@ def course_detail(request, username, course_key):
     return course
 
 
-def list_courses(request, username):
+def list_courses(user):
     """
     Return a list of available courses.
 
@@ -66,10 +65,7 @@ def list_courses(request, username):
             The name of the user the logged-in user would like to be
             identified as
 
-
     Return value:
         A CourseSerializer object representing the collection of courses.
     """
-    user = get_effective_user(request.user, username)
-    courses = get_courses(user)
-    return courses
+    return get_courses(user)

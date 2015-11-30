@@ -3,8 +3,7 @@ Test for course API
 """
 
 from django.contrib.auth.models import AnonymousUser
-from rest_framework.exceptions import NotFound, PermissionDenied
-from rest_framework.request import Request
+from rest_framework.exceptions import NotFound
 from rest_framework.test import APIRequestFactory
 
 from opaque_keys.edx.keys import CourseKey
@@ -61,14 +60,12 @@ class CourseDetailTestMixin(CourseApiTestMixin):
     """
     Common functionality for course_detail tests
     """
-    def _make_api_call(self, requesting_user, target_user, course_key):
+    def _make_api_call(self, user, course_key):
         """
         Call the `course_detail` api endpoint to get information on the course
         identified by `course_key`.
         """
-        request = Request(self.request_factory.get('/'))
-        request.user = requesting_user
-        return course_detail(request, target_user, course_key)
+        return course_detail(user, course_key)
 
 
 class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
@@ -84,39 +81,33 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
         cls.staff_user = cls.create_user('staff', is_staff=True)
 
     def test_get_existing_course(self):
-        course = self._make_api_call(self.honor_user, self.honor_user.username, self.course.id)
+        course = self._make_api_call(self.honor_user, self.course.id)
         self.verify_course(course)
 
     def test_get_nonexistent_course(self):
         course_key = CourseKey.from_string(u'edX/toy/nope')
         with self.assertRaises(NotFound):
-            self._make_api_call(self.honor_user, self.honor_user.username, course_key)
+            self._make_api_call(self.honor_user, course_key)
 
     def test_hidden_course_for_honor(self):
         with self.assertRaises(NotFound):
-            self._make_api_call(self.honor_user, self.honor_user.username, self.hidden_course.id)
+            self._make_api_call(self.honor_user, self.hidden_course.id)
 
     def test_hidden_course_for_staff(self):
-        course = self._make_api_call(self.staff_user, self.staff_user.username, self.hidden_course.id)
+        course = self._make_api_call(self.staff_user, self.hidden_course.id)
         self.verify_course(course, course_id=u'edX/hidden/2012_Fall')
-
-    def test_hidden_course_for_staff_as_honor(self):
-        with self.assertRaises(NotFound):
-            self._make_api_call(self.staff_user, self.honor_user.username, self.hidden_course.id)
 
 
 class CourseListTestMixin(CourseApiTestMixin):
     """
     Common behavior for list_courses tests
     """
-    def _make_api_call(self, requesting_user, specified_user):
+    def _make_api_call(self, user):
         """
         Call the list_courses api endpoint to get information about
         `specified_user` on behalf of `requesting_user`.
         """
-        request = Request(self.request_factory.get('/'))
-        request.user = requesting_user
-        return list_courses(request, specified_user.username)
+        return list_courses(user)
 
     def verify_courses(self, courses):
         """
@@ -139,35 +130,22 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
         cls.honor_user = cls.create_user("honor", is_staff=False)
 
     def test_as_staff(self):
-        courses = self._make_api_call(self.staff_user, self.staff_user)
+        courses = self._make_api_call(self.staff_user)
         self.assertEqual(len(courses), 1)
         self.verify_courses(courses)
 
-    def test_for_honor_user_as_staff(self):
-        courses = self._make_api_call(self.staff_user, self.honor_user)
-        self.verify_courses(courses)
-
     def test_as_honor(self):
-        courses = self._make_api_call(self.honor_user, self.honor_user)
+        courses = self._make_api_call(self.honor_user)
         self.verify_courses(courses)
-
-    def test_for_staff_user_as_honor(self):
-        with self.assertRaises(PermissionDenied):
-            self._make_api_call(self.honor_user, self.staff_user)
 
     def test_as_anonymous(self):
         anonuser = AnonymousUser()
-        courses = self._make_api_call(anonuser, anonuser)
+        courses = self._make_api_call(anonuser)
         self.verify_courses(courses)
-
-    def test_for_honor_user_as_anonymous(self):
-        anonuser = AnonymousUser()
-        with self.assertRaises(PermissionDenied):
-            self._make_api_call(anonuser, self.staff_user)
 
     def test_multiple_courses(self):
         self.create_course(course='second')
-        courses = self._make_api_call(self.honor_user, self.honor_user)
+        courses = self._make_api_call(self.honor_user)
         self.assertEqual(len(courses), 2)
 
 
@@ -183,15 +161,15 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
         cls.honor_user = cls.create_user("honor", is_staff=False)
 
     def test_no_courses(self):
-        courses = self._make_api_call(self.honor_user, self.honor_user)
+        courses = self._make_api_call(self.honor_user)
         self.assertEqual(len(courses), 0)
 
     def test_hidden_course_for_honor(self):
         self.create_course(visible_to_staff_only=True)
-        courses = self._make_api_call(self.honor_user, self.honor_user)
+        courses = self._make_api_call(self.honor_user)
         self.assertEqual(len(courses), 0)
 
     def test_hidden_course_for_staff(self):
         self.create_course(visible_to_staff_only=True)
-        courses = self._make_api_call(self.staff_user, self.staff_user)
+        courses = self._make_api_call(self.staff_user)
         self.verify_courses(courses)
