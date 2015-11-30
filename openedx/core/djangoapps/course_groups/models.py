@@ -142,11 +142,13 @@ class CohortMembership(models.Model):
         if not success:
             raise IntegrityError("Unable to save membership after {} tries, aborting.".format(max_retries))
 
-    @receiver(pre_delete)
-    def remove_user_from_cohort(sender, instance, **kwargs):
-        instance.course_user_group.users.remove(instance.user)
-        instance.course_user_group.save()
 
+# Ensures CohortMemberships remove underlying course_user_group data on delete
+# Needs to exist outside class definition in order to use 'sender=CohortMembership'
+@receiver(pre_delete, sender=CohortMembership)
+def remove_user_from_cohort(sender, instance, **kwargs):
+    instance.course_user_group.users.remove(instance.user)
+    instance.course_user_group.save()
 
 class CourseUserGroupPartitionGroup(models.Model):
     """
