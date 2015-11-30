@@ -319,6 +319,10 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request, *args, **kwargs):
+        """
+        GET /api/projects/
+        Returns list of projects, optionally filtered by course ID and content ID (simultaneously)
+        """
         target_course_id = self.request.QUERY_PARAMS.get('course_id')
         target_content_id = self.request.QUERY_PARAMS.get('content_id')
         has_target_course, has_target_content = bool(target_course_id), bool(target_content_id)
@@ -333,6 +337,9 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     model = Project
 
     def get_queryset(self):
+        """
+        Returns queryset optionally filtered by course_id and content_id
+        """
         target_course_id = self.request.QUERY_PARAMS.get('course_id')
         target_content_id = self.request.QUERY_PARAMS.get('content_id')
 
