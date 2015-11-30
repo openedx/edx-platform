@@ -11,6 +11,7 @@ from urlparse import urljoin
 import pytz
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pyquery import PyQuery as pq
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -249,7 +250,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.client.login(username="jack", password="test")
         self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
         self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
-        self._check_verification_status_on('audit', 'You\'re auditing this course')
+        self._check_verification_status_off('audit', '')
         self._check_verification_status_on('professional', 'You\'re enrolled as a professional education student')
         self._check_verification_status_on('no-id-professional', 'You\'re enrolled as a professional education student')
 
@@ -269,8 +270,13 @@ class DashboardTest(ModuleStoreTestCase):
             attempt.approve()
 
         response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, "class=\"course {0}\"".format(mode))
-        self.assertNotContains(response, value)
+
+        if mode == 'audit':
+            # Audit mode does not have a banner.  Assert no banner element.
+            self.assertEqual(pq(response.content)(".sts-enrollment").length, 0)
+        else:
+            self.assertNotContains(response, "class=\"course {0}\"".format(mode))
+            self.assertNotContains(response, value)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
     def test_verification_status_invisible(self):
@@ -281,7 +287,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.client.login(username="jack", password="test")
         self._check_verification_status_off('verified', 'You\'re enrolled as a verified student')
         self._check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
-        self._check_verification_status_off('audit', 'You\'re auditing this course')
+        self._check_verification_status_off('audit', '')
 
     def test_course_mode_info(self):
         verified_mode = CourseModeFactory.create(
