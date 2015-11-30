@@ -993,6 +993,7 @@ ADVANCED_COMPONENT_TYPES = [
     'word_cloud',
     'graphical_slider_tool',
     'lti',
+    'lti_consumer',
     'library_content',
     'edx_sga',
     'problem-builder',
