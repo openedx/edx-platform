@@ -173,13 +173,13 @@ def create_ccx(request, course, ccx=None):
     override_field_for_ccx(ccx, course, 'lti_passports', [])
 
     # Hide anything that can show up in the schedule
-    hidden = 'visible_to_staff_only'
-    for chapter in course.get_children():
-        override_field_for_ccx(ccx, chapter, hidden, True)
-        for sequential in chapter.get_children():
-            override_field_for_ccx(ccx, sequential, hidden, True)
-            for vertical in sequential.get_children():
-                override_field_for_ccx(ccx, vertical, hidden, True)
+    # hidden = 'visible_to_staff_only'
+    # for chapter in course.get_children():
+    #     override_field_for_ccx(ccx, chapter, hidden, True)
+    #     for sequential in chapter.get_children():
+    #         override_field_for_ccx(ccx, sequential, hidden, True)
+    #         for vertical in sequential.get_children():
+    #             override_field_for_ccx(ccx, vertical, hidden, True)
 
     ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)  # pylint: disable=no-member
 
