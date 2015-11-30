@@ -185,7 +185,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
         try:
             cohort = CohortMembership.objects.get(
                 course_id=course_key,
-                user__id=user.id,
+                user=user,
             )
             return request_cache.data.setdefault(cache_key, cohort)
         except CourseUserGroup.DoesNotExist:
@@ -210,7 +210,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
         with transaction.atomic():
             membership, created = CohortMembership.objects.get_or_create(
                 course_user_group=cohort,
-                user__id=user.id
+                user=user
             )
             if created:
                 membership.save()
