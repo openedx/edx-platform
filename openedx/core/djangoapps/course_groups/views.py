@@ -394,8 +394,12 @@ def remove_user_from_cohort(request, course_key_string, cohort_id):
 
     try:
         membership = CohortMembership.objects.get(user=user, course_id=course_group.course_id)
+
+        # This atomic() wrapper ensures that the CohortMembership and course_user_group models are updated atomically.
+        # This will be commited to the database immediately.
         with transaction.atomic(): # This is to ensure pre-delete handling is done atomically
             membership.delete()
+
         return json_http_response({'success': True})
     except CohortMembership.DoesNotExist:
         return json_http_response({'success': False,

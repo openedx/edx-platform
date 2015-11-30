@@ -206,12 +206,14 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
                 assignment_type=CourseCohort.RANDOM
             ).course_user_group
 
+        # This block will transactionally commit the membership and the corresponding update to cohort.users
         with transaction.atomic:
-            membership = CohortMembership.objects.get_or_create(
+            membership, created = CohortMembership.objects.get_or_create(
                 course_user_group=cohort,
                 user__id=user.id
             )
-            membership.save()
+            if created:
+                membership.save()
 
         return request_cache.data.setdefault(cache_key, cohort)
 
