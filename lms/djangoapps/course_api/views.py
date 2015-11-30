@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 
 from .api import course_detail, list_courses
+from .permissions import MasqueradingPermission
 from .serializers import CourseSerializer
 
 
@@ -88,6 +89,8 @@ class CourseDetailView(RetrieveAPIView):
             }
     """
 
+    masquerading_param = 'username'
+    permission_classes = [MasqueradingPermission]
     serializer_class = CourseSerializer
     lookup_url_kwarg = 'course_key_string'
 
@@ -96,15 +99,13 @@ class CourseDetailView(RetrieveAPIView):
         Return the requested course object, if the user has appropriate
         permissions.
         """
-
-        username = self.request.query_params.get('username', self.request.user.username)
         course_key_string = self.kwargs[self.lookup_url_kwarg]
         try:
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError:
             raise NotFound()
 
-        return course_detail(self.request, username, course_key)
+        return course_detail(self.request.user, course_key)
 
 
 class CourseListView(ListAPIView):
@@ -162,13 +163,14 @@ class CourseListView(ListAPIView):
             ]
     """
 
-    pagination_class = NamespacedPageNumberPagination
+    masquerading_param = 'username'
+    permission_classes = [MasqueradingPermission]
     serializer_class = CourseSerializer
+    pagination_class = NamespacedPageNumberPagination
     paginate_by = 20
 
     def get_queryset(self):
         """
         Return a list of courses visible to the user.
         """
-        username = self.request.query_params.get('username', self.request.user.username)
-        return list_courses(self.request, username)
+        return list_courses(self.request.user)
