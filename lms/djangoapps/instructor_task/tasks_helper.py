@@ -1505,8 +1505,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                 continue
 
             try:
-                with outer_atomic():
-                    add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
+                add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
                 cohorts_status[cohort_name]['Students Added'] += 1
                 task_progress.succeeded += 1
             except User.DoesNotExist:
