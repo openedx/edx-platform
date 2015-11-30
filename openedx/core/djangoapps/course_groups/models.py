@@ -9,6 +9,8 @@ import logging
 from django.contrib.auth.models import User
 from django.db import models, transaction, IntegrityError
 from django.core.exceptions import ValidationError
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -142,6 +144,10 @@ class CohortMembership(models.Model):
         if not success:
             raise IntegrityError("Unable to save membership after {} tries, aborting.".format(max_retries))
 
+    @receiver(pre_delete)
+    def remove_user_from_cohort(sender, instance, **kwargs):
+        instance.course_user_group.users.remove(instance.user)
+        instance.course_user_group.save()
 
 class CourseUserGroupPartitionGroup(models.Model):
     """
