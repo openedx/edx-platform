@@ -150,6 +150,7 @@ def remove_user_from_cohort(sender, instance, **kwargs):
     instance.course_user_group.users.remove(instance.user)
     instance.course_user_group.save()
 
+
 class CourseUserGroupPartitionGroup(models.Model):
     """
     Create User Partition Info.
