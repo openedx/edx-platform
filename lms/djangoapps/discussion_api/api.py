@@ -696,7 +696,11 @@ def get_thread(request, thread_id):
         thread_id: The id for the thread to retrieve
 
     """
-    cc_thread, context = _get_thread_and_context(request, thread_id)
+    cc_thread, context = _get_thread_and_context(
+        request,
+        thread_id,
+        retrieve_kwargs={"user_id": unicode(request.user.id)}
+    )
     serializer = ThreadSerializer(cc_thread, context=context)
     return serializer.data
 
