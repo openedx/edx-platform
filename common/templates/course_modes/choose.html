@@ -143,15 +143,35 @@ from django.core.urlresolvers import reverse
                             <div class="register-choice register-choice-audit">
                                 <div class="wrapper-copy">
                                     <span class="deco-ribbon"></span>
-                                    <h4 class="title">${_("Audit This Course")}</h4>
+                                    <h4 class="title">${_("Earn an Honor Certificate")}</h4>
                                     <div class="copy">
-                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums. If your work is satisfactory and you abide by the Honor Code, you'll receive a personalized Honor Code Certificate to showcase your achievement.")}</p>
+                                        <p>${_("Take this course for free and have complete access to all the course material, activities, tests, and forums. Please note that learners who earn a passing grade will earn a certificate in this course.")}</p>
                                     </div>
                                 </div>
 
                                 <ul class="list-actions">
                                     <li class="action action-select">
-                                        <input type="submit" name="honor_mode" value="${_('Audit This Course')}" />
+                                        <input type="submit" name="honor_mode" value="${_('Pursue an Honor Certificate')}" />
+                                    </li>
+                                </ul>
+                            </div>
+                        % elif "audit" in modes:
+                            <span class="deco-divider">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+
+                            <div class="register-choice register-choice-audit">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    <h4 class="title">${_("Audit This Course")}</h4>
+                                    <div class="copy">
+                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.  Please note that this track does not offer a certificate for learners who earn a passing grade.")}</p>
+                                    </div>
+                                </div>
+
+                                <ul class="list-actions">
+                                    <li class="action action-select">
+                                        <input type="submit" name="audit_mode" value="${_('Audit This Course')}" />
                                     </li>
                                 </ul>
                             </div>

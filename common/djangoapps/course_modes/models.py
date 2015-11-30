@@ -511,8 +511,27 @@ class CourseMode(models.Model):
         if cls.is_white_label(course_id, modes_dict=modes_dict):
             return False
 
-        # Check that the default mode is available.
-        return cls.DEFAULT_MODE_SLUG in modes_dict
+        # Check that a free mode is available.
+        return cls.AUDIT in modes_dict or cls.HONOR in modes_dict
+
+    @classmethod
+    def auto_enroll_mode(cls, course_id, modes_dict=None):
+        """
+        return the auto-enrollable mode from given dict
+
+        Args:
+            modes_dict (dict): course modes.
+
+        Returns:
+            String: Mode name
+        """
+        if modes_dict is None:
+            modes_dict = cls.modes_for_course_dict(course_id)
+
+        if cls.HONOR in modes_dict:
+            return cls.HONOR
+        elif cls.AUDIT in modes_dict:
+            return cls.AUDIT
 
     @classmethod
     def is_white_label(cls, course_id, modes_dict=None):
@@ -551,96 +570,6 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency.lower() == currency.lower())
-
-    @classmethod
-    def enrollment_mode_display(cls, mode, verification_status):
-        """ Select appropriate display strings and CSS classes.
-
-            Uses mode and verification status to select appropriate display strings and CSS classes
-            for certificate display.
-
-            Args:
-                mode (str): enrollment mode.
-                verification_status (str) : verification status of student
-
-            Returns:
-                dictionary:
-        """
-
-        # import inside the function to avoid the circular import
-        from student.helpers import (
-            VERIFY_STATUS_NEED_TO_VERIFY,
-            VERIFY_STATUS_SUBMITTED,
-            VERIFY_STATUS_APPROVED
-        )
-
-        show_image = False
-        image_alt = ''
-
-        if mode == cls.VERIFIED:
-            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
-                enrollment_title = _("Your verification is pending")
-                enrollment_value = _("Verified: Pending Verification")
-                show_image = True
-                image_alt = _("ID verification pending")
-            elif verification_status == VERIFY_STATUS_APPROVED:
-                enrollment_title = _("You're enrolled as a verified student")
-                enrollment_value = _("Verified")
-                show_image = True
-                image_alt = _("ID Verified Ribbon/Badge")
-            else:
-                enrollment_title = _("You're enrolled as an honor code student")
-                enrollment_value = _("Honor Code")
-        elif mode == cls.HONOR:
-            enrollment_title = _("You're enrolled as an honor code student")
-            enrollment_value = _("Honor Code")
-        elif mode == cls.AUDIT:
-            enrollment_title = _("You're auditing this course")
-            enrollment_value = _("Auditing")
-        elif mode in [cls.PROFESSIONAL, cls.NO_ID_PROFESSIONAL_MODE]:
-            enrollment_title = _("You're enrolled as a professional education student")
-            enrollment_value = _("Professional Ed")
-        else:
-            enrollment_title = ''
-            enrollment_value = ''
-
-        return {
-            'enrollment_title': unicode(enrollment_title),
-            'enrollment_value': unicode(enrollment_value),
-            'show_image': show_image,
-            'image_alt': unicode(image_alt),
-            'display_mode': cls._enrollment_mode_display(mode, verification_status)
-        }
-
-    @staticmethod
-    def _enrollment_mode_display(enrollment_mode, verification_status):
-        """Checking enrollment mode and status and returns the display mode
-         Args:
-            enrollment_mode (str): enrollment mode.
-            verification_status (str) : verification status of student
-
-        Returns:
-            display_mode (str) : display mode for certs
-        """
-
-        # import inside the function to avoid the circular import
-        from student.helpers import (
-            VERIFY_STATUS_NEED_TO_VERIFY,
-            VERIFY_STATUS_SUBMITTED,
-            VERIFY_STATUS_APPROVED
-        )
-
-        if enrollment_mode == CourseMode.VERIFIED:
-            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
-                display_mode = "verified"
-            else:
-                display_mode = "honor"
-        elif enrollment_mode in [CourseMode.PROFESSIONAL, CourseMode.NO_ID_PROFESSIONAL_MODE]:
-            display_mode = "professional"
-        else:
-            display_mode = enrollment_mode
-
-        return display_mode
 
     def to_tuple(self):
         """
