@@ -1,6 +1,7 @@
 """
 Tests for users API
 """
+# pylint: disable=no-member
 import datetime
 import ddt
 from mock import patch
@@ -11,6 +12,7 @@ from django.utils import timezone
 from django.template import defaultfilters
 from django.test import RequestFactory
 
+from certificates.api import generate_user_certificates
 from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory
 from courseware.access_response import (
@@ -184,7 +186,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         certificate_data = response.data[0]['certificate']
         self.assertDictEqual(certificate_data, {})
 
-    def test_certificate(self):
+    def test_pdf_certificate(self):
         self.login_and_enroll()
 
         certificate_url = "http://test_certificate_url"
@@ -199,6 +201,27 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
         self.assertEquals(certificate_data['url'], certificate_url)
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_web_certificate(self):
+        self.login_and_enroll()
+
+        self.course.cert_html_view_enabled = True
+        self.store.update_item(self.course, self.user.id)
+
+        with patch('courseware.grades.grade') as mock_grade:
+            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
+            generate_user_certificates(self.user, self.course.id)
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']
+        self.assertRegexpMatches(
+            certificate_data['url'],
+            r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
+                user_id=self.user.id,
+                course_id=self.course.id,
+            )
+        )
 
     def test_no_facebook_url(self):
         self.login_and_enroll()

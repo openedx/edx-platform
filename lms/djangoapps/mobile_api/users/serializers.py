@@ -8,7 +8,7 @@ from django.template import defaultfilters
 
 from courseware.access import has_access
 from student.models import CourseEnrollment, User
-from certificates.models import certificate_status_for_student, CertificateStatuses
+from certificates.api import certificate_downloadable_status
 from xmodule.course_module import DEFAULT_START_DATE
 
 
@@ -102,10 +102,12 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     def get_certificate(self, model):
         """Returns the information about the user's certificate in the course."""
-        certificate_info = certificate_status_for_student(model.user, model.course_id)
-        if certificate_info['status'] == CertificateStatuses.downloadable:
+        certificate_info = certificate_downloadable_status(model.user, model.course_id)
+        if certificate_info['is_downloadable']:
             return {
-                "url": certificate_info['download_url'],
+                'url': self.context['request'].build_absolute_uri(
+                    certificate_info['download_url']
+                ),
             }
         else:
             return {}
