@@ -2,6 +2,7 @@
 Django models related to course groups functionality.
 """
 
+import time
 import json
 import logging
 
@@ -113,6 +114,7 @@ class CohortMembership(models.Model):
                 }
             )
 
+            time.sleep(10)
             # If the membership was newly created, all the validation and course_user_group logic was settled
             # with a call to self.save(force_insert=True), which gets handled above.
             if created:
