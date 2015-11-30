@@ -98,12 +98,9 @@ class CohortMembership(models.Model):
         success = False
         for __ in range(max_retries):
 
-            # This block will transactionally commit updates to CohortMembership and underlying course_user_groups.
             with transaction.atomic():
 
                 try:
-                    # This block is atomic in order to make CohortMembership creation a small operation.
-                    # It will commit the creation of the new CohortMembership, if needed.
                     with transaction.atomic():
                         saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
                             user__id=self.user.id,
@@ -126,11 +123,9 @@ class CohortMembership(models.Model):
                     self.previous_cohort_name = saved_membership.course_user_group.name
                     self.previous_cohort_id = saved_membership.course_user_group.id
                     self.previous_cohort.users.remove(self.user)
-                    self.previous_cohort.save()
 
                 saved_membership.course_user_group = self.course_user_group
                 self.course_user_group.users.add(self.user)
-                self.course_user_group.save()
 
                 super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
 
