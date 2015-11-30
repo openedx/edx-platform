@@ -70,3 +70,6 @@ git+https://github.com/edx/ecommerce-api-client.git@0.4.3#egg=ecommerce-api-clie
 
 # OLI XBlocks
 -e git+https://github.com/openlearninginitiative/xblock-image-coding.git@cee23e3d59943066159ca13839c82a12d9ccf749#egg=xblock_image_coding
+
+# Stanford XBlocks
+-e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@a34e78871f79afc8b14ed47410cee813d96421e4#egg=xblock-qualtrics-survey
