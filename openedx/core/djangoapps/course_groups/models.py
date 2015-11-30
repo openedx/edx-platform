@@ -124,9 +124,11 @@ class CohortMembership(models.Model):
                     self.previous_cohort_name = saved_membership.course_user_group.name
                     self.previous_cohort_id = saved_membership.course_user_group.id
                     self.previous_cohort.users.remove(self.user)
+                    self.previous_cohort.save()
 
                 saved_membership.course_user_group = self.course_user_group
                 self.course_user_group.users.add(self.user)
+                self.course_user_group.save()
 
                 time.sleep(10)
                 super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
