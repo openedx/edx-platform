@@ -8,7 +8,10 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models, transaction, IntegrityError
+from util.db import outer_atomic
 from django.core.exceptions import ValidationError
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -99,7 +102,8 @@ class CohortMembership(models.Model):
         success = False
         for __ in range(max_retries):
 
-            with transaction.atomic():
+            # This block will transactionally commit updates to CohortMembership and underlying course_user_groups.
+            with outer_atomic():
 
                 try:
                     with transaction.atomic():
@@ -138,6 +142,14 @@ class CohortMembership(models.Model):
 
         if not success:
             raise IntegrityError("Unable to save membership after {} tries, aborting.".format(max_retries))
+
+
+# Ensures CohortMemberships remove underlying course_user_group data on delete
+# Needs to exist outside class definition in order to use 'sender=CohortMembership'
+@receiver(pre_delete, sender=CohortMembership)
+def remove_user_from_cohort(sender, instance, **kwargs):
+    instance.course_user_group.users.remove(instance.user)
+    instance.course_user_group.save()
 
 
 class CourseUserGroupPartitionGroup(models.Model):
