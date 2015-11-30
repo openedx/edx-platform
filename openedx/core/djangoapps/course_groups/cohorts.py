@@ -6,6 +6,7 @@ forums, and to the cohort admin views.
 import logging
 import random
 
+from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.http import Http404
@@ -180,36 +181,39 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
         return request_cache.data.setdefault(cache_key, None)
 
     # If course is cohorted, check if the user already has a cohort.
-    try:
-        cohort = CourseUserGroup.objects.get(
-            course_id=course_key,
-            group_type=CourseUserGroup.COHORT,
-            users__id=user.id,
-        )
-        return request_cache.data.setdefault(cache_key, cohort)
-    except CourseUserGroup.DoesNotExist:
-        # Didn't find the group. If we do not want to assign, return here.
-        if not assign:
+    if not assign: # Check assign first, so as to use django's get_or_create() below if able
+        try:
+            cohort = CohortMembership.objects.get(
+                course_id=course_key,
+                user__id=user.id,
+            )
+            return request_cache.data.setdefault(cache_key, cohort)
+        except CourseUserGroup.DoesNotExist:
             # Do not cache the cohort here, because in the next call assign
             # may be True, and we will have to assign the user a cohort.
             return None
 
-    # Otherwise assign the user a cohort.
-    course = courses.get_course(course_key)
-    cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
-    if cohorts:
-        cohort = local_random().choice(cohorts)
     else:
-        cohort = CourseCohort.create(
-            cohort_name=DEFAULT_COHORT_NAME,
-            course_id=course_key,
-            assignment_type=CourseCohort.RANDOM
-        ).course_user_group
+        # Otherwise assign the user a cohort.
+        course = courses.get_course(course_key)
+        cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
+        if cohorts:
+            cohort = local_random().choice(cohorts)
+        else:
+            cohort = CourseCohort.create(
+                cohort_name=DEFAULT_COHORT_NAME,
+                course_id=course_key,
+                assignment_type=CourseCohort.RANDOM
+            ).course_user_group
 
-    membership = CohortMembership(course_user_group=cohort, user=user)
-    membership.save()
+        with transaction.atomic:
+            membership = CohortMembership.objects.get_or_create(
+                course_user_group=cohort,
+                user__id=user.id
+            )
+            membership.save()
 
-    return request_cache.data.setdefault(cache_key, cohort)
+        return request_cache.data.setdefault(cache_key, cohort)
 
 
 def migrate_cohort_settings(course):
