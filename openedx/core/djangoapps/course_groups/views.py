@@ -12,6 +12,7 @@ from django.views.decorators.http import require_http_methods
 from util.json_request import expect_json, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext
+from django.db import transaction
 
 import logging
 import re
@@ -384,15 +385,25 @@ def remove_user_from_cohort(request, course_key_string, cohort_id):
         return json_http_response({'success': False,
                                    'msg': 'No username specified'})
 
-    cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
     try:
         user = User.objects.get(username=username)
-        cohort.users.remove(user)
-        return json_http_response({'success': True})
     except User.DoesNotExist:
         log.debug('no user')
         return json_http_response({'success': False,
                                    'msg': "No user '{0}'".format(username)})
+
+    try:
+        membership = CohortMembership.objects.get(user=user, course_id=course_group.course_id)
+
+        # This atomic() wrapper ensures that the CohortMembership and course_user_group models are updated atomically.
+        # This will be commited to the database immediately.
+        with transaction.atomic():  # This is to ensure pre-delete handling is done atomically
+            membership.delete()
+
+        return json_http_response({'success': True})
+    except CohortMembership.DoesNotExist:
+        return json_http_response({'success': False,
+                                   'msg': "User '{0}' was not present in cohort '{1}'".format(username, cohort_id)})
 
 
 def debug_cohort_mgmt(request, course_key_string):
