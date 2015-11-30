@@ -2,6 +2,7 @@
 Django models related to course groups functionality.
 """
 
+import time
 import json
 import logging
 
@@ -127,6 +128,7 @@ class CohortMembership(models.Model):
                 saved_membership.course_user_group = self.course_user_group
                 self.course_user_group.users.add(self.user)
 
+                time.sleep(10)
                 super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
 
             success = True
