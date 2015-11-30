@@ -2,40 +2,43 @@
 Static file finders for Django.
 https://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-STATICFILES_FINDERS
 Yes, this interface is private and undocumented, but we need to access it anyway.
+
+A little explanation would go a long way here.. I'm sure the rationale
+is obvious to you already, but it's not to me now. A future developer
+likely won't understand why either.
+For these kinds of decisions, it's important to know _why_ you arrived at
+your conclusion, not just that you did. The lack of explanation now
+means additional/redundant discovery work on behalf of a future
+developer who audits this functionality.
 """
+from os.path import basename
+
 from path import Path
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
+
+from openedx.core.djangoapps.theming.core import get_paths
 from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingStorage
 
 
 class ComprehensiveThemeFinder(BaseFinder):
     """
     A static files finder that searches the active comprehensive theme
-    for static files. If the ``COMP_THEME_DIR`` setting is unset, or the
-    ``COMP_THEME_DIR`` does not exist on the file system, this finder will
+    for static files. If the ``COMPREHENSIVE_THEMING_DIRECTORY`` setting
+    is unset or does not exist on the file system, this finder will
     never find any files.
     """
     def __init__(self, *args, **kwargs):
         super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
-
-        COMP_THEME_DIR = getattr(settings, "COMP_THEME_DIR", "")  # pylint: disable=invalid-name
-        if not COMP_THEME_DIR:
+        path_theme = Path(settings.COMPREHENSIVE_THEMING_DIRECTORY)
+        if not path_theme:
             self.storage = None
             return
-
-        if not isinstance(COMP_THEME_DIR, basestring):
-            raise ImproperlyConfigured("Your COMP_THEME_DIR setting must be a string")
-
-        PROJECT_ROOT = getattr(settings, "PROJECT_ROOT", "")  # pylint: disable=invalid-name
-        if PROJECT_ROOT.endswith("cms"):
-            THEME_STATIC_DIR = Path(COMP_THEME_DIR) / "studio" / "static"  # pylint: disable=invalid-name
-        else:
-            THEME_STATIC_DIR = Path(COMP_THEME_DIR) / "lms" / "static"  # pylint: disable=invalid-name
-
-        self.storage = CachedComprehensiveThemingStorage(location=THEME_STATIC_DIR)
+        paths = get_paths(path_theme)
+        self.storage = CachedComprehensiveThemingStorage(location=paths['static'])
 
     def find(self, path, all=False):  # pylint: disable=redefined-builtin
         """

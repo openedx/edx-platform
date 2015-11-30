@@ -103,6 +103,27 @@ You should **not** use the following names in your comprehensive theme:
 
 * ``themable-footer.html``
 
+
+Why the term "themable"? That implies something _could_ be themed, but
+in this context, the footer _always_ _is_ themed. As is, the name is
+misleading. Further, we now have at least 3 different files that may
+need changed in order to theme a footer; ugh..
+- themable-footer.html
+- theme-footer.html
+- footer.html
+
+It's worth considering that if we're already imposing breaking changes
+on site operators, then we should just jump in and skip half-measure
+work-arounds. As a theme maintainer, I _really_ don't want to be
+auditing and updating my theme each and every merge from upstream. If
+I'm going to devote a sprint to bringing our theme into compliance, I
+don't want to make it a regular habit. But once I'm already in there,
+this shouldn't be anything more than renaming a file to avoid the naming
+conflict with ``footer.html``, right?
+
+Can we just call this ``footer.html`` and be done with it?
+
+
 If you look at the ``main.html`` template file, you will notice that it includes
 ``header.html`` and ``themable-footer.html``, rather than ``footer.html``.
 You might be inclined to override ``themable-footer.html`` as a result. DO NOT
@@ -133,11 +154,16 @@ directory. There are two ways to do this.
             $ sudo /edx/bin/update edx-platform HEAD
 
 #.  Otherwise, edit the /edx/app/edxapp/lms.env.json file to add the
-    ``COMP_THEME_DIR`` value::
+    ``COMPREHENSIVE_THEMING_DIRECTORY`` value::
 
-        "COMP_THEME_DIR": "/full/path/to/my-theme",
+        "COMPREHENSIVE_THEMING_DIRECTORY": "/full/path/to/my-theme",
 
 Restart your site.  Your changes should now be visible.
+
+
+Comprehensive Theming
+=====================
+* The ``PROFILE_IMAGE_DEFAULT_FILENAME`` Django setting is now ignored.
 
 
 "Stanford" theming
@@ -194,6 +220,19 @@ other templates:
 
 * ``google_tag_manager.html`` has been renamed to ``body-initial.html``.
 
+* What is the connection between these two files/names?
+
+* What is the shared functionality here?
+
+* It's worth nothing that this is actually a much larger change than
+  "just moving stuff around". By moving this declaration from the
+  beginning to the end of the BODY, you risk breaking any JavaScript in
+  the BODY that had previously assumed the DOM/global namespace had
+  already been modified. It's possible it's a non-issue, but it's not
+  apparent that this has been taken into consideration.
+
+* Which microsites did you test this with?
+
 In addition, there are some other changes you'll need to make:
 
 * The ``google_analytics_file`` config value is now ignored. If your Open edX
@@ -209,6 +248,36 @@ In addition, there are some other changes you'll need to make:
   "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string, and then load
   Google Analytics yourself (with whatever customizations you want) in your
   ``head-extra.html`` template.
+
+
+    If you want to customize the way that Google Analytics is loaded, [...]
+    then load Google Analytics yourself
+
+Why go to all of this work to allow instances to selectively theme
+content if we're going to turn right around and force them to edit less
+intuitively labeled locations?
+
+Of particular frustration is the idea that if I want/need to override
+the GA code, I can no longer use `settings.GOOGLE_ANALYTICS_ACCOUNT`
+variable, as doing so would implicitly enable the SCRIPT tag in multiple
+locations. This not only fails to follow the principle of least
+surprise, but it also imposes additional work on the implementations'
+behalf; now I have to create _another_ setting, with a different name,
+to do the same thing, just to avoid hard-coding a theme. Worse yet, this
+also prevents me from parameterizing the setting via Ansible/JSON,
+_unless_ I also fork the platform code. If you're going to make me fork
+platform code just to override a variable, you're doing something wrong.
+
+It's unclear why this change was deemed necessary, particularly when it
+causes a regression in customization.
+
+That all said, while some generalization may be in order, I think there
+is a common enough use-case for including a generalized "analytics"
+file. Many instances may use Google Analytics, but many be chose (or
+even be legally required!) to use some other analytics backend. This
+could range from Piwik to in-house analytics to benchmarking libraries.
+But this could configured/overridden from the single
+`head-analytics.html` file.
 
 * The ``css_overrides_file`` config value is now ignored. To add a CSS override
   file to your microsite, create a ``head-extra.html`` template with the

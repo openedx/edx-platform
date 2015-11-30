@@ -3,10 +3,16 @@ Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
 import os.path
+from path import Path
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
 from django.utils._os import safe_join
+
+from pipeline.storage import PipelineMixin, NonPackagingMixin
+from require.storage import OptimizedFilesMixin
+
+from openedx.core.djangoapps.theming.core import get_paths
 
 
 class ComprehensiveThemingAwareMixin(object):
@@ -17,30 +23,22 @@ class ComprehensiveThemingAwareMixin(object):
     """
     def __init__(self, *args, **kwargs):
         super(ComprehensiveThemingAwareMixin, self).__init__(*args, **kwargs)
-        COMP_THEME_DIR = getattr(settings, "COMP_THEME_DIR", "")  # pylint: disable=invalid-name
-        if not COMP_THEME_DIR:
+        path_theme = Path(settings.COMPREHENSIVE_THEMING_DIRECTORY)
+        if not path_theme:
             self.theme_location = None
             return
-
-        if not isinstance(COMP_THEME_DIR, basestring):
-            raise ImproperlyConfigured("Your COMP_THEME_DIR setting must be a string")
-
-        PROJECT_ROOT = getattr(settings, "PROJECT_ROOT", "")  # pylint: disable=invalid-name
-        if PROJECT_ROOT.endswith("cms"):
-            component = "studio"
-        else:
-            component = "lms"
-        self.theme_location = os.path.join(COMP_THEME_DIR, component, "static")
+        paths = get_paths(path_theme)
+        self.theme_location = paths['static']
 
     @property
     def prefix(self):
         """
         This is used by the ComprehensiveThemeFinder in the collection step.
         """
-        COMP_THEME_DIR = getattr(settings, "COMP_THEME_DIR", "")  # pylint: disable=invalid-name
-        if not COMP_THEME_DIR:
+        pathname_theme = settings.COMPREHENSIVE_THEMING_DIRECTORY
+        if not pathname_theme:
             return None
-        theme_name = os.path.basename(os.path.normpath(COMP_THEME_DIR))
+        theme_name = os.path.basename(os.path.normpath(pathname_theme))
         return "themes/{name}/".format(name=theme_name)
 
     def themed(self, name):
@@ -80,8 +78,37 @@ class CachedComprehensiveThemingStorage(
         CachedFilesMixin,
         StaticFilesStorage
     ):  # nopep8
+    # What quality violations are we silencing here?
     """
     Used by the ComprehensiveThemeFinder class. Mixes in support for cached
     files and comprehensive theming in static files.
+    """
+    pass
+
+
+class ProductionStorage(
+        ComprehensiveThemingAwareMixin,
+        OptimizedFilesMixin,
+        PipelineMixin,
+        CachedFilesMixin,
+        StaticFilesStorage
+    ):  # nopep8
+    """
+    This class combines Django's StaticFilesStorage class with several mixins
+    that provide additional functionality. We use this version on production.
+    """
+    pass
+
+
+class DevelopmentStorage(
+        ComprehensiveThemingAwareMixin,
+        NonPackagingMixin,
+        PipelineMixin,
+        StaticFilesStorage
+    ):  # nopep8
+    """
+    This class combines Django's StaticFilesStorage class with several mixins
+    that provide additional functionality. We use this version for development,
+    so that we can skip packaging and optimization.
     """
     pass
