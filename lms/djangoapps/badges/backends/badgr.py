@@ -108,7 +108,10 @@ class BadgrBackend(BadgeBackend):
             'slug': self._slugify(badge_class),
             'description': badge_class.description,
         }
-        result = requests.post(self._badge_create_url, headers=self._get_headers(), data=data, files=files)
+        result = requests.post(
+            self._badge_create_url, headers=self._get_headers(), data=data, files=files,
+            timeout=settings.BADGR_TIMEOUT
+        )
         self._log_if_raised(result, data)
 
     def _send_assertion_created_event(self, user, assertion):
@@ -139,7 +142,8 @@ class BadgrBackend(BadgeBackend):
             'evidence': evidence_url,
         }
         response = requests.post(
-            self._assertion_url(self._slugify(badge_class)), headers=self._get_headers(), data=data
+            self._assertion_url(self._slugify(badge_class)), headers=self._get_headers(), data=data,
+            timeout=settings.BADGR_TIMEOUT
         )
         self._log_if_raised(response, data)
         assertion, __ = BadgeAssertion.objects.get_or_create(user=user, badge_class=badge_class)
@@ -165,7 +169,7 @@ class BadgrBackend(BadgeBackend):
         slug = self._slugify(badge_class)
         if slug in BadgrBackend.badges:
             return
-        response = requests.get(self._badge_url(slug), headers=self._get_headers())
+        response = requests.get(self._badge_url(slug), headers=self._get_headers(), timeout=settings.BADGR_TIMEOUT)
         if response.status_code != 200:
             self._create_badge(badge_class)
         BadgrBackend.badges.append(slug)
