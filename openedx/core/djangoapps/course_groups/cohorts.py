@@ -181,7 +181,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
         return request_cache.data.setdefault(cache_key, None)
 
     # If course is cohorted, check if the user already has a cohort.
-    if not assign: # Check assign first, so as to use django's get_or_create() below if able
+    if not assign:  # Check assign first, so as to use django's get_or_create() below if able
         try:
             cohort = CohortMembership.objects.get(
                 course_id=course_key,
