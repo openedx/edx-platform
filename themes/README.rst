@@ -192,9 +192,7 @@ other templates:
 * ``google_analytics.html`` has been removed. The contents of this template
   can and should be added to the ``head-extra.html`` template.
 
-* ``google_tag_manager.html`` has been renamed to ``body-extra.html``. The
-  template include has been adjusted so that it is included at the *end* of
-  the ``<body>`` element, rather than at the start.
+* ``google_tag_manager.html`` has been renamed to ``body-initial.html``.
 
 In addition, there are some other changes you'll need to make:
 
