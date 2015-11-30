@@ -30,13 +30,6 @@
             expect($('.skip-control')).toExist();
         });
 
-        it('add ARIA attributes to play control', function () {
-            state.el.trigger('play');
-            expect($('.skip-control')).toHaveAttrs({
-                'aria-disabled': 'false'
-            });
-        });
-
         it('can skip the video on click', function () {
             spyOn(state.bumperState.videoBumper, 'skipAndDoNotShowAgain');
             state.el.trigger('play');
