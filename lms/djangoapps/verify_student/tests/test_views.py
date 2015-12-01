@@ -1875,6 +1875,12 @@ class TestReverifyView(TestCase):
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(success, msg="Could not log in")
 
+    def test_reverify_view_can_do_initial_verification(self):
+        """
+        Test that a User can use reverify link for initial verification.
+        """
+        self._assert_can_reverify()
+
     def test_reverify_view_can_reverify_denied(self):
         # User has a denied attempt, so can reverify
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -1897,14 +1903,22 @@ class TestReverifyView(TestCase):
         # Allow the student to reverify
         self._assert_can_reverify()
 
-    def test_reverify_view_cannot_reverify_pending(self):
+    def test_reverify_view_can_reverify_pending(self):
+        """ Test that the user can still re-verify even if the previous photo
+        verification is in pending state.
+
+        A photo verification is considered in pending state when the user has
+        either submitted the photo verification (status in database: 'submitted')
+        or photo verification submission failed (status in database: 'must_retry').
+        """
+
         # User has submitted a verification attempt, but Software Secure has not yet responded
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         attempt.mark_ready()
         attempt.submit()
 
-        # Cannot reverify because an attempt has already been submitted.
-        self._assert_cannot_reverify()
+        # Can re-verify because an attempt has already been submitted.
+        self._assert_can_reverify()
 
     def test_reverify_view_cannot_reverify_approved(self):
         # Submitted attempt has been approved
@@ -1948,8 +1962,6 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         """
         Build up a course tree with a Reverificaiton xBlock.
         """
-        # pylint: disable=attribute-defined-outside-init
-
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 

@@ -22,7 +22,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, unused-import, unused-wildcard-import, invalid-name
+# pylint: disable=wildcard-import, unused-import, unused-wildcard-import
 
 # Pylint gets confused by path.py instances, which report themselves as class
 # objects. As a result, pylint applies the wrong regex in validating names,
@@ -1282,6 +1282,9 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
+    'js/vendor/afontgarde/afontgarde.js',
+    'js/vendor/afontgarde/edx-icons.js',
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
@@ -1385,6 +1388,7 @@ credit_web_view_js = [
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
+            'js/vendor/afontgarde/afontgarde.css',
             'css/vendor/font-awesome.css',
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
@@ -2672,7 +2676,7 @@ CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
 CREDIT_TASK_MAX_RETRIES = 5
 
 # Dummy secret key for dev/test
-SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+SECRET_KEY = 'dev key'
 
 # Secret keys shared with credit providers.
 # Used to digitally sign credit requests (us --> provider)
@@ -2722,3 +2726,10 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+#### Custom Courses for EDX (CCX) configuration
+
+# This is an arbitrary hard limit.
+# The reason we introcuced this number is because we do not want the CCX
+# to compete with the MOOC.
+CCX_MAX_STUDENTS_ALLOWED = 200

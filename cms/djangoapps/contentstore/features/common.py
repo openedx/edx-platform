@@ -3,7 +3,7 @@
 
 import os
 from lettuce import world, step
-from nose.tools import assert_true, assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_in
 from django.conf import settings
 
 from student.roles import CourseStaffRole, CourseInstructorRole, GlobalStaff

@@ -325,7 +325,7 @@ class @CombinedOpenEnded
         @submit_button.hide()
         @queueing()
         @grader_status = @$(@grader_status_sel)
-        @grader_status.html("<span class='grading'>" + gettext "Your response has been submitted. Please check back later for your grade." + "</span>")
+        @grader_status.html("<span class='grading'>" + (gettext "Your response has been submitted. Please check back later for your grade.") + "</span>")
       else if @child_type == "selfassessment"
         @setup_score_selection()
     else if @child_state == 'post_assessment'

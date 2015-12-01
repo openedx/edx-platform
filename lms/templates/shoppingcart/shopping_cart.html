@@ -67,7 +67,7 @@ from django.utils.translation import ungettext
         <div class="clearfix">
         <div class="image">
           <img class="item-image" src="${course_image_url(course)}"
-              alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} ${_('Cover Image')}" />
+              alt="${course.display_number_with_default | h} ${get_course_about_section(request, course, 'title')} ${_('Cover Image')}" />
         </div>
         <div class="data-input">
           ## Translators: "Registration for:" is followed by a course name

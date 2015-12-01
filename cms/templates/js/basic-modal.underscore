@@ -1,7 +1,5 @@
 <div class="wrapper wrapper-modal-window wrapper-modal-window-<%= name %>"
-     aria-describedby="modal-window-description"
      aria-labelledby="modal-window-title"
-     aria-hidden=""
      role="dialog">
     <div class="modal-window-overlay"></div>
     <div class="modal-window <%= viewSpecificClasses %> modal-<%= size %> modal-type-<%= type %>" tabindex="-1" aria-labelledby="modal-window-title">

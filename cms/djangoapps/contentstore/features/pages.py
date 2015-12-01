@@ -3,7 +3,7 @@
 # pylint: disable=unused-argument
 
 from lettuce import world, step
-from nose.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_equal, assert_in
 
 
 CSS_FOR_TAB_ELEMENT = "li[data-tab-id='{0}'] input.toggle-checkbox"

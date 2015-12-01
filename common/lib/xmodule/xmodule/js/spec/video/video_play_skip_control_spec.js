@@ -27,8 +27,6 @@
 
         it('add ARIA attributes to play control', function () {
             expect($('.video_control.play')).toHaveAttrs({
-                'role': 'button',
-                'title': 'Play',
                 'aria-disabled': 'false'
             });
         });

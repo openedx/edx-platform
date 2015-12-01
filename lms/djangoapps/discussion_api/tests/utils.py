@@ -301,6 +301,16 @@ class CommentsServiceMockMixin(object):
         """
         self.assert_query_params_equal(httpretty.last_request(), expected_params)
 
+    def request_patch(self, request_data):
+        """
+        make a request to PATCH endpoint and return response
+        """
+        return self.client.patch(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/merge-patch+json"
+        )
+
 
 def make_minimal_cs_thread(overrides=None):
     """

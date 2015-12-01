@@ -531,9 +531,9 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         get_coupon = Coupon.objects.get(id=1)
         request = HttpRequest()
         request.user = admin
-        setattr(request, 'session', 'session')
+        request.session = 'session'
         messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
+        request._messages = messages        # pylint: disable=protected-access
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
         test_query_set = coupon_admin.queryset(request)
         test_actions = coupon_admin.get_actions(request)
@@ -1546,7 +1546,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
-        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=getattr(expired_course_item, 'course_id'),
+        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=expired_course_item.course_id,
                                                             order=expired_course_item.order_id)
         self.assertEqual(coupon_redemption.count(), 1)
         # testing_course enrollment is closed but the course is in the cart
@@ -1557,7 +1557,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
 
         # now the redemption entry should be deleted from the table.
-        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=getattr(expired_course_item, 'course_id'),
+        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=expired_course_item.course_id,
                                                             order=expired_course_item.order_id)
         self.assertEqual(coupon_redemption.count(), 0)
         ((template, context), _tmp) = render_mock.call_args

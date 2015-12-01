@@ -19,7 +19,7 @@ class LibraryEditPageTest(StudioLibraryTest):
     """
     Test the functionality of the library edit page.
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """
         Ensure a library exists and navigate to the library edit page.
         """
@@ -192,7 +192,7 @@ class LibraryNavigationTest(StudioLibraryTest):
     """
     Test common Navigation actions
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """
         Ensure a library exists and navigate to the library edit page.
         """
@@ -206,7 +206,6 @@ class LibraryNavigationTest(StudioLibraryTest):
         Create four pages worth of XBlocks, and offset by one so each is named
         after the number they should be in line by the user's perception.
         """
-        # pylint: disable=attribute-defined-outside-init
         self.blocks = [XBlockFixtureDesc('html', str(i)) for i in xrange(1, 41)]
         library_fixture.add_children(*self.blocks)
 
@@ -656,7 +655,13 @@ class StudioLibraryA11yTest(StudioLibraryTest):
         # There are several existing color contrast errors on this page,
         # we will ignore this error in the test until we fix them.
         lib_page.a11y_audit.config.set_rules({
-            "ignore": ['color-contrast'],
+            "ignore": [
+                'color-contrast',  # TODO: AC-225
+                'link-href',  # TODO: AC-226
+                'nav-aria-label',  # TODO: AC-227
+                'skip-link',  # TODO: AC-228
+                'icon-aria-hidden',  # TODO: AC-229
+            ],
         })
 
         lib_page.a11y_audit.check_for_accessibility_errors()

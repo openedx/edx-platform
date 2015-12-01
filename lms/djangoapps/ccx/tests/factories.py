@@ -12,5 +12,5 @@ class CcxFactory(DjangoModelFactory):  # pylint: disable=missing-docstring
         model = CustomCourseForEdX
 
     display_name = "Test CCX"
-    id = None  # pylint: disable=redefined-builtin, invalid-name
+    id = None  # pylint: disable=invalid-name
     coach = SubFactory(UserFactory)

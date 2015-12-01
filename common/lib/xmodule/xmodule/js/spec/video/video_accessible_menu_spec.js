@@ -260,7 +260,7 @@
                     state.videoSpeedControl.setSpeed(1.0);
                     spyOn(state.videoPlayer, 'onSpeedChange').andCallThrough();
 
-                    $('li[data-speed="0.75"] a').click();
+                    $('li[data-speed="0.75"] .speed-link').click();
                 });
 
                 it('trigger speedChange event', function () {
@@ -274,7 +274,7 @@
         xdescribe('onSpeedChange', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
-                $('li[data-speed="1.0"] a').addClass('active');
+                $('li[data-speed="1.0"] .speed-link').addClass('active');
                 state.videoSpeedControl.setSpeed(0.75);
             });
 

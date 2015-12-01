@@ -140,6 +140,7 @@
         "spyOnEvent",
 
         // Miscellaneous globals
-        "JSON"
+        "JSON",
+        "gettext"
     ]
 }

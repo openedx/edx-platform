@@ -60,7 +60,7 @@ class AuthNotConfigured(SocialAuthBaseException):
         self.provider_name = provider_name
 
     def __str__(self):
-        return _('Authentication with {} is currently unavailable.').format(  # pylint: disable=no-member
+        return _('Authentication with {} is currently unavailable.').format(
             self.provider_name
         )
 
@@ -590,7 +590,7 @@ class ProviderApiPermissions(models.Model):
         )
     )
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         app_label = "third_party_auth"
         verbose_name = "Provider API Permission"
         verbose_name_plural = verbose_name + 's'

@@ -1,2 +1,2 @@
-common/static/js/vendor
-lms/static/js/vendor
+**/vendor
+node_modules

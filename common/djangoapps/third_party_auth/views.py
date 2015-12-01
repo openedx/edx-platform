@@ -17,8 +17,13 @@ URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'socia
 
 def inactive_user_view(request):
     """
-    A newly registered user has completed the social auth pipeline.
-    Their account is not yet activated, but we let them login this once.
+    A newly or recently registered user has completed the social auth pipeline.
+    Their account is not yet activated, but we let them login since the third party auth
+    provider is trusted to vouch for them. See details in pipeline.py.
+
+    The reason this view exists is that if we don't define this as the
+    SOCIAL_AUTH_INACTIVE_USER_URL, inactive users will get sent to LOGIN_ERROR_URL, which we
+    don't want.
     """
     # 'next' may be set to '/account/finish_auth/.../' if this user needs to be auto-enrolled
     # in a course. Otherwise, just redirect them to the dashboard, which displays a message

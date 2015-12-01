@@ -601,7 +601,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         )
 
         module.descriptor.scope_ids = (
-            module.descriptor.scope_ids._replace(user_id=real_user.id)  # pylint: disable=protected-access
+            module.descriptor.scope_ids._replace(user_id=real_user.id)
         )
         module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
@@ -769,7 +769,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
     system.set(u'user_is_staff', user_is_staff)
     system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    system.set(u'days_early_for_beta', getattr(descriptor, 'days_early_for_beta'))
+    system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):
@@ -822,7 +822,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         ],
     )
 
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
 
     # Do not check access when it's a noauth request.
     # Not that the access check needs to happen after the descriptor is bound

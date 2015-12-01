@@ -280,7 +280,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
     """
     def url_method(self, url, **kwargs):
         # override implementation to use PATCH method.
-        return self.client.patch(url, data=kwargs.get('data', None))  # pylint: disable=no-member
+        return self.client.patch(url, data=kwargs.get('data', None))
 
     def test_success(self):
         self.login_and_enroll()
