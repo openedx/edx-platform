@@ -169,6 +169,10 @@ def instructor_dashboard_2(request, course_id):
         'generate_certificate_exceptions',
         kwargs={'course_id': unicode(course_key), 'generate_for': ''}
     )
+    generate_bulk_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+        'generate_bulk_certificate_exceptions',
+        kwargs={'course_id': unicode(course_key)}
+    )
     certificate_exception_view_url = reverse(
         'certificate_exception_view',
         kwargs={'course_id': unicode(course_key)}
@@ -183,6 +187,7 @@ def instructor_dashboard_2(request, course_id):
         'analytics_dashboard_message': analytics_dashboard_message,
         'certificate_white_list': certificate_white_list,
         'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
+        'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
         'certificate_exception_view_url': certificate_exception_view_url
     }
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)

@@ -18,6 +18,8 @@ from certificates.models import CertificateGenerationConfiguration, CertificateS
     GeneratedCertificate
 from certificates import api as certs_api
 from student.models import CourseEnrollment
+from django.core.files.uploadedfile import SimpleUploadedFile
+import io
 
 
 @attr('shard_1')
@@ -765,3 +767,161 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
             res_json['message'],
             u"Invalid data, user_id must be present for all certificate exceptions."
         )
+
+
+@attr('shard_1')
+@ddt.ddt
+class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTestCase):
+    """
+    Test Bulk certificates white list exceptions from csv file
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCertificatesInstructorApiBulkWhiteListExceptions, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.url = reverse('generate_bulk_certificate_exceptions',
+                          kwargs={'course_id': cls.course.id})
+
+    def setUp(self):
+        super(TestCertificatesInstructorApiBulkWhiteListExceptions, self).setUp()
+        self.global_staff = GlobalStaffFactory()
+        self.enrolled_user_1 = UserFactory(
+            username='TestStudent1',
+            email='test_student1@example.com',
+            first_name='Enrolled',
+            last_name='Student'
+        )
+        self.enrolled_user_2 = UserFactory(
+            username='TestStudent2',
+            email='test_student2@example.com',
+            first_name='Enrolled',
+            last_name='Student'
+        )
+
+        self.not_enrolled_student = UserFactory(
+            username='NotEnrolledStudent',
+            email='nonenrolled@test.com',
+            first_name='NotEnrolled',
+            last_name='Student'
+        )
+        CourseEnrollment.enroll(self.enrolled_user_1, self.course.id)
+        CourseEnrollment.enroll(self.enrolled_user_2, self.course.id)
+
+        # Global staff can see the certificates section
+        self.client.login(username=self.global_staff.username, password="test")
+
+    def test_create_white_list_exception_record(self):
+        """
+        Happy path test to create a single new white listed record
+        """
+        csv_content = "test_student1@example.com,dummy_notes\n" \
+                      "test_student2@example.com,dummy_notes"
+        data = self.upload_file(csv_content=csv_content)
+        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEquals(len(data['row_errors']['data_format_error']), 0)
+        self.assertEquals(len(data['row_errors']['user_not_exist']), 0)
+        self.assertEquals(len(data['row_errors']['user_already_white_listed']), 0)
+        self.assertEquals(len(data['row_errors']['user_not_enrolled']), 0)
+        self.assertEquals(len(data['success']), 2)
+        self.assertEquals(len(CertificateWhitelist.objects.all()), 2)
+
+    def test_invalid_data_format_in_csv(self):
+        """
+        Try uploading a CSV file with invalid data formats and verify the errors.
+        """
+        csv_content = "test_student1@example.com,test,1,USA\n" \
+                      "test_student2@example.com,test,1"
+
+        data = self.upload_file(csv_content=csv_content)
+        self.assertEquals(len(data['row_errors']['data_format_error']), 2)
+        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEquals(len(data['success']), 0)
+        self.assertEquals(len(CertificateWhitelist.objects.all()), 0)
+
+    def test_file_upload_type_not_csv(self):
+        """
+        Try uploading some non-CSV file e.g. .JPG file and verify that it is rejected
+        """
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['general_errors']), 0)
+        self.assertEquals(data['general_errors'][0], 'Make sure that the file you upload is in CSV format with '
+                                                     'no extraneous characters or rows.')
+
+    def test_bad_file_upload_type(self):
+        """
+        Try uploading CSV file with invalid binary data and verify that it is rejected
+        """
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['general_errors']), 0)
+        self.assertEquals(data['general_errors'][0], 'Could not read uploaded file.')
+
+    def test_invalid_email_in_csv(self):
+        """
+        Test failure case of a poorly formatted email field
+        """
+        csv_content = "test_student.example.com,dummy_notes"
+
+        data = self.upload_file(csv_content=csv_content)
+        self.assertEquals(len(data['row_errors']['user_not_exist']), 1)
+        self.assertEquals(len(data['success']), 0)
+        self.assertEquals(len(CertificateWhitelist.objects.all()), 0)
+
+    def test_csv_user_not_enrolled(self):
+        """
+        If the user is not enrolled in the course then there should be a user_not_enrolled error.
+        """
+        csv_content = "nonenrolled@test.com,dummy_notes"
+
+        data = self.upload_file(csv_content=csv_content)
+        self.assertEquals(len(data['row_errors']['user_not_enrolled']), 1)
+        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEquals(len(data['success']), 0)
+
+    def test_certificate_exception_already_exist(self):
+        """
+        Test error if existing user is already in certificates exception list.
+        """
+        CertificateWhitelist.objects.create(
+            user=self.enrolled_user_1,
+            course_id=self.course.id,
+            whitelist=True,
+            notes=''
+        )
+        csv_content = "test_student1@example.com,dummy_notes"
+        data = self.upload_file(csv_content=csv_content)
+        self.assertEquals(len(data['row_errors']['user_already_white_listed']), 1)
+        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEquals(len(data['success']), 0)
+        self.assertEquals(len(CertificateWhitelist.objects.all()), 1)
+
+    def test_csv_file_not_attached(self):
+        """
+        Test when the user does not attach a file
+        """
+        csv_content = "test_student1@example.com,dummy_notes\n" \
+                      "test_student2@example.com,dummy_notes"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+
+        response = self.client.post(self.url, {'file_not_found': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['general_errors']), 1)
+        self.assertEquals(len(data['success']), 0)
+
+    def upload_file(self, csv_content):
+        """
+        Upload a csv file.
+        :return json data
+        """
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        return data
