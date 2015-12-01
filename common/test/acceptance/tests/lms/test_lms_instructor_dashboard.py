@@ -728,7 +728,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
 
             Given that I am on the Certificates tab on the Instructor Dashboard
             When I fill in student username that already is in the list and click 'Add Exception' button
-            Then Error Message should say 'username/email already in exception list'
+            Then Error Message should say 'User (username/email={user}) already in exception list.'
         """
         # Add a student to Certificate exception list
         self.certificates_section.add_certificate_exception(self.user_name, '')
@@ -737,7 +737,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            'username/email already in exception list',
+            'User (username/email={user}) already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -749,14 +749,17 @@ class CertificatesTest(BaseInstructorDashboardTest):
             Given that I am on the Certificates tab on the Instructor Dashboard
             When I click on 'Add Exception' button
             AND student username/email field is empty
-            Then Error Message should say 'Student username/email is required.'
+            Then Error Message should say
+                'Student username/email field is required and can not be empty. '
+                'Kindly fill in username/email and then press "Add Exception" button.'
         """
         # Click 'Add Exception' button without filling username/email field
         self.certificates_section.wait_for_certificate_exceptions_section()
         self.certificates_section.click_add_exception_button()
 
         self.assertIn(
-            'Student username/email is required.',
+            'Student username/email field is required and can not be empty. '
+            'Kindly fill in username/email and then press "Add Exception" button.',
             self.certificates_section.message.text
         )
 
@@ -768,7 +771,9 @@ class CertificatesTest(BaseInstructorDashboardTest):
             Given that I am on the Certificates tab on the Instructor Dashboard
             When I click on 'Add Exception' button
             AND student username/email does not exists
-            Then Error Message should say 'Student username/email is required.'
+            Then Error Message should say
+                'Student username/email field is required and can not be empty. '
+                'Kindly fill in username/email and then press "Add Exception" button.
         """
         invalid_user = 'test_user_non_existent'
         # Click 'Add Exception' button with invalid username/email field
@@ -779,7 +784,42 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            'Student (username/email={}) does not exist'.format(invalid_user),
+            "We can't find the user (username/email={user}) you've entered. "
+            "Make sure the username or email address is correct, then try again.".format(user=invalid_user),
+            self.certificates_section.message.text
+        )
+
+    def test_user_not_enrolled_error(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard,
+        Error message appears if user is not enrolled in the course while trying to add a new exception.
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I click on 'Add Exception' button
+            AND student is not enrolled in the course
+            Then Error Message should say
+                "The user (username/email={user}) you have entered is not enrolled in this course.
+                Make sure the username or email address is correct, then try again."
+        """
+        new_user = 'test_user_{uuid}'.format(uuid=self.unique_id[6:12])
+        new_email = 'test_user_{uuid}@example.com'.format(uuid=self.unique_id[6:12])
+        # Create a new user who is not enrolled in the course
+        AutoAuthPage(self.browser, username=new_user, email=new_email).visit()
+        # Login as instructor and visit Certificate Section of Instructor Dashboard
+        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.instructor_dashboard_page.visit()
+        self.certificates_section = self.instructor_dashboard_page.select_certificates()
+
+        # Click 'Add Exception' button with invalid username/email field
+        self.certificates_section.wait_for_certificate_exceptions_section()
+
+        self.certificates_section.fill_user_name_field(new_user)
+        self.certificates_section.click_add_exception_button()
+        self.certificates_section.wait_for_ajax()
+
+        self.assertIn(
+            "The user (username/email={user}) you have entered is not enrolled in this course. "
+            "Make sure the username or email address is correct, then try again.".format(user=new_user),
             self.certificates_section.message.text
         )
 

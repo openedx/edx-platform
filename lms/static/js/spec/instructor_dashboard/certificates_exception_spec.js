@@ -24,7 +24,8 @@ define([
             };
 
             var EXPECTED_ERRORS = {
-                user_name_or_email_required: "Student username/email is required."
+                user_name_or_email_required: 'Student username/email field is required and can not be empty. ' +
+                'Kindly fill in username/email and then press "Add Exception" button.'
             };
 
             beforeEach(function() {
@@ -331,12 +332,14 @@ define([
                 var message_selector='.message',
                     error_class = 'msg-error',
                     success_class = 'msg-success',
-                    success_message = 'Students added to Certificate white list successfully',
-                    requests = AjaxHelpers.requests(this);
+                    success_message = 'Student added to Certificate white list successfully.',
+                    requests = AjaxHelpers.requests(this),
+                    duplicate_user='test_user';
 
                 var error_messages = {
-                    empty_user_name_email: 'Student username/email is required.',
-                    duplicate_user: 'username/email already in exception list'
+                    empty_user_name_email: 'Student username/email field is required and can not be empty. ' +
+                    'Kindly fill in username/email and then press "Add Exception" button.',
+                    duplicate_user: "User (username/email=" + (duplicate_user) + ") already in exception list."
                 };
 
                 // click 'Add Exception' button with empty username/email field
@@ -348,7 +351,7 @@ define([
                 expect(view.$el.find(message_selector).html()).toMatch(error_messages.empty_user_name_email);
 
                 // Add a new Exception to list
-                view.$el.find('#certificate-exception').val("test_user");
+                view.$el.find('#certificate-exception').val(duplicate_user);
                 view.$el.find('#notes').val("test user notes");
                 view.$el.find('#add-exception').click();
 
@@ -357,7 +360,7 @@ define([
                     {
                         id: 3,
                         user_id : 3,
-                        user_name: "test_user",
+                        user_name: duplicate_user,
                         user_email : "test2@test.com",
                         course_id: "edX/test/course",
                         created: "Thursday, October 29, 2015",
@@ -370,13 +373,13 @@ define([
                 expect(view.$el.find(message_selector).html()).toMatch(success_message);
 
                 // Add a duplicate Certificate Exception
-                view.$el.find('#certificate-exception').val("test_user");
+                view.$el.find('#certificate-exception').val(duplicate_user);
                 view.$el.find('#notes').val("test user notes");
                 view.$el.find('#add-exception').click();
 
                 // Verify success message
                 expect(view.$el.find(message_selector)).toHaveClass(error_class);
-                expect(view.$el.find(message_selector).html()).toMatch(error_messages.duplicate_user);
+                expect(view.$el.find(message_selector).html()).toEqual(error_messages.duplicate_user);
             });
 
             it('verifies certificate exception can be deleted by clicking "delete" ', function(){
