@@ -73,3 +73,4 @@ git+https://github.com/edx/ecommerce-api-client.git@0.4.3#egg=ecommerce-api-clie
 
 # Stanford XBlocks
 -e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@a34e78871f79afc8b14ed47410cee813d96421e4#egg=xblock-qualtrics-survey
+-e git+https://github.com/Stanford-Online/xblock-free-text-response@666c23eafeecf7fbf91bb3f9871e8e7b71ff54a9#egg=xblock-free-text-response
