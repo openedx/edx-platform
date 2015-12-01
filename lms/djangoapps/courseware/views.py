@@ -3,8 +3,9 @@ Courseware views functions
 """
 
 import logging
-import urllib
 import json
+import textwrap
+import urllib
 
 from datetime import datetime
 from django.utils.translation import ugettext as _
@@ -16,15 +17,18 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Q
 from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from ipware.ip import get_ip
 from markupsafe import escape
+from rest_framework import status
 
 from courseware import grades
 from courseware.access import has_access, _adjust_start_date_for_beta_testers
@@ -72,6 +76,7 @@ from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
 from util.milestones_helpers import get_prerequisite_courses_display
+from util.views import _record_feedback_in_zendesk
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -1404,3 +1409,229 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
+
+
+# Translators: "percent_sign" is the symbol "%". "platform_name" is a
+# string identifying the name of this installation, such as "edX".
+FINANCIAL_ASSISTANCE_HEADER = _(
+    '{platform_name} now offers financial assistance for learners who want to earn verified certificates but'
+    ' who may not be able to pay the Verified Certificate fee. Eligible learners receive 90{percent_sign} off'
+    ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
+    ' audit track for a course that offers Verified Certificates, and then complete this application.'
+    ' Note that you must complete a separate application for each course you take.'
+).format(
+    percent_sign="%",
+    platform_name=settings.PLATFORM_NAME
+).split('\n')
+
+
+FA_INCOME_LABEL = _('Annual Income')
+FA_REASON_FOR_APPLYING_LABEL = _(
+    'Tell us about your current financial situation, including any unusual circumstances.'
+)
+FA_GOALS_LABEL = _(
+    'Tell us about your learning or professional goals. How will a Verified Certificate in'
+    ' this course help you achieve these goals?'
+)
+FA_EFFORT_LABEL = _(
+    'Tell us about your plans for this course. What steps will you take to help you complete'
+    ' the course work a receive a certificate?'
+)
+FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
+
+
+@login_required
+def financial_assistance(_request):
+    """Render the initial financial assistance page."""
+    return render_to_response('financial-assistance/financial-assistance.html', {
+        'header_text': FINANCIAL_ASSISTANCE_HEADER
+    })
+
+
+@login_required
+@require_POST
+def financial_assistance_request(request):
+    """Submit a request for financial assistance to Zendesk."""
+    try:
+        data = json.loads(request.body)
+        # Simple sanity check that the session belongs to the user
+        # submitting an FA request
+        username = data['username']
+        if request.user.username != username:
+            return HttpResponseForbidden()
+
+        course_id = data['course_id']
+        legal_name = data['legal_name']
+        email = data['email']
+        country = data['country']
+        income = data['income']
+        reason_for_applying = data['reason_for_applying']
+        goals = data['goals']
+        effort = data['effort']
+        marketing_permission = data['marketing_permission']
+        ip_address = get_ip(request)
+    except ValueError:
+        # Thrown if JSON parsing fails
+        return HttpResponseBadRequest('Could not parse request JSON.')
+    except KeyError as err:
+        # Thrown if fields are missing
+        return HttpResponseBadRequest('The field {} is required.'.format(err.message))
+
+    ticket_body = textwrap.dedent(
+        '''
+        Annual Income: {income}
+        Country: {country}
+
+        {reason_label}
+        {separator}
+            {reason_for_applying}
+
+        {goals_label}
+        {separator}
+            {goals}
+
+        {effort_label}
+        {separator}
+            {effort}
+
+        This user {allowed_for_marketing} allowed this content to be used for edX marketing purposes.
+        '''.format(
+            income=income,
+            country=country,
+            reason_label=FA_REASON_FOR_APPLYING_LABEL,
+            reason_for_applying=reason_for_applying,
+            goals_label=FA_GOALS_LABEL,
+            goals=goals,
+            effort_label=FA_EFFORT_LABEL,
+            effort=effort,
+            allowed_for_marketing='HAS' if marketing_permission else 'HAS NOT',
+            separator='=' * 16
+        )
+    )
+
+    zendesk_submitted = _record_feedback_in_zendesk(
+        legal_name,
+        email,
+        'Financial assistance request for user {username} in course {course_id}'.format(
+            username=username,
+            course_id=course_id
+        ),
+        ticket_body,
+        {'issue_type': 'Financial Assistance', 'course_id': course_id},
+        {'Client IP': ip_address}
+    )
+
+    if not zendesk_submitted:
+        # The call to Zendesk failed. The frontend will display a
+        # message to the user.
+        return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+
+@login_required
+def financial_assistance_form(request):
+    """Render the financial assistance application form page."""
+    user = request.user
+    enrolled_courses = [
+        {'name': enrollment.course_overview.display_name, 'value': unicode(enrollment.course_id)}
+        for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created')
+        if CourseMode.objects.filter(
+            Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gt=datetime.now(UTC())),
+            course_id=enrollment.course_id,
+            mode_slug=CourseMode.VERIFIED
+        ).exists()
+        and enrollment.mode != CourseMode.VERIFIED
+    ]
+    return render_to_response('financial-assistance/apply.html', {
+        'header_text': FINANCIAL_ASSISTANCE_HEADER,
+        'student_faq_url': marketing_link('FAQ'),
+        'dashboard_url': reverse('dashboard'),
+        'platform_name': settings.PLATFORM_NAME,
+        'user_details': {
+            'email': user.email,
+            'username': user.username,
+            'name': user.profile.name,
+            'country': str(user.profile.country.name),
+        },
+        'submit_url': reverse('submit_financial_assistance_request'),
+        'fields': [
+            {
+                'name': 'course',
+                'type': 'select',
+                'label': _('Course'),
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'options': enrolled_courses,
+                'instructions': _(
+                    'Select the course for which you want to earn a verified certificate. If'
+                    ' the course does not appear in the list, make sure that you have enrolled'
+                    ' in the audit track for the course.'
+                )
+            },
+            {
+                'name': 'income',
+                'type': 'text',
+                'label': FA_INCOME_LABEL,
+                'placeholder': _('income in USD ($)'),
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {},
+                'instructions': _('Specify your annual income in USD.')
+            },
+            {
+                'name': 'reason_for_applying',
+                'type': 'textarea',
+                'label': FA_REASON_FOR_APPLYING_LABEL,
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {
+                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
+                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
+                },
+                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+            },
+            {
+                'name': 'goals',
+                'type': 'textarea',
+                'label': FA_GOALS_LABEL,
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {
+                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
+                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
+                },
+                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+            },
+            {
+                'name': 'effort',
+                'type': 'textarea',
+                'label': FA_EFFORT_LABEL,
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {
+                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
+                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
+                },
+                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+            },
+            {
+                'placeholder': '',
+                'name': 'mktg-permission',
+                'label': _(
+                    'I allow edX to use the information provided in this application for edX marketing purposes.'
+                ),
+                'defaultValue': '',
+                'type': 'checkbox',
+                'required': False,
+                'instructions': _(
+                    'Annual income and personal information such as email address will not be shared.'
+                ),
+                'restrictions': {}
+            }
+        ],
+    })
