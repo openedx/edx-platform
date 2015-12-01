@@ -40,7 +40,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 
 # Forking Submissions repo for ORA2 score override function.
 -e git+https://github.com/Stanford-Online/edx-submissions.git@906c52584ff3f2d37ddb1d741a6313525f7547a2#egg=edx-submissions
--e git+https://github.com/edx/edx-analytics-data-api-client.git@4d934a789e3a60a516e70b4bf6617522d6ed153d#egg=edx-analytics-data-api-client
+-e git+https://github.com/Stanford-Online/edx-analytics-data-api-client.git@7632d6e51108a4c5834a47007183870d49a47c94#egg=edx-analytics-data-api-client
 
 # This portion of requirements.txt is now maintained only for the Stanford fork, i.e. we should update as necessary
 # Third Party XBlocks
