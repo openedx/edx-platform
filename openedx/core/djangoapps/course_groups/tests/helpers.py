@@ -32,6 +32,11 @@ class CohortFactory(DjangoModelFactory):
         """
         if extracted:
             self.users.add(*extracted)
+            for user in self.users.all():
+                CohortMembership.objects.create(
+                    user=user,
+                    course_user_group=self,
+                )
 
 
 class CourseCohortFactory(DjangoModelFactory):
@@ -40,18 +45,6 @@ class CourseCohortFactory(DjangoModelFactory):
     """
     class Meta(object):
         model = CourseCohort
-
-    @post_generation
-    def memberships(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
-        """
-        Returns the memberships linking users to this cohort.
-        """
-        for user in self.course_user_group.users.all():  # pylint: disable=E1101
-            membership = CohortMembership(user=user, course_user_group=self.course_user_group)
-            membership.save()
-
-    course_user_group = factory.SubFactory(CohortFactory)
-    assignment_type = 'manual'
 
 
 class CourseCohortSettingsFactory(DjangoModelFactory):

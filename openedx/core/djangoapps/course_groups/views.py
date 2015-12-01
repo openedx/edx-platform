@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from util.json_request import expect_json, JsonResponse
-from util.db import outer_atomic
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext
