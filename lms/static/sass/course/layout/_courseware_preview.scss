@@ -3,11 +3,15 @@
   @include box-sizing(border-box);
   margin: 0 auto 0;
   padding: ($baseline*0.75);
-  width: 100%;
   background-color: $gray-l3;
+
+  @media print {
+    display: none;
+  }
 
   .preview-menu {
     @extend %inner-wrapper;
+    width: auto;
   }
 
   .preview-actions {
@@ -22,6 +26,68 @@
         margin-bottom: 0;
         vertical-align: middle;
       }
+
+      .action-preview-select {
+        margin-right: $baseline;
+      }
+
+      .action-preview-username-container {
+        display: none;
+
+        .action-preview-username {
+          vertical-align: middle;
+          height: 25px;
+        }
+      }
     }
+  }
+
+  .preview-specific-student-notice {
+    margin-top: ($baseline/2);
+    font-size: 90%;
+  }
+}
+.exam-timer {
+  line-height: 56px;
+  background-color: #e5eaec;
+  padding-left: 42px;
+  padding-right: 32px;
+  border-left: 4px solid #14a6ea;
+  margin: 0 auto;
+  color: #4e575b;
+  font-size: 14px;
+  a {
+    color: #0979ba;
+  }
+  span.pull-right {
+    color: #646161;
+    line-height: 56px;
+    b {
+      color: #414040;
+    }
+  }
+  &.low-time {
+    color: #cdd7db;
+    background-color: #4F585C;
+    a {
+      color: #fff;
+      text-decoration: underline;
+    }
+    span.pull-right {
+      color: #cdd7db;
+      b {
+        color: #fff;
+      }
+    }
+  }
+  &.warning {
+    border-left-color: #feb93e;
+  }
+  &.critical {
+    border-left-color: #b30101;
+    color: #fff;
+  }
+  .exam-button-turn-in-exam {
+    margin-right: 20px;
   }
 }

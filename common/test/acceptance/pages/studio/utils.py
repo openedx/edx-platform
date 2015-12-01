@@ -207,6 +207,7 @@ def set_input_value_and_save(page, css, value):
     Sets the text field with given label (display name) to the specified value, and presses Save.
     """
     set_input_value(page, css, value).send_keys(Keys.ENTER)
+    page.wait_for_ajax()
 
 
 def drag(page, source_index, target_index, placeholder_height=0):

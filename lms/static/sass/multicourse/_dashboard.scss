@@ -13,16 +13,33 @@
 // ====================
 .dashboard {
   @include clearfix();
-  padding: ($baseline*2) 0 0 0;
+  padding: ($baseline*2) 0 $baseline 0;
+
+  .wrapper-find-courses {
+    @include float(right);
+    @include margin-left(flex-gutter());
+    width: flex-grid(3);
+    margin-top: ($baseline*2);
+    border-top: 3px solid $blue;
+    padding: $baseline 0;
+
+    .copy {
+      @extend %t-copy-sub1;
+    }
+
+    .btn-find-courses {
+      @extend %btn-pl-elevated-alt;
+    }
+  }
 
   .profile-sidebar {
     background: transparent;
     @include float(right);
-    margin-top: ($baseline*2);
+    @include margin-left(flex-gutter());
     width: flex-grid(3);
-    box-shadow: 0 0 1px $shadow-l1;
-    border: 1px solid $border-color-2;
-    border-radius: 3px;
+    margin-top: ($baseline*2);
+    border-top: 3px solid $blue;
+    padding: $baseline 0;
 
     .user-info {
       @include clearfix();
@@ -31,7 +48,7 @@
         @include box-sizing(border-box);
         @include clearfix();
         margin: 0;
-        padding: $baseline;
+        padding: 0;
         width: flex-grid(12);
 
         li {
@@ -59,7 +76,7 @@
           }
 
           span.title {
-            @extend %t-copy-sub1;
+            @extend %t-title6;
             @extend %t-strong;
 
             a {
@@ -511,25 +528,11 @@
       }
 
       .enter-course {
-        @include button(simple, $button-color);
-        @include box-sizing(border-box);
-        border-radius: 3px;
+        @extend %btn-pl-primary-base;
         @include float(right);
-        font: normal 15px/1.6rem $sans-serif;
-        letter-spacing: 0;
-        text-align: center;
 
         &.archived {
-          @include button(simple, $button-archive-color);
-          font: normal 15px/1.6rem $sans-serif;
-
-          &:hover, &:focus {
-            text-decoration: none;
-          }
-        }
-
-        &:hover, &:focus {
-          text-decoration: none;
+          @extend %btn-pl-default-base;
         }
       }
     }
@@ -543,6 +546,33 @@
       .messages-list {
         margin: 0;
         padding: 0;
+      }
+
+      .credit-eligibility-msg {
+        @include float(left);
+        margin-top: 10px;
+      }
+
+      .purchase_credit {
+        @include float(right);
+      }
+
+      .pending-credit-btn{
+        @include float(right);
+      }
+
+      .denied-credit-btn{
+        @include float(right);
+      }
+      .credit-request-pending-msg{
+        display: inline-block;
+      }
+
+      .credit-btn {
+        @extend %btn-pl-yellow-base;
+        background-image: none ;
+        text-shadow: none;
+        box-shadow: none;
       }
 
       .message {
@@ -898,15 +928,8 @@
             position: relative;
 
             .cta {
-              @include button(simple, $green-d1);
-              @include box-sizing(border-box);
+              @extend %btn-pl-green-base;
               @include float(right);
-              border-radius: 3px;
-              display: block;
-              font: normal 15px/1.6rem $sans-serif;
-              letter-spacing: 0;
-              padding: 6px 32px 7px;
-              text-align: center;
             }
           }
         }
@@ -1033,12 +1056,11 @@
 .status-verification {
 
   .status-title {
-    margin: 0 0 ($baseline/4) 26px;
+    margin: 0 0 ($baseline/4) 0;
   }
 
   .status-data {
-    margin: 0 0 ($baseline/2) 26px;
-    width: 80%;
+    margin: 0 0 ($baseline/2) 0;
   }
 
   .status-data-message {
@@ -1072,7 +1094,7 @@
       @include triangle(($baseline/2), $m-gray-d3, up);
       position: absolute;
       left: 45%;
-      top: -($baseline/2);
+      top: -6px;
     }
   }
 

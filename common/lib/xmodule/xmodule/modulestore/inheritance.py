@@ -88,13 +88,22 @@ class InheritanceMixin(XBlockMixin):
     )
     showanswer = String(
         display_name=_("Show Answer"),
-        help=_("Specify when the Show Answer button appears for each problem. Valid values are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", \"past_due\", and \"never\"."),
+        help=_(
+            'Specify when the Show Answer button appears for each problem. '
+            'Valid values are "always", "answered", "attempted", "closed", '
+            '"finished", "past_due", "correct_or_past_due", and "never".'
+        ),
         scope=Scope.settings,
         default="finished",
     )
     rerandomize = String(
         display_name=_("Randomization"),
-        help=_("Specify how often variable values in a problem are randomized when a student loads the problem. Valid values are \"always\", \"onreset\", \"never\", and \"per_student\". This setting only applies to problems that have randomly generated numeric values."),
+        help=_(
+            'Specify the default for how often variable values in a problem are randomized. '
+            'This setting should be set to \"never\" unless you plan to provide a Python '
+            'script to identify and randomize values in most of the problems in your course. '
+            'Valid values are \"always\", \"onreset\", \"never\", and \"per_student\".'
+        ),
         scope=Scope.settings,
         default="never",
     )
@@ -147,6 +156,18 @@ class InheritanceMixin(XBlockMixin):
         display_name=_("Enable video caching system"),
         help=_("Enter true or false. If true, video caching will be used for HTML5 videos."),
         default=True,
+        scope=Scope.settings
+    )
+    video_bumper = Dict(
+        display_name=_("Video Pre-Roll"),
+        help=_(
+            """Identify a video, 5-10 seconds in length, to play before course videos. Enter the video ID from"""
+            """ the Video Uploads page and one or more transcript files in the following format:"""
+            """ {"video_id": "ID", "transcripts": {"language": "/static/filename.srt"}}."""
+            """ For example, an entry for a video with two transcripts looks like this:"""
+            """ {"video_id": "77cef264-d6f5-4cf2-ad9d-0178ab8c77be","""
+            """ "transcripts": {"en": "/static/DemoX-D01_1.srt", "uk": "/static/DemoX-D01_1_uk.srt"}}"""
+        ),
         scope=Scope.settings
     )
 

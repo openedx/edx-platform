@@ -3,7 +3,8 @@ Tests for testing the modulestore settings migration code.
 """
 import copy
 import ddt
-from tempfile import mkdtemp
+
+from openedx.core.lib.tempdir import mkdtemp_clean
 
 from unittest import TestCase
 from xmodule.modulestore.modulestore_settings import (
@@ -37,7 +38,7 @@ class ModuleStoreSettingsMigration(TestCase):
                 "collection": "modulestore",
                 "db": "edxapp",
                 "default_class": "xmodule.hidden_module.HiddenDescriptor",
-                "fs_root": mkdtemp(),
+                "fs_root": mkdtemp_clean(),
                 "host": "localhost",
                 "password": "password",
                 "port": 27017,

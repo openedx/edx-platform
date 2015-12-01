@@ -6,7 +6,7 @@ from common import *
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import InvalidElementStateException
 from contentstore.utils import reverse_course_url
-from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
 
 
 @step(u'I am viewing the grading settings')
@@ -30,6 +30,14 @@ def delete_grade(step):
     #world.css_find(range_css)[1].mouseover()
     #world.css_click(grade_css)
     world.browser.execute_script('document.getElementsByClassName("remove-button")[0].click()')
+
+
+@step(u'Grade list has "([^"]*)" grades$')
+def check_grade_values(step, grade_list):  # pylint: disable=unused-argument
+    visible_list = ''.join(
+        [grade.text for grade in world.css_find('.letter-grade')]
+    )
+    assert_equal(visible_list, grade_list, 'Grade lists should be equal')
 
 
 @step(u'I see I now have "([^"]*)" grades$')
@@ -162,7 +170,7 @@ def cannot_edit_fail(_step):
     # try to change the grade range -- this should throw an exception
     try:
         ranges.last.value = 'Failure'
-    except (InvalidElementStateException):
+    except InvalidElementStateException:
         pass  # We should get this exception on failing to edit the element
 
     # check to be sure that nothing has changed

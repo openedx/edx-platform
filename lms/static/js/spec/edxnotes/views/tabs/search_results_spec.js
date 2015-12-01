@@ -1,9 +1,9 @@
 define([
-    'jquery', 'js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers',
+    'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_helpers',
     'logger', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/search_results',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(
-    $, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView,
+    $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView,
     customMatchers
 ) {
     'use strict';
@@ -79,7 +79,8 @@ define([
                 identifier: 'view-search-results',
                 icon: 'fa fa-search',
                 is_active: true,
-                is_closable: true
+                is_closable: true,
+                view: 'Search Results'
             });
             expect(view.$('#search-results-panel')).toExist();
             expect(view.$('#search-results-panel')).toBeFocused();
@@ -157,12 +158,7 @@ define([
                 requests = AjaxHelpers.requests(this);
 
             submitForm(view.searchBox, 'test error');
-            requests[0].respond(
-                500, {'Content-Type': 'application/json'},
-                JSON.stringify({
-                    error: 'test error message'
-                })
-            );
+            AjaxHelpers.respondWithError(requests, 500, {error: 'test error message'});
 
             expect(view.$('.wrapper-msg')).not.toHaveClass('is-hidden');
             expect(view.$('.wrapper-msg .copy')).toContainText('test error message');

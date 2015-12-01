@@ -3,12 +3,14 @@ A class used for defining and running test suites
 """
 import sys
 import subprocess
+from paver.easy import sh
+
 from pavelib.utils.process import kill_process
 
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
+    colorize = lambda color, text: text  # pylint: disable=invalid-name
 
 __test__ = False  # do not collect
 
@@ -56,6 +58,14 @@ class TestSuite(object):
         The command to run tests (as a string). For this base class there is none.
         """
         return None
+
+    def generate_optimized_static_assets(self):
+        """
+        Collect static assets using test_static_optimized.py which generates
+        optimized files to a dedicated test static root.
+        """
+        print colorize('green', "Generating optimized static assets...")
+        sh("paver update_assets --settings=test_static_optimized")
 
     def run_test(self):
         """

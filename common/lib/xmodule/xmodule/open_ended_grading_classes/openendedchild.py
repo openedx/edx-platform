@@ -213,7 +213,7 @@ class OpenEndedChild(object):
         """None if not available"""
         if not self.child_history:
             return None
-        return [self.child_history[i].get('score') for i in xrange(0, len(self.child_history))]
+        return [child_hist.get('score') for child_hist in self.child_history]
 
     def latest_post_assessment(self, system):
         """Empty string if not available"""
@@ -298,7 +298,7 @@ class OpenEndedChild(object):
 
     def _allow_reset(self):
         """Can the module be reset?"""
-        return (self.child_state == self.DONE and self.child_attempts < self.max_attempts)
+        return self.child_state == self.DONE and self.child_attempts < self.max_attempts
 
     def max_score(self):
         """
@@ -396,7 +396,7 @@ class OpenEndedChild(object):
         @return: Boolean correct.
         """
         correct = False
-        if (isinstance(score, (int, long, float, complex))):
+        if isinstance(score, (int, long, float, complex)):
             score_ratio = int(score) / float(self.max_score())
             correct = (score_ratio >= 0.66)
         return correct

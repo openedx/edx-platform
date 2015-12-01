@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
+Miscellaneous tests for the student app.
 """
 from datetime import datetime, timedelta
 import logging
@@ -13,23 +10,26 @@ import ddt
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.test.client import RequestFactory, Client
+from django.test.client import Client
+from django.test.client import RequestFactory
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user, LinkedInAddToProfileConfiguration
 )
-from student.views import (process_survey_link, _cert_info,
-                           change_enrollment, complete_course_mode_info)
+from student.views import (
+    process_survey_link,
+    _cert_info,
+    complete_course_mode_info,
+)
 from student.tests.factories import UserFactory, CourseModeFactory
 from util.testing import EventTestMixin
 from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, ModuleStoreEnum
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
@@ -60,6 +60,7 @@ class CourseEndingTest(TestCase):
         link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=user_id)
         self.assertEqual(process_survey_link(link2, user), link2_expected)
 
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_info(self):
         user = Mock(username="fred")
         survey_url = "http://a_survey.com"
@@ -192,6 +193,7 @@ class CourseEndingTest(TestCase):
         self.assertIsNone(_cert_info(user, course2, cert_status, course_mode))
 
 
+@ddt.ddt
 class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
@@ -439,6 +441,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertNotContains(response, response_url)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_linked_in_add_to_profile_btn_with_certificate(self):
         # If user has a certificate with valid linked-in config then Add Certificate to LinkedIn button
         # should be visible. and it has URL value with valid parameters.
@@ -485,6 +488,59 @@ class DashboardTest(ModuleStoreTestCase):
         )
         self.assertContains(response, expected_url)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1), (ModuleStoreEnum.Type.split, 3))
+    @ddt.unpack
+    def test_dashboard_metadata_caching(self, modulestore_type, expected_mongo_calls):
+        """
+        Check that the student dashboard makes use of course metadata caching.
+
+        After enrolling a student in a course, that course's metadata should be
+        cached as a CourseOverview. The student dashboard should never have to make
+        calls to the modulestore.
+
+        Arguments:
+            modulestore_type (ModuleStoreEnum.Type): Type of modulestore to create
+                test course in.
+            expected_mongo_calls (int >=0): Number of MongoDB queries expected for
+                a single call to the module store.
+
+        Note to future developers:
+            If you break this test so that the "check_mongo_calls(0)" fails,
+            please do NOT change it to "check_mongo_calls(n>1)". Instead, change
+            your code to not load courses from the module store. This may
+            involve adding fields to CourseOverview so that loading a full
+            CourseDescriptor isn't necessary.
+        """
+        # Create a course and log in the user.
+        test_course = CourseFactory.create(default_store=modulestore_type)
+        self.client.login(username="jack", password="test")
+
+        # Enrolling the user in the course will result in a modulestore query.
+        with check_mongo_calls(expected_mongo_calls):
+            CourseEnrollment.enroll(self.user, test_course.id)
+
+        # Subsequent requests will only result in SQL queries to load the
+        # CourseOverview object that has been created.
+        with check_mongo_calls(0):
+            response_1 = self.client.get(reverse('dashboard'))
+            self.assertEquals(response_1.status_code, 200)
+            response_2 = self.client.get(reverse('dashboard'))
+            self.assertEquals(response_2.status_code, 200)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    def test_dashboard_header_nav_has_find_courses(self):
+        self.client.login(username="jack", password="test")
+        response = self.client.get(reverse("dashboard"))
+
+        # "Find courses" is shown in the side panel
+        self.assertContains(response, "Find courses")
+
+        # But other links are hidden in the navigation
+        self.assertNotContains(response, "How it Works")
+        self.assertNotContains(response, "Schools & Partners")
+
 
 class UserSettingsEventTestMixin(EventTestMixin):
     """
@@ -503,7 +559,7 @@ class UserSettingsEventTestMixin(EventTestMixin):
             kwargs['truncated'] = []
         self.assert_event_emitted(
             USER_SETTINGS_CHANGED_EVENT_NAME,
-            table=self.table,  # pylint: disable=no-member
+            table=self.table,
             user_id=self.user.id,
             **kwargs
         )
@@ -815,38 +871,6 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         )
         self.assertTrue(is_active)
         self.assertEqual(enrollment_mode, u'honor')
-
-
-class PaidRegistrationTest(ModuleStoreTestCase):
-    """
-    Tests for paid registration functionality (not verified student), involves shoppingcart
-    """
-    def setUp(self):
-        super(PaidRegistrationTest, self).setUp()
-        # Create course
-        self.course = CourseFactory.create()
-        self.req_factory = RequestFactory()
-        self.user = UserFactory(username="jack", email="jack@fake.edx.org")
-
-    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
-    def test_change_enrollment_add_to_cart(self):
-        request = self.req_factory.post(
-            reverse('change_enrollment'), {
-                'course_id': self.course.id.to_deprecated_string(),
-                'enrollment_action': 'add_to_cart'
-            }
-        )
-
-        # Add a session to the request
-        SessionMiddleware().process_request(request)
-        request.session.save()
-
-        request.user = self.user
-        response = change_enrollment(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
-        self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
-            shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
 
 
 class AnonymousLookupTable(ModuleStoreTestCase):

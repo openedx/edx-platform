@@ -375,6 +375,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
     mako_template = "widgets/metadata-only-edit.html"
 
+    show_in_read_only_mode = True
+
     child_descriptor = module_attr('child_descriptor')
     log_child_render = module_attr('log_child_render')
     get_content_titles = module_attr('get_content_titles')
@@ -473,7 +475,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         non_editable_fields = super(SplitTestDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
             SplitTestDescriptor.due,
-            SplitTestDescriptor.user_partitions
+            SplitTestDescriptor.user_partitions,
+            SplitTestDescriptor.group_id_to_child,
         ])
         return non_editable_fields
 

@@ -2,13 +2,16 @@
 import contextlib
 import ddt
 import mock
+import json
+
 from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
-from courseware.tests.factories import GlobalStaffFactory, InstructorFactory
+from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from certificates.models import CertificateGenerationConfiguration
 from certificates import api as certs_api
 
@@ -91,6 +94,39 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
             # to be disabled even if an error has occurred
             certs_api.set_cert_generation_enabled(self.course.id, True)
             self._assert_enable_certs_button(False)
+
+    @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_show_enabled_button_for_html_certs(self):
+        """
+        Tests `Enable Student-Generated Certificates` button is enabled
+        and `Generate Example Certificates` button is not available if
+        course has Web/HTML certificates view enabled.
+        """
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.client.login(username=self.global_staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Enable Student-Generated Certificates')
+        self.assertContains(response, 'enable-certificates-submit')
+        self.assertNotContains(response, 'Generate Example Certificates')
+
+    @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_buttons_for_html_certs_in_self_paced_course(self):
+        """
+        Tests `Enable Student-Generated Certificates` button is enabled
+        and `Generate Certificates` button is not available if
+        course has Web/HTML certificates view enabled on a self paced course.
+        """
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.client.login(username=self.global_staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Enable Student-Generated Certificates')
+        self.assertContains(response, 'enable-certificates-submit')
+        self.assertNotContains(response, 'Generate Certificates')
+        self.assertNotContains(response, 'btn-start-generating-certificates')
 
     def _assert_certificates_visible(self, is_visible):
         """Check that the certificates section is visible on the instructor dash. """
@@ -222,3 +258,39 @@ class CertificatesInstructorApiTest(ModuleStoreTestCase):
         )
         expected_redirect += '#view-certificates'
         self.assertRedirects(response, expected_redirect)
+
+    def test_certificate_generation_api_without_global_staff(self):
+        """
+        Test certificates generation api endpoint returns permission denied if
+        user who made the request is not member of global staff.
+        """
+        user = UserFactory.create()
+        self.client.login(username=user.username, password='test')
+        url = reverse(
+            'start_certificate_generation',
+            kwargs={'course_id': unicode(self.course.id)}
+        )
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+        self.client.login(username=self.instructor.username, password='test')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_certificate_generation_api_with_global_staff(self):
+        """
+        Test certificates generation api endpoint returns success status when called with
+        valid course key
+        """
+        self.client.login(username=self.global_staff.username, password='test')
+        url = reverse(
+            'start_certificate_generation',
+            kwargs={'course_id': unicode(self.course.id)}
+        )
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertIsNotNone(res_json['message'])
+        self.assertIsNotNone(res_json['task_id'])

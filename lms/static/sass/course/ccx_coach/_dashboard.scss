@@ -55,3 +55,22 @@ form.ccx-form {
         margin: 5px 0 5px 0;
     }
 }
+
+button.ccx-button-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #069;
+    cursor: pointer;
+    &:after {
+        content: "\00a0 ";
+    }
+    &:active {
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    &:hover {
+        color: brown;
+    }
+}

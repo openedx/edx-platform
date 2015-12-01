@@ -83,7 +83,7 @@ class CourseEmailTemplateTest(TestCase):
         context = {
             'course_title': "Bogus Course Title",
             'course_url': "/location/of/course/url",
-            'account_settings_url': "/location/of/account/settings/url",
+            'email_settings_url': "/location/of/email/settings/url",
             'platform_name': 'edX',
             'email': 'your-email@test.com',
         }

@@ -93,3 +93,13 @@ class mock_basket_order(mock_ecommerce_api_endpoint):  # pylint: disable=invalid
 
     def get_uri(self):
         return TEST_API_URL + '/baskets/{}/order/'.format(self.basket_id)
+
+
+class mock_create_refund(mock_ecommerce_api_endpoint):  # pylint: disable=invalid-name
+    """ Mocks calls to E-Commerce API client refund creation method. """
+
+    default_response = []
+    method = httpretty.POST
+
+    def get_uri(self):
+        return TEST_API_URL + '/refunds/'

@@ -1,15 +1,19 @@
+# coding: utf-8
 """
 Acceptance tests for Studio's Setting pages
 """
+from __future__ import unicode_literals
+from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
 from ...fixtures.course import XBlockFixtureDesc
 from ..helpers import create_user_partition_json
 from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
-from unittest import skip
+from ...pages.lms.courseware import CoursewarePage
 from textwrap import dedent
 from xmodule.partitions.partitions import Group
 
@@ -132,7 +136,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
             <problem markdown="Simple Problem" max_attempts="" weight="">
               <p>Choose Yes.</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical">
+                <checkboxgroup>
                   <choice correct="true">Yes</choice>
                 </checkboxgroup>
               </choiceresponse>
@@ -397,3 +401,77 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         expected_fields = self.advanced_settings.expected_settings_names
         displayed_fields = self.advanced_settings.displayed_settings_names
         self.assertEquals(set(displayed_fields), set(expected_fields))
+
+
+@attr('shard_1')
+class ContentLicenseTest(StudioCourseTest):
+    """
+    Tests for course-level licensing (that is, setting the license,
+    for an entire course's content, to All Rights Reserved or Creative Commons)
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(ContentLicenseTest, self).setUp()
+        self.outline_page = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.settings_page = SettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.lms_courseware = CoursewarePage(
+            self.browser,
+            self.course_id,
+        )
+        self.settings_page.visit()
+
+    def test_empty_license(self):
+        """
+        When I visit the Studio settings page,
+        I see that the course license is "All Rights Reserved" by default.
+        Then I visit the LMS courseware page,
+        and I see that the default course license is displayed.
+        """
+        self.assertEqual(self.settings_page.course_license, "All Rights Reserved")
+        self.lms_courseware.visit()
+        self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
+
+    def test_arr_license(self):
+        """
+        When I visit the Studio settings page,
+        and I set the course license to "All Rights Reserved",
+        and I refresh the page,
+        I see that the course license is "All Rights Reserved".
+        Then I visit the LMS courseware page,
+        and I see that the course license is "All Rights Reserved".
+        """
+        self.settings_page.course_license = "All Rights Reserved"
+        self.settings_page.save_changes()
+        self.settings_page.refresh_and_wait_for_load()
+        self.assertEqual(self.settings_page.course_license, "All Rights Reserved")
+
+        self.lms_courseware.visit()
+        self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
+
+    def test_cc_license(self):
+        """
+        When I visit the Studio settings page,
+        and I set the course license to "Creative Commons",
+        and I refresh the page,
+        I see that the course license is "Creative Commons".
+        Then I visit the LMS courseware page,
+        and I see that the course license is "Some Rights Reserved".
+        """
+        self.settings_page.course_license = "Creative Commons"
+        self.settings_page.save_changes()
+        self.settings_page.refresh_and_wait_for_load()
+        self.assertEqual(self.settings_page.course_license, "Creative Commons")
+
+        self.lms_courseware.visit()
+        # The course_license text will include a bunch of screen reader text to explain
+        # the selected options
+        self.assertIn("Some Rights Reserved", self.lms_courseware.course_license)

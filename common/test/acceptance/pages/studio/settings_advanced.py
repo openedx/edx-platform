@@ -162,6 +162,7 @@ class AdvancedSettingsPage(CoursePage):
             'info_sidebar_name',
             'is_new',
             'ispublic',
+            'issue_badges',
             'max_student_enrollments_allowed',
             'no_grade',
             'display_coursenumber',
@@ -198,5 +199,7 @@ class AdvancedSettingsPage(CoursePage):
             'text_customization',
             'annotation_storage_url',
             'social_sharing_url',
-            'teams_configuration',
+            'video_bumper',
+            'cert_html_view_enabled',
+            'enable_proctored_exams',
         ]

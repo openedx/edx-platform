@@ -27,6 +27,11 @@ from instructor_task.tasks import (
     get_ora2_responses,
     get_course_forums_usage,
     cohort_students,
+    enrollment_report_features_csv,
+    calculate_may_enroll_csv,
+    exec_summary_report_csv,
+    generate_certificates,
+    proctored_exam_results_csv
 )
 
 from instructor_task.api_helper import (
@@ -418,6 +423,63 @@ def submit_student_forums_usage_task(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
+def submit_detailed_enrollment_features_csv(request, course_key):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate a CSV containing detailed enrollment info.
+
+    Raises AlreadyRunningError if said CSV is already being updated.
+    """
+    task_type = 'detailed_enrollment_report'
+    task_class = enrollment_report_features_csv
+    task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_calculate_may_enroll_csv(request, course_key, features):
+    """
+    Submits a task to generate a CSV file containing information about
+    invited students who have not enrolled in a given course yet.
+
+    Raises AlreadyRunningError if said file is already being updated.
+    """
+    task_type = 'may_enroll_info_csv'
+    task_class = calculate_may_enroll_csv
+    task_input = {'features': features}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_executive_summary_report(request, course_key):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate a HTML File containing the executive summary report.
+
+    Raises AlreadyRunningError if HTML File is already being updated.
+    """
+    task_type = 'exec_summary_report'
+    task_class = exec_summary_report_csv
+    task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_proctored_exam_results_report(request, course_key, features):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate a HTML File containing the executive summary report.
+
+    Raises AlreadyRunningError if HTML File is already being updated.
+    """
+    task_type = 'proctored_exam_results_report'
+    task_class = proctored_exam_results_csv
+    task_input = {'features': features}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
 def submit_cohort_students(request, course_key, file_name):
     """
     Request to have students cohorted in bulk.
@@ -427,6 +489,20 @@ def submit_cohort_students(request, course_key, file_name):
     task_type = 'cohort_students'
     task_class = cohort_students
     task_input = {'file_name': file_name}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def generate_certificates_for_all_students(request, course_key):   # pylint: disable=invalid-name
+    """
+    Submits a task to generate certificates for all students enrolled in the course.
+
+    Raises AlreadyRunningError if certificates are currently being generated.
+    """
+    task_type = 'generate_certificates_all_student'
+    task_class = generate_certificates
+    task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

@@ -7,7 +7,7 @@ ${corp_address}
 
 ${_("Date: {date}").format(date=date)}
 ${_("Invoice No: {invoice_number}").format(invoice_number=invoice.id)}
-${_("Terms: Due Immediately")}
+${_("Terms: Due Upon Receipt")}
 ${_("Due Date: {date}").format(date=date)}
 
 ${_("Bill to:")}
@@ -33,10 +33,10 @@ ${_("Total:      {currency_symbol}{sale_price}").format(sale_price=sale_price, c
 
 ———————————————————————————————————————————
 
-${_("Payment instructions")}
+${_("Payment Instructions")}
 
 ${payment_instructions}
 
-${_("Failure to pay this invoice will result the invalidation of student enrollment that use these codes. All purchases are final. Please refer to the cancellation policy on {site_name} for more information.").format(site_name=site_name)}
+${_("If we do not receive payment, the learner enrollments that use these codes will be canceled and learners will not be able to access course materials. All purchases are final. For more information, see the {site_name} cancellation policy.").format(site_name=site_name)}
 
-${_("If you have payment questions, please contact {contact_email}").format(contact_email=contact_email)}
+${_("For payment questions, contact {contact_email}").format(contact_email=contact_email)}

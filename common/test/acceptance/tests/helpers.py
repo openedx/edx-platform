@@ -24,6 +24,7 @@ from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from unittest import TestCase
 
 
 from ..pages.common import BASE_URL
@@ -89,9 +90,17 @@ def load_data_str(rel_path):
     Load a file from the "data" directory as a string.
     `rel_path` is the path relative to the data directory.
     """
-    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=no-value-for-parameter
+    full_path = path(__file__).abspath().dirname() / "data" / rel_path
     with open(full_path) as data_file:
         return data_file.read()
+
+
+def remove_file(filename):
+    """
+    Remove a file if it exists
+    """
+    if os.path.exists(filename):
+        os.remove(filename)
 
 
 def disable_animations(page):
@@ -281,7 +290,7 @@ def get_modal_alert(browser):
     return browser.switch_to.alert
 
 
-class EventsTestMixin(object):
+class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted
     """
@@ -673,4 +682,4 @@ class TestWithSearchIndexMixin(object):
 
     def _cleanup_index_file(self):
         """ Removes search index backing file """
-        os.remove(self.TEST_INDEX_FILENAME)
+        remove_file(self.TEST_INDEX_FILENAME)

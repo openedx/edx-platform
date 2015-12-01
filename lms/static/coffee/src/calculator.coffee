@@ -82,6 +82,7 @@ class @Calculator
       .addClass('shown')
       .attr('aria-hidden', false)
 
+
     $(document).on('click', @handleClickOnDocument)
 
   hideHint: ->
@@ -185,11 +186,14 @@ class @Calculator
     @hideHint()
 
   handleClickOnHintButton: (e) ->
+    e.preventDefault()
     e.stopPropagation()
     if @hintPopup.hasClass 'shown'
       @hideHint()
+      @hintButton.attr('aria-expanded', false)
     else
       @showHint()
+      @hintButton.attr('aria-expanded', true)
       @activeHint.focus()
 
   handleClickOnHintPopup: (e) ->

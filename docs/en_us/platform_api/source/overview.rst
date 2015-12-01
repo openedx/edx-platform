@@ -18,8 +18,8 @@ The following edX Platform APIs are currently supported:
 
 * :ref:`edX Platform Enrollment API Version 1.0`
 * :ref:`edX Platform Mobile API Version 0.5`
+* :ref:`Profile Images API Version 1.0`
 * :ref:`edX Platform User API Version 1.0`
-
 
 **********************************************
 Experimental edX Platform API Modules

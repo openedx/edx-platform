@@ -19,11 +19,12 @@ import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 from django.conf import settings
+from request_cache.middleware import RequestCache
 from xblock.field_data import FieldData
 from xmodule.modulestore.inheritance import InheritanceMixin
 
-
 NOTSET = object()
+ENABLED_OVERRIDE_PROVIDERS_KEY = "courseware.field_overrides.enabled_providers"
 
 
 def resolve_dotted(name):
@@ -61,7 +62,7 @@ class OverrideFieldData(FieldData):
     provider_classes = None
 
     @classmethod
-    def wrap(cls, user, wrapped):
+    def wrap(cls, user, course, wrapped):
         """
         Will return a :class:`OverrideFieldData` which wraps the field data
         given in `wrapped` for the given `user`, if override providers are
@@ -75,14 +76,42 @@ class OverrideFieldData(FieldData):
                 (resolve_dotted(name) for name in
                  settings.FIELD_OVERRIDE_PROVIDERS))
 
-        if cls.provider_classes:
-            return cls(user, wrapped)
+        enabled_providers = cls._providers_for_course(course)
+
+        if enabled_providers:
+            # TODO: we might not actually want to return here.  Might be better
+            # to check for instance.providers after the instance is built. This
+            # would allow for the case where we have registered providers but
+            # none are enabled for the provided course
+            return cls(user, wrapped, enabled_providers)
 
         return wrapped
 
-    def __init__(self, user, fallback):
+    @classmethod
+    def _providers_for_course(cls, course):
+        """
+        Return a filtered list of enabled providers based
+        on the course passed in. Cache this result per request to avoid
+        needing to call the provider filter api hundreds of times.
+
+        Arguments:
+            course: The course XBlock
+        """
+        request_cache = RequestCache.get_request_cache()
+        enabled_providers = request_cache.data.get(
+            ENABLED_OVERRIDE_PROVIDERS_KEY, NOTSET
+        )
+        if enabled_providers == NOTSET:
+            enabled_providers = tuple(
+                (provider_class for provider_class in cls.provider_classes if provider_class.enabled_for(course))
+            )
+            request_cache.data[ENABLED_OVERRIDE_PROVIDERS_KEY] = enabled_providers
+
+        return enabled_providers
+
+    def __init__(self, user, fallback, providers):
         self.fallback = fallback
-        self.providers = tuple((cls(user) for cls in self.provider_classes))
+        self.providers = tuple(provider(user) for provider in providers)
 
     def get_override(self, block, name):
         """
@@ -109,6 +138,9 @@ class OverrideFieldData(FieldData):
         self.fallback.delete(block, name)
 
     def has(self, block, name):
+        if not self.providers:
+            return self.fallback.has(block, name)
+
         has = self.get_override(block, name)
         if has is NOTSET:
             # If this is an inheritable field and an override is set above,
@@ -128,7 +160,7 @@ class OverrideFieldData(FieldData):
     def default(self, block, name):
         # The `default` method is overloaded by the field storage system to
         # also handle inheritance.
-        if not overrides_disabled():
+        if self.providers and not overrides_disabled():
             inheritable = InheritanceMixin.fields.keys()
             if name in inheritable:
                 for ancestor in _lineage(block):
@@ -191,6 +223,17 @@ class FieldOverrideProvider(object):
         Returns the overridden value or `default` if no override is found.
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def enabled_for(self, course):  # pragma no cover
+        """
+        Return True if this provider should be enabled for a given course
+
+        Return False otherwise
+
+        Concrete implementations are responsible for implementing this method
+        """
+        return False
 
 
 def _lineage(block):

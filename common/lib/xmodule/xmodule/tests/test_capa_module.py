@@ -65,7 +65,7 @@ class CapaFactory(object):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + cls.answer_key(response_num, input_num))
+        return "input_" + cls.answer_key(response_num, input_num)
 
     @classmethod
     def answer_key(cls, response_num=2, input_num=1):
@@ -1902,7 +1902,7 @@ class TestProblemCheckTracking(unittest.TestCase):
               </multiplechoiceresponse>
               <p>Which of the following are musical instruments?</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical" label="Which of the following are musical instruments?">
+                <checkboxgroup label="Which of the following are musical instruments?">
                   <choice correct="true">a piano</choice>
                   <choice correct="false">a tree</choice>
                   <choice correct="true">a guitar</choice>

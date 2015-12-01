@@ -129,6 +129,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     module_class = CapaModule
 
     has_score = True
+    show_in_read_only_mode = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
@@ -153,7 +154,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         Show them only if use_latex_compiler is set to True in
         course settings.
         """
-        return ('latex' not in template['template_id'] or course.use_latex_compiler)
+        return 'latex' not in template['template_id'] or course.use_latex_compiler
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
@@ -194,7 +195,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def problem_types(self):
         """ Low-level problem type introspection for content libraries filtering by problem type """
-        tree = etree.XML(self.data)  # pylint: disable=no-member
+        tree = etree.XML(self.data)
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
 
@@ -212,6 +213,17 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         }
         result.update(index)
         return result
+
+    def has_support(self, view, functionality):
+        """
+        Override the XBlock.has_support method to return appropriate
+        value for the multi-device functionality.
+        Returns whether the given view has support for the given functionality.
+        """
+        if functionality == "multi_device":
+            return self.lcp.has_multi_device_support
+        else:
+            return False
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

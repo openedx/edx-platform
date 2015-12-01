@@ -16,7 +16,7 @@ def get_user_role(user, course_id):
     :param course_id: the course_id of the course we're interested in
     """
     # afaik, this is only used in lti
-    if auth.has_access(user, CourseInstructorRole(course_id)):
+    if auth.user_has_role(user, CourseInstructorRole(course_id)):
         return 'instructor'
     else:
         return 'staff'

@@ -5,6 +5,7 @@ import mock
 from mock import patch
 import shutil
 import lxml.html
+from lxml import etree
 import ddt
 
 from datetime import timedelta
@@ -35,7 +36,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.utils import XssTestMixin
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 
@@ -113,6 +115,69 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     def test_xlint_fails(self):
         err_cnt = perform_xlint(TEST_DATA_DIR, ['toy'])
         self.assertGreater(err_cnt, 0)
+
+    def test_invalid_asset_overwrite(self):
+        """
+        Tests that an asset with invalid displayname can be overwritten if multiple assets have same displayname.
+        It Verifies that:
+            During import, if ('/') or ('\') is present in displayname of an asset, it is replaced with underscores '_'.
+            Export does not fail when an asset has '/' in its displayname. If the converted display matches with
+            any other asset, then it will be replaced.
+
+        Asset name in XML: "/invalid\\displayname/subs-esLhHcdKGWvKs.srt"
+        """
+        content_store = contentstore()
+        expected_displayname = '_invalid_displayname_subs-esLhHcdKGWvKs.srt'
+
+        import_course_from_xml(
+            self.store,
+            self.user.id,
+            TEST_DATA_DIR,
+            ['import_draft_order'],
+            static_content_store=content_store,
+            verbose=True,
+            create_if_not_present=True
+        )
+
+        # Verify the course has imported successfully
+        course = self.store.get_course(self.store.make_course_key(
+            'test_org',
+            'import_draft_order',
+            'import_draft_order'
+        ))
+        self.assertIsNotNone(course)
+
+        # Add a new asset in the course, and make sure to name it such that it overwrite the one existing
+        # asset in the course. (i.e. _invalid_displayname_subs-esLhHcdKGWvKs.srt)
+        asset_key = course.id.make_asset_key('asset', 'sample_asset.srt')
+        content = StaticContent(
+            asset_key, expected_displayname, 'application/text', 'test',
+        )
+        content_store.save(content)
+
+        # Get & verify that course actually has two assets
+        assets, count = content_store.get_all_content_for_course(course.id)
+        self.assertEqual(count, 2)
+
+        # Verify both assets have similar `displayname` after saving.
+        for asset in assets:
+            self.assertEquals(asset['displayname'], expected_displayname)
+
+        # Test course export does not fail
+        root_dir = path(mkdtemp_clean())
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+        export_course_to_xml(self.store, content_store, course.id, root_dir, 'test_export')
+
+        filesystem = OSFS(root_dir / 'test_export/static')
+        exported_static_files = filesystem.listdir()
+
+        # Verify that asset have been overwritten during export.
+        self.assertEqual(len(exported_static_files), 1)
+        self.assertTrue(filesystem.exists(expected_displayname))
+        self.assertEqual(exported_static_files[0], expected_displayname)
+
+        # Remove exported course
+        shutil.rmtree(root_dir)
 
     def test_about_overrides(self):
         '''
@@ -545,6 +610,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         )
 
 
+@ddt.ddt
 class MiscCourseTests(ContentStoreTestCase):
     """
     Tests that rely on the toy courses.
@@ -626,6 +692,76 @@ class MiscCourseTests(ContentStoreTestCase):
              'Open Response Assessment', 'Peer Grading Interface', 'split_test'],
         )
 
+    @ddt.data('/Fake/asset/displayname', '\\Fake\\asset\\displayname')
+    def test_export_on_invalid_displayname(self, invalid_displayname):
+        """ Tests that assets with invalid 'displayname' does not cause export to fail """
+        content_store = contentstore()
+        exported_asset_name = '_Fake_asset_displayname'
+
+        # Create an asset with slash `invalid_displayname` '
+        asset_key = self.course.id.make_asset_key('asset', "fake_asset.txt")
+        content = StaticContent(
+            asset_key, invalid_displayname, 'application/text', 'test',
+        )
+        content_store.save(content)
+
+        # Verify that the course has only one asset and it has been added with an invalid asset name.
+        assets, count = content_store.get_all_content_for_course(self.course.id)
+        self.assertEqual(count, 1)
+        display_name = assets[0]['displayname']
+        self.assertEqual(display_name, invalid_displayname)
+
+        # Now export the course to a tempdir and test that it contains assets. The export should pass
+        root_dir = path(mkdtemp_clean())
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_export')
+
+        filesystem = OSFS(root_dir / 'test_export/static')
+        exported_static_files = filesystem.listdir()
+
+        # Verify that only single asset has been exported with the expected asset name.
+        self.assertTrue(filesystem.exists(exported_asset_name))
+        self.assertEqual(len(exported_static_files), 1)
+
+        # Remove tempdir
+        shutil.rmtree(root_dir)
+
+    def test_assets_overwrite(self):
+        """ Tests that assets will similar 'displayname' will be overwritten during export """
+        content_store = contentstore()
+        asset_displayname = 'Fake_asset.txt'
+
+        # Create two assets with similar 'displayname'
+        for i in range(2):
+            asset_path = 'sample_asset_{}.txt'.format(i)
+            asset_key = self.course.id.make_asset_key('asset', asset_path)
+            content = StaticContent(
+                asset_key, asset_displayname, 'application/text', 'test',
+            )
+            content_store.save(content)
+
+        # Fetch & verify course assets to be equal to 2.
+        assets, count = content_store.get_all_content_for_course(self.course.id)
+        self.assertEqual(count, 2)
+
+        # Verify both assets have similar 'displayname' after saving.
+        for asset in assets:
+            self.assertEquals(asset['displayname'], asset_displayname)
+
+        # Now export the course to a tempdir and test that it contains assets.
+        root_dir = path(mkdtemp_clean())
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_export')
+
+        # Verify that asset have been overwritten during export.
+        filesystem = OSFS(root_dir / 'test_export/static')
+        exported_static_files = filesystem.listdir()
+        self.assertTrue(filesystem.exists(asset_displayname))
+        self.assertEqual(len(exported_static_files), 1)
+
+        # Remove tempdir
+        shutil.rmtree(root_dir)
+
     def test_advanced_components_require_two_clicks(self):
         self.check_components_on_page(['word_cloud'], ['Word cloud'])
 
@@ -659,7 +795,7 @@ class MiscCourseTests(ContentStoreTestCase):
         direct_store_items = self.store.get_items(
             self.course.id, revision=ModuleStoreEnum.RevisionOption.published_only
         )
-        items_from_direct_store = [item for item in direct_store_items if (item.location == self.problem.location)]
+        items_from_direct_store = [item for item in direct_store_items if item.location == self.problem.location]
         self.assertEqual(len(items_from_direct_store), 1)
         self.assertFalse(getattr(items_from_direct_store[0], 'is_draft', False))
 
@@ -667,7 +803,7 @@ class MiscCourseTests(ContentStoreTestCase):
         draft_store_items = self.store.get_items(
             self.course.id, revision=ModuleStoreEnum.RevisionOption.draft_only
         )
-        items_from_draft_store = [item for item in draft_store_items if (item.location == self.problem.location)]
+        items_from_draft_store = [item for item in draft_store_items if item.location == self.problem.location]
         self.assertEqual(len(items_from_draft_store), 1)
         # TODO the below won't work for split mongo
         self.assertTrue(getattr(items_from_draft_store[0], 'is_draft', False))
@@ -981,7 +1117,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
 
 @ddt.ddt
-class ContentStoreTest(ContentStoreTestCase):
+class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
     """
     Tests for the CMS ContentStore application.
     """
@@ -1021,6 +1157,14 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_create_course(self):
         """Test new course creation - happy path"""
         self.assert_created_course()
+
+    @override_settings(DEFAULT_COURSE_LANGUAGE='hr')
+    def test_create_course_default_language(self):
+        """Test new course creation and verify default language"""
+        test_course_data = self.assert_created_course()
+        course_id = _get_course_id(self.store, test_course_data)
+        course_module = self.store.get_course(course_id)
+        self.assertEquals(course_module.language, 'hr')
 
     def test_create_course_with_dots(self):
         """Test new course creation with dots in the name"""
@@ -1069,13 +1213,13 @@ class ContentStoreTest(ContentStoreTestCase):
 
         # test that a user gets his enrollment and its 'student' role as default on creating a course
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
-        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))
 
         delete_course_and_groups(course_id, self.user.id)
         # check that user's enrollment for this course is not deleted
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
         # check that user has form role "Student" for this course even after deleting it
-        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))
 
     def test_course_access_groups_on_delete(self):
         """
@@ -1100,6 +1244,17 @@ class ContentStoreTest(ContentStoreTestCase):
 
         self.assertFalse(instructor_role.has_user(self.user))
         self.assertEqual(len(instructor_role.users_with_role()), 0)
+
+    def test_create_course_after_delete(self):
+        """
+        Test that course creation works after deleting a course with the same URL
+        """
+        test_course_data = self.assert_created_course()
+        course_id = _get_course_id(self.store, test_course_data)
+
+        delete_course_and_groups(course_id, self.user.id)
+
+        self.assert_created_course()
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
@@ -1254,6 +1409,22 @@ class ContentStoreTest(ContentStoreTestCase):
             status_code=200,
             html=True
         )
+
+    def test_course_index_view_xss(self):
+        """Test that the index page correctly escapes course names with script
+        tags."""
+        CourseFactory.create(
+            display_name='<script>alert("course XSS")</script>'
+        )
+
+        LibraryFactory.create(display_name='<script>alert("library XSS")</script>')
+
+        resp = self.client.get_html('/home/')
+        for xss in ('course', 'library'):
+            html = '<script>alert("{name} XSS")</script>'.format(
+                name=xss
+            )
+            self.assert_xss(resp, html)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
@@ -1749,6 +1920,13 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEqual(1, len(source_videos))
         self.assertEqual(source_videos, target_videos)
 
+    def test_rerun_course_resets_advertised_date(self):
+        source_course = CourseFactory.create(advertised_start="01-12-2015")
+        destination_course_key = self.post_rerun_request(source_course.id)
+        destination_course = self.store.get_course(destination_course_key)
+
+        self.assertEqual(None, destination_course.advertised_start)
+
     def test_rerun_of_rerun(self):
         source_course = CourseFactory.create()
         rerun_course_key = self.post_rerun_request(source_course.id)
@@ -1839,6 +2017,80 @@ class RerunCourseTest(ContentStoreTestCase):
             self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
             self.assertTrue(rerun_state.message.endswith("traceback"))
             self.assertEqual(len(rerun_state.message), CourseRerunState.MAX_MESSAGE_LENGTH)
+
+    def test_rerun_course_wiki_slug(self):
+        """
+        Test that unique wiki_slug is assigned to rerun course.
+        """
+        course_data = {
+            'org': 'edX',
+            'number': '123',
+            'display_name': 'Rerun Course',
+            'run': '2013'
+        }
+
+        source_wiki_slug = '{0}.{1}.{2}'.format(course_data['org'], course_data['number'], course_data['run'])
+
+        source_course_key = _get_course_id(self.store, course_data)
+        _create_course(self, source_course_key, course_data)
+        source_course = self.store.get_course(source_course_key)
+
+        # Verify created course's wiki_slug.
+        self.assertEquals(source_course.wiki_slug, source_wiki_slug)
+
+        destination_course_data = course_data
+        destination_course_data['run'] = '2013_Rerun'
+
+        destination_course_key = self.post_rerun_request(
+            source_course.id, destination_course_data=destination_course_data
+        )
+        self.verify_rerun_course(source_course.id, destination_course_key, destination_course_data['display_name'])
+        destination_course = self.store.get_course(destination_course_key)
+
+        destination_wiki_slug = '{0}.{1}.{2}'.format(
+            destination_course.id.org, destination_course.id.course, destination_course.id.run
+        )
+
+        # Verify rerun course's wiki_slug.
+        self.assertEquals(destination_course.wiki_slug, destination_wiki_slug)
+
+
+class ContentLicenseTest(ContentStoreTestCase):
+    """
+    Tests around content licenses
+    """
+    def test_course_license_export(self):
+        content_store = contentstore()
+        root_dir = path(mkdtemp_clean())
+        self.course.license = "creative-commons: BY SA"
+        self.store.update_item(self.course, None)
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
+        fname = "{block}.xml".format(block=self.course.scope_ids.usage_id.block_id)
+        run_file_path = root_dir / "test_license" / "course" / fname
+        run_xml = etree.parse(run_file_path.open())
+        self.assertEqual(run_xml.getroot().get("license"), "creative-commons: BY SA")
+
+    def test_video_license_export(self):
+        content_store = contentstore()
+        root_dir = path(mkdtemp_clean())
+        video_descriptor = ItemFactory.create(
+            parent_location=self.course.location, category='video',
+            license="all-rights-reserved"
+        )
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
+        fname = "{block}.xml".format(block=video_descriptor.scope_ids.usage_id.block_id)
+        video_file_path = root_dir / "test_license" / "video" / fname
+        video_xml = etree.parse(video_file_path.open())
+        self.assertEqual(video_xml.getroot().get("license"), "all-rights-reserved")
+
+    def test_license_import(self):
+        course_items = import_course_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_if_not_present=True
+        )
+        course = course_items[0]
+        self.assertEqual(course.license, "creative-commons: BY")
+        videos = self.store.get_items(course.id, qualifiers={'category': 'video'})
+        self.assertEqual(videos[0].license, "all-rights-reserved")
 
 
 class EntryPageTestCase(TestCase):

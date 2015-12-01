@@ -18,9 +18,10 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_GET
 
-from django_future.csrf import ensure_csrf_cookie
+import dogstats_wrapper as dog_stats_api
 from edxmako.shortcuts import render_to_response
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import SerializationError
@@ -260,13 +261,17 @@ def _import_handler(request, courselike_key, root_name, successful_url, context_
                 log.info("Course import %s: Extracted file verified", courselike_key)
                 _save_request_status(request, courselike_string, 3)
 
-                courselike_items = import_func(
-                    modulestore(), request.user.id,
-                    settings.GITHUB_REPO_ROOT, [dirpath],
-                    load_error_modules=False,
-                    static_content_store=contentstore(),
-                    target_id=courselike_key
-                )
+                with dog_stats_api.timer(
+                    'courselike_import.time',
+                    tags=[u"courselike:{}".format(courselike_key)]
+                ):
+                    courselike_items = import_func(
+                        modulestore(), request.user.id,
+                        settings.GITHUB_REPO_ROOT, [dirpath],
+                        load_error_modules=False,
+                        static_content_store=contentstore(),
+                        target_id=courselike_key
+                    )
 
                 new_location = courselike_items[0].location
                 logging.debug('new course at %s', new_location)

@@ -170,7 +170,7 @@ class SSLClientTest(ModuleStoreTestCase):
         """
         response = self.client.get(reverse('dashboard'), follows=True)
         self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse('accounts_login'), response['location'])
+        self.assertIn(reverse('signin_user'), response['location'])
 
         response = self.client.get(
             reverse('dashboard'), follow=True,

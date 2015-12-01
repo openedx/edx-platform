@@ -3,10 +3,13 @@ Test the course_info xblock
 """
 import mock
 from nose.plugins.attrib import attr
+from urllib import urlencode
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -61,6 +64,24 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             user=self.user, course_id=self.course.id
         ).exists()
         self.assertFalse(enrollment_exists)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    def test_non_live_course(self):
+        """Ensure that a user accessing a non-live course sees a redirect to
+        the student dashboard, not a 404.
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        url = reverse('info', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        start_date = strftime_localized(self.course.start, 'SHORT_DATE')
+        self.assertRedirects(response, '{0}?{1}'.format(reverse('dashboard'), urlencode({'notlive': start_date})))
+
+    def test_nonexistent_course(self):
+        self.setup_user()
+        url = reverse('info', args=['not/a/course'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
 
 @attr('shard_1')

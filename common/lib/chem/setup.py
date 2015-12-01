@@ -8,6 +8,6 @@ setup(
         "pyparsing==2.0.1",
         "numpy",
         "scipy",
-        "nltk==2.0.5",
+        "nltk<3.0",
     ],
 )

@@ -8,7 +8,7 @@ from mako.exceptions import TopLevelLookupException
 from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from util.cache import cache_if_anonymous
 

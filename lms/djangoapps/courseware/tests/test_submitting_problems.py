@@ -9,6 +9,7 @@ from textwrap import dedent
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch
 from nose.plugins.attrib import attr
@@ -18,7 +19,7 @@ from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
 )
 from courseware import grades
-from courseware.models import StudentModule
+from courseware.models import StudentModule, StudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
@@ -26,34 +27,17 @@ from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
+from openedx.core.djangoapps.credit.api import (
+    set_credit_requirements, get_credit_requirement_status
+)
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class ProblemSubmissionTestMixin(TestCase):
     """
-    Check that a course gets graded properly.
+    TestCase mixin that provides functions to submit answers to problems.
     """
-
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-
-    def setUp(self):
-
-        super(TestSubmittingProblems, self).setUp(create_user=False)
-        # Create course
-        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        assert self.course, "Couldn't load course %r" % self.COURSE_NAME
-
-        # create a test student
-        self.student = 'view@test.com'
-        self.password = 'foo'
-        self.create_account('u1', self.student, self.password)
-        self.activate_user(self.student)
-        self.enroll(self.course)
-        self.student_user = User.objects.get(email=self.student)
-        self.factory = RequestFactory()
-
     def refresh_course(self):
         """
         Re-fetch the course from the database so that the object being dealt with has everything added to it.
@@ -64,7 +48,6 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Returns the url of the problem given the problem's name
         """
-
         return self.course.id.make_usage_key('problem', problem_url_name)
 
     def modx_url(self, problem_location, dispatch):
@@ -105,6 +88,15 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         return resp
 
+    def look_at_question(self, problem_url_name):
+        """
+        Create state for a problem, but don't answer it
+        """
+        location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(location, "problem_get")
+        resp = self.client.get(modx_url)
+        return resp
+
     def reset_question_answer(self, problem_url_name):
         """
         Reset specified problem for current user.
@@ -122,6 +114,32 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         modx_url = self.modx_url(problem_location, 'problem_show')
         resp = self.client.post(modx_url)
         return resp
+
+
+class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, ProblemSubmissionTestMixin):
+    """
+    Check that a course gets graded properly.
+    """
+
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+
+    def setUp(self):
+
+        super(TestSubmittingProblems, self).setUp(create_user=False)
+        # Create course
+        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        assert self.course, "Couldn't load course %r" % self.COURSE_NAME
+
+        # create a test student
+        self.student = 'view@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.activate_user(self.student)
+        self.enroll(self.course)
+        self.student_user = User.objects.get(email=self.student)
+        self.factory = RequestFactory()
 
     def add_dropdown_to_section(self, section_location, name, num_inputs=2):
         """
@@ -161,7 +179,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
 
         # if we don't already have a chapter create a new one
-        if not(hasattr(self, 'chapter')):
+        if not hasattr(self, 'chapter'):
             self.chapter = ItemFactory.create(
                 parent_location=self.course.location,
                 category='chapter'
@@ -238,6 +256,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
         )
 
+        fake_request.user = self.student_user
         return grades.grade(self.student_user, fake_request, self.course)
 
     def get_progress_summary(self):
@@ -426,6 +445,59 @@ class TestCourseGrader(TestSubmittingProblems):
         )
         self.assertEqual(json.loads(resp.content).get("success"), err_msg)
 
+    def test_show_answer_doesnt_write_to_csm(self):
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': u'Correct'})
+
+        # Now fetch the state entry for that problem.
+        student_module = StudentModule.objects.get(
+            course_id=self.course.id,
+            student=self.student_user
+        )
+        # count how many state history entries there are
+        baseline = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        )
+        baseline_count = baseline.count()
+        self.assertEqual(baseline_count, 3)
+
+        # now click "show answer"
+        self.show_question_answer('p1')
+
+        # check that we don't have more state history entries
+        csmh = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        )
+        current_count = csmh.count()
+        self.assertEqual(current_count, 3)
+
+    def test_grade_with_max_score_cache(self):
+        """
+        Tests that the max score cache is populated after a grading run
+        and that the results of grading runs before and after the cache
+        warms are the same.
+        """
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.look_at_question('p2')
+        self.assertTrue(
+            StudentModule.objects.filter(
+                module_state_key=self.problem_location('p2')
+            ).exists()
+        )
+        location_to_cache = unicode(self.problem_location('p2'))
+        max_scores_cache = grades.MaxScoresCache.create_for_course(self.course)
+
+        # problem isn't in the cache
+        max_scores_cache.fetch_from_remote([location_to_cache])
+        self.assertIsNone(max_scores_cache.get(location_to_cache))
+        self.check_grade_percent(0.33)
+
+        # problem is in the cache
+        max_scores_cache.fetch_from_remote([location_to_cache])
+        self.assertIsNotNone(max_scores_cache.get(location_to_cache))
+        self.check_grade_percent(0.33)
+
     def test_none_grade(self):
         """
         Check grade is 0 to begin with.
@@ -442,6 +514,13 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.check_grade_percent(0.33)
         self.assertEqual(self.get_grade_summary()['grade'], 'B')
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_MAX_SCORE_CACHE": False})
+    def test_grade_no_max_score_cache(self):
+        """
+        Tests grading when the max score cache is disabled
+        """
+        self.test_b_grade_exact()
 
     def test_b_grade_above(self):
         """
@@ -593,6 +672,41 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(1.0)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
+
+    def test_min_grade_credit_requirements_status(self):
+        """
+        Test for credit course. If user passes minimum grade requirement then
+        status will be updated as satisfied in requirement status table.
+        """
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+
+        # Enable the course for credit
+        credit_course = CreditCourse.objects.create(
+            course_key=self.course.id,
+            enabled=True,
+        )
+
+        # Configure a credit provider for the course
+        CreditProvider.objects.create(
+            provider_id="ASU",
+            enable_integration=True,
+            provider_url="https://credit.example.com/request",
+        )
+
+        requirements = [{
+            "namespace": "grade",
+            "name": "grade",
+            "display_name": "Grade",
+            "criteria": {"min_grade": 0.52},
+        }]
+        # Add a single credit requirement (final grade)
+        set_credit_requirements(self.course.id, requirements)
+
+        self.get_grade_summary()
+        req_status = get_credit_requirement_status(self.course.id, self.student_user.username, 'grade', 'grade')
+        self.assertEqual(req_status[0]["status"], 'satisfied')
 
 
 @attr('shard_1')
@@ -1140,7 +1254,7 @@ class TestConditionalContent(TestSubmittingProblems):
         UserCourseTagFactory(
             user=self.student_user,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
             value=str(user_partition_group)
         )
 

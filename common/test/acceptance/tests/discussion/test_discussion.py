@@ -6,6 +6,7 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
+from flaky import flaky
 
 from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
@@ -176,7 +177,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionHomePageTest(UniqueCourseTest):
     """
     Tests for the discussion home page.
@@ -203,7 +204,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.assertIsNotNone(self.page.new_post_form)
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -217,6 +218,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
+    @flaky  # TODO fix this, see TNL-2419
     def test_mathjax_rendering(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
 
@@ -233,6 +235,26 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertTrue(self.thread_page.is_discussion_body_visible())
         self.assertTrue(self.thread_page.is_mathjax_preview_available())
         self.assertTrue(self.thread_page.is_mathjax_rendered())
+
+    def test_markdown_reference_link(self):
+        """
+        Check markdown editor renders reference link correctly
+        and colon(:) in reference link is not converted to %3a
+        """
+        sample_link = "http://example.com/colon:test"
+        thread_content = """[enter link description here][1]\n[1]: http://example.com/colon:test"""
+        thread_id = "test_thread_{}".format(uuid4().hex)
+        thread_fixture = SingleThreadViewFixture(
+            Thread(
+                id=thread_id,
+                body=thread_content,
+                commentable_id=self.discussion_id,
+                thread_type="discussion"
+            )
+        )
+        thread_fixture.push()
+        self.setup_thread_page(thread_id)
+        self.assertEqual(self.thread_page.get_link_href(), sample_link)
 
     def test_marked_answer_comments(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
@@ -256,7 +278,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
     """
     Tests for the discussion page with multiple threads
@@ -311,7 +333,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.check_window_is_on_top()
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
     Tests for checking the display of attributes on open and closed threads
@@ -360,7 +382,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     """
     Tests for deleting comments displayed beneath responses in the single thread view.
@@ -397,7 +419,7 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         page.delete_comment("comment_other_author")
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.
@@ -491,7 +513,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.endorse_response('response_other_author')
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
@@ -574,7 +596,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertTrue(page.is_add_comment_visible("response1"))
 
 
-@attr('shard_1')
+@attr('shard_2')
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
@@ -582,6 +604,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
+        self.thread_ids = []
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.additional_discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fix = CourseFixture(**self.course_info).add_children(
@@ -615,6 +638,38 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.expand()
+
+    def setup_multiple_inline_threads(self, thread_count):
+        """
+        Set up multiple treads on the page by passing 'thread_count'
+        """
+        threads = []
+        for i in range(thread_count):
+            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
+            threads.append(
+                Thread(id=thread_id, commentable_id=self.discussion_id),
+            )
+            self.thread_ids.append(thread_id)
+        thread_fixture = MultipleThreadFixture(threads)
+        thread_fixture.add_response(
+            Response(id="response1"),
+            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)],
+            threads[0]
+        )
+        thread_fixture.push()
+
+    def test_page_while_expanding_inline_discussion(self):
+        """
+        Tests for the Inline Discussion page with multiple treads. Page should not focus 'thread-wrapper'
+        after loading responses.
+        """
+        self.setup_multiple_inline_threads(thread_count=3)
+        self.discussion_page.expand_discussion()
+        thread_page = InlineDiscussionThreadPage(self.browser, self.thread_ids[0])
+        thread_page.expand()
+
+        # Check if 'thread-wrapper' is focused after expanding thread
+        self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
 
     def test_initial_render(self):
         self.assertFalse(self.discussion_page.is_discussion_expanded())
@@ -700,7 +755,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionUserProfileTest(UniqueCourseTest):
     """
     Tests for user profile page in discussion tab.
@@ -829,7 +884,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
     Tests for spawning and dismissing alerts related to user search actions and their results.
@@ -903,7 +958,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         ).wait_for_page()
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionSortPreferenceTest(UniqueCourseTest):
     """
     Tests for the discussion page displaying a single thread.

@@ -78,7 +78,7 @@ class LibraryRoot(XBlock):
 
         force_render = context.get('force_render', None)
 
-        for child_key in children_to_show:  # pylint: disable=E1101
+        for child_key in children_to_show:
             # Children must have a separate context from the library itself. Make a copy.
             child_context = context.copy()
             child_context['show_preview'] = self.show_children_previews

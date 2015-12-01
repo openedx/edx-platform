@@ -4,7 +4,9 @@ Serializer for video outline
 from rest_framework.reverse import reverse
 
 from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
+from xmodule.modulestore.django import modulestore
 from courseware.access import has_access
+from courseware.courses import get_course_by_id
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
@@ -49,49 +51,52 @@ class BlockOutline(object):
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 self.course_id, self.request.user, descriptor, depth=0,
             )
+            course = get_course_by_id(self.course_id)
             return get_module_for_descriptor(
-                self.request.user, self.request, descriptor, field_data_cache, self.course_id
+                self.request.user, self.request, descriptor, field_data_cache, self.course_id, course=course
             )
 
-        child_to_parent = {}
-        stack = [self.start_block]
-        while stack:
-            curr_block = stack.pop()
+        with modulestore().bulk_operations(self.course_id):
+            child_to_parent = {}
+            stack = [self.start_block]
+            while stack:
+                curr_block = stack.pop()
 
-            if curr_block.hide_from_toc:
-                # For now, if the 'hide_from_toc' setting is set on the block, do not traverse down
-                # the hierarchy.  The reason being is that these blocks may not have human-readable names
-                # to display on the mobile clients.
-                # Eventually, we'll need to figure out how we want these blocks to be displayed on the
-                # mobile clients.  As they are still accessible in the browser, just not navigatable
-                # from the table-of-contents.
-                continue
-
-            if curr_block.location.block_type in self.block_types:
-                if not has_access(self.request.user, 'load', curr_block, course_key=self.course_id):
+                if curr_block.hide_from_toc:
+                    # For now, if the 'hide_from_toc' setting is set on the block, do not traverse down
+                    # the hierarchy.  The reason being is that these blocks may not have human-readable names
+                    # to display on the mobile clients.
+                    # Eventually, we'll need to figure out how we want these blocks to be displayed on the
+                    # mobile clients.  As they are still accessible in the browser, just not navigatable
+                    # from the table-of-contents.
                     continue
 
-                summary_fn = self.block_types[curr_block.category]
-                block_path = list(path(curr_block, child_to_parent, self.start_block))
-                unit_url, section_url = find_urls(self.course_id, curr_block, child_to_parent, self.request)
+                if curr_block.location.block_type in self.block_types:
+                    if not has_access(self.request.user, 'load', curr_block, course_key=self.course_id):
+                        continue
 
-                yield {
-                    "path": block_path,
-                    "named_path": [b["name"] for b in block_path],
-                    "unit_url": unit_url,
-                    "section_url": section_url,
-                    "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
-                }
+                    summary_fn = self.block_types[curr_block.category]
+                    block_path = list(path(curr_block, child_to_parent, self.start_block))
+                    unit_url, section_url = find_urls(self.course_id, curr_block, child_to_parent, self.request)
 
-            if curr_block.has_children:
-                children = get_dynamic_descriptor_children(
-                    curr_block,
-                    create_module,
-                    usage_key_filter=parent_or_requested_block_type
-                )
-                for block in reversed(children):
-                    stack.append(block)
-                    child_to_parent[block] = curr_block
+                    yield {
+                        "path": block_path,
+                        "named_path": [b["name"] for b in block_path],
+                        "unit_url": unit_url,
+                        "section_url": section_url,
+                        "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
+                    }
+
+                if curr_block.has_children:
+                    children = get_dynamic_descriptor_children(
+                        curr_block,
+                        self.request.user.id,
+                        create_module,
+                        usage_key_filter=parent_or_requested_block_type
+                    )
+                    for block in reversed(children):
+                        stack.append(block)
+                        child_to_parent[block] = curr_block
 
 
 def path(block, child_to_parent, start_block):
@@ -140,20 +145,19 @@ def find_urls(course_id, block, child_to_parent, request):
 
     kwargs = {'course_id': unicode(course_id)}
     if chapter_id is None:
-        no_chapter_url = reverse("courseware", kwargs=kwargs, request=request)
-        return no_chapter_url, no_chapter_url
+        course_url = reverse("courseware", kwargs=kwargs, request=request)
+        return course_url, course_url
 
     kwargs['chapter'] = chapter_id
     if section is None:
-        no_section_url = reverse("courseware_chapter", kwargs=kwargs, request=request)
-        return no_section_url, no_section_url
+        chapter_url = reverse("courseware_chapter", kwargs=kwargs, request=request)
+        return chapter_url, chapter_url
 
     kwargs['section'] = section.url_name
-    if position is None:
-        no_position_url = reverse("courseware_section", kwargs=kwargs, request=request)
-        return no_position_url, no_position_url
-
     section_url = reverse("courseware_section", kwargs=kwargs, request=request)
+    if position is None:
+        return section_url, section_url
+
     kwargs['position'] = position
     unit_url = reverse("courseware_position", kwargs=kwargs, request=request)
     return unit_url, section_url
@@ -207,7 +211,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
     size = default_encoded_video.get('file_size', 0)
 
     # Transcripts...
-    transcript_langs = video_descriptor.available_translations(verify_assets=False)
+    transcripts_info = video_descriptor.get_transcripts_info()
+    transcript_langs = video_descriptor.available_translations(transcripts_info, verify_assets=False)
 
     transcripts = {
         lang: reverse(
@@ -228,7 +233,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "duration": duration,
         "size": size,
         "transcripts": transcripts,
-        "language": video_descriptor.get_default_transcript_language(),
+        "language": video_descriptor.get_default_transcript_language(transcripts_info),
         "encoded_videos": video_data.get('profiles')
     }
     ret.update(always_available_data)

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'backbone', 'js/common_helpers/template_helpers', 'js/edxnotes/collections/tabs',
+    'jquery', 'backbone', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
     'js/edxnotes/views/tabs_list', 'js/edxnotes/views/tab_view',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(

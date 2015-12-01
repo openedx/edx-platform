@@ -1,12 +1,12 @@
 """
 Serializers for all Course Enrollment related return objects.
-
 """
 import logging
 
 from rest_framework import serializers
-from student.models import CourseEnrollment
+
 from course_modes.models import CourseMode
+from student.models import CourseEnrollment
 
 
 log = logging.getLogger(__name__)
@@ -38,20 +38,23 @@ class CourseField(serializers.RelatedField):
 
     """
 
-    def to_native(self, course):
-        course_id = unicode(course.id)
+    def to_native(self, course, **kwargs):
         course_modes = ModeSerializer(
-            CourseMode.modes_for_course(course.id, only_selectable=False)
-        ).data  # pylint: disable=no-member
+            CourseMode.modes_for_course(
+                course.id,
+                include_expired=kwargs.get('include_expired', False),
+                only_selectable=False
+            )
+        ).data
 
         return {
-            "course_id": course_id,
-            "enrollment_start": course.enrollment_start,
-            "enrollment_end": course.enrollment_end,
-            "course_start": course.start,
-            "course_end": course.end,
-            "invite_only": course.invitation_only,
-            "course_modes": course_modes,
+            'course_id': unicode(course.id),
+            'enrollment_start': course.enrollment_start,
+            'enrollment_end': course.enrollment_end,
+            'course_start': course.start,
+            'course_end': course.end,
+            'invite_only': course.invitation_only,
+            'course_modes': course_modes,
         }
 
 
@@ -94,7 +97,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """Retrieves the username from the associated model."""
         return model.username
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course_details', 'user')
         lookup_field = 'username'

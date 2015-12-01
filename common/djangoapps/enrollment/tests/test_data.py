@@ -170,6 +170,45 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         self.assertEqual(self.user.username, result['user'])
         self.assertEqual(enrollment, result)
 
+    @ddt.data(
+        # Default (no course modes in the database)
+        # Expect that users are automatically enrolled as "honor".
+        ([], 'credit'),
+
+        # Audit / Verified / Honor
+        # We should always go to the "choose your course" page.
+        # We should also be enrolled as "honor" by default.
+        (['honor', 'verified', 'audit', 'credit'], 'credit'),
+    )
+    @ddt.unpack
+    def test_add_or_update_enrollment_attr(self, course_modes, enrollment_mode):
+        # Create the course modes (if any) required for this test case
+        self._create_course_modes(course_modes)
+        data.create_course_enrollment(self.user.username, unicode(self.course.id), enrollment_mode, True)
+        enrollment_attributes = [
+            {
+                "namespace": "credit",
+                "name": "provider_id",
+                "value": "hogwarts",
+            }
+        ]
+
+        data.add_or_update_enrollment_attr(self.user.username, unicode(self.course.id), enrollment_attributes)
+        enrollment_attr = data.get_enrollment_attributes(self.user.username, unicode(self.course.id))
+        self.assertEqual(enrollment_attr[0], enrollment_attributes[0])
+
+        enrollment_attributes = [
+            {
+                "namespace": "credit",
+                "name": "provider_id",
+                "value": "ASU",
+            }
+        ]
+
+        data.add_or_update_enrollment_attr(self.user.username, unicode(self.course.id), enrollment_attributes)
+        enrollment_attr = data.get_enrollment_attributes(self.user.username, unicode(self.course.id))
+        self.assertEqual(enrollment_attr[0], enrollment_attributes[0])
+
     @raises(CourseNotFoundError)
     def test_non_existent_course(self):
         data.get_course_enrollment_info("this/is/bananas")

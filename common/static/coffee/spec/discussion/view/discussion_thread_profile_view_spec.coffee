@@ -2,30 +2,22 @@
 describe "DiscussionThreadProfileView", ->
 
     beforeEach ->
-
-        setFixtures """
-        <article class="discussion-thread" id="thread_1"></article>
-        <script type='text/template' id='_profile_thread'>
-          <article class="discussion-article" data-id="{{id}}">
-            <div class="discussion-post local">
-              <div class="post-body">{{{abbreviatedBody}}}</div>
-            </div>
-          </article>
-        </script>
-        """
+        DiscussionSpecHelper.setUpGlobals()
+        DiscussionSpecHelper.setUnderscoreFixtures()
         @threadData = {
             id: "1",
             body: "dummy body",
             discussion: new Discussion()
             abuse_flaggers: [],
             commentable_id: 'dummy_discussion',
-            votes: {up_count: "42"}
+            votes: {up_count: "42"},
+            created_at: "2014-09-09T20:11:08Z"
         }
         @imageTag = '<img src="https://www.google.com.pk/images/srpr/logo11w.png">'
         window.MathJax = { Hub: { Queue: -> } }
 
     makeView = (thread) ->
-      view = new DiscussionThreadProfileView(el: $("article#thread_#{thread.id}"), model: thread)
+      view = new DiscussionThreadProfileView(model: thread)
       spyConvertMath(view)
       return view
 

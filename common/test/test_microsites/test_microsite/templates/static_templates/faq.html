@@ -1,8 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-<%namespace name='static' file='../static_content.html'/>
-
 <%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 
 <%block name="title"><title>${_("FAQ")}</title></%block>
 

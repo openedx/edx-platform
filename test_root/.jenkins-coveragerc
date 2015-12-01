@@ -1,8 +1,0 @@
-[paths]
-build_jenkins_source =
-    /home/jenkins/workspace/edx-platform-unit-coverage
-    /home/jenkins/workspace/edx-platform-test-subset
-
-test_jenkins_source =
-    /home/jenkins/workspace/test-edx-platform-unit-coverage
-    /home/jenkins/workspace/*test-edx-platform-test-subset

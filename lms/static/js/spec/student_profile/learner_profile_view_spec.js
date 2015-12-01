@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
+define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_profile/helpers',
         'js/views/fields',
@@ -101,7 +101,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         placeholderValue: "Tell other learners a little about yourself: where you live, " +
                             "what your interests are, why you're taking courses, or what you hope to learn.",
                         valueAttribute: "bio",
-                        helpMessage: ''
+                        helpMessage: '',
+                        messagePosition: 'header'
                     })
                 ];
 
@@ -122,12 +123,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             beforeEach(function () {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
-                TemplateHelpers.installTemplate('templates/fields/field_readonly');
-                TemplateHelpers.installTemplate('templates/fields/field_dropdown');
-                TemplateHelpers.installTemplate('templates/fields/field_textarea');
-                TemplateHelpers.installTemplate('templates/fields/field_image');
-                TemplateHelpers.installTemplate('templates/fields/message_banner');
-                TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 
             it("shows loading error correctly", function() {

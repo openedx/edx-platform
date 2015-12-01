@@ -2,8 +2,11 @@ import json
 import logging
 
 from datetime import datetime
+
+from django.utils.timezone import UTC
 from lxml import etree
 from pkg_resources import resource_string
+
 from xblock.fields import Dict, String, Scope, Boolean, Float, Reference
 
 from xmodule.capa_module import ComplexEncoder
@@ -13,10 +16,10 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.timeinfo import TimeInfo
 from xmodule.x_module import XModule, module_attr
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
+from xmodule.validation import StudioValidation, StudioValidationMessage
 
 from open_ended_grading_classes import combined_open_ended_rubric
-from django.utils.timezone import UTC
-from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 
 log = logging.getLogger(__name__)
 
@@ -115,7 +118,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         # We need to set the location here so the child modules can use it.
         self.runtime.set('location', self.location)
-        if (self.runtime.open_ended_grading_interface):
+        if self.runtime.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system.render_template)
         else:
             self.peer_gs = MockPeerGradingService()
@@ -645,6 +648,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
         else:
             return True, ""
 
+    def validate(self):
+        """
+        Message for either error or warning validation message/s.
+
+        Returns message and type. Priority given to error type message.
+        """
+        return self.descriptor.validate()
+
 
 class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     """
@@ -711,3 +722,22 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     show_calibration_essay = module_attr('show_calibration_essay')
     use_for_single_location_local = module_attr('use_for_single_location_local')
     _find_corresponding_module_for_location = module_attr('_find_corresponding_module_for_location')
+
+    def validate(self):
+        """
+        Validates the state of this instance. This is the override of the general XBlock method,
+        and it will also ask its superclass to validate.
+        """
+        validation = super(PeerGradingDescriptor, self).validate()
+        validation = StudioValidation.copy(validation)
+
+        i18n_service = self.runtime.service(self, "i18n")
+
+        validation.summary = StudioValidationMessage(
+            StudioValidationMessage.ERROR,
+            i18n_service.ugettext(
+                "ORA1 is no longer supported. To use this assessment, "
+                "replace this ORA1 component with an ORA2 component."
+            )
+        )
+        return validation

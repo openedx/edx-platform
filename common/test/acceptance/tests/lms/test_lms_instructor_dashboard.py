@@ -3,13 +3,23 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
+import time
+
 from nose.plugins.attrib import attr
+from bok_choy.promise import EmptyPromise
 
 from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.auto_auth import AutoAuthPage
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.lms.create_mode import ModeCreationPage
+from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage
-from ...fixtures.course import CourseFixture
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...pages.lms.dashboard import DashboardPage
+from ...pages.lms.problem import ProblemPage
+from ...pages.lms.track_selection import TrackSelectionPage
+from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -104,6 +114,175 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.upload_non_csv_file()
         self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
+
+
+class ProctoredExamsTest(BaseInstructorDashboardTest):
+    """
+    End-to-end tests for Proctoring Sections of the Instructor Dashboard.
+    """
+
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        super(ProctoredExamsTest, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+
+        self.course_outline = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        course_fixture = CourseFixture(**self.course_info)
+        course_fixture.add_advanced_settings({
+            "enable_proctored_exams": {"value": "true"}
+        })
+
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem 1')
+                )
+            )
+        ).install()
+
+        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
+        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
+        self.immediate_verification_page = PaymentAndVerificationFlow(
+            self.browser, self.course_id, entry_point='verify-now'
+        )
+        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
+        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
+        self.dashboard_page = DashboardPage(self.browser)
+        self.problem_page = ProblemPage(self.browser)
+
+        # Add a verified mode to the course
+        ModeCreationPage(
+            self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate',
+            min_price=10, suggested_prices='10,20'
+        ).visit()
+
+        # Auto-auth register for the course.
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+
+    def _auto_auth(self, username, email, staff):
+        """
+        Logout and login with given credentials.
+        """
+        AutoAuthPage(self.browser, username=username, email=email,
+                     course_id=self.course_id, staff=staff).visit()
+
+    def _login_as_a_verified_user(self):
+        """
+        login as a verififed user
+        """
+
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+
+        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
+        # Navigate to the track selection page
+        self.track_selection_page.visit()
+
+        # Enter the payment and verification flow by choosing to enroll as verified
+        self.track_selection_page.enroll('verified')
+
+        # Proceed to the fake payment page
+        self.payment_and_verification_flow.proceed_to_payment()
+
+        # Submit payment
+        self.fake_payment_page.submit_payment()
+
+    def _create_a_proctored_exam_and_attempt(self):
+        """
+        Creates a proctored exam and makes the student attempt it so that
+        the associated allowance and attempts are visible on the Instructor Dashboard.
+        """
+        # Visit the course outline page in studio
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+
+        #open the exam settings to make it a proctored exam.
+        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.make_exam_proctored()
+        time.sleep(2)  # Wait for 2 seconds to save the settings.
+
+        # login as a verified student and visit the courseware.
+        LogoutPage(self.browser).visit()
+        self._login_as_a_verified_user()
+        self.courseware_page.visit()
+
+        # Start the proctored exam.
+        self.courseware_page.start_proctored_exam()
+
+    def _create_a_timed_exam_and_attempt(self):
+        """
+        Creates a timed exam and makes the student attempt it so that
+        the associated allowance and attempts are visible on the Instructor Dashboard.
+        """
+        # Visit the course outline page in studio
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+
+        #open the exam settings to make it a proctored exam.
+        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.make_exam_timed()
+        time.sleep(2)  # Wait for 2 seconds to save the settings.
+
+        # login as a verified student and visit the courseware.
+        LogoutPage(self.browser).visit()
+        self._login_as_a_verified_user()
+        self.courseware_page.visit()
+
+        # Start the proctored exam.
+        self.courseware_page.start_timed_exam()
+
+    def test_can_add_remove_allowance(self):
+        """
+        Make sure that allowances can be added and removed.
+        """
+
+        # Given that an exam has been configured to be a proctored exam.
+        self._create_a_proctored_exam_and_attempt()
+
+        # When I log in as an instructor,
+        self.log_in_as_instructor()
+
+        # And visit the Allowance Section of Instructor Dashboard's Proctoring tab
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        allowance_section = instructor_dashboard_page.select_proctoring().select_allowance_section()
+
+        # Then I can add Allowance to that exam for a student
+        self.assertTrue(allowance_section.is_add_allowance_button_visible)
+
+    def test_can_reset_attempts(self):
+        """
+        Make sure that Exam attempts are visible and can be reset.
+        """
+
+        # Given that an exam has been configured to be a proctored exam.
+        self._create_a_timed_exam_and_attempt()
+
+        # When I log in as an instructor,
+        self.log_in_as_instructor()
+
+        # And visit the Student Proctored Exam Attempts Section of Instructor Dashboard's Proctoring tab
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        exam_attempts_section = instructor_dashboard_page.select_proctoring().select_exam_attempts_section()
+
+        # Then I can see the search text field
+        self.assertTrue(exam_attempts_section.is_search_text_field_visible)
+
+        # And I can see one attempt by a student.
+        self.assertTrue(exam_attempts_section.is_student_attempt_visible)
+
+        # And I can remove the attempt by clicking the "x" at the end of the row.
+        exam_attempts_section.remove_student_attempt()
+        self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
 @attr('shard_5')
@@ -396,3 +575,47 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
         self.verify_report_download(report_name)
+
+
+@attr('shard_5')
+class CertificatesTest(BaseInstructorDashboardTest):
+    """
+    Tests for Certificates functionality on instructor dashboard.
+    """
+
+    def setUp(self):
+        super(CertificatesTest, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.log_in_as_instructor()
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.certificates_section = instructor_dashboard_page.select_certificates()
+
+    def test_generate_certificates_buttons_is_visible(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Generate Certificates button is visible.
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            And the instructor-generation feature flag has been enabled
+            Then I see a 'Generate Certificates' button
+            And when I click on the 'Generate Certificates' button
+            Then I should see a status message and 'Generate Certificates' button should be disabled.
+        """
+        self.assertTrue(self.certificates_section.generate_certificates_button.visible)
+        self.certificates_section.generate_certificates_button.click()
+        alert = get_modal_alert(self.certificates_section.browser)
+        alert.accept()
+
+        self.certificates_section.wait_for_ajax()
+        EmptyPromise(
+            lambda: self.certificates_section.certificate_generation_status.visible,
+            'Certificate generation status shown'
+        ).fulfill()
+        disabled = self.certificates_section.generate_certificates_button.attrs('disabled')
+        self.assertEqual(disabled[0], 'true')
+
+    def test_pending_tasks_section_is_visible(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Pending Instructor Tasks section is visible.
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            Then I see 'Pending Instructor Tasks' section
+        """
+        self.assertTrue(self.certificates_section.pending_tasks_section.visible)

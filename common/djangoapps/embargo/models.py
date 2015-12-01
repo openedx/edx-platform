@@ -379,7 +379,7 @@ class Country(models.Model):
             code=unicode(self.country)
         )
 
-    class Meta:
+    class Meta(object):
         """Default ordering is ascending by country code """
         ordering = ['country']
 
@@ -522,7 +522,7 @@ class CountryAccessRule(models.Model):
         cache.delete(cache_key)
         log.info("Invalidated country access list for course %s", course_key)
 
-    class Meta:
+    class Meta(object):
         """a course can be added with either black or white list.  """
         unique_together = (
             # This restriction ensures that a country is on
@@ -646,7 +646,7 @@ class CourseAccessRuleHistory(models.Model):
             else:
                 CourseAccessRuleHistory.save_snapshot(restricted_course)
 
-    class Meta:  # pylint: disable=missing-docstring,old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'timestamp'
 
 

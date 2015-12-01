@@ -1,10 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-
 <%inherit file="../main.html" />
-
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 <%block name="pagetitle">${_("Payment Error")}</%block>
-
 
 <section class="container">
     <p><h1>${_("There was an error processing your order!")}</h1></p>

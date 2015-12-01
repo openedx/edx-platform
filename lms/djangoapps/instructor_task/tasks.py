@@ -41,7 +41,12 @@ from instructor_task.tasks_helper import (
     upload_problem_grade_report,
     upload_students_csv,
     push_student_forums_data_to_s3,
-    cohort_students_and_upload
+    cohort_students_and_upload,
+    upload_enrollment_report,
+    upload_may_enroll_csv,
+    upload_exec_summary_report,
+    generate_students_certificates,
+    upload_proctored_exam_results_report
 )
 
 
@@ -228,6 +233,70 @@ def get_student_forums_usage(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_student_forums_data_to_s3, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def enrollment_report_features_csv(entry_id, xmodule_instance_args):
+    """
+    Compute student profile information for a course and upload the
+    CSV to an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('generating_enrollment_report')
+    task_fn = partial(upload_enrollment_report, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def exec_summary_report_csv(entry_id, xmodule_instance_args):
+    """
+    Compute executive summary report for a course and upload the
+    Html generated report to an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = 'generating_exec_summary_report'
+    task_fn = partial(upload_exec_summary_report, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def proctored_exam_results_csv(entry_id, xmodule_instance_args):
+    """
+    Compute proctored exam results report for a course and upload the
+    CSV for download.
+    """
+    action_name = 'generating_proctored_exam_results_report'
+    task_fn = partial(upload_proctored_exam_results_report, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
+    """
+    Compute information about invited students who have not enrolled
+    in a given course yet and upload the CSV to an S3 bucket for
+    download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_may_enroll_csv, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def generate_certificates(entry_id, xmodule_instance_args):
+    """
+    Grade students and generate certificates.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('certificates generated')
+    TASK_LOG.info(
+        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        xmodule_instance_args.get('task_id'), entry_id, action_name
+    )
+
+    task_fn = partial(generate_students_certificates, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 

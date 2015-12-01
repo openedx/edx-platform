@@ -166,3 +166,18 @@ class VideoEventProcessor(object):
                 event['page'] = page
 
         event['event'] = json.dumps(payload)
+
+
+class GoogleAnalyticsProcessor(object):
+    """Adds course_id as label, and sets nonInteraction property"""
+
+    # documentation of fields here: https://segment.com/docs/integrations/google-analytics/
+    # this should *only* be used on events destined for segment.com and eventually google analytics
+    def __call__(self, event):
+        context = event.get('context', {})
+        course_id = context.get('course_id')
+
+        if course_id is not None:
+            event['label'] = course_id
+
+        event['nonInteraction'] = 1

@@ -24,7 +24,8 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
-from student.views import create_account_with_params, set_marketing_cookie
+from student.views import create_account_with_params
+from student.cookies import set_logged_in_cookies
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from .preferences.api import update_email_opt_in
@@ -195,7 +196,7 @@ class RegistrationView(APIView):
 
         # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
-        for field_name in (self.DEFAULT_FIELDS + self.EXTRA_FIELDS):
+        for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
             handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
             self.field_handlers[field_name] = handler
 
@@ -294,7 +295,7 @@ class RegistrationView(APIView):
             data["terms_of_service"] = data["honor_code"]
 
         try:
-            create_account_with_params(request, data)
+            user = create_account_with_params(request, data)
         except ValidationError as err:
             # Should only get non-field errors from this function
             assert NON_FIELD_ERRORS not in err.message_dict
@@ -306,7 +307,7 @@ class RegistrationView(APIView):
             return JsonResponse(errors, status=400)
 
         response = JsonResponse({"success": True})
-        set_marketing_cookie(request, response)
+        set_logged_in_cookies(request, response, user)
         return response
 
     def _add_email_field(self, form_desc, required=True):
@@ -719,7 +720,7 @@ class RegistrationView(APIView):
         if third_party_auth.is_enabled():
             running_pipeline = third_party_auth.pipeline.get(request)
             if running_pipeline:
-                current_provider = third_party_auth.provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+                current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
 
                 # Override username / email / full name
                 field_overrides = current_provider.get_register_form_data(

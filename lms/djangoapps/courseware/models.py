@@ -13,6 +13,7 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
 import logging
+import itertools
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -25,14 +26,53 @@ from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
 from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
+log = logging.getLogger(__name__)
 
 log = logging.getLogger("edx.courseware")
+
+
+def chunks(items, chunk_size):
+    """
+    Yields the values from items in chunks of size chunk_size
+    """
+    items = list(items)
+    return (items[i:i + chunk_size] for i in xrange(0, len(items), chunk_size))
+
+
+class ChunkingManager(models.Manager):
+    """
+    :class:`~Manager` that adds an additional method :meth:`chunked_filter` to provide
+    the ability to make select queries with specific chunk sizes.
+    """
+    def chunked_filter(self, chunk_field, items, **kwargs):
+        """
+        Queries model_class with `chunk_field` set to chunks of size `chunk_size`,
+        and all other parameters from `**kwargs`.
+
+        This works around a limitation in sqlite3 on the number of parameters
+        that can be put into a single query.
+
+        Arguments:
+            chunk_field (str): The name of the field to chunk the query on.
+            items: The values for of chunk_field to select. This is chunked into ``chunk_size``
+                chunks, and passed as the value for the ``chunk_field`` keyword argument to
+                :meth:`~Manager.filter`. This implies that ``chunk_field`` should be an
+                ``__in`` key.
+            chunk_size (int): The size of chunks to pass. Defaults to 500.
+        """
+        chunk_size = kwargs.pop('chunk_size', 500)
+        res = itertools.chain.from_iterable(
+            self.filter(**dict([(chunk_field, chunk)] + kwargs.items()))
+            for chunk in chunks(items, chunk_size)
+        )
+        return res
 
 
 class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
     """
+    objects = ChunkingManager()
     MODEL_TAGS = ['course_id', 'module_type']
 
     # For a homework problem, contains a JSON
@@ -56,10 +96,10 @@ class StudentModule(models.Model):
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_state_key', 'course_id'),)
 
-    ## Internal state of the object
+    # Internal state of the object
     state = models.TextField(null=True, blank=True)
 
-    ## Grade, and are we done?
+    # Grade, and are we done?
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
     DONE_TYPES = (
@@ -93,7 +133,10 @@ class StudentModule(models.Model):
         return 'StudentModule<%r>' % ({
             'course_id': self.course_id,
             'module_type': self.module_type,
-            'student': self.student.username,  # pylint: disable=no-member
+            # We use the student_id instead of username to avoid a database hop.
+            # This can actually matter in cases where we're logging many of
+            # these (e.g. on a broken progress page).
+            'student_id': self.student_id,  # pylint: disable=no-member
             'module_state_key': self.module_state_key,
             'state': str(self.state)[:20],
         },)
@@ -106,7 +149,6 @@ class StudentModuleHistory(models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
     explode in size."""
-
     HISTORY_SAVING_TYPES = {'problem'}
 
     class Meta(object):  # pylint: disable=missing-docstring
@@ -142,6 +184,8 @@ class XBlockFieldBase(models.Model):
     """
     Base class for all XBlock field storage.
     """
+    objects = ChunkingManager()
+
     class Meta(object):  # pylint: disable=missing-docstring
         abstract = True
 
@@ -169,7 +213,6 @@ class XModuleUserStateSummaryField(XBlockFieldBase):
     """
     Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
-
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('usage_id', 'field_name'),)
 
@@ -181,7 +224,6 @@ class XModuleStudentPrefsField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
-
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_type', 'field_name'),)
 
@@ -195,10 +237,8 @@ class XModuleStudentInfoField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
-
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'field_name'),)
-
     student = models.ForeignKey(User, db_index=True)
 
 

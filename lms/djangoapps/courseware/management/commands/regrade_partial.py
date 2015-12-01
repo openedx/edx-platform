@@ -159,8 +159,8 @@ class Command(BaseCommand):
 
         save_changes = options['save_changes']
 
-        LOG.info("Starting run: save_changes = {0}".format(save_changes))
+        LOG.info("Starting run: save_changes = %s", save_changes)
 
         self.fix_studentmodules(save_changes)
 
-        LOG.info("Finished run:  updating {0} of {1} modules".format(self.num_changed, self.num_visited))
+        LOG.info("Finished run: updating %s of %s modules", self.num_changed, self.num_visited)

@@ -44,8 +44,8 @@ class TestTransferStudents(ModuleStoreTestCase):
     def test_transfer_students(self):
         """ Verify the transfer student command works as intended. """
         student = UserFactory.create()
-        student.set_password(self.PASSWORD)  # pylint: disable=no-member
-        student.save()   # pylint: disable=no-member
+        student.set_password(self.PASSWORD)
+        student.save()
         mode = 'verified'
         # Original Course
         original_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')

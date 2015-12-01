@@ -53,7 +53,7 @@ def marketing_link(name):
         if link_map[name] is not None:
             return reverse(link_map[name])
     else:
-        log.warning("Cannot find corresponding link for name: {name}".format(name=name))
+        log.debug("Cannot find corresponding link for name: %s", name)
         return '#'
 
 

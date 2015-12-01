@@ -63,46 +63,46 @@
   border-radius: 3px 3px 0 0;
   padding: ($baseline/2);
   width: 100%;
-  height: 240px;
+  height: 125px;
   background: $white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
   font-size: 13px;
-  font-family: 'Monaco', monospace;
+  font-family: $sans-serif;
   line-height: 1.6;
 }
 
 @mixin discussion-wmd-preview-container {
   @include box-sizing(border-box);
-  border: 1px solid #aaa;
+  @include border-radius(0, 0, 3px, 3px);
+  border: 1px solid $gray-l1;
   border-top: none;
-  border-radius: 0 0 3px 3px;
   width: 100%;
-  background: #eee;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+  background: $gray-l4;
+  box-shadow: 0 1px 3px $shadow-l1 inset;
 }
 
 @mixin discussion-new-post-wmd-preview-container {
   @include discussion-wmd-preview-container;
-  border-color: #333;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+  border-color: $gray-d3;
+  box-shadow: 0 1px 3px $shadow-d1 inset;
 }
 
 @mixin discussion-wmd-preview-label {
+  @include padding-left($baseline/4);
   padding-top: 3px;
-  @include padding-left(5px);
   width: 100%;
-  color: #bbb;
+  color: $gray-l2;
   text-transform: uppercase;
   font-size: 11px;
 }
 
 @mixin discussion-wmd-preview {
   padding: ($baseline/2) $baseline;
-  width: 100%;
-  color: #333;
+  width: auto;
+  color: $gray-d3;
 
   ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
-    @include padding-left(40px);
+    @include padding-left($baseline*2);
     @include padding-right(0);
   }
 }

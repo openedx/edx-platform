@@ -107,18 +107,39 @@ class UsersPageMixin(PageObject):
         """ Gets modal dialog text """
         return self.q(css='.prompt.{dialog_type} .message'.format(dialog_type=dialog_type)).text[0]
 
+    def wait_until_no_loading_indicator(self):
+        """
+        When the page first loads, there is a loading indicator and most
+        functionality is not yet available. This waits for that loading to finish
+        and be removed from the DOM.
+
+        This method is different from wait_until_ready because the loading element
+        is removed from the DOM, rather than hidden.
+
+        It also disables animations for improved test reliability.
+        """
+
+        self.wait_for(
+            lambda: not self.q(css='.ui-loading').present,
+            "Wait for page to complete its initial loading"
+        )
+        disable_animations(self)
+
     def wait_until_ready(self):
         """
         When the page first loads, there is a loading indicator and most
         functionality is not yet available. This waits for that loading to
         finish.
 
-        Always call this before using the page. It also disables animations
-        for improved test reliability.
+        This method is different from wait_until_no_loading_indicator because this expects
+        the loading indicator to still exist on the page; it is just hidden.
+
+        It also disables animations for improved test reliability.
         """
+
         self.wait_for_element_invisibility(
             '.ui-loading',
-            'Wait for the page to complete its initial loading and rendering via Backbone'
+            'Wait for the page to complete its initial loading'
         )
         disable_animations(self)
 

@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
 from student.tests.factories import AdminFactory
-from student.auth import has_access, add_users, remove_users
+from student.auth import user_has_role, add_users, remove_users
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -30,30 +30,30 @@ class CreatorGroupTest(TestCase):
         Tests that CourseCreatorRole().has_user always returns True if ENABLE_CREATOR_GROUP
         and DISABLE_COURSE_CREATION are both not turned on.
         """
-        self.assertTrue(has_access(self.user, CourseCreatorRole()))
+        self.assertTrue(user_has_role(self.user, CourseCreatorRole()))
 
     def test_creator_group_enabled_but_empty(self):
         """ Tests creator group feature on, but group empty. """
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            self.assertFalse(has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(user_has_role(self.user, CourseCreatorRole()))
 
             # Make user staff. This will cause CourseCreatorRole().has_user to return True.
             self.user.is_staff = True
-            self.assertTrue(has_access(self.user, CourseCreatorRole()))
+            self.assertTrue(user_has_role(self.user, CourseCreatorRole()))
 
     def test_creator_group_enabled_nonempty(self):
         """ Tests creator group feature on, user added. """
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             add_users(self.admin, CourseCreatorRole(), self.user)
-            self.assertTrue(has_access(self.user, CourseCreatorRole()))
+            self.assertTrue(user_has_role(self.user, CourseCreatorRole()))
 
             # check that a user who has not been added to the group still returns false
             user_not_added = User.objects.create_user('testuser2', 'test+courses2@edx.org', 'foo2')
-            self.assertFalse(has_access(user_not_added, CourseCreatorRole()))
+            self.assertFalse(user_has_role(user_not_added, CourseCreatorRole()))
 
             # remove first user from the group and verify that CourseCreatorRole().has_user now returns false
             remove_users(self.admin, CourseCreatorRole(), self.user)
-            self.assertFalse(has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(user_has_role(self.user, CourseCreatorRole()))
 
     def test_course_creation_disabled(self):
         """ Tests that the COURSE_CREATION_DISABLED flag overrides course creator group settings. """
@@ -63,15 +63,15 @@ class CreatorGroupTest(TestCase):
             add_users(self.admin, CourseCreatorRole(), self.user)
 
             # DISABLE_COURSE_CREATION overrides (user is not marked as staff).
-            self.assertFalse(has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(user_has_role(self.user, CourseCreatorRole()))
 
             # Mark as staff. Now CourseCreatorRole().has_user returns true.
             self.user.is_staff = True
-            self.assertTrue(has_access(self.user, CourseCreatorRole()))
+            self.assertTrue(user_has_role(self.user, CourseCreatorRole()))
 
             # Remove user from creator group. CourseCreatorRole().has_user still returns true because is_staff=True
             remove_users(self.admin, CourseCreatorRole(), self.user)
-            self.assertTrue(has_access(self.user, CourseCreatorRole()))
+            self.assertTrue(user_has_role(self.user, CourseCreatorRole()))
 
     def test_add_user_not_authenticated(self):
         """
@@ -84,7 +84,7 @@ class CreatorGroupTest(TestCase):
             anonymous_user = AnonymousUser()
             role = CourseCreatorRole()
             add_users(self.admin, role, anonymous_user)
-            self.assertFalse(has_access(anonymous_user, role))
+            self.assertFalse(user_has_role(anonymous_user, role))
 
     def test_add_user_not_active(self):
         """
@@ -96,7 +96,7 @@ class CreatorGroupTest(TestCase):
         ):
             self.user.is_active = False
             add_users(self.admin, CourseCreatorRole(), self.user)
-            self.assertFalse(has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(user_has_role(self.user, CourseCreatorRole()))
 
     def test_add_user_to_group_requires_staff_access(self):
         with self.assertRaises(PermissionDenied):
@@ -150,15 +150,15 @@ class CourseGroupTest(TestCase):
         Tests adding user to course group (happy path).
         """
         # Create groups for a new course (and assign instructor role to the creator).
-        self.assertFalse(has_access(self.creator, CourseInstructorRole(self.course_key)))
+        self.assertFalse(user_has_role(self.creator, CourseInstructorRole(self.course_key)))
         add_users(self.global_admin, CourseInstructorRole(self.course_key), self.creator)
         add_users(self.global_admin, CourseStaffRole(self.course_key), self.creator)
-        self.assertTrue(has_access(self.creator, CourseInstructorRole(self.course_key)))
+        self.assertTrue(user_has_role(self.creator, CourseInstructorRole(self.course_key)))
 
         # Add another user to the staff role.
-        self.assertFalse(has_access(self.staff, CourseStaffRole(self.course_key)))
+        self.assertFalse(user_has_role(self.staff, CourseStaffRole(self.course_key)))
         add_users(self.creator, CourseStaffRole(self.course_key), self.staff)
-        self.assertTrue(has_access(self.staff, CourseStaffRole(self.course_key)))
+        self.assertTrue(user_has_role(self.staff, CourseStaffRole(self.course_key)))
 
     def test_add_user_to_course_group_permission_denied(self):
         """
@@ -177,13 +177,13 @@ class CourseGroupTest(TestCase):
         add_users(self.global_admin, CourseStaffRole(self.course_key), self.creator)
 
         add_users(self.creator, CourseStaffRole(self.course_key), self.staff)
-        self.assertTrue(has_access(self.staff, CourseStaffRole(self.course_key)))
+        self.assertTrue(user_has_role(self.staff, CourseStaffRole(self.course_key)))
 
         remove_users(self.creator, CourseStaffRole(self.course_key), self.staff)
-        self.assertFalse(has_access(self.staff, CourseStaffRole(self.course_key)))
+        self.assertFalse(user_has_role(self.staff, CourseStaffRole(self.course_key)))
 
         remove_users(self.creator, CourseInstructorRole(self.course_key), self.creator)
-        self.assertFalse(has_access(self.creator, CourseInstructorRole(self.course_key)))
+        self.assertFalse(user_has_role(self.creator, CourseInstructorRole(self.course_key)))
 
     def test_remove_user_from_course_group_permission_denied(self):
         """

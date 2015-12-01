@@ -156,9 +156,10 @@ class CapaFields(object):
     )
     rerandomize = Randomization(
         display_name=_("Randomization"),
-        help=_("Defines how often inputs are randomized when a student loads the problem. "
-               "This setting only applies to problems that can have randomly generated numeric values. "
-               "A default value can be set in Advanced Settings."),
+        help=_(
+            'Defines when to randomize the variables specified in the associated Python script. '
+            'For problems that do not randomize values, specify \"Never\". '
+        ),
         default=RANDOMIZATION.NEVER,
         scope=Scope.settings,
         values=[
@@ -511,7 +512,7 @@ class CapaMixin(CapaFields):
 
         # If the problem is closed (and not a survey question with max_attempts==0),
         # then do NOT show the reset button.
-        if (self.closed() and not is_survey_question):
+        if self.closed() and not is_survey_question:
             return False
 
         # Button only shows up for randomized problems if the question has been submitted
@@ -1159,8 +1160,6 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-            # pylint: disable=maybe-no-member
-            # pylint is unable to verify that .total_seconds() exists
             if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(

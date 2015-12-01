@@ -1,4 +1,5 @@
 import logging
+from urllib import urlencode
 
 from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
@@ -33,6 +34,8 @@ def generate_problem_url(problem_url_parts, base_course_url):
     @param base_course_url: Base url of a given course
     @return: A path to the problem
     """
+    activate_block_id = problem_url_parts[-1]
+    problem_url_parts = problem_url_parts[0:-1]
     problem_url = base_course_url + "/"
     for i, part in enumerate(problem_url_parts):
         if part is not None:
@@ -44,6 +47,7 @@ def generate_problem_url(problem_url_parts, base_course_url):
             if i == 1:
                 problem_url += "courseware/"
             problem_url += part + "/"
+    problem_url += '?{}'.format(urlencode({'activate_block_id': unicode(activate_block_id)}))
     return problem_url
 
 

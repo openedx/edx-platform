@@ -2,6 +2,7 @@
 metadata:
     display_name: Drag and Drop
     markdown: !!null
+    showanswer: never
 data: |
     <problem>
       <p>
@@ -17,8 +18,7 @@ data: |
        <p>_____________________________________________________________________________</p>
        <customresponse>
          <h3>Simple Drag and Drop</h3>
-        <fieldset>
-          <legend>Drag each word in the scrollbar to the bucket that matches the number of letters in the word.</legend>
+        <p>Drag each word in the scrollbar to the bucket that matches the number of letters in the word.</p>
                 <drag_and_drop_input img="https://studio.edx.org/c4x/edX/DemoX/asset/L9_buckets.png">
                   <draggable id="1" label="a"/>
                   <draggable id="2" label="bog"/>
@@ -32,7 +32,6 @@ data: |
                   <draggable id="10" label="strop"/>
                   <draggable id="11" label="few"/>
                 </drag_and_drop_input>
-        </fieldset>
         <answer type="loncapa/python">
     correct_answer = {
             '1':      [[70, 150], 121],
@@ -54,8 +53,7 @@ data: |
     </customresponse>
         <customresponse>
           <h3>Drag and Drop with Outline</h3>
-          <fieldset>
-            <legend>Label the hydrogen atoms connected with the left carbon atom.</legend>
+          <p>Label the hydrogen atoms connected with the left carbon atom.</p>
             <drag_and_drop_input img="https://studio.edx.org/c4x/edX/DemoX/asset/ethglycol.jpg" target_outline="true" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
                 <draggable id="1" label="Hydrogen" />
                 <draggable id="2" label="Hydrogen" />
@@ -71,7 +69,6 @@ data: |
                 <target id="t9_o" x="445" y="162" w="100" h="100"/>
                 <target id="t10" x="591" y="132" w="70" h="70"/>
             </drag_and_drop_input>
-          </fieldset>
           <answer type="loncapa/python">
     correct_answer = [{
         'draggables': ['1', '2'],

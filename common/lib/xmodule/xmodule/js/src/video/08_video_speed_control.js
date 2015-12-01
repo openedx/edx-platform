@@ -16,6 +16,10 @@ function (Iterator) {
             return new SpeedControl(state);
         }
 
+        _.bindAll(this, 'onSetSpeed', 'onRenderSpeed', 'clickLinkHandler',
+            'keyDownLinkHandler', 'mouseEnterHandler', 'mouseLeaveHandler',
+            'clickMenuHandler', 'keyDownMenuHandler', 'destroy'
+        );
         this.state = state;
         this.state.videoSpeedControl = this;
         this.initialize();
@@ -24,24 +28,51 @@ function (Iterator) {
     };
 
     SpeedControl.prototype = {
+        template: [
+            '<div class="speeds menu-container">',
+                '<a class="speed-button" href="#" title="',
+                    gettext('Speeds'), '" role="button" aria-disabled="false">',
+                    '<span class="label">', gettext('Speed'), '</span>',
+                    '<span class="value"></span>',
+                '</a>',
+              '<ol class="video-speeds menu" role="menu"></ol>',
+            '</div>'
+        ].join(''),
+
+        destroy: function () {
+            this.el.off({
+                'mouseenter': this.mouseEnterHandler,
+                'mouseleave': this.mouseLeaveHandler,
+                'click': this.clickMenuHandler,
+                'keydown': this.keyDownMenuHandler
+            });
+
+            this.state.el.off({
+                'speed:set': this.onSetSpeed,
+                'speed:render': this.onRenderSpeed
+            });
+            this.closeMenu(true);
+            this.speedsContainer.remove();
+            this.el.remove();
+            delete this.state.videoSpeedControl;
+        },
+
         /** Initializes the module. */
         initialize: function () {
             var state = this.state;
 
-            this.el = state.el.find('.speeds');
-            this.speedsContainer = this.el.find('.video-speeds');
-            this.speedButton = this.el.find('.speed-button');
-
             if (!this.isPlaybackRatesSupported(state)) {
-                this.el.remove();
                 console.log(
                     '[Video info]: playbackRate is not supported.'
                 );
 
                 return false;
             }
-
+            this.el = $(this.template);
+            this.speedsContainer = this.el.find('.video-speeds');
+            this.speedButton = this.el.find('.speed-button');
             this.render(state.speeds, state.speed);
+            this.setSpeed(state.speed, true, true);
             this.bindHandlers();
 
             return true;
@@ -51,13 +82,11 @@ function (Iterator) {
          * Creates any necessary DOM elements, attach them, and set their,
          * initial configuration.
          * @param {array} speeds List of speeds available for the player.
-         * @param {string|number} currentSpeed Current speed for the player.
          */
-        render: function (speeds, currentSpeed) {
-            var self = this,
-                speedsContainer = this.speedsContainer,
+        render: function (speeds) {
+            var speedsContainer = this.speedsContainer,
                 reversedSpeeds = speeds.concat().reverse(),
-                speedsList = $.map(reversedSpeeds, function (speed, index) {
+                speedsList = $.map(reversedSpeeds, function (speed) {
                     return [
                         '<li data-speed="', speed, '" role="presentation">',
                             '<a class="speed-link" href="#" role="menuitem" tabindex="-1">',
@@ -69,7 +98,7 @@ function (Iterator) {
 
             speedsContainer.html(speedsList.join(''));
             this.speedLinks = new Iterator(speedsContainer.find('.speed-link'));
-            this.setSpeed(currentSpeed, true, true);
+            this.state.el.find('.secondary-controls').prepend(this.el);
         },
 
         /**
@@ -77,31 +106,34 @@ function (Iterator) {
          * mousemove, etc.).
          */
         bindHandlers: function () {
-            var self = this;
-
             // Attach various events handlers to the speed menu button.
             this.el.on({
-                'mouseenter': this.mouseEnterHandler.bind(this),
-                'mouseleave': this.mouseLeaveHandler.bind(this),
-                'click': this.clickMenuHandler.bind(this),
-                'keydown': this.keyDownMenuHandler.bind(this)
+                'mouseenter': this.mouseEnterHandler,
+                'mouseleave': this.mouseLeaveHandler,
+                'click': this.clickMenuHandler,
+                'keydown': this.keyDownMenuHandler
             });
 
             // Attach click and keydown event handlers to the individual speed
             // entries.
             this.speedsContainer.on({
-                click: this.clickLinkHandler.bind(this),
-                keydown: this.keyDownLinkHandler.bind(this)
+                click: this.clickLinkHandler,
+                keydown: this.keyDownLinkHandler
             }, 'a.speed-link');
 
             this.state.el.on({
-                'speed:set': function (event, speed) {
-                    self.setSpeed(speed, true);
-                },
-                'speed:render': function (event, speeds, currentSpeed) {
-                    self.render(speeds, currentSpeed);
-                }
+                'speed:set': this.onSetSpeed,
+                'speed:render': this.onRenderSpeed
             });
+            this.state.el.on('destroy', this.destroy);
+        },
+
+        onSetSpeed: function (event, speed) {
+            this.setSpeed(speed, true);
+        },
+
+        onRenderSpeed: function (event, speeds, currentSpeed) {
+            this.render(speeds, currentSpeed);
         },
 
         /**
@@ -133,7 +165,7 @@ function (Iterator) {
             // element to have clicks close the menu when they happen
             // outside of it.
             if (bindEvent) {
-                $(window).on('click.speedMenu', this.clickMenuHandler.bind(this));
+                $(window).on('click.speedMenu', this.clickMenuHandler);
             }
 
             this.el.addClass('is-opened');
@@ -175,7 +207,7 @@ function (Iterator) {
                 this.currentSpeed = speed;
 
                 if (!silent) {
-                    this.el.trigger('speedchange', [speed]);
+                    this.el.trigger('speedchange', [speed, this.state.speed]);
                 }
             }
         },

@@ -90,4 +90,21 @@
     </li>
   </ol>
 </section>
+
+<section class="group-settings course_details">
+  <header>
+    <h2 class="title-2">Course Details</h2>
+    <span class="tip">Provide useful information about your course</span>
+  </header>
+  <ol class="list-input">
+    <li class="field" id="field-course-language">
+      <label for="course-language">Course Language</label>
+      <select id="course-language">
+        <option value="" selected> - </option>
+        <option value="en">English</option>
+      </select>
+      <span class="tip tip-stacked">Identify the course language here. This is used to assist users find courses that are taught in a specific language.</span>
+    </li>
+  </ol>
+</section>
 </form>

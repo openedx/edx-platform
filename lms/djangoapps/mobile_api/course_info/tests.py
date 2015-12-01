@@ -11,41 +11,12 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from ..testutils import (
-    MobileAPITestCase, MobileCourseAccessTestMixin, MobileEnrolledCourseAccessTestMixin, MobileAuthTestMixin
+    MobileAPITestCase, MobileCourseAccessTestMixin, MobileAuthTestMixin
 )
 
 
-class TestAbout(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
-    """
-    Tests for /api/mobile/v0.5/course_info/{course_id}/about
-    """
-    REVERSE_INFO = {'name': 'course-about-detail', 'params': ['course_id']}
-
-    def verify_success(self, response):
-        super(TestAbout, self).verify_success(response)
-        self.assertTrue('overview' in response.data)
-
-    def init_course_access(self, course_id=None):
-        # override this method since enrollment is not required for the About endpoint.
-        self.login()
-
-    def test_about_static_rewrite(self):
-        self.login()
-
-        about_usage_key = self.course.id.make_usage_key('about', 'overview')
-        about_module = modulestore().get_item(about_usage_key)
-        underlying_about_html = about_module.data
-
-        # check that we start with relative static assets
-        self.assertIn('\"/static/', underlying_about_html)
-
-        # but shouldn't finish with any
-        response = self.api_response()
-        self.assertNotIn('\"/static/', response.data['overview'])
-
-
 @ddt.ddt
-class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/updates
     """
@@ -105,13 +76,13 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAc
 
         # verify content and sort order of updates (most recent first)
         for num in range(1, num_updates + 1):
-            update_data = response.data[num_updates - num]  # pylint: disable=maybe-no-member
+            update_data = response.data[num_updates - num]
             self.assertEquals(num, update_data['id'])
             self.assertEquals("Date" + str(num), update_data['date'])
             self.assertIn("Update" + str(num), update_data['content'])
 
 
-class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/handouts
     """

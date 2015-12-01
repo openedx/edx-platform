@@ -3,6 +3,7 @@ Instructor Views
 """
 ## NOTE: This is the code for the legacy instructor dashboard
 ## We are no longer supporting this file or accepting changes into it.
+# pylint: disable=line-too-long, missing-docstring
 from contextlib import contextmanager
 import csv
 import json
@@ -20,7 +21,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
@@ -83,7 +84,7 @@ def instructor_dashboard(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
-    instructor_access = has_access(request.user, 'instructor', course)   # an instructor can manage staff lists
+    instructor_access = bool(has_access(request.user, 'instructor', course))   # an instructor can manage staff lists
 
     forum_admin_access = has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR)
 
@@ -102,7 +103,7 @@ def instructor_dashboard(request, course_id):
     else:
         idash_mode = request.session.get(idash_mode_key, 'Grades')
 
-    enrollment_number = CourseEnrollment.num_enrolled_in(course_key)
+    enrollment_number = CourseEnrollment.objects.num_enrolled_in(course_key)
 
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
@@ -155,7 +156,7 @@ def instructor_dashboard(request, course_id):
     if settings.FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
             data_dir = course.data_dir
-            log.debug('git pull {0}'.format(data_dir))
+            log.debug('git pull %s', data_dir)
             gdir = settings.DATA_DIR / data_dir
             if not os.path.exists(gdir):
                 msg += "====> ERROR in gitreload - no such directory {0}".format(gdir)
@@ -166,7 +167,7 @@ def instructor_dashboard(request, course_id):
                 track.views.server_track(request, "git-pull", {"directory": data_dir}, page="idashboard")
 
         if 'Reload course' in action:
-            log.debug('reloading {0} ({1})'.format(course_key, course))
+            log.debug('reloading %s (%s)', course_key, course)
             try:
                 data_dir = course.data_dir
                 modulestore().try_load_course(data_dir)
@@ -306,12 +307,6 @@ def instructor_dashboard(request, course_id):
 
     #----------------------------------------
     # enrollment
-
-    elif action == 'List students who may enroll but may not have yet signed up':
-        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key)
-        datatable = {'header': ['StudentEmail']}
-        datatable['data'] = [[x.email] for x in ceaset]
-        datatable['title'] = action
 
     elif action == 'Enroll multiple students':
 
@@ -914,7 +909,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
     datatable['data'] = [[x, status[x]] for x in sorted(status)]
     datatable['title'] = _('Enrollment of students')
 
-    def sf(stat):
+    def sf(stat):  # pylint: disable=invalid-name
         return [x for x in status if status[x] == stat]
 
     data = dict(added=sf('added'), rejected=sf('rejected') + sf('exists'),

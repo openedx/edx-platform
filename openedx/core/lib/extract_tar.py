@@ -7,6 +7,7 @@ http://stackoverflow.com/questions/10060069/safely-extract-zip-or-tar-using-pyth
 """
 from os.path import abspath, realpath, dirname, join as joinpath
 from django.core.exceptions import SuspiciousOperation
+from django.conf import settings
 import logging
 
 log = logging.getLogger(__name__)
@@ -28,19 +29,23 @@ def _is_bad_path(path, base):
 
 def _is_bad_link(info, base):
     """
-    Does the file sym- ord hard-link to files outside `base`?
+    Does the file sym- or hard-link to files outside `base`?
     """
     # Links are interpreted relative to the directory containing the link
     tip = resolved(joinpath(base, dirname(info.name)))
     return _is_bad_path(info.linkname, base=tip)
 
 
-def safemembers(members):
+def safemembers(members, base):
     """
     Check that all elements of a tar file are safe.
     """
 
-    base = resolved(".")
+    base = resolved(base)
+
+    # check that we're not trying to import outside of the data_dir
+    if not base.startswith(resolved(settings.DATA_DIR)):
+        raise SuspiciousOperation("Attempted to import course outside of data dir")
 
     for finfo in members:
         if _is_bad_path(finfo.name, base):
@@ -61,8 +66,8 @@ def safemembers(members):
     return members
 
 
-def safetar_extractall(tarf, *args, **kwargs):
+def safetar_extractall(tar_file, path=".", members=None):  # pylint: disable=unused-argument
     """
-    Safe version of `tarf.extractall()`.
+    Safe version of `tar_file.extractall()`.
     """
-    return tarf.extractall(members=safemembers(tarf), *args, **kwargs)
+    return tar_file.extractall(path, safemembers(tar_file, path))

@@ -148,7 +148,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestRecommender.XBLOCK_NAMES[0]
         url = self.get_handler_url(handler, xblock_name)
-        for _ in range(0, times):
+        for _ in range(times):
             self.client.post(url, json.dumps({'id': resource_id}), '')
 
     def call_event(self, handler, resource, xblock_name=None):
@@ -460,7 +460,7 @@ class TestRecommenderVoteWithResources(TestRecommenderWithResources):
         Vote a resource thrice
         """
         resource = {"id": self.resource_id, 'event': test_case['event']}
-        for _ in range(0, 2):
+        for _ in range(2):
             self.call_event('handle_vote', resource)
         # Test
         self.check_event_response_by_key('handle_vote', resource, 'newVotes', test_case['new_votes'])
@@ -552,7 +552,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
         Endorse a resource once/twice/thrice
         """
         resource = {"id": self.resource_id, 'reason': ''}
-        for _ in range(0, test_case['times'] - 1):
+        for _ in range(test_case['times'] - 1):
             self.call_event('endorse_resource', resource)
         # Test
         self.check_event_response_by_key('endorse_resource', resource, test_case['key'], test_case['val'])
@@ -567,7 +567,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
         Remove a resource once/twice/thrice
         """
         resource = {"id": self.resource_id, 'reason': ''}
-        for _ in range(0, test_case['times'] - 1):
+        for _ in range(test_case['times'] - 1):
             self.call_event('remove_resource', resource)
         # Test
         self.check_event_response_by_http_status('remove_resource', resource, test_case['status'])

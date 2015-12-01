@@ -1,5 +1,5 @@
 define([
-    'jquery', 'js/common_helpers/template_helpers', 'js/edxnotes/collections/notes',
+    'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/notes',
     'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/recent_activity',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(
@@ -63,7 +63,8 @@ define([
                 identifier: 'view-recent-activity',
                 icon: 'fa fa-clock-o',
                 is_active: true,
-                is_closable: false
+                is_closable: false,
+                view: 'Recent Activity'
             });
             expect(view.$('#recent-panel')).toExist();
             expect(view.$('.note')).toHaveLength(3);

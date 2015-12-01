@@ -1,6 +1,6 @@
 define([
     'jquery', 'js/models/settings/course_details', 'js/views/settings/main',
-    'js/common_helpers/ajax_helpers'
+    'common/js/spec_helpers/ajax_helpers'
 ], function($, CourseDetailsModel, MainView, AjaxHelpers) {
     'use strict';
 
@@ -30,7 +30,10 @@ define([
                 enable_enrollment_email: false,
                 pre_requisite_courses : [],
                 entrance_exam_enabled : '',
-                entrance_exam_minimum_score_pct: '50'
+                entrance_exam_minimum_score_pct: '50',
+                license: null,
+                language: '',
+                has_cert_config: false
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
@@ -68,6 +71,13 @@ define([
             AjaxHelpers.expectJsonRequest(
                 requests, 'POST', urlRoot, expectedJson
             );
+        });
+
+        it('Changing course start date without active certificate configuration should result in error', function () {
+            this.view.$el.find('#course-start-date')
+                .val('10/06/2014')
+                .trigger('change');
+            expect(this.view.$el.find('span.message-error').text()).toContain("course must have at least one active certificate configuration");
         });
 
         it('Selecting a course in pre-requisite drop down should save it as part of course details', function () {
@@ -154,5 +164,28 @@ define([
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
+
+        it('should save language as part of course details', function(){
+            var requests = AjaxHelpers.requests(this);
+            var expectedJson = $.extend(true, {}, modelData, {
+                language: 'en',
+            });
+            $('#course-language').val('en').trigger('change');
+            expect(this.model.get('language')).toEqual('en');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+        });
+
+        it('should not error if about_page_editable is False', function(){
+            var requests = AjaxHelpers.requests(this);
+            // if about_page_editable is false, there is no section.course_details
+            $('.course_details').remove();
+            expect(this.model.get('language')).toEqual('');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(requests, 'POST', urlRoot, modelData);
+        });
+
     });
 });
