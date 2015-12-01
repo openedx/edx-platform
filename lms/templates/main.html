@@ -23,15 +23,9 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 ## embedding theme conditionals into templates. All inheriting
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
-<%def name="theme_enabled()">
-  <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
-</%def>
-<%def name="is_microsite()">
-  <% return microsite.is_request_in_microsite() %>
-</%def>
-<%def name="is_non_microsite_theme()">
-  <% return theme_enabled() and not is_microsite() %>
-</%def>
+<%def name="theme_enabled()"><% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %></%def>
+<%def name="is_microsite()"><% return microsite.is_request_in_microsite() %></%def>
+<%def name="is_non_microsite_theme()"><% return theme_enabled() and not is_microsite() %></%def>
 
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
 <%def name="pagetitle()" />

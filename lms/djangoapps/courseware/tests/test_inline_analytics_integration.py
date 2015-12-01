@@ -49,6 +49,7 @@ class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
         response = get_analytics_answer_dist(request)
         self.assertEquals(response.content, self.zendesk_response)
 
+    @override_settings(ZENDESK_URL=None)
     def test_no_url_no_zendesk(self):
         request = self.factory.post('', self.data)
         request.user = self.instructor
