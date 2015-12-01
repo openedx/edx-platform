@@ -11,12 +11,12 @@ structure:
     'definition.children': <list of all child location.to_deprecated_string()s>
 }
 """
-
 import pymongo
 import sys
 import logging
 import copy
 import re
+from collections import defaultdict
 from uuid import uuid4
 
 from bson.son import SON
@@ -510,6 +510,27 @@ class ParentLocationCache(dict):
     Dict-based object augmented with a more cache-like interface, for internal use.
     """
     # pylint: disable=missing-docstring
+    def __init__(self, *args, **kwargs):
+        self._values_to_keys = defaultdict(set)
+        super(ParentLocationCache, self).__init__(*args, **kwargs)
+
+        # Needed in the case where we were given data on __init__()
+        for key, value in self.items():
+            self._values_to_keys[value].add(key)
+
+    def __setitem__(self, key, value):
+        # If the key already exists, we have to remove it from the reverse lookup
+        if key in self:
+            old_val = self[key]
+            old_val_keys = self._values_to_keys[old_val]
+            if key in old_val_keys:
+                old_val_keys.remove(key)
+
+        # Now invoke dict's __setitem__
+        super(ParentLocationCache, self).__setitem__(key, value)
+
+        # Add to our reverse lookup, so that we can make delete_by_value() fast
+        self._values_to_keys[value].add(key)
 
     @contract(key=unicode)
     def has(self, key):
@@ -521,9 +542,10 @@ class ParentLocationCache(dict):
 
     @contract(value="BlockUsageLocator")
     def delete_by_value(self, value):
-        keys_to_delete = [k for k, v in self.iteritems() if v == value]
+        keys_to_delete = self._values_to_keys.pop(value, set())
         for key in keys_to_delete:
-            del self[key]
+            if key in self:
+                del self[key]
 
 
 class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, MongoBulkOpsMixin):

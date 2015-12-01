@@ -29,8 +29,9 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from opaque_keys.edx.locator import LibraryLocator, CourseLocator
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryLocator, CourseLocator, BlockUsageLocator
+from opaque_keys.edx.keys import UsageKey 
+
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
@@ -39,7 +40,7 @@ from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
-from xmodule.modulestore.mongo.base import as_draft
+from xmodule.modulestore.mongo.base import as_draft, ParentLocationCache
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -900,3 +901,61 @@ def _build_requested_filter(requested_filter):
         "$where": ' || '.join(where),
     }
     return filter_params
+
+
+class TestParentLocationCache(unittest.TestCase):
+    """
+    Test the small helper parent location lookup cache -- how we quickly find
+    the parent for a given node. This is being tested because we do a little
+    bookkeeping in order to make `delete_by_value()` run quickly without having
+    to iterate through the entire collection.
+    """
+
+    def test_delete_by_value(self):
+        course_key = CourseLocator(org="edX", course="parenting_101", run="2014")
+        parent_keys = [
+            BlockUsageLocator(course_key, u"vertical", unicode(block_id))
+            for block_id in range(3)
+        ]
+        # These are unicode, not Locators.
+        child_ids = [
+            unicode(BlockUsageLocator(course_key, u"html", unicode(block_id)))
+            for block_id in range(3)
+        ]
+
+        # Simplest happy path...
+        p_cache = ParentLocationCache()
+        p_cache.set(child_ids[0], parent_keys[0])
+        p_cache[child_ids[1]] = parent_keys[1]
+        p_cache.delete_by_value(parent_keys[0])
+        assert_equals(p_cache, {child_ids[1]: parent_keys[1]})
+
+        # Changing keys
+        p_cache[child_ids[1]] = parent_keys[2]
+        p_cache.delete_by_value(parent_keys[1])  # should do nothing
+        assert_equals(p_cache, {child_ids[1]: parent_keys[2]})
+        p_cache.delete_by_value(parent_keys[2])
+        assert_equals(p_cache, {})
+
+        # Multiple pointers to the same parent
+        p_cache[child_ids[0]] = parent_keys[2]
+        p_cache[child_ids[1]] = parent_keys[2]
+        p_cache[child_ids[2]] = parent_keys[2]
+        assert_equals(
+            p_cache,
+            {
+                child_ids[0]: parent_keys[2],
+                child_ids[1]: parent_keys[2],
+                child_ids[2]: parent_keys[2],
+            }
+        )
+        p_cache.delete_by_value(parent_keys[2])
+        assert_equals(p_cache, {})
+
+        # Initializing the dict in the constructor
+        p_cache2 = ParentLocationCache([
+            (child_ids[0], parent_keys[0]),
+            (child_ids[1], parent_keys[1])
+        ])
+        p_cache2.delete_by_value(parent_keys[0])
+        assert_equals(p_cache2, {child_ids[1]: parent_keys[1]})
