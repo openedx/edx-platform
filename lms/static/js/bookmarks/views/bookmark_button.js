@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message'],
-        function (gettext, $, _, Backbone, MessageView) {
+    define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message_banner'],
+        function (gettext, $, _, Backbone, MessageBannerView) {
 
         return Backbone.View.extend({
 
@@ -81,9 +81,8 @@
 
             showError: function() {
                 if (!this.messageView) {
-                    this.messageView = new MessageView({
-                        el: $('.coursewide-message-banner'),
-                        templateId: '#message_banner-tpl'
+                    this.messageView = new MessageBannerView({
+                        el: $('.message-banner')
                     });
                 }
                 this.messageView.showMessage(this.errorMessage, this.errorIcon);

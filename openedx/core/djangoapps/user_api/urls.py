@@ -8,8 +8,6 @@ from ..profile_images.views import ProfileImageView
 from .accounts.views import AccountView
 from .preferences.views import PreferencesView, PreferencesDetailView
 
-from django.conf.urls import patterns, url
-
 USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
 
 urlpatterns = patterns(

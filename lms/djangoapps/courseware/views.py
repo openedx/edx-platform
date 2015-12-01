@@ -419,6 +419,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         studio_url = get_studio_url(course, 'course')
 
+        language_preference = get_user_preference(request.user, LANGUAGE_KEY)
+        if not language_preference:
+            language_preference = settings.LANGUAGE_CODE
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),

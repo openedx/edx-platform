@@ -7,11 +7,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
         'js/student_account/views/account_settings_fields',
-        'js/views/message'
+        'js/views/message_banner'
        ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
               UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
-              AccountSettingsFieldViews, MessageView) {
+              AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
 
         describe("edx.user.LearnerProfileView", function () {
@@ -45,9 +45,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     accountSettingsPageUrl: '/account/settings/'
                 });
 
-                var messageView = new MessageView({
-                    el: $('.message-banner'),
-                    templateId: '#message_banner-tpl'
+                var messageView = new MessageBannerView({
+                    el: $('.message-banner')
                 });
 
                 var profileImageFieldView = new LearnerProfileFields.ProfileImageFieldView({

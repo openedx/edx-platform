@@ -66,15 +66,12 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
-            'moment': 'xmodule_js/common_static/js/src/moment',
-            'moment': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
             'js/utils/navigation': 'js/utils/navigation',
-
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -94,7 +91,7 @@
             'js/bookmarks/views/bookmarks_list_button': 'js/bookmarks/views/bookmarks_list_button',
             'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
             'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button',
-            'js/views/message': 'js/views/message',
+            'js/views/message_banner': 'js/views/message_banner',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
@@ -744,11 +741,9 @@
         'lms/include/teams/js/spec/views/topics_spec.js',
         'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js',
         'lms/include/js/spec/financial-assistance/financial_assistance_form_view_spec.js',
-        'lms/include/teams/js/spec/views/team_join_spec.js'
-        'lms/include/js/spec/discovery/discovery_spec.js',
-        'lms/include/js/spec/ccx/schedule_spec.js',
         'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
-        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js'
+        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
+        'lms/include/js/spec/views/message_banner_spec.js'
     ]);
 
 }).call(this, requirejs, define);

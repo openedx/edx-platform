@@ -1,8 +1,11 @@
 ;(function (define, undefined) {
     'use strict';
     define(['gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment',
-            'common/js/components/views/paging_header', 'common/js/components/views/paging_footer'],
-        function (gettext, $, _, Backbone, Logger, _moment, PagingHeaderView, PagingFooterView) {
+            'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
+            'text!templates/bookmarks/bookmarks-list.underscore'
+        ],
+        function (gettext, $, _, Backbone, Logger, _moment,
+                  PagingHeaderView, PagingFooterView, BookmarksListTemplate) {
 
         var moment = _moment || window.moment;
 
@@ -24,7 +27,7 @@
             },
 
             initialize: function (options) {
-                this.template = _.template($('#bookmarks-list-tpl').text());
+                this.template = _.template(BookmarksListTemplate);
                 this.loadingMessageView = options.loadingMessageView;
                 this.errorMessageView = options.errorMessageView;
                 this.langCode = $(this.el).data('langCode');

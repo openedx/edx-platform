@@ -95,7 +95,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         if check_all_fields:
             query_parameters += '&fields=path,display_name'
 
-        with self.assertNumQueries(7):  # 2 queries for bookmark table.
+        with self.assertNumQueries(9):  # 2 queries for bookmark table.
             response = self.send_get(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -138,7 +138,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         page_size = 5
         query_parameters = 'course_id={}&page_size={}'.format(urllib.quote(unicode(course.id)), page_size)
 
-        with self.assertNumQueries(7):  # 2 queries for bookmark table.
+        with self.assertNumQueries(9):  # 2 queries for bookmark table.
             response = self.send_get(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -171,7 +171,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         Test that requesting bookmarks with invalid data returns 0 records.
         """
         # Invalid course id.
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             response = self.send_get(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -189,7 +189,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         """
         # Without course id we would return all the bookmarks for that user.
 
-        with self.assertNumQueries(7):  # 2 queries for bookmark table.
+        with self.assertNumQueries(9):  # 2 queries for bookmark table.
             response = self.send_get(
                 client=self.client,
                 url=reverse('bookmarks')
@@ -214,7 +214,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         Test that an anonymous client (not logged in) cannot call GET or POST.
         """
         query_parameters = 'course_id={}'.format(self.course_id)
-        with self.assertNumQueries(1):  # No queries for bookmark table.
+        with self.assertNumQueries(4):  # No queries for bookmark table.
             self.send_get(
                 client=self.anonymous_client,
                 url=reverse('bookmarks'),
@@ -222,7 +222,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
                 expected_status=401
             )
 
-        with self.assertNumQueries(1):  # No queries for bookmark table.
+        with self.assertNumQueries(4):  # No queries for bookmark table.
             self.send_post(
                 client=self.anonymous_client,
                 url=reverse('bookmarks'),
@@ -234,7 +234,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         """
         Test that posting a bookmark successfully returns newly created data with 201 code.
         """
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(15):
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -255,10 +255,10 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         Scenarios:
             1) Invalid usage id.
             2) Without usage id.
-            3) With empty request.DATA
+            3) With empty request.data
         """
         # Send usage_id with invalid format.
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -268,7 +268,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         self.assertEqual(response.data['user_message'], u'Invalid usage_id: invalid.')
 
         # Send data without usage_id.
-        with self.assertNumQueries(4):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -279,7 +279,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         self.assertEqual(response.data['developer_message'], u'Parameter usage_id not provided.')
 
         # Send empty data dictionary.
-        with self.assertNumQueries(4):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -293,7 +293,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         """
         Test that posting a bookmark for a block that does not exist returns a 400.
         """
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -322,7 +322,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
     @ddt.data(
         {'page_size': -1, 'expected_bookmarks_count': 2, 'expected_page_size': 10, 'expected_page_number': 1},
         {'page_size': 0, 'expected_bookmarks_count': 2, 'expected_page_size': 10, 'expected_page_number': 1},
-        {'page_size': 999, 'expected_bookmarks_count': 2, 'expected_page_size': 500, 'expected_page_number': 1}
+        {'page_size': 999, 'expected_bookmarks_count': 2, 'expected_page_size': 100, 'expected_page_number': 1}
     )
     def test_listed_event_for_different_page_size_values(self, mock_tracker, page_size, expected_bookmarks_count,
                                                          expected_page_size, expected_page_number):
@@ -371,7 +371,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that requesting bookmark returns data with 200 code.
         """
-        with self.assertNumQueries(6):  # 1 query for bookmark table.
+        with self.assertNumQueries(8):  # 1 query for bookmark table.
             response = self.send_get(
                 client=self.client,
                 url=reverse(
@@ -388,7 +388,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that requesting bookmark that belongs to other user returns 404 status code.
         """
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(8):  # No queries for bookmark table.
             self.send_get(
                 client=self.client,
                 url=reverse(
@@ -402,7 +402,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that requesting bookmark that does not exist returns 404 status code.
         """
-        with self.assertNumQueries(6):  # 1 query for bookmark table.
+        with self.assertNumQueries(8):  # 1 query for bookmark table.
             response = self.send_get(
                 client=self.client,
                 url=reverse(
@@ -424,7 +424,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that requesting bookmark with invalid usage id returns 400.
         """
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             response = self.send_get(
                 client=self.client,
                 url=reverse(
@@ -440,14 +440,14 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         Test that an anonymous client (not logged in) cannot call GET or DELETE.
         """
         url = reverse('bookmarks_detail', kwargs={'username': self.user.username, 'usage_id': 'i4x'})
-        with self.assertNumQueries(4):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             self.send_get(
                 client=self.anonymous_client,
                 url=url,
                 expected_status=401
             )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(4):
             self.send_delete(
                 client=self.anonymous_client,
                 url=url,
@@ -463,7 +463,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         bookmarks_data = response.data['results']
         self.assertEqual(len(bookmarks_data), 2)
 
-        with self.assertNumQueries(7):  # 2 queries for bookmark table.
+        with self.assertNumQueries(10):  # 2 queries for bookmark table.
             self.send_delete(
                 client=self.client,
                 url=reverse(
@@ -480,7 +480,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that delete bookmark that belongs to other user returns 404.
         """
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(8):  # No queries for bookmark table.
             self.send_delete(
                 client=self.client,
                 url=reverse(
@@ -494,7 +494,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that delete bookmark that does not exist returns 404.
         """
-        with self.assertNumQueries(6):  # 1 query for bookmark table.
+        with self.assertNumQueries(8):  # 1 query for bookmark table.
             response = self.send_delete(
                 client=self.client,
                 url=reverse(
@@ -516,7 +516,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that delete bookmark with invalid usage id returns 400.
         """
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(7):  # No queries for bookmark table.
             response = self.send_delete(
                 client=self.client,
                 url=reverse(
@@ -533,8 +533,8 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         url = reverse('bookmarks_detail', kwargs={'username': self.user.username, 'usage_id': 'i4x'})
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-        with self.assertNumQueries(5):  # No queries for bookmark table.
+        with self.assertNumQueries(8):  # No queries for bookmark table.
             self.assertEqual(405, self.client.put(url).status_code)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(8):
             self.assertEqual(405, self.client.post(url).status_code)

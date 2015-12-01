@@ -68,14 +68,6 @@ class CoursewareTest(UniqueCourseTest):
         self.problem_page = ProblemPage(self.browser)
         self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 1')
 
-    def _change_problem_release_date_in_studio(self):
-        """
-
-        """
-        self.course_outline.q(css=".subsection-header-actions .configure-button").first.click()
-        self.course_outline.q(css="#start_date").fill("01/01/2030")
-        self.course_outline.q(css=".action-save").first.click()
-
     def _create_breadcrumb(self, index):
         """ Create breadcrumb """
         return ['Test Section {}'.format(index), 'Test Subsection {}'.format(index), 'Test Problem {}'.format(index)]
@@ -105,9 +97,6 @@ class CoursewareTest(UniqueCourseTest):
         # Set release date for subsection in future.
         self.course_outline.change_problem_release_date_in_studio()
 
-        # Wait for 2 seconds to save new date.
-        time.sleep(2)
-
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
         self._auto_auth(self.USERNAME, self.EMAIL, False)
@@ -116,6 +105,23 @@ class CoursewareTest(UniqueCourseTest):
         self.courseware_page.visit()
         # Problem name should be "TEST PROBLEM 2".
         self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 2')
+
+    def test_course_tree_breadcrumb(self):
+        """
+        Scenario: Correct course tree breadcrumb is shown.
+
+        Given that I am a registered user
+        And I visit my courseware page
+        Then I should see correct course tree breadcrumb
+        """
+        self.courseware_page.visit()
+
+        xblocks = self.course_fix.get_nested_xblocks(category="problem")
+        for index in range(1, len(xblocks) + 1):
+            self.course_nav.go_to_section('Test Section {}'.format(index), 'Test Subsection {}'.format(index))
+            courseware_page_breadcrumb = self.courseware_page.breadcrumb
+            expected_breadcrumb = self._create_breadcrumb(index)  # pylint: disable=no-member
+            self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
 
 class ProctoredExamTest(UniqueCourseTest):
@@ -261,23 +267,6 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.courseware_page.start_timed_exam()
         self.assertTrue(self.courseware_page.is_timer_bar_present)
-
-    def test_course_tree_breadcrumb(self):
-        """
-        Scenario: Correct course tree breadcrumb is shown.
-
-        Given that I am a registered user
-        And I visit my courseware page
-        Then I should see correct course tree breadcrumb
-        """
-        self.courseware_page.visit()
-
-        xblocks = self.course_fix.get_nested_xblocks(category="problem")
-        for index in range(1, len(xblocks) + 1):
-            self.course_nav.go_to_section('Test Section {}'.format(index), 'Test Subsection {}'.format(index))
-            courseware_page_breadcrumb = self.courseware_page.breadcrumb
-            expected_breadcrumb = self._create_breadcrumb(index)
-            self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
     def test_time_allotted_field_is_not_visible_with_none_exam(self):
         """

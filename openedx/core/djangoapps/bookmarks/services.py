@@ -10,7 +10,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from request_cache.middleware import RequestCache
 
-from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
+from . import DEFAULT_FIELDS, api
 
 log = logging.getLogger(__name__)
 
@@ -42,8 +42,7 @@ class BookmarksService(object):
             fetch (Bool): if the bookmarks should be fetched and cached if they already aren't.
         """
         store = modulestore()
-        if hasattr(store, 'fill_in_run'):
-            course_key = store.fill_in_run(course_key)
+        course_key = store.fill_in_run(course_key)
         if course_key.run is None:
             return []
         cache_key = CACHE_KEY_TEMPLATE.format(self._user.id, course_key)

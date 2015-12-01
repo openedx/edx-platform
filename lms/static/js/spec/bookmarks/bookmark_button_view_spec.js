@@ -68,7 +68,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 };
                 var requests = AjaxHelpers.requests(this);
 
-                _.each([[addBookmarkedData, removeBookmarkData], [removeBookmarkData, addBookmarkedData]], function(actionsData) {
+                var bookmarkedData = [[addBookmarkedData, removeBookmarkData], [removeBookmarkData, addBookmarkedData]];
+                _.each(bookmarkedData, function(actionsData) {
                     var firstActionData = actionsData[0];
                     var secondActionData =  actionsData[1];
 
@@ -110,13 +111,14 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     expect(secondActionData.event).toHaveBeenTriggeredOn(bookmarkButtonView.$el);
 
                     verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
+                    bookmarkButtonView.undelegateEvents();
                 });
 
             });
 
             it("shows an error message for HTTP 500", function () {
                 var requests = AjaxHelpers.requests(this),
-                    $messageBanner = $('.coursewide-message-banner'),
+                    $messageBanner = $('.message-banner'),
                     bookmarkButtonView = createBookmarkButtonView(false);
                 bookmarkButtonView.$el.click();
 

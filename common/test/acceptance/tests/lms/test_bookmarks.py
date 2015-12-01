@@ -207,14 +207,13 @@ class BookmarksTest(BookmarksTestMixin):
         self.assertEqual(self.bookmarks_page.get_current_page_number(), current_page_number)
         self.assertEqual(self.bookmarks_page.get_total_pages, total_pages)
 
-    def _navigate_and_verify_bookmarks_list(self, bookmarks_count):
+    def _navigate_to_bookmarks_list(self):
         """
         Navigates and verifies the bookmarks list page.
         """
         self.bookmarks_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
-        self.assertEqual(self.bookmarks_page.count(), bookmarks_count)
 
     def _verify_breadcrumbs(self, num_units, modified_name=None):
         """
@@ -310,6 +309,9 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup()
         self._bookmark_units(2)
 
+        self._navigate_to_bookmarks_list()
+        self._verify_breadcrumbs(num_units=2)
+
         self._verify_pagination_info(
             bookmark_count_on_current_page=2,
             header_text='Showing 1-2 out of 2 total',
@@ -319,9 +321,6 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=1
         )
 
-        self._navigate_and_verify_bookmarks_list(bookmarks_count=2)
-        self._verify_breadcrumbs(num_units=2)
-
         # get usage ids for units
         xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
         xblock_usage_ids = [xblock.locator for xblock in xblocks]
@@ -329,7 +328,7 @@ class BookmarksTest(BookmarksTestMixin):
         for index in range(2):
             self.bookmarks_page.click_bookmarked_block(index)
             self.courseware_page.wait_for_page()
-            self.assertTrue(self.courseware_page.active_usage_id() in xblock_usage_ids)
+            self.assertIn(self.courseware_page.active_usage_id(), xblock_usage_ids)
             self.courseware_page.visit().wait_for_page()
             self.bookmarks_page.click_bookmarks_button()
 
@@ -352,11 +351,11 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup(num_chapters=1)
         self._bookmark_units(num_units=1)
 
-        self._navigate_and_verify_bookmarks_list(bookmarks_count=1)
+        self._navigate_to_bookmarks_list()
         self._verify_breadcrumbs(num_units=1)
 
         LogoutPage(self.browser).visit()
-        AutoAuthPage(
+        LmsAutoAuthPage(
             self.browser,
             username=self.USERNAME,
             email=self.EMAIL,
@@ -368,10 +367,10 @@ class BookmarksTest(BookmarksTestMixin):
         self.update_and_publish_block_display_name(modified_name)
 
         LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
         self.courseware_page.visit()
 
-        self._navigate_and_verify_bookmarks_list(bookmarks_count=1)
+        self._navigate_to_bookmarks_list()
         self._verify_breadcrumbs(num_units=1, modified_name=modified_name)
 
     def test_unreachable_bookmark(self):
@@ -387,15 +386,15 @@ class BookmarksTest(BookmarksTestMixin):
         When I click on deleted bookmark
         Then I should navigated to 404 page
         """
-        self._test_setup()
-        self._bookmark_units(2)
+        self._test_setup(num_chapters=1)
+        self._bookmark_units(1)
         self._delete_section(0)
 
-        self._navigate_and_verify_bookmarks_list(bookmarks_count=2)
+        self._navigate_to_bookmarks_list()
 
         self._verify_pagination_info(
-            bookmark_count_on_current_page=2,
-            header_text='Showing 1-2 out of 2 total',
+            bookmark_count_on_current_page=1,
+            header_text='Showing 1 out of 1 total',
             previous_button_enabled=False,
             next_button_enabled=False,
             current_page_number=1,
@@ -418,7 +417,7 @@ class BookmarksTest(BookmarksTestMixin):
         """
         self._test_setup(11)
         self._bookmark_units(11)
-        self._navigate_and_verify_bookmarks_list(bookmarks_count=11)
+        self._navigate_to_bookmarks_list()
 
         self._verify_pagination_info(
             bookmark_count_on_current_page=10,
