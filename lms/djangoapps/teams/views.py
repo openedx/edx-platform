@@ -155,7 +155,7 @@ class TeamsDashboardView(GenericAPIView):
 
         user = request.user
 
-        user_teams = CourseTeam.objects.filter(membership__user=user)
+        user_teams = CourseTeam.objects.filter(membership__user=user, course_id=course.id)
         user_teams_data = self._serialize_and_paginate(
             MyTeamsPagination,
             user_teams,
