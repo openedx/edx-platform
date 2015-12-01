@@ -1972,7 +1972,6 @@ INSTALLED_APPS = (
 
     # Bookmarks
     'openedx.core.djangoapps.bookmarks',
-    'bookmarks',
 
     # programs support
     'openedx.core.djangoapps.programs',

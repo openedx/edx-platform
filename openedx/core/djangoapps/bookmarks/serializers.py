@@ -2,6 +2,7 @@
 Serializers for Bookmarks.
 """
 from rest_framework import serializers
+from openedx.core.lib.api.serializers import CourseKeyField, UsageKeyField
 
 from . import DEFAULT_FIELDS
 from .models import Bookmark
@@ -11,12 +12,12 @@ class BookmarkSerializer(serializers.ModelSerializer):
     """
     Serializer for the Bookmark model.
     """
-    id = serializers.Field(source='resource_id')  # pylint: disable=invalid-name
-    course_id = serializers.Field(source='course_key')
-    usage_id = serializers.Field(source='usage_key')
-    block_type = serializers.Field(source='usage_key.block_type')
-    display_name = serializers.Field(source='display_name')
-    path = serializers.SerializerMethodField('path_data')
+    id = serializers.SerializerMethodField()  # pylint: disable=invalid-name
+    course_id = CourseKeyField(source='course_key')
+    usage_id = UsageKeyField(source='usage_key')
+    block_type = serializers.ReadOnlyField(source='usage_key.block_type')
+    display_name = serializers.ReadOnlyField()
+    path = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
@@ -46,14 +47,17 @@ class BookmarkSerializer(serializers.ModelSerializer):
             'created',
         )
 
-    def resource_id(self, bookmark):
+    def get_id(self, bookmark):
         """
         Return the REST resource id: {username,usage_id}.
         """
         return "{0},{1}".format(bookmark.user.username, bookmark.usage_key)
 
-    def path_data(self, bookmark):
+    def get_path(self, bookmark):
         """
         Serialize and return the path data of the bookmark.
         """
-        return [path_item._asdict() for path_item in bookmark.path]
+        path_items = [path_item._asdict() for path_item in bookmark.path]
+        for path_item in path_items:
+            path_item['usage_key'] = unicode(path_item['usage_key'])
+        return path_items

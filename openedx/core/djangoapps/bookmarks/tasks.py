@@ -3,10 +3,9 @@ Tasks for bookmarks.
 """
 import logging
 
-from django.db import transaction
-
 from celery.task import task  # pylint: disable=import-error,no-name-in-module
 from opaque_keys.edx.keys import CourseKey
+from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 from . import PathItem
@@ -120,7 +119,7 @@ def _update_xblocks_cache(course_key):
             block_cache.paths = paths
             block_cache.save()
 
-    with transaction.commit_on_success():
+    with outer_atomic():
         block_caches = XBlockCache.objects.filter(course_key=course_key)
         for block_cache in block_caches:
             block_data = blocks_data.pop(unicode(block_cache.usage_key), None)
@@ -128,7 +127,7 @@ def _update_xblocks_cache(course_key):
                 update_block_cache_if_needed(block_cache, block_data)
 
     for block_data in blocks_data.values():
-        with transaction.commit_on_success():
+        with outer_atomic():
             paths = _paths_from_data(block_data['paths'])
             log.info(u'Creating XBlockCache with usage_key: %s', unicode(block_data['usage_key']))
             block_cache, created = XBlockCache.objects.get_or_create(usage_key=block_data['usage_key'], defaults={

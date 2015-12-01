@@ -12,25 +12,34 @@ from django.utils.translation import ugettext as _, ugettext_noop
 
 from rest_framework import status
 from rest_framework import permissions
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_oauth.authentication import OAuth2Authentication
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from openedx.core.lib.api.permissions import IsUserInUrl
-from openedx.core.lib.api.serializers import PaginationSerializer
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from lms.djangoapps.lms_xblock.runtime import unquote_slashes
+from openedx.core.lib.api.paginators import DefaultPagination
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
 from .serializers import BookmarkSerializer
 
 log = logging.getLogger(__name__)
+
+
+class BookmarksPagination(DefaultPagination):
+    """
+    Paginator for bookmarks API.
+    """
+    page_size = 10
+    max_page_size = 100
 
 
 class BookmarksViewMixin(object):
@@ -129,12 +138,8 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    pagination_class = BookmarksPagination
     permission_classes = (permissions.IsAuthenticated,)
-
-    paginate_by = 10
-    max_paginate_by = 500
-    paginate_by_param = 'page_size'
-    pagination_serializer_class = PaginationSerializer
     serializer_class = BookmarkSerializer
 
     def get_serializer_context(self):
@@ -143,7 +148,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         """
         context = super(BookmarksListView, self).get_serializer_context()
         if self.request.method == 'GET':
-            context['fields'] = self.fields_to_return(self.request.QUERY_PARAMS)
+            context['fields'] = self.fields_to_return(self.request.query_params)
         return context
 
     def get_queryset(self):
@@ -154,7 +159,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         If the course_id is specified in the request parameters,
         the queryset will only include bookmarks from that course.
         """
-        course_id = self.request.QUERY_PARAMS.get('course_id', None)
+        course_id = self.request.query_params.get('course_id', None)
 
         if course_id:
             try:
@@ -167,14 +172,14 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
         return api.get_bookmarks(
             user=self.request.user, course_key=course_key,
-            fields=self.fields_to_return(self.request.QUERY_PARAMS), serialized=False
+            fields=self.fields_to_return(self.request.query_params), serialized=False
         )
 
-    def paginate_queryset(self, queryset, page_size=None):
+    def paginate_queryset(self, queryset):
         """ Override GenericAPIView.paginate_queryset for the purpose of eventing """
-        page = super(BookmarksListView, self).paginate_queryset(queryset, page_size)
+        page = super(BookmarksListView, self).paginate_queryset(queryset)
 
-        course_id = self.request.QUERY_PARAMS.get('course_id')
+        course_id = self.request.query_params.get('course_id')
         if course_id:
             try:
                 CourseKey.from_string(course_id)
@@ -183,9 +188,9 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
         event_data = {
             'list_type': 'all_courses',
-            'bookmarks_count': page.paginator.count,
-            'page_size': self.get_paginate_by(),
-            'page_number': page.number,
+            'bookmarks_count': self.paginator.page.paginator.count,
+            'page_size': self.paginator.page.paginator.per_page,
+            'page_number': self.paginator.page.number,
         }
         if course_id is not None:
             event_data['list_type'] = 'per_course'
@@ -200,10 +205,10 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         POST /api/bookmarks/v1/bookmarks/
         Request data: {"usage_id": "<usage-id>"}
         """
-        if not request.DATA:
+        if not request.data:
             return self.error_response(ugettext_noop(u'No data provided.'))
 
-        usage_id = request.DATA.get('usage_id', None)
+        usage_id = request.data.get('usage_id', None)
         if not usage_id:
             return self.error_response(ugettext_noop(u'Parameter usage_id not provided.'))
 
@@ -297,7 +302,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             bookmark_data = api.get_bookmark(
                 user=request.user,
                 usage_key=usage_key_or_response,
-                fields=self.fields_to_return(request.QUERY_PARAMS)
+                fields=self.fields_to_return(request.query_params)
             )
         except ObjectDoesNotExist:
             error_message = ugettext_noop(

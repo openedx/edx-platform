@@ -16,7 +16,9 @@ LOCATION = partial(COURSE_KEY.make_usage_key, u'problem')
 
 class BookmarkFactory(DjangoModelFactory):
     """ Simple factory class for generating Bookmark """
-    FACTORY_FOR = Bookmark
+
+    class Meta(object):
+        model = Bookmark
 
     user = factory.SubFactory(UserFactory)
     course_key = COURSE_KEY
@@ -31,7 +33,9 @@ class BookmarkFactory(DjangoModelFactory):
 
 class XBlockCacheFactory(DjangoModelFactory):
     """ Simple factory class for generating XblockCache. """
-    FACTORY_FOR = XBlockCache
+
+    class Meta(object):
+        model = XBlockCache
 
     course_key = COURSE_KEY
     usage_key = factory.Sequence(u'4x://edx/100/block/{0}'.format)

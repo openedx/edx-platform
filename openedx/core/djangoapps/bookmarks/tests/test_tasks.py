@@ -140,8 +140,8 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
                     )
 
     @ddt.data(
-        ('course', 19),
-        ('other_course', 13)
+        ('course', 47),
+        ('other_course', 34)
     )
     @ddt.unpack
     def test_update_xblocks_cache(self, course_attr, expected_sql_queries):
@@ -162,5 +162,5 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
                         path_item.usage_key, expected_cache_data[usage_key][path_index][path_item_index + 1]
                     )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             _update_xblocks_cache(course.id)
