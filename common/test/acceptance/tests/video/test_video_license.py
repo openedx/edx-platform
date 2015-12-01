@@ -76,7 +76,7 @@ class VideoLicenseTest(StudioCourseTest):
         container_page = unit.go_to()
         container_page.edit()
         video = [xb for xb in container_page.xblocks if xb.name == "Test Video"][0]
-        video.edit().open_advanced_tab()
+        video.open_advanced_tab()
         video.set_license('all-rights-reserved')
         video.save_settings()
         container_page.publish_action.click()
@@ -106,7 +106,7 @@ class VideoLicenseTest(StudioCourseTest):
         container_page = unit.go_to()
         container_page.edit()
         video = [xb for xb in container_page.xblocks if xb.name == "Test Video"][0]
-        video.edit().open_advanced_tab()
+        video.open_advanced_tab()
         video.set_license('creative-commons')
         video.save_settings()
         container_page.publish_action.click()
