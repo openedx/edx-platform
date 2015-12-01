@@ -179,6 +179,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     if not course_cohort_settings.is_cohorted:
         return request_cache.data.setdefault(cache_key, None)
 
+    # If course is cohorted, check if the user already has a cohort.
     try:
         membership = CohortMembership.objects.get(
             course_id=course_key,
@@ -192,6 +193,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             # may be True, and we will have to assign the user a cohort.
             return None
 
+    # Otherwise assign the user a cohort.
     membership = CohortMembership.objects.create(
         user=user,
         course_user_group=_get_default_cohort(course_key)
@@ -334,6 +336,27 @@ def is_cohort_exists(course_key, name):
     Check if a cohort already exists.
     """
     return CourseUserGroup.objects.filter(course_id=course_key, group_type=CourseUserGroup.COHORT, name=name).exists()
+
+
+def remove_user_from_cohort(cohort, username_or_email):
+    """
+    Look up the given user, and if successful, remove them from the specified cohort.
+
+    Arguments:
+        cohort: CourseUserGroup
+        username_or_email: string.  Treated as email if has '@'
+
+    Raises:
+        User.DoesNotExist if can't find user.
+        ValueError if user not already present in this cohort.
+    """
+    user = get_user_by_username_or_email(username_or_email)
+
+    try:
+        membership = CohortMembership.objects.get(course_user_group=cohort, user=user)
+        membership.delete()
+    except CohortMembership.DoesNotExist:
+        raise ValueError("User {} was not present in cohort {}".format(username_or_email, cohort))
 
 
 def add_user_to_cohort(cohort, username_or_email):
