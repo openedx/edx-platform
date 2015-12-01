@@ -9,7 +9,6 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from lms.djangoapps.courseware.courses import get_courses, get_course_with_access
 
 from .permissions import can_view_courses_for_username
-from .serializers import CourseSerializer
 
 
 def get_effective_user(requesting_user, target_username):
@@ -41,14 +40,14 @@ def course_detail(request, username, course_key):
         course_key (CourseKey): Identifies the course of interest
 
     Return value:
-        CourseSerializer object representing the requested course
+        `CourseDescriptor` object representing the requested course
     """
     user = get_effective_user(request.user, username)
     try:
         course = get_course_with_access(user, 'see_exists', course_key)
     except Http404:
         raise NotFound()
-    return CourseSerializer(course, context={'request': request}).data
+    return course
 
 
 def list_courses(request, username):
@@ -69,8 +68,8 @@ def list_courses(request, username):
 
 
     Return value:
-        A CourseSerializer object representing the collection of courses.
+        List of `CourseDescriptor` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
     courses = get_courses(user)
-    return CourseSerializer(courses, context={'request': request}, many=True).data
+    return courses
