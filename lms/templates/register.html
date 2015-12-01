@@ -112,6 +112,7 @@ import calendar
 <section class="register container">
   <section role="main" class="content">
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
+      <%block name="register_form">
       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
 
       <!-- status messages -->
@@ -369,6 +370,7 @@ import calendar
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update register-button">${_('Register')} <span class="orn-plus">+</span> ${_('Create My Account')}</button>
       </div>
+      </%block>
     </form>
   </section>
 
