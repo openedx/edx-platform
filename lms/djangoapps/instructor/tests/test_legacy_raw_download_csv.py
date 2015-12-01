@@ -97,11 +97,11 @@ class TestRawGradeCSV(TestSubmittingProblems):
             ],
             'data': [
                 [
-                    1, u'u1', u'username', u'view@test.com', '', 0.0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    1, u'u1', u'username', u'view@test.com', '', (0.0, 1.0), 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],
                 [
-                    2, u'u2', u'username', u'view2@test.com', '', 0.3333333333333333, 0, 0, 0,
+                    2, u'u2', u'username', u'view2@test.com', '', (1.0, 3.0), 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0.03333333333333333, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0
                 ]

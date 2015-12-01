@@ -13,7 +13,7 @@ import re
 import requests
 import urllib
 
-from collections import defaultdict, OrderedDict
+from collections import defaultdict, OrderedDict, Counter
 from markupsafe import escape
 from requests.status_codes import codes
 from StringIO import StringIO
@@ -244,19 +244,30 @@ def instructor_dashboard(request, course_id):
         if not aname:
             msg += "<font color='red'>{text}</font>".format(text=_("Please enter an assignment name"))
         else:
-            allgrades = get_student_grade_summary_data(request, course, get_grades=True, use_offline=use_offline)
+            allgrades = get_student_grade_summary_data(
+                request,
+                course,
+                get_grades=True,
+                use_offline=use_offline,
+                get_score_max=True
+            )
             if aname not in allgrades['assignments']:
                 msg += "<font color='red'>{text}</font>".format(
                     text=_("Invalid assignment name '{name}'").format(name=aname)
                 )
             else:
                 aidx = allgrades['assignments'].index(aname)
-                datatable = {'header': [_('External email'), aname]}
+                datatable = {'header': [_('External email'), aname, _('max_pts')]}
                 ddata = []
-                for student in allgrades['students']:  # do one by one in case there is a student who has only partial grades
-                    try:
-                        ddata.append([student.email, student.grades[aidx]])
-                    except IndexError:
+                # do one by one in case there is a student who has only partial grades
+                for student in allgrades['students']:
+                    if len(student.grades) >= aidx and student.grades[aidx] is not None:
+                        ddata.append(
+                            [student.email,
+                             student.grades[aidx][0],
+                             student.grades[aidx][1]]
+                        )
+                    else:
                         log.debug(u'No grade for assignment %(idx)s (%(name)s) for student %(email)s', {
                             "idx": aidx,
                             "name": aname,
@@ -736,8 +747,16 @@ def get_student_grade_summary_data(
                         else:
                             add_grade(score.section, score.earned)
                 else:
+                    category_cnts = Counter()
                     for grade_item in gradeset['section_breakdown']:
-                        add_grade(grade_item['label'], grade_item['percent'])
+                        category = grade_item['category']
+                        try:
+                            earned = gradeset['totaled_scores'][category][category_cnts[category]].earned
+                            possible = gradeset['totaled_scores'][category][category_cnts[category]].possible
+                            add_grade(grade_item['label'], earned, possible=possible)
+                        except (IndexError, KeyError):
+                            add_grade(grade_item['label'], grade_item['percent'])
+                        category_cnts[category] += 1
             student.grades = gtab.get_grade(student.id)
 
         data.append(datarow)
