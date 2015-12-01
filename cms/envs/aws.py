@@ -379,3 +379,7 @@ MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = ENV_TOKENS.get(
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
 OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
+
+######################## CUSTOM COURSES for EDX CONNECTOR ######################
+if FEATURES.get('CUSTOM_COURSES_EDX'):
+    INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
