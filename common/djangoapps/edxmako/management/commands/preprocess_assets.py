@@ -24,8 +24,8 @@ class Command(BaseCommand):
     help = "Preprocess asset template files to ready them for compilation."
 
     def handle(self, *args, **options):
-        theme_name = 'default'
-        use_custom_theme = settings.FEATURES.get("USE_CUSTOM_THEME")
+        theme_name = getattr(settings, "THEME_NAME", None)
+        use_custom_theme = settings.FEATURES.get("USE_CUSTOM_THEME", False)
         if not use_custom_theme or not theme_name:
             # No custom theme, nothing to do!
             return

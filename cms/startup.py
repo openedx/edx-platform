@@ -24,8 +24,11 @@ def run():
 
     add_mimetypes()
 
-    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
-        enable_theme()
+    if settings.FEATURES.get('USE_CUSTOM_THEME'):
+        theme_root = settings.ENV_ROOT / 'themes' / settings.THEME_NAME
+        settings.STATICFILES_DIRS.append(
+            (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
+        )
 
     # In order to allow descriptors to use a handler url, we need to
     # monkey-patch the x_module library.

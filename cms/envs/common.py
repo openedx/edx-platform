@@ -570,6 +570,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "coffee/*/*.coffee",
     "coffee/*/*/*.coffee",
     "coffee/*/*/*/*.coffee",
+    ""
 
     # Ignore tests
     "spec",

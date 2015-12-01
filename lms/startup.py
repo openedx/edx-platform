@@ -98,7 +98,7 @@ def enable_stanford_theme():
     )
 
     # Calculate the location of the theme's files
-    theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
+    theme_root = settings.ENV_ROOT / "edx-platform" / "themes" / settings.THEME_NAME
 
     # Include the theme's templates in the template search paths
     settings.TEMPLATE_DIRS.insert(0, theme_root / 'templates')

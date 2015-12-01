@@ -34,9 +34,9 @@ SASS_CACHE_PATH = '/tmp/sass-cache'
 def configure_paths():
     """Configure our paths based on settings.  Called immediately."""
     edxapp_env = Env()
-    # if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
+    # if edxapp_env.feature_flags.get('USE_CUSTOM_THEME'):
     theme_name = "default"
-    parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
+    parent_dir = path("/home/darwish/devstack/edx-platform").abspath()
     theme_root = parent_dir / "themes" / theme_name
     COFFEE_DIRS.append(theme_root)
     sass_dir = theme_root / "static" / "sass"
@@ -262,7 +262,7 @@ def collect_assets(systems, settings):
     `settings` is the Django settings module to use.
     """
     for sys in systems:
-        sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
+        sh(django_cmd(sys, 'dev', "collectstatic --noinput > /dev/null"))
         print("\t\tFinished collecting {} assets.".format(sys))
 
 
