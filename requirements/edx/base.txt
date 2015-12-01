@@ -186,3 +186,7 @@ sailthru-client==2.2.3
 
 # Release utils for the edx release pipeline
 edx-django-release-util==0.1.0
+
+# Used to communicate with Neo4j, which is used internally for
+# modulestore inspection
+py2neo==3.1.2
