@@ -34,19 +34,19 @@ class CohortedTestCase(SharedModuleStoreTestCase):
     def setUp(self):
         super(CohortedTestCase, self).setUp()
 
-        self.student_cohort = CohortFactory.create(
-            name="student_cohort",
-            course_id=self.course.id
-        )
-        self.moderator_cohort = CohortFactory.create(
-            name="moderator_cohort",
-            course_id=self.course.id
-        )
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
         self.moderator = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
         CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
         self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
-        self.student_cohort.users.add(self.student)
-        self.moderator_cohort.users.add(self.moderator)
+        self.student_cohort = CohortFactory.create(
+            name="student_cohort",
+            course_id=self.course.id,
+            users=[self.student]
+        )
+        self.moderator_cohort = CohortFactory.create(
+            name="moderator_cohort",
+            course_id=self.course.id,
+            users=[self.moderator]
+        )
