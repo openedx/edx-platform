@@ -257,8 +257,8 @@ ${fragment.foot_html()}
   % if course and user.is_authenticated() and not UserProfile.has_registered(user):
     <div class="unauth-tos">
       ${_("By exploring the course, you are agreeing to our {tos_link_start}Terms of Service{link_end} and {privacy_link_start}Privacy Policy{link_end}. Please read them carefully.").format(
-        tos_link_start='<a href="/tos">',
-        privacy_link_start='<a href="/tos#privacy">',
+        tos_link_start='<a href="https://lagunita.stanford.edu/tos">',
+        privacy_link_start='<a href="https://lagunita.stanford.edu/tos#privacy">',
         link_end='</a>'
       )}
     </div>
