@@ -36,7 +36,7 @@ from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_fie
 from xmodule.exceptions import NotFoundError
 
 from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
-from .video_utils import create_youtube_string, get_video_from_cdn, get_poster, rewrite_video_url
+from .video_utils import create_youtube_string, get_poster, rewrite_video_url
 from .bumper_utils import bumperize
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
