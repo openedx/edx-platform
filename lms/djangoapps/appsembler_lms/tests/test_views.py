@@ -60,6 +60,8 @@ class TestUserSignup(TestCase):
         self.assertIn('john@doe.com', mail.outbox[0].body)
         self.assertIn('password', mail.outbox[0].body)
         self.assertIn('John Doe', mail.outbox[0].body)
+        # make sure user creation follows django 1.8 usage where last_login = None
+        self.assertEqual(User.objects.get(email="john@doe.com").last_login, None)
 
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_unique_username_if_already_exists(self):
