@@ -52,7 +52,7 @@ import json
     </%static:require_module>
   % endif
   % if redirect_message:
-    <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+    <%static:require_module module_name="js/views/message" class_name="MessageBannerView">
         var banner = new MessageBannerView({urgency: 'low', type: 'warning'});
         $('#content').prepend(banner.$el);
         banner.showMessage(${json.dumps(redirect_message)})

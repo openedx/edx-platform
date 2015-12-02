@@ -29,7 +29,7 @@
             'js/student_account/views/account_settings_factory',
             'js/student_account/views/finish_auth_factory',
             'js/student_profile/views/learner_profile_factory',
-            'js/views/message_banner',
+            'js/views/message',
             'teams/js/teams_tab_factory',
             'support/js/certificates_factory'
         ]),

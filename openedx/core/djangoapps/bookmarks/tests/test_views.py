@@ -234,7 +234,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         """
         Test that posting a bookmark successfully returns newly created data with 201 code.
         """
-        with self.assertNumQueries(18):
+        with self.assertNumQueries(15):
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
