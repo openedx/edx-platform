@@ -194,7 +194,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('input.date').datepicker({'dateFormat': 'm/d/yy'});
             this.$('input.time').timepicker({
                 'timeFormat' : 'H:i',
-                'forceRoundTime': true
+                'forceRoundTime': false
             });
             if (this.model.get(this.fieldName)) {
                 DateUtils.setDate(
