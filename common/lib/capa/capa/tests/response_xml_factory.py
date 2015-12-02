@@ -235,7 +235,7 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
 
         if partial_answers is not None and 'list' in credit_type:
             # The line below throws a false positive pylint violation, so it's excepted.
-            responseparam_element = etree.SubElement(response_element, 'responseparam')  # pylint: disable=E1101
+            responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('partial_answers', partial_answers)
 
         return response_element
@@ -771,11 +771,11 @@ class StringResponseXMLFactory(ResponseXMLFactory):
                 hintgroup_element.set("hintfn", hint_fn)
 
         for additional_answer in additional_answers:
-            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node = etree.SubElement(response_element, "additional_answer")
             additional_node.set("answer", additional_answer)
 
         for answer in non_attribute_answers:
-            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node = etree.SubElement(response_element, "additional_answer")
             additional_node.text = answer
 
         return response_element

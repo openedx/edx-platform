@@ -69,7 +69,7 @@ class TestRawGradeCSV(TestSubmittingProblems):
 
     def get_expected_grade_data(
             self, get_grades=True, get_raw_scores=False,
-            use_offline=False):
+            use_offline=False, get_score_max=False):
         """
         Return expected results from the get_student_grade_summary_data call
         with any options selected.
@@ -79,6 +79,11 @@ class TestRawGradeCSV(TestSubmittingProblems):
         get_student_grade_summary_data for this function to be accurate.
         If kwargs are added or removed, or the functionality triggered by
         them changes, this function must be updated to match.
+
+        If get_score_max is True, instead of a single score between 0 and 1,
+        the actual score and total possible are returned. For example, if the
+        student got one out of two possible points, the values (1, 2) will be
+        returned instead of 0.5.
         """
         expected_data = {
             'students': [self.student_user, self.student_user2],
@@ -155,6 +160,10 @@ class TestRawGradeCSV(TestSubmittingProblems):
                 u'ID', u'Username', u'Full Name', u'edX email',
                 u'External email', u'p3', u'p2', u'p1'
             ]
+            # Strip out the single-value float scores and replace them
+            # with two-tuples of actual and possible scores (see docstring).
+            if get_score_max:
+                expected_data["data"][-1][-3:] = (0.0, 1), (1.0, 1.0), (0.0, 1)
 
         return expected_data
 
@@ -197,7 +206,7 @@ class TestRawGradeCSV(TestSubmittingProblems):
             request, self.course, get_grades=False
         )
         expected_data = self.get_expected_grade_data(get_grades=False)
-        # if get_grades == False, get_expected_grade_data does not
+        # if get_grades is False, get_expected_grade_data does not
         # add an "assignments" key.
         self.assertNotIn("assignments", expected_data)
         self.compare_data(data, expected_data)
@@ -225,6 +234,22 @@ class TestRawGradeCSV(TestSubmittingProblems):
         )
         expected_data = self.get_expected_grade_data(
             use_offline=True, get_raw_scores=True
+        )
+        self.compare_data(data, expected_data)
+
+    def test_grade_summary_data_get_score_max(self):
+        """
+        Test grade summary data report generation with get_score_max set
+        to True (also requires get_raw_scores to be True).
+        """
+        request = DummyRequest()
+        self.answer_question()
+        data = get_student_grade_summary_data(
+            request, self.course, use_offline=True, get_raw_scores=True,
+            get_score_max=True,
+        )
+        expected_data = self.get_expected_grade_data(
+            use_offline=True, get_raw_scores=True, get_score_max=True,
         )
         self.compare_data(data, expected_data)
 

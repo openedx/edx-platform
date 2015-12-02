@@ -1,4 +1,3 @@
-# pylint: disable=invalid-name
 """
 Utility library for working with the edx-organizations app
 """

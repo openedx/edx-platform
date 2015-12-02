@@ -344,7 +344,6 @@ class ConfigurationModelAPITests(TestCase):
         request = self.factory.get('/config/ExampleConfig')
         request.user = self.user
         response = self.current_view(request)
-        # pylint: disable=no-member
         self.assertEquals('', response.data['string_field'])
         self.assertEquals(10, response.data['int_field'])
         self.assertEquals(None, response.data['changed_by'])

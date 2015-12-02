@@ -22,12 +22,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, unused-import, unused-wildcard-import
-
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
+# pylint: disable=unused-import
 
 import imp
 import os
@@ -62,7 +57,7 @@ from xmodule.mixin import LicenseMixin
 
 
 # Dummy secret key for dev/test
-SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+SECRET_KEY = 'dev key'
 
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
@@ -811,6 +806,11 @@ INSTALLED_APPS = (
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
+    # OAuth2 Provider
+    'provider',
+    'provider.oauth2',
+    'oauth2_provider',
+
     # These are apps that aren't strictly needed by Studio, but are imported by
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
@@ -993,6 +993,7 @@ ADVANCED_COMPONENT_TYPES = [
     'word_cloud',
     'graphical_slider_tool',
     'lti',
+    'lti_consumer',
     'library_content',
     'edx_sga',
     'problem-builder',
@@ -1014,6 +1015,8 @@ ADVANCED_COMPONENT_TYPES = [
     'notes',
     'schoolyourself_review',
     'schoolyourself_lesson',
+    # Office Mix
+    'officemix',
 
     # Google Drive embedded components. These XBlocks allow one to
     # embed public google drive documents and calendars within edX units
@@ -1115,3 +1118,9 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+
+############################ OAUTH2 Provider ###################################
+
+# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
+OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'

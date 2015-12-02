@@ -955,6 +955,11 @@ class VerificationDeadline(TimeStampedModel):
         )
     )
 
+    # The system prefers to set this automatically based on default settings. But
+    # if the field is set manually we want a way to indicate that so we don't
+    # overwrite the manual setting of the field.
+    deadline_is_explicit = models.BooleanField(default=True)
+
     # Maintain a history of changes to deadlines for auditing purposes
     history = HistoricalRecords()
 
@@ -1102,7 +1107,7 @@ class VerificationCheckpoint(models.Model):
             VerificationStatus object if found any else None
         """
         try:
-            return self.checkpoint_status.filter(user_id=user_id).latest()  # pylint: disable=no-member
+            return self.checkpoint_status.filter(user_id=user_id).latest()
         except ObjectDoesNotExist:
             return None
 

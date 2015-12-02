@@ -68,8 +68,6 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
-FEATURES['ENABLE_CREDIT_API'] = True
-
 # Enable this feature for course staff grade downloads, to enable acceptance tests
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
@@ -309,7 +307,7 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 # the same settings, we can generate this randomly and guarantee
 # that they are using the same secret.
 from random import choice
-from string import letters, digits, punctuation  # pylint: disable=deprecated-module
+from string import letters, digits, punctuation
 RANDOM_SHARED_SECRET = ''.join(
     choice(letters + digits + punctuation)
     for x in range(250)
@@ -337,13 +335,13 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
-    'FAQ': 'help',
+    'HELP_CENTER': 'help-center',
     'COURSES': 'courses',
     'ROOT': 'root',
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy',
-    'JOBS': 'jobs',
+    'CAREERS': 'careers',
     'NEWS': 'news',
     'PRESS': 'press',
     'BLOG': 'blog',
@@ -353,6 +351,7 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
+SUPPORT_SITE_LINK = 'https://support.example.com'
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

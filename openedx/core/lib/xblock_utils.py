@@ -347,7 +347,7 @@ def get_course_update_items(course_updates, provided_index=0):
         # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
         try:
             course_html_parsed = html.fromstring(course_updates.data)
-        except (etree.XMLSyntaxError, etree.ParserError):   # pylint: disable=no-member
+        except (etree.XMLSyntaxError, etree.ParserError):
             log.error("Cannot parse: " + course_updates.data)
             escaped = escape(course_updates.data)
             course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")

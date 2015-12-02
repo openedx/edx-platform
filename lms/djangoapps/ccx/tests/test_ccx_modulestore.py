@@ -65,7 +65,7 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
         )
         ccx.save()
 
-        self.ccx_locator = CCXLocator.from_course_locator(self.course.id, ccx.id)  # pylint: disable=no-member
+        self.ccx_locator = CCXLocator.from_course_locator(self.course.id, ccx.id)
 
     def get_all_children_bf(self, block):
         """traverse the children of block in a breadth-first order"""

@@ -46,7 +46,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = SlashSeparatedCourseKey('MITx', 'edx4edx_branch', 'edx4edx')
-    GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR')
+    GIT_REPO_DIR = settings.GIT_REPO_DIR
 
     def assertCommandFailureRegexp(self, regex, *args):
         """

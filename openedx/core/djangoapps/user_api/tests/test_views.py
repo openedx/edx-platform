@@ -892,7 +892,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 u"required": True,
                 u"label": u"Full name",
                 u"placeholder": u"Jane Doe",
-                u"instructions": u"Needed for any certificates you may earn",
+                u"instructions": u"Your legal name, used for any certificates you earn.",
                 u"restrictions": {
                     "max_length": 255
                 },
@@ -978,7 +978,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     u"required": True,
                     u"label": u"Full name",
                     u"placeholder": u"Jane Doe",
-                    u"instructions": u"Needed for any certificates you may earn",
+                    u"instructions": u"Your legal name, used for any certificates you earn.",
                     u"restrictions": {
                         "max_length": NAME_MAX_LENGTH,
                     }

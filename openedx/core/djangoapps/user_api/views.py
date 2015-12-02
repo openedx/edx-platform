@@ -47,7 +47,7 @@ class LoginSessionView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, request):
         """Return a description of the login form.
 
         This decouples clients from the API definition:
@@ -360,7 +360,7 @@ class RegistrationView(APIView):
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"Needed for any certificates you may earn")
+        name_instructions = _(u"Your legal name, used for any certificates you earn.")
 
         form_desc.add_field(
             "name",
@@ -758,7 +758,7 @@ class PasswordResetView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, request):
         """Return a description of the password reset form.
 
         This decouples clients from the API definition:

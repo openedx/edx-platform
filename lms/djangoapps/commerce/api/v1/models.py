@@ -18,7 +18,7 @@ class Course(object):
     modes = None
     _deleted_modes = None
 
-    def __init__(self, id, modes, verification_deadline=None):  # pylint: disable=invalid-name,redefined-builtin
+    def __init__(self, id, modes, verification_deadline=None):  # pylint: disable=redefined-builtin
         self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
         self.verification_deadline = verification_deadline
@@ -27,7 +27,7 @@ class Course(object):
     @property
     def name(self):
         """ Return course name. """
-        course_id = CourseKey.from_string(unicode(self.id))  # pylint: disable=invalid-name
+        course_id = CourseKey.from_string(unicode(self.id))
 
         try:
             return CourseOverview.get_from_id(course_id).display_name

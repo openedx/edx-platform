@@ -676,7 +676,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
 
-        self.assertEqual(test_redemption.id, redemption.id)  # pylint: disable=no-member
+        self.assertEqual(test_redemption.id, redemption.id)
 
     def test_regcode_multi_redemptions(self):
         """
@@ -702,7 +702,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
                 course_enrollment=enrollment
             )
             redemption.save()
-            ids.append(redemption.id)  # pylint: disable=no-member
+            ids.append(redemption.id)
 
         test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
 
@@ -1059,6 +1059,10 @@ class CertificateItemTest(ModuleStoreTestCase):
         email = mail.outbox[0]
         self.assertEquals('Order Payment Confirmation', email.subject)
         self.assertNotIn("If you haven't verified your identity yet, please start the verification process", email.body)
+        self.assertIn(
+            "You can unenroll in the course and receive a full refund for 2 days after the course start date. ",
+            email.body
+        )
 
 
 class DonationTest(ModuleStoreTestCase):

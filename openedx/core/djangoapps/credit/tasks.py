@@ -2,13 +2,9 @@
 This file contains celery tasks for credit course views.
 """
 
-import datetime
-from pytz import UTC
-
-from django.conf import settings
-
 from celery import task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -106,7 +102,7 @@ def _get_min_grade_requirement(course_key):
                 "name": "grade",
                 "display_name": "Minimum Grade",
                 "criteria": {
-                    "min_grade": getattr(course, "minimum_grade_credit")
+                    "min_grade": course.minimum_grade_credit
                 },
             }
         ]

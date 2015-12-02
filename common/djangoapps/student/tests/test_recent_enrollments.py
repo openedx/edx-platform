@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment, DashboardConfiguration
-from student.views import get_course_enrollments, _get_recently_enrolled_courses  # pylint: disable=protected-access
+from student.views import get_course_enrollments, _get_recently_enrolled_courses
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -36,7 +36,7 @@ class TestStudentDashboardUnenrollments(ModuleStoreTestCase):
         self.cert_status = None
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
-    def mock_cert(self, _user, _course_overview, _course_mode):  # pylint: disable=unused-argument
+    def mock_cert(self, _user, _course_overview, _course_mode):
         """ Return a preset certificate status. """
         if self.cert_status is not None:
             return {

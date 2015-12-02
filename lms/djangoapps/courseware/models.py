@@ -26,7 +26,7 @@ from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
 from openedx.core.djangoapps.call_stack_manager import CallStackManager, CallStackMixin
-from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
+from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
 log = logging.getLogger(__name__)
 
 log = logging.getLogger("edx.courseware")
@@ -152,7 +152,7 @@ class StudentModule(CallStackMixin, models.Model):
             # We use the student_id instead of username to avoid a database hop.
             # This can actually matter in cases where we're logging many of
             # these (e.g. on a broken progress page).
-            'student_id': self.student_id,  # pylint: disable=no-member
+            'student_id': self.student_id,
             'module_state_key': self.module_state_key,
             'state': str(self.state)[:20],
         },)

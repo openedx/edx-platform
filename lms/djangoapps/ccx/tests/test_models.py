@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from django.utils.timezone import UTC
 from mock import patch
 from nose.plugins.attrib import attr
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
-from student.tests.factories import (  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import (
     AdminFactory,
 )
 from util.tests.test_date_utils import fake_ugettext
@@ -199,4 +199,13 @@ class TestCCX(ModuleStoreTestCase):
         actual = self.ccx.end_datetime_text()  # pylint: disable=no-member
         self.assertEqual(expected, actual)
         actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
+        self.assertEqual(expected, actual)
+
+    def test_ccx_max_student_enrollment_correct(self):
+        """
+        Verify the override value for max_student_enrollments_allowed
+        """
+        expected = 200
+        self.set_ccx_override('max_student_enrollments_allowed', expected)
+        actual = self.ccx.max_student_enrollments_allowed  # pylint: disable=no-member
         self.assertEqual(expected, actual)

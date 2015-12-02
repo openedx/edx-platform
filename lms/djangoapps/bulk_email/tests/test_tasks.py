@@ -99,7 +99,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         course_email = CourseEmail.create(
             course_id, self.instructor, to_option, "Test Subject", "<p>This is a test message</p>"
         )
-        task_input = {'email_id': course_email.id}  # pylint: disable=no-member
+        task_input = {'email_id': course_email.id}
         task_id = str(uuid4())
         instructor_task = InstructorTaskFactory.create(
             course_id=course_id,

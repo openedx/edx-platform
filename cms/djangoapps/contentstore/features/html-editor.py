@@ -4,7 +4,7 @@
 from collections import OrderedDict
 
 from lettuce import world, step
-from nose.tools import assert_in, assert_false, assert_true, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_false, assert_true, assert_equal
 from common import type_in_codemirror, get_codemirror_value
 
 CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"

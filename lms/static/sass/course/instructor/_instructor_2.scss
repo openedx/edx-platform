@@ -92,6 +92,20 @@
     }
   }
 
+  .msg-success{
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+    color: $confirm-color;
+  }
+
+  .multi-select {
+    min-width: 150px;
+
+    option {
+        padding: ($baseline/5) $baseline ($baseline/10) ($baseline/4);
+    }
+  }
+
   // inline copy
   .copy-confirm {
     color: $confirm-color;
@@ -456,43 +470,6 @@
     }
     .enrollment_signup_button {
       @include margin-right($baseline/4);
-    }
-    // Custom File upload
-    .customBrowseBtn {
-      margin: ($baseline/2) 0;
-      display: inline-block;
-      .file-browse {
-        position:relative;
-        overflow:hidden;
-        display: inline;
-        @include margin-left(-5px);
-        span.browse{
-          @include button(simple, $blue);
-          @include margin-right($baseline);
-          padding: 6px ($baseline/2);
-          font-size: 12px;
-          border-radius: 0 3px 3px 0;
-        }
-        input.file_field {
-          position:absolute;
-          @include right(0);
-          top:0;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          opacity:0;
-          filter:alpha(opacity=0);
-        }
-      }
-      & > span, & input[disabled]{
-        vertical-align: middle;
-      }
-      input[disabled] {
-        @include border-radius(4px 0 0 4px);
-        @include padding(6px 6px 5px);
-        border: 1px solid $lightGrey1;
-        cursor: not-allowed;
-      }
     }
   }
 
@@ -1825,6 +1802,15 @@ input[name="subject"] {
     width: 75%;
   }
 
+  .certificate-exception-container {
+    h3 {
+      border-bottom: 1px groove black;
+      display: inline-block;
+    }
+    p.under-heading-text {
+      margin: 12px 0 12px 0;
+    }
+  }
 }
 
 input[name="subject"] {
@@ -2125,12 +2111,6 @@ input[name="subject"] {
 }
 
 #certificate-white-list-editor{
-  .msg-success{
-    border-top: 2px solid $confirm-color;
-    background: tint($confirm-color,95%);
-    color: $confirm-color;
-  }
-
   .certificate-exception-inputs{
     .student-username-or-email{
       width: 300px;
@@ -2161,9 +2141,22 @@ input[name="subject"] {
       text-align: left;
       color: $gray;
 
-      &.date-column{
+      &.date, &.email{
         width: 230px;
       }
+
+      &.user-id{
+        width: 60px;
+      }
+
+     &.user-name{
+        width: 150px;
+      }
+
+      &.action{
+        width: 150px;
+      }
+
     }
 
     td {
@@ -2202,5 +2195,42 @@ input[name="subject"] {
         }
       }
     }
+  }
+}
+// Custom File upload
+.customBrowseBtn {
+  margin: ($baseline/2) 0;
+  display: inline-block;
+  .file-browse {
+    position:relative;
+    overflow:hidden;
+    display: inline;
+    @include margin-left(-5px);
+    span.browse{
+      @include button(simple, $blue);
+      @include margin-right($baseline);
+      padding: 6px ($baseline/2);
+      font-size: 12px;
+      border-radius: 0 3px 3px 0;
+    }
+    input.file_field {
+      position:absolute;
+      @include right(0);
+      top:0;
+      margin:0;
+      padding:0;
+      cursor:pointer;
+      opacity:0;
+      filter:alpha(opacity=0);
+    }
+  }
+  & > span, & input[disabled]{
+    vertical-align: middle;
+  }
+  input[disabled] {
+    @include border-radius(4px 0 0 4px);
+    @include padding(6px 6px 5px);
+    border: 1px solid $lightGrey1;
+    cursor: not-allowed;
   }
 }

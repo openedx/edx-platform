@@ -225,9 +225,15 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           course.
         * course: A collection of the following data about the course.
 
+        * courseware_access: A JSON representation with access information for the course,
+          including any access errors.
+
+          * course_about: The URL to the course about page.
           * course_handouts: The URI to get data for course handouts.
           * course_image: The path to the course image.
           * course_updates: The URI to get data for course updates.
+          * discussion_url: The URI to access data for course discussions if
+            it is enabled, otherwise null.
           * end: The end date of the course.
           * id: The unique ID of the course.
           * latest_updates: Reserved for future use.
@@ -235,12 +241,15 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           * number: The course number.
           * org: The organization that created the course.
           * start: The date and time when the course starts.
+          * start_display:
+            If start_type is a string, then the advertised_start date for the course.
+            If start_type is a timestamp, then a formatted date for the start of the course.
+            If start_type is empty, then the value is None and it indicates that the course has not yet started.
+          * start_type: One of either "string", "timestamp", or "empty"
           * subscription_id: A unique "clean" (alphanumeric with '_') ID of
             the course.
           * video_outline: The URI to get the list of all videos that the user
             can access in the course.
-          * discussion_url: The URI to access data for course discussions if
-            it is enabled, otherwise null.
 
         * created: The date the course was created.
         * is_active: Whether the course is currently active. Possible values

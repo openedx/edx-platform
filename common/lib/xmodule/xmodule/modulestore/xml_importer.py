@@ -961,7 +961,7 @@ def create_xml_attributes(module, xml):
             xml_attrs[attr] = val
 
     # now cache it on module where it's expected
-    setattr(module, 'xml_attributes', xml_attrs)
+    module.xml_attributes = xml_attrs
 
 
 def validate_no_non_editable_metadata(module_store, course_id, category):

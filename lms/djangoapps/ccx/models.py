@@ -9,7 +9,7 @@ from django.db import models
 from django.utils.timezone import UTC
 
 from lazy import lazy
-from xmodule_django.models import CourseKeyField, LocationKeyField  # pylint: disable=import-error
+from xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -55,6 +55,16 @@ class CustomCourseForEdX(models.Model):
         # avoid circular import problems
         from .overrides import get_override_for_ccx
         return get_override_for_ccx(self, self.course, 'due')
+
+    @lazy
+    def max_student_enrollments_allowed(self):
+        """
+        Get the value of the override of the 'max_student_enrollments_allowed'
+        datetime for this CCX
+        """
+        # avoid circular import problems
+        from .overrides import get_override_for_ccx
+        return get_override_for_ccx(self, self.course, 'max_student_enrollments_allowed')
 
     def has_started(self):
         """Return True if the CCX start date is in the past"""

@@ -24,7 +24,7 @@ class TestDeleteOrphan(TestOrphanBase):
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_delete_orphans_no_commit(self, default_store):
         """
-        Tests that running the command without a 'commit' argument
+        Tests that running the command without a '--commit' argument
         results in no orphans being deleted
         """
         course = self.create_course_with_orphans(default_store)
@@ -37,12 +37,12 @@ class TestDeleteOrphan(TestOrphanBase):
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_delete_orphans_commit(self, default_store):
         """
-        Tests that running the command WITH the 'commit' argument
+        Tests that running the command WITH the '--commit' argument
         results in the orphans being deleted
         """
         course = self.create_course_with_orphans(default_store)
 
-        call_command('delete_orphans', unicode(course.id), commit='commit')
+        call_command('delete_orphans', unicode(course.id), '--commit')
 
         # make sure this module wasn't deleted
         self.assertTrue(self.store.has_item(course.id.make_usage_key('html', 'multi_parent_html')))
@@ -66,7 +66,7 @@ class TestDeleteOrphan(TestOrphanBase):
 
         # call delete orphans, specifying the published branch
         # of the course
-        call_command('delete_orphans', unicode(published_branch), commit='commit')
+        call_command('delete_orphans', unicode(published_branch), '--commit')
 
         # now all orphans should be deleted
         self.assertOrphanCount(course.id, 0)

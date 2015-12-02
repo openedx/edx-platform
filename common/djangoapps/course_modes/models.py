@@ -63,6 +63,11 @@ class CourseMode(models.Model):
         ),
     )
 
+    # The system prefers to set this automatically based on default settings. But
+    # if the field is set manually we want a way to indicate that so we don't
+    # overwrite the manual setting of the field.
+    expiration_datetime_is_explicit = models.BooleanField(default=True)
+
     # DEPRECATED: the `expiration_date` field has been replaced by `expiration_datetime`
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
@@ -538,7 +543,7 @@ class CourseMode(models.Model):
         return False
 
     @classmethod
-    def min_course_price_for_currency(cls, course_id, currency):  # pylint: disable=invalid-name
+    def min_course_price_for_currency(cls, course_id, currency):
         """
         Returns the minimum price of the course in the appropriate currency over all the course's
         non-expired modes.

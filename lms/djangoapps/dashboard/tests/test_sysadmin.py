@@ -442,8 +442,8 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self._setstaff_login()
 
-        if os.path.isdir(getattr(settings, 'GIT_REPO_DIR')):
-            shutil.rmtree(getattr(settings, 'GIT_REPO_DIR'))
+        if os.path.isdir(settings.GIT_REPO_DIR):
+            shutil.rmtree(settings.GIT_REPO_DIR)
 
         # Create git loaded course
         response = self._add_edx4edx()
@@ -457,7 +457,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """
 
         self._setstaff_login()
-        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self._mkdir(settings.GIT_REPO_DIR)
 
         def_ms = modulestore()
         self.assertFalse('xml' == def_ms.get_modulestore_type(None))
@@ -485,7 +485,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """, re.VERBOSE)
 
         self._setstaff_login()
-        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self._mkdir(settings.GIT_REPO_DIR)
 
         # Make sure we don't have any git hashes on the page
         response = self.client.get(reverse('sysadmin_courses'))
@@ -501,7 +501,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """
 
         self._setstaff_login()
-        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self._mkdir(settings.GIT_REPO_DIR)
 
         self._add_edx4edx()
         response = self.client.get(reverse('gitlogs'))
@@ -534,7 +534,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         tz_format = DEFAULT_DATE_TIME_FORMAT
 
         self._setstaff_login()
-        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self._mkdir(settings.GIT_REPO_DIR)
 
         self._add_edx4edx()
         date = CourseImportLog.objects.first().created.replace(tzinfo=UTC)
@@ -564,7 +564,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """
 
         self._setstaff_login()
-        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self._mkdir(settings.GIT_REPO_DIR)
 
         self._add_edx4edx()
 
@@ -623,7 +623,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         Ensure course team users are allowed to access only their own course.
         """
 
-        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self._mkdir(settings.GIT_REPO_DIR)
 
         self._setstaff_login()
         self._add_edx4edx()

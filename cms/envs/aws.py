@@ -269,6 +269,8 @@ else:
 DATABASES = AUTH_TOKENS['DATABASES']
 
 # Enable automatic transaction management on all databases
+# https://docs.djangoproject.com/en/1.8/topics/db/transactions/#tying-transactions-to-http-requests
+# This needs to be true for all databases
 for database_name in DATABASES:
     DATABASES[database_name]['ATOMIC_REQUESTS'] = True
 
@@ -362,3 +364,8 @@ XBLOCK_SETTINGS.setdefault("VideoModule", {})['YOUTUBE_API_KEY'] = AUTH_TOKENS.g
 
 PROCTORING_BACKEND_PROVIDER = AUTH_TOKENS.get("PROCTORING_BACKEND_PROVIDER", PROCTORING_BACKEND_PROVIDER)
 PROCTORING_SETTINGS = ENV_TOKENS.get("PROCTORING_SETTINGS", PROCTORING_SETTINGS)
+
+############################ OAUTH2 Provider ###################################
+
+# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
+OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']

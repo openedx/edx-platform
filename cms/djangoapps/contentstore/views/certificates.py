@@ -245,7 +245,7 @@ class CertificateManager(object):
         """
         for cert_index, cert in enumerate(course.certificates['certificates']):  # pylint: disable=unused-variable
             if int(cert['id']) == int(certificate_id):
-                for sig_index, signatory in enumerate(cert.get('signatories')):  # pylint: disable=unused-variable
+                for sig_index, signatory in enumerate(cert.get('signatories')):
                     if int(signatory_id) == int(signatory['id']):
                         _delete_asset(course.id, signatory['signature_image_path'])
                         del cert['signatories'][sig_index]
@@ -354,9 +354,11 @@ def certificates_list_handler(request, course_key_string):
                 handler_name='certificates.certificate_activation_handler',
                 course_key=course_key
             )
-            course_modes = [mode.slug for mode in CourseMode.modes_for_course(
-                course_id=course.id, include_expired=True
-            )]
+            course_modes = [
+                mode.slug for mode in CourseMode.modes_for_course(
+                    course_id=course.id, include_expired=True
+                ) if mode.slug != 'audit'
+            ]
             certificate_web_view_url = get_lms_link_for_certificate_web_view(
                 user_id=request.user.id,
                 course_key=course_key,
