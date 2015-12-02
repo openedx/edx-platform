@@ -1924,6 +1924,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
 
     'sorl.thumbnail',
+
+    # Credentials support
+    'openedx.core.djangoapps.credentials',
 )
 
 # Migrations which are not in the standard module "migrations"
