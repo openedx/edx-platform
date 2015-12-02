@@ -66,7 +66,6 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
-            'moment': 'xmodule_js/common_static/js/src/moment',
             'moment': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
 
             // Manually specify LMS files that are not converted to RequireJS
@@ -74,7 +73,6 @@
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
             'js/utils/navigation': 'js/utils/navigation',
-
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
