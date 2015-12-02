@@ -6,7 +6,6 @@ from datetime import datetime
 from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 import logging
-import inspect
 
 from path import Path as path
 import pytz
@@ -17,7 +16,6 @@ from edxmako.shortcuts import render_to_string
 from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
@@ -112,28 +110,6 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
             raise UserNotEnrolled(course_key)
 
     return course
-
-
-def course_image_url(course):
-    """Try to look up the image url for the course.  If it's not found,
-    log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:
-        # If we are a static course with the course_image attribute
-        # set different than the default, return that path so that
-        # courses can use custom course image paths, otherwise just
-        # return the default static path.
-        url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
-        if hasattr(course, 'course_image') and course.course_image != course.fields['course_image'].default:
-            url += '/' + course.course_image
-        else:
-            url += '/images/course_image.jpg'
-    elif not course.course_image:
-        # if course_image is empty, use the default image url from settings
-        url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
-    else:
-        loc = StaticContent.compute_location(course.id, course.course_image)
-        url = StaticContent.serialize_asset_key_with_slash(loc)
-    return url
 
 
 def find_file(filesystem, dirs, filename):

@@ -9,7 +9,8 @@ from django.template import defaultfilters
 
 from rest_framework import serializers
 
-from lms.djangoapps.courseware.courses import course_image_url, get_course_about_section
+from lms.djangoapps.courseware.courses import get_course_about_section
+from openedx.core.lib.courses import course_image_url
 from xmodule.course_module import DEFAULT_START_DATE
 
 

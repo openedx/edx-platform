@@ -3,9 +3,10 @@
 from microsite_configuration import microsite
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section
+from courseware.courses import get_course_about_section
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
+from openedx.core.lib.courses import course_image_url
 %>
 
 <%inherit file="../main.html" />

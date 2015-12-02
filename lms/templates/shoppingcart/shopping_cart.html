@@ -2,12 +2,12 @@
 <%block name="review_highlight">class="active"</%block>
 
 <%!
-from courseware.courses import course_image_url, get_course_about_section
+from courseware.courses import get_course_about_section
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import marketing_link
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-
+from openedx.core.lib.courses import course_image_url
 %>
 
 <section class="wrapper confirm-enrollment shopping-cart cart-view">

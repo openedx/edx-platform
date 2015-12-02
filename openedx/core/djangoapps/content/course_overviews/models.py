@@ -97,7 +97,7 @@ class CourseOverview(TimeStampedModel):
             CourseOverview: overview extracted from the given course
         """
         from lms.djangoapps.certificates.api import get_active_web_certificate
-        from lms.djangoapps.courseware.courses import course_image_url
+        from openedx.core.lib.courses import course_image_url
 
         # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
         # If the course has a malformed grading policy such that

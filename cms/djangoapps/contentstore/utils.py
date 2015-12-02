@@ -158,16 +158,6 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     )
 
 
-def course_image_url(course):
-    """Returns the image url for the course."""
-    try:
-        loc = StaticContent.compute_location(course.location.course_key, course.course_image)
-    except InvalidKeyError:
-        return ''
-    path = StaticContent.serialize_asset_key_with_slash(loc)
-    return path
-
-
 # pylint: disable=invalid-name
 def is_currently_visible_to_students(xblock):
     """
