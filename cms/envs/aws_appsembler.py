@@ -5,3 +5,5 @@ from .appsembler import *
 
 INSTALLED_APPS += ('appsembler',)
 TEMPLATE_CONTEXT_PROCESSORS += ('appsembler.context_processors.intercom',)
+
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
