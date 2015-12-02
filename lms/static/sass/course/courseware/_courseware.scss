@@ -58,12 +58,14 @@ html.video-fullscreen {
 
 .content-wrapper {
 
-  .course-license, .xblock-license {
+  .course-license,
+  .xblock-license {
     @include text-align(right);
     @extend %t-title7;
     display: block;
     width: auto;
     padding: ($baseline/4) 0;
+    color: $gray-d1;
 
     span {
       color: inherit;
