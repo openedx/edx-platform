@@ -972,7 +972,7 @@ div.problem {
   .detailed-solution {
     > p:first-child {
       @extend %t-strong;
-      color: #aaa;
+      color: $gray;
       text-transform: uppercase;
       font-style: normal;
       font-size: 0.9em;
