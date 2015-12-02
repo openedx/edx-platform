@@ -68,6 +68,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
+from ccx_keys.locator import CCXLocator
 
 from collections import namedtuple
 
@@ -1812,6 +1813,7 @@ def auto_auth(request):
     is_staff = request.GET.get('staff', None)
     is_superuser = request.GET.get('superuser', None)
     course_id = request.GET.get('course_id', None)
+    ccx_id = request.GET.get('ccx_id', None)
 
     # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
     enrollment_mode = request.GET.get('enrollment_mode', 'honor')
@@ -1821,6 +1823,10 @@ def auto_auth(request):
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
     login_when_done = 'no_login' not in request.GET
+
+    ccx_key = None
+    if ccx_id:
+        ccx_key = CCXLocator.from_course_locator(course_key, ccx_id)
 
     form = AccountCreationForm(
         data={
@@ -1868,6 +1874,10 @@ def auto_auth(request):
     # Enroll the user in a course
     if course_key is not None:
         CourseEnrollment.enroll(user, course_key, mode=enrollment_mode)
+
+    # Enroll the user in a ccx
+    if ccx_key is not None:
+        CourseEnrollment.enroll(user, ccx_key)
 
     # Apply the roles
     for role_name in role_names:
