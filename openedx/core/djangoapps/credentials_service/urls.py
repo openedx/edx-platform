@@ -1,3 +1,3 @@
 """
-URLs for the credential service.
+URLs for the credentials service.
 """

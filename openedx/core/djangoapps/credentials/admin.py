@@ -1,3 +1,3 @@
 """
-django admin pages for credential support models
+django admin pages for credentials support models.
 """

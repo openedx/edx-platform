@@ -1,3 +1,3 @@
 """
-Serializers for data manipulated by credential service API endpoints.
+Serializers for data manipulated by the credentials service APIs.
 """

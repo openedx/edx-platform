@@ -1,3 +1,3 @@
 """
-URLs for credential service APIs.
+URLs for the credentials service APIs.
 """

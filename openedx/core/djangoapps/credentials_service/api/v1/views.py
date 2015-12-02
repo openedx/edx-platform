@@ -1,3 +1,3 @@
 """
-API views for credential service.
+Credentials service API views (v1).
 """

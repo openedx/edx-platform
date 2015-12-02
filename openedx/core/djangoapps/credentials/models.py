@@ -1,3 +1,3 @@
 """
-Models providing credential service support for the LMS and Studio.
+Models for credentials support for the LMS and Studio.
 """

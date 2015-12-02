@@ -1,3 +1,3 @@
 """
-Celery tasks for credential support views.
+Celery tasks for credentials support views.
 """

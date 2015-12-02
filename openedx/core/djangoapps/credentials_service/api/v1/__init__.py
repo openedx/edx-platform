@@ -1,3 +1,3 @@
 """
-This package will contain APIs for credential service.
+This package will contain APIs for the credentials service.
 """

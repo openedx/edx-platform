@@ -1,3 +1,3 @@
 """
-Models for credential service.
+Models for the credentials service.
 """
