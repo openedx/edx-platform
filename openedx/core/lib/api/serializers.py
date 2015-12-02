@@ -6,6 +6,7 @@ from rest_framework import serializers
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+
 class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):
     """Serializes arbitrary models in a collapsed format, with just an id and url."""
     url = serializers.HyperlinkedIdentityField(view_name='')

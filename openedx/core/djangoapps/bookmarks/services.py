@@ -10,7 +10,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from request_cache.middleware import RequestCache
 
-from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
+from . import DEFAULT_FIELDS, api
 
 log = logging.getLogger(__name__)
 

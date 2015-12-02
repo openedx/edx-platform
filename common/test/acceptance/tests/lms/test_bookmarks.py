@@ -329,7 +329,7 @@ class BookmarksTest(BookmarksTestMixin):
         for index in range(2):
             self.bookmarks_page.click_bookmarked_block(index)
             self.courseware_page.wait_for_page()
-            self.assertTrue(self.courseware_page.active_usage_id() in xblock_usage_ids)
+            self.assertIn(xblock_usage_ids, self.courseware_page.active_usage_id())
             self.courseware_page.visit().wait_for_page()
             self.bookmarks_page.click_bookmarks_button()
 
@@ -356,7 +356,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._verify_breadcrumbs(num_units=1)
 
         LogoutPage(self.browser).visit()
-        AutoAuthPage(
+        LmsAutoAuthPage(
             self.browser,
             username=self.USERNAME,
             email=self.EMAIL,
@@ -368,7 +368,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.update_and_publish_block_display_name(modified_name)
 
         LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
         self.courseware_page.visit()
 
         self._navigate_and_verify_bookmarks_list(bookmarks_count=1)

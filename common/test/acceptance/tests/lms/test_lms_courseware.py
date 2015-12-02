@@ -70,7 +70,7 @@ class CoursewareTest(UniqueCourseTest):
 
     def _change_problem_release_date_in_studio(self):
         """
-
+        Change problem release date.
         """
         self.course_outline.q(css=".subsection-header-actions .configure-button").first.click()
         self.course_outline.q(css="#start_date").fill("01/01/2030")
@@ -283,7 +283,7 @@ class ProctoredExamTest(UniqueCourseTest):
         for index in range(1, len(xblocks) + 1):
             self.course_nav.go_to_section('Test Section {}'.format(index), 'Test Subsection {}'.format(index))
             courseware_page_breadcrumb = self.courseware_page.breadcrumb
-            expected_breadcrumb = self._create_breadcrumb(index)
+            expected_breadcrumb = self._create_breadcrumb(index)  # pylint: disable=no-member
             self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
     def test_time_allotted_field_is_not_visible_with_none_exam(self):

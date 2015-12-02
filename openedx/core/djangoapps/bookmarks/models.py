@@ -56,6 +56,9 @@ class Bookmark(TimeStampedModel):
         """
         unique_together = ('user', 'usage_key')
 
+    def __unicode__(self):
+        return self.resource_id
+
     @classmethod
     def create(cls, data):
         """
@@ -196,6 +199,9 @@ class XBlockCache(TimeStampedModel):
     _paths = JSONField(
         db_column='paths', default=[], help_text='All paths in course tree to the corresponding block.'
     )
+
+    def __unicode__(self):
+        return unicode(self.usage_key)
 
     @property
     def paths(self):
