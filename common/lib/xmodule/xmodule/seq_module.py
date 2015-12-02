@@ -111,7 +111,7 @@ class ProctoringFields(object):
 @XBlock.wants('credit')
 @XBlock.needs("user")
 @XBlock.needs("bookmarks")
-class SequenceModule(SequenceFields, XModule):
+class SequenceModule(SequenceFields, ProctoringFields, XModule):
     """
     Layout module which lays out content in a temporal sequence
     """
