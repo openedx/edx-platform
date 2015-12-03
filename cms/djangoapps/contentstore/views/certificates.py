@@ -362,7 +362,7 @@ def certificates_list_handler(request, course_key_string):
             certificate_web_view_url = get_lms_link_for_certificate_web_view(
                 user_id=request.user.id,
                 course_key=course_key,
-                mode=course_modes[0]  # CourseMode.modes_for_course returns default mode 'honor' if doesn't find anyone.
+                mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
             )
             certificates = None
             is_active = False
