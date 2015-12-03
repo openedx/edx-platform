@@ -80,13 +80,16 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         data_parsed = json.loads(data_decoded)
         # The user's details get passed to the custom page as a base64 encoded query parameter:
         self.assertEqual(data_parsed, {
+            'auth_entry': 'custom1',
+            'backend_name': 'google-oauth2',
+            'provider_id': 'oa2-google-oauth2',
             'user_details': {
                 'username': 'email_value',
                 'email': 'email_value@example.com',
                 'fullname': 'name_value',
                 'first_name': 'given_name_value',
                 'last_name': 'family_name_value',
-            }
+            },
         })
         # Check the hash that is used to confirm the user's data in the GET parameter is correct
         secret_key = settings.THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS['custom1']['secret_key']

@@ -461,7 +461,7 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
         # choice of the user.
 
 
-def redirect_to_custom_form(request, auth_entry, user_details):
+def redirect_to_custom_form(request, auth_entry, kwargs):
     """
     If auth_entry is found in AUTH_ENTRY_CUSTOM, this is used to send provider
     data to an external server's registration/login page.
@@ -469,13 +469,18 @@ def redirect_to_custom_form(request, auth_entry, user_details):
     The data is sent as a base64-encoded values in a POST request and includes
     a cryptographic checksum in case the integrity of the data is important.
     """
+    backend_name = request.backend.name
+    provider_id = provider.Registry.get_from_pipeline({'backend': backend_name, 'kwargs': kwargs}).provider_id
     form_info = AUTH_ENTRY_CUSTOM[auth_entry]
     secret_key = form_info['secret_key']
     if isinstance(secret_key, unicode):
         secret_key = secret_key.encode('utf-8')
     custom_form_url = form_info['url']
     data_str = json.dumps({
-        "user_details": user_details
+        "auth_entry": auth_entry,
+        "backend_name": backend_name,
+        "provider_id": provider_id,
+        "user_details": kwargs['details'],
     })
     digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
     # Store the data in the session temporarily, then redirect to a page that will POST it to
@@ -537,7 +542,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
             # Pass the username, email, etc. via query params to the custom entry page:
-            return redirect_to_custom_form(strategy.request, auth_entry, kwargs['details'])
+            return redirect_to_custom_form(strategy.request, auth_entry, kwargs)
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
 
