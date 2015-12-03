@@ -1,21 +1,19 @@
 """ Views for a student's profile information. """
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django_countries import countries
-
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.views.decorators.http import require_http_methods
+from django_countries import countries
 
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, marketing_link
+from microsite_configuration import microsite
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.djangoapps.user_api.accounts.serializers import PROFILE_IMAGE_KEY_PREFIX
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthorized
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import User
-from microsite_configuration import microsite
 
 
 @login_required
@@ -87,9 +85,14 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'has_preferences_access': (logged_in_user.username == profile_username or user_is_staff),
             'own_profile': own_profile,
             'country_options': list(countries),
+            'find_courses_url': marketing_link('COURSES'),
             'language_options': settings.ALL_LANGUAGES,
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         },
         'disable_courseware_js': True,
     }
+
+    if settings.FEATURES.get("ENABLE_OPENBADGES"):
+        context['data']['badges_api_url'] = reverse("badges_api:user_assertions", kwargs={'username': profile_username})
+
     return context

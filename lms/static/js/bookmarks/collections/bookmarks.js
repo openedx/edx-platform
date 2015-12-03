@@ -13,7 +13,7 @@
                             course_id: function () { return encodeURIComponent(options.course_id); },
                             fields : function () { return encodeURIComponent('display_name,path'); }
                         },
-                        PagingCollection.prototype.server_api
+                        this.server_api
                     );
                     delete this.server_api.sort_order; // Sort order is not specified for the Bookmark API
                 },

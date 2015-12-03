@@ -4,7 +4,7 @@
     define(['jquery',
             'underscore',
             'backbone',
-            'js/components/tabbed/views/tabbed_view'
+            'common/js/components/views/tabbed_view'
            ],
            function($, _, Backbone, TabbedView) {
                var view,

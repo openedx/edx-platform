@@ -104,7 +104,6 @@ fixture_paths:
     - templates/verify_student
     - templates/file-upload.underscore
     - templates/components/header
-    - templates/components/tabbed
     - templates/components/card
     - templates/financial-assistance/
     - js/fixtures/edxnotes

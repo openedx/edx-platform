@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 
 import json
+from datetime import datetime
 
 import os
+import time
 from django.db import migrations, models
 
 
@@ -43,14 +45,20 @@ def forwards(apps, schema_editor):
             data = badge.data
         else:
             data = json.dumps(badge.data)
-        BadgeAssertion(
+        assertion = BadgeAssertion(
             user_id=badge.user_id,
             badge_class=classes[(badge.course_id, badge.mode)],
             data=data,
             backend='BadgrBackend',
             image_url=badge.data['image'],
             assertion_url=badge.data['json']['id'],
-        ).save()
+        )
+        assertion.save()
+        # Would be overwritten by the first save.
+        assertion.created = datetime.fromtimestamp(
+            time.mktime(time.strptime(badge.data['created_at'], "%Y-%m-%dT%H:%M:%S"))
+        )
+        assertion.save()
 
     for configuration in BadgeImageConfiguration.objects.all():
         file_content = ContentFile(configuration.icon.read())

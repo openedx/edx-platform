@@ -155,6 +155,7 @@
 
     define([
         // Run the common tests that use RequireJS.
+        'common-requirejs/include/common/js/spec/components/tabbed_view_spec.js',
         'common-requirejs/include/common/js/spec/components/feedback_spec.js',
         'common-requirejs/include/common/js/spec/components/list_spec.js',
         'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',

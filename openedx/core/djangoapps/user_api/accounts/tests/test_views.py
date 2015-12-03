@@ -8,6 +8,7 @@ import datetime
 import ddt
 import hashlib
 import json
+
 from mock import patch
 from pytz import UTC
 import unittest
@@ -153,12 +154,12 @@ class TestAccountAPI(UserAPITestCase):
             }
         )
 
-    def _verify_full_shareable_account_response(self, response, account_privacy=None):
+    def _verify_full_shareable_account_response(self, response, account_privacy=None, badges_enabled=False):
         """
         Verify that the shareable fields from the account are returned
         """
         data = response.data
-        self.assertEqual(7, len(data))
+        self.assertEqual(8, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual("US", data["country"])
         self._verify_profile_image_data(data, True)
@@ -166,6 +167,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual([{"code": "en"}], data["language_proficiencies"])
         self.assertEqual("Tired mother of twins", data["bio"])
         self.assertEqual(account_privacy, data["account_privacy"])
+        self.assertEqual(badges_enabled, data['accomplishments_shared'])
 
     def _verify_private_account_response(self, response, requires_parental_consent=False, account_privacy=None):
         """
@@ -182,7 +184,7 @@ class TestAccountAPI(UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(16, len(data))
+        self.assertEqual(17, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
@@ -259,6 +261,7 @@ class TestAccountAPI(UserAPITestCase):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     @ddt.data(
         ("client", "user", PRIVATE_VISIBILITY),
         ("different_client", "different_user", PRIVATE_VISIBILITY),
@@ -279,7 +282,7 @@ class TestAccountAPI(UserAPITestCase):
             if preference_visibility == PRIVATE_VISIBILITY:
                 self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
             else:
-                self._verify_full_shareable_account_response(response, ALL_USERS_VISIBILITY)
+                self._verify_full_shareable_account_response(response, ALL_USERS_VISIBILITY, badges_enabled=True)
 
         client = self.login_client(api_client, requesting_username)
 
@@ -309,7 +312,7 @@ class TestAccountAPI(UserAPITestCase):
             with self.assertNumQueries(9):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(16, len(data))
+            self.assertEqual(17, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -324,6 +327,8 @@ class TestAccountAPI(UserAPITestCase):
             self.assertTrue(data["requires_parental_consent"])
             self.assertEqual([], data["language_proficiencies"])
             self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
+            # Badges aren't on by default, so should not be present.
+            self.assertEqual(False, data["accomplishments_shared"])
 
         self.client.login(username=self.user.username, password=self.test_password)
         verify_get_own_information()
@@ -686,7 +691,7 @@ class TestAccountAPI(UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(16, len(data))
+            self.assertEqual(17, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])

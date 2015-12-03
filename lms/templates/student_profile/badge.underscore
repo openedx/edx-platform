@@ -1,0 +1,16 @@
+<div class="badge-image-container">
+  <img class="badge" src="<%- image_url %>" alt=""/>
+</div>
+<div class="badge-details">
+  <div class="badge-name"><%- badge_class.display_name %></div>
+  <p class="badge-description"><%- badge_class.description %></p>
+  <div class="badge-date-stamp">
+    <%-
+      interpolate(
+        // Translators: Date stamp for earned badges. Example: Earned December 3, 2015.
+        gettext('Earned %(created)s.'),
+        {created: created.format('LL')},
+        true
+      )
+    %></div>
+</div>
