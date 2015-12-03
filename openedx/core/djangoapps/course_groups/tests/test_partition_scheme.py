@@ -21,7 +21,7 @@ from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartiti
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
 from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
-from ..cohorts import add_user_to_cohort, get_course_cohorts
+from ..cohorts import add_user_to_cohort, remove_user_from_cohort, get_course_cohorts
 from .helpers import CohortFactory, config_course_cohorts
 
 
@@ -100,7 +100,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         self.assert_student_in_group(self.groups[1])
 
         # move the student out of the cohort
-        second_cohort.users.remove(self.student)
+        remove_user_from_cohort(second_cohort, self.student.username)
         self.assert_student_in_group(None)
 
     def test_cohort_partition_group_assignment(self):
