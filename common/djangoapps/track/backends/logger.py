@@ -41,6 +41,7 @@ class LoggerBackend(BaseBackend):
                 "UnicodeDecodeError Event_type: %r, Event_source: %r, Page: %r, Referer: %r",
                 event.get('event_type'), event.get('event_source'), event.get('page'), event.get('referer')
             )
+            raise
 
         # TODO: remove trucation of the serialized event, either at a
         # higher level during the emittion of the event, or by
