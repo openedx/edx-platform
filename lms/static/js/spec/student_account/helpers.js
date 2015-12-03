@@ -3,8 +3,10 @@ define(['underscore'], function(_) {
 
     var USER_ACCOUNTS_API_URL = '/api/user/v0/accounts/student';
     var USER_PREFERENCES_API_URL = '/api/user/v0/preferences/student';
+    var BADGES_API_URL = '/api/badges/v1/assertions/student/';
     var IMAGE_UPLOAD_API_URL = '/api/profile_images/v0/staff/upload';
     var IMAGE_REMOVE_API_URL = '/api/profile_images/v0/staff/remove';
+    var FIND_COURSES_URL = '/courses';
 
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
@@ -23,7 +25,8 @@ define(['underscore'], function(_) {
         language: null,
         bio: "About the student",
         language_proficiencies: [{code: '1'}],
-        profile_image: PROFILE_IMAGE
+        profile_image: PROFILE_IMAGE,
+        accomplishments_shared: false
     };
 
     var createAccountSettingsData = function(options) {
@@ -109,6 +112,8 @@ define(['underscore'], function(_) {
     return {
         USER_ACCOUNTS_API_URL: USER_ACCOUNTS_API_URL,
         USER_PREFERENCES_API_URL: USER_PREFERENCES_API_URL,
+        BADGES_API_URL: BADGES_API_URL,
+        FIND_COURSES_URL: FIND_COURSES_URL,
         IMAGE_UPLOAD_API_URL: IMAGE_UPLOAD_API_URL,
         IMAGE_REMOVE_API_URL: IMAGE_REMOVE_API_URL,
         IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,

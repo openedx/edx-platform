@@ -11,11 +11,11 @@
                     this.perPage = topics.results.length;
 
                     this.server_api = _.extend(
+                        this.server_api,
                         {
                             course_id: function () { return encodeURIComponent(self.course_id); },
                             order_by: function () { return this.sortField; }
-                        },
-                        BaseCollection.prototype.server_api
+                        }
                     );
                     delete this.server_api['sort_order']; // Sort order is not specified for the Team API
 

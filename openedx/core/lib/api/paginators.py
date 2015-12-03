@@ -15,6 +15,7 @@ class DefaultPagination(pagination.PageNumberPagination):
     by any subclass of Django Rest Framework's generic API views.
     """
     page_size_query_param = "page_size"
+    max_page_size = 100
 
     def get_paginated_response(self, data):
         """
@@ -25,6 +26,8 @@ class DefaultPagination(pagination.PageNumberPagination):
             'previous': self.get_previous_link(),
             'count': self.page.paginator.count,
             'num_pages': self.page.paginator.num_pages,
+            'current_page': self.page.number,
+            'start': (self.page.number - 1) * self.get_page_size(self.request),
             'results': data
         })
 

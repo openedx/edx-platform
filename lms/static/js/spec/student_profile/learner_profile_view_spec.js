@@ -6,12 +6,14 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         'js/student_account/models/user_preferences_model',
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
+        'js/student_profile/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
+        'common/js/components/collections/paging_collection',
         'js/views/message_banner'
        ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
               UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
-              AccountSettingsFieldViews, MessageBannerView) {
+              BadgeListContainer, AccountSettingsFieldViews, PagingCollection, MessageBannerView) {
         'use strict';
 
         describe("edx.user.LearnerProfileView", function () {
@@ -106,6 +108,15 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     })
                 ];
 
+                var badgeCollection = new PagingCollection();
+                badgeCollection.url = Helpers.BADGES_API_URL;
+
+                var badgeListContainer = new BadgeListContainer({
+                    'attributes': {'class': 'badge-set-display'},
+                    'collection': badgeCollection,
+                    'find_courses_url': Helpers.FIND_COURSES_URL
+                });
+
                 return new LearnerProfileView(
                     {
                         el: $('.wrapper-profile'),
@@ -117,12 +128,17 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         usernameFieldView: usernameFieldView,
                         profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
-                        sectionTwoFieldViews: sectionTwoFieldViews
+                        sectionTwoFieldViews: sectionTwoFieldViews,
+                        badgeListContainer: badgeListContainer
                     });
             };
 
             beforeEach(function () {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
+            });
+
+            afterEach(function () {
+                Backbone.history.stop();
             });
 
             it("shows loading error correctly", function() {
@@ -189,5 +205,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
+
         });
     });
