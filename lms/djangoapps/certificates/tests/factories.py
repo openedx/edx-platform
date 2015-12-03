@@ -1,15 +1,11 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
-import factory
-from django.core.files.base import ContentFile
-from factory.django import DjangoModelFactory, ImageField
-
-from student.models import LinkedInAddToProfileConfiguration
+from factory.django import DjangoModelFactory
 
 from certificates.models import (
-    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion,
-    BadgeImageConfiguration,
+    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist,
 )
+from student.models import LinkedInAddToProfileConfiguration
 
 
 class GeneratedCertificateFactory(DjangoModelFactory):
@@ -31,33 +27,6 @@ class CertificateWhitelistFactory(DjangoModelFactory):
     course_id = None
     whitelist = True
     notes = None
-
-
-class BadgeAssertionFactory(DjangoModelFactory):
-    class Meta(object):
-        model = BadgeAssertion
-
-    mode = 'honor'
-    data = {
-        'image': 'http://www.example.com/image.png',
-        'json': {'id': 'http://www.example.com/assertion.json'},
-        'issuer': 'http://www.example.com/issuer.json',
-    }
-
-
-class BadgeImageConfigurationFactory(DjangoModelFactory):
-
-    class Meta(object):
-        model = BadgeImageConfiguration
-
-    mode = 'honor'
-    icon = factory.LazyAttribute(
-        lambda _: ContentFile(
-            ImageField()._make_data(  # pylint: disable=protected-access
-                {'color': 'blue', 'width': 50, 'height': 50, 'format': 'PNG'}
-            ), 'test.png'
-        )
-    )
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):

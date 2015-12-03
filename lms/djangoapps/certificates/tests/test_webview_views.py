@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 
+from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
@@ -26,13 +27,12 @@ from certificates.models import (
     CertificateStatuses,
     CertificateSocialNetworks,
     CertificateTemplate,
-    CertificateHtmlViewConfiguration
-)
+    CertificateHtmlViewConfiguration,
+    get_completion_badge)
 
 from certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     LinkedInAddToProfileConfigurationFactory,
-    BadgeAssertionFactory,
 )
 from util import organizations_helpers as organizations_api
 from django.test.client import RequestFactory
@@ -40,6 +40,8 @@ import urllib
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
+FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
+FEATURES_WITH_BADGES_ENABLED['ENABLE_OPENBADGES'] = True
 
 FEATURES_WITH_CERTS_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
@@ -95,10 +97,11 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         CourseEnrollmentFactory.create(
             user=self.user,
-            course_id=self.course_id
+            course_id=self.course_id,
         )
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
+        CourseCompleteImageConfigurationFactory.create()
 
     def _add_course_certificates(self, count=1, signatory_count=0, is_active=True):
         """
@@ -221,7 +224,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         self.assertIn('logo_test1.png', response.content)
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
         "CERTIFICATE_TWITTER": True,
         "CERTIFICATE_FACEBOOK": True,
@@ -243,8 +246,9 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
         organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        badge_class = get_completion_badge(course_id=self.course_id, user=self.user)
         BadgeAssertionFactory.create(
-            user=self.user, course_id=self.course_id,
+            user=self.user, badge_class=badge_class,
         )
         self.course.cert_html_view_overrides = {
             "logo_src": "/static/certificates/images/course_override_logo.png"
@@ -593,8 +597,15 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         test_url = '{}?evidence_visit=1'.format(cert_url)
         self._add_course_certificates(count=1, signatory_count=2)
         self.recreate_tracker()
+        badge_class = get_completion_badge(self.course_id, self.user)
         assertion = BadgeAssertionFactory.create(
-            user=self.user, course_id=self.course_id,
+            user=self.user, badge_class=badge_class,
+            backend='DummyBackend',
+            image_url='http://www.example.com/image.png',
+            assertion_url='http://www.example.com/assertion.json',
+            data={
+                'issuer': 'http://www.example.com/issuer.json',
+            }
         )
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
@@ -605,6 +616,10 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                     'course_id': 'testorg/run1/refundable_course',
                     # pylint: disable=no-member
                     'assertion_id': assertion.id,
+                    'badge_generator': u'DummyBackend',
+                    'badge_name': u'refundable course',
+                    'issuing_component': u'',
+                    'badge_slug': u'testorgrun1refundable_course_honor_432f164',
                     'assertion_json_url': 'http://www.example.com/assertion.json',
                     'assertion_image_url': 'http://www.example.com/image.png',
                     'user_id': self.user.id,
