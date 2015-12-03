@@ -20,6 +20,7 @@ from courseware.access_response import (
     StartDateError,
     VisibilityError,
 )
+from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -94,7 +95,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('course_info/{}/handouts'.format(self.course.id), found_course['course_handouts'])
         self.assertIn('video_outlines/courses/{}'.format(self.course.id), found_course['video_outline'])
         self.assertEqual(found_course['id'], unicode(self.course.id))
-        self.assertEqual(courses[0]['mode'], 'honor')
+        self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
 
     def verify_failure(self, response, error_type=None):
