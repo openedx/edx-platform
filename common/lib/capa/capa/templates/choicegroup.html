@@ -19,15 +19,12 @@
             % endif
             % endif
             >
-            <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-role="radio" aria-describedby="answer_${id}" value="${choice_id}"
+            <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-describedby="answer_${id}" value="${choice_id}"
             ## If the student selected this choice...
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
             checked="true"
             % elif input_type != 'radio' and choice_id in value:
             checked="true"
-            % endif
-            % if input_type != 'radio':
-            aria-multiselectable="true"
             % endif
 
             /> ${choice_description}
