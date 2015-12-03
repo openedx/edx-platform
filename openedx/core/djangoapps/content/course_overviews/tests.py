@@ -90,7 +90,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             'location',
             'number',
             'url_name',
-            'display_name_with_default',
+            'display_name_w_default_escaped',
             'start_date_is_still_default',
             'pre_requisite_courses',
             'enrollment_domain',

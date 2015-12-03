@@ -1148,7 +1148,7 @@ def _compose_message_reverification_email(
         subject = "Re-verification Status"
         context = {
             "status": status,
-            "course_name": course.display_name_with_default,
+            "course_name": course.display_name_w_default_escaped,
             "assessment": reverification_block.related_assessment
         }
 
@@ -1429,7 +1429,7 @@ class InCourseReverifyView(View):
 
         context = {
             'course_key': unicode(course_key),
-            'course_name': course.display_name_with_default,
+            'course_name': course.display_name_w_default_escaped,
             'checkpoint_name': checkpoint.checkpoint_name,
             'platform_name': settings.PLATFORM_NAME,
             'usage_id': usage_id,

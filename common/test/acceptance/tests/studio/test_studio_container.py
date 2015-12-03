@@ -1045,7 +1045,7 @@ class UnitPublishingTest(ContainerBase):
 @attr('shard_3')
 class DisplayNameTest(ContainerBase):
     """
-    Test consistent use of display_name_with_default
+    Test consistent use of display_name_w_default_escaped
     """
     def populate_course_fixture(self, course_fixture):
         """
@@ -1061,7 +1061,7 @@ class DisplayNameTest(ContainerBase):
             )
         )
 
-    def test_display_name_default(self):
+    def test_display_name_default_esc(self):
         """
         Scenario: Given that an XBlock with a dynamic display name has been added to the course,
             When I view the unit page and note the display name of the block,
@@ -1069,7 +1069,7 @@ class DisplayNameTest(ContainerBase):
             And when I then go to the container page for that same block,
             Then I see the same generated display name.
         """
-        # Unfortunately no blocks in the core platform implement display_name_with_default
+        # Unfortunately no blocks in the core platform implement display_name_w_default_escaped
         # in an interesting way for this test, so we are just testing for consistency and not
         # the actual value.
         unit = self.go_to_unit_page()
@@ -1080,9 +1080,9 @@ class DisplayNameTest(ContainerBase):
 
 
 @attr('shard_3')
-class DisplayNameUnescapedTest(ContainerBase):
+class DisplayNameWithDefaultTest(ContainerBase):
     """
-    Test display_name_unescaped
+    Test display_name_with_default
     """
     def populate_course_fixture(self, course_fixture):
         """
@@ -1096,7 +1096,7 @@ class DisplayNameUnescapedTest(ContainerBase):
             )
         )
 
-    def test_display_name_unescaped(self):
+    def test_display_name_with_default(self):
         """
         Scenario: Verify that Unit names containing <> characters
         are rendered correctly on the unit page.  This tests for TNL-3429.

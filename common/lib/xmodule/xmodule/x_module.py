@@ -259,7 +259,7 @@ class XModuleFields(object):
         help="This name appears in the horizontal navigation at the top of the page.",
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
-        # use display_name_with_default for those
+        # use display_name_w_default_escaped for those
         default=None
     )
 
@@ -341,20 +341,20 @@ class XModuleMixin(XModuleFields, XBlock):
         return course_metadata_utils.url_name_for_course_location(self.location)
 
     @property
-    def display_name_with_default(self):
+    def display_name_w_default_escaped(self):
         """
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
         """
-        return course_metadata_utils.display_name_with_default(self)
+        return course_metadata_utils.display_name_w_default_escaped(self)
 
     @property
-    def display_name_unescaped(self):
+    def display_name_with_default(self):
         """
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name; don't escape <> characters.
         """
-        return course_metadata_utils.display_name_unescaped(self)
+        return course_metadata_utils.display_name_with_default(self)
 
     @property
     def xblock_kvs(self):
@@ -432,7 +432,7 @@ class XModuleMixin(XModuleFields, XBlock):
         if self.has_children:
             return sum((child.get_content_titles() for child in self.get_children()), [])
         else:
-            return [self.display_name_with_default]
+            return [self.display_name_w_default_escaped]
 
     def get_children(self, usage_id_filter=None, usage_key_filter=None):  # pylint: disable=arguments-differ
         """Returns a list of XBlock instances for the children of

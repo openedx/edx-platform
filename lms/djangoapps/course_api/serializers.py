@@ -43,7 +43,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     course_id = serializers.CharField(source='id', read_only=True)
-    name = serializers.CharField(source='display_name_with_default')
+    name = serializers.CharField(source='display_name_w_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
     org = serializers.CharField(source='display_org_with_default')
     description = serializers.SerializerMethodField()

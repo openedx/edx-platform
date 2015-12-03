@@ -40,7 +40,7 @@ class HtmlBlock(object):
         help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
-        # use display_name_with_default for those
+        # use display_name_w_default_escaped for those
         default=_("Text")
     )
     data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
