@@ -18,6 +18,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'url', 'username', 'email')
 
 
+class ExtendedUserSerializer(serializers.HyperlinkedModelSerializer):
+    """ Serializer for model interactions """
+
+    class Meta:
+        """ Meta class for defining additional serializer characteristics """
+        model = User
+        fields = ('id', 'url', 'username', 'email', 'first_name', 'last_name')
+
+
 class GradeSerializer(serializers.Serializer):
     """ Serializer for model interactions """
     grade = serializers.Field()
@@ -97,7 +106,7 @@ class WorkgroupSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializer for model interactions """
     project = serializers.PrimaryKeyRelatedField(required=True)
     groups = GroupSerializer(many=True, required=False)
-    users = UserSerializer(many=True, required=False)
+    users = ExtendedUserSerializer(many=True, required=False)
     submissions = serializers.PrimaryKeyRelatedField(many=True, required=False)
     workgroup_reviews = serializers.PrimaryKeyRelatedField(many=True, required=False)
     peer_reviews = serializers.PrimaryKeyRelatedField(many=True, required=False)
