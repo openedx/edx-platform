@@ -74,7 +74,7 @@ def post_to_custom_auth_form(request):
     # Verify the format of pipeline_data:
     data = {
         'post_url': pipeline_data['post_url'],
-        # The user's name, email, etc. as base64 encoded JSON
+        # data: The provider info and user's name, email, etc. as base64 encoded JSON
         # It's base64 encoded because it's signed cryptographically and we don't want whitespace
         # or ordering issues affecting the hash/signature.
         'data': pipeline_data['data'],
