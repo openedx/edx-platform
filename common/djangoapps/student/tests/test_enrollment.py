@@ -45,10 +45,17 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         # and automatically enrolled
         ([], '', CourseMode.DEFAULT_MODE_SLUG),
 
-        # Audit / Verified / Honor
+        # Audit / Verified
         # We should always go to the "choose your course" page.
         # We should also be enrolled as the default mode.
-        (['honor', 'verified', 'audit'], 'course_modes_choose', CourseMode.DEFAULT_MODE_SLUG),
+        (['verified', 'audit'], 'course_modes_choose', CourseMode.DEFAULT_MODE_SLUG),
+
+        # Audit / Verified / Honor
+        # We should always go to the "choose your course" page.
+        # We should also be enrolled as the honor mode.
+        # Since honor and audit are currently offered together this precedence must
+        # be maintained.
+        (['honor', 'verified', 'audit'], 'course_modes_choose', CourseMode.HONOR),
 
         # Professional ed
         # Expect that we're sent to the "choose your track" page
