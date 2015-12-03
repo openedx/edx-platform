@@ -89,9 +89,12 @@ class InheritanceMixin(XBlockMixin):
         help=_("Enter the ids for the content groups this problem belongs to."),
         scope=Scope.settings,
     )
+
     showanswer = String(
         display_name=_("Show Answer"),
         help=_(
+            # Translators: DO NOT translate the words in quotes here, they are
+            # specific words for the acceptable values.
             'Specify when the Show Answer button appears for each problem. '
             'Valid values are "always", "answered", "attempted", "closed", '
             '"finished", "past_due", "correct_or_past_due", and "never".'
@@ -102,10 +105,12 @@ class InheritanceMixin(XBlockMixin):
     rerandomize = String(
         display_name=_("Randomization"),
         help=_(
+            # Translators: DO NOT translate the words in quotes here, they are
+            # specific words for the acceptable values.
             'Specify the default for how often variable values in a problem are randomized. '
-            'This setting should be set to \"never\" unless you plan to provide a Python '
+            'This setting should be set to "never" unless you plan to provide a Python '
             'script to identify and randomize values in most of the problems in your course. '
-            'Valid values are \"always\", \"onreset\", \"never\", and \"per_student\".'
+            'Valid values are "always", "onreset", "never", and "per_student".'
         ),
         scope=Scope.settings,
         default="never",

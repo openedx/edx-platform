@@ -43,6 +43,8 @@ class LmsBlockMixin(XBlockMixin):
     )
     chrome = String(
         display_name=_("Courseware Chrome"),
+        # Translators: DO NOT translate the words in quotes here, they are
+        # specific words for the acceptable values.
         help=_("Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
                "\"chromeless\" -- to not use tabs or the accordion; \n"
                "\"tabs\" -- to use tabs only; \n"
