@@ -232,7 +232,7 @@ def footer(request):
                 "title": "Powered by Open edX",
                 "image": "http://example.com/openedx.png"
             },
-            "logo_image": "http://example.com/static/images/default-theme/logo.png",
+            "logo_image": "http://example.com/static/images/logo.png",
             "copyright": "EdX, Open edX, and the edX and Open edX logos are \
                 registered trademarks or trademarks of edX Inc."
         }
