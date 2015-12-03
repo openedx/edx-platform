@@ -631,7 +631,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
             # Pass the username, email, etc. via query params to the custom entry page:
-            return redirect_to_custom_form(auth_entry, kwargs['details'])
+            return redirect_to_custom_form(strategy.request, auth_entry, kwargs)
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
 
