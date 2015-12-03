@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'js/views/message', 'js/common_helpers/template_helpers'
+define(['backbone', 'jquery', 'underscore', 'js/views/message_banner', 'js/common_helpers/template_helpers'
        ],
     function (Backbone, $, _, MessageView, TemplateHelpers) {
         'use strict';

@@ -1,6 +1,6 @@
 ;(function (define, undefined) {
     'use strict';
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message'],
+    define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message_banner'],
         function (gettext, $, _, Backbone, MessageView) {
 
         return Backbone.View.extend({

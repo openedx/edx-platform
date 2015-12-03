@@ -1,16 +1,14 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'text!templates/fields/message_banner.underscore'
-    ], function (gettext, $, _, Backbone, messageBannerTemplate) {
+        'gettext', 'jquery', 'underscore', 'backbone'
+    ], function (gettext, $, _, Backbone) {
 
-        var MessageBannerView = Backbone.View.extend({
+        return Backbone.View.extend({
 
             initialize: function (options) {
-                if (_.isUndefined(options)) {
-                    options = {};
-                }
-                this.options = _.defaults(options, {urgency: 'high', type: ''});
+                var templateId = _.isUndefined(options.templateId) ? '#message_view-tpl' : options.templateId;
+                this.template = _.template($(templateId).text());
             },
 
             render: function () {
@@ -36,7 +34,5 @@
                 this.render();
             }
         });
-
-        return MessageBannerView;
     });
 }).call(this, define || RequireJS.define);

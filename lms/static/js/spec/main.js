@@ -92,7 +92,7 @@
             'js/bookmarks/views/bookmarks_list_button': 'js/bookmarks/views/bookmarks_list_button',
             'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
             'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button',
-            'js/views/message': 'js/views/message',
+            'js/views/message_banner': 'js/views/message_banner',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
