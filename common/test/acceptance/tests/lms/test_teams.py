@@ -1271,6 +1271,7 @@ class DeleteTeamTest(TeamFormActions):
             ):
                 confirm_prompt(self.team_management_page, **kwargs)
 
+    @flaky(max_runs=20, min_passes=20)
     def test_delete_team_updates_topics(self):
         """
         Scenario: Deleting a team should update the team count on the topics page
