@@ -58,12 +58,13 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from edxmako.shortcuts import render_to_response
 from microsite_configuration import microsite
-from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
+from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration

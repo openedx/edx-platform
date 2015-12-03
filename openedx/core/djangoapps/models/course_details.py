@@ -1,19 +1,17 @@
+"""
+CourseDetails
+"""
 import re
 import logging
-import datetime
-import json
-from json.encoder import JSONEncoder
 
 from django.conf import settings
 
-from opaque_keys.edx.locations import Location
+from xmodule.fields import Date
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from contentstore.utils import has_active_web_certificate
-from models.settings import course_grading
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.courses import course_image_url
-from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
+
 
 # This list represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
@@ -30,8 +28,12 @@ ABOUT_ATTRIBUTES = [
 
 
 class CourseDetails(object):
+    """
+    An interface for extracting course information from the modulestore.
+    """
     def __init__(self, org, course_id, run):
-        # still need these for now b/c the client's screen shows these 3 fields
+        # still need these for now b/c the client's screen shows these 3
+        # fields
         self.org = org
         self.course_id = course_id
         self.run = run
@@ -44,7 +46,7 @@ class CourseDetails(object):
         self.short_description = ""
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer
-        self.effort = None  # int hours/week
+        self.effort = None  # hours/week
         self.license = "all-rights-reserved"  # default course license is all rights reserved
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
@@ -73,7 +75,8 @@ class CourseDetails(object):
     @classmethod
     def fetch(cls, course_key):
         """
-        Fetch the course details for the given course from persistence and return a CourseDetails model.
+        Fetch the course details for the given course from persistence
+        and return a CourseDetails model.
         """
         descriptor = modulestore().get_course(course_key)
         course_details = cls(course_key.org, course_key.course, course_key.run)
@@ -86,33 +89,57 @@ class CourseDetails(object):
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
         course_details.language = descriptor.language
+        course_details.self_paced = descriptor.self_paced
+
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(descriptor, "license", "all-rights-reserved")
+
         course_details.has_cert_config = has_active_web_certificate(descriptor)
-        course_details.self_paced = descriptor.self_paced
+        course_details.intro_video = cls.fetch_youtube_video_id(course_key)
 
         for attribute in ABOUT_ATTRIBUTES:
             value = cls._fetch_about_attribute(course_key, attribute)
             if value is not None:
                 setattr(course_details, attribute, value)
 
-        raw_video = cls._fetch_about_attribute(course_key, 'video')
-        if raw_video:
-            course_details.intro_video = CourseDetails.parse_video_tag(raw_video)
-
         return course_details
 
     @classmethod
-    def update_about_item(cls, course_key, about_key, data, course, user):
+    def fetch_youtube_video_id(cls, course_key):
         """
-        Update the about item with the new data blob. If data is None, then
-        delete the about item.
+        Returns the course about video ID.
         """
-        temploc = course_key.make_usage_key('about', about_key)
-        store = modulestore()
+        raw_video = cls._fetch_about_attribute(course_key, 'video')
+        if raw_video:
+            return cls.parse_video_tag(raw_video)
+
+    @classmethod
+    def fetch_video_url(cls, course_key):
+        """
+        Returns the course about video URL.
+        """
+        video_id = cls.fetch_youtube_video_id(course_key)
+        if video_id:
+            return "http://www.youtube.com/watch?v={0}".format(video_id)
+
+    @classmethod
+    def fetch_effort(cls, course_key):
+        """
+        Returns the hours per week of effort for the course.
+        """
+        return cls._fetch_about_attribute(course_key, 'effort')
+
+    @classmethod
+    def update_about_item(cls, course, about_key, data, user_id, store=None):
+        """
+        Update the about item with the new data blob. If data is None,
+        then delete the about item.
+        """
+        temploc = course.id.make_usage_key('about', about_key)
+        store = store or modulestore()
         if data is None:
             try:
-                store.delete_item(temploc, user.id)
+                store.delete_item(temploc, user_id)
             # Ignore an attempt to delete an item that doesn't exist
             except ValueError:
                 pass
@@ -122,10 +149,18 @@ class CourseDetails(object):
             except ItemNotFoundError:
                 about_item = store.create_xblock(course.runtime, course.id, 'about', about_key)
             about_item.data = data
-            store.update_item(about_item, user.id, allow_not_found=True)
+            store.update_item(about_item, user_id, allow_not_found=True)
 
     @classmethod
-    def update_from_json(cls, course_key, jsondict, user):
+    def update_about_video(cls, course, video_id, user_id):
+        """
+        Updates the Course's about video to the given video ID.
+        """
+        recomposed_video_tag = CourseDetails.recompose_video_tag(video_id)
+        cls.update_about_item(course, 'video', recomposed_video_tag, user_id)
+
+    @classmethod
+    def update_from_json(cls, course_key, jsondict, user):  # pylint: disable=too-many-statements
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
@@ -134,10 +169,11 @@ class CourseDetails(object):
 
         dirty = False
 
-        # In the descriptor's setter, the date is converted to JSON using Date's to_json method.
-        # Calling to_json on something that is already JSON doesn't work. Since reaching directly
-        # into the model is nasty, convert the JSON Date to a Python date, which is what the
-        # setter expects as input.
+        # In the descriptor's setter, the date is converted to JSON
+        # using Date's to_json method. Calling to_json on something that
+        # is already JSON doesn't work. Since reaching directly into the
+        # model is nasty, convert the JSON Date to a Python date, which
+        # is what the setter expects as input.
         date = Date()
 
         if 'start_date' in jsondict:
@@ -202,25 +238,28 @@ class CourseDetails(object):
         if dirty:
             module_store.update_item(descriptor, user.id)
 
-        # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
-        # to make faster, could compare against db or could have client send over a list of which fields changed.
+        # NOTE: below auto writes to the db w/o verifying that any of
+        # the fields actually changed to make faster, could compare
+        # against db or could have client send over a list of which
+        # fields changed.
         for attribute in ABOUT_ATTRIBUTES:
             if attribute in jsondict:
-                cls.update_about_item(course_key, attribute, jsondict[attribute], descriptor, user)
+                cls.update_about_item(descriptor, attribute, jsondict[attribute], user.id)
 
-        recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
-        cls.update_about_item(course_key, 'video', recomposed_video_tag, descriptor, user)
+        cls.update_about_video(descriptor, jsondict['intro_video'], user.id)
 
-        # Could just return jsondict w/o doing any db reads, but I put the reads in as a means to confirm
-        # it persisted correctly
+        # Could just return jsondict w/o doing any db reads, but I put
+        # the reads in as a means to confirm it persisted correctly
         return CourseDetails.fetch(course_key)
 
     @staticmethod
     def parse_video_tag(raw_video):
         """
-        Because the client really only wants the author to specify the youtube key, that's all we send to and get from the client.
-        The problem is that the db stores the html markup as well (which, of course, makes any sitewide changes to how we do videos
-        next to impossible.)
+        Because the client really only wants the author to specify the
+        youtube key, that's all we send to and get from the client. The
+        problem is that the db stores the html markup as well (which, of
+        course, makes any site-wide changes to how we do videos next to
+        impossible.)
         """
         if not raw_video:
             return None
@@ -237,26 +276,37 @@ class CourseDetails(object):
 
     @staticmethod
     def recompose_video_tag(video_key):
-        # TODO should this use a mako template? Of course, my hope is that this is a short-term workaround for the db not storing
-        # the right thing
+        """
+        Returns HTML string to embed the video in an iFrame.
+        """
+        # TODO should this use a mako template? Of course, my hope is
+        # that this is a short-term workaround for the db not storing
+        #  the right thing
         result = None
         if video_key:
-            result = '<iframe title="YouTube Video" width="560" height="315" src="//www.youtube.com/embed/' + \
-                video_key + '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
+            result = (
+                '<iframe title="YouTube Video" width="560" height="315" src="//www.youtube.com/embed/' +
+                video_key +
+                '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
+            )
         return result
 
 
-# TODO move to a more general util?
-class CourseSettingsEncoder(json.JSONEncoder):
+# TODO - we may no longer need this - check with Zia
+def has_active_web_certificate(course):
     """
-    Serialize CourseDetails, CourseGradingModel, datetime, and old Locations
+    Returns True if given course has active web certificate
+    configuration. If given course has no active web certificate
+    configuration returns False. Returns None If `CERTIFICATES_HTML_VIEW`
+    is not enabled or course has not enabled `cert_html_view_enabled`
+    settings.
     """
-    def default(self, obj):
-        if isinstance(obj, (CourseDetails, course_grading.CourseGradingModel)):
-            return obj.__dict__
-        elif isinstance(obj, Location):
-            return obj.dict()
-        elif isinstance(obj, datetime.datetime):
-            return Date().to_json(obj)
-        else:
-            return JSONEncoder.default(self, obj)
+    cert_config = None
+    if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False) and course.cert_html_view_enabled:
+        cert_config = False
+        certificates = getattr(course, 'certificates', {})
+        configurations = certificates.get('certificates', [])
+        for config in configurations:
+            if config.get('is_active'):
+                return True
+    return cert_config
