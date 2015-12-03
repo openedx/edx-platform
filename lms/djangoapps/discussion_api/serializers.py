@@ -272,7 +272,7 @@ class ThreadSerializer(_ContentSerializer):
     def update(self, instance, validated_data):
         for key, val in validated_data.items():
             instance[key] = val
-        instance.save()
+        instance.save(params={"requested_user_id": self.context["cc_requester"]["id"]})
         return instance
 
 
