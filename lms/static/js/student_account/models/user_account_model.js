@@ -23,6 +23,7 @@
                 language_proficiencies: [],
                 requires_parental_consent: true,
                 profile_image: null,
+                accomplishments_shared: false,
                 default_public_account_fields: []
             },
 

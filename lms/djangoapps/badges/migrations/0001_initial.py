@@ -5,6 +5,8 @@ from django.db import migrations, models
 import jsonfield.fields
 import badges.models
 from django.conf import settings
+import django.utils.timezone
+from model_utils import fields
 import xmodule_django.models
 
 
@@ -23,14 +25,16 @@ class Migration(migrations.Migration):
                 ('backend', models.CharField(max_length=50)),
                 ('image_url', models.URLField()),
                 ('assertion_url', models.URLField()),
+                ('modified', fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
+                ('created', fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False, db_index=True)),
             ],
         ),
         migrations.CreateModel(
             name='BadgeClass',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('slug', models.SlugField(max_length=255)),
-                ('issuing_component', models.SlugField(default=b'', blank=True)),
+                ('slug', models.SlugField(max_length=255, validators=[badges.models.validate_lowercase])),
+                ('issuing_component', models.SlugField(default=b'', blank=True, validators=[badges.models.validate_lowercase])),
                 ('display_name', models.CharField(max_length=255)),
                 ('course_id', xmodule_django.models.CourseKeyField(default=None, max_length=255, blank=True)),
                 ('description', models.TextField()),

@@ -113,7 +113,7 @@ var edx = edx || {};
             event.preventDefault();
             this.clearStatus();
 
-            self = this;
+            var self = this;
             $.ajax({
                 url: 'password',
                 type: 'POST',

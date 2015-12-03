@@ -3,9 +3,9 @@
     define(['backbone',
             'underscore',
             'jquery',
-            'text!templates/components/tabbed/tabbed_view.underscore',
-            'text!templates/components/tabbed/tab.underscore',
-            'text!templates/components/tabbed/tabpanel.underscore',
+            'text!common/templates/components/tabbed_view.underscore',
+            'text!common/templates/components/tab.underscore',
+            'text!common/templates/components/tabpanel.underscore',
            ], function (
                Backbone,
                _,
@@ -37,8 +37,6 @@
                        'click .nav-item.tab': 'switchTab'
                    },
 
-                   template: _.template(tabbedViewTemplate),
-
                    /**
                     * View for a tabbed interface. Expects a list of tabs
                     * in its options object, each of which should contain the
@@ -51,12 +49,13 @@
                     * If a router is passed in (via options.router),
                     * use that router to keep track of history between
                     * tabs.  Backbone.history.start() must be called
-                    * by the router's instatiator after this view is
+                    * by the router's instantiator after this view is
                     * initialized.
                     */
                    initialize: function (options) {
                        this.router = options.router || null;
                        this.tabs = options.tabs;
+                       this.template = _.template(tabbedViewTemplate, {viewLabel: this.options.viewLabel});
                        // Convert each view into a TabPanelView
                        _.each(this.tabs, function (tabInfo) {
                            tabInfo.view = new TabPanelView({url: tabInfo.url, view: tabInfo.view});
@@ -69,7 +68,7 @@
 
                    render: function () {
                        var self = this;
-                       this.$el.html(this.template({}));
+                       this.$el.html(this.template);
                        _.each(this.tabs, function(tabInfo, index) {
                            var tabEl = $(_.template(tabTemplate, {
                                    index: index,

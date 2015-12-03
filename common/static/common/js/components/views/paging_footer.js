@@ -13,6 +13,7 @@
                 initialize: function(options) {
                     this.collection = options.collection;
                     this.hideWhenOnePage = options.hideWhenOnePage || false;
+                    this.paginationLabel = options.paginationLabel;
                     this.collection.bind('add', _.bind(this.render, this));
                     this.collection.bind('remove', _.bind(this.render, this));
                     this.collection.bind('reset', _.bind(this.render, this));
@@ -32,7 +33,8 @@
                     }
                     this.$el.html(_.template(paging_footer_template, {
                         current_page: this.collection.getPage(),
-                        total_pages: this.collection.totalPages
+                        total_pages: this.collection.totalPages,
+                        paginationLabel: this.paginationLabel
                     }));
                     this.$(".previous-page-link").toggleClass("is-disabled", onFirstPage).attr('aria-disabled', onFirstPage);
                     this.$(".next-page-link").toggleClass("is-disabled", onLastPage).attr('aria-disabled', onLastPage);

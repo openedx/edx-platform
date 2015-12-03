@@ -24,17 +24,19 @@ from ..errors import (
 )
 from ..forms import PasswordResetFormNoActive
 from ..helpers import intercept_errors
-from ..models import UserPreference
 
 from . import (
-    ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,
     EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
 from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
-    UserReadOnlySerializer
+    UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
 )
+
+
+# Public access point for this function.
+visible_fields = _visible_fields
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])

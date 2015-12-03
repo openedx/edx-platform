@@ -85,7 +85,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         account_settings = get_account_settings(
             self.default_request,
             self.different_user.username,
-            configuration=config
+            configuration=config,
         )
         self.assertEqual(self.different_user.email, account_settings["email"])
 
@@ -279,6 +279,7 @@ class AccountSettingsOnCreationTest(TestCase):
             'requires_parental_consent': True,
             'language_proficiencies': [],
             'account_privacy': PRIVATE_VISIBILITY,
+            'accomplishments_shared': False,
         })
 
 

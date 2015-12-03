@@ -7,6 +7,6 @@ from .views import UserBadgeAssertions
 from openedx.core.djangoapps.user_api.urls import USERNAME_PATTERN
 
 urlpatterns = patterns(
-    'badges.views',
-    url('^assertions/user/' + USERNAME_PATTERN + '/$', UserBadgeAssertions.as_view(), name='user-assertions'),
+    'badges.api',
+    url('^assertions/user/' + USERNAME_PATTERN + '/$', UserBadgeAssertions.as_view(), name='user_assertions'),
 )

@@ -26,7 +26,7 @@
     ], function (Backbone, _, PagingHeader, PagingFooter, ListView, paginatedViewTemplate) {
         var PaginatedView = Backbone.View.extend({
             initialize: function () {
-                var ItemListView = ListView.extend({
+                var ItemListView = this.listViewClass.extend({
                     tagName: 'div',
                     className: this.type  + '-container',
                     itemViewClass: this.itemViewClass
@@ -39,18 +39,25 @@
                 }, this);
             },
 
+            listViewClass: ListView,
+
+            viewTemplate: paginatedViewTemplate,
+
+            paginationLabel: gettext("Pagination"),
+
             createHeaderView: function() {
                 return new PagingHeader({collection: this.options.collection, srInfo: this.srInfo});
             },
 
             createFooterView: function() {
                 return new PagingFooter({
-                    collection: this.options.collection, hideWhenOnePage: true
+                    collection: this.options.collection, hideWhenOnePage: true,
+                    paginationLabel: this.paginationLabel
                 });
             },
 
             render: function () {
-                this.$el.html(_.template(paginatedViewTemplate, {type: this.type}));
+                this.$el.html(_.template(this.viewTemplate, {type: this.type}));
                 this.assign(this.listView, '.' + this.type + '-list');
                 if (this.headerView) {
                     this.assign(this.headerView, '.' + this.type + '-paging-header');
