@@ -66,7 +66,6 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
-            'moment': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',

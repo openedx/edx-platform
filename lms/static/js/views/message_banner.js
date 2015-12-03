@@ -1,31 +1,31 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone'
-    ], function (gettext, $, _, Backbone) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'text!templates/fields/message_banner.underscore'
+    ], function (gettext, $, _, Backbone, messageBannerTemplate) {
 
-        return Backbone.View.extend({
+        var MessageBannerView = Backbone.View.extend({
 
             initialize: function (options) {
-                var templateId = _.isUndefined(options.templateId) ? '#message_view-tpl' : options.templateId;
-                this.template = _.template($(templateId).text());
+                if (_.isUndefined(options)) {
+                    options = {};
+                }
+                this.options = _.defaults(options, {urgency: 'high', type: ''});
             },
 
             render: function () {
                 if (_.isUndefined(this.message) || _.isNull(this.message)) {
                     this.$el.html('');
                 } else {
-                    this.$el.html(this.template({
-                        message: this.message,
-                        icon: this.icon
-                    }));
+                    this.$el.html(_.template(messageBannerTemplate, _.extend(this.options, {
+                        message: this.message
+                    })));
                 }
                 return this;
             },
 
-            showMessage: function (message, icon) {
+            showMessage: function (message) {
                 this.message = message;
-                this.icon = icon;
                 this.render();
             },
 
@@ -34,5 +34,7 @@
                 this.render();
             }
         });
+
+        return MessageBannerView;
     });
 }).call(this, define || RequireJS.define);
