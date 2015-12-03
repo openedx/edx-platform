@@ -1384,7 +1384,6 @@ class EditTeamTest(TeamFormActions):
         with self.assert_events_match_during(
             event_filter=self.only_team_events,
             expected_events=expected_events,
-            in_order=False,
         ):
             self.team_management_page.submit_form()
 
