@@ -72,6 +72,10 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
         expect(request.readyState).toEqual(XML_HTTP_READY_STATES.OPENED);
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
+        if (typeof body === 'undefined') {
+            // The contents if this call may not be germane to the current test.
+            return;
+        }
         expect(request.requestBody).toEqual(body);
     };
 

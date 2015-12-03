@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from lazy import lazy
+from model_utils.models import TimeStampedModel
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -122,7 +123,7 @@ class BadgeClass(models.Model):
         verbose_name_plural = "Badge Classes"
 
 
-class BadgeAssertion(models.Model):
+class BadgeAssertion(TimeStampedModel):
     """
     Tracks badges on our side of the badge baking transaction
     """
@@ -150,6 +151,10 @@ class BadgeAssertion(models.Model):
 
     class Meta(object):
         app_label = "badges"
+
+
+# Abstract model doesn't index this, so we have to.
+BadgeAssertion._meta.get_field('created').db_index = True  # pylint: disable=protected-access
 
 
 class CourseCompleteImageConfiguration(models.Model):
@@ -216,7 +221,7 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         help_text=_(
             u"On each line, put the number of completed courses to award a badge for, a comma, and the slug of a "
             u"badge class you have created with the issuing component 'edx__course'. "
-            u"For example: 3,course-v1:edx/Demo/DemoX"
+            u"For example: 3,enrolled_3_courses"
         )
     )
     courses_enrolled = models.TextField(
@@ -224,7 +229,7 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         help_text=_(
             u"On each line, put the number of enrolled courses to award a badge for, a comma, and the slug of a "
             u"badge class you have created with the issuing component 'edx__course'. "
-            u"For example: 3,course-v1:edx/Demo/DemoX"
+            u"For example: 3,enrolled_3_courses"
         )
     )
     course_groups = models.TextField(
@@ -232,8 +237,8 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         help_text=_(
             u"Each line is a comma-separated list. The first item in each line is the slug of a badge class to award, "
             u"with an issuing component of 'edx__course'. The remaining items in each line are the course keys the "
-            u"user will need to complete to get the badge. For example: slug_for_compsci_courses_group_badge,course-v1"
-            u":CompSci+Course+First,course-v1:CompsSci+Course+Second"
+            u"user will need to complete to be awarded the badge. For example: "
+            u"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
         )
     )
 

@@ -7,11 +7,15 @@
         'js/views/fields',
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
+        'js/student_profile/models/badges_model',
+        'common/js/components/collections/paging_collection',
+        'js/student_profile/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
     ], function (gettext, $, _, Backbone, Logger, AccountSettingsModel, AccountPreferencesModel, FieldsView,
-                 LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews, MessageBannerView) {
+                 LearnerProfileFieldsView, LearnerProfileView, BadgeModel, PagingCollection, BadgeListContainer,
+                 AccountSettingsFieldViews, MessageBannerView) {
 
         return function (options) {
 
@@ -121,6 +125,15 @@
                 })
             ];
 
+            var badgeCollection = new PagingCollection();
+            badgeCollection.url = options.badges_api_url;
+
+            var badgeListContainer = new BadgeListContainer({
+                'attributes': {'class': 'badge-set-display'},
+                'collection': badgeCollection,
+                'find_courses_url': options.find_courses_url
+            });
+
             var learnerProfileView = new LearnerProfileView({
                 el: learnerProfileElement,
                 ownProfile: options.own_profile,
@@ -131,7 +144,8 @@
                 profileImageFieldView: profileImageFieldView,
                 usernameFieldView: usernameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
-                sectionTwoFieldViews: sectionTwoFieldViews
+                sectionTwoFieldViews: sectionTwoFieldViews,
+                badgeListContainer: badgeListContainer
             });
 
             var getProfileVisibility = function() {
@@ -164,7 +178,8 @@
             return {
                 accountSettingsModel: accountSettingsModel,
                 accountPreferencesModel: accountPreferencesModel,
-                learnerProfileView: learnerProfileView
+                learnerProfileView: learnerProfileView,
+                badgeListContainer: badgeListContainer
             };
         };
     });
