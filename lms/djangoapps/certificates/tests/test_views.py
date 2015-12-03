@@ -210,7 +210,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.cert = GeneratedCertificate.objects.create(
             user=self.user,
             course_id=self.course_id,
-            verify_uuid=uuid4(),
             download_uuid=uuid4(),
             grade="0.95",
             key='the_key',

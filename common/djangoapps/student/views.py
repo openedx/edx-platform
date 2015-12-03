@@ -337,13 +337,9 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         # showing the certificate web view button if certificate is ready state and feature flags are enabled.
         if has_html_certificates_enabled(course_overview.id, course_overview):
             if course_overview.has_any_active_web_certificate:
-                certificate_url = get_certificate_url(
-                    user_id=user.id,
-                    course_id=unicode(course_overview.id),
-                )
                 status_dict.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': u'{url}'.format(url=certificate_url)
+                    'cert_web_view_url': get_certificate_url(uuid=cert_status['uuid'])
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course

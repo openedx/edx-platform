@@ -966,18 +966,14 @@ def _progress(request, course_key, student_id):
     }
 
     if show_generate_cert_btn:
-        context.update(certs_api.certificate_downloadable_status(student, course_key))
+        cert_status = certs_api.certificate_downloadable_status(student, course_key)
+        context.update(cert_status)
         # showing the certificate web view button if feature flags are enabled.
         if certs_api.has_html_certificates_enabled(course_key, course):
             if certs_api.get_active_web_certificate(course) is not None:
                 context.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': u'{url}'.format(
-                        url=certs_api.get_certificate_url(
-                            user_id=student.id,
-                            course_id=unicode(course.id)
-                        )
-                    )
+                    'cert_web_view_url': certs_api.get_certificate_url(uuid=cert_status['uuid']),
                 })
             else:
                 context.update({

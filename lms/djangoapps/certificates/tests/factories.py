@@ -1,6 +1,7 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
 import factory
+from uuid import uuid4
 from django.core.files.base import ContentFile
 from factory.django import DjangoModelFactory, ImageField
 
@@ -21,6 +22,7 @@ class GeneratedCertificateFactory(DjangoModelFactory):
     status = CertificateStatuses.unavailable
     mode = GeneratedCertificate.MODES.honor
     name = ''
+    verify_uuid = uuid4().hex
 
 
 class CertificateWhitelistFactory(DjangoModelFactory):
