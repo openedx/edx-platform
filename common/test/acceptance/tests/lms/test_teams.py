@@ -45,6 +45,8 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
         self.tab_nav = TabNavPage(self.browser)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.teams_page = TeamsPage(self.browser, self.course_id)
+        # TODO: Refactor so resetting events database is not necessary
+        self.reset_event_tracking()
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
@@ -1384,7 +1386,6 @@ class EditTeamTest(TeamFormActions):
         with self.assert_events_match_during(
             event_filter=self.only_team_events,
             expected_events=expected_events,
-            in_order=False,
         ):
             self.team_management_page.submit_form()
 
