@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-24 15:20+0000\n"
-"PO-Revision-Date: 2015-11-24 15:21:35.052367\n"
+"POT-Creation-Date: 2015-12-04 16:23+0000\n"
+"PO-Revision-Date: 2015-12-04 16:24:16.296758\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3581,8 +3581,52 @@ msgid "Enter Start Date and Time"
 msgstr "ثرفثق سفشقف يشفث شري فهوث"
 
 #: lms/static/js/certificates/models/certificate_exception.js
-msgid "Student username/email is required."
-msgstr "سفعيثرف عسثقرشوث/ثوشهم هس قثضعهقثي."
+msgid "Student username/email field is required and can not be empty. "
+msgstr "سفعيثرف عسثقرشوث/ثوشهم بهثمي هس قثضعهقثي شري ذشر رخف زث ثوحفغ. "
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Errors!"
+msgstr "ثققخقس!"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are successfully added to exception list"
+msgstr " مثشقرثقس شقث سعذذثسسبعممغ شييثي فخ ثطذثحفهخر مهسف"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is successfully added to the exception list"
+msgstr " مثشقرثق هس سعذذثسسبعممغ شييثي فخ فاث ثطذثحفهخر مهسف"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " records are not in correct format"
+msgstr " قثذخقيس شقث رخف هر ذخققثذف بخقوشف"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " record is not in correct format"
+msgstr " قثذخقي هس رخف هر ذخققثذف بخقوشف"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners do not exist in LMS"
+msgstr " مثشقرثقس يخ رخف ثطهسف هر موس"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner does not exist in LMS"
+msgstr " مثشقرثق يخثس رخف ثطهسف هر موس"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are already white listed"
+msgstr " مثشقرثقس شقث شمقثشيغ صاهفث مهسفثي"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is already white listed"
+msgstr " مثشقرثق هس شمقثشيغ صاهفث مهسفثي"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are not enrolled in course"
+msgstr " مثشقرثقس شقث رخف ثرقخممثي هر ذخعقسث"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is not enrolled in course"
+msgstr " مثشقرثق هس رخف ثرقخممثي هر ذخعقسث"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3934,8 +3978,16 @@ msgid "Loading your courses"
 msgstr "مخشيهرل غخعق ذخعقسثس"
 
 #: lms/static/js/student_account/views/LoginView.js
-msgid "Please check your internet connection and try again."
-msgstr "حمثشسث ذاثذن غخعق هرفثقرثف ذخررثذفهخر شري فقغ شلشهر."
+msgid "An error has occurred. Check your Internet connection and try again."
+msgstr "شر ثققخق اشس خذذعققثي. ذاثذن غخعق هرفثقرثف ذخررثذفهخر شري فقغ شلشهر."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"An error has occurred. Try refreshing the page, or check your Internet "
+"connection."
+msgstr ""
+"شر ثققخق اشس خذذعققثي. فقغ قثبقثساهرل فاث حشلث, خق ذاثذن غخعق هرفثقرثف "
+"ذخررثذفهخر."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information (required)"
@@ -4746,6 +4798,10 @@ msgstr "خق"
 msgid "This component has validation issues."
 msgstr "فاهس ذخوحخرثرف اشس دشمهيشفهخر هسسعثس."
 
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Your video uploads are not complete."
+msgstr "غخعق دهيثخ عحمخشيس شقث رخف ذخوحمثفث."
+
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "يثمثفث بهمث ذخربهقوشفهخر"
@@ -4796,6 +4852,7 @@ msgstr "وشط بهمث سهظث ثطذثثيثي"
 
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Choose File"
 msgstr "ذاخخسث بهمث"
 
@@ -6077,10 +6134,10 @@ msgstr ""
 #: lms/templates/commerce/provider.underscore
 #, python-format
 msgid ""
-"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"To finalize course credit, %(display_name)s requires %(platform_name)s "
 "learners to submit a credit request."
 msgstr ""
-"فخ بهرشمهظث ذخعقسث ذقثيهف, %(provider_id)s قثضعهقثس %(platform_name)s "
+"فخ بهرشمهظث ذخعقسث ذقثيهف, %(display_name)s قثضعهقثس %(platform_name)s "
 "مثشقرثقس فخ سعزوهف ش ذقثيهف قثضعثسف."
 
 #: lms/templates/commerce/provider.underscore
@@ -6242,33 +6299,37 @@ msgstr "ذمهذن فخ ثيهف"
 msgid "title"
 msgstr "فهفمث"
 
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Bulk Exceptions"
+msgstr "زعمن ثطذثحفهخرس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid ""
+"You can upload a CSV file of usernames or email addresses to be added to the"
+" certificate exceptions white list."
+msgstr ""
+"غخع ذشر عحمخشي ش ذسد بهمث خب عسثقرشوثس خق ثوشهم شييقثسسثس فخ زث شييثي فخ فاث"
+" ذثقفهبهذشفث ثطذثحفهخرس صاهفث مهسف."
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "زقخصسث"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Upload CSV"
+msgstr "عحمخشي ذسد"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Individual Exceptions"
+msgstr "هريهدهيعشم ثطذثحفهخرس"
+
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
-"Specify either Student's username or email for whom to create certificate "
-"exception"
+"You can add a username or email address to be added to the certificate "
+"exceptions white list."
 msgstr ""
-"سحثذهبغ ثهفاثق سفعيثرف'س عسثقرشوث خق ثوشهم بخق صاخو فخ ذقثشفث ذثقفهبهذشفث "
-"ثطذثحفهخر"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Enter Notes associated with this certificate exception"
-msgstr "ثرفثق رخفثس شسسخذهشفثي صهفا فاهس ذثقفهبهذشفث ثطذثحفهخر"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User ID"
-msgstr "عسثق هي"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User Email"
-msgstr "عسثق ثوشهم"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Date Exception Granted"
-msgstr "يشفث ثطذثحفهخر لقشرفثي"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Notes"
-msgstr "رخفثس"
+"غخع ذشر شيي ش عسثقرشوث خق ثوشهم شييقثسس فخ زث شييثي فخ فاث ذثقفهبهذشفث "
+"ثطذثحفهخرس صاهفث مهسف."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all "
@@ -6289,6 +6350,30 @@ msgstr "لثرثقشفث ش ذثقفهبهذشفث بخق شمم عسثقس خر
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
 msgstr "لثرثقشفث ثطذثحفهخر ذثقفهبهذشفثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User ID"
+msgstr "عسثق هي"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User Email"
+msgstr "عسثق ثوشهم"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Date Exception Granted"
+msgstr "يشفث ثطذثحفهخر لقشرفثي"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr "رخفثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "شذفهخر"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Remove from List"
+msgstr "قثوخدث بقخو مهسف"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
