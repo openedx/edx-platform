@@ -774,3 +774,22 @@ urlpatterns += (
 urlpatterns += (
     url(r'^api/', include('edx_proctoring.urls')),
 )
+
+if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
+    urlpatterns += (
+        url(
+            r'^financial-assistance/$',
+            'courseware.views.financial_assistance',
+            name='financial_assistance'
+        ),
+        url(
+            r'^financial-assistance/apply/$',
+            'courseware.views.financial_assistance_form',
+            name='financial_assistance_form'
+        ),
+        url(
+            r'^financial-assistance/submit/$',
+            'courseware.views.financial_assistance_request',
+            name='submit_financial_assistance_request'
+        )
+    )

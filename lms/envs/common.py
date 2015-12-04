@@ -2732,3 +2732,10 @@ PROCTORING_SETTINGS = {}
 # The reason we introcuced this number is because we do not want the CCX
 # to compete with the MOOC.
 CCX_MAX_STUDENTS_ALLOWED = 200
+
+# Financial assistance settings
+
+# Maximum and minimum length of answers, in characters, for the
+# financial assistance form
+FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
+FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
