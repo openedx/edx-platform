@@ -6,6 +6,9 @@
 requirements/private.txt
 lms/envs/private.py
 cms/envs/private.py
+xblocks/*
+!xblocks/README.txt
+!xblocks/fetch-xblocks.sh
 
 ### Python artifacts
 *.pyc
