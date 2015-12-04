@@ -167,9 +167,9 @@ class DatabaseMicrositeTemplateBackend(BaseMicrositeTemplateBackend):
 
     @staticmethod
     @receiver(post_save, sender=MicrositeTemplate)
-    def clear_cache(sender, instance, **kwargs):
+    def clear_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument
         """
         Clear the cached template when the model is saved
         """
         cache_key = "template_cache." + instance.microsite.key + '.' + instance.template_uri
-        cache.delete(cache_key)
+        cache.delete(cache_key)  # pylint: disable=maybe-no-member
