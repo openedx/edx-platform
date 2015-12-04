@@ -29,8 +29,6 @@ EXPORT_VERSION_KEY = "export_format"
 
 DEFAULT_CONTENT_FIELDS = ['metadata', 'data']
 
-DEFAULT_XML_COURSE_IMAGE_FILENAME = "images_course_image.jpg"
-
 
 def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
     """
