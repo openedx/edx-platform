@@ -257,7 +257,7 @@ def get_next(request, course_id):
 
     'error': if success is False, will have an error message with more info.
     """
-    assert(isinstance(course_id, basestring))
+    assert isinstance(course_id, basestring)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     _check_access(request.user, course_key)
 
@@ -300,7 +300,7 @@ def get_problem_list(request, course_id):
 
         'error': if success is False, will have an error message with more info.
     """
-    assert(isinstance(course_id, basestring))
+    assert isinstance(course_id, basestring)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     _check_access(request.user, course_key)
     try:
@@ -319,7 +319,7 @@ def get_problem_list(request, course_id):
                 u'If not, please do so and return to this page.'
             )
         valid_problem_list = []
-        for i in xrange(0, len(problem_list)):
+        for i in xrange(len(problem_list)):
             # Needed to ensure that the 'location' key can be accessed.
             try:
                 problem_list[i] = json.loads(problem_list[i])

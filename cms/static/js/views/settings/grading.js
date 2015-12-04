@@ -42,6 +42,7 @@ var GradingView = ValidatingView.extend({
         this.clearValidationErrors();
 
         this.renderGracePeriod();
+        this.renderMinimumGradeCredit();
 
         // Create and render the grading type subs
         var self = this;
@@ -86,7 +87,8 @@ var GradingView = ValidatingView.extend({
         this.model.get('graders').push({});
     },
     fieldToSelectorMap : {
-        'grace_period' : 'course-grading-graceperiod'
+        'grace_period' : 'course-grading-graceperiod',
+        'minimum_grade_credit' : 'course-minimum_grade_credit'
     },
     renderGracePeriod: function() {
         var format = function(time) {
@@ -97,10 +99,22 @@ var GradingView = ValidatingView.extend({
             format(grace_period.hours) + ':' + format(grace_period.minutes)
         );
     },
+    renderMinimumGradeCredit: function() {
+        var minimum_grade_credit = this.model.get('minimum_grade_credit');
+        this.$el.find('#course-minimum_grade_credit').val(
+            Math.round(parseFloat(minimum_grade_credit) * 100)
+        );
+    },
     setGracePeriod : function(event) {
         this.clearValidationErrors();
         var newVal = this.model.parseGracePeriod($(event.currentTarget).val());
         this.model.set('grace_period', newVal, {validate: true});
+    },
+    setMinimumGradeCredit : function(event) {
+        this.clearValidationErrors();
+        // get field value in float
+        var newVal = this.model.parseMinimumGradeCredit($(event.currentTarget).val()) / 100;
+        this.model.set('minimum_grade_credit', newVal, {validate: true});
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -108,6 +122,10 @@ var GradingView = ValidatingView.extend({
         switch (this.selectorToField[event.currentTarget.id]) {
         case 'grace_period':
             this.setGracePeriod(event);
+            break;
+
+        case 'minimum_grade_credit':
+            this.setMinimumGradeCredit(event);
             break;
 
         default:
@@ -233,6 +251,28 @@ var GradingView = ValidatingView.extend({
         };
     },
 
+    renderGradeLabels: function(){
+        // When a grade is removed, keep the remaining grades consistent.
+        var _this = this;
+        if (_this.descendingCutoffs.length === 1 && _this.descendingCutoffs[0]['designation'] === _this.GRADES[0]) {
+            _this.descendingCutoffs[0]['designation'] = 'Pass';
+            _this.setTopGradeLabel();
+        } else {
+            _.each(_this.descendingCutoffs, function(cutoff, index) {
+                cutoff['designation'] = _this.GRADES[index];
+            });
+            _this.updateDomGradeLabels();
+        }
+    },
+    updateDomGradeLabels: function(){
+        // Update the DOM elements (Grades)
+        var _this = this;
+        var gradeElements = this.$el.find('.grades .letter-grade[contenteditable=true]');
+        _.each(gradeElements, function(element, index) {
+            if (index !== 0 ) $(element).text(_this.GRADES[index])
+        });
+    },
+
     saveCutoffs: function() {
         this.model.set('grade_cutoffs',
                 _.reduce(this.descendingCutoffs,
@@ -292,12 +332,9 @@ var GradingView = ValidatingView.extend({
         this.descendingCutoffs.splice(index, 1);
         domElement.remove();
 
-        if (this.descendingCutoffs.length === 1 && this.descendingCutoffs[0]['designation'] === this.GRADES[0]) {
-            this.descendingCutoffs[0]['designation'] = 'Pass';
-            this.setTopGradeLabel();
-        }
         this.setFailLabel();
         this.renderGradeRanges();
+        this.renderGradeLabels();
         this.saveCutoffs();
     },
 

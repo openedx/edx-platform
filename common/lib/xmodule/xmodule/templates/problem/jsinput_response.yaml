@@ -2,6 +2,7 @@
 metadata:
     display_name: Custom Javascript Display and Grading
     markdown: !!null
+    showanswer: never
 data: |
       <problem>
       <p>
@@ -22,12 +23,11 @@ data: |
       <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_javascript.html" target="_blank">
       Custom JavaScript Problem</a> in <i>Building and Running an edX Course</i>.
       </p>
-      <p>JavaScript developers shoud also see <a href="http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/extending_platform/javascript.html" target="_blank">
-      Custom JavaScript Applications</a> in the <i>edX Developer's Guide</i>.</p>
+      <p>JavaScript developers should also see <a href="http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/extending_platform/javascript.html" target="_blank">
+      Custom JavaScript Applications</a> in the <i>EdX Developer's Guide</i>.</p>
       <p>When you add the problem, be sure to select <strong>Settings</strong> 
       to specify a <strong>Display Name</strong> and other values that apply.</p>
       <p>You can use the following example problem as a model.</p>
-      <p>_____________________________________________________________________________</p>
 
       <script type="loncapa/python">
       <![CDATA[

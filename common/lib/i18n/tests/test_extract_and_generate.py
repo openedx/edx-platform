@@ -44,9 +44,9 @@ class TestGenerate(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        # Clear the Esperanto directory of any test artifacts
-        cmd = "git checkout conf/locale/eo"
-        sys.stderr.write("Cleaning up eo: " + cmd)
+        # Clear the Esperanto & RTL directories of any test artifacts
+        cmd = "git checkout conf/locale/eo conf/locale/rtl"
+        sys.stderr.write("Cleaning up dummy language directories: " + cmd)
         sys.stderr.flush()
         returncode = subprocess.call(cmd, shell=True)
         assert returncode == 0

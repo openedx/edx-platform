@@ -74,8 +74,9 @@ def see_a_problem_component(step, category):
                 'No problem was added to the unit.')
 
     problem_css = 'li.studio-xblock-wrapper div.xblock-student_view'
-    actual_text = world.css_text(problem_css)
-    assert_in(category.upper(), actual_text)
+    # This view presents the given problem component in uppercase. Assert that the text matches
+    # the component selected (in uppercase)
+    assert_true(world.css_contains_text(problem_css, category.upper()))
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')

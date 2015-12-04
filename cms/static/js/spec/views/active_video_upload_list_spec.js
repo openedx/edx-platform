@@ -1,5 +1,5 @@
 define(
-    ["jquery", "js/models/active_video_upload", "js/views/active_video_upload_list", "js/common_helpers/template_helpers", "mock-ajax", "jasmine-jquery"],
+    ["jquery", "js/models/active_video_upload", "js/views/active_video_upload_list", "common/js/spec_helpers/template_helpers", "mock-ajax", "jasmine-jquery"],
     function($, ActiveVideoUpload, ActiveVideoUploadListView, TemplateHelpers) {
         "use strict";
         var concurrentUploadLimit = 2;

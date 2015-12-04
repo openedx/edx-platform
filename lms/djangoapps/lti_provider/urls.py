@@ -8,7 +8,10 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns(
     '',
 
-    url(r'^courses/{}/(?P<usage_id>[^/]*)$'.format(settings.COURSE_ID_PATTERN),
+    url(
+        r'^courses/{course_id}/{usage_id}$'.format(
+            course_id=settings.COURSE_ID_PATTERN,
+            usage_id=settings.USAGE_ID_PATTERN
+        ),
         'lti_provider.views.lti_launch', name="lti_provider_launch"),
-    url(r'^lti_run$', 'lti_provider.views.lti_run', name="lti_provider_run"),
 )

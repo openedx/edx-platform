@@ -6,17 +6,17 @@ import unittest
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
 from student.views import notify_enrollment_by_email
 from student.views import (
-    reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change,
-    SETTING_CHANGE_INITIATED
+    reactivation_email_for_user, do_email_change_request, confirm_email_change,
+    validate_new_email, SETTING_CHANGE_INITIATED
 )
 from student.models import UserProfile, PendingEmailChange
 from django.core.urlresolvers import reverse
 from django.core import mail
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
@@ -250,16 +250,19 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         self.request.user = self.user
         self.user.email_user = Mock()
 
-    def run_request(self, request=None):
-        """Execute request and return result parsed as json
+    def do_email_validation(self, email):
+        """Executes validate_new_email, returning any resulting error message. """
+        try:
+            validate_new_email(self.request.user, email)
+        except ValueError as err:
+            return err.message
 
-        If request isn't passed in, use self.request instead
-        """
-        if request is None:
-            request = self.request
-
-        response = change_email_request(self.request)
-        return json.loads(response.content)
+    def do_email_change(self, user, email, activation_key=None):
+        """Executes do_email_change_request, returning any resulting error message. """
+        try:
+            do_email_change_request(user, email, activation_key)
+        except ValueError as err:
+            return err.message
 
     def assertFailedRequest(self, response_data, expected_error):
         """Assert that `response_data` indicates a failed request that returns `expected_error`"""
@@ -267,78 +270,50 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         self.assertEquals(expected_error, response_data['error'])
         self.assertFalse(self.user.email_user.called)
 
-    def test_unauthenticated(self):
-        self.request.user = AnonymousUser()
-        self.request.user.email_user = Mock()
-        with self.assertRaises(Http404):
-            change_email_request(self.request)
-        self.assertFalse(self.request.user.email_user.called)
-
-    def test_invalid_password(self):
-        self.request.POST['password'] = 'wrong'
-        self.assertFailedRequest(self.run_request(), 'Invalid password')
-
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_duplicate_activation_key(self):
-        """Assert that if two users change Email address simultaneously, server should return 200"""
+        """Assert that if two users change Email address simultaneously, no error is thrown"""
 
         # New emails for the users
         user1_new_email = "valid_user1_email@example.com"
         user2_new_email = "valid_user2_email@example.com"
 
-        # Set new email for user1.
-        self.request.POST['new_email'] = user1_new_email
-
         # Create a another user 'user2' & make request for change email
         user2 = UserFactory.create(email=self.new_email, password="test2")
-        user2_request = self.req_factory.post('unused_url', data={
-            'password': 'test2',
-            'new_email': user2_new_email
-        })
-        user2_request.user = user2
 
-        # Send requests & check if response was successful
-        user1_response = change_email_request(self.request)
-        user2_response = change_email_request(user2_request)
-
-        self.assertEqual(user1_response.status_code, 200)
-        self.assertEqual(user2_response.status_code, 200)
+        # Send requests & ensure no error was thrown
+        self.assertIsNone(self.do_email_change(self.user, user1_new_email))
+        self.assertIsNone(self.do_email_change(user2, user2_new_email))
 
     def test_invalid_emails(self):
+        """
+        Assert the expected error message from the email validation method for an invalid
+        (improperly formatted) email address.
+        """
         for email in ('bad_email', 'bad_email@', '@bad_email'):
-            self.request.POST['new_email'] = email
-            self.assertFailedRequest(self.run_request(), 'Valid e-mail address required.')
+            self.assertEqual(self.do_email_validation(email), 'Valid e-mail address required.')
 
     def test_change_email_to_existing_value(self):
         """ Test the error message if user attempts to change email to the existing value. """
-        self.request.POST['new_email'] = self.user.email
-        self.assertFailedRequest(self.run_request(), 'Old email is the same as the new email.')
-
-    def check_duplicate_email(self, email):
-        """Test that a request to change a users email to `email` fails"""
-        request = self.req_factory.post('unused_url', data={
-            'new_email': email,
-            'password': 'test',
-        })
-        request.user = self.user
-        self.assertFailedRequest(self.run_request(request), 'An account with this e-mail already exists.')
+        self.assertEqual(self.do_email_validation(self.user.email), 'Old email is the same as the new email.')
 
     def test_duplicate_email(self):
+        """
+        Assert the expected error message from the email validation method for an email address
+        that is already in use by another account.
+        """
         UserFactory.create(email=self.new_email)
-        self.check_duplicate_email(self.new_email)
-
-    def test_capitalized_duplicate_email(self):
-        """Test that we check for email addresses in a case insensitive way"""
-        UserFactory.create(email=self.new_email)
-        self.check_duplicate_email(self.new_email.capitalize())
+        self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
 
     @patch('django.core.mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_email_failure(self, send_mail):
         """ Test the return value if sending the email for the user to click fails. """
         send_mail.side_effect = [Exception, None]
-        self.request.POST['new_email'] = "valid@email.com"
-        self.assertFailedRequest(self.run_request(), 'Unable to send email activation link. Please try again later.')
+        self.assertEqual(
+            self.do_email_change(self.user, "valid@email.com"),
+            'Unable to send email activation link. Please try again later.'
+        )
         self.assert_no_events_were_emitted()
 
     @patch('django.core.mail.send_mail')
@@ -348,7 +323,7 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         old_email = self.user.email
         new_email = "valid@example.com"
         registration_key = "test registration key"
-        do_email_change_request(self.user, new_email, registration_key)
+        self.assertIsNone(self.do_email_change(self.user, new_email, registration_key))
         context = {
             'key': registration_key,
             'old_email': old_email,

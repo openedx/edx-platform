@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'js/common_helpers/template_helpers', 'js/spec/edxnotes/helpers',
+    'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
     'js/edxnotes/views/tabs/course_structure', 'js/spec/edxnotes/custom_matchers',
     'jasmine-jquery'
@@ -56,7 +56,8 @@ define([
                 identifier: 'view-course-structure',
                 icon: 'fa fa-list-ul',
                 is_active: true,
-                is_closable: false
+                is_closable: false,
+                view: 'Location in Course'
             });
             expect(view.$('#structure-panel')).toExist();
             expect(chapters).toEqual(['First Chapter', 'Second Chapter']);

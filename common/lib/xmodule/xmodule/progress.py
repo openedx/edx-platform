@@ -116,12 +116,15 @@ class Progress(object):
         return not self.__eq__(other)
 
     def __str__(self):
-        ''' Return a string representation of this string.
+        '''Return a string representation of this string. Rounds results to
+        two decimal places, stripping out any trailing zeroes.
 
         subclassing note: implemented in terms of frac().
+
         '''
         (a, b) = self.frac()
-        return "{0}/{1}".format(a, b)
+        display = lambda n: '{:.2f}'.format(n).rstrip('0').rstrip('.')
+        return "{0}/{1}".format(display(a), display(b))
 
     @staticmethod
     def add_counts(a, b):

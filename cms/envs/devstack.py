@@ -31,6 +31,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
+########################### PIPELINE #################################
+
+# Skip RequireJS optimizer in development
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
 ############################# ADVANCED COMPONENTS #############################
 
 # Make it easier to test advanced components in local dev
@@ -79,10 +84,27 @@ FEATURES['MILESTONES_APP'] = True
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
+################################ COURSE LICENSES ################################
+FEATURES['LICENSING'] = True
+# Needed to enable licensing on video modules
+XBLOCK_SETTINGS = {
+    "VideoDescriptor": {
+        "licensing_enabled": True
+    }
+}
+
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+########################## Certificates Web/HTML View #######################
+FEATURES['CERTIFICATES_HTML_VIEW'] = True
+
+################################# DJANGO-REQUIRE ###############################
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = DEBUG
 
 ###############################################################################
 # See if the developer has any local overrides.

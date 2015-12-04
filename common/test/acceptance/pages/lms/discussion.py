@@ -143,6 +143,11 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
                 "Response edit started"
             ).fulfill()
 
+    def get_link_href(self):
+        """Extracts href attribute of the referenced link"""
+        link_href = self._find_within(".post-body p a").attrs('href')
+        return link_href[0] if link_href else None
+
     def get_response_vote_count(self, response_id):
         return self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
 
@@ -384,7 +389,7 @@ class InlineDiscussionPage(PageObject):
     def __init__(self, browser, discussion_id):
         super(InlineDiscussionPage, self).__init__(browser)
         self._discussion_selector = (
-            "body.courseware .discussion-module[data-discussion-id='{discussion_id}'] ".format(
+            ".discussion-module[data-discussion-id='{discussion_id}'] ".format(
                 discussion_id=discussion_id
             )
         )
@@ -412,6 +417,10 @@ class InlineDiscussionPage(PageObject):
 
     def get_num_displayed_threads(self):
         return len(self._find_within(".discussion-thread"))
+
+    def has_thread(self, thread_id):
+        """Returns true if this page is showing the thread with the specified id."""
+        return self._find_within('.discussion-thread#thread_{}'.format(thread_id)).present
 
     def element_exists(self, selector):
         return self.q(css=self._discussion_selector + " " + selector).present
@@ -464,6 +473,13 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
     def is_thread_anonymous(self):
         return not self.q(css=".posted-details > .username").present
 
+    @wait_for_js
+    def check_if_selector_is_focused(self, selector):
+        """
+        Check if selector is focused
+        """
+        return self.browser.execute_script("return $('{}').is(':focus')".format(selector))
+
 
 class DiscussionUserProfilePage(CoursePage):
 
@@ -480,9 +496,9 @@ class DiscussionUserProfilePage(CoursePage):
         return (
             self.q(css='section.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
             and
-            self.q(css='section.user-profile a.leaner-profile-link').present
+            self.q(css='section.user-profile a.learner-profile-link').present
             and
-            self.q(css='section.user-profile a.leaner-profile-link').text[0] == self.username
+            self.q(css='section.user-profile a.learner-profile-link').text[0] == self.username
         )
 
     @wait_for_js
@@ -564,7 +580,7 @@ class DiscussionUserProfilePage(CoursePage):
 
     def click_on_sidebar_username(self):
         self.wait_for_page()
-        self.q(css='.leaner-profile-link').first.click()
+        self.q(css='.learner-profile-link').first.click()
 
 
 class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):

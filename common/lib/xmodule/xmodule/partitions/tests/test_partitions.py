@@ -20,14 +20,14 @@ class TestGroup(TestCase):
         test_id = 10
         name = "Grendel"
         group = Group(test_id, name)
-        self.assertEqual(group.id, test_id)    # pylint: disable=no-member
+        self.assertEqual(group.id, test_id)
         self.assertEqual(group.name, name)
 
     def test_string_id(self):
         test_id = "10"
         name = "Grendel"
         group = Group(test_id, name)
-        self.assertEqual(group.id, 10)    # pylint: disable=no-member
+        self.assertEqual(group.id, 10)
 
     def test_to_json(self):
         test_id = 10
@@ -50,7 +50,7 @@ class TestGroup(TestCase):
             "version": Group.VERSION
         }
         group = Group.from_json(jsonified)
-        self.assertEqual(group.id, test_id)    # pylint: disable=no-member
+        self.assertEqual(group.id, test_id)
         self.assertEqual(group.name, name)
 
     def test_from_json_broken(self):
@@ -60,7 +60,7 @@ class TestGroup(TestCase):
         jsonified = {
             "id": test_id,
             "name": name,
-            "version": 9001
+            "version": -1,
         }
         with self.assertRaisesRegexp(TypeError, "has unexpected version"):
             Group.from_json(jsonified)
@@ -151,17 +151,17 @@ class TestUserPartition(PartitionTestCase):
         user_partition = UserPartition(
             self.TEST_ID, self.TEST_NAME, self.TEST_DESCRIPTION, self.TEST_GROUPS, MockUserPartitionScheme()
         )
-        self.assertEqual(user_partition.id, self.TEST_ID)    # pylint: disable=no-member
+        self.assertEqual(user_partition.id, self.TEST_ID)
         self.assertEqual(user_partition.name, self.TEST_NAME)
-        self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)    # pylint: disable=no-member
-        self.assertEqual(user_partition.groups, self.TEST_GROUPS)    # pylint: disable=no-member
-        self.assertEquals(user_partition.scheme.name, self.TEST_SCHEME_NAME)    # pylint: disable=no-member
+        self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)
+        self.assertEqual(user_partition.groups, self.TEST_GROUPS)
+        self.assertEquals(user_partition.scheme.name, self.TEST_SCHEME_NAME)
 
     def test_string_id(self):
         user_partition = UserPartition(
             "70", self.TEST_NAME, self.TEST_DESCRIPTION, self.TEST_GROUPS
         )
-        self.assertEqual(user_partition.id, 70)    # pylint: disable=no-member
+        self.assertEqual(user_partition.id, 70)
 
     def test_to_json(self):
         jsonified = self.user_partition.to_json()
@@ -185,10 +185,10 @@ class TestUserPartition(PartitionTestCase):
             "scheme": "mock",
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertEqual(user_partition.id, self.TEST_ID)    # pylint: disable=no-member
-        self.assertEqual(user_partition.name, self.TEST_NAME)    # pylint: disable=no-member
-        self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)    # pylint: disable=no-member
-        for act_group in user_partition.groups:    # pylint: disable=no-member
+        self.assertEqual(user_partition.id, self.TEST_ID)
+        self.assertEqual(user_partition.name, self.TEST_NAME)
+        self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)
+        for act_group in user_partition.groups:
             self.assertIn(act_group.id, [0, 1])
             exp_group = self.TEST_GROUPS[act_group.id]
             self.assertEqual(exp_group.id, act_group.id)
@@ -204,7 +204,7 @@ class TestUserPartition(PartitionTestCase):
             "version": 1,
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertEqual(user_partition.scheme.name, "random")    # pylint: disable=no-member
+        self.assertEqual(user_partition.scheme.name, "random")
 
     def test_from_json_broken(self):
         # Missing field
@@ -241,14 +241,13 @@ class TestUserPartition(PartitionTestCase):
         with self.assertRaisesRegexp(UserPartitionError, "Unrecognized scheme"):
             UserPartition.from_json(jsonified)
 
-        # Wrong version (it's over 9000!)
-        # Wrong version (it's over 9000!)
+        # Wrong version
         jsonified = {
             'id': self.TEST_ID,
             "name": self.TEST_NAME,
             "description": self.TEST_DESCRIPTION,
             "groups": [group.to_json() for group in self.TEST_GROUPS],
-            "version": 9001,
+            "version": -1,
             "scheme": self.TEST_SCHEME_NAME,
         }
         with self.assertRaisesRegexp(TypeError, "has unexpected version"):
@@ -274,15 +273,33 @@ class TestUserPartition(PartitionTestCase):
         the lookup fails.
         """
         self.assertEqual(
-            self.user_partition.get_group(self.TEST_GROUPS[0].id),  # pylint: disable=no-member
+            self.user_partition.get_group(self.TEST_GROUPS[0].id),
             self.TEST_GROUPS[0]
         )
         self.assertEqual(
-            self.user_partition.get_group(self.TEST_GROUPS[1].id),  # pylint: disable=no-member
+            self.user_partition.get_group(self.TEST_GROUPS[1].id),
             self.TEST_GROUPS[1]
         )
         with self.assertRaises(NoSuchUserPartitionGroupError):
             self.user_partition.get_group(3)
+
+    def test_forward_compatibility(self):
+        # If the user partition version is updated in a release,
+        # then the release is rolled back, courses might contain
+        # version numbers greater than the currently deployed
+        # version number.
+        newer_version_json = {
+            "id": self.TEST_ID,
+            "name": self.TEST_NAME,
+            "description": self.TEST_DESCRIPTION,
+            "groups": [group.to_json() for group in self.TEST_GROUPS],
+            "version": UserPartition.VERSION + 1,
+            "scheme": "mock",
+            "additional_new_field": "foo",
+        }
+        partition = UserPartition.from_json(newer_version_json)
+        self.assertEqual(partition.id, self.TEST_ID)
+        self.assertEqual(partition.name, self.TEST_NAME)
 
 
 class StaticPartitionService(PartitionService):
@@ -326,22 +343,22 @@ class TestPartitionService(PartitionTestCase):
 
     def test_get_user_group_id_for_partition(self):
         # assign the first group to be returned
-        user_partition_id = self.user_partition.id    # pylint: disable=no-member
-        groups = self.user_partition.groups    # pylint: disable=no-member
-        self.user_partition.scheme.current_group = groups[0]    # pylint: disable=no-member
+        user_partition_id = self.user_partition.id
+        groups = self.user_partition.groups
+        self.user_partition.scheme.current_group = groups[0]
 
         # get a group assigned to the user
         group1_id = self.partition_service.get_user_group_id_for_partition(user_partition_id)
-        self.assertEqual(group1_id, groups[0].id)    # pylint: disable=no-member
+        self.assertEqual(group1_id, groups[0].id)
 
         # switch to the second group and verify that it is returned for the user
-        self.user_partition.scheme.current_group = groups[1]    # pylint: disable=no-member
+        self.user_partition.scheme.current_group = groups[1]
         group2_id = self.partition_service.get_user_group_id_for_partition(user_partition_id)
-        self.assertEqual(group2_id, groups[1].id)    # pylint: disable=no-member
+        self.assertEqual(group2_id, groups[1].id)
 
     def test_caching(self):
         username = "psvc_cache_user"
-        user_partition_id = self.user_partition.id    # pylint: disable=no-member
+        user_partition_id = self.user_partition.id
         shared_cache = {}
 
         # Two StaticPartitionService objects that share the same cache:
@@ -356,7 +373,7 @@ class TestPartitionService(PartitionTestCase):
 
         # Set the group we expect users to be placed into
         first_group = self.user_partition.groups[0]
-        self.user_partition.scheme.current_group = first_group    # pylint: disable=no-member
+        self.user_partition.scheme.current_group = first_group
 
         # Make sure our partition services all return the right thing, but skip
         # ps_shared_cache_2 so we can see if its cache got updated anyway.
@@ -396,14 +413,14 @@ class TestPartitionService(PartitionTestCase):
         """
         Test that a partition group is assigned to a user.
         """
-        groups = self.user_partition.groups    # pylint: disable=no-member
+        groups = self.user_partition.groups
 
         # assign first group and verify that it is returned for the user
-        self.user_partition.scheme.current_group = groups[0]    # pylint: disable=no-member
+        self.user_partition.scheme.current_group = groups[0]
         group1 = self.partition_service.get_group(self.user_partition)
-        self.assertEqual(group1, groups[0])    # pylint: disable=no-member
+        self.assertEqual(group1, groups[0])
 
         # switch to the second group and verify that it is returned for the user
-        self.user_partition.scheme.current_group = groups[1]    # pylint: disable=no-member
+        self.user_partition.scheme.current_group = groups[1]
         group2 = self.partition_service.get_group(self.user_partition)
-        self.assertEqual(group2, groups[1])    # pylint: disable=no-member
+        self.assertEqual(group2, groups[1])

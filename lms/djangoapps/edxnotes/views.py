@@ -53,7 +53,9 @@ def edxnotes(request, course_id):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2
         )
-        course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
+        course_module = get_module_for_descriptor(
+            request.user, request, course, field_data_cache, course_key, course=course
+        )
         position = get_course_position(course_module)
         if position:
             context.update({
@@ -103,7 +105,9 @@ def edxnotes_visibility(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
     field_data_cache = FieldDataCache([course], course_key, request.user)
-    course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
+    course_module = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course_key, course=course
+    )
 
     if not is_feature_enabled(course):
         raise Http404

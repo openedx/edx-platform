@@ -1,9 +1,16 @@
+"""
+xModule implementation of a learning sequence
+"""
+
+# pylint: disable=abstract-method
+
 import json
 import logging
 import warnings
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -44,11 +51,56 @@ class SequenceFields(object):
             "Tag this course module as an Entrance Exam. "
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
+        default=False,
         scope=Scope.content,
     )
 
 
-class SequenceModule(SequenceFields, XModule):
+class ProctoringFields(object):
+    """
+    Fields that are specific to Proctored or Timed Exams
+    """
+    is_time_limited = Boolean(
+        display_name=_("Is Time Limited"),
+        help=_(
+            "This setting indicates whether students have a limited time"
+            " to view or interact with this courseware component."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+    default_time_limit_minutes = Integer(
+        display_name=_("Time Limit in Minutes"),
+        help=_(
+            "The number of minutes available to students for viewing or interacting with this courseware component."
+        ),
+        default=None,
+        scope=Scope.settings,
+    )
+
+    is_proctored_enabled = Boolean(
+        display_name=_("Is Proctoring Enabled"),
+        help=_(
+            "This setting indicates whether this exam is a proctored exam."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+    is_practice_exam = Boolean(
+        display_name=_("Is Practice Exam"),
+        help=_(
+            "This setting indicates whether this exam is for testing purposes only. Practice exams are not verified."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+
+@XBlock.wants('proctoring')
+@XBlock.wants('credit')
+class SequenceModule(SequenceFields, ProctoringFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {
@@ -98,6 +150,7 @@ class SequenceModule(SequenceFields, XModule):
             else:
                 self.position = 1
             return json.dumps({'success': True})
+
         raise NotFoundError('Unexpected dispatch type')
 
     def student_view(self, context):
@@ -110,6 +163,16 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
 
         fragment = Fragment()
+
+        # Is this sequential part of a timed or proctored exam?
+        if self.is_time_limited:
+            view_html = self._time_limited_student_view(context)
+
+            # Do we have an alternate rendering
+            # from the edx_proctoring subsystem?
+            if view_html:
+                fragment.add_content(view_html)
+                return fragment
 
         for child in self.get_display_items():
             progress = child.get_progress()
@@ -138,9 +201,71 @@ class SequenceModule(SequenceFields, XModule):
                   'ajax_url': self.system.ajax_url,
                   }
 
-        fragment.add_content(self.system.render_template('seq_module.html', params))
+        fragment.add_content(self.system.render_template("seq_module.html", params))
 
         return fragment
+
+    def _time_limited_student_view(self, context):
+        """
+        Delegated rendering of a student view when in a time
+        limited view. This ultimately calls down into edx_proctoring
+        pip installed djangoapp
+        """
+
+        # None = no overridden view rendering
+        view_html = None
+
+        proctoring_service = self.runtime.service(self, 'proctoring')
+        credit_service = self.runtime.service(self, 'credit')
+
+        # Is the feature turned on and do we have all required services
+        # Also, the ENABLE_PROCTORED_EXAMS feature flag must be set to
+        # True and the Sequence in question, should have the
+        # fields set to indicate this is a timed/proctored exam
+        feature_enabled = (
+            proctoring_service and
+            credit_service and
+            proctoring_service.is_feature_enabled()
+        )
+        if feature_enabled:
+            user_id = self.runtime.user_id
+            user_role_in_course = 'staff' if self.runtime.user_is_staff else 'student'
+            course_id = self.runtime.course_id
+            content_id = self.location
+
+            context = {
+                'display_name': self.display_name,
+                'default_time_limit_mins': (
+                    self.default_time_limit_minutes if
+                    self.default_time_limit_minutes else 0
+                ),
+                'is_practice_exam': self.is_practice_exam
+            }
+
+            # inject the user's credit requirements and fulfillments
+            if credit_service:
+                credit_state = credit_service.get_credit_state(user_id, course_id)
+                if credit_state:
+                    context.update({
+                        'credit_state': credit_state
+                    })
+
+            # See if the edx-proctoring subsystem wants to present
+            # a special view to the student rather
+            # than the actual sequence content
+            #
+            # This will return None if there is no
+            # overridden view to display given the
+            # current state of the user
+            view_html = proctoring_service.get_student_view(
+                user_id=user_id,
+                course_id=course_id,
+                content_id=content_id,
+                context=context,
+                user_role=user_role_in_course
+            )
+
+        return view_html
 
     def get_icon_class(self):
         child_classes = set(child.get_icon_class()
@@ -152,9 +277,14 @@ class SequenceModule(SequenceFields, XModule):
         return new_class
 
 
-class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
+class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
+    """
+    A Sequences Descriptor object
+    """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
+
+    show_in_read_only_mode = True
 
     js = {
         'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')],
@@ -180,6 +310,15 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
+
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        `is_entrance_exam` should not be editable in the Studio settings editor.
+        """
+        non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(self.fields['is_entrance_exam'])
+        return non_editable_fields
 
     def index_dictionary(self):
         """

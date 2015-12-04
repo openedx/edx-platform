@@ -1,8 +1,8 @@
-define(['js/common_helpers/ajax_helpers', 'js/student_account/emailoptin'],
+define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/emailoptin'],
     function( AjaxHelpers, EmailOptInInterface ) {
         'use strict';
 
-        describe( 'edx.student.account.EmailOptInInterface', function() {
+        describe( 'EmailOptInInterface', function() {
 
             var COURSE_KEY = 'edX/DemoX/Fall',
                 EMAIL_OPT_IN = 'True',

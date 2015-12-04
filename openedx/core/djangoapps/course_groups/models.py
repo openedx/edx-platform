@@ -18,7 +18,7 @@ class CourseUserGroup(models.Model):
     which may be treated specially.  For example, a user can be in at most one cohort per
     course, and cohorts are used to split up the forums by group.
     """
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('name', 'course_id'), )
 
     name = models.CharField(max_length=255,

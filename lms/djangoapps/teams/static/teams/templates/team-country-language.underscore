@@ -1,0 +1,2 @@
+<% if (country) { print('<p class="meta-detail team-location"><span class="icon fa-globe"></span>' + country + '</p>'); } %>
+<% if (language) { print('<p class="meta-detail team-language"><span class="icon fa-comment"></span>' + language + '</p>'); } %>

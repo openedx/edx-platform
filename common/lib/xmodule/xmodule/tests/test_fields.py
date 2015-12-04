@@ -95,7 +95,7 @@ class DateTest(unittest.TestCase):
         now = datetime.datetime.now(UTC())
         delta = now - datetime.datetime.fromtimestamp(0, UTC())
         self.assertEqual(
-            DateTest.date.from_json(delta.total_seconds() * 1000),  # pylint: disable=maybe-no-member
+            DateTest.date.from_json(delta.total_seconds() * 1000),
             now
         )
         yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=-1)

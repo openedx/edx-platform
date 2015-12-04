@@ -47,22 +47,26 @@ Eligibility:
 """
 from datetime import datetime
 import json
+import logging
 import uuid
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_lazy as _
+from django_extensions.db.fields.json import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from xmodule.modulestore.django import modulestore
 from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from util.milestones_helpers import fulfill_course_milestone
 from course_modes.models import CourseMode
+
+LOGGER = logging.getLogger(__name__)
 
 
 class CertificateStatuses(object):
@@ -75,6 +79,15 @@ class CertificateStatuses(object):
     regenerating = 'regenerating'
     restricted = 'restricted'
     unavailable = 'unavailable'
+
+
+class CertificateSocialNetworks(object):
+    """
+    Enum for certificate social networks
+    """
+    linkedin = 'LinkedIn'
+    facebook = 'Facebook'
+    twitter = 'Twitter'
 
 
 class CertificateWhitelist(models.Model):
@@ -135,10 +148,11 @@ class GeneratedCertificate(models.Model):
 def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
     """
     Handles post_save signal of GeneratedCertificate, and mark user collected
-    course milestone entry if user has passed the course
-    or certificate status is 'generating'.
+    course milestone entry if user has passed the course.
+    User is assumed to have passed the course if certificate status is either 'generating' or 'downloadable'.
     """
-    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status == CertificateStatuses.generating:
+    allowed_cert_states = [CertificateStatuses.generating, CertificateStatuses.downloadable]
+    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status in allowed_cert_states:
         fulfill_course_milestone(instance.course_id, instance.user)
 
 
@@ -227,7 +241,7 @@ class ExampleCertificateSet(TimeStampedModel):
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
 
-    class Meta:  # pylint: disable=missing-docstring, old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
 
     @classmethod
@@ -331,7 +345,7 @@ class ExampleCertificate(TimeStampedModel):
 
     description = models.CharField(
         max_length=255,
-        help_text=ugettext_lazy(
+        help_text=_(
             u"A human-readable description of the example certificate.  "
             u"For example, 'verified' or 'honor' to differentiate between "
             u"two types of certificates."
@@ -346,7 +360,7 @@ class ExampleCertificate(TimeStampedModel):
         default=_make_uuid,
         db_index=True,
         unique=True,
-        help_text=ugettext_lazy(
+        help_text=_(
             u"A unique identifier for the example certificate.  "
             u"This is used when we receive a response from the queue "
             u"to determine which example certificate was processed."
@@ -357,7 +371,7 @@ class ExampleCertificate(TimeStampedModel):
         max_length=255,
         default=_make_uuid,
         db_index=True,
-        help_text=ugettext_lazy(
+        help_text=_(
             u"An access key for the example certificate.  "
             u"This is used when we receive a response from the queue "
             u"to validate that the sender is the same entity we asked "
@@ -368,12 +382,12 @@ class ExampleCertificate(TimeStampedModel):
     full_name = models.CharField(
         max_length=255,
         default=EXAMPLE_FULL_NAME,
-        help_text=ugettext_lazy(u"The full name that will appear on the certificate.")
+        help_text=_(u"The full name that will appear on the certificate.")
     )
 
     template = models.CharField(
         max_length=255,
-        help_text=ugettext_lazy(u"The template file to use when generating the certificate.")
+        help_text=_(u"The template file to use when generating the certificate.")
     )
 
     # Outputs from certificate generation
@@ -385,20 +399,20 @@ class ExampleCertificate(TimeStampedModel):
             (STATUS_SUCCESS, 'Success'),
             (STATUS_ERROR, 'Error')
         ),
-        help_text=ugettext_lazy(u"The status of the example certificate.")
+        help_text=_(u"The status of the example certificate.")
     )
 
     error_reason = models.TextField(
         null=True,
         default=None,
-        help_text=ugettext_lazy(u"The reason an error occurred during certificate generation.")
+        help_text=_(u"The reason an error occurred during certificate generation.")
     )
 
     download_url = models.CharField(
         max_length=255,
         null=True,
         default=None,
-        help_text=ugettext_lazy(u"The download URL for the generated certificate.")
+        help_text=_(u"The download URL for the generated certificate.")
     )
 
     def update_status(self, status, error_reason=None, download_url=None):
@@ -484,7 +498,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)
 
-    class Meta:  # pylint: disable=missing-docstring, old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = 'created'
 
     @classmethod
@@ -544,12 +558,10 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         {
             "default": {
                 "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png",
-                "logo_alt": "Valid Certificate"
+                "logo_src": "http://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png",
-                "logo_alt": "Honor Certificate"
+                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
             }
         }
     """
@@ -574,3 +586,195 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         instance = cls.current()
         json_data = json.loads(instance.configuration) if instance.enabled else {}
         return json_data
+
+
+class BadgeAssertion(models.Model):
+    """
+    Tracks badges on our side of the badge baking transaction
+    """
+    user = models.ForeignKey(User)
+    course_id = CourseKeyField(max_length=255, blank=True, default=None)
+    # Mode a badge was awarded for.
+    mode = models.CharField(max_length=100)
+    data = JSONField()
+
+    @property
+    def image_url(self):
+        """
+        Get the image for this assertion.
+        """
+
+        return self.data['image']
+
+    @property
+    def assertion_url(self):
+        """
+        Get the public URL for the assertion.
+        """
+        return self.data['json']['id']
+
+    class Meta(object):
+        """
+        Meta information for Django's construction of the model.
+        """
+        unique_together = (('course_id', 'user', 'mode'),)
+
+
+def validate_badge_image(image):
+    """
+    Validates that a particular image is small enough, of the right type, and square to be a badge.
+    """
+    if image.width != image.height:
+        raise ValidationError(_(u"The badge image must be square."))
+    if not image.size < (250 * 1024):
+        raise ValidationError(_(u"The badge image file size must be less than 250KB."))
+
+
+class BadgeImageConfiguration(models.Model):
+    """
+    Contains the configuration for badges for a specific mode. The mode
+    """
+    mode = models.CharField(
+        max_length=125,
+        help_text=_(u'The course mode for this badge image. For example, "verified" or "honor".'),
+        unique=True,
+    )
+    icon = models.ImageField(
+        # Actual max is 256KB, but need overhead for badge baking. This should be more than enough.
+        help_text=_(
+            u"Badge images must be square PNG files. The file size should be under 250KB."
+        ),
+        upload_to='badges',
+        validators=[validate_badge_image]
+    )
+    default = models.BooleanField(
+        help_text=_(
+            u"Set this value to True if you want this image to be the default image for any course modes "
+            u"that do not have a specified badge image. You can have only one default image."
+        )
+    )
+
+    def clean(self):
+        """
+        Make sure there's not more than one default.
+        """
+        # pylint: disable=no-member
+        if self.default and BadgeImageConfiguration.objects.filter(default=True).exclude(id=self.id):
+            raise ValidationError(_(u"There can be only one default image."))
+
+    @classmethod
+    def image_for_mode(cls, mode):
+        """
+        Get the image for a particular mode.
+        """
+        try:
+            return cls.objects.get(mode=mode).icon
+        except cls.DoesNotExist:
+            # Fall back to default, if there is one.
+            return cls.objects.get(default=True).icon
+
+
+class CertificateTemplate(TimeStampedModel):
+    """A set of custom web certificate templates.
+
+    Web certificate templates are Django web templates
+    to replace PDF certificate.
+
+    A particular course may have several kinds of certificate templates
+    (e.g. honor and verified).
+
+    """
+    name = models.CharField(
+        max_length=255,
+        help_text=_(u'Name of template.'),
+    )
+    description = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_(u'Description and/or admin notes.'),
+    )
+    template = models.TextField(
+        help_text=_(u'Django template HTML.'),
+    )
+    organization_id = models.IntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text=_(u'Organization of template.'),
+    )
+    course_key = CourseKeyField(
+        max_length=255,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    mode = models.CharField(
+        max_length=125,
+        choices=GeneratedCertificate.MODES,
+        default=GeneratedCertificate.MODES.honor,
+        null=True,
+        blank=True,
+        help_text=_(u'The course mode for this template.'),
+    )
+    is_active = models.BooleanField(
+        help_text=_(u'On/Off switch.'),
+        default=False,
+    )
+
+    def __unicode__(self):
+        return u'%s' % (self.name, )
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = 'created'
+        unique_together = (('organization_id', 'course_key', 'mode'),)
+
+
+class CertificateTemplateAsset(TimeStampedModel):
+    """A set of assets to be used in custom web certificate templates.
+
+    This model stores assets used in custom web certificate templates
+    such as image, css files.
+
+    """
+    description = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_(u'Description of the asset.'),
+    )
+    asset = models.FileField(
+        max_length=255,
+        upload_to='certificate_template_assets',
+        help_text=_(u'Asset file. It could be an image or css file.'),
+    )
+
+    def __unicode__(self):
+        return u'%s' % (self.asset.url, )  # pylint: disable=no-member
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = 'created'
+
+
+@receiver(post_save, sender=GeneratedCertificate)
+#pylint: disable=unused-argument
+def create_badge(sender, instance, **kwargs):
+    """
+    Standard signal hook to create badges when a certificate has been generated.
+    """
+    if not settings.FEATURES.get('ENABLE_OPENBADGES', False):
+        return
+    if not modulestore().get_course(instance.course_id).issue_badges:
+        LOGGER.info("Course is not configured to issue badges.")
+        return
+    if BadgeAssertion.objects.filter(user=instance.user, course_id=instance.course_id):
+        LOGGER.info("Badge already exists for this user on this course.")
+        # Badge already exists. Skip.
+        return
+    # Don't bake a badge until the certificate is available. Prevents user-facing requests from being paused for this
+    # by making sure it only gets run on the callback during normal workflow.
+    if not instance.status == CertificateStatuses.downloadable:
+        return
+    from .badge_handler import BadgeHandler
+    handler = BadgeHandler(instance.course_id)
+    handler.award(instance.user)

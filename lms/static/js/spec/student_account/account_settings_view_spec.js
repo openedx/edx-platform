@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
+define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/views/fields',
         'js/student_account/models/user_account_model',
@@ -61,11 +61,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             beforeEach(function () {
                 setFixtures('<div class="wrapper-account-settings"></div>');
-                TemplateHelpers.installTemplate('templates/fields/field_readonly');
-                TemplateHelpers.installTemplate('templates/fields/field_dropdown');
-                TemplateHelpers.installTemplate('templates/fields/field_link');
-                TemplateHelpers.installTemplate('templates/fields/field_text');
-                TemplateHelpers.installTemplate('templates/student_account/account_settings');
             });
 
             it("shows loading error correctly", function() {

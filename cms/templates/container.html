@@ -24,6 +24,9 @@ from django.utils.translation import ugettext as _
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
+<script type="text/template" id="image-modal-tpl">
+    <%static:include path="common/templates/image-modal.underscore" />
+</script>
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 </%block>
 

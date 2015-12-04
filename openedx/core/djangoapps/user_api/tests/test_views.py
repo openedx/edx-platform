@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 
 from social.apps.django_app.default.models import UserSocialAuth
 
@@ -25,7 +26,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from django_comment_common import models
 from student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import simulate_running_pipeline
+from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
@@ -78,7 +79,7 @@ class ApiTestCase(TestCase):
         """Given a user preference object, get the URI for the corresponding resource"""
         prefs = self.get_json(USER_PREFERENCE_LIST_URI)["results"]
         for pref in prefs:
-            if (pref["user"]["id"] == target_pref.user.id and pref["key"] == target_pref.key):
+            if pref["user"]["id"] == target_pref.user.id and pref["key"] == target_pref.key:
                 return pref["url"]
         self.fail()
 
@@ -800,7 +801,7 @@ class PasswordResetViewTest(ApiTestCase):
 
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegistrationViewTest(ApiTestCase):
+class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     """Tests for the registration end-points of the User API. """
 
     maxDiff = None
@@ -907,6 +908,7 @@ class RegistrationViewTest(ApiTestCase):
     def test_register_form_third_party_auth_running(self):
         no_extra_fields_setting = {}
 
+        self.configure_google_provider(enabled=True)
         with simulate_running_pipeline(
             "openedx.core.djangoapps.user_api.views.third_party_auth.pipeline",
             "google-oauth2", email="bob@example.com",
@@ -1015,7 +1017,7 @@ class RegistrationViewTest(ApiTestCase):
         )
 
     def test_register_form_year_of_birth(self):
-        this_year = datetime.datetime.now(UTC).year  # pylint: disable=maybe-no-member
+        this_year = datetime.datetime.now(UTC).year
         year_options = (
             [{"value": "", "name": "--", "default": True}] + [
                 {"value": unicode(year), "name": unicode(year)}
@@ -1264,10 +1266,13 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertHttpOK(response)
-        self.assertIn(settings.EDXMKTG_COOKIE_NAME, self.client.cookies)
+        self.assertIn(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, self.client.cookies)
+        self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
 
         user = User.objects.get(username=self.USERNAME)
-        account_settings = get_account_settings(user)
+        request = RequestFactory().get('/url')
+        request.user = user
+        account_settings = get_account_settings(request)
 
         self.assertEqual(self.USERNAME, account_settings["username"])
         self.assertEqual(self.EMAIL, account_settings["email"])
@@ -1305,7 +1310,10 @@ class RegistrationViewTest(ApiTestCase):
 
         # Verify the user's account
         user = User.objects.get(username=self.USERNAME)
-        account_settings = get_account_settings(user)
+        request = RequestFactory().get('/url')
+        request.user = user
+        account_settings = get_account_settings(request)
+
         self.assertEqual(account_settings["level_of_education"], self.EDUCATION)
         self.assertEqual(account_settings["mailing_address"], self.ADDRESS)
         self.assertEqual(account_settings["year_of_birth"], int(self.YEAR_OF_BIRTH))

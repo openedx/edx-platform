@@ -13,7 +13,8 @@ from django.utils.translation import get_language
 from django.utils.translation import override as override_language
 from nose.plugins.attrib import attr
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.enrollment import (
@@ -295,31 +296,99 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 
 
 @attr('shard_1')
-class TestInstructorEnrollmentStudentModule(TestCase):
+class TestInstructorEnrollmentStudentModule(ModuleStoreTestCase):
     """ Test student module manipulations. """
     def setUp(self):
         super(TestInstructorEnrollmentStudentModule, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('fake', 'course', 'id')
+        store = modulestore()
+        self.user = UserFactory()
+        self.course = CourseFactory(
+            name='fake',
+            org='course',
+            run='id',
+        )
+        # pylint: disable=no-member
+        self.course_key = self.course.location.course_key
+        self.parent = ItemFactory(
+            category="library_content",
+            user_id=self.user.id,
+            parent=self.course,
+            publish_item=True,
+            modulestore=store,
+        )
+        self.child = ItemFactory(
+            category="html",
+            user_id=self.user.id,
+            parent=self.parent,
+            publish_item=True,
+            modulestore=store,
+        )
+        self.unrelated = ItemFactory(
+            category="html",
+            user_id=self.user.id,
+            parent=self.course,
+            publish_item=True,
+            modulestore=store,
+        )
+        parent_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
+        child_state = json.dumps({'attempts': 10, 'whatever': 'things'})
+        unrelated_state = json.dumps({'attempts': 12, 'brains': 'zombie'})
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=self.parent.location,
+            state=parent_state,
+        )
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=self.child.location,
+            state=child_state,
+        )
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=self.unrelated.location,
+            state=unrelated_state,
+        )
 
     def test_reset_student_attempts(self):
-        user = UserFactory()
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
-        StudentModule.objects.create(student=user, course_id=self.course_key, module_state_key=msk, state=original_state)
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=msk,
+            state=original_state
+        )
         # lambda to reload the module state from the database
-        module = lambda: StudentModule.objects.get(student=user, course_id=self.course_key, module_state_key=msk)
+        module = lambda: StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
         self.assertEqual(json.loads(module().state)['attempts'], 32)
-        reset_student_attempts(self.course_key, user, msk)
+        reset_student_attempts(self.course_key, self.user, msk)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
     def test_delete_student_attempts(self):
-        user = UserFactory()
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
-        StudentModule.objects.create(student=user, course_id=self.course_key, module_state_key=msk, state=original_state)
-        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_state_key=msk).count(), 1)
-        reset_student_attempts(self.course_key, user, msk, delete_module=True)
-        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_state_key=msk).count(), 0)
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=msk,
+            state=original_state
+        )
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.user,
+                course_id=self.course_key,
+                module_state_key=msk
+            ).count(), 1)
+        reset_student_attempts(self.course_key, self.user, msk, delete_module=True)
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.user,
+                course_id=self.course_key,
+                module_state_key=msk
+            ).count(), 0)
 
     def test_delete_submission_scores(self):
         user = UserFactory()
@@ -352,6 +421,61 @@ class TestInstructorEnrollmentStudentModule(TestCase):
         # Verify that the student's scores have been reset in the submissions API
         score = sub_api.get_score(student_item)
         self.assertIs(score, None)
+
+    def get_state(self, location):
+        """Reload and grab the module state from the database"""
+        return StudentModule.objects.get(
+            student=self.user, course_id=self.course_key, module_state_key=location
+        ).state
+
+    def test_reset_student_attempts_children(self):
+        parent_state = json.loads(self.get_state(self.parent.location))
+        self.assertEqual(parent_state['attempts'], 32)
+        self.assertEqual(parent_state['otherstuff'], 'alsorobots')
+
+        child_state = json.loads(self.get_state(self.child.location))
+        self.assertEqual(child_state['attempts'], 10)
+        self.assertEqual(child_state['whatever'], 'things')
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
+
+        reset_student_attempts(self.course_key, self.user, self.parent.location)
+
+        parent_state = json.loads(self.get_state(self.parent.location))
+        self.assertEqual(json.loads(self.get_state(self.parent.location))['attempts'], 0)
+        self.assertEqual(parent_state['otherstuff'], 'alsorobots')
+
+        child_state = json.loads(self.get_state(self.child.location))
+        self.assertEqual(child_state['attempts'], 0)
+        self.assertEqual(child_state['whatever'], 'things')
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
+
+    def test_delete_submission_scores_attempts_children(self):
+        parent_state = json.loads(self.get_state(self.parent.location))
+        self.assertEqual(parent_state['attempts'], 32)
+        self.assertEqual(parent_state['otherstuff'], 'alsorobots')
+
+        child_state = json.loads(self.get_state(self.child.location))
+        self.assertEqual(child_state['attempts'], 10)
+        self.assertEqual(child_state['whatever'], 'things')
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
+
+        reset_student_attempts(self.course_key, self.user, self.parent.location, delete_module=True)
+
+        self.assertRaises(StudentModule.DoesNotExist, self.get_state, self.parent.location)
+        self.assertRaises(StudentModule.DoesNotExist, self.get_state, self.child.location)
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
 
 
 class EnrollmentObjects(object):

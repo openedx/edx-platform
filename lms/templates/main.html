@@ -1,18 +1,17 @@
 ## coding=utf-8
 <%namespace name='static' file='static_content.html'/>
 <%!
+from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
-from django.utils.translation import get_language_bidi
 from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
-
-dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+from branding import api as branding_api
 %>
 <!DOCTYPE html>
 <!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-<head dir="${dir_rtl}">
+<head dir="${static.dir_rtl()}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     % if responsive:
@@ -46,35 +45,31 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
       </script>
   % endif
 
-  <script type="text/javascript" src="/jsi18n/"></script>
+  <script type="text/javascript" src="/i18n.js"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
+  <%static:css group='style-main'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
+    <%static:js group='base_application'/>
   % else:
     <%static:js group='main_vendor'/>
+    <%static:js group='application'/>
+    <%static:js group='module-js'/>
   % endif
 
   <script>
     window.baseUrl = "${settings.STATIC_URL}";
     (function (require) {
-    % if settings.DEBUG is True:
-        ## Using what amounts to a random number in the Development environment for cache-busting
-        var urlArgs = "bust=" + (new Date()).getTime();
-    % else:
-        var urlArgs = "v=${settings.EDX_PLATFORM_REVISION}";
-    % endif
       require.config({
-          baseUrl: baseUrl,
-          urlArgs: urlArgs
+          baseUrl: window.baseUrl
       });
     }).call(this, require || RequireJS.require);
   </script>
-  <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+  <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
 
   <%block name="headextra"/>
 
@@ -140,11 +135,11 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 
 </head>
 
-<body class="${dir_rtl} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-  <div class="window-wrap" dir="${dir_rtl}">
+<body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+% if not disable_window_wrap:
+  <div class="window-wrap" dir="${static.dir_rtl()}">
+% endif
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
-
-    <%include file="mathjax_accessible.html" />
 
     % if not disable_header:
         <%include file="${header_file}" />
@@ -158,42 +153,27 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
     % if not disable_footer:
         <%block name="footer">
           ## Can be overridden by child templates wanting to hide the footer.
-          <%
-            if theme_enabled() and not is_microsite():
-              footer_file = 'theme-footer.html'
-            elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-              footer_file = microsite.get_template_path('footer-edx-new.html')
-            else:
-              footer_file = microsite.get_template_path('footer.html')
-          %>
-          <%include file="${footer_file}" />
+          % if theme_enabled() and not is_microsite():
+            <%include file="theme-footer.html" />
+          % elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
+              <%include file="footer-edx-v3.html" />
+          % else:
+            <%include file="${microsite.get_template_path('footer.html')}" />
+          % endif
         </%block>
     % endif
 
+% if not disable_window_wrap:
   </div>
-
-  % if not disable_courseware_js:
-    <%static:js group='application'/>
-    <%static:js group='module-js'/>
-  % endif
+% endif
 
   <%block name="js_extra"/>
+  <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
 </body>
 </html>
 
 <%def name="login_query()">${
-  u"?course_id={0}&enrollment_action={1}{course_mode}{email_opt_in}".format(
-    urlquote_plus(course_id),
-    urlquote_plus(enrollment_action),
-    course_mode=(
-      u"&course_mode=" + urlquote_plus(course_mode)
-      if course_mode else ""
-    ),
-    email_opt_in=(
-      u"&email_opt_in=" + urlquote_plus(email_opt_in)
-      if email_opt_in else ""
-    )
-  ) if course_id and enrollment_action else ""
+  u"?next={0}".format(urlquote_plus(login_redirect_url)) if login_redirect_url else ""
 }</%def>
 
 <!-- Performance beacon for onload times -->

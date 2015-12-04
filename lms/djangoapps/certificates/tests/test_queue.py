@@ -22,7 +22,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from capa.xqueue_interface import XQueueInterface
 
 from certificates.queue import XQueueCertInterface
-from certificates.models import ExampleCertificateSet, ExampleCertificate
+from certificates.models import (
+    ExampleCertificateSet,
+    ExampleCertificate,
+    GeneratedCertificate,
+    CertificateStatuses,
+)
 
 
 @attr('shard_1')
@@ -53,6 +58,20 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         __, kwargs = mock_send.call_args_list[0]
         actual_header = json.loads(kwargs['header'])
         self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+
+    def test_no_create_action_in_queue_for_html_view_certs(self):
+        """
+        Tests there is no certificate create message in the queue if generate_pdf is False
+        """
+        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
+                self.xqueue.add_cert(self.user, self.course.id, generate_pdf=False)
+
+        # Verify that add_cert method does not add message to queue
+        self.assertFalse(mock_send.called)
+        certificate = GeneratedCertificate.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(certificate.status, CertificateStatuses.downloadable)
+        self.assertIsNotNone(certificate.verify_uuid)
 
 
 @attr('shard_1')

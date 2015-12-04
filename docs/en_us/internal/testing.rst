@@ -31,8 +31,8 @@ Unit Tests
 
 -  As a rule of thumb, your unit tests should cover every code branch.
 
--  Mock or patch external dependencies. We use `voidspace
-   mock <http://www.voidspace.org.uk/python/mock/>`__.
+-  Mock or patch external dependencies. We use voidspace
+   `Mock Library <http://www.voidspace.org.uk/python/mock/>`__.
 
 -  We unit test Python code (using
    `unittest <http://docs.python.org/2/library/unittest.html>`__) and
@@ -90,8 +90,9 @@ Test Locations
       ``common/djangoapps/terrain``
    -  Lettuce Tests: located in ``features`` subpackage within a Django
       app. For example: ``lms/djangoapps/courseware/features``
-   -  Bok Choy Tests: Artifacts are located under
-      ``common/test/acceptance``
+   -  Bok Choy Acceptance Tests: located under ``common/test/acceptance/tests``
+   -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/accessibility``
+   -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
 
 Factories
 ---------
@@ -120,6 +121,10 @@ You can run all of the unit-level tests using the command
 This includes python, javascript, and documentation tests. It does not,
 however, run any acceptance tests.
 
+Note -
+`paver` is a scripting tool. To get information about various options, you can run the following command -
+::
+	paver -h
 Running Python Unit tests
 -------------------------
 
@@ -274,6 +279,7 @@ console::
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
     paver test_js_run -s common
+    paver test_js_run -s common-requirejs
 
 To run JavaScript tests in your default browser::
 
@@ -283,6 +289,7 @@ To run JavaScript tests in your default browser::
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule
     paver test_js_dev -s common
+    paver test_js_dev -s common-requirejs
 
 These paver commands call through to a custom test runner. For more
 info, see `js-test-tool <https://github.com/edx/js-test-tool>`__.
@@ -360,6 +367,44 @@ and 'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore). For
 example::
 
     paver test_bokchoy --default_store='draft'
+
+Running Bok Choy Accessibility Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We use Bok
+Choy for `automated accessibility testing
+<http://bok-choy.readthedocs.org/en/latest/accessibility.html>`__.
+Bok Choy, a UI-level acceptance test framework for writing robust
+`Selenium <http://docs.seleniumhq.org/>`__
+tests in `Python <https://www.python.org/>`__, includes the ability to perform
+accessibility audits on web pages using `Google Accessibility Developer Tools
+<https://github.com/GoogleChrome/accessibility-developer-tools/>`__.  For more
+details about how to write accessibility tests, please read the `Bok
+Choy documentation <http://bok-choy.readthedocs.org/en/latest/accessibility.html>`__
+and the Automated Accessibility Tests `openedx Confluence page
+<https://openedx.atlassian.net/wiki/display/TE/Automated+Accessibility+Tests>`__.
+
+**Prerequisites**:
+
+These prerequisites are all automatically installed and available in `Devstack
+<https://github.com/edx/configuration/wiki/edX-Developer-Stack>`__ (since the Cypress release), the supported development enviornment for the edX Platform.
+
+* PhantomJS
+
+* Mongo
+
+* Memcache
+
+* mySQL
+
+To run all the bok choy accessibility tests::
+
+    SELENIUM_BROWSER=phantomjs paver test_bokchoy -d accessibility
+
+To run specific tests, use the ``-t`` flag to specify a nose-style test spec
+relative to the ``common/test/acceptance/accessibility`` directory::
+
+    SELENIUM_BROWSER=phantomjs paver test_bokchoy -d accessibility -t test_lms_dashboard_axs.py:LmsDashboardAxsTest.test_dashboard_course_listings_axs
 
 Running Lettuce Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -494,10 +539,10 @@ To view test coverage:
 3. Reports are located in the ``reports`` folder. The command generates
    HTML and XML (Cobertura format) reports.
 
-Code Style Quality
+Python Code Style Quality
 ------------------
 
-To view code style quality (including pep8 and pylint violations)::
+To view Python code style quality (including pep8 and pylint violations)::
 
     paver run_quality
 
@@ -530,6 +575,20 @@ More specific options are below.
 
    ``system`` is an optional argument here. It defaults to
    ``cms,lms,common``.
+
+
+JavaScript Code Style Quality
+------------------
+
+To view JavaScript code style quality::
+
+    paver run_jshint
+
+-  This command also comes with a ``--limit`` switch, for example::
+
+	paver run_jshint --limit=700
+
+
 
 Testing using queue servers
 ---------------------------
@@ -590,4 +649,3 @@ Acceptance Test Techniques
    and "LMS" when they follow this convention: name your feature in the
    .feature file CMS or LMS with a single period and then no other
    periods in the name. The name can contain spaces. E.g. "CMS.Sign Up"
-

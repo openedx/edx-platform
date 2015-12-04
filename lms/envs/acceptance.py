@@ -122,6 +122,8 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 
+FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+
 # Don't actually send any requests to Software Secure for student identity
 # verification.
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
@@ -135,7 +137,7 @@ FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware', 'instructor',)
+LETTUCE_APPS = ('courseware', 'instructor')
 
 # Lettuce appears to have a bug that causes it to search
 # `instructor_task` when we specify the `instructor` app.
@@ -179,7 +181,9 @@ YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['METADATA_URL'] = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
 
-if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
+   FEATURES.get('ENABLE_DASHBOARD_SEARCH') or \
+   FEATURES.get('ENABLE_COURSE_DISCOVERY'):
     # Use MockSearchEngine as the search engine for test scenario
     SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 

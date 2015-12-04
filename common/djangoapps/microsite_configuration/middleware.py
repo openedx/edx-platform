@@ -38,7 +38,7 @@ class MicrositeMiddleware(object):
         return response
 
 
-class MicrositeSessionCookieDomainMiddleware():
+class MicrositeSessionCookieDomainMiddleware(object):
     """
     Special case middleware which should be at the very end of the MIDDLEWARE list (so that it runs first
     on the process_response chain). This middleware will define a wrapper function for the set_cookie() function

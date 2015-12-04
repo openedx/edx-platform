@@ -50,7 +50,6 @@ from .processors import (
 )
 
 import json
-from xmodule_django.models import CourseKeyField
 from .decorators import enforce_shopping_cart_enabled
 
 
@@ -174,10 +173,8 @@ def show_cart(request):
 
     if is_any_course_expired:
         for expired_item in expired_cart_items:
-            Order.remove_cart_item_from_order(expired_item)
+            Order.remove_cart_item_from_order(expired_item, request.user)
         cart.update_order_type()
-
-    appended_expired_course_names = ", ".join(expired_cart_item_names)
 
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
@@ -188,7 +185,7 @@ def show_cart(request):
         'shoppingcart_items': valid_cart_item_tuples,
         'amount': cart.total_cost,
         'is_course_enrollment_closed': is_any_course_expired,
-        'appended_expired_course_names': appended_expired_course_names,
+        'expired_course_names': expired_cart_item_names,
         'site_name': site_name,
         'form_html': form_html,
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
@@ -232,40 +229,10 @@ def remove_item(request):
     else:
         item = items[0]
         if item.user == request.user:
-            order_item_course_id = getattr(item, 'course_id')
-            item.delete()
-            log.info(
-                u'order item %s removed for user %s',
-                item_id,
-                request.user,
-            )
-            remove_code_redemption(order_item_course_id, item_id, item, request.user)
+            Order.remove_cart_item_from_order(item, request.user)
             item.order.update_order_type()
 
     return HttpResponse('OK')
-
-
-def remove_code_redemption(order_item_course_id, item_id, item, user):
-    """
-    If an item removed from shopping cart then we will remove
-    the corresponding redemption info of coupon code
-    """
-    try:
-        # Try to remove redemption information of coupon code, If exist.
-        coupon_redemption = CouponRedemption.objects.get(
-            user=user,
-            coupon__course_id=order_item_course_id if order_item_course_id else CourseKeyField.Empty,
-            order=item.order_id
-        )
-        coupon_redemption.delete()
-        log.info(
-            u'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
-            coupon_redemption.coupon.code,
-            user,
-            item_id,
-        )
-    except CouponRedemption.DoesNotExist:
-        log.debug(u'Code redemption does not exist for order item id=%s.', item_id)
 
 
 @login_required
@@ -276,7 +243,7 @@ def reset_code_redemption(request):
     """
     cart = Order.get_cart_for_user(request.user)
     cart.reset_cart_items_prices()
-    CouponRedemption.delete_coupon_redemption(request.user, cart)
+    CouponRedemption.remove_coupon_redemption_from_cart(request.user, cart)
     return HttpResponse('reset')
 
 
@@ -319,17 +286,14 @@ def get_reg_code_validity(registration_code, request, limiter):
     except CourseRegistrationCode.DoesNotExist:
         reg_code_is_valid = False
     else:
-        reg_code_is_valid = True
-        try:
-            RegistrationCodeRedemption.objects.get(registration_code__code=registration_code)
-        except RegistrationCodeRedemption.DoesNotExist:
-            reg_code_already_redeemed = False
+        if course_registration.is_valid:
+            reg_code_is_valid = True
         else:
-            reg_code_already_redeemed = True
-
+            reg_code_is_valid = False
+        reg_code_already_redeemed = RegistrationCodeRedemption.is_registration_code_redeemed(registration_code)
     if not reg_code_is_valid:
         # tick the rate limiter counter
-        AUDIT_LOG.info("Redemption of a non existing RegistrationCode {code}".format(code=registration_code))
+        AUDIT_LOG.info("Redemption of a invalid RegistrationCode %s", registration_code)
         limiter.tick_bad_request_counter(request)
         raise Http404()
 
@@ -462,15 +426,24 @@ def _is_enrollment_code_an_update(course, user, redemption_code):
 def use_registration_code(course_reg, user):
     """
     This method utilize course registration code.
+    If the registration code is invalid, it returns an error.
     If the registration code is already redeemed, it returns an error.
     Else, it identifies and removes the applicable OrderItem from the Order
     and redirects the user to the Registration code redemption page.
     """
-    if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg):
-        log.warning(u"Registration code '%s' already used", course_reg.code)
+    if not course_reg.is_valid:
+        log.warning(u"The enrollment code (%s) is no longer valid.", course_reg.code)
         return HttpResponseBadRequest(
-            _("Oops! The code '{registration_code}' you entered is either invalid or expired").format(
-                registration_code=course_reg.code
+            _("This enrollment code ({enrollment_code}) is no longer valid.").format(
+                enrollment_code=course_reg.code
+            )
+        )
+
+    if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg.code):
+        log.warning(u"This enrollment code ({%s}) has already been used.", course_reg.code)
+        return HttpResponseBadRequest(
+            _("This enrollment code ({enrollment_code}) is not valid.").format(
+                enrollment_code=course_reg.code
             )
         )
     try:
@@ -925,6 +898,7 @@ def _show_receipt_html(request, order):
                     'course_name': course.display_name,
                     'redemption_url': reverse('register_code_redemption', args=[course_registration_code.code]),
                     'code': course_registration_code.code,
+                    'is_valid': course_registration_code.is_valid,
                     'is_redeemed': RegistrationCodeRedemption.objects.filter(
                         registration_code=course_registration_code).exists(),
                 })

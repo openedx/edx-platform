@@ -49,7 +49,7 @@ def course_context_from_course_id(course_id):
         return {'course_id': '', 'org_id': ''}
 
     # TODO: Make this accept any CourseKey, and serialize it using .to_string
-    assert(isinstance(course_id, CourseKey))
+    assert isinstance(course_id, CourseKey)
     return {
         'course_id': course_id.to_deprecated_string(),
         'org_id': course_id.org,

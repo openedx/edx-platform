@@ -1,8 +1,8 @@
 define([
     'jquery',
     'underscore',
-    'js/common_helpers/template_helpers',
-    'js/common_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers',
+    'common/js/spec_helpers/ajax_helpers',
     'js/student_account/models/LoginModel',
     'js/student_account/views/LoginView',
     'js/student_account/models/PasswordResetModel'
@@ -25,12 +25,14 @@ define([
                 currentProvider: null,
                 providers: [
                     {
+                        id: 'oa2-google-oauth2',
                         name: 'Google',
                         iconClass: 'fa-google-plus',
                         loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
                         registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
                     },
                     {
+                        id: 'oa2-facebook',
                         name: 'Facebook',
                         iconClass: 'fa-facebook',
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
@@ -195,8 +197,8 @@ define([
             createLoginView(this);
 
             // Verify that Google and Facebook registration buttons are displayed
-            expect($('.button-Google')).toBeVisible();
-            expect($('.button-Facebook')).toBeVisible();
+            expect($('.button-oa2-google-oauth2')).toBeVisible();
+            expect($('.button-oa2-facebook')).toBeVisible();
         });
 
         it('displays a link to the password reset form', function() {

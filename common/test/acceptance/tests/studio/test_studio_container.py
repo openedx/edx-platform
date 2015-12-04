@@ -8,6 +8,7 @@ from unittest import skip
 
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
+from ...pages.studio.container import ContainerPage
 from ...pages.studio.html_component_editor import HtmlComponentEditorView
 from ...pages.studio.utils import add_discussion, drag
 from ...pages.lms.courseware import CoursewarePage
@@ -1056,3 +1057,61 @@ class DisplayNameTest(ContainerBase):
         title_on_unit_page = test_block.name
         container = test_block.go_to_container()
         self.assertEqual(container.name, title_on_unit_page)
+
+
+class ProblemCategoryTabsTest(ContainerBase):
+    """
+    Test to verify tabs in problem category.
+    """
+    def setUp(self, is_staff=True):
+        super(ProblemCategoryTabsTest, self).setUp(is_staff=is_staff)
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up course structure.
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit')
+                )
+            )
+        )
+
+    def test_correct_tabs_present(self):
+        """
+        Scenario: Verify that correct tabs are present in problem category.
+
+        Given I am a staff user
+        When I go to unit page
+        Then I only see `Common Problem Types` and `Advanced` tabs in `problem` category
+        """
+        self.go_to_unit_page()
+        page = ContainerPage(self.browser, None)
+        self.assertEqual(page.get_category_tab_names('problem'), ['Common Problem Types', 'Advanced'])
+
+    def test_common_problem_types_tab(self):
+        """
+        Scenario: Verify that correct components are present in Common Problem Types tab.
+
+        Given I am a staff user
+        When I go to unit page
+        Then I see correct components under `Common Problem Types` tab in `problem` category
+        """
+        self.go_to_unit_page()
+        page = ContainerPage(self.browser, None)
+
+        expected_components = [
+            "Blank Common Problem",
+            "Checkboxes",
+            "Dropdown",
+            "Multiple Choice",
+            "Numerical Input",
+            "Text Input",
+            "Checkboxes with Hints and Feedback",
+            "Dropdown with Hints and Feedback",
+            "Multiple Choice with Hints and Feedback",
+            "Numerical Input with Hints and Feedback",
+            "Text Input with Hints and Feedback",
+        ]
+        self.assertEqual(page.get_category_tab_components('problem', 1), expected_components)

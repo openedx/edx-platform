@@ -8,8 +8,8 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.dashboard import DashboardPage
 
 
-class LmsDashboardPageTest(UniqueCourseTest):
-    """ Test suite for the LMS Student Dashboard page """
+class BaseLmsDashboardTest(UniqueCourseTest):
+    """ Base test suite for the LMS Student Dashboard """
 
     def setUp(self):
         """
@@ -17,7 +17,7 @@ class LmsDashboardPageTest(UniqueCourseTest):
         """
         # Some parameters are provided by the parent setUp() routine, such as the following:
         # self.course_id, self.course_info, self.unique_id
-        super(LmsDashboardPageTest, self).setUp()
+        super(BaseLmsDashboardTest, self).setUp()
 
         # Load page objects for use by the tests
         self.dashboard_page = DashboardPage(self.browser)
@@ -46,6 +46,10 @@ class LmsDashboardPageTest(UniqueCourseTest):
 
         # Navigate the authenticated, enrolled user to the dashboard page and get testing!
         self.dashboard_page.visit()
+
+
+class LmsDashboardPageTest(BaseLmsDashboardTest):
+    """ Test suite for the LMS Student Dashboard page """
 
     def test_dashboard_course_listings(self):
         """

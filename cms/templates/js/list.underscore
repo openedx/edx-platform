@@ -11,7 +11,7 @@
 <% } else { %>
     <div class="list-items"></div>
     <% if (!isEditing) { %>
-        <button class="action action-add">
+        <button class="action action-add <% if(!canCreateNewItem) {%> action-add-hidden <% }%>" >
             <i class="icon fa fa-plus"></i>
             <%- interpolate(
                 gettext('New %(item_type)s'), {item_type: itemCategoryDisplayName}, true

@@ -1,8 +1,9 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", "js/common_helpers/template_helpers"],
-    function($, NotificationView, Prompt, TemplateHelpers) {
+define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 'common/js/spec_helpers/ajax_helpers',
+    "common/js/spec_helpers/template_helpers"],
+    function($, NotificationView, Prompt, AjaxHelpers, TemplateHelpers) {
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
@@ -94,6 +95,36 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
             }
         };
 
+        clickDeleteItem = function (that, promptSpy, promptText) {
+            that.view.$('.delete').click();
+            verifyPromptShowing(promptSpy, promptText);
+            confirmPrompt(promptSpy);
+            verifyPromptHidden(promptSpy);
+        };
+
+        patchAndVerifyRequest = function (requests, url, notificationSpy) {
+            // Backbone.emulateHTTP is enabled in our system, so setting this
+            // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
+            // setting the X-HTTP-Method-Override header with the true method.
+            AjaxHelpers.expectJsonRequest(requests, 'POST', url);
+            expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
+            verifyNotificationShowing(notificationSpy, /Deleting/);
+        };
+
+        submitAndVerifyFormSuccess = function (view, requests, notificationSpy) {
+            view.$('form').submit();
+            verifyNotificationShowing(notificationSpy, /Saving/);
+            AjaxHelpers.respondWithJson(requests, {});
+            verifyNotificationHidden(notificationSpy);
+        };
+
+        submitAndVerifyFormError = function (view, requests, notificationSpy) {
+            view.$('form').submit();
+            verifyNotificationShowing(notificationSpy, /Saving/);
+            AjaxHelpers.respondWithError(requests);
+            verifyNotificationShowing(notificationSpy, /Saving/);
+        };
+
         return {
             'installViewTemplates': installViewTemplates,
             'createNotificationSpy': createNotificationSpy,
@@ -106,6 +137,10 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
             'inlineEdit': inlineEdit,
             'verifyInlineEditChange': verifyInlineEditChange,
             'installMockAnalytics': installMockAnalytics,
-            'removeMockAnalytics': removeMockAnalytics
+            'removeMockAnalytics': removeMockAnalytics,
+            'clickDeleteItem': clickDeleteItem,
+            'patchAndVerifyRequest': patchAndVerifyRequest,
+            'submitAndVerifyFormSuccess': submitAndVerifyFormSuccess,
+            'submitAndVerifyFormError': submitAndVerifyFormError
         };
     });

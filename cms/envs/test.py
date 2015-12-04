@@ -53,13 +53,16 @@ THIS_UUID = uuid4().hex[:5]
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-_system = 'cms'
-_report_dir = REPO_ROOT / 'reports' / _system
-_report_dir.makedirs_p()
+_SYSTEM = 'cms'
+
+_REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
+_REPORT_DIR.makedirs_p()
+_NOSEID_DIR = REPO_ROOT / '.testids' / _SYSTEM
+_NOSEID_DIR.makedirs_p()
 
 NOSE_ARGS = [
-    '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
-    '--xunit-file', _report_dir / 'nosetests.xml',
+    '--id-file', _NOSEID_DIR / 'noseids',
+    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
 ]
 
 TEST_ROOT = path('test_root')
@@ -68,6 +71,7 @@ TEST_ROOT = path('test_root')
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
+DATA_DIR = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
 # For testing "push to lms"
@@ -172,14 +176,16 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_location_mem_cache',
     },
-
+    'course_structure_cache': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    },
 }
 
 # Add external_auth to Installed apps for testing
 INSTALLED_APPS += ('external_auth', )
 
 # Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', )
+INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')

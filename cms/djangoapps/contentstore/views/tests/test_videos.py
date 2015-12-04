@@ -16,11 +16,9 @@ from mock import Mock, patch
 from edxval.api import create_profile, create_video, get_video_info
 
 from contentstore.models import VideoUploadConfig
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, VIDEO_ASSET_TYPE, StatusDisplayStrings
+from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -47,6 +45,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "test1.mp4",
                 "duration": 42.0,
                 "status": "upload",
+                "courses": [unicode(self.course.id)],
                 "encoded_videos": [],
             },
             {
@@ -54,6 +53,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "test2.mp4",
                 "duration": 128.0,
                 "status": "file_complete",
+                "courses": [unicode(self.course.id)],
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -74,6 +74,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": u"nón-ascii-näme.mp4",
                 "duration": 256.0,
                 "status": "transcode_active",
+                "courses": [unicode(self.course.id)],
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -91,6 +92,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "status_test.mp4",
                 "duration": 3.14,
                 "status": status,
+                "courses": [unicode(self.course.id)],
                 "encoded_videos": [],
             }
             for status in (
@@ -102,12 +104,6 @@ class VideoUploadTestMixin(object):
             create_profile(profile)
         for video in self.previous_uploads:
             create_video(video)
-            modulestore().save_asset_metadata(
-                AssetMetadata(
-                    self.course.id.make_asset_key(VIDEO_ASSET_TYPE, video["edx_video_id"])
-                ),
-                self.user.id
-            )
 
     def _get_previous_upload(self, edx_video_id):
         """Returns the previous upload with the given video id."""
@@ -288,13 +284,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 "PUT",
                 headers={"Content-Type": file_info["content_type"]}
             )
-
-            # Ensure asset store was updated and the created_by field was set
-            asset_metadata = modulestore().find_asset_metadata(
-                self.course.id.make_asset_key(VIDEO_ASSET_TYPE, video_id)
-            )
-            self.assertIsNotNone(asset_metadata)
-            self.assertEquals(asset_metadata.created_by, self.user.id)
 
             # Ensure VAL was updated
             val_info = get_video_info(video_id)

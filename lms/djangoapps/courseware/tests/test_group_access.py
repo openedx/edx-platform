@@ -58,8 +58,6 @@ class GroupAccessTestCase(ModuleStoreTestCase):
     Tests to ensure that has_access() correctly enforces the visibility
     restrictions specified in the `group_access` field of XBlocks.
     """
-    # pylint: disable=no-member
-
     def set_user_group(self, user, partition, group):
         """
         Internal DRY / shorthand.
@@ -185,7 +183,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         DRY helper.
         """
         self.assertIs(
-            access.has_access(user, 'load', modulestore().get_item(block_location), self.course.id),
+            bool(access.has_access(user, 'load', modulestore().get_item(block_location), self.course.id)),
             is_accessible
         )
 

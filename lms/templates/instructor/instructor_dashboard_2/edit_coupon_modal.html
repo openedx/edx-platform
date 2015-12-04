@@ -1,7 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 <%page args="section_data"/>
-<section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Edit Coupon')}">
+<section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Edit Coupon Code')}">
   <div class="inner-wrapper">
     <button class="close-modal">
       <i class="icon fa fa-remove"></i>
@@ -13,12 +15,12 @@
 
     <div id="coupon-content">
       <header>
-        <h2>${_("Update Coupon")}</h2>
+        <h2>${_("Edit Coupon Code")}</h2>
       </header>
 
       <div class="instructions">
         <p>
-          ${_("Update Coupon Information")}</p>
+          ${_("Edit Coupon Code Information")}</p>
       </div>
 
       <form id="edit_coupon_form" action="${section_data['ajax_update_coupon']}" method="post" data-remote="true">
@@ -60,7 +62,7 @@
 
         <div class="submit">
           <input type="hidden" name="coupon_id" id="coupon_id"/>
-          <input name="submit" type="button" id="update_coupon_button" value="${_('Update Coupon')}"/>
+          <input name="submit" type="button" id="update_coupon_button" value="${_('Update Coupon Code')}"/>
         </div>
       </form>
     </div>

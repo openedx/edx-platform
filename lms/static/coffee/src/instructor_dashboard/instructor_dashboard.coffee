@@ -91,7 +91,7 @@ $ =>
 # handles hiding and showing sections
 setup_instructor_dashboard = (idash_content) =>
   # clickable section titles
-  $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a.instructor-dashboard-link')
+  $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a')
 
   # attach link click handlers
   $links.each (i, link) ->
@@ -174,15 +174,25 @@ setup_instructor_dashboard_sections = (idash_content) ->
     constructor: window.InstructorDashboard.sections.Email
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#send_email"
   ,
-    constructor: window.InstructorDashboard.sections.InstructorAnalytics
-    $element: idash_content.find ".#{CSS_IDASH_SECTION}#instructor_analytics"
-  ,
     constructor: window.InstructorDashboard.sections.Metrics
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#metrics"
   ,
     constructor: window.InstructorDashboard.sections.CohortManagement
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#cohort_management"
+  ,
+    constructor: window.InstructorDashboard.sections.Certificates
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#certificates"
   ]
+
+  # proctoring can be feature disabled
+  if edx.instructor_dashboard.proctoring != undefined
+    sections_to_initialize = sections_to_initialize.concat [
+      constructor: edx.instructor_dashboard.proctoring.ProctoredExamAllowanceView
+      $element: idash_content.find ".#{CSS_IDASH_SECTION}#proctoring"
+    ,
+      constructor: edx.instructor_dashboard.proctoring.ProctoredExamAttemptView
+      $element: idash_content.find ".#{CSS_IDASH_SECTION}#proctoring"
+    ]
 
   sections_to_initialize.map ({constructor, $element}) ->
     # See fault isolation NOTE at top of file.

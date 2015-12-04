@@ -44,8 +44,8 @@ def path_to_location(modulestore, usage_key):
 
         If no path exists, return None.
 
-        If a path exists, return it as a list with target location first, and
-        the starting location last.
+        If a path exists, return it as a tuple with root location first, and
+        the target location last.
         '''
         # Standard DFS
 
@@ -86,6 +86,7 @@ def path_to_location(modulestore, usage_key):
         # pull out the location names
         chapter = path[1].name if n > 1 else None
         section = path[2].name if n > 2 else None
+        vertical = path[3].name if n > 3 else None
         # Figure out the position
         position = None
 
@@ -109,7 +110,7 @@ def path_to_location(modulestore, usage_key):
                     position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
             position = "_".join(position_list)
 
-        return (course_id, chapter, section, position)
+    return (course_id, chapter, section, vertical, position, path[-1])
 
 
 def navigation_index(position):

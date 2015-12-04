@@ -50,7 +50,6 @@ urlpatterns = patterns(
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-    url(r'^lang_pref/', include('lang_pref.urls')),
 )
 
 # User creation and updating views
@@ -117,7 +116,6 @@ urlpatterns += patterns(
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)(/)?(?P<group_id>\d+)?$'.format(
         settings.COURSE_KEY_PATTERN), 'group_configurations_detail_handler'),
-
     url(r'^api/val/v0/', include('edxval.urls')),
 )
 
@@ -182,12 +180,31 @@ if settings.FEATURES.get('ENTRANCE_EXAMS'):
         url(r'^course/{}/entrance_exam/?$'.format(settings.COURSE_KEY_PATTERN), 'contentstore.views.entrance_exam'),
     )
 
+# Enable Web/HTML Certificates
+if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
+    urlpatterns += (
+        url(r'^certificates/activation/{}/'.format(settings.COURSE_KEY_PATTERN),
+            'contentstore.views.certificates.certificate_activation_handler'),
+        url(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
+            settings.COURSE_KEY_PATTERN), 'contentstore.views.certificates.signatory_detail_handler'),
+        url(r'^certificates/{}/(?P<certificate_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
+            'contentstore.views.certificates.certificates_detail_handler'),
+        url(r'^certificates/{}$'.format(settings.COURSE_KEY_PATTERN),
+            'contentstore.views.certificates.certificates_list_handler')
+    )
+
 if settings.DEBUG:
     try:
         from .urls_dev import urlpatterns as dev_urlpatterns
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
+
+if 'debug_toolbar' in settings.INSTALLED_APPS:
+    import debug_toolbar
+    urlpatterns += (
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )
 
 # Custom error pages
 # pylint: disable=invalid-name

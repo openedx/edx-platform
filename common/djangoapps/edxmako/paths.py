@@ -1,6 +1,8 @@
 """
 Set up lookup paths for mako templates.
 """
+
+import hashlib
 import os
 import pkg_resources
 
@@ -15,6 +17,10 @@ class DynamicTemplateLookup(TemplateLookup):
     A specialization of the standard mako `TemplateLookup` class which allows
     for adding directories progressively.
     """
+    def __init__(self, *args, **kwargs):
+        super(DynamicTemplateLookup, self).__init__(*args, **kwargs)
+        self.__original_module_directory = self.template_args['module_directory']
+
     def add_directory(self, directory, prepend=False):
         """
         Add a new directory to the template lookup path.
@@ -23,6 +29,18 @@ class DynamicTemplateLookup(TemplateLookup):
             self.directories.insert(0, os.path.normpath(directory))
         else:
             self.directories.append(os.path.normpath(directory))
+
+        # Since the lookup path has changed, the compiled modules might be
+        # wrong because now "foo.html" might be a completely different template,
+        # and "foo.html.py" in the module directory has no way to know that.
+        # Update the module_directory argument to point to a directory
+        # specifically for this lookup path.
+        unique = hashlib.md5(":".join(str(d) for d in self.directories)).hexdigest()
+        self.template_args['module_directory'] = os.path.join(self.__original_module_directory, unique)
+
+        # Also clear the internal caches. Ick.
+        self._collection.clear()
+        self._uri_cache.clear()
 
 
 def clear_lookups(namespace):

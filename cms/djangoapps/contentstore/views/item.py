@@ -242,7 +242,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-        elif view_name in (PREVIEW_VIEWS + container_views):
+        elif view_name in PREVIEW_VIEWS + container_views:
             is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
             can_edit = has_studio_write_access(request.user, usage_key.course_key)
 
@@ -332,13 +332,14 @@ def xblock_outline_handler(request, usage_key_string):
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         store = modulestore()
-        root_xblock = store.get_item(usage_key)
-        return JsonResponse(create_xblock_info(
-            root_xblock,
-            include_child_info=True,
-            course_outline=True,
-            include_children_predicate=lambda xblock: not xblock.category == 'vertical'
-        ))
+        with store.bulk_operations(usage_key.course_key):
+            root_xblock = store.get_item(usage_key, depth=None)
+            return JsonResponse(create_xblock_info(
+                root_xblock,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical'
+            ))
     else:
         return Http404
 
@@ -478,6 +479,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                             if verr.message:
                                 reason = _("Invalid data ({details})").format(details=verr.message)
                             return JsonResponse({"error": reason}, 400)
+
                         field.write_to(xblock, value)
 
         # update the xblock and call any xblock callbacks
@@ -753,7 +755,8 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
-                       course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None):
+                       course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
+                       user=None):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -793,9 +796,12 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             course_outline,
             graders,
             include_children_predicate=include_children_predicate,
+            user=user
         )
     else:
         child_info = None
+
+    release_date = _get_release_date(xblock, user)
 
     if xblock.category != 'course':
         visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
@@ -806,6 +812,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # defining the default value 'True' for delete, drag and add new child actions in xblock_actions for each xblock.
     xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True}
     explanatory_message = None
+
     # is_entrance_exam is inherited metadata.
     if xblock.category == 'chapter' and getattr(xblock, "is_entrance_exam", None):
         # Entrance exam section should not be deletable, draggable and not have 'New Subsection' button.
@@ -831,7 +838,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "published_on": get_default_time_display(xblock.published_on) if published and xblock.published_on else None,
         "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
-        "release_date": _get_release_date(xblock),
+        "release_date": release_date,
         "visibility_state": visibility_state,
         "has_explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
         "start": xblock.fields['start'].to_json(xblock.start),
@@ -842,8 +849,22 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
         "actions": xblock_actions,
-        "explanatory_message": explanatory_message
+        "explanatory_message": explanatory_message,
     }
+
+    # update xblock_info with proctored_exam information if the feature flag is enabled
+    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+        if xblock.category == 'course':
+            xblock_info.update({
+                "enable_proctored_exams": xblock.enable_proctored_exams
+            })
+        elif xblock.category == 'sequential':
+            xblock_info.update({
+                "is_proctored_enabled": xblock.is_proctored_enabled,
+                "is_time_limited": xblock.is_time_limited,
+                "default_time_limit_minutes": xblock.default_time_limit_minutes,
+                "is_practice_exam": xblock.is_practice_exam
+            })
 
     # Entrance exam subsection should be hidden. in_entrance_exam is inherited metadata, all children will have it.
     if xblock.category == 'sequential' and getattr(xblock, "in_entrance_exam", False):
@@ -1002,7 +1023,7 @@ def _create_xblock_ancestor_info(xblock, course_outline):
     }
 
 
-def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER):
+def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None):
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -1020,16 +1041,30 @@ def _create_xblock_child_info(xblock, course_outline, graders, include_children_
                 child, include_child_info=True, course_outline=course_outline,
                 include_children_predicate=include_children_predicate,
                 parent_xblock=xblock,
-                graders=graders
+                graders=graders,
+                user=user
             ) for child in xblock.get_children()
         ]
     return child_info
 
 
-def _get_release_date(xblock):
+def _get_release_date(xblock, user=None):
     """
     Returns the release date for the xblock, or None if the release date has never been set.
     """
+    # If year of start date is less than 1900 then reset the start date to DEFAULT_START_DATE
+    reset_to_default = False
+    try:
+        reset_to_default = xblock.start.year < 1900
+    except ValueError:
+        # For old mongo courses, accessing the start attribute calls `to_json()`,
+        # which raises a `ValueError` for years < 1900.
+        reset_to_default = True
+
+    if reset_to_default and user:
+        xblock.start = DEFAULT_START_DATE
+        xblock = _update_with_callback(xblock, user)
+
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     return get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
 

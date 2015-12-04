@@ -1,7 +1,8 @@
 from django.conf import settings
 from rest_framework import permissions
-from rest_framework.exceptions import PermissionDenied
 from django.http import Http404
+
+from student.roles import CourseStaffRole
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -34,19 +35,6 @@ class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.
         return api_permissions or is_authenticated_permissions
 
 
-class IsAuthenticatedOrDebug(permissions.BasePermission):
-    """
-    Allows access only to authenticated users, or anyone if debug mode is enabled.
-    """
-
-    def has_permission(self, request, view):
-        if settings.DEBUG:
-            return True
-
-        user = getattr(request, 'user', None)
-        return user and user.is_authenticated()
-
-
 class IsUserInUrl(permissions.BasePermission):
     """
     Permission that checks to see if the request user matches the user in the URL.
@@ -75,3 +63,13 @@ class IsUserInUrlOrStaff(IsUserInUrl):
             return True
 
         return super(IsUserInUrlOrStaff, self).has_permission(request, view)
+
+
+class IsStaffOrReadOnly(permissions.BasePermission):
+    """Permission that checks to see if the user is global or course
+    staff, permitting only read-only access if they are not.
+    """
+    def has_object_permission(self, request, view, obj):
+        return (request.user.is_staff or
+                CourseStaffRole(obj.course_id).has_user(request.user) or
+                request.method in permissions.SAFE_METHODS)

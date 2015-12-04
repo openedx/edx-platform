@@ -7,14 +7,11 @@ import csv
 from collections import defaultdict
 from unittest import skipUnless
 
-
 import ddt
 from django.conf import settings
-from django.test.utils import override_settings
 from django.core.management.base import CommandError
 
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
@@ -331,11 +328,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         # Create a temporary directory for the output
         # Delete it when we're finished
         temp_dir_path = tempfile.mkdtemp()
-
-        def _cleanup():  # pylint: disable=missing-docstring
-            shutil.rmtree(temp_dir_path)
-
-        self.addCleanup(_cleanup)
+        self.addCleanup(shutil.rmtree, temp_dir_path)
 
         # Sanitize the arguments
         if other_names is None:

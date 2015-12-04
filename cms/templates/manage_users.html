@@ -1,7 +1,9 @@
-<%! import json %>
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
 <%inherit file="base.html" />
+<%!
+import json
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 <%def name="online_help_token()"><% return "team_course" %></%def>
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
@@ -51,7 +53,7 @@
                   <li class="field text required create-user-email">
                     <label for="user-email-input">${_("User's Email Address")}</label>
                     <input id="user-email-input" class="user-email-input" name="user-email" type="text" placeholder="${_('example: username@domain.com')}" value="">
-                    <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
+                    <span class="tip tip-stacked">${_("Provide the email address of the user you want to add as Staff")}</span>
                   </li>
                 </ol>
             </fieldset>
@@ -92,14 +94,15 @@
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title-3">${_("Course Team Roles")}</h3>
-        <p>${_("Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content.")}</p>
+        <p>${_("Course team members with the Staff role are course co-authors. They have full writing and editing privileges on all course content.")}</p>
         <p>${_("Admins are course team members who can add and remove other course team members.")}</p>
+        <p>${_("All course team members are automatically enrolled in the course and can access content in Studio, the LMS, and Insights.")}</p>
       </div>
 
       % if show_transfer_ownership_hint:
       <div class="bit">
         <h3 class="title-3">${_("Transferring Ownership")}</h3>
-        <p>${_("Every course must have an Admin. If you're the Admin and you want transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
+        <p>${_("Every course must have an Admin. If you are the Admin and you want to transfer ownership of the course, click <strong>Add admin access</strong> to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
       </div>
       % endif
     </aside>

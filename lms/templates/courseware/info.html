@@ -1,8 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from courseware.courses import get_course_info_section %>
-
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_course_info_section
+%>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
 
@@ -11,7 +12,6 @@
 <%static:css group='style-course'/>
 </%block>
 
-<%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 
 % if show_enroll_banner:
   <div class="wrapper-msg urgency-low" id="failed-verification-banner">
@@ -20,7 +20,7 @@
         <h2 class="title">${_("You are not enrolled yet")}</h2>
         <div class="copy">
           <p class='enroll-message'>
-            ${_(u"You are not currently enrolled in this course. Sign up for it {link_start}here{link_end}!").format(
+            ${_(u"You are not currently enrolled in this course. {link_start}Sign up now!{link_end}").format(
             link_start=u"<a href={}>".format(url_to_enroll),
             link_end=u"</a>"
             )}
@@ -42,14 +42,16 @@ $(document).ready(function(){
   </script>
 </%block>
 
-<%block name="bodyclass">${course.css_class or ''}</%block>
+<%block name="bodyclass">view-incourse view-course-info ${course.css_class or ''}</%block>
 <section class="container">
   <div class="info-wrapper">
     % if user.is_authenticated():
     <section class="updates">
       % if studio_url is not None and masquerade and masquerade.role == 'staff':
         <div class="wrap-instructor-info studio-view">
-          <a class="instructor-info-action" href="${studio_url}">${_("View Updates in Studio")}</a>
+          <a class="instructor-info-action" href="${studio_url}">
+            ${_("View Updates in Studio")}
+          </a>
         </div>
       % endif
 

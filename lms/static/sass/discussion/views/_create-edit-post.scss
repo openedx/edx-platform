@@ -8,10 +8,8 @@
   box-sizing: border-box;
   margin: 0;
   border-radius: 3px;
-  padding: ($baseline*2);
-  min-width: 760px;
+  padding: ($baseline);
   max-width: 1180px;
-  background: $gray-l5;
 
   .post-field {
     margin-bottom: $baseline;
