@@ -1875,33 +1875,6 @@ CREATE TABLE `instructor_task_instructortask` (
   CONSTRAINT `instructor_task_in_requester_id_3383acfe2fe42391_fk_auth_user_id` FOREIGN KEY (`requester_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `licenses_coursesoftware`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `licenses_coursesoftware` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `full_name` varchar(255) NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `course_id` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `licenses_userlicense`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `licenses_userlicense` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `serial` varchar(255) NOT NULL,
-  `software_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `licen_software_id_209fd400b7c7a3ca_fk_licenses_coursesoftware_id` (`software_id`),
-  KEY `licenses_userlicense_user_id_7d98c37aa4438a34_fk_auth_user_id` (`user_id`),
-  CONSTRAINT `licen_software_id_209fd400b7c7a3ca_fk_licenses_coursesoftware_id` FOREIGN KEY (`software_id`) REFERENCES `licenses_coursesoftware` (`id`),
-  CONSTRAINT `licenses_userlicense_user_id_7d98c37aa4438a34_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `lms_xblock_xblockasidesconfig`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
