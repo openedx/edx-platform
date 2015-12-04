@@ -175,7 +175,40 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
             response_data
         )
 
-    def _auto_auth(self, params=None, **kwargs):
+    @ddt.data(*COURSE_IDS_DDT)
+    @ddt.unpack
+    def test_redirect_to_course(self, course_id, course_key):
+
+        # Create a user and enroll in a course
+        response = self._auto_auth({
+            'username': 'test',
+            'course_id': course_id,
+            'redirect': True,
+            'staff': 'true',
+        }, status_code=302)
+
+        # Check that a course enrollment was created for the user
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
+        enrollment = CourseEnrollment.objects.get(course_id=course_key)
+        self.assertEqual(enrollment.user.username, "test")
+
+        # Check that the redirect was to the course info/outline page
+        urls = ('/info', 'course/{}'.format(course_key.to_deprecated_string()))
+        response.url.endswith(urls)  # pylint: disable=no-member
+
+    def test_redirect_to_main(self):
+        # Create user and redirect to 'home' (cms) or 'dashboard' (lms)
+        response = self._auto_auth({
+            'username': 'test',
+            'redirect': True,
+            'staff': 'true',
+        }, status_code=302)
+
+        # Check that the redirect was to either /dashboard or /home
+        urls = ('/dashboard', '/home')
+        response.url.endswith(urls)  # pylint: disable=no-member
+
+    def _auto_auth(self, params=None, status_code=None, **kwargs):
         """
         Make a request to the auto-auth end-point and check
         that the response is successful.
@@ -189,7 +222,9 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         """
         params = params or {}
         response = self.client.get(self.url, params, **kwargs)
-        self.assertEqual(response.status_code, 200)
+
+        expected_status_code = status_code if status_code else 200
+        self.assertEqual(response.status_code, expected_status_code)
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
