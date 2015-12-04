@@ -21,7 +21,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class ExtendedUserSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializer for model interactions """
 
-    class Meta:
+    class Meta(object):
         """ Meta class for defining additional serializer characteristics """
         model = User
         fields = ('id', 'url', 'username', 'email', 'first_name', 'last_name')
