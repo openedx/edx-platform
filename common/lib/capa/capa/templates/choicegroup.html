@@ -1,5 +1,5 @@
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
-    <fieldset>
+    <div role="group" aria-describedby="">
         % for choice_id, choice_description in choices:
         <label for="input_${id}_${choice_id}"
             ## If the student has selected this choice...
@@ -37,7 +37,7 @@
         </label>
         % endfor
         <span id="answer_${id}"></span>
-    </fieldset>
+    </div>
     <div class="indicator-container">
         % if input_type == 'checkbox' or not value:
             <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" aria-describedby="inputtype_${id}" data-tooltip="${status.display_tooltip}">
