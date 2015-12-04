@@ -2528,20 +2528,6 @@ CREATE TABLE `programs_programsapiconfig` (
   CONSTRAINT `programs_programsa_changed_by_id_b7c3b49d5c0dcd3_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `psychometrics_psychometricdata`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `psychometrics_psychometricdata` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `done` tinyint(1) NOT NULL,
-  `attempts` int(11) NOT NULL,
-  `checktimes` longtext,
-  `studentmodule_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `studentmodule_id` (`studentmodule_id`),
-  CONSTRAINT `D758b867e6fa9161734bd9cb58b9a485` FOREIGN KEY (`studentmodule_id`) REFERENCES `courseware_studentmodule` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `self_paced_selfpacedconfiguration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;

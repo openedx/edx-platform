@@ -1767,17 +1767,6 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertEqual(module.scope_ids.user_id, user2.id)
         self.assertEqual(module.descriptor.scope_ids.user_id, user2.id)
 
-    @patch('courseware.module_render.make_psychometrics_data_update_handler')
-    @patch.dict(settings.FEATURES, {'ENABLE_PSYCHOMETRICS': True})
-    def test_psychometrics_anonymous(self, psycho_handler):
-        """
-        Make sure that noauth modules with anonymous users don't have
-        the psychometrics callback bound.
-        """
-        module = self.get_module_for_user(self.anon_user)
-        module.system.rebind_noauth_module_to_user(module, self.anon_user)
-        self.assertFalse(psycho_handler.called)
-
 
 @attr('shard_1')
 @ddt.ddt

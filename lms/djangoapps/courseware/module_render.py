@@ -56,7 +56,6 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock,
     request_token as xblock_request_token,
 )
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from xblock.core import XBlock
@@ -760,11 +759,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             position = None
 
     system.set('position', position)
-    if settings.FEATURES.get('ENABLE_PSYCHOMETRICS') and user.is_authenticated():
-        system.set(
-            'psychometrics_handler',  # set callback for updating PsychometricsData
-            make_psychometrics_data_update_handler(course_id, user, descriptor.location)
-        )
 
     system.set(u'user_is_staff', user_is_staff)
     system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
