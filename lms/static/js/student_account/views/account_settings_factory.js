@@ -131,14 +131,9 @@
                             title: gettext('Email Address'),
                             valueAttribute: 'email',
                             helpMessage: interpolate_text(
-<<<<<<< HEAD
-                                gettext("The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address."), {platform_name: platformName}
-                            )
-=======
                                 gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
                             ),
                             persistChanges: true
->>>>>>> origin/release
                         })
                     }
                 )
@@ -152,17 +147,11 @@
                         valueAttribute: 'pref-lang',
                         required: true,
                         refreshPageOnSave: true,
-<<<<<<< HEAD
-                        helpMessage:
-                            gettext('The language used throughout this site. The site is currently available in a limited number of languages.'),
-                        options: fieldsData.language.options
-=======
                         helpMessage: interpolate_text(
                             gettext('The language used throughout this site. This site is currently available in a limited number of languages.'), {platform_name: platformName}
                         ),
                         options: fieldsData.language.options,
                         persistChanges: true
->>>>>>> origin/release
                     })
                 },
                 {
