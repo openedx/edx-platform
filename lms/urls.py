@@ -417,26 +417,6 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN), include(COURSE_URLS)),
         # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
-        # Open Ended grading views
-        url(r'^courses/{}/staff_grading$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.views.staff_grading', name='staff_grading'),
-        url(r'^courses/{}/staff_grading/get_next$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.staff_grading_service.get_next', name='staff_grading_get_next'),
-        url(r'^courses/{}/staff_grading/save_grade$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
-        url(r'^courses/{}/staff_grading/get_problem_list$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
-
-        # Open Ended problem list
-        url(r'^courses/{}/open_ended_problems$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.views.student_problem_list', name='open_ended_problems'),
-
-        # Open Ended flagged problem list
-        url(r'^courses/{}/open_ended_flagged_problems$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.views.flagged_problem_list', name='open_ended_flagged_problems'),
-        url(r'^courses/{}/open_ended_flagged_problems/take_action_on_flags$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.views.take_action_on_flags', name='open_ended_flagged_problems_take_action'),
-
         # Cohorts management
         url(r'^courses/{}/cohorts/settings$'.format(settings.COURSE_KEY_PATTERN),
             'openedx.core.djangoapps.course_groups.views.course_cohort_settings_handler',
@@ -458,13 +438,6 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{}/cohorts/topics$'.format(settings.COURSE_KEY_PATTERN),
             'openedx.core.djangoapps.course_groups.views.cohort_discussion_topics',
             name='cohort_discussion_topics'),
-
-        # Open Ended Notifications
-        url(r'^courses/{}/open_ended_notifications$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.views.combined_notifications', name='open_ended_notifications'),
-
-        url(r'^courses/{}/peer_grading$'.format(settings.COURSE_ID_PATTERN),
-            'open_ended_grading.views.peer_grading', name='peer_grading'),
 
         url(r'^courses/{}/notes$'.format(settings.COURSE_ID_PATTERN), 'notes.views.notes', name='notes'),
         url(r'^courses/{}/notes/'.format(settings.COURSE_ID_PATTERN), include('notes.urls')),

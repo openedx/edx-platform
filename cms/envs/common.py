@@ -1011,8 +1011,6 @@ ADVANCED_COMPONENT_TYPES = [
     'rate',  # Allows up-down voting of course content. See https://github.com/pmitros/RateXBlock
 
     'split_test',
-    'combinedopenended',
-    'peergrading',
     'notes',
     'schoolyourself_review',
     'schoolyourself_lesson',
@@ -1048,10 +1046,6 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 #               None to omit.
 #
 ADVANCED_PROBLEM_TYPES = [
-    {
-        'component': 'openassessment',
-        'boilerplate_name': None,
-    },
 ]
 
 
@@ -1110,7 +1104,7 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 ################################ Deprecated Blocks Info ################################
 
-DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
+DEPRECATED_BLOCK_TYPES = []
 
 #### PROCTORING CONFIGURATION DEFAULTS
 
