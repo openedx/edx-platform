@@ -19,43 +19,17 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
     """
     Establish basic functionality for Course API tests
     """
-
-    maxDiff = 5000  # long enough to show mismatched dicts
-
-    expected_course_data = {
-        'course_id': u'edX/toy/2012_Fall',
-        'name': u'Toy Course',
-        'number': u'toy',
-        'org': u'edX',
-        'description': u'A course about toys.',
-        'media': {
-            'course_image': {
-                'uri': u'/c4x/edX/toy/asset/just_a_test.jpg',
-            }
-        },
-        'start': u'2015-07-17T12:00:00Z',
-        'start_type': u'timestamp',
-        'start_display': u'July 17, 2015',
-        'end': u'2015-09-19T18:00:00Z',
-        'enrollment_start': u'2015-06-15T00:00:00Z',
-        'enrollment_end': u'2015-07-15T00:00:00Z',
-        'blocks_url': '/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
-    }
-
-    def verify_course(self, course, course_id=None):
-        """
-        Ensure that the returned course is the course we just created
-        """
-
-        if course_id is None:
-            course_id = self.expected_course_data['course_id']
-        self.assertIsInstance(course, CourseDescriptor)
-        self.assertEqual(course_id, str(course.id))
-
     @classmethod
     def setUpClass(cls):
         super(CourseApiTestMixin, cls).setUpClass()
         cls.request_factory = APIRequestFactory()
+
+    def verify_course(self, course, course_id=u'edX/toy/2012_Fall'):
+        """
+        Ensure that the returned course is the course we just created
+        """
+        self.assertIsInstance(course, CourseDescriptor)
+        self.assertEqual(course_id, str(course.id))
 
 
 class CourseDetailTestMixin(CourseApiTestMixin):

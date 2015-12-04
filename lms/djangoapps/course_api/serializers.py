@@ -11,6 +11,7 @@ from rest_framework import serializers
 
 from lms.djangoapps.courseware.courses import get_course_about_section
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.course_module import DEFAULT_START_DATE
 
 
@@ -36,6 +37,10 @@ class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: di
     Nested serializer to represent a collection of media objects
     """
     course_image = _MediaSerializer(source='*', uri_parser=course_image_url)
+    course_video = _MediaSerializer(
+        source='*',
+        uri_parser=lambda course: CourseDetails.fetch_video_url(course.id),
+    )
 
 
 class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -47,14 +52,19 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     name = serializers.CharField(source='display_name_with_default')
     number = serializers.CharField(source='display_number_with_default')
     org = serializers.CharField(source='display_org_with_default')
-    description = serializers.SerializerMethodField()
+    short_description = serializers.SerializerMethodField()
+    effort = serializers.SerializerMethodField()
+
     media = _CourseApiMediaCollectionSerializer(source='*')
+
     start = serializers.DateTimeField()
     start_type = serializers.SerializerMethodField()
     start_display = serializers.SerializerMethodField()
     end = serializers.DateTimeField()
+
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
+
     blocks_url = serializers.SerializerMethodField()
 
     def get_start_type(self, course):
@@ -79,9 +89,9 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         else:
             return None
 
-    def get_description(self, course):
+    def get_short_description(self, course):
         """
-        Get the representation for SerializerMethodField `description`
+        Get the representation for SerializerMethodField `short_description`
         """
         return get_course_about_section(self.context['request'], course, 'short_description').strip()
 
@@ -94,3 +104,9 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
             urllib.urlencode({'course_id': course.id}),
         ])
         return self.context['request'].build_absolute_uri(base_url)
+
+    def get_effort(self, course):
+        """
+        Get the representation for SerializerMethodField `effort`
+        """
+        return CourseDetails.fetch_effort(course.id)
