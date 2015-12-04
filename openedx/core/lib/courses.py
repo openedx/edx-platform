@@ -17,8 +17,9 @@ def course_image_url(course):
         # courses can use custom course image paths, otherwise just
         # return the default static path.
         url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
-        if hasattr(course, 'course_image') and course.course_image != course.fields['course_image'].default:
-            url += '/' + course.course_image
+        static_course_image = getattr(course, 'course_image', None)
+        if static_course_image and static_course_image != settings.DEFAULT_XML_COURSE_IMAGE_FILENAME:
+            url += '/' + static_course_image
         else:
             url += '/images/course_image.jpg'
     elif not course.course_image:
