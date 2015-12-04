@@ -76,7 +76,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# may <may@qordoba.com>, 2014
+# may <may@qordoba.com>, 2014-2015
 # mustafasadiq <mustafasadiq0@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
@@ -100,7 +100,7 @@
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# may <may@qordoba.com>, 2014
+# may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # omarithawi <oithawi@qrf.org>, 2015
@@ -127,16 +127,16 @@
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # mabdelhaq <mabdelhaq@qou.edu>, 2014
-# may <may@qordoba.com>, 2014
+# may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # SalmaGhazal <salma-ghazal1@hotmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-24 13:41+0000\n"
-"PO-Revision-Date: 2015-11-24 13:39+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-12-03 21:16+0000\n"
+"PO-Revision-Date: 2015-11-25 07:04+0000\n"
+"Last-Translator: may <may@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -151,7 +151,7 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/django_comment_client/forum/views.py
 msgid "Discussion"
-msgstr ""
+msgstr "حوار"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -262,6 +262,46 @@ msgid ""
 "verification."
 msgstr ""
 
+#: common/djangoapps/course_modes/helpers.py
+msgid "Your verification is pending"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "Verified: Pending Verification"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "ID verification pending"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Verified"
+msgstr "موثَّقة"
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "ID Verified Ribbon/Badge"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "ميثاق الشرف"
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as a professional education student"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "Professional Ed"
+msgstr ""
+
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "المساق "
@@ -292,62 +332,14 @@ msgid ""
 " to the ecommerce service."
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py
-msgid "Honor Code Certificate"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "مستمع"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
 "Professional education modes are not allowed to have expiration_datetime "
 "set."
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Your verification is pending"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Verified: Pending Verification"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "ID verification pending"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as a verified student"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Verified"
-msgstr "موثَّقة"
-
-#: common/djangoapps/course_modes/models.py
-msgid "ID Verified Ribbon/Badge"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as an honor code student"
-msgstr ""
-
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "ميثاق الشرف"
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're auditing this course"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Auditing"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as a professional education student"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Professional Ed"
 msgstr ""
 
 #: common/djangoapps/course_modes/views.py
@@ -850,6 +842,10 @@ msgid ""
 "If this option is selected, users will not be required to confirm their "
 "email, and their account will be activated immediately upon registration."
 msgstr ""
+
+#: lms/templates/student_account/finish_auth.html
+msgid "Please wait"
+msgstr "يرجى الانتظار"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -2396,6 +2392,11 @@ msgstr ""
 msgid "Enable CCX"
 msgstr ""
 
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content. CCX Coach is
+#. a role created by a course Instructor to enable a person (the "Coach") to
+#. manage the custom course for
+#. his students.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
@@ -3410,6 +3411,8 @@ msgstr ""
 msgid "Request user's username"
 msgstr ""
 
+#. Translators: This is used to request the user's username for a third party
+#. service.
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Select True to request the user's username."
 msgstr ""
@@ -3418,6 +3421,8 @@ msgstr ""
 msgid "Request user's email"
 msgstr ""
 
+#. Translators: This is used to request the user's email for a third party
+#. service.
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Select True to request the user's email address."
 msgstr ""
@@ -4393,6 +4398,8 @@ msgstr ""
 msgid "Top num_top_words words for word cloud."
 msgstr ""
 
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
@@ -4416,7 +4423,7 @@ msgid "News"
 msgstr "الأخبار"
 
 #: lms/djangoapps/branding/api.py
-msgid "FAQs"
+msgid "Help Center"
 msgstr ""
 
 #: lms/templates/static_templates/contact.html
@@ -4424,10 +4431,9 @@ msgstr ""
 msgid "Contact"
 msgstr "معلومات الاتّصال"
 
-#: lms/templates/static_templates/jobs.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Jobs"
-msgstr "الوظائف"
+#: lms/djangoapps/branding/api.py
+msgid "Careers"
+msgstr ""
 
 #: lms/templates/static_templates/donate.html
 msgid "Donate"
@@ -5854,32 +5860,51 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invalid Json data"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Students added to Certificate white list successfully"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Student username/email is required."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Duplicate Student Username/password."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Student (username/email={user}) does not exist"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Multiple Students found with username/email={user}"
+msgid "Student (username/email={user}) already in certificate exception list."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Student (username/email={user_id} already in certificate exception  list)"
+"Certificate exception (user={user}) does not exist in certificate white "
+"list. Please refresh the page and try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid Json data, Please refresh the page and then try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Add Exception\" button."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"We can't find the user (username/email={user}) you've entered. Make sure the"
+" username or email address is correct, then try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The user (username/email={user}) you have entered is not enrolled in this "
+"course. Make sure the username or email address is correct, then try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid data, user_id must be present for all certificate exceptions."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate generation started for white listed students."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "user \"{user}\" in row#    {row}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "user \"{username}\" in row# {row}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -6741,16 +6766,27 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
+"You can unenroll in the course and receive a full refund for 14 days after "
+"the course start date. "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
 "If you haven't verified your identity yet, please start the verification "
 "process ({verification_url})."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"You have up to two weeks into the course to unenroll and receive a full "
-"refund.To receive your refund, contact {billing_email}. Please include your "
-"order number in your email. Please do NOT include your credit card "
-"information."
+"You can unenroll in the course and receive a full refund for 2 days after "
+"the course start date. "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
+"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
+" include your order number in your email. Please do NOT include your credit "
+"card information."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -8565,6 +8601,14 @@ msgstr ""
 msgid "Course Credit Eligibility"
 msgstr ""
 
+#: openedx/core/djangoapps/credit/exceptions.py
+msgid "[{username}] is not eligible for credit for [{course_key}]."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/exceptions.py
+msgid "[{course_key}] is not a valid course key."
+msgstr ""
+
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
 "Unique identifier for this credit provider. Only alphanumeric characters and"
@@ -8651,6 +8695,10 @@ msgid "No file provided for profile image"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
 msgid "Internal Service URL"
 msgstr ""
 
@@ -8659,11 +8707,16 @@ msgid "Public Service URL"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "API Version"
+msgid "Path to authoring app's JS"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "Enable Student Dashboard Displays"
+msgid ""
+"This value is required in order to enable the Studio authoring interface."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Path to authoring app's CSS"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
@@ -8674,6 +8727,14 @@ msgstr ""
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Studio Authoring Interface"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -8720,6 +8781,10 @@ msgstr ""
 msgid "username@domain.com"
 msgstr ""
 
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
@@ -8735,12 +8800,16 @@ msgstr "كلمة السر"
 msgid "Remember me"
 msgstr "تذكُّر بياناتي"
 
+#. Translators: This message is shown to users who attempt to create a new
+#. account using an email address associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
 msgstr ""
 
+#. Translators: This message is shown to users who attempt to create a new
+#. account using a username associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
@@ -8753,9 +8822,13 @@ msgstr ""
 msgid "Jane Doe"
 msgstr ""
 
-#: lms/templates/register.html
-msgid "Needed for any certificates you may earn"
-msgstr "مطلوب لأي شهادة قد تنالها - يفضل باللغة العربية"
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -8763,6 +8836,9 @@ msgstr "مطلوب لأي شهادة قد تنالها - يفضل باللغة �
 msgid "Public username"
 msgstr ""
 
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "The name that will identify you in your courses - {bold_start}(cannot be "
@@ -8789,6 +8865,8 @@ msgstr "سنة الميلاد"
 msgid "Mailing address"
 msgstr "العنوان البريدي"
 
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
 msgstr ""
@@ -8803,10 +8881,18 @@ msgstr ""
 msgid "Terms of Service and Honor Code"
 msgstr ""
 
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
 msgstr ""
 
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
 msgstr ""
@@ -9552,19 +9638,30 @@ msgid ""
 msgstr ""
 
 #: common/templates/course_modes/choose.html
+msgid "Earn an Honor Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Take this course for free and have complete access to all the course "
+"material, activities, tests, and forums. Please note that learners who earn "
+"a passing grade will earn a certificate in this course."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Pursue an Honor Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "سجِّل في هذا المساق كمستمع "
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
+"material, activities, tests, and forums.  Please note that this track does "
+"not offer a certificate for learners who earn a passing grade."
 msgstr ""
-"استمع إلى دروس هذا المساق مجّانًا واستمتع بإمكانية استخدام كافة مواد المساق "
-"وأنشطته واختباراته ومنتدياته. وإذا جاءت نتيجة عملك مُرضية، والتزمتَ بميثاق "
-"الشرف، فإنّك ستحصل على شهادة في ميثاق الشرف تحمِل اسمك لإثبات إنجازك."
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
@@ -10831,10 +10928,10 @@ msgstr "موقع المستودع"
 msgid "Repo Branch (optional)"
 msgstr "فرع المستودع (اختياري)"
 
-#. Translators: Github is a popular website for hosting code
+#. Translators: GitHub is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
-msgid "Load new course from github"
-msgstr "تحميل مساق جديد من github"
+msgid "Load new course from GitHub"
+msgstr ""
 
 #. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
@@ -12436,6 +12533,10 @@ msgstr "درجتك النهائية:"
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
 msgstr "مجموع الدرجات المطلوب لشهادة {cert_name_short}:"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grade required to pass this course:"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -14043,10 +14144,6 @@ msgstr "معلومات التسجيل"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "عدد المسجلين (المشرفون والطاقم والطلاب) بحسب المسار."
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "مستمع"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
@@ -16273,6 +16370,11 @@ msgstr ""
 msgid "FAQ"
 msgstr "الأسئلة الشائعة"
 
+#: lms/templates/static_templates/jobs.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Jobs"
+msgstr "الوظائف"
+
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
@@ -16319,10 +16421,6 @@ msgstr "إعدادات الحساب"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
-msgstr "يرجى الانتظار"
-
-#: lms/templates/student_account/finish_auth.html
-msgid "Please wait"
 msgstr "يرجى الانتظار"
 
 #: lms/templates/student_account/login_and_register.html
@@ -16454,10 +16552,8 @@ msgstr ""
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
 "The deadline to upgrade to a verified certificate for this course has "
-"passed. You can still earn an honor code certificate."
+"passed."
 msgstr ""
-"لقد انقضى الموعد النهائي للتحقق من أجل هذا المساق. ما زال يمكنك الحصول على "
-"شهادة رمز الشرف."
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Upgrade Your Enrollment For {course_name}."
@@ -18346,6 +18442,10 @@ msgid "New Library"
 msgstr "مكتبة جديدة"
 
 #: cms/templates/index.html
+msgid "New Program"
+msgstr ""
+
+#: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr "يُرجى تصحيح الحقول المركَّز عليها أدناه."
 
@@ -18516,6 +18616,10 @@ msgstr ""
 msgid "Libraries"
 msgstr "المكتبات"
 
+#: cms/templates/index.html cms/templates/widgets/header.html
+msgid "Programs"
+msgstr ""
+
 #: cms/templates/index.html
 msgid "Re-run Course"
 msgstr "مساق مشغَّل مرّة أخرى"
@@ -18644,6 +18748,18 @@ msgid ""
 msgstr ""
 "تنطوي المكتبات على مجموعة من المكوِّنات التي يمكن إعادة استخدامها في عدّة "
 "مساقات. تفضَّل بإنشاء مكتبتك الأولى بمجرّد كبسة زرّ!"
+
+#: cms/templates/index.html
+msgid "You haven't created any programs yet."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Programs are groups of courses related to a common subject."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Create Your First Program"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -18950,6 +19066,10 @@ msgstr ""
 "يملك المشرفون على المكتبات كامل صلاحيات التحرير، كما يمكنهم إضافة أعضاء "
 "الفريق الآخرين وحذفهم. ويجب أن يكون لدى مستخدم واحد على الأقلّ صلاحيات "
 "المشرِف في أي مكتبة."
+
+#: cms/templates/program_authoring.html cms/templates/widgets/header.html
+msgid "Program Administration"
+msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
