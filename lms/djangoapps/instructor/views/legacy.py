@@ -48,7 +48,6 @@ from instructor_task.api import (
 from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
 from class_dashboard import dashboard_data
-from psychometrics import psychoanalyze
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -97,7 +96,7 @@ def instructor_dashboard(request, course_id):
     plots = []
     datatable = {}
 
-    # the instructor dashboard page is modal: grades, psychometrics, admin
+    # the instructor dashboard page is modal: grades, admin
     # keep that state in request.session (defaults to grades mode)
     idash_mode = request.POST.get('idash_mode', '')
     idash_mode_key = u'idash_mode:{0}'.format(course_id)
@@ -320,18 +319,6 @@ def instructor_dashboard(request, course_id):
             datatable = ret['datatable']
 
     #----------------------------------------
-    # psychometrics
-
-    elif action == 'Generate Histogram and IRT Plot':
-        problem = request.POST['Problem']
-        nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
-        msg += nmsg
-        track.views.server_track(request, "psychometrics-histogram-generation", {"problem": unicode(problem)}, page="idashboard")
-
-    if idash_mode == 'Psychometrics':
-        problems = psychoanalyze.problems_with_psychometric_data(course_key)
-
-    #----------------------------------------
     # analytics
     def get_analytics_result(analytics_name):
         """Return data for an Analytic piece, or None if it doesn't exist. It
@@ -435,8 +422,6 @@ def instructor_dashboard(request, course_id):
 
         'show_email_tab': show_email_tab,  # email
 
-        'problems': problems,  # psychometrics
-        'plots': plots,  # psychometrics
         'course_errors': modulestore().get_course_errors(course.id),
         'instructor_tasks': instructor_tasks,
         'offline_grade_log': offline_grades_available(course_key),

@@ -1125,9 +1125,6 @@ class CapaMixin(CapaFields):
                 self.attempts,
             )
 
-        if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.runtime.psychometrics_handler(self.get_state_for_lcp())
-
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
 
@@ -1374,10 +1371,6 @@ class CapaMixin(CapaFields):
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         self.track_function_unmask('problem_rescore', event_info)
-
-        # psychometrics should be called on rescoring requests in the same way as check-problem
-        if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.runtime.psychometrics_handler(self.get_state_for_lcp())
 
         return {'success': success}
 

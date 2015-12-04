@@ -116,8 +116,6 @@ FEATURES = {
     # in their emails, and they will have no way to resubscribe.
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
 
-    'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
-
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
@@ -1833,7 +1831,6 @@ INSTALLED_APPS = (
     'instructor',
     'instructor_task',
     'open_ended_grading',
-    'psychometrics',
     'licenses',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
