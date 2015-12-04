@@ -21,7 +21,7 @@ from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.core import mail
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
@@ -1893,12 +1893,28 @@ def auto_auth(request):
     if redirect_when_done:
         # Redirect to course info page if course_id is known
         if course_id:
-            return redirect(reverse('info', kwargs={'course_id': unicode(course_id)}))
-        # Otherwise redirect to dashboard
+            try:
+                # redirect to course info page in LMS
+                redirect_url = reverse(
+                    'info',
+                    kwargs={'course_id': unicode(course_id)}
+                )
+            except NoReverseMatch:
+                # redirect to course outline page in Studio
+                redirect_url = reverse(
+                    'course_handler',
+                    kwargs={'course_key_string': unicode(course_key)}
+                )
         else:
-            return redirect(reverse('dashboard'))
+            try:
+                # redirect to dashboard for LMS
+                redirect_url = reverse('dashboard')
+            except NoReverseMatch:
+                # redirect to home for Studio
+                redirect_url = reverse('home')
 
-    if request.META.get('HTTP_ACCEPT') == 'application/json':
+        return redirect(redirect_url)
+    elif request.META.get('HTTP_ACCEPT') == 'application/json':
         response = JsonResponse({
             'created_status': u"Logged in" if login_when_done else "Created",
             'username': username,
