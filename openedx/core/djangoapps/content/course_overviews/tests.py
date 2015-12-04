@@ -11,7 +11,7 @@ import pytz
 from django.utils import timezone
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
-from lms.djangoapps.courseware.courses import course_image_url
+from openedx.core.lib.courses import course_image_url
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum

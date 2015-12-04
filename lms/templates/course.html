@@ -2,7 +2,8 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section
+from courseware.courses import get_course_about_section
+from openedx.core.lib.courses import course_image_url
 %>
 <%page args="course" />
 <article class="course" id="${course.id | h}" role="region" aria-label="${get_course_about_section(request, course, 'title')}">

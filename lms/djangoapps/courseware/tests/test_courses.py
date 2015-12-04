@@ -14,7 +14,7 @@ from django.test.client import RequestFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import (
-    get_course_by_id, get_cms_course_link, course_image_url,
+    get_course_by_id, get_cms_course_link,
     get_course_info_section, get_course_about_section, get_cms_block_link
 )
 
@@ -23,6 +23,7 @@ from courseware.module_render import get_module_for_descriptor
 from courseware.tests.helpers import get_request_for_user
 from courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore import ModuleStoreEnum

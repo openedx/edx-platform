@@ -29,7 +29,7 @@ from xblock.fragment import Fragment
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
 from courseware import module_render as render
-from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
+from courseware.courses import get_course_with_access, get_course_info_section
 from courseware.field_overrides import OverrideFieldData
 from courseware.model_data import FieldDataCache
 from courseware.module_render import hash_resource, get_module_for_descriptor
@@ -39,6 +39,7 @@ from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.lib.courses import course_image_url
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE,
