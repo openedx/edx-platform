@@ -726,7 +726,8 @@
         'lms/include/teams/js/spec/views/topic_card_spec.js',
         'lms/include/teams/js/spec/views/topic_teams_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js',
-        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js'
+        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js',
+        'lms/include/js/spec/financial-assistance/financial_assistance_form_view_spec.js'
     ]);
 
 }).call(this, requirejs, define);

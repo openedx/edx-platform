@@ -1460,15 +1460,15 @@ def financial_assistance_request(request):
         if request.user.username != username:
             return HttpResponseForbidden()
 
-        course_id = data['course_id']
-        legal_name = data['legal_name']
+        course_id = data['course']
+        legal_name = data['name']
         email = data['email']
         country = data['country']
         income = data['income']
         reason_for_applying = data['reason_for_applying']
         goals = data['goals']
         effort = data['effort']
-        marketing_permission = data['marketing_permission']
+        marketing_permission = data['mktg-permission']
         ip_address = get_ip(request)
     except ValueError:
         # Thrown if JSON parsing fails

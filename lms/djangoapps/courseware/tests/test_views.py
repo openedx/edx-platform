@@ -522,15 +522,15 @@ class ViewsTestCase(ModuleStoreTestCase):
         effort = "I'm done, okay? You just give me my money, and you and I, we're done."
         data = {
             'username': username,
-            'course_id': course,
-            'legal_name': legal_name,
+            'course': course,
+            'name': legal_name,
             'email': self.user.email,
             'country': country,
             'income': income,
             'reason_for_applying': reason_for_applying,
             'goals': goals,
             'effort': effort,
-            'marketing_permission': False,
+            'mktg-permission': False,
         }
         response = self._submit_financial_assistance_form(data)
         self.assertEqual(response.status_code, 204)
@@ -560,15 +560,15 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_zendesk_submission_failed(self, _mock_record_feedback):
         response = self._submit_financial_assistance_form({
             'username': self.user.username,
-            'course_id': '',
-            'legal_name': '',
+            'course': '',
+            'name': '',
             'email': '',
             'country': '',
             'income': '',
             'reason_for_applying': '',
             'goals': '',
             'effort': '',
-            'marketing_permission': False,
+            'mktg-permission': False,
         })
         self.assertEqual(response.status_code, 500)
 

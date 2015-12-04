@@ -213,6 +213,13 @@
                 this.focusFirstError();
             },
 
+            /* Allows extended views to add non-form attributes
+             * to the data before saving it to model 
+             */
+            setExtraData: function( data ) {
+                return data;
+            },
+
             submitForm: function( event ) {
                 var data = this.getFormData();
 
@@ -223,6 +230,7 @@
                 this.toggleDisableButton(true);
 
                 if ( !_.compact(this.errors).length ) {
+                    data = this.setExtraData( data );
                     this.model.set( data );
                     this.model.save();
                     this.toggleErrorMsg( false );
