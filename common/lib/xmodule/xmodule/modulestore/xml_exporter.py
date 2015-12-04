@@ -228,17 +228,12 @@ class CourseExportManager(ExportManager):
 
             # If we are using the default course image, export it to the
             # legacy location to support backwards compatibility.
-            is_xml_course = courselike.runtime.modulestore.get_modulestore_type() == ModuleStoreEnum.Type.xml
-            existing_course_image = courselike.course_image
-            if is_xml_course and not existing_course_image:
-                existing_course_image = DEFAULT_XML_COURSE_IMAGE_FILENAME
-
-            if existing_course_image == DEFAULT_XML_COURSE_IMAGE_FILENAME:
+            if courselike.course_image == courselike.fields['course_image'].default:
                 try:
                     course_image = self.contentstore.find(
                         StaticContent.compute_location(
                             courselike.id,
-                            existing_course_image
+                            courselike.course_image
                         ),
                     )
                 except NotFoundError:
