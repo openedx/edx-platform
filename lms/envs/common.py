@@ -1605,25 +1605,6 @@ PIPELINE_JS = {
     }
 }
 
-# Compile all coffee files in course data directories if they are out of date.
-# TODO: Remove this once we move data into Mongo. This is only temporary while
-# course data directories are still in use.
-if os.path.isdir(DATA_DIR):
-    for course_dir in os.listdir(DATA_DIR):
-        js_dir = DATA_DIR / course_dir / "js"
-        if not os.path.isdir(js_dir):
-            continue
-        for filename in os.listdir(js_dir):
-            if filename.endswith('coffee'):
-                new_filename = os.path.splitext(filename)[0] + ".js"
-                if os.path.exists(js_dir / new_filename):
-                    coffee_timestamp = os.stat(js_dir / filename).st_mtime
-                    js_timestamp = os.stat(js_dir / new_filename).st_mtime
-                    if coffee_timestamp <= js_timestamp:
-                        continue
-                os.system("rm %s" % (js_dir / new_filename))
-                os.system("coffee -c %s" % (js_dir / filename))
-
 
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
