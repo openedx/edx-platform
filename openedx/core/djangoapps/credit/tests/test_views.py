@@ -660,7 +660,18 @@ class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):
     def test_nonstaff_can_only_view_own_data(self):
         """ Verify that non-staff users can only view their own eligibility data. """
         user = UserFactory(password=self.password)
+        eligibility = CreditEligibilityFactory(username=user.username)
+        url = self.create_url(eligibility)
+
+        # Verify user can view own data
         self.client.logout()
         self.client.login(username=user.username, password=self.password)
-        response = self.client.get(self.path)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # User should not be able to view data for other users.
+        alt_user = UserFactory(password=self.password)
+        alt_eligibility = CreditEligibilityFactory(username=alt_user.username)
+        url = self.create_url(alt_eligibility)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
