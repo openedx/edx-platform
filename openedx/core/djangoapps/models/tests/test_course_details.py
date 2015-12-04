@@ -39,7 +39,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
         self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
-        self.assertIsNone(details.has_cert_config)
         self.assertFalse(details.self_paced)
 
     def test_update_and_fetch(self):

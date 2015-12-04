@@ -57,7 +57,6 @@ class CourseDetails(object):
             'ENTRANCE_EXAM_MIN_SCORE_PCT',
             '50'
         )  # minimum passing score for entrance exam content module/tree,
-        self.has_cert_config = None  # course has active certificate configuration
         self.self_paced = None
 
     @classmethod
@@ -94,7 +93,6 @@ class CourseDetails(object):
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(descriptor, "license", "all-rights-reserved")
 
-        course_details.has_cert_config = has_active_web_certificate(descriptor)
         course_details.intro_video = cls.fetch_youtube_video_id(course_key)
 
         for attribute in ABOUT_ATTRIBUTES:
@@ -290,23 +288,3 @@ class CourseDetails(object):
                 '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
             )
         return result
-
-
-# TODO - we may no longer need this - check with Zia
-def has_active_web_certificate(course):
-    """
-    Returns True if given course has active web certificate
-    configuration. If given course has no active web certificate
-    configuration returns False. Returns None If `CERTIFICATES_HTML_VIEW`
-    is not enabled or course has not enabled `cert_html_view_enabled`
-    settings.
-    """
-    cert_config = None
-    if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False) and course.cert_html_view_enabled:
-        cert_config = False
-        certificates = getattr(course, 'certificates', {})
-        configurations = certificates.get('certificates', [])
-        for config in configurations:
-            if config.get('is_active'):
-                return True
-    return cert_config
