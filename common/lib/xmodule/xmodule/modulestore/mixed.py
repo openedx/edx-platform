@@ -60,15 +60,27 @@ def strip_key(func):
         def strip_key_func(val):
             """
             Strips the version and branch information according to the settings of rem_vers and rem_branch.
-            Recursively calls this function if the given value has a 'location' attribute.
+            dict contains course summary not the CourseDescriptor, check for the value type & strip
+            information accordingly.
+            Recursively calls this function if the given value has a 'location' key/attribute.
             """
             retval = val
-            if rem_vers and hasattr(retval, 'version_agnostic'):
-                retval = retval.version_agnostic()
-            if rem_branch and hasattr(retval, 'for_branch'):
-                retval = retval.for_branch(None)
-            if hasattr(retval, 'location'):
-                retval.location = strip_key_func(retval.location)
+            # If `val` is dict, it contains course summary not CourseDescriptor, handle it accordingly.
+            # Other than `dict`, `val` can be an instance of CourseDescriptor or BlockUsageLocator.
+            if isinstance(val, dict):
+                if rem_vers and 'locator' in retval:
+                    retval['locator'] = retval['locator'].version_agnostic()
+                if rem_branch and 'locator' in retval:
+                    retval['locator'] = retval['locator'].for_branch(None)
+                if 'location' in retval:
+                    retval['location'] = strip_key_func(retval['location'])
+            else:
+                if rem_vers and hasattr(retval, 'version_agnostic'):
+                    retval = retval.version_agnostic()
+                if rem_branch and hasattr(retval, 'for_branch'):
+                    retval = retval.for_branch(None)
+                if hasattr(retval, 'location'):
+                    retval.location = strip_key_func(retval.location)
             return retval
 
         # function for stripping both, collection of, and individual, values
@@ -264,6 +276,24 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         store = self._get_modulestore_for_courselike(course_key)
         return store.get_items(course_key, **kwargs)
+
+    @strip_key
+    def get_courses_summary(self, **kwargs):
+        """
+        Returns a list of dict containing the course information like, `location`, `display_name`
+         `locator` of the courses in this modulestore.
+        """
+        course_summaries = {}
+        for store in self.modulestores:
+            # filter out ones which were fetched from earlier stores but locations may not be ==
+            for course_summary in store.get_courses_summary(**kwargs):
+                course_id = self._clean_locator_for_mapping(locator=course_summary['locator'])
+                if course_id not in course_summaries:
+                    # add location in the course information
+                    course_summary['location'] = course_id.make_usage_key('course', 'course')
+                    # course is indeed unique. save it in result
+                    course_summaries[course_id] = course_summary
+        return course_summaries.values()
 
     @strip_key
     def get_courses(self, **kwargs):

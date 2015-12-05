@@ -835,6 +835,13 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return self.courses.values()
 
+    def get_courses_summary(self, **kwargs):
+        """
+        Returns what `self.get_courses()` returns. A method is called on studio dashboard
+        when logged in user is global staff.
+        """
+        return self.get_courses(**kwargs)
+
     def get_errored_courses(self):
         """
         Return a dictionary of course_dir -> [(msg, exception_str)], for each

@@ -17,6 +17,10 @@ import django.utils
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
+
+
+from xmodule.course_module import CourseDescriptor
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
@@ -340,6 +344,39 @@ def _course_outline_json(request, course_module):
     )
 
 
+def get_in_process_course_actions(request):
+    """
+     Get all inprocess course actions
+    """
+    return [
+        course for course in
+        CourseRerunState.objects.find_all(
+            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
+        )
+        if has_studio_read_access(request.user, course.course_key)
+    ]
+
+
+def _staff_accessible_course_list(request):
+    """
+    List all courses available to the logged in user by iterating through all the courses
+    """
+    def course_filter(course_summary):
+        """
+        Filter out unusable and inaccessible courses
+        """
+        # pylint: disable=fixme
+        # TODO remove this condition when templates purged from db
+        if course_summary['location'].course == 'templates':
+            return False
+
+        return has_studio_read_access(request.user, course_summary['locator'])
+
+    course_summaries = filter(course_filter, modulestore().get_courses_summary())
+    in_process_course_actions = get_in_process_course_actions(request)
+    return course_summaries, in_process_course_actions
+
+
 def _accessible_courses_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
@@ -359,13 +396,8 @@ def _accessible_courses_list(request):
         return has_studio_read_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
-    in_process_course_actions = [
-        course for course in
-        CourseRerunState.objects.find_all(
-            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
-        )
-        if has_studio_read_access(request.user, course.course_key)
-    ]
+    in_process_course_actions = get_in_process_course_actions(request)
+
     return courses, in_process_course_actions
 
 
@@ -581,6 +613,11 @@ def course_index(request, course_key):
         })
 
 
+def is_course_summary(course):
+    """ Check if the course contains course summary """
+    return isinstance(course, dict)
+
+
 def get_courses_accessible_to_user(request):
     """
     Try to get all courses by first reversing django groups and fallback to old method if it fails
@@ -588,7 +625,7 @@ def get_courses_accessible_to_user(request):
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_list(request)
+        courses, in_process_course_actions = _staff_accessible_course_list(request)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
@@ -604,28 +641,49 @@ def _remove_in_process_courses(courses, in_process_course_actions):
     removes any in-process courses in courses list. in-process actually refers to courses
     that are in the process of being generated for re-run
     """
+
     def format_course_for_view(course):
         """
         Return a dict of the data which the view requires for each course
         """
-        return {
-            'display_name': course.display_name,
-            'course_key': unicode(course.location.course_key),
-            'url': reverse_course_url('course_handler', course.id),
-            'lms_link': get_lms_link_for_item(course.location),
-            'rerun_link': _get_rerun_link_for_item(course.id),
-            'org': course.display_org_with_default,
-            'number': course.display_number_with_default,
-            'run': course.location.run
-        }
+        if is_course_summary(course):
+            course_id = course['locator']
+
+            return {
+                'display_name': course['display_name'],
+                'course_key': unicode(course_id),
+                'url': reverse_course_url('course_handler', course_id),
+                'lms_link': get_lms_link_for_item(course['location']),
+                'rerun_link': _get_rerun_link_for_item(course_id),
+                'org': course.get('display_organization', course_id.org),
+                'number': course.get('display_coursenumber', course_id.course),
+                'run': course_id.run
+            }
+        else:
+            return {
+                'display_name': course.display_name,
+                'course_key': unicode(course.location.course_key),
+                'url': reverse_course_url('course_handler', course.id),
+                'lms_link': get_lms_link_for_item(course.location),
+                'rerun_link': _get_rerun_link_for_item(course.id),
+                'org': course.display_org_with_default,
+                'number': course.display_number_with_default,
+                'run': course.location.run
+            }
 
     in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
-    courses = [
-        format_course_for_view(c)
-        for c in courses
-        if not isinstance(c, ErrorDescriptor) and (c.id not in in_process_action_course_keys)
-    ]
-    return courses
+
+    # Format courses for the view
+    formatted_courses = []
+    for course in courses:
+        # If course is instance of dict, it contains course overview summary.
+        if is_course_summary(course):
+            course_id = course['locator']
+            if course_id not in in_process_action_course_keys:
+                formatted_courses.append(format_course_for_view(course))
+        elif not isinstance(course, ErrorDescriptor) and (course.id not in in_process_action_course_keys):
+            formatted_courses.append(format_course_for_view(course))
+    return formatted_courses
 
 
 def course_outline_initial_state(locator_to_show, course_structure):
@@ -959,7 +1017,12 @@ def settings_handler(request, course_key_string):
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
                 # exclude current course from the list of available courses
-                courses = [course for course in courses if course.id != course_key]
+                courses = [
+                    course
+                    for course in courses
+                    if (is_course_summary(course) and course['locator'] != course_key)
+                    or isinstance(course, CourseDescriptor) and course.id != course_key
+                ]
                 if courses:
                     courses = _remove_in_process_courses(courses, in_process_course_actions)
                 settings_context.update({'possible_pre_requisite_courses': courses})
