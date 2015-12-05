@@ -2,6 +2,9 @@
 Test scenarios for the crowdsource hinter xblock.
 """
 import json
+import unittest
+
+from nose.plugins.attrib import attr
 
 from django.core.urlresolvers import reverse
 
@@ -9,11 +12,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from courseware.tests.factories import GlobalStaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
 
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
+from django.conf import settings
+from django.core.urlresolvers import reverse
 
 class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -23,36 +28,47 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         {'email': 'view@test.com', 'password': 'foo'},
         {'email': 'view2@test.com', 'password': 'foo'}
     ]
-    XBLOCK_NAMES = ['crowdsource_hinter']
+    XBLOCK_NAMES = ['crowdsourcehinter']
 
-    def setUp(self):
-        self.course = CourseFactory.create(
-            display_name='Crowdsource_Hinter_Test_Course'
-        )
-        self.chapter = ItemFactory.create(
-            parent=self.course, display_name='Overview'
-        )
-        self.section = ItemFactory.create(
-            parent=self.chapter, display_name='Welcome'
-        )
-        self.unit = ItemFactory.create(
-            parent=self.section, display_name='New Unit'
-        )
-        self.xblock = ItemFactory.create(
-            parent=self.unit,
-            category='crowdsourcehinter',
-            display_name='crowdsource_hinter'
-        )
+    @classmethod
+    def setUpClass(cls):
+        # Nose runs setUpClass methods even if a class decorator says to skip
+        # the class: https://github.com/nose-devs/nose/issues/946
+        # So, skip the test class here if we are not in the LMS.
+        if settings.ROOT_URLCONF != 'lms.urls':
+            raise unittest.SkipTest('Test only valid in lms')
 
-        self.course_url = reverse(
+        super(TestCrowdsourceHinter, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            display_name='CrowdsourceHinter_Test_Course'
+        )
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            cls.chapter = ItemFactory.create(
+                parent=cls.course, display_name='Overview'
+            )
+            cls.section = ItemFactory.create(
+                parent=cls.chapter, display_name='Welcome'
+            )
+            cls.unit = ItemFactory.create(
+                parent=cls.section, display_name='New Unit'
+            )
+            cls.xblock = ItemFactory.create(
+                parent=cls.unit,
+                category='crowdsourcehinter',
+                display_name='crowdsourcehinter'
+            )
+
+        cls.course_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
+                'course_id': cls.course.id.to_deprecated_string(),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
         )
 
+    def setUp(self):
+        super(TestCrowdsourceHinter, self).setUp()
         for idx, student in enumerate(self.STUDENTS):
             username = "u{}".format(idx)
             self.create_account(username, student['email'], student['password'])
@@ -66,10 +82,9 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         if xblock_name is None:
             xblock_name = TestCrowdsourceHinter.XBLOCK_NAMES[0]
-        usage_key = self.course.id.make_usage_key('crowdsourcehinter', xblock_name)
         return reverse('xblock_handler', kwargs={
             'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(usage_key.to_deprecated_string()),
+            'usage_id': quote_slashes(self.course.id.make_usage_key('crowdsourcehinter', xblock_name).to_deprecated_string()),
             'handler': handler,
             'suffix': ''
         })
@@ -90,6 +105,17 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.course, verify=True)
 
+    def initialize_database_by_id(self, handler, resource_id, times, xblock_name=None):
+        """
+        Call a ajax event (vote, delete, endorse) on a resource by its id
+        several times
+        """
+        if xblock_name is None:
+            xblock_name = TestCrowdsourceHinter.XBLOCK_NAMES[0]
+        url = self.get_handler_url(handler, xblock_name)
+        for _ in range(times):
+            self.client.post(url, json.dumps({'id': resource_id}), '')
+
     def call_event(self, handler, resource, xblock_name=None):
         """
         Call a ajax event (add, edit, flag, etc.) by specifying the resource
@@ -98,8 +124,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestCrowdsourceHinter.XBLOCK_NAMES[0]
         url = self.get_handler_url(handler, xblock_name)
-        resp = self.client.post(url, json.dumps(resource), '')
-        return json.loads(resp.content)
+        return self.client.post(url, json.dumps(resource), '')
 
     def check_event_response_by_element(self, handler, resource, resp_key, resp_val, xblock_name=None):
         """
@@ -112,7 +137,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(resp[resp_key], resp_val)
         self.assert_request_status_code(200, self.course_url)
 
-
+@attr('shard_1')
 class TestHinterFunctions(TestCrowdsourceHinter):
     """
     Check that the essential functions of the hinter work as expected.
@@ -123,10 +148,10 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         """
         Check that a generic statement is returned when no default/specific hints exist
         """
-        result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
+        result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'}, 'crowdsourcehinter')
         expected = {'BestHint': 'Sorry, there are no hints for this answer.', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': False}
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_add_new_hint(self):
         """
@@ -138,7 +163,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('add_new_hint', data)
         expected = {'success':True,
                     'result': 'Hint added'}
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_get_hint(self):
         """
@@ -151,7 +176,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         expected = {'BestHint': 'new hint for answer 1', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': 'ErrorResponse'}
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_rate_hint_upvote(self):
         """
@@ -168,7 +193,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         }
         expected = {'success': True}
         result = self.call_event('rate_hint', data)
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_rate_hint_downvote(self):
         """
@@ -185,7 +210,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         }
         expected = {'success': True}
         result = self.call_event('rate_hint', data)
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_report_hint(self):
         """
@@ -202,7 +227,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         }
         expected = {'rating': 'reported', 'hint': 'new hint for answer 1'}
         result = self.call_event('rate_hint', data)
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_dont_show_reported_hint(self):
         """
@@ -221,7 +246,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         expected = {'BestHint': 'Sorry, there are no hints for this answer.', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': False}
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_get_used_hint_answer_data(self):
         """
@@ -236,7 +261,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         result = self.call_event('get_used_hint_answer_data', "")
         expected = {'new hint for answer 1': 'incorrect answer 1'}
-        self.assertEqual(result, expected)
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_show_best_hint(self):
         """
@@ -264,4 +289,4 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         expected = {'BestHint': 'new hint for answer 1', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': 'ErrorResponse'}
-        self.assertEqual(expected, result)
+        self.assertEqual(json.loads(result.content), expected)
