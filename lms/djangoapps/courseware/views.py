@@ -29,6 +29,7 @@ from django.views.decorators.cache import cache_control
 from ipware.ip import get_ip
 from markupsafe import escape
 from rest_framework import status
+import newrelic.agent
 
 from courseware import grades
 from courseware.access import has_access, _adjust_start_date_for_beta_testers
@@ -317,6 +318,10 @@ def index(request, course_id, chapter=None, section=None,
     """
 
     course_key = CourseKey.from_string(course_id)
+
+    # Gather metrics for New Relic so we can slice data in New Relic Insights
+    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
 
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
 
