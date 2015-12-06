@@ -560,9 +560,10 @@ class CourseFields(object):
     # Explicit comparison to True because we always want to return a bool.
     hide_progress_tab = Boolean(
         display_name=_("Hide Progress Tab"),
-        help=_("Allows hiding of the progress tab."),
+        help=_("Allows hiding of the progress tab. Enter true to hide."),
         scope=Scope.settings,
-        deprecated=True
+        # deprecated=True
+        deprecated=False  # we want to allow ISC to hide progress tab
     )
 
     display_organization = String(
