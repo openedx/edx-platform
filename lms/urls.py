@@ -310,14 +310,6 @@ if settings.COURSEWARE_ENABLED:
             name='xblock_resource_url',
         ),
 
-        # Software Licenses
-
-        # TODO: for now, this is the endpoint of an ajax replay
-        # service that retrieve and assigns license numbers for
-        # software assigned to a course. The numbers have to be loaded
-        # into the database.
-        url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
-
         url(
             r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
                 settings.COURSE_ID_PATTERN

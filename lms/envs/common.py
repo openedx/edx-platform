@@ -1831,7 +1831,6 @@ INSTALLED_APPS = (
     'instructor',
     'instructor_task',
     'open_ended_grading',
-    'licenses',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
