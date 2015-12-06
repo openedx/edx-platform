@@ -36,7 +36,6 @@ XMODULES = [
     "textannotation = xmodule.textannotation_module:TextAnnotationDescriptor",
     "videoannotation = xmodule.videoannotation_module:VideoAnnotationDescriptor",
     "imageannotation = xmodule.imageannotation_module:ImageAnnotationDescriptor",
-    "foldit = xmodule.foldit_module:FolditDescriptor",
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",

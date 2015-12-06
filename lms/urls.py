@@ -643,12 +643,6 @@ if settings.FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
         url(r'^edinsights_service/', include('edinsights.core.urls')),
     )
 
-# FoldIt views
-urlpatterns += (
-    # The path is hardcoded into their app...
-    url(r'^comm/foldit_ops', 'foldit.views.foldit_ops', name="foldit_ops"),
-)
-
 if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += (
         url(r'^debug/run_python$', 'debug.views.run_python'),

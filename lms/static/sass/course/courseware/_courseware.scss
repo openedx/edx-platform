@@ -649,17 +649,3 @@ section.self-assessment {
     font-weight: bold;
   }
 }
-
-section.foldit {
-  table {
-    margin-top: ($baseline/2);
-  }
-  th {
-    text-align: center;
-  }
-  td {
-    padding-left: ($baseline/4);
-    padding-right: ($baseline/4);
-
-  }
-}
