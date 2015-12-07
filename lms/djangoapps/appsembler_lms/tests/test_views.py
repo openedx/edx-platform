@@ -13,6 +13,7 @@ from django.test import TestCase
 from rest_framework import status
 
 from student.models import CourseEnrollment
+# from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
@@ -119,3 +120,16 @@ class TestUserEnroll(ModuleStoreTestCase):
         self.assertIn('john@doe.com', mail.outbox[0].body)
         self.assertIn('password', mail.outbox[0].body)
         self.assertIn('John Doe', mail.outbox[0].body)
+
+
+# class TestUserLogin(TestCase):
+#     def setUp(self):
+#         self.email = 'janedoe@example.com'
+#         self.password = 'password'
+#         self.user = UserFactory.create(username="janedoe", email=self.email,  password=self.password)
+#
+#     def test_login_pings_amc(self):
+#         # For some reason, the last_login is not getting set here
+#         self.user.last_login = None
+#         response = self.client.post(reverse('user_api_login_session'), {'email':self.email, 'password': self.password})
+#         self.assertEqual(response.status_code, 200)
