@@ -261,7 +261,11 @@ def _footer_logo_img(is_secure):
         Absolute url to logo
     """
     logo_name = microsite.get_value('FOOTER_ORGANIZATION_IMAGE', settings.FOOTER_ORGANIZATION_IMAGE)
-    return _absolute_url_staticfile(is_secure, logo_name)
+    try:
+        return _absolute_url_staticfile(is_secure, logo_name)
+    except ValueError:
+        # fall back on core logo asset
+        return staticfiles_storage.url("images/logo.png")
 
 
 def _absolute_url(is_secure, url_path):
