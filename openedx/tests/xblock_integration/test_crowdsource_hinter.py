@@ -8,17 +8,15 @@ from nose.plugins.attrib import attr
 
 from django.core.urlresolvers import reverse
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+
 
 class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -84,7 +82,8 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             xblock_name = TestCrowdsourceHinter.XBLOCK_NAMES[0]
         return reverse('xblock_handler', kwargs={
             'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(self.course.id.make_usage_key('crowdsourcehinter', xblock_name).to_deprecated_string()),
+            'usage_id': quote_slashes(self.course.id.make_usage_key('crowdsourcehinter', xblock_name).
+                                      to_deprecated_string()),
             'handler': handler,
             'suffix': ''
         })
@@ -137,6 +136,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(resp[resp_key], resp_val)
         self.assert_request_status_code(200, self.course_url)
 
+
 @attr('shard_1')
 class TestHinterFunctions(TestCrowdsourceHinter):
     """
@@ -161,7 +161,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         data = {'new_hint_submission': 'new hint for answer 1', 'answer': 'incorrect answer 1'}
         self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         result = self.call_event('add_new_hint', data)
-        expected = {'success':True,
+        expected = {'success': True,
                     'result': 'Hint added'}
         self.assertEqual(json.loads(result.content), expected)
 

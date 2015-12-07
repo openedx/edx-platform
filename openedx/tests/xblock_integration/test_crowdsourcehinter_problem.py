@@ -4,7 +4,7 @@ Javascript tests for the crowdsourcehinter xblock
 from textwrap import dedent
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from openedx.tests.xblock_integration.pages.crowdsourcehinter_problem import CrowdsourcehinterProblemPage
+from pages.crowdsourcehinter_problem import CrowdsourcehinterProblemPage
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 
@@ -59,6 +59,9 @@ class CrowdsourcehinterProblemTest(UniqueCourseTest):
                      course_id=self.course_id, staff=False).visit()
 
     def _goto_csh_problem_page(self):
+        """
+        Visit the page courseware page containing the hinter
+        """
         self.courseware_page.visit()
         csh_problem_page = CrowdsourcehinterProblemPage(self.browser)
         self.assertGreater(len(self.browser.find_elements_by_class_name('crowdsourcehinter_block')), 0)
