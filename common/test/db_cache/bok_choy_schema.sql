@@ -1810,45 +1810,6 @@ CREATE TABLE `external_auth_externalauthmap` (
   CONSTRAINT `external_auth_externala_user_id_644e7779f2d52b9a_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `foldit_puzzlecomplete`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `foldit_puzzlecomplete` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `unique_user_id` varchar(50) NOT NULL,
-  `puzzle_id` int(11) NOT NULL,
-  `puzzle_set` int(11) NOT NULL,
-  `puzzle_subset` int(11) NOT NULL,
-  `created` datetime(6) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `foldit_puzzlecomplete_user_id_4c63656af6674331_uniq` (`user_id`,`puzzle_id`,`puzzle_set`,`puzzle_subset`),
-  KEY `foldit_puzzlecomplete_ff2b2d15` (`unique_user_id`),
-  KEY `foldit_puzzlecomplete_56c088b4` (`puzzle_set`),
-  KEY `foldit_puzzlecomplete_2dc27ffb` (`puzzle_subset`),
-  CONSTRAINT `foldit_puzzlecomplete_user_id_cd0294fb3a392_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `foldit_score`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `foldit_score` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `unique_user_id` varchar(50) NOT NULL,
-  `puzzle_id` int(11) NOT NULL,
-  `best_score` double NOT NULL,
-  `current_score` double NOT NULL,
-  `score_version` int(11) NOT NULL,
-  `created` datetime(6) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `foldit_score_user_id_6ac502fe1f6861b2_fk_auth_user_id` (`user_id`),
-  KEY `foldit_score_ff2b2d15` (`unique_user_id`),
-  KEY `foldit_score_44726e86` (`best_score`),
-  KEY `foldit_score_32d6f808` (`current_score`),
-  CONSTRAINT `foldit_score_user_id_6ac502fe1f6861b2_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `instructor_task_instructortask`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
