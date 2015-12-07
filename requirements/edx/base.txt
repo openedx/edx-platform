@@ -159,7 +159,7 @@ python-subunit==0.0.16
 pyquery==1.2.9
 radon==1.2
 rednose==0.4.3
-selenium==2.42.1
+selenium==2.48.0
 splinter==0.5.4
 testtools==0.9.34
 testfixtures==4.5.0
