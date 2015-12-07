@@ -194,7 +194,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         # Check that the redirect was to the course info/outline page
         urls = ('/info', 'course/{}'.format(course_key.to_deprecated_string()))
-        response.url.endswith(urls)  # pylint: disable=no-member
+        self.assertTrue(response.url.endswith(urls))  # pylint: disable=no-member
 
     def test_redirect_to_main(self):
         # Create user and redirect to 'home' (cms) or 'dashboard' (lms)
@@ -206,7 +206,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         # Check that the redirect was to either /dashboard or /home
         urls = ('/dashboard', '/home')
-        response.url.endswith(urls)  # pylint: disable=no-member
+        self.assertTrue(response.url.endswith(urls))  # pylint: disable=no-member
 
     def _auto_auth(self, params=None, status_code=None, **kwargs):
         """

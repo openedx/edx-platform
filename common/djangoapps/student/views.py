@@ -1826,7 +1826,7 @@ def auto_auth(request):
     if course_id:
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
-    redirect_when_done = request.GET.get('redirect', None)
+    redirect_when_done = request.GET.get('redirect', '').lower() == 'true'
     login_when_done = 'no_login' not in request.GET
 
     form = AccountCreationForm(
@@ -1897,13 +1897,13 @@ def auto_auth(request):
                 # redirect to course info page in LMS
                 redirect_url = reverse(
                     'info',
-                    kwargs={'course_id': unicode(course_id)}
+                    kwargs={'course_id': course_id}
                 )
             except NoReverseMatch:
                 # redirect to course outline page in Studio
                 redirect_url = reverse(
                     'course_handler',
-                    kwargs={'course_key_string': unicode(course_key)}
+                    kwargs={'course_key_string': course_id}
                 )
         else:
             try:
