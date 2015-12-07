@@ -1008,14 +1008,16 @@ def change_enrollment(request, check_access=True):
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
         if CourseMode.can_auto_enroll(course_id):
-            # Enroll the user using the default mode (honor)
+            # Enroll the user using the default mode (audit)
             # We're assuming that users of the course enrollment table
             # will NOT try to look up the course enrollment model
             # by its slug.  If they do, it's possible (based on the state of the database)
             # for no such model to exist, even though we've set the enrollment type
-            # to "honor".
+            # to "audit".
             try:
-                CourseEnrollment.enroll(user, course_id, check_access=check_access)
+                enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
+                if enroll_mode:
+                    CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
             except Exception:
                 return HttpResponseBadRequest(_("Could not enroll"))
 

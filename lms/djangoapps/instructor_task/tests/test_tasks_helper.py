@@ -362,6 +362,11 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
     def setUp(self):
         super(TestInstructorDetailedEnrollmentReport, self).setUp()
         self.course = CourseFactory.create()
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            min_price=50,
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        )
 
         # create testing invoice 1
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -476,7 +481,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         )
         course_registration_code.save()
 
@@ -517,7 +522,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         )
         course_registration_code.save()
 
@@ -845,7 +850,11 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
     def setUp(self):
         super(TestExecutiveSummaryReport, self).setUp()
         self.course = CourseFactory.create()
-        CourseModeFactory.create(course_id=self.course.id, min_price=50)
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            min_price=50,
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        )
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.student1 = UserFactory()

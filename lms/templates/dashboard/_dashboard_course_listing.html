@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from markupsafe import escape
 from courseware.courses import get_course_university_about_section
 from course_modes.models import CourseMode
+from course_modes.helpers import enrollment_mode_display
 from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
@@ -34,7 +35,13 @@ from student.helpers import (
 
 <li class="course-item">
   % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
-    <% course_verified_certs = CourseMode.enrollment_mode_display(enrollment.mode, verification_status.get('status')) %>
+    <%
+        course_verified_certs = enrollment_mode_display(
+            enrollment.mode,
+            verification_status.get('status'),
+            course_overview.id
+        )
+    %>
     <%
         mode_class = course_verified_certs.get('display_mode', '')
         if mode_class != '':
@@ -69,7 +76,7 @@ from student.helpers import (
           <img src="${course_overview.course_image_url}" class="course-image" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default) | h}" />
         </a>
       % endif
-      % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+      % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES') and course_verified_certs.get('display_mode') != 'audit':
         <span class="sts-enrollment" title="${course_verified_certs.get('enrollment_title')}">
           <span class="label">${_("Enrolled as: ")}</span>
           % if course_verified_certs.get('show_image'):

@@ -68,6 +68,7 @@ from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from course_modes.models import CourseMode
+from instructor_task.models import InstructorTask
 
 LOGGER = logging.getLogger(__name__)
 
@@ -234,6 +235,24 @@ class GeneratedCertificate(models.Model):
         self.status = CertificateStatuses.unavailable
 
         self.save()
+
+
+class CertificateGenerationHistory(TimeStampedModel):
+    """
+    Model for storing Certificate Generation History.
+    """
+
+    course_id = CourseKeyField(max_length=255)
+    generated_by = models.ForeignKey(User)
+    instructor_task = models.ForeignKey(InstructorTask)
+    is_regeneration = models.BooleanField(default=False)
+
+    class Meta(object):
+        app_label = "certificates"
+
+    def __unicode__(self):
+        return u"certificates %s by %s on %s for %s" % \
+               ("regenerated" if self.is_regeneration else "generated", self.generated_by, self.created, self.course_id)
 
 
 @receiver(post_save, sender=GeneratedCertificate)

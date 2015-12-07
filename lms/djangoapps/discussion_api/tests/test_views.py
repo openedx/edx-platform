@@ -683,6 +683,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "closed": ["False"],
                 "pinned": ["False"],
                 "read": ["False"],
+                "requested_user_id": [str(self.user.id)],
             }
         )
 
@@ -735,6 +736,83 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         request_data = {field: value}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 400)
+
+    def test_patch_read_owner_user(self):
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        request_data = {"read": True}
+        response = self.request_patch(request_data)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(
+            response_data,
+            self.expected_response_data({
+                "comment_count": 1,
+                "read": True,
+                "editable_fields": [
+                    "abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
+                ],
+            })
+        )
+
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["original_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Original Title"],
+                "body": ["Original body"],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "closed": ["False"],
+                "pinned": ["False"],
+                "read": ["True"],
+                "requested_user_id": [str(self.user.id)],
+            }
+        )
+
+    def test_patch_read_non_owner_user(self):
+        self.register_get_user_response(self.user)
+        thread_owner_user = UserFactory.create(password=self.password)
+        CourseEnrollmentFactory.create(user=thread_owner_user, course_id=self.course.id)
+        self.register_get_user_response(thread_owner_user)
+        self.register_thread({"username": thread_owner_user.username, "user_id": str(thread_owner_user.id)})
+
+        request_data = {"read": True}
+        response = self.request_patch(request_data)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(
+            response_data,
+            self.expected_response_data({
+                "author": str(thread_owner_user.username),
+                "comment_count": 1,
+                "read": True,
+                "editable_fields": [
+                    "abuse_flagged", "following", "read", "voted"
+                ],
+            })
+        )
+
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["original_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Original Title"],
+                "body": ["Original body"],
+                "user_id": [str(thread_owner_user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "closed": ["False"],
+                "pinned": ["False"],
+                "read": ["True"],
+                "requested_user_id": [str(self.user.id)],
+            }
+        )
 
 
 @httpretty.activate

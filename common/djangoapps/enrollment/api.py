@@ -7,6 +7,7 @@ import importlib
 import logging
 from django.conf import settings
 from django.core.cache import cache
+from course_modes.models import CourseMode
 from enrollment import errors
 
 log = logging.getLogger(__name__)
@@ -132,10 +133,10 @@ def get_enrollment(user_id, course_id):
     return _data_api().get_course_enrollment(user_id, course_id)
 
 
-def add_enrollment(user_id, course_id, mode='honor', is_active=True):
+def add_enrollment(user_id, course_id, mode=CourseMode.DEFAULT_MODE_SLUG, is_active=True):
     """Enrolls a user in a course.
 
-    Enrolls a user in a course. If the mode is not specified, this will default to 'honor'.
+    Enrolls a user in a course. If the mode is not specified, this will default to `CourseMode.DEFAULT_MODE_SLUG`.
 
     Arguments:
         user_id (str): The user to enroll.
@@ -143,7 +144,7 @@ def add_enrollment(user_id, course_id, mode='honor', is_active=True):
 
     Keyword Arguments:
         mode (str): Optional argument for the type of enrollment to create. Ex. 'audit', 'honor', 'verified',
-            'professional'. If not specified, this defaults to 'honor'.
+            'professional'. If not specified, this defaults to the default course mode.
         is_active (boolean): Optional argument for making the new enrollment inactive. If not specified, is_active
             defaults to True.
 
@@ -154,7 +155,7 @@ def add_enrollment(user_id, course_id, mode='honor', is_active=True):
         >>> add_enrollment("Bob", "edX/DemoX/2014T2", mode="audit")
         {
             "created": "2014-10-20T20:18:00Z",
-            "mode": "honor",
+            "mode": "audit",
             "is_active": True,
             "user": "Bob",
             "course": {
@@ -165,8 +166,8 @@ def add_enrollment(user_id, course_id, mode='honor', is_active=True):
                 "course_end": "2015-05-06T00:00:00Z",
                 "course_modes": [
                     {
-                        "slug": "honor",
-                        "name": "Honor Code Certificate",
+                        "slug": "audit",
+                        "name": "Audit",
                         "min_price": 0,
                         "suggested_prices": "",
                         "currency": "usd",

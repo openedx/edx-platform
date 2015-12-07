@@ -1,6 +1,7 @@
 """
 Test helpers for testing course block transformers.
 """
+from course_modes.models import CourseMode
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -221,7 +222,12 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
         self.password = 'test'
         self.student = UserFactory.create(is_staff=False, username='test_student', password=self.password)
         self.staff = UserFactory.create(is_staff=True, username='test_staff', password=self.password)
-        CourseEnrollmentFactory.create(is_active=True, mode='honor', user=self.student, course_id=self.course.id)
+        CourseEnrollmentFactory.create(
+            is_active=True,
+            mode=CourseMode.DEFAULT_MODE_SLUG,
+            user=self.student,
+            course_id=self.course.id
+        )
 
     def assert_transform_results(
             self,

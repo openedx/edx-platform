@@ -56,10 +56,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             display_name='<script>alert("XSS")</script>'
         )
 
-        self.course_mode = CourseMode(course_id=self.course.id,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=40)
+        self.course_mode = CourseMode(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE.name,
+            min_price=40
+        )
         self.course_mode.save()
         # Create instructor account
         self.instructor = AdminFactory.create()

@@ -35,9 +35,8 @@
           % endif
 
           % if is_programs_enabled:
-            <!-- TODO: Link to the program creation view in the authoring app. -->
-            <button class="button new-button new-program-button"><i class="icon fa fa-plus icon-inline"></i>
-            ${_("New Program")}</button>
+            <a href=${program_authoring_url + 'new'} class="button new-button new-program-button"><i class="icon fa fa-plus icon-inline"></i>
+            ${_("New Program")}</a>
           % endif
         </li>
       </ul>
@@ -508,8 +507,7 @@
               % for program in programs:
               <li class="course-item">
 
-                <!-- TODO: Use the program ID contained in the dict to link to the appropriate view in the authoring app. -->
-                <a class="program-link" href="#">
+                <a class="program-link" href=${program_authoring_url + str(program['id'])}>
                   <h3 class="course-title">${program['name'] | h}</h3>
 
                   <div class="course-metadata">
@@ -538,8 +536,7 @@
 
               <ul class="list-actions">
                 <li class="action-item">
-                  <!-- TODO: Link to the program creation view in the authoring app. -->
-                  <button class="action-primary action-create new-button action-create-program new-program-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Create Your First Program')}</button>
+                  <a href=${program_authoring_url + 'new'} class="action-primary action-create new-button action-create-program new-program-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Create Your First Program')}</a>
                 </li>
               </ul>
 

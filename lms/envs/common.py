@@ -426,7 +426,7 @@ COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
 # comprehensive theming system
-COMP_THEME_DIR = ""
+COMPREHENSIVE_THEME_DIR = ""
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -1087,7 +1087,7 @@ FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/edx-openedx-log
 
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
-FOOTER_ORGANIZATION_IMAGE = "images/default-theme/logo.png"
+FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
 
 # These are referred to both by the Django asset pipeline
 # AND by the branding footer API, which needs to decide which
@@ -1197,12 +1197,12 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 PIPELINE_ENABLED = True
 
-# Process static files using RequireJS Optimizer
-STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -1604,25 +1604,6 @@ PIPELINE_JS = {
         'output_filename': 'js/credit/web_view.js'
     }
 }
-
-# Compile all coffee files in course data directories if they are out of date.
-# TODO: Remove this once we move data into Mongo. This is only temporary while
-# course data directories are still in use.
-if os.path.isdir(DATA_DIR):
-    for course_dir in os.listdir(DATA_DIR):
-        js_dir = DATA_DIR / course_dir / "js"
-        if not os.path.isdir(js_dir):
-            continue
-        for filename in os.listdir(js_dir):
-            if filename.endswith('coffee'):
-                new_filename = os.path.splitext(filename)[0] + ".js"
-                if os.path.exists(js_dir / new_filename):
-                    coffee_timestamp = os.stat(js_dir / filename).st_mtime
-                    js_timestamp = os.stat(js_dir / new_filename).st_mtime
-                    if coffee_timestamp <= js_timestamp:
-                        continue
-                os.system("rm %s" % (js_dir / new_filename))
-                os.system("coffee -c %s" % (js_dir / filename))
 
 
 STATICFILES_IGNORE_PATTERNS = (
@@ -2550,7 +2531,7 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 PDF_RECEIPT_LOGO_PATH = PROJECT_ROOT + '/static/images/openedx-logo-tag.png'
 # Height of the Logo in mm
 PDF_RECEIPT_LOGO_HEIGHT_MM = 12
-PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/logo.png'
+PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/logo.png'
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
@@ -2647,7 +2628,7 @@ PROFILE_IMAGE_BACKEND = {
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
-PROFILE_IMAGE_DEFAULT_FILENAME = 'images/default-theme/default-profile'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 # This secret key is used in generating unguessable URLs to users'
 # profile images.  Once it has been set, changing it will make the
@@ -2732,3 +2713,10 @@ PROCTORING_SETTINGS = {}
 # The reason we introcuced this number is because we do not want the CCX
 # to compete with the MOOC.
 CCX_MAX_STUDENTS_ALLOWED = 200
+
+# Financial assistance settings
+
+# Maximum and minimum length of answers, in characters, for the
+# financial assistance form
+FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
+FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500

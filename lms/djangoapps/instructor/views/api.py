@@ -2679,7 +2679,7 @@ def start_certificate_generation(request, course_id):
     Start generating certificates for all students enrolled in given course.
     """
     course_key = CourseKey.from_string(course_id)
-    task = instructor_task.api.generate_certificates_for_all_students(request, course_key)
+    task = instructor_task.api.generate_certificates_for_students(request, course_key)
     message = _('Certificate generation task for all students of this course has been started. '
                 'You can view the status of the generation task in the "Pending Tasks" section.')
     response_payload = {
