@@ -111,6 +111,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     expect(secondActionData.event).toHaveBeenTriggeredOn(bookmarkButtonView.$el);
 
                     verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
+                    bookmarkButtonView.undelegateEvents();
                 });
 
             });

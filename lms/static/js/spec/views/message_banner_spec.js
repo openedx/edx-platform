@@ -21,7 +21,7 @@ define(['backbone', 'jquery', 'underscore', 'js/views/message_banner', 'js/commo
             };
 
             it('renders correctly with the /fields/message_banner template', function() {
-                var messageView = createMessageView(messageSelector, '#message_banner-tpl');
+                var messageView = createMessageView(messageEl, '#message_banner-tpl');
 
                 messageView.showMessage('I am message view');
                 expect($(messageEl).text().trim()).toBe('I am message view');
