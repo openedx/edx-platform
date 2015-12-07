@@ -1016,7 +1016,6 @@ ADVANCED_COMPONENT_TYPES = [
     'rate',  # Allows up-down voting of course content. See https://github.com/pmitros/RateXBlock
 
     'split_test',
-    'combinedopenended',
     'peergrading',
     'notes',
     'schoolyourself_review',

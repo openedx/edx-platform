@@ -1029,26 +1029,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 # Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 
-################################# open ended grading config  #####################
-
-#By setting up the default settings with an incorrect user name and password,
-# will get an error when attempting to connect
-OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://example.com/peer_grading',
-    'username': 'incorrect_user',
-    'password': 'incorrect_pass',
-    'staff_grading': 'staff_grading',
-    'peer_grading': 'peer_grading',
-    'grading_controller': 'grading_controller'
-}
-
-# Used for testing, debugging peer grading
-MOCK_PEER_GRADING = False
-
-# Used for testing, debugging staff grading
-MOCK_STAFF_GRADING = False
-
-
 ################################# EdxNotes config  #########################
 
 # Configure the LMS to use our stub EdxNotes implementation
@@ -1828,7 +1808,6 @@ INSTALLED_APPS = (
     'dashboard',
     'instructor',
     'instructor_task',
-    'open_ended_grading',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
