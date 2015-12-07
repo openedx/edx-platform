@@ -10,8 +10,8 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
+from datetime import datetime
 import logging
-from datetime import datetime, timedelta
 import pytz
 
 from django.conf import settings
@@ -23,13 +23,14 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
 from xmodule.course_module import (
-    CourseDescriptor, CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
-    CATALOG_VISIBILITY_ABOUT)
+    CourseDescriptor,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_ABOUT,
+)
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
@@ -37,26 +38,31 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
-    GlobalStaff, CourseStaffRole, CourseInstructorRole,
-    OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
+    CourseBetaTesterRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+    SupportStaffRole,
+    OrgInstructorRole,
+    OrgStaffRole,
 )
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
+    is_prerequisite_courses_enabled,
 )
 from ccx_keys.locator import CCXLocator
 
 import dogstats_wrapper as dog_stats_api
 
-DEBUG_ACCESS = False
+from courseware.access_response import (
+    MilestoneError,
+    MobileAvailabilityError,
+    VisibilityError,
+)
+from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
 
 log = logging.getLogger(__name__)
-
-
-def debug(*args, **kwargs):
-    # to avoid overly verbose output, this is off by default
-    if DEBUG_ACCESS:
-        log.debug(*args, **kwargs)
 
 
 def has_access(user, action, obj, course_key=None):
@@ -86,8 +92,8 @@ def has_access(user, action, obj, course_key=None):
         Required when accessing anything other than a CourseDescriptor, 'global',
         or a location with category 'course'
 
-    Returns a bool.  It is up to the caller to actually deny access in a way
-    that makes sense in context.
+    Returns an AccessResponse object.  It is up to the caller to actually
+    deny access in a way that makes sense in context.
     """
     # Just in case user is passed in as None, make them anonymous
     if not user:
@@ -146,25 +152,16 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
 
     Arguments:
         user (User): the user whose descriptor access we are checking.
-        descriptor (AType): the descriptor for which we are checking access.
-    where AType is any descriptor that has the attributes .location and
-        .days_early_for_beta
+        descriptor (AType): the descriptor for which we are checking access,
+            where AType is CourseDescriptor, CourseOverview, or any other class
+            that represents a descriptor and has the attributes .location, .id,
+            .start, and .days_early_for_beta.
+
+    Returns:
+        AccessResponse: The result of this access check. Possible results are
+            ACCESS_GRANTED or a StartDateError.
     """
-    start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
-    if start_dates_disabled and not is_masquerading_as_student(user, course_key):
-        return True
-    else:
-        now = datetime.now(UTC())
-        effective_start = _adjust_start_date_for_beta_testers(
-            user,
-            descriptor,
-            course_key=course_key
-        )
-        return (
-            descriptor.start is None
-            or now > effective_start
-            or in_preview_mode()
-        )
+    return check_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
 
 
 def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
@@ -177,15 +174,22 @@ def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=in
     Arguments:
         user (User): the user whose course access we are checking.
         course (AType): the course for which we are checking access.
-    where AType is CourseDescriptor, CourseOverview, or any other class that
-        represents a course and has the attributes .location and .id.
+            where AType is CourseDescriptor, CourseOverview, or any other
+            class that represents a course and has the attributes .location
+            and .id.
     """
+
+    def _is_prerequisites_disabled():
+        """
+        Checks if prerequisites are disabled in the settings.
+        """
+        return ACCESS_DENIED if is_prerequisite_courses_enabled() else ACCESS_GRANTED
+
     return (
-        not settings.FEATURES['ENABLE_PREREQUISITE_COURSES']
+        _is_prerequisites_disabled()
         or _has_staff_access_to_descriptor(user, course, course.id)
-        or not course.pre_requisite_courses
         or user.is_anonymous()
-        or not get_pre_requisite_courses_not_completed(user, [course.id])
+        or _has_fulfilled_prerequisites(user, [course.id])
     )
 
 
@@ -209,9 +213,61 @@ def _can_load_course_on_mobile(user, course):
         is_mobile_available_for_user(user, course) and
         (
             _has_staff_access_to_descriptor(user, course, course.id) or
-            not any_unfulfilled_milestones(course.id, user.id)
+            _has_fulfilled_all_milestones(user, course.id)
         )
     )
+
+
+def _can_enroll_courselike(user, courselike):
+    """
+    Ascertain if the user can enroll in the given courselike object.
+
+    Arguments:
+        user (User): The user attempting to enroll.
+        courselike (CourseDescriptor or CourseOverview): The object representing the
+            course in which the user is trying to enroll.
+
+    Returns:
+        AccessResponse, indicating whether the user can enroll.
+    """
+    enrollment_domain = courselike.enrollment_domain
+    # Courselike objects (e.g., course descriptors and CourseOverviews) have an attribute named `id`
+    # which actually points to a CourseKey. Sigh.
+    course_key = courselike.id
+
+    # If using a registration method to restrict enrollment (e.g., Shibboleth)
+    if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and enrollment_domain:
+        if user is not None and user.is_authenticated() and \
+                ExternalAuthMap.objects.filter(user=user, external_domain=enrollment_domain):
+            debug("Allow: external_auth of " + enrollment_domain)
+            reg_method_ok = True
+        else:
+            reg_method_ok = False
+    else:
+        reg_method_ok = True
+
+    # If the user appears in CourseEnrollmentAllowed paired with the given course key,
+    # they may enroll. Note that as dictated by the legacy database schema, the filter
+    # call includes a `course_id` kwarg which requires a CourseKey.
+    if user is not None and user.is_authenticated():
+        if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course_key):
+            return ACCESS_GRANTED
+
+    if _has_staff_access_to_descriptor(user, courselike, course_key):
+        return ACCESS_GRANTED
+
+    if courselike.invitation_only:
+        debug("Deny: invitation only")
+        return ACCESS_DENIED
+
+    now = datetime.now(UTC())
+    enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
+    enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
+    if reg_method_ok and enrollment_start < now < enrollment_end:
+        debug("Allow: in enrollment period")
+        return ACCESS_GRANTED
+
+    return ACCESS_DENIED
 
 
 def _has_access_course_desc(user, action, course):
@@ -240,63 +296,12 @@ def _has_access_course_desc(user, action, course):
         return _has_access_descriptor(user, 'load', course, course.id)
 
     def can_enroll():
-        """
-        First check if restriction of enrollment by login method is enabled, both
-            globally and by the course.
-        If it is, then the user must pass the criterion set by the course, e.g. that ExternalAuthMap
-            was set by 'shib:https://idp.stanford.edu/", in addition to requirements below.
-        Rest of requirements:
-        (CourseEnrollmentAllowed always overrides)
-          or
-        (staff can always enroll)
-          or
-        Enrollment can only happen in the course enrollment period, if one exists, and
-        course is not invitation only.
-        """
-
-        # if using registration method to restrict (say shibboleth)
-        if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-            if user is not None and user.is_authenticated() and \
-                    ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
-                debug("Allow: external_auth of " + course.enrollment_domain)
-                reg_method_ok = True
-            else:
-                reg_method_ok = False
-        else:
-            reg_method_ok = True  # if not using this access check, it's always OK.
-
-        now = datetime.now(UTC())
-        start = course.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
-        end = course.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
-
-        # if user is in CourseEnrollmentAllowed with right course key then can also enroll
-        # (note that course.id actually points to a CourseKey)
-        # (the filter call uses course_id= since that's the legacy database schema)
-        # (sorry that it's confusing :( )
-        if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
-            if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
-                return True
-
-        if _has_staff_access_to_descriptor(user, course, course.id):
-            return True
-
-        # Invitation_only doesn't apply to CourseEnrollmentAllowed or has_staff_access_access
-        if course.invitation_only:
-            debug("Deny: invitation only")
-            return False
-
-        if reg_method_ok and start < now < end:
-            debug("Allow: in enrollment period")
-            return True
+        return _can_enroll_courselike(user, course)
 
     def see_exists():
         """
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
         it's past the enrollment period, they should still see it.
-
-        TODO (vshnayder): This means that courses with limited enrollment periods will not appear
-        to non-staff visitors after the enrollment period is over.  If this is not what we want, will
-        need to change this logic.
         """
         # VS[compat] -- this setting should go away once all courses have
         # properly configured enrollment_start times (if course should be
@@ -314,10 +319,10 @@ def _has_access_course_desc(user, action, course):
             # seen by non-staff
             if course.ispublic:
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
-                return True
+                return ACCESS_GRANTED
             return _has_staff_access_to_descriptor(user, course, course.id)
 
-        return can_enroll() or can_load()
+        return ACCESS_GRANTED if (can_enroll() or can_load()) else ACCESS_DENIED
 
     def can_see_in_catalog():
         """
@@ -326,8 +331,8 @@ def _has_access_course_desc(user, action, course):
         but also allow course staff to see this.
         """
         return (
-            course.catalog_visibility == CATALOG_VISIBILITY_CATALOG_AND_ABOUT or
-            _has_staff_access_to_descriptor(user, course, course.id)
+            _has_catalog_visibility(course, CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
+            or _has_staff_access_to_descriptor(user, course, course.id)
         )
 
     def can_see_about_page():
@@ -337,9 +342,9 @@ def _has_access_course_desc(user, action, course):
         but also allow course staff to see this.
         """
         return (
-            course.catalog_visibility == CATALOG_VISIBILITY_CATALOG_AND_ABOUT or
-            course.catalog_visibility == CATALOG_VISIBILITY_ABOUT or
-            _has_staff_access_to_descriptor(user, course, course.id)
+            _has_catalog_visibility(course, CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
+            or _has_catalog_visibility(course, CATALOG_VISIBILITY_ABOUT)
+            or _has_staff_access_to_descriptor(user, course, course.id)
         )
 
     checkers = {
@@ -370,13 +375,18 @@ def _can_load_course_overview(user, course_overview):
         The user doesn't have to be enrolled in the course in order to have load
         load access.
     """
-    return (
-        not course_overview.visible_to_staff_only
+    response = (
+        _visible_to_nonstaff_users(course_overview)
         and _can_access_descriptor_with_start_date(user, course_overview, course_overview.id)
-    ) or _has_staff_access_to_descriptor(user, course_overview, course_overview.id)
+    )
 
+    return (
+        ACCESS_GRANTED if (response or _has_staff_access_to_descriptor(user, course_overview, course_overview.id))
+        else response
+    )
 
 _COURSE_OVERVIEW_CHECKERS = {
+    'enroll': _can_enroll_courselike,
     'load': _can_load_course_overview,
     'load_mobile': lambda user, course_overview: (
         _can_load_course_overview(user, course_overview)
@@ -384,7 +394,7 @@ _COURSE_OVERVIEW_CHECKERS = {
     ),
     'view_courseware_with_prerequisites': _can_view_courseware_with_prerequisites
 }
-COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()  # pylint: disable=invalid-name
+COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()
 
 
 def _has_access_course_overview(user, action, course_overview):
@@ -432,7 +442,7 @@ def _has_group_access(descriptor, user, course_key):
         # Short-circuit the process, since there are no defined user partitions that are not
         # user_partitions used by the split_test module. The split_test module handles its own access
         # via updating the children of the split_test module.
-        return True
+        return ACCESS_GRANTED
 
     # use merged_group_access which takes group access on the block's
     # parents / ancestors into account
@@ -441,20 +451,28 @@ def _has_group_access(descriptor, user, course_key):
     # partition's group list excludes all students.
     if False in merged_access.values():
         log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
-        return False
+        return ACCESS_DENIED
 
     # resolve the partition IDs in group_access to actual
     # partition objects, skipping those which contain empty group directives.
-    # if a referenced partition could not be found, access will be denied.
-    try:
-        partitions = [
-            descriptor._get_user_partition(partition_id)  # pylint:disable=protected-access
-            for partition_id, group_ids in merged_access.items()
-            if group_ids is not None
-        ]
-    except NoSuchUserPartitionError:
-        log.warning("Error looking up user partition, access will be denied.", exc_info=True)
-        return False
+    # If a referenced partition could not be found, it will be denied
+    # If the partition is found but is no longer active (meaning it's been disabled)
+    # then skip the access check for that partition.
+    partitions = []
+    for partition_id, group_ids in merged_access.items():
+        try:
+            partition = descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
+            if partition.active:
+                if group_ids is not None:
+                    partitions.append(partition)
+            else:
+                log.debug(
+                    "Skipping partition with ID %s in course %s because it is no longer active",
+                    partition.id, course_key
+                )
+        except NoSuchUserPartitionError:
+            log.warning("Error looking up user partition, access will be denied.", exc_info=True)
+            return ACCESS_DENIED
 
     # next resolve the group IDs specified within each partition
     partition_groups = []
@@ -468,7 +486,7 @@ def _has_group_access(descriptor, user, course_key):
                 partition_groups.append((partition, groups))
     except NoSuchUserPartitionGroupError:
         log.warning("Error looking up referenced user partition group, access will be denied.", exc_info=True)
-        return False
+        return ACCESS_DENIED
 
     # look up the user's group for each partition
     user_groups = {}
@@ -482,10 +500,10 @@ def _has_group_access(descriptor, user, course_key):
     # finally: check that the user has a satisfactory group assignment
     # for each partition.
     if not all(user_groups.get(partition.id) in groups for partition, groups in partition_groups):
-        return False
+        return ACCESS_DENIED
 
     # all checks passed.
-    return True
+    return ACCESS_GRANTED
 
 
 def _has_access_descriptor(user, action, descriptor, course_key=None):
@@ -507,14 +525,20 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-        return (
-            not descriptor.visible_to_staff_only
+        response = (
+            _visible_to_nonstaff_users(descriptor)
             and _has_group_access(descriptor, user, course_key)
-            and (
-                'detached' in descriptor._class_tags  # pylint: disable=protected-access
+            and
+            (
+                _has_detached_class_tag(descriptor)
                 or _can_access_descriptor_with_start_date(user, descriptor, course_key)
             )
-        ) or _has_staff_access_to_descriptor(user, descriptor, course_key)
+        )
+
+        return (
+            ACCESS_GRANTED if (response or _has_staff_access_to_descriptor(user, descriptor, course_key))
+            else response
+        )
 
     checkers = {
         'load': can_load,
@@ -589,16 +613,32 @@ def _has_access_string(user, action, perm):
     Valid actions:
 
     'staff' -- global staff access.
+    'support' -- access to student support functionality
+    'certificates' --- access to view and regenerate certificates for other users.
     """
 
     def check_staff():
+        """
+        Checks for staff access
+        """
         if perm != 'global':
             debug("Deny: invalid permission '%s'", perm)
-            return False
-        return GlobalStaff().has_user(user)
+            return ACCESS_DENIED
+        return ACCESS_GRANTED if GlobalStaff().has_user(user) else ACCESS_DENIED
+
+    def check_support():
+        """Check that the user has access to the support UI. """
+        if perm != 'global':
+            return ACCESS_DENIED
+        return (
+            ACCESS_GRANTED if GlobalStaff().has_user(user) or SupportStaffRole().has_user(user)
+            else ACCESS_DENIED
+        )
 
     checkers = {
-        'staff': check_staff
+        'staff': check_staff,
+        'support': check_support,
+        'certificates': check_support,
     }
 
     return _dispatch(checkers, action, user, perm)
@@ -625,7 +665,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # pylint: disable=invalid-name
+def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.
@@ -644,21 +684,8 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # p
     NOTE: For now, this function assumes that the descriptor's location is in the course
     the user is looking at.  Once we have proper usages and definitions per the XBlock
     design, this should use the course the usage is in.
-
-    NOTE: If testing manually, make sure FEATURES['DISABLE_START_DATES'] = False
-    in envs/dev.py!
     """
-    if descriptor.days_early_for_beta is None:
-        # bail early if no beta testing is set up
-        return descriptor.start
-
-    if CourseBetaTesterRole(course_key).has_user(user):
-        debug("Adjust start time: user in beta role for %s", descriptor)
-        delta = timedelta(descriptor.days_early_for_beta)
-        effective = descriptor.start - delta
-        return effective
-
-    return descriptor.start
+    return adjust_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
 
 
 def _has_instructor_access_to_location(user, location, course_key=None):
@@ -674,38 +701,37 @@ def _has_staff_access_to_location(user, location, course_key=None):
 
 
 def _has_access_to_course(user, access_level, course_key):
-    '''
+    """
     Returns True if the given user has access_level (= staff or
     instructor) access to the course with the given course_key.
     This ensures the user is authenticated and checks if global staff or has
     staff / instructor access.
 
     access_level = string, either "staff" or "instructor"
-    '''
+    """
     if user is None or (not user.is_authenticated()):
         debug("Deny: no user or anon user")
-        return False
+        return ACCESS_DENIED
 
     if is_masquerading_as_student(user, course_key):
-        return False
+        return ACCESS_DENIED
 
     if GlobalStaff().has_user(user):
         debug("Allow: user.is_staff")
-        return True
+        return ACCESS_GRANTED
 
     if access_level not in ('staff', 'instructor'):
         log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
-        return False
+        return ACCESS_DENIED
 
     staff_access = (
         CourseStaffRole(course_key).has_user(user) or
         OrgStaffRole(course_key.org).has_user(user)
     )
-
     if staff_access and access_level == 'staff':
         debug("Allow: user has course staff access")
-        return True
+        return ACCESS_GRANTED
 
     instructor_access = (
         CourseInstructorRole(course_key).has_user(user) or
@@ -714,10 +740,10 @@ def _has_access_to_course(user, access_level, course_key):
 
     if instructor_access and access_level in ('staff', 'instructor'):
         debug("Allow: user has course instructor access")
-        return True
+        return ACCESS_GRANTED
 
     debug("Deny: user did not have correct access")
-    return False
+    return ACCESS_DENIED
 
 
 def _has_instructor_access_to_descriptor(user, descriptor, course_key):  # pylint: disable=invalid-name
@@ -738,6 +764,64 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
+def _visible_to_nonstaff_users(descriptor):
+    """
+    Returns if the object is visible to nonstaff users.
+
+    Arguments:
+        descriptor: object to check
+    """
+    return VisibilityError() if descriptor.visible_to_staff_only else ACCESS_GRANTED
+
+
+def _has_detached_class_tag(descriptor):
+    """
+    Returns if the given descriptor's type is marked as detached.
+
+    Arguments:
+        descriptor: object to check
+    """
+    return ACCESS_GRANTED if 'detached' in descriptor._class_tags else ACCESS_DENIED  # pylint: disable=protected-access
+
+
+def _has_fulfilled_all_milestones(user, course_id):
+    """
+    Returns whether the given user has fulfilled all milestones for the
+    given course.
+
+    Arguments:
+        course_id: ID of the course to check
+        user_id: ID of the user to check
+    """
+    return MilestoneError() if any_unfulfilled_milestones(course_id, user.id) else ACCESS_GRANTED
+
+
+def _has_fulfilled_prerequisites(user, course_id):
+    """
+    Returns whether the given user has fulfilled all prerequisites for the
+    given course.
+
+    Arguments:
+        user: user to check
+        course_id: ID of the course to check
+    """
+    return MilestoneError() if get_pre_requisite_courses_not_completed(user, course_id) else ACCESS_GRANTED
+
+
+def _has_catalog_visibility(course, visibility_type):
+    """
+    Returns whether the given course has the given visibility type
+    """
+    return ACCESS_GRANTED if course.catalog_visibility == visibility_type else ACCESS_DENIED
+
+
+def _is_descriptor_mobile_available(descriptor):
+    """
+    Returns if descriptor is available on mobile.
+    """
+    return ACCESS_GRANTED if descriptor.mobile_available else MobileAvailabilityError()
+
+
 def is_mobile_available_for_user(user, descriptor):
     """
     Returns whether the given course is mobile_available for the given user.
@@ -748,9 +832,9 @@ def is_mobile_available_for_user(user, descriptor):
         descriptor (CourseDescriptor|CourseOverview): course or overview of course in question
     """
     return (
-        descriptor.mobile_available or
-        auth.has_access(user, CourseBetaTesterRole(descriptor.id)) or
-        _has_staff_access_to_descriptor(user, descriptor, descriptor.id)
+        auth.user_has_role(user, CourseBetaTesterRole(descriptor.id))
+        or _has_staff_access_to_descriptor(user, descriptor, descriptor.id)
+        or _is_descriptor_mobile_available(descriptor)
     )
 
 
@@ -768,11 +852,3 @@ def get_user_role(user, course_key):
         return 'staff'
     else:
         return 'student'
-
-
-def in_preview_mode():
-    """
-    Returns whether the user is in preview mode or not.
-    """
-    hostname = get_current_request_hostname()
-    return bool(hostname and settings.PREVIEW_DOMAIN in hostname.split('.'))

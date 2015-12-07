@@ -1,52 +1,44 @@
 ;(function (define) {
     'use strict';
     define([
-        'backbone',
-        'underscore',
         'gettext',
-        'common/js/components/views/list',
-        'common/js/components/views/paging_header',
-        'common/js/components/views/paging_footer',
         'teams/js/views/topic_card',
-        'text!teams/templates/topics.underscore'
-    ], function (Backbone, _, gettext, ListView, PagingHeader, PagingFooterView, TopicCardView, topics_template) {
-        var TopicsListView = ListView.extend({
-            tagName: 'div',
-            className: 'topics-container',
-            itemViewClass: TopicCardView
-        });
+        'teams/js/views/team_utils',
+        'common/js/components/views/paging_header',
+        'common/js/components/views/paginated_view'
+    ], function (gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView) {
+        var TopicsView = PaginatedView.extend({
+            type: 'topics',
 
-        var TopicsView = Backbone.View.extend({
-            initialize: function() {
-                this.listView = new TopicsListView({collection: this.collection});
-                this.headerView = new PagingHeader({collection: this.collection});
-                this.pagingFooterView = new PagingFooterView({
-                    collection: this.collection, hideWhenOnePage: true
+            srInfo: {
+                id: "heading-browse-topics",
+                text: gettext("All topics")
+            },
+
+            initialize: function (options) {
+                this.itemViewClass = TopicCardView.extend({
+                    router: options.router,
+                    srInfo: this.srInfo
                 });
-                // Focus top of view for screen readers
-                this.collection.on('page_changed', function () {
-                    this.$('.sr-is-focusable.sr-topics-view').focus();
-                }, this);
+                PaginatedView.prototype.initialize.call(this);
+            },
+
+            createHeaderView: function () {
+                return new PagingHeader({
+                    collection: this.options.collection,
+                    srInfo: this.srInfo,
+                    showSortControls: true
+                });
             },
 
             render: function() {
-                this.$el.html(_.template(topics_template));
-                this.assign(this.listView, '.topics-list');
-                this.assign(this.headerView, '.topics-paging-header');
-                this.assign(this.pagingFooterView, '.topics-paging-footer');
+                var self = this;
+                this.collection.refresh()
+                    .done(function() {
+                        PaginatedView.prototype.render.call(self);
+                        TeamUtils.hideMessage();
+                    });
                 return this;
-            },
-
-            /**
-             * Helper method to render subviews and re-bind events.
-             *
-             * Borrowed from http://ianstormtaylor.com/rendering-views-in-backbonejs-isnt-always-simple/
-             *
-             * @param view The Backbone view to render
-             * @param selector The string CSS selector which the view should attach to
-             */
-            assign: function(view, selector) {
-                view.setElement(this.$(selector)).render();
             }
         });
         return TopicsView;

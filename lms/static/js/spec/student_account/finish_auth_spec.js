@@ -1,13 +1,18 @@
-define([
-    'jquery',
-    'utility',
-    'common/js/spec_helpers/ajax_helpers',
-    'js/student_account/views/FinishAuthView',
-    'js/student_account/enrollment',
-    'js/student_account/shoppingcart',
-    'js/student_account/emailoptin'
-], function($, utility, AjaxHelpers, FinishAuthView, EnrollmentInterface, ShoppingCartInterface, EmailOptInInterface) {
-        'use strict';
+;(function (define) {
+    'use strict';
+    define([
+            'jquery',
+            'jquery.url',
+            'utility',
+            'common/js/spec_helpers/ajax_helpers',
+            'js/student_account/views/FinishAuthView',
+            'js/student_account/enrollment',
+            'js/student_account/shoppingcart',
+            'js/student_account/emailoptin'
+        ],
+        function($, url, utility, AjaxHelpers, FinishAuthView, EnrollmentInterface, ShoppingCartInterface,
+                 EmailOptInInterface) {
+
         describe('FinishAuthView', function() {
             var requests = null,
                 view = null,
@@ -90,7 +95,7 @@ define([
                 );
             });
 
-            it('sends the user to the payment flow when the course mode is not honor', function() {
+            it('sends the user to the payment flow for a paid course mode', function() {
                 // Simulate providing enrollment query string params
                 // AND specifying a course mode.
                 setFakeQueryParams({
@@ -109,13 +114,13 @@ define([
                 );
             });
 
-            it('sends the user to the student dashboard when the course mode is honor', function() {
+            it('sends the user to the student dashboard for an unpaid course mode', function() {
                 // Simulate providing enrollment query string params
                 // AND specifying a course mode.
                 setFakeQueryParams({
                     '?enrollment_action': 'enroll',
                     '?course_id': COURSE_KEY,
-                    '?course_mode': 'honor'
+                    '?course_mode': 'audit'
                 });
 
                 ajaxSpyAndInitialize(this);
@@ -167,5 +172,5 @@ define([
                 expect( view.redirect ).toHaveBeenCalledWith( "/dashboard" );
             });
         });
-    }
-);
+    });
+}).call(this, define || RequireJS.define);

@@ -88,7 +88,7 @@ class EmbargoedState(ConfigurationModel):
         """
         if self.embargoed_countries == '':
             return []
-        return [country.strip().upper() for country in self.embargoed_countries.split(',')]  # pylint: disable=no-member
+        return [country.strip().upper() for country in self.embargoed_countries.split(',')]
 
 
 class RestrictedCourse(models.Model):
@@ -221,7 +221,7 @@ class RestrictedCourse(models.Model):
         """
         country_rules_for_course = (
             CountryAccessRule.objects
-        ).select_related('restricted_country').filter(restricted_course=self)
+        ).select_related('country').filter(restricted_course=self)
 
         return {
             'enroll_msg': self.enroll_msg_key,
@@ -646,7 +646,7 @@ class CourseAccessRuleHistory(models.Model):
             else:
                 CourseAccessRuleHistory.save_snapshot(restricted_course)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = 'timestamp'
 
 
@@ -703,7 +703,7 @@ class IPFilter(ConfigurationModel):
         """
         if self.whitelist == '':
             return []
-        return self.IPFilterList([addr.strip() for addr in self.whitelist.split(',')])  # pylint: disable=no-member
+        return self.IPFilterList([addr.strip() for addr in self.whitelist.split(',')])
 
     @property
     def blacklist_ips(self):
@@ -712,4 +712,4 @@ class IPFilter(ConfigurationModel):
         """
         if self.blacklist == '':
             return []
-        return self.IPFilterList([addr.strip() for addr in self.blacklist.split(',')])  # pylint: disable=no-member
+        return self.IPFilterList([addr.strip() for addr in self.blacklist.split(',')])

@@ -4,18 +4,21 @@ Python tests for the Survey workflows
 
 from collections import OrderedDict
 from nose.plugins.attrib import attr
+from copy import deepcopy
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
-from survey.models import SurveyForm
+from survey.models import SurveyForm, SurveyAnswer
 
+from common.test.utils import XssTestMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 
 @attr('shard_1')
-class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file
     """
@@ -39,6 +42,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
         })
 
         self.course = CourseFactory.create(
+            display_name='<script>alert("XSS")</script>',
             course_survey_required=True,
             course_survey_name=self.test_survey_name
         )
@@ -62,6 +66,8 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.enroll(self.course, True)
         self.enroll(self.course_without_survey, True)
         self.enroll(self.course_with_bogus_survey, True)
+
+        self.user = User.objects.get(email=email)
 
         self.view_url = reverse('view_survey', args=[self.test_survey_name])
         self.postback_url = reverse('submit_answers', args=[self.test_survey_name])
@@ -135,6 +141,52 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         self._assert_no_redirect(self.course)
 
+    def test_course_id_field(self):
+        """
+        Assert that the course_id will be in the form fields, if available
+        """
+
+        resp = self.client.get(
+            reverse(
+                'course_survey',
+                kwargs={'course_id': unicode(self.course.id)}
+            )
+        )
+
+        self.assertEqual(resp.status_code, 200)
+        expected = '<input type="hidden" name="course_id" value="{course_id}" />'.format(
+            course_id=unicode(self.course.id)
+        )
+
+        self.assertContains(resp, expected)
+
+    def test_course_id_persists(self):
+        """
+        Assert that a posted back course_id is stored in the database
+        """
+
+        answers = deepcopy(self.student_answers)
+        answers.update({
+            'course_id': unicode(self.course.id)
+        })
+
+        resp = self.client.post(
+            self.postback_url,
+            answers
+        )
+        self.assertEquals(resp.status_code, 200)
+
+        self._assert_no_redirect(self.course)
+
+        # however we want to make sure we persist the course_id
+        answer_objs = SurveyAnswer.objects.filter(
+            user=self.user,
+            form=self.survey
+        )
+
+        for answer_obj in answer_objs:
+            self.assertEquals(answer_obj.course_key, self.course.id)
+
     def test_visiting_course_with_bogus_survey(self):
         """
         Verifies that going to the courseware with a required, but non-existing survey, does not redirect
@@ -172,3 +224,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
             resp,
             reverse('info', kwargs={'course_id': unicode(self.course_without_survey.id)})
         )
+
+    def test_survey_xss(self):
+        """Test that course display names are correctly HTML-escaped."""
+        response = self.client.get(
+            reverse(
+                'course_survey',
+                kwargs={'course_id': unicode(self.course.id)}
+            )
+        )
+        self.assert_xss(response, '<script>alert("XSS")</script>')

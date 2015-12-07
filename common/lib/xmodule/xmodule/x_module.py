@@ -36,7 +36,6 @@ from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
 from xmodule.exceptions import UndefinedContext
 import dogstats_wrapper as dog_stats_api
 
-
 log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
@@ -143,7 +142,7 @@ class OpaqueKeyReader(IdReader):
         return aside_id.aside_type
 
 
-class AsideKeyGenerator(IdGenerator):  # pylint: disable=abstract-method
+class AsideKeyGenerator(IdGenerator):
     """
     An :class:`.IdGenerator` that only provides facilities for constructing new XBlockAsides.
     """
@@ -591,6 +590,11 @@ class XModuleMixin(XModuleFields, XBlock):
 
             if field.scope.user == UserScope.ONE:
                 field._del_cached_value(self)  # pylint: disable=protected-access
+                # not the most elegant way of doing this, but if we're removing
+                # a field from the module's field_data_cache, we should also
+                # remove it from its _dirty_fields
+                if field in self._dirty_fields:
+                    del self._dirty_fields[field]
 
         # Set the new xmodule_runtime and field_data (which are user-specific)
         self.xmodule_runtime = xmodule_runtime
@@ -746,7 +750,7 @@ module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disa
 
 
 @XBlock.needs("i18n")
-class XModule(HTMLSnippet, XModuleMixin):  # pylint: disable=abstract-method
+class XModule(HTMLSnippet, XModuleMixin):
     """ Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -1171,7 +1175,7 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         return Fragment(self.get_html())
 
 
-class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
+class ConfigurableFragmentWrapper(object):
     """
     Runtime mixin that allows for composition of many `wrap_xblock` wrappers
     """
@@ -1201,8 +1205,11 @@ class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
 
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
-# the Runtime part of its interface. This function matches the Runtime.handler_url interface
-def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=invalid-name, unused-argument
+# the Runtime part of its interface. This function mostly matches the
+# Runtime.handler_url interface.
+#
+# The monkey-patching happens in (lms|cms)/startup.py
+def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=unused-argument
     """
     See :meth:`xblock.runtime.Runtime.handler_url`.
     """
@@ -1212,6 +1219,8 @@ def descriptor_global_handler_url(block, handler_name, suffix='', query='', thir
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
 # the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
+#
+# The monkey-patching happens in (lms|cms)/startup.py
 def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid-name, unused-argument
     """
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
@@ -1299,7 +1308,7 @@ class MetricsMixin(object):
             )
 
 
-class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
@@ -1533,7 +1542,7 @@ class XMLParsingSystem(DescriptorSystem):
             return value
         return course_key.make_usage_key_from_deprecated_string(value)
 
-    def _convert_reference_fields_to_keys(self, xblock):  # pylint: disable=invalid-name
+    def _convert_reference_fields_to_keys(self, xblock):
         """
         Find all fields of type reference and convert the payload into UsageKeys
         """
@@ -1555,7 +1564,7 @@ class XMLParsingSystem(DescriptorSystem):
                     setattr(xblock, field.name, field_value)
 
 
-class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
@@ -1738,7 +1747,6 @@ class CombinedSystem(object):
     #
     # At runtime, the ModuleSystem and/or DescriptorSystem will define those methods
     #
-    # pylint: disable=abstract-method
     def __init__(self, module_system, descriptor_system):
         # These attributes are set directly to __dict__ below to avoid a recursion in getattr/setattr.
         self._module_system = module_system
@@ -1815,6 +1823,7 @@ class CombinedSystem(object):
         DescriptorSystem, instead. This allows XModuleDescriptors that are bound as XModules
         to still function as XModuleDescriptors.
         """
+        # First we try a lookup in the module system...
         try:
             return getattr(self._module_system, name)
         except AttributeError:

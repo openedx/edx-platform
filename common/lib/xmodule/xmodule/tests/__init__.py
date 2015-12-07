@@ -20,7 +20,7 @@ from functools import wraps
 from lazy import lazy
 from mock import Mock, patch
 from operator import attrgetter
-from path import path
+from path import Path as path
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import DictFieldData

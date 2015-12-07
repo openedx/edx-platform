@@ -6,13 +6,12 @@ from io import BytesIO
 from pytz import UTC
 from PIL import Image
 import json
-
+from mock import patch
 from django.conf import settings
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
 from contentstore.utils import reverse_course_url
-from xmodule.assetstore.assetmgr import AssetMetadataFoundTemporary
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -331,23 +330,13 @@ class DownloadTestCase(AssetsTestCase):
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 404)
 
-    def test_metadata_found_in_modulestore(self):
-        # Insert asset metadata into the modulestore (with no accompanying asset).
-        asset_key = self.course.id.make_asset_key(AssetMetadata.GENERAL_ASSET_TYPE, 'pic1.jpg')
-        asset_md = AssetMetadata(asset_key, {
-            'internal_name': 'EKMND332DDBK',
-            'basename': 'pix/archive',
-            'locked': False,
-            'curr_version': '14',
-            'prev_version': '13'
-        })
-        modulestore().save_asset_metadata(asset_md, 15)
-        # Get the asset metadata and have it be found in the modulestore.
-        # Currently, no asset metadata should be found in the modulestore. The code is not yet storing it there.
-        # If asset metadata *is* found there, an exception is raised. This test ensures the exception is indeed raised.
-        # THIS IS TEMPORARY. Soon, asset metadata *will* be stored in the modulestore.
-        with self.assertRaises((AssetMetadataFoundTemporary, NameError)):
-            self.client.get(unicode(asset_key), HTTP_ACCEPT='text/html')
+    @patch('xmodule.modulestore.mixed.MixedModuleStore.find_asset_metadata')
+    def test_pickling_calls(self, patched_find_asset_metadata):
+        """ Tests if assets are not calling find_asset_metadata
+        """
+        patched_find_asset_metadata.return_value = None
+        self.client.get(self.uploaded_url, HTTP_ACCEPT='text/html')
+        self.assertFalse(patched_find_asset_metadata.called)
 
 
 class AssetToJsonTestCase(AssetsTestCase):

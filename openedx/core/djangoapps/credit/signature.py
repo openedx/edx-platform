@@ -54,10 +54,10 @@ def signature(params, shared_secret):
         str: The 32-character signature.
 
     """
-    encoded_params = "".join([
-        "{key}:{value}".format(key=key, value=params[key])
+    encoded_params = u"".join([
+        u"{key}:{value}".format(key=key, value=params[key])
         for key in sorted(params.keys())
-        if key != "signature"
+        if key != u"signature"
     ])
-    hasher = hmac.new(shared_secret, encoded_params, hashlib.sha256)
+    hasher = hmac.new(shared_secret.encode('utf-8'), encoded_params.encode('utf-8'), hashlib.sha256)
     return hasher.hexdigest()

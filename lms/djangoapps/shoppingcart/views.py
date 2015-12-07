@@ -319,7 +319,7 @@ def register_code_redemption(request, registration_code):
     if request.method == "GET":
         reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
                                                                                                   request, limiter)
-        course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
+        course = get_course_by_id(course_registration.course_id, depth=0)
 
         # Restrict the user from enrolling based on country access rules
         embargo_redirect = embargo_api.redirect_if_blocked(
@@ -339,9 +339,12 @@ def register_code_redemption(request, registration_code):
         }
         return render_to_response(template_to_render, context)
     elif request.method == "POST":
-        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
-                                                                                                  request, limiter)
-        course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
+        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(
+            registration_code,
+            request,
+            limiter
+        )
+        course = get_course_by_id(course_registration.course_id, depth=0)
 
         # Restrict the user from enrolling based on country access rules
         embargo_redirect = embargo_api.redirect_if_blocked(
@@ -700,7 +703,7 @@ def billing_details(request):
 
     cart = Order.get_cart_for_user(request.user)
     cart_items = cart.orderitem_set.all().select_subclasses()
-    if getattr(cart, 'order_type') != OrderTypes.BUSINESS:
+    if cart.order_type != OrderTypes.BUSINESS:
         raise Http404('Page not found!')
 
     if request.method == "GET":
@@ -845,7 +848,7 @@ def _show_receipt_json(order):
                 'unit_cost': item.unit_cost,
                 'line_cost': item.line_cost,
                 'line_desc': item.line_desc,
-                'course_key': unicode(getattr(item, 'course_id'))
+                'course_key': unicode(item.course_id)
             }
             for item in OrderItem.objects.filter(order=order).select_subclasses()
         ]
@@ -868,7 +871,7 @@ def _show_receipt_html(request, order):
     shoppingcart_items = []
     course_names_list = []
     for order_item in order_items:
-        course_key = getattr(order_item, 'course_id')
+        course_key = order_item.course_id
         if course_key:
             course = get_course_by_id(course_key, depth=0)
             shoppingcart_items.append((order_item, course))
@@ -878,12 +881,12 @@ def _show_receipt_html(request, order):
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
-    order_type = getattr(order, 'order_type')
+    order_type = order.order_type
 
     recipient_list = []
     total_registration_codes = None
     reg_code_info_list = []
-    recipient_list.append(getattr(order.user, 'email'))
+    recipient_list.append(order.user.email)
     if order_type == OrderTypes.BUSINESS:
         if order.company_contact_email:
             recipient_list.append(order.company_contact_email)
@@ -989,7 +992,7 @@ def csv_report(request):
         report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
         items = report.rows()
 
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         report.write_csv(response)

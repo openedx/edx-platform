@@ -1,5 +1,0 @@
-<h3 class="header-facet">
-    <%= displayName %>
-</h3>
-<ul data-facet="<%= name %>" class="facet-list collapse">
-</ul>

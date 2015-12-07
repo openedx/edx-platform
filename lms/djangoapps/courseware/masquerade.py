@@ -34,11 +34,24 @@ class CourseMasquerade(object):
     Masquerade settings for a particular course.
     """
     def __init__(self, course_key, role='student', user_partition_id=None, group_id=None, user_name=None):
+        # All parameters to this function must be named identically to the corresponding attribute.
+        # If you remove or rename an attribute, also update the __setstate__() method to migrate
+        # old data from users' sessions.
         self.course_key = course_key
         self.role = role
         self.user_partition_id = user_partition_id
         self.group_id = group_id
         self.user_name = user_name
+
+    def __setstate__(self, state):
+        """
+        Ensure that all attributes are initialised when unpickling CourseMasquerade objects.
+
+        Users might still have CourseMasquerade objects from older versions of the code in their
+        session.  These old objects might not have all attributes set, possibly resulting in
+        AttributeErrors.
+        """
+        self.__init__(**state)
 
 
 @require_POST
@@ -54,8 +67,8 @@ def handle_ajax(request, course_key_string):
     masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
     request_json = request.json
     role = request_json.get('role', 'student')
-    user_partition_id = request_json.get('user_partition_id', None)
     group_id = request_json.get('group_id', None)
+    user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
     user_name = request_json.get('user_name', None)
     if user_name:
         users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)

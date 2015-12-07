@@ -11,7 +11,6 @@ from __future__ import absolute_import
 import abc
 
 
-# pylint: disable=unused-argument
 class BaseBackend(object):
     """
     Abstract Base Class for event tracking backends.

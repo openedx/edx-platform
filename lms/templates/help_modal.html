@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from xmodule.tabs import CourseTabList
 from microsite_configuration import microsite
-platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+from microsite_configuration.templatetags.microsite import platform_name
 %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
@@ -17,7 +17,7 @@ platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
   <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=platform_name)}">
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=platform_name())}">
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal "tabindex="0">
@@ -31,7 +31,7 @@ platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     <header>
       <h2>
 	${_('{platform_name} Help').format(
-	    platform_name=u'<span class="edx">{}</span>'.format(platform_name)
+	    platform_name=u'<span class="edx">{}</span>'.format(platform_name())
 	)}
       </h2>
       <hr>
@@ -55,11 +55,11 @@ platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
           url=marketing_link('FAQ')
         ),
         link_end='</a>',
-        platform_name=platform_name)}
+        platform_name=platform_name())}
       </p>
 
     <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
-        platform_name=platform_name
+        platform_name=platform_name()
       )}</p>
     <hr>
 
@@ -70,7 +70,7 @@ platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     </div>
 
     <p class="note">${_('Please note: The {platform_name} support team is English speaking. While we will do our best to address your inquiry in any language, our responses will be in English.').format(
-        platform_name=platform_name
+        platform_name=platform_name()
       )}</p>
 
   </div>

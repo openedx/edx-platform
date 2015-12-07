@@ -1,0 +1,13 @@
+@import 'bourbon/bourbon';
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
+@import 'base/reset';
+@import 'base/variables';
+@import 'base/font_face';
+@import 'base/mixins';
+
+// This comment is used by preprocess_assets.py to include resources from a
+// theme, for old-style deprecated theming.
+//<THEME-OVERRIDE>
+
+@import 'build-course'; // shared app style assets/rendering

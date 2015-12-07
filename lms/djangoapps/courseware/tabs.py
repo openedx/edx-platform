@@ -20,7 +20,7 @@ class EnrolledTab(CourseTab):
     def is_enabled(cls, course, user=None):
         if user is None:
             return True
-        return CourseEnrollment.is_enrolled(user, course.id) or has_access(user, 'staff', course, course.id)
+        return bool(CourseEnrollment.is_enrolled(user, course.id) or has_access(user, 'staff', course, course.id))
 
 
 class CoursewareTab(EnrolledTab):
@@ -64,7 +64,7 @@ class SyllabusTab(EnrolledTab):
     is_default = False
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         if not super(SyllabusTab, cls).is_enabled(course, user=user):
             return False
         return getattr(course, 'syllabus_present', False)
@@ -82,7 +82,7 @@ class ProgressTab(EnrolledTab):
     is_default = False
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         if not super(ProgressTab, cls).is_enabled(course, user=user):
             return False
         return not course.hide_progress_tab
@@ -98,7 +98,7 @@ class TextbookTabsBase(CourseTab):
     is_default = False
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         return user is None or user.is_authenticated()
 
     @classmethod
@@ -119,7 +119,7 @@ class TextbookTabs(TextbookTabsBase):
     view_name = 'book'
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         parent_is_enabled = super(TextbookTabs, cls).is_enabled(course, user)
         return settings.FEATURES.get('ENABLE_TEXTBOOK') and parent_is_enabled
 
@@ -214,7 +214,7 @@ class LinkTab(CourseTab):
         return self.link_value == other.get('link')
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         return True
 
 
@@ -236,7 +236,7 @@ class ExternalDiscussionCourseTab(LinkTab):
                 key_checker(['link'])(tab_dict, raise_error))
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         if not super(ExternalDiscussionCourseTab, cls).is_enabled(course, user=user):
             return False
         return course.discussion_link
@@ -294,8 +294,9 @@ def get_course_tab_list(request, course):
     # If the user has to take an entrance exam, we'll need to hide away all but the
     # "Courseware" tab. The tab is then renamed as "Entrance Exam".
     course_tab_list = []
+    must_complete_ee = user_must_complete_entrance_exam(request, user, course)
     for tab in xmodule_tab_list:
-        if user_must_complete_entrance_exam(request, user, course):
+        if must_complete_ee:
             # Hide all of the tabs except for 'Courseware'
             # Rename 'Courseware' tab to 'Entrance Exam'
             if tab.type is not 'courseware':

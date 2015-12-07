@@ -12,20 +12,7 @@ from microsite_configuration import microsite
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="pagetitle">${_("Account Settings")}</%block>
-<%block name="nav_skip">#u-field-input-username</%block>
-
-<%block name="header_extras">
-
-    <script type="text/template" id="account_settings-tpl">
-        <%static:include path="student_account/account_settings.underscore" />
-    </script>
-
-    % for template_name in ["field_dropdown", "field_link", "field_readonly", "field_text"]:
-        <script type="text/template" id="${template_name}-tpl">
-            <%static:include path="fields/${template_name}.underscore" />
-        </script>
-    % endfor
-</%block>
+<%block name="nav_skip">#content</%block>
 
 % if duplicate_provider:
     <section>
@@ -37,21 +24,16 @@ from microsite_configuration import microsite
 
 <%block name="headextra">
     <%static:css group='style-course'/>
+</%block>
 
-    <script>
-          (function (require) {
-            require(['js/student_account/views/account_settings_factory'], function(setupAccountSettingsSection) {
+<%block name="js_extra">
+<%static:require_module module_name="js/student_account/views/account_settings_factory" class_name="AccountSettingsFactory">
+    var fieldsData = ${ json.dumps(fields) };
+    var authData = ${ json.dumps(auth) };
+    var platformName = ${ json.dumps(microsite.get_value('platform_name', settings.PLATFORM_NAME))};
 
-                var fieldsData = ${ json.dumps(fields) };
-                var authData = ${ json.dumps(auth) };
-                var platformName = ${ json.dumps(microsite.get_value('platform_name', settings.PLATFORM_NAME))};
-
-                setupAccountSettingsSection(
-                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id},
-                        platformName
-                );
-            });
-          }).call(this, require || RequireJS.require);
-    </script>
-
+    AccountSettingsFactory(
+        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id}, platformName
+    );
+</%static:require_module>
 </%block>

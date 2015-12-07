@@ -1,3 +1,6 @@
+"""
+Asynchronous tasks related to the Course Structure sub-application
+"""
 import json
 import logging
 

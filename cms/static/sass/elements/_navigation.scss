@@ -57,7 +57,7 @@ nav {
 
     .ui-toggle-dd {
       @include transition(all $tmg-f2 ease-in-out 0s);
-      margin: 0 ($baseline/10);
+      margin: 0;
       display: inline-block;
       vertical-align: middle;
     }

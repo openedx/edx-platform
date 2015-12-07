@@ -61,7 +61,7 @@
 
             a {
               color: $lighter-base-font-color;
-              font: italic 800 0.6em/1em $sans-serif;
+              font: italic 700 0.6em/1em $sans-serif;
               letter-spacing: 0px;
               margin-left: ($baseline*0.75);
               text-shadow: 0 1px rgba(255,255,255, 0.6);
@@ -79,7 +79,7 @@
 
             a {
               color: $lighter-base-font-color;
-              font: italic 800 1em/1em $sans-serif;
+              font: italic 700 1em/1em $sans-serif;
               letter-spacing: 0px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-transform: none;
@@ -112,6 +112,9 @@
 
             &:hover, &:focus {
               color: rgb(255,255,255);
+            }
+            span {
+              display: inline-block;
             }
           }
 
@@ -156,7 +159,7 @@
           }
 
           #register_error {
-            background: $error-red;
+            background: $error-color;
             border: 1px solid rgb(202, 17, 17);
             color: rgb(143, 14, 14);
             display: none;
@@ -249,10 +252,10 @@
         background-color: $shadow-l2;
         text-align: right;
         text-transform: uppercase;
-        color: $lighter-base-font-color;
+        color: $staff-color;
 
         &:hover {
-          background-color: $link-hover;
+          background-color: $staff-color;
           color: $white;
         }
       }
@@ -402,7 +405,7 @@
 
         .opencourseware {
           text-indent: -9999px;
-          background: url('../images/opencourseware.png') 0 0 no-repeat;
+          background: url('#{$static-path}/images/opencourseware.png') 0 0 no-repeat;
           width: 266px;
           height: 31px;
           margin-bottom: $baseline;
@@ -416,7 +419,7 @@
         li {
           list-style: none;
           padding-left: 29px;
-          background: url('../images/link-icon.png') left center no-repeat;
+          background: url('#{$static-path}/images/link-icon.png') left center no-repeat;
         }
       }
     }
@@ -443,7 +446,7 @@
         color: $base-font-color;
         font-family: $sans-serif;
         font-style: italic;
-        font-weight: 800;
+        font-weight: 700;
         display: inline-block;
         letter-spacing: 0px;
         margin-right: ($baseline*0.75);

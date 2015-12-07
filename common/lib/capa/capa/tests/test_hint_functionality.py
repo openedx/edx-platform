@@ -13,7 +13,6 @@ from ddt import ddt, data, unpack
 # in the test code. Therefore:
 # pylint: disable=line-too-long
 # For out many ddt data cases, prefer a compact form of { .. }
-# pylint: disable=bad-continuation
 
 from . import new_loncapa_problem, load_fixture
 
@@ -65,21 +64,21 @@ class TextInputHintsTest(HintTest):
 
     @data(
         {'problem_id': u'1_2_1', u'choice': u'GermanyΩ',
-         'expected_string': u'<div class="feedback-hint-incorrect"><div class="hint-label">Incorrect: </div><div class="hint-text">I do not think so.Ω</div></div>'},
+         'expected_string': u'<div class="feedback-hint-incorrect"><div class="hint-label">Incorrect: </div><div class="hint-text">I do not think so.&#937;</div></div>'},
         {'problem_id': u'1_2_1', u'choice': u'franceΩ',
-         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Viva la France!Ω</div></div>'},
+         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Viva la France!&#937;</div></div>'},
         {'problem_id': u'1_2_1', u'choice': u'FranceΩ',
-         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Viva la France!Ω</div></div>'},
+         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Viva la France!&#937;</div></div>'},
         {'problem_id': u'1_2_1', u'choice': u'Mexico',
          'expected_string': ''},
         {'problem_id': u'1_2_1', u'choice': u'USAΩ',
-         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Less well known, but yes, there is a Paris, Texas.Ω</div></div>'},
+         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Less well known, but yes, there is a Paris, Texas.&#937;</div></div>'},
         {'problem_id': u'1_2_1', u'choice': u'usaΩ',
-         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Less well known, but yes, there is a Paris, Texas.Ω</div></div>'},
+         'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">Less well known, but yes, there is a Paris, Texas.&#937;</div></div>'},
         {'problem_id': u'1_2_1', u'choice': u'uSAxΩ',
          'expected_string': u''},
         {'problem_id': u'1_2_1', u'choice': u'NICKLANDΩ',
-         'expected_string': u'<div class="feedback-hint-incorrect"><div class="hint-label">Incorrect: </div><div class="hint-text">The country name does not end in LANDΩ</div></div>'},
+         'expected_string': u'<div class="feedback-hint-incorrect"><div class="hint-label">Incorrect: </div><div class="hint-text">The country name does not end in LAND&#937;</div></div>'},
         {'problem_id': u'1_3_1', u'choice': u'Blue',
          'expected_string': u'<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text">The red light is scattered by water molecules leaving only blue light.</div></div>'},
         {'problem_id': u'1_3_1', u'choice': u'blue',
@@ -338,7 +337,7 @@ class CheckboxHintsTestTracking(HintTest):
     <problem>
         <p>question</p>
         <choiceresponse>
-        <checkboxgroup direction="vertical">
+        <checkboxgroup>
             <choice correct="true">Apple
               <choicehint selected="true">A true</choicehint>
               <choicehint selected="false">A false</choicehint>
@@ -443,6 +442,40 @@ class MultpleChoiceHintsTest(HintTest):
          'expected_string': '<div class="feedback-hint-incorrect"><div class="hint-label">OOPS: </div><div class="hint-text">Apple is a fruit.</div></div>'},
         {'problem_id': u'1_3_1', 'choice': u'choice_9',
          'expected_string': ''},
+    )
+    @unpack
+    def test_multiplechoice_hints(self, problem_id, choice, expected_string):
+        hint = self.get_hint(problem_id, choice)
+        self.assertEqual(hint, expected_string)
+
+
+@ddt
+class MultpleChoiceHintsWithHtmlTest(HintTest):
+    """
+    This class consists of a suite of test cases to be run on the multiple choice problem represented by the XML below.
+
+    """
+    xml = load_fixture('extended_hints_multiple_choice_with_html.xml')
+    problem = new_loncapa_problem(xml)
+
+    def test_tracking_log(self):
+        """Test that the tracking log comes out right."""
+        self.problem.capa_module.reset_mock()
+        self.get_hint(u'1_2_1', u'choice_0')
+        self.problem.capa_module.runtime.track_function.assert_called_with(
+            'edx.problem.hint.feedback_displayed',
+            {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_1', 'trigger_type': 'single',
+             'student_answer': [u'choice_0'], 'correctness': False, 'question_type': 'multiplechoiceresponse',
+             'hint_label': 'Incorrect', 'hints': [{'text': 'Mushroom <img src="#" ale="#"/>is a fungus, not a fruit.'}]}
+        )
+
+    @data(
+        {'problem_id': u'1_2_1', 'choice': u'choice_0',
+         'expected_string': '<div class="feedback-hint-incorrect"><div class="hint-label">Incorrect: </div><div class="hint-text">Mushroom <img src="#" ale="#"/>is a fungus, not a fruit.</div></div>'},
+        {'problem_id': u'1_2_1', 'choice': u'choice_1',
+         'expected_string': '<div class="feedback-hint-incorrect"><div class="hint-label">Incorrect: </div><div class="hint-text">Potato is <img src="#" ale="#"/> not a fruit.</div></div>'},
+        {'problem_id': u'1_2_1', 'choice': u'choice_2',
+         'expected_string': '<div class="feedback-hint-correct"><div class="hint-label">Correct: </div><div class="hint-text"><a href="#">Apple</a> is a fruit.</div></div>'}
     )
     @unpack
     def test_multiplechoice_hints(self, problem_id, choice, expected_string):

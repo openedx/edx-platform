@@ -1,1 +1,1 @@
-<a class="nav-item" href="" data-index="<%= index %>" role="tab" aria-selected="false"><%- title %></a>
+<button class="nav-item tab" data-url="<%= url %>" data-index="<%= index %>" is-active="false" aria-expanded="false" aria-controls="<%= tabPanelId %>"><%= title %></button>

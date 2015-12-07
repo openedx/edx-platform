@@ -1,301 +1,470 @@
 """
 Tests for credit app views.
 """
-import unittest
-import json
+
+# pylint: disable=no-member
+
+from __future__ import unicode_literals
 import datetime
-import pytz
+import json
+import unittest
 
 import ddt
-from mock import patch
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
 from django.conf import settings
-
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
-from util.date_utils import to_timestamp
+from django.core.urlresolvers import reverse
+from django.test import TestCase, Client
+from django.test.utils import override_settings
+from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.credit import api
+import pytz
+
 from openedx.core.djangoapps.credit.signature import signature
+from openedx.core.djangoapps.credit.serializers import CreditProviderSerializer, CreditEligibilitySerializer
+from openedx.core.djangoapps.credit.tests.factories import (
+    CreditProviderFactory,
+    CreditEligibilityFactory,
+    CreditCourseFactory, CreditRequestFactory)
+from student.tests.factories import UserFactory, AdminFactory
 from openedx.core.djangoapps.credit.models import (
     CreditCourse,
-    CreditProvider,
-    CreditRequirement,
-    CreditRequirementStatus,
-    CreditEligibility,
-    CreditRequest,
-)
+    CreditProvider, CreditRequest, CreditRequirement, CreditRequirementStatus)
+from util.date_utils import to_timestamp
+
+JSON = 'application/json'
 
 
-TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
+class ApiTestCaseMixin(object):
+    """ Mixin to aid with API testing. """
+
+    def assert_error_response(self, response, msg, status_code=400):
+        """ Validate the response's status and detail message. """
+        self.assertEqual(response.status_code, status_code)
+        self.assertDictEqual(response.data, {'detail': msg})
+
+
+class UserMixin(object):
+    """ Test mixin that creates, and authenticates, a new user for every test. """
+    password = 'password'
+    list_path = None
+
+    def setUp(self):
+        super(UserMixin, self).setUp()
+
+        # This value must be set here, as setting it outside of a method results in issues with CMS/Studio tests.
+        if self.list_path:
+            self.path = reverse(self.list_path)
+
+        # Create a user and login, so that we can use session auth for the
+        # tests that aren't specifically testing authentication or authorization.
+        self.user = UserFactory(password=self.password, is_staff=True)
+        self.client.login(username=self.user.username, password=self.password)
+
+
+class AuthMixin(object):
+    """ Test mixin with methods to test OAuth 2.0 and session authentication. """
+
+    def test_authentication_required(self):
+        """ Verify the endpoint requires authentication. """
+        self.client.logout()
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 401)
+
+    def test_oauth(self):
+        """ Verify the endpoint supports authentication via OAuth 2.0. """
+        access_token = AccessTokenFactory(user=self.user, client=ClientFactory()).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+        self.client.logout()
+        response = self.client.get(self.path, **headers)
+        self.assertEqual(response.status_code, 200)
+
+    def test_session_auth(self):
+        """ Verify the endpoint supports authentication via session. """
+        self.client.logout()
+        self.client.login(username=self.user.username, password=self.password)
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
 
 
 @ddt.ddt
-@override_settings(CREDIT_PROVIDER_SECRET_KEYS={
-    "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY
-})
+class ReadOnlyMixin(object):
+    """ Test mixin for read-only API endpoints. """
+
+    @ddt.data('delete', 'post', 'put')
+    def test_readonly(self, method):
+        """ Verify the viewset does not allow CreditProvider objects to be created or modified. """
+        response = getattr(self.client, method)(self.path)
+        self.assertEqual(response.status_code, 405)
+
+
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CreditProviderViewTests(UrlResetMixin, TestCase):
-    """
-    Tests for HTTP end-points used to issue requests to credit providers
-    and receive responses approving or denying requests.
-    """
+class CreditCourseViewSetTests(UserMixin, TestCase):
+    """ Tests for the CreditCourse endpoints.
 
-    USERNAME = "ron"
-    USER_FULL_NAME = "Ron Weasley"
-    PASSWORD = "password"
-    PROVIDER_ID = "hogwarts"
-    PROVIDER_URL = "https://credit.example.com/request"
-    COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
-    FINAL_GRADE = 0.95
+     GET/POST /api/v1/credit/creditcourse/
+     GET/PUT  /api/v1/credit/creditcourse/:course_id/
+    """
+    list_path = 'credit:creditcourse-list'
 
-    @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_API": True})
+    def _serialize_credit_course(self, credit_course):
+        """ Serializes a CreditCourse to a Python dict. """
+
+        return {
+            'course_key': unicode(credit_course.course_key),
+            'enabled': credit_course.enabled
+        }
+
+    def test_session_auth(self):
+        """ Verify the endpoint supports session authentication, and only allows authorization for staff users. """
+        user = UserFactory(password=self.password, is_staff=False)
+        self.client.login(username=user.username, password=self.password)
+
+        # Non-staff users should not have access to the API
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 403)
+
+        # Staff users should have access to the API
+        user.is_staff = True
+        user.save()  # pylint: disable=no-member
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+
+    def test_session_auth_post_requires_csrf_token(self):
+        """ Verify non-GET requests require a CSRF token be attached to the request. """
+        user = UserFactory(password=self.password, is_staff=True)
+        client = Client(enforce_csrf_checks=True)
+        self.assertTrue(client.login(username=user.username, password=self.password))
+
+        data = {
+            'course_key': 'a/b/c',
+            'enabled': True
+        }
+
+        # POSTs without a CSRF token should fail.
+        response = client.post(self.path, data=json.dumps(data), content_type=JSON)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('CSRF', response.content)
+
+        # Retrieve a CSRF token
+        response = client.get('/')
+        csrf_token = response.cookies[settings.CSRF_COOKIE_NAME].value  # pylint: disable=no-member
+        self.assertGreater(len(csrf_token), 0)
+
+        # Ensure POSTs made with the token succeed.
+        response = client.post(self.path, data=json.dumps(data), content_type=JSON, HTTP_X_CSRFTOKEN=csrf_token)
+        self.assertEqual(response.status_code, 201)
+
+    def test_oauth(self):
+        """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
+        user = UserFactory(is_staff=False)
+        oauth_client = ClientFactory.create()
+        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+
+        # Non-staff users should not have access to the API
+        response = self.client.get(self.path, **headers)
+        self.assertEqual(response.status_code, 403)
+
+        # Staff users should have access to the API
+        user.is_staff = True
+        user.save()  # pylint: disable=no-member
+        response = self.client.get(self.path, **headers)
+        self.assertEqual(response.status_code, 200)
+
+    def assert_course_created(self, course_id, response):
+        """ Verify an API request created a new CreditCourse object. """
+        enabled = True
+        data = {
+            'course_key': unicode(course_id),
+            'enabled': enabled
+        }
+
+        self.assertEqual(response.status_code, 201)
+
+        # Verify the API returns the serialized CreditCourse
+        self.assertDictEqual(json.loads(response.content), data)
+
+        # Verify the CreditCourse was actually created
+        course_key = CourseKey.from_string(course_id)
+        self.assertTrue(CreditCourse.objects.filter(course_key=course_key, enabled=enabled).exists())
+
+    def test_create(self):
+        """ Verify the endpoint supports creating new CreditCourse objects. """
+        course_id = 'a/b/c'
+        enabled = True
+        data = {
+            'course_key': unicode(course_id),
+            'enabled': enabled
+        }
+
+        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON)
+        self.assert_course_created(course_id, response)
+
+    def test_put_as_create(self):
+        """ Verify the update endpoint supports creating a new CreditCourse object. """
+        course_id = 'd/e/f'
+        enabled = True
+        data = {
+            'course_key': unicode(course_id),
+            'enabled': enabled
+        }
+
+        path = reverse('credit:creditcourse-detail', args=[course_id])
+        response = self.client.put(path, data=json.dumps(data), content_type=JSON)
+        self.assert_course_created(course_id, response)
+
+    def test_get(self):
+        """ Verify the endpoint supports retrieving CreditCourse objects. """
+        course_id = 'a/b/c'
+        cc1 = CreditCourse.objects.create(course_key=CourseKey.from_string(course_id))
+        path = reverse('credit:creditcourse-detail', args=[course_id])
+
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the API returns the serialized CreditCourse
+        self.assertDictEqual(json.loads(response.content), self._serialize_credit_course(cc1))
+
+    def test_list(self):
+        """ Verify the endpoint supports listing all CreditCourse objects. """
+        cc1 = CreditCourse.objects.create(course_key=CourseKey.from_string('a/b/c'))
+        cc2 = CreditCourse.objects.create(course_key=CourseKey.from_string('d/e/f'), enabled=True)
+        expected = [self._serialize_credit_course(cc1), self._serialize_credit_course(cc2)]
+
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the API returns a list of serialized CreditCourse objects
+        self.assertListEqual(json.loads(response.content), expected)
+
+    def test_update(self):
+        """ Verify the endpoint supports updating a CreditCourse object. """
+        course_id = 'course-v1:edX+BlendedX+1T2015'
+        credit_course = CreditCourse.objects.create(course_key=CourseKey.from_string(course_id), enabled=False)
+        self.assertFalse(credit_course.enabled)
+
+        path = reverse('credit:creditcourse-detail', args=[course_id])
+        data = {'course_key': course_id, 'enabled': True}
+        response = self.client.put(path, json.dumps(data), content_type=JSON)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the serialized CreditCourse is returned
+        self.assertDictEqual(json.loads(response.content), data)
+
+        # Verify the data was persisted
+        credit_course = CreditCourse.objects.get(course_key=credit_course.course_key)
+        self.assertTrue(credit_course.enabled)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, UserMixin, TestCase):
+    """ Tests for CreditProviderViewSet. """
+    list_path = 'credit:creditprovider-list'
+
+    @classmethod
+    def setUpClass(cls):
+        super(CreditProviderViewSetTests, cls).setUpClass()
+        cls.bayside = CreditProviderFactory(provider_id='bayside')
+        cls.hogwarts = CreditProviderFactory(provider_id='hogwarts')
+        cls.starfleet = CreditProviderFactory(provider_id='starfleet')
+
+    def test_list(self):
+        """ Verify the endpoint returns a list of all CreditProvider objects. """
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+
+        expected = CreditProviderSerializer(CreditProvider.objects.all(), many=True).data
+        self.assertEqual(response.data, expected)
+
+    @ddt.data(
+        ('bayside',),
+        ('hogwarts', 'starfleet')
+    )
+    def test_list_filtering(self, provider_ids):
+        """ Verify the endpoint returns a list of all CreditProvider objects, filtered to contain only those objects
+        associated with the given IDs. """
+        url = '{}?provider_ids={}'.format(self.path, ','.join(provider_ids))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        expected = CreditProviderSerializer(CreditProvider.objects.filter(provider_id__in=provider_ids),
+                                            many=True).data
+        self.assertEqual(response.data, expected)
+
+    def test_retrieve(self):
+        """ Verify the endpoint returns the details for a single CreditProvider. """
+        url = reverse('credit:creditprovider-detail', kwargs={'provider_id': self.bayside.provider_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, CreditProviderSerializer(self.bayside).data)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase):
+    """ Tests for CreditProviderRequestCreateView. """
+
+    @classmethod
+    def setUpClass(cls):
+        super(CreditProviderRequestCreateViewTests, cls).setUpClass()
+        cls.provider = CreditProviderFactory()
+
     def setUp(self):
-        """
-        Configure a credit course.
-        """
-        super(CreditProviderViewTests, self).setUp()
+        super(CreditProviderRequestCreateViewTests, self).setUp()
+        self.path = reverse('credit:create_request', kwargs={'provider_id': self.provider.provider_id})
+        self.eligibility = CreditEligibilityFactory(username=self.user.username)
 
-        # Create the test user and log in
-        self.user = UserFactory(username=self.USERNAME, password=self.PASSWORD)
-        self.user.profile.name = self.USER_FULL_NAME
-        self.user.profile.save()
+    def post_credit_request(self, username, course_id):
+        """ Create a credit request for the given user and course. """
+        data = {
+            'username': username,
+            'course_key': unicode(course_id)
+        }
+        return self.client.post(self.path, json.dumps(data), content_type=JSON)
 
-        success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(success, msg="Could not log in")
+    def test_post_with_provider_integration(self):
+        """ Verify the endpoint can create a new credit request. """
+        username = self.user.username
+        course = self.eligibility.course
+        course_key = course.course_key
+        final_grade = 0.95
 
-        # Enable the course for credit
-        credit_course = CreditCourse.objects.create(
-            course_key=self.COURSE_KEY,
-            enabled=True,
-        )
-
-        # Configure a credit provider for the course
-        CreditProvider.objects.create(
-            provider_id=self.PROVIDER_ID,
-            enable_integration=True,
-            provider_url=self.PROVIDER_URL,
-        )
+        # Enable provider integration
+        self.provider.enable_integration = True
+        self.provider.save()
 
         # Add a single credit requirement (final grade)
         requirement = CreditRequirement.objects.create(
-            course=credit_course,
-            namespace="grade",
-            name="grade",
+            course=course,
+            namespace='grade',
+            name='grade',
         )
 
-        # Mark the user as having satisfied the requirement
-        # and eligible for credit.
+        # Mark the user as having satisfied the requirement and eligible for credit.
         CreditRequirementStatus.objects.create(
-            username=self.USERNAME,
+            username=username,
             requirement=requirement,
-            status="satisfied",
-            reason={"final_grade": self.FINAL_GRADE}
-        )
-        CreditEligibility.objects.create(
-            username=self.USERNAME,
-            course=credit_course,
+            status='satisfied',
+            reason={'final_grade': final_grade}
         )
 
-    def test_credit_request_and_response(self):
-        # Initiate a request
-        response = self._create_credit_request(self.USERNAME, self.COURSE_KEY)
+        secret_key = 'secret'
+        with override_settings(CREDIT_PROVIDER_SECRET_KEYS={self.provider.provider_id: secret_key}):
+            response = self.post_credit_request(username, course_key)
         self.assertEqual(response.status_code, 200)
 
         # Check that the user's request status is pending
-        requests = api.get_credit_requests_for_user(self.USERNAME)
-        self.assertEqual(len(requests), 1)
-        self.assertEqual(requests[0]["status"], "pending")
+        request = CreditRequest.objects.get(username=username, course__course_key=course_key)
+        self.assertEqual(request.status, 'pending')
 
         # Check request parameters
         content = json.loads(response.content)
-        self.assertEqual(content["url"], self.PROVIDER_URL)
-        self.assertEqual(content["method"], "POST")
-        self.assertEqual(len(content["parameters"]["request_uuid"]), 32)
-        self.assertEqual(content["parameters"]["course_org"], "edX")
-        self.assertEqual(content["parameters"]["course_num"], "DemoX")
-        self.assertEqual(content["parameters"]["course_run"], "Demo_Course")
-        self.assertEqual(content["parameters"]["final_grade"], self.FINAL_GRADE)
-        self.assertEqual(content["parameters"]["user_username"], self.USERNAME)
-        self.assertEqual(content["parameters"]["user_full_name"], self.USER_FULL_NAME)
-        self.assertEqual(content["parameters"]["user_mailing_address"], "")
-        self.assertEqual(content["parameters"]["user_country"], "")
+        parameters = content['parameters']
+
+        self.assertEqual(content['url'], self.provider.provider_url)
+        self.assertEqual(content['method'], 'POST')
+        self.assertEqual(len(parameters['request_uuid']), 32)
+        self.assertEqual(parameters['course_org'], course_key.org)
+        self.assertEqual(parameters['course_num'], course_key.course)
+        self.assertEqual(parameters['course_run'], course_key.run)
+        self.assertEqual(parameters['final_grade'], unicode(final_grade))
+        self.assertEqual(parameters['user_username'], username)
+        self.assertEqual(parameters['user_full_name'], self.user.get_full_name())
+        self.assertEqual(parameters['user_mailing_address'], '')
+        self.assertEqual(parameters['user_country'], '')
 
         # The signature is going to change each test run because the request
         # is assigned a different UUID each time.
         # For this reason, we use the signature function directly
         # (the "signature" parameter will be ignored when calculating the signature).
         # Other unit tests verify that the signature function is working correctly.
-        self.assertEqual(
-            content["parameters"]["signature"],
-            signature(content["parameters"], TEST_CREDIT_PROVIDER_SECRET_KEY)
-        )
+        self.assertEqual(parameters['signature'], signature(parameters, secret_key))
 
-        # Simulate a response from the credit provider
-        response = self._credit_provider_callback(
-            content["parameters"]["request_uuid"],
-            "approved"
-        )
-        self.assertEqual(response.status_code, 200)
-
-        # Check that the user's status is approved
-        requests = api.get_credit_requests_for_user(self.USERNAME)
-        self.assertEqual(len(requests), 1)
-        self.assertEqual(requests[0]["status"], "approved")
-
-    def test_request_credit_anonymous_user(self):
-        self.client.logout()
-        response = self._create_credit_request(self.USERNAME, self.COURSE_KEY)
-        self.assertEqual(response.status_code, 403)
-
-    def test_request_credit_for_another_user(self):
-        response = self._create_credit_request("another_user", self.COURSE_KEY)
-        self.assertEqual(response.status_code, 403)
-
-    @ddt.data(
-        # Invalid JSON
-        "{",
-
-        # Missing required parameters
-        json.dumps({"username": USERNAME}),
-        json.dumps({"course_key": unicode(COURSE_KEY)}),
-
-        # Invalid course key format
-        json.dumps({"username": USERNAME, "course_key": "invalid"}),
-    )
-    def test_create_credit_request_invalid_parameters(self, request_data):
-        url = reverse("credit:create_request", args=[self.PROVIDER_ID])
-        response = self.client.post(url, data=request_data, content_type="application/json")
-        self.assertEqual(response.status_code, 400)
-
-    def test_credit_provider_callback_validates_signature(self):
-        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
-
-        # Simulate a callback from the credit provider with an invalid signature
-        # Since the signature is invalid, we respond with a 403 Not Authorized.
-        response = self._credit_provider_callback(request_uuid, "approved", sig="invalid")
-        self.assertEqual(response.status_code, 403)
-
-    def test_credit_provider_callback_validates_timestamp(self):
-        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
-
-        # Simulate a callback from the credit provider with a timestamp too far in the past
-        # (slightly more than 15 minutes)
-        # Since the message isn't timely, respond with a 403.
-        timestamp = to_timestamp(datetime.datetime.now(pytz.UTC) - datetime.timedelta(0, 60 * 15 + 1))
-        response = self._credit_provider_callback(request_uuid, "approved", timestamp=timestamp)
-        self.assertEqual(response.status_code, 403)
-
-    def test_credit_provider_callback_handles_string_timestamp(self):
-        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
-
-        # Simulate a callback from the credit provider with a timestamp
-        # encoded as a string instead of an integer.
-        timestamp = str(to_timestamp(datetime.datetime.now(pytz.UTC)))
-        response = self._credit_provider_callback(request_uuid, "approved", timestamp=timestamp)
-        self.assertEqual(response.status_code, 200)
-
-    def test_credit_provider_callback_is_idempotent(self):
-        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
-
-        # Initially, the status should be "pending"
-        self._assert_request_status(request_uuid, "pending")
-
-        # First call sets the status to approved
-        self._credit_provider_callback(request_uuid, "approved")
-        self._assert_request_status(request_uuid, "approved")
-
-        # Second call succeeds as well; status is still approved
-        self._credit_provider_callback(request_uuid, "approved")
-        self._assert_request_status(request_uuid, "approved")
-
-    @ddt.data(
-        # Invalid JSON
-        "{",
-
-        # Not a dictionary
-        "4",
-
-        # Invalid timestamp format
-        json.dumps({
-            "request_uuid": "557168d0f7664fe59097106c67c3f847",
-            "status": "approved",
-            "timestamp": "invalid",
-            "signature": "7685ae1c8f763597ee7ce526685c5ac24353317dbfe087f0ed32a699daf7dc63",
-        }),
-    )
-    def test_credit_provider_callback_invalid_parameters(self, request_data):
-        url = reverse("credit:provider_callback", args=[self.PROVIDER_ID])
-        response = self.client.post(url, data=request_data, content_type="application/json")
-        self.assertEqual(response.status_code, 400)
-
-    def test_credit_provider_invalid_status(self):
-        response = self._credit_provider_callback("557168d0f7664fe59097106c67c3f847", "invalid")
-        self.assertEqual(response.status_code, 400)
-
-    def test_credit_provider_key_not_configured(self):
-        # Cannot initiate a request because we can't sign it
-        with override_settings(CREDIT_PROVIDER_SECRET_KEYS={}):
-            response = self._create_credit_request(self.USERNAME, self.COURSE_KEY)
-            self.assertEqual(response.status_code, 400)
-
-        # Create the request with the secret key configured
-        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
-
-        # Callback from the provider is not authorized, because
-        # the shared secret isn't configured.
-        with override_settings(CREDIT_PROVIDER_SECRET_KEYS={}):
-            response = self._credit_provider_callback(request_uuid, "approved")
-            self.assertEqual(response.status_code, 403)
-
-    def test_request_associated_with_another_provider(self):
-        other_provider_id = "other_provider"
-        other_provider_secret_key = "1d01f067a5a54b0b8059f7095a7c636d"
-
-        # Create an additional credit provider
-        CreditProvider.objects.create(provider_id=other_provider_id, enable_integration=True)
-
-        # Initiate a credit request with the first provider
-        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
-
-        # Attempt to update the request status for a different provider
-        with override_settings(CREDIT_PROVIDER_SECRET_KEYS={other_provider_id: other_provider_secret_key}):
-            response = self._credit_provider_callback(
-                request_uuid,
-                "approved",
-                provider_id=other_provider_id,
-                secret_key=other_provider_secret_key,
-            )
-
-        # Response should be a 404 to avoid leaking request UUID values to other providers.
+    def test_post_invalid_provider(self):
+        """ Verify the endpoint returns HTTP 404 if the credit provider is not valid. """
+        path = reverse('credit:create_request', kwargs={'provider_id': 'fake'})
+        response = self.client.post(path, {})
         self.assertEqual(response.status_code, 404)
 
-        # Request status should still be "pending"
-        self._assert_request_status(request_uuid, "pending")
+    def test_post_no_username(self):
+        """ Verify the endpoint returns HTTP 400 if no username is supplied. """
+        response = self.post_credit_request(None, 'a/b/c')
+        self.assert_error_response(response, 'A username must be specified.')
 
-    def _create_credit_request(self, username, course_key):
-        """
-        Initiate a request for credit.
-        """
-        url = reverse("credit:create_request", args=[self.PROVIDER_ID])
-        return self.client.post(
-            url,
-            data=json.dumps({
-                "username": username,
-                "course_key": unicode(course_key),
-            }),
-            content_type="application/json",
-        )
+    def test_post_invalid_course_key(self):
+        """ Verify the endpoint returns HTTP 400 if the course is not a valid course key. """
+        course_key = 'not-a-course-id'
+        response = self.post_credit_request(self.user.username, course_key)
+        self.assert_error_response(response, '[{}] is not a valid course key.'.format(course_key))
 
-    def _create_credit_request_and_get_uuid(self, username, course_key):
-        """
-        Initiate a request for credit and return the request UUID.
-        """
-        response = self._create_credit_request(username, course_key)
+    def test_post_user_not_eligible(self):
+        """ Verify the endpoint returns HTTP 400 if the user is not eligible for credit for the course. """
+        credit_course = CreditCourseFactory()
+        username = 'ineligible-user'
+        course_key = credit_course.course_key
+
+        response = self.post_credit_request(username, course_key)
+        msg = '[{username}] is not eligible for credit for [{course_key}].'.format(username=username,
+                                                                                   course_key=course_key)
+        self.assert_error_response(response, msg)
+
+    def test_post_permissions_staff(self):
+        """ Verify staff users can create requests for any user. """
+        admin = AdminFactory(password=self.password)
+        self.client.logout()
+        self.client.login(username=admin.username, password=self.password)
+        response = self.post_credit_request(self.user.username, self.eligibility.course.course_key)
         self.assertEqual(response.status_code, 200)
-        return json.loads(response.content)["parameters"]["request_uuid"]
+
+    def test_post_other_user(self):
+        """ Verify non-staff users cannot create requests for other users. """
+        user = UserFactory(password=self.password)
+        self.client.logout()
+        self.client.login(username=user.username, password=self.password)
+        response = self.post_credit_request(self.user.username, self.eligibility.course.course_key)
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_no_provider_integration(self):
+        """ Verify the endpoint returns the provider URL if provider integration is not enabled. """
+        response = self.post_credit_request(self.user.username, self.eligibility.course.course_key)
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'url': self.provider.provider_url,
+            'method': 'GET',
+            'parameters': {},
+        }
+        self.assertEqual(response.data, expected)
+
+    def test_post_secret_key_not_set(self):
+        """ Verify the endpoint returns HTTP 400 if we attempt to create a
+        request for a provider with no secret key set. """
+        # Enable provider integration
+        self.provider.enable_integration = True
+        self.provider.save()
+
+        # Cannot initiate a request because we cannot sign it
+        with override_settings(CREDIT_PROVIDER_SECRET_KEYS={}):
+            response = self.post_credit_request(self.user.username, self.eligibility.course.course_key)
+        self.assertEqual(response.status_code, 400)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CreditProviderCallbackViewTests(UserMixin, TestCase):
+    """ Tests for CreditProviderCallbackView. """
+
+    def setUp(self):
+        super(CreditProviderCallbackViewTests, self).setUp()
+
+        # Authentication should NOT be required for this endpoint.
+        self.client.logout()
+
+        self.provider = CreditProviderFactory()
+        self.path = reverse('credit:provider_callback', args=[self.provider.provider_id])
+        self.eligibility = CreditEligibilityFactory(username=self.user.username)
 
     def _credit_provider_callback(self, request_uuid, status, **kwargs):
         """
@@ -311,26 +480,198 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
             secret_key (str): Shared secret key for signing messages.
             timestamp (datetime): Timestamp of the message.
             sig (str): Digital signature to use on messages.
+            keys (dict): Override for CREDIT_PROVIDER_SECRET_KEYS setting.
 
         """
-        provider_id = kwargs.get("provider_id", self.PROVIDER_ID)
-        secret_key = kwargs.get("secret_key", TEST_CREDIT_PROVIDER_SECRET_KEY)
-        timestamp = kwargs.get("timestamp", to_timestamp(datetime.datetime.now(pytz.UTC)))
+        provider_id = kwargs.get('provider_id', self.provider.provider_id)
+        secret_key = kwargs.get('secret_key', '931433d583c84ca7ba41784bad3232e6')
+        timestamp = kwargs.get('timestamp', to_timestamp(datetime.datetime.now(pytz.UTC)))
+        keys = kwargs.get('keys', {self.provider.provider_id: secret_key})
 
-        url = reverse("credit:provider_callback", args=[provider_id])
+        url = reverse('credit:provider_callback', args=[provider_id])
 
         parameters = {
-            "request_uuid": request_uuid,
-            "status": status,
-            "timestamp": timestamp,
+            'request_uuid': request_uuid,
+            'status': status,
+            'timestamp': timestamp,
         }
-        parameters["signature"] = kwargs.get("sig", signature(parameters, secret_key))
+        parameters['signature'] = kwargs.get('sig', signature(parameters, secret_key))
 
-        return self.client.post(url, data=json.dumps(parameters), content_type="application/json")
+        with override_settings(CREDIT_PROVIDER_SECRET_KEYS=keys):
+            return self.client.post(url, data=json.dumps(parameters), content_type=JSON)
+
+    def _create_credit_request_and_get_uuid(self, username=None, course_key=None):
+        """ Initiate a request for credit and return the request UUID. """
+        username = username or self.user.username
+        course = CreditCourse.objects.get(course_key=course_key) if course_key else self.eligibility.course
+        credit_request = CreditRequestFactory(username=username, course=course, provider=self.provider)
+        return credit_request.uuid
 
     def _assert_request_status(self, uuid, expected_status):
-        """
-        Check the status of a credit request.
-        """
+        """ Check the status of a credit request. """
         request = CreditRequest.objects.get(uuid=uuid)
         self.assertEqual(request.status, expected_status)
+
+    def test_post_invalid_provider_id(self):
+        """ Verify the endpoint returns HTTP 404 if the provider does not exist. """
+        provider_id = 'fakey-provider'
+        self.assertFalse(CreditProvider.objects.filter(provider_id=provider_id).exists())
+
+        path = reverse('credit:provider_callback', args=[provider_id])
+        response = self.client.post(path, {})
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_with_invalid_signature(self):
+        """ Verify the endpoint returns HTTP 403 if a request is received with an invalid signature. """
+        request_uuid = self._create_credit_request_and_get_uuid()
+
+        # Simulate a callback from the credit provider with an invalid signature
+        # Since the signature is invalid, we respond with a 403 Not Authorized.
+        response = self._credit_provider_callback(request_uuid, "approved", sig="invalid")
+        self.assertEqual(response.status_code, 403)
+
+    @ddt.data(
+        to_timestamp(datetime.datetime.now(pytz.UTC) - datetime.timedelta(0, 60 * 15 + 1)),
+        'invalid'
+    )
+    def test_post_with_invalid_timestamp(self, timestamp):
+        """ Verify HTTP 400 is returned for requests with an invalid timestamp. """
+        request_uuid = self._create_credit_request_and_get_uuid()
+        response = self._credit_provider_callback(request_uuid, 'approved', timestamp=timestamp)
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_with_string_timestamp(self):
+        """ Verify the endpoint supports timestamps transmitted as strings instead of integers. """
+        request_uuid = self._create_credit_request_and_get_uuid()
+        timestamp = str(to_timestamp(datetime.datetime.now(pytz.UTC)))
+        response = self._credit_provider_callback(request_uuid, 'approved', timestamp=timestamp)
+        self.assertEqual(response.status_code, 200)
+
+    def test_credit_provider_callback_is_idempotent(self):
+        """ Verify clients can make subsequent calls with the same status. """
+        request_uuid = self._create_credit_request_and_get_uuid()
+
+        # Initially, the status should be "pending"
+        self._assert_request_status(request_uuid, "pending")
+
+        # First call sets the status to approved
+        self._credit_provider_callback(request_uuid, 'approved')
+        self._assert_request_status(request_uuid, "approved")
+
+        # Second call succeeds as well; status is still approved
+        self._credit_provider_callback(request_uuid, 'approved')
+        self._assert_request_status(request_uuid, "approved")
+
+    def test_credit_provider_invalid_status(self):
+        """ Verify requests with an invalid status value return HTTP 400. """
+        request_uuid = self._create_credit_request_and_get_uuid()
+        response = self._credit_provider_callback(request_uuid, 'invalid')
+        self.assertEqual(response.status_code, 400)
+
+    def test_request_associated_with_another_provider(self):
+        """ Verify the endpoint returns HTTP 404 if a request is received for the incorrect provider. """
+        other_provider_id = 'other-provider'
+        other_provider_secret_key = '1d01f067a5a54b0b8059f7095a7c636d'
+
+        # Create an additional credit provider
+        CreditProvider.objects.create(provider_id=other_provider_id, enable_integration=True)
+
+        # Initiate a credit request with the first provider
+        request_uuid = self._create_credit_request_and_get_uuid()
+
+        # Attempt to update the request status for a different provider
+        response = self._credit_provider_callback(
+            request_uuid,
+            'approved',
+            provider_id=other_provider_id,
+            secret_key=other_provider_secret_key,
+            keys={other_provider_id: other_provider_secret_key}
+        )
+
+        # Response should be a 404 to avoid leaking request UUID values to other providers.
+        self.assertEqual(response.status_code, 404)
+
+        # Request status should still be 'pending'
+        self._assert_request_status(request_uuid, 'pending')
+
+    def test_credit_provider_key_not_configured(self):
+        """ Verify the endpoint returns HTTP 403 if the provider has no key configured. """
+        request_uuid = self._create_credit_request_and_get_uuid()
+
+        # Callback from the provider is not authorized, because the shared secret isn't configured.
+        with override_settings(CREDIT_PROVIDER_SECRET_KEYS={}):
+            response = self._credit_provider_callback(request_uuid, 'approved', keys={})
+            self.assertEqual(response.status_code, 403)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):
+    """ Tests for CreditEligibilityView. """
+    view_name = 'credit:eligibility_details'
+
+    def setUp(self):
+        super(CreditEligibilityViewTests, self).setUp()
+        self.eligibility = CreditEligibilityFactory(username=self.user.username)
+        self.path = self.create_url(self.eligibility)
+
+    def create_url(self, eligibility):
+        """ Returns a URL that can be used to view eligibility data. """
+        return '{path}?username={username}&course_key={course_key}'.format(
+            path=reverse(self.view_name),
+            username=eligibility.username,
+            course_key=eligibility.course.course_key
+        )
+
+    def assert_valid_get_response(self, eligibility):
+        """ Ensure the endpoint returns the correct eligibility data. """
+        url = self.create_url(eligibility)
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response.data, CreditEligibilitySerializer([eligibility], many=True).data)
+
+    def test_get(self):
+        """ Verify the endpoint returns eligibility information for the give user and course. """
+        self.assert_valid_get_response(self.eligibility)
+
+    def test_get_with_missing_parameters(self):
+        """ Verify the endpoint returns HTTP status 400 if either the username or course_key querystring argument
+        is not provided. """
+        response = self.client.get(reverse(self.view_name))
+        self.assertEqual(response.status_code, 400)
+        self.assertDictEqual(response.data,
+                             {'detail': 'Both the course_key and username querystring parameters must be supplied.'})
+
+    def test_get_with_invalid_course_key(self):
+        """ Verify the endpoint returns HTTP status 400 if the provided course_key is not an actual CourseKey. """
+        url = '{}?username=edx&course_key=a'.format(reverse(self.view_name))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+        self.assertDictEqual(response.data, {'detail': '[a] is not a valid course key.'})
+
+    def test_staff_can_view_all(self):
+        """ Verify that staff users can view eligibility data for all users. """
+        staff = AdminFactory(password=self.password)
+        self.client.logout()
+        self.client.login(username=staff.username, password=self.password)
+        self.assert_valid_get_response(self.eligibility)
+
+    def test_nonstaff_can_only_view_own_data(self):
+        """ Verify that non-staff users can only view their own eligibility data. """
+        user = UserFactory(password=self.password)
+        eligibility = CreditEligibilityFactory(username=user.username)
+        url = self.create_url(eligibility)
+
+        # Verify user can view own data
+        self.client.logout()
+        self.client.login(username=user.username, password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # User should not be able to view data for other users.
+        alt_user = UserFactory(password=self.password)
+        alt_eligibility = CreditEligibilityFactory(username=alt_user.username)
+        url = self.create_url(alt_eligibility)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)

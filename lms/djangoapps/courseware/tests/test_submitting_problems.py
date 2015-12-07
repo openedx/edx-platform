@@ -140,6 +140,10 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         self.enroll(self.course)
         self.student_user = User.objects.get(email=self.student)
         self.factory = RequestFactory()
+        # Disable the score change signal to prevent other components from being pulled into tests.
+        signal_patch = patch('courseware.module_render.SCORE_CHANGED.send')
+        signal_patch.start()
+        self.addCleanup(signal_patch.stop)
 
     def add_dropdown_to_section(self, section_location, name, num_inputs=2):
         """
@@ -1254,7 +1258,7 @@ class TestConditionalContent(TestSubmittingProblems):
         UserCourseTagFactory(
             user=self.student_user,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
             value=str(user_partition_group)
         )
 

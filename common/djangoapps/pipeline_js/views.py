@@ -4,7 +4,7 @@ Views for returning XModule JS (used by requirejs)
 import json
 from django.conf import settings
 from django.http import HttpResponse
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 from edxmako.shortcuts import render_to_response
 
 

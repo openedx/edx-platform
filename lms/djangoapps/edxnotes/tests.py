@@ -81,7 +81,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
     @patch("edxnotes.decorators.get_public_endpoint")
     @patch("edxnotes.decorators.get_token_url")
-    @patch("edxnotes.decorators.get_id_token")
+    @patch("edxnotes.decorators.get_edxnotes_id_token")
     @patch("edxnotes.decorators.generate_uid")
     def test_edxnotes_enabled(self, mock_generate_uid, mock_get_id_token, mock_get_token_url, mock_get_endpoint):
         """
@@ -691,7 +691,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
     @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
     @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user")
-    @patch("edxnotes.helpers.get_id_token")
+    @patch("edxnotes.helpers.get_edxnotes_id_token")
     @patch("edxnotes.helpers.requests.get")
     def test_send_request_with_query_string(self, mock_get, mock_get_id_token, mock_anonymous_id_for_user):
         """
@@ -720,7 +720,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
     @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
     @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user")
-    @patch("edxnotes.helpers.get_id_token")
+    @patch("edxnotes.helpers.get_edxnotes_id_token")
     @patch("edxnotes.helpers.requests.get")
     def test_send_request_without_query_string(self, mock_get, mock_get_id_token, mock_anonymous_id_for_user):
         """

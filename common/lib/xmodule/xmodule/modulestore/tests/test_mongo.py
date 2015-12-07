@@ -1,14 +1,13 @@
 """
 Unit tests for the Mongo modulestore
 """
-# pylint: disable=no-member
 # pylint: disable=protected-access
 # pylint: disable=no-name-in-module
 # pylint: disable=bad-continuation
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
 # pylint: enable=E0611
-from path import path
+from path import Path as path
 import pymongo
 import logging
 import shutil
@@ -217,7 +216,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         # When we fix the caching issue, we should reduce this
         # to 6 and remove the 'treexport_peer_component' course_id
         # from the list below
-        assert_equals(len(courses), 7)  # pylint: disable=no-value-for-parameter
+        assert_equals(len(courses), 7)
         course_ids = [course.id for course in courses]
 
         for course_key in [
@@ -252,7 +251,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
 
         courses = self.draft_store.get_courses(org='guestx')
-        assert_equals(len(courses), 1)  # pylint: disable=no-value-for-parameter
+        assert_equals(len(courses), 1)
         course_ids = [course.id for course in courses]
 
         for course_key in [
@@ -261,7 +260,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 ['guestx', 'foo', 'bar']
             ]
         ]:
-            assert_in(course_key, course_ids)  # pylint: disable=no-value-for-parameter
+            assert_in(course_key, course_ids)
 
         courses = self.draft_store.get_courses(org='edX')
         # note, the number of courses expected is really
@@ -270,7 +269,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         # When we fix the caching issue, we should reduce this
         # to 6 and remove the 'treexport_peer_component' course_id
         # from the list below
-        assert_equals(len(courses), 6)  # pylint: disable=no-value-for-parameter
+        assert_equals(len(courses), 6)
         course_ids = [course.id for course in courses]
 
         for course_key in [
@@ -286,7 +285,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 ['edX', 'treeexport_peer_component', 'export_peer_component'],
             ]
         ]:
-            assert_in(course_key, course_ids)  # pylint: disable=no-value-for-parameter
+            assert_in(course_key, course_ids)
 
     def test_no_such_course(self):
         """
@@ -758,6 +757,13 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
+
+    def test_make_course_usage_key(self):
+        """Test that we get back the appropriate usage key for the root of a course key."""
+        course_key = CourseLocator(org="edX", course="101", run="2015")
+        root_block_key = self.draft_store.make_course_usage_key(course_key)
+        self.assertEqual(root_block_key.block_type, "course")
+        self.assertEqual(root_block_key.name, "2015")
 
 
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):

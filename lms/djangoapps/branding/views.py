@@ -10,7 +10,7 @@ from django.http import HttpResponse, Http404
 from django.utils import translation
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from edxmako.shortcuts import render_to_response
 import student.views
@@ -57,9 +57,8 @@ def index(request):
         # In this case, we want to have the user stay on a course catalog
         # page to make it easier to browse for courses (and register)
         if microsite.get_value(
-            'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
-            settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)
-        ):
+                'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
+                settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)):
             return redirect(reverse('dashboard'))
 
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
@@ -233,7 +232,7 @@ def footer(request):
                 "title": "Powered by Open edX",
                 "image": "http://example.com/openedx.png"
             },
-            "logo_image": "http://example.com/static/images/default-theme/logo.png",
+            "logo_image": "http://example.com/static/images/logo.png",
             "copyright": "EdX, Open edX, and the edX and Open edX logos are \
                 registered trademarks or trademarks of edX Inc."
         }

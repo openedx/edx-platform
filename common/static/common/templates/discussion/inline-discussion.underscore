@@ -1,0 +1,13 @@
+<section class="discussion" data-discussion-id="<%= discussionId %>">
+    <article class="new-post-article"></article>
+
+    <section class="threads">
+        <% _.each(threads, function(thread) { %>
+            <article class="discussion-thread" id="thread_<%= thread.id %>">
+            </article>
+        <% }); %>
+    </section>
+
+    <section class="discussion-pagination">
+    </section>
+</section>

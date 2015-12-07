@@ -1,6 +1,6 @@
 <%!
 from django.utils.translation import ugettext as _
-import django_comment_client.helpers as helpers
+from django_comment_client.utils import permalink
 %>
 
 % if recent_active_threads:
@@ -11,7 +11,7 @@ import django_comment_client.helpers as helpers
     </header>
     <ol class="discussion-sidebar-following-list">
       % for thread in recent_active_threads:
-        <li><a href="${helpers.permalink(thread) | h}"><span class="sidebar-following-name">${thread['title'] | h}</span> <span class="sidebar-vote-count">${thread['votes']['point'] | h}</span></a></li>
+        <li><a href="${permalink(thread) | h}"><span class="sidebar-following-name">${thread['title'] | h}</span> <span class="sidebar-vote-count">${thread['votes']['point'] | h}</span></a></li>
       % endfor
     <ol>
   </article>

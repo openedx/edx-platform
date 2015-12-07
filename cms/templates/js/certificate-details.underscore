@@ -13,28 +13,59 @@
         </li>
      <% } %>
      <% if (showDetails) { %>
-         <header>
-           <span class="title"><%= gettext("Certificate Details") %></span>
-         </header>
-        <% if (course_title) { %>
-            <div class="course-title-override">
-                <span class="certificate-label"><%= gettext('Course Title Override') %>: </span>
-                <span class="certificate-value"><%= course_title %></span>
+         <section class="certificate-settings course-details">
+             <header>
+               <h2 class="title title-2"><%= gettext("Certificate Details") %></h2>
+             </header>
+             <div class='certificate-info-section'>
+                 <div class='course-title-section pull-left'>
+                    <p class="actual-course-title">
+                            <span class="certificate-label"><%= gettext('Course Title') %>: </span>
+                            <span class="certificate-value"><%= course.get('name') %></span>
+                    </p>
+                    <% if (course_title) { %>
+                        <p class="course-title-override">
+                            <span class="certificate-label"><b><%= gettext('Course Title Override') %>: </b></span>
+                            <span class="certificate-value"><%= course_title %></span>
+                        </p>
+                    <% } %>
+                 </div>
+
+                <div class='course-number-section pull-left'>
+                    <p class="actual-course-number">
+                            <span class="certificate-label"><b><%= gettext('Course Number') %>: </b> </span>
+                            <span class="certificate-value"><%= course.get('num') %></span>
+                    </p>
+
+                    <% if (course.get('display_course_number')) { %>
+                        <p class="course-number-override">
+                            <span class="certificate-label"><b><%= gettext('Course Number Override') %>: </b></span>
+                            <span class="certificate-value"><%= course.get('display_course_number') %></span>
+                        </p>
+                    <% } %>
+                </div>
             </div>
-        <% } %>
-         <header style='margin-top: 30px;'>
-           <span class="title"><%= gettext("Certificate Signatories") %></span>
-         </header>
-         <div class="signatory-details-list"></div>
+        </section>
+
+
+        <section class="certificate-settings signatories">
+             <header>
+               <h2 class="title title-2"><%= gettext("Certificate Signatories") %></h2>
+             </header>
+             <p class="instructions">It is strongly recommended that you include four or fewer signatories. If you include additional signatories, preview the certificate in Print View to ensure the certificate will print correctly on one page.</p>
+             <div class="signatory-details-list"></div>
+        </section>
     <% } %>
    </ol>
 
     <ul class="actions certificate-actions">
+        <% if (CMS.User.isGlobalStaff || !is_active) { %>
         <li class="action action-edit">
             <button class="edit"><i class="icon fa fa-pencil" aria-hidden="true"></i> <%= gettext("Edit") %></button>
         </li>
         <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Delete') %>">
             <button class="delete action-icon"><i class="icon fa fa-trash-o" aria-hidden="true"></i><span><%= gettext("Delete") %></span></button>
         </li>
+        <% } %>
     </ul>
 </div>

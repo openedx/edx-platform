@@ -98,6 +98,7 @@ DEFAULT_SHORT_DATE_FORMAT = "%b %d, %Y"
 DEFAULT_LONG_DATE_FORMAT = "%A, %B %d, %Y"
 DEFAULT_TIME_FORMAT = "%I:%M:%S %p"
 DEFAULT_DATE_TIME_FORMAT = "%b %d, %Y at %H:%M"
+DEFAULT_DAY_AND_TIME_FORMAT = "%A at %-I%P"
 
 
 def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
@@ -147,6 +148,8 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
         format = ugettext("DATE_TIME_FORMAT")
         if format == "DATE_TIME_FORMAT":
             format = DEFAULT_DATE_TIME_FORMAT
+    elif format == "DAY_AND_TIME":
+        format = DEFAULT_DAY_AND_TIME_FORMAT
     elif format == "TIME":
         format = "%X"
 
@@ -204,7 +207,7 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
 
         return part
 
-    formatted_date = re.sub(r"%.|%", process_percent_code, format)
+    formatted_date = re.sub(r"%-.|%.|%", process_percent_code, format)
     return formatted_date
 
 

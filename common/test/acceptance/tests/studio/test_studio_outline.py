@@ -14,6 +14,7 @@ from ...pages.studio.utils import add_discussion, drag, verify_ordering
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.staff_view import StaffPage
+from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
@@ -1599,6 +1600,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
                                    'from the course advanced settings. To do this, go to the Advanced Settings '
                                    'page, locate the "Advanced Module List" setting, and then delete the following '
                                    'modules from the list.')
+    DEFAULT_DISPLAYNAME = "Deprecated Component"
 
     def _add_deprecated_advance_modules(self, block_types):
         """
@@ -1686,6 +1688,32 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
             deprecated_modules_list=['peergrading', 'combinedopenended']
         )
 
+    def test_deprecation_warning_with_no_displayname(self):
+        """
+        Scenario: Verify deprecation warning message if  ORA1 components are present.
+
+        Given I have created 1 ORA1 deprecated component
+        When I go to course outline
+        Then I see ORA1 deprecated warning
+        And I see correct ORA1 deprecated warning heading text
+        And I see list of ORA1 components with correct message
+        """
+        parent_vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+
+        # Create a deprecated ORA1 component with display_name to be empty and make sure
+        # the deprecation warning is displayed with
+        self.course_fixture.create_xblock(
+            parent_vertical.locator,
+            XBlockFixtureDesc(category='combinedopenended', display_name="", data=load_data_str('ora_peer_problem.xml'))
+        )
+        self.course_outline_page.visit()
+
+        self._verify_deprecation_warning_info(
+            deprecated_blocks_present=False,
+            components_present=True,
+            components_display_name_list=[self.DEFAULT_DISPLAYNAME],
+        )
+
     def test_warning_with_ora1_advance_modules_only(self):
         """
         Scenario: Verify that deprecation warning message is shown if only
@@ -1725,3 +1753,58 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
             components_present=True,
             components_display_name_list=['Open', 'Peer']
         )
+
+
+@attr('shard_4')
+class SelfPacedOutlineTest(CourseOutlineTest):
+    """Test the course outline for a self-paced course."""
+
+    def populate_course_fixture(self, course_fixture):
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', SECTION_NAME).add_children(
+                XBlockFixtureDesc('sequential', SUBSECTION_NAME).add_children(
+                    XBlockFixtureDesc('vertical', UNIT_NAME)
+                )
+            ),
+        )
+        self.course_fixture.add_course_details({
+            'self_paced': True,
+            'start_date': datetime.now() + timedelta(days=1)
+        })
+        ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
+
+    def test_release_dates_not_shown(self):
+        """
+        Scenario: Ensure that block release dates are not shown on the
+            course outline page of a self-paced course.
+
+        Given I am the author of a self-paced course
+        When I go to the course outline
+        Then I should not see release dates for course content
+        """
+        self.course_outline_page.visit()
+        section = self.course_outline_page.section(SECTION_NAME)
+        self.assertEqual(section.release_date, '')
+        subsection = section.subsection(SUBSECTION_NAME)
+        self.assertEqual(subsection.release_date, '')
+
+    def test_edit_section_and_subsection(self):
+        """
+        Scenario: Ensure that block release/due dates are not shown
+            in their settings modals.
+
+        Given I am the author of a self-paced course
+        When I go to the course outline
+        And I click on settings for a section or subsection
+        Then I should not see release or due date settings
+        """
+        self.course_outline_page.visit()
+        section = self.course_outline_page.section(SECTION_NAME)
+        modal = section.edit()
+        self.assertFalse(modal.has_release_date())
+        self.assertFalse(modal.has_due_date())
+        modal.cancel()
+        subsection = section.subsection(SUBSECTION_NAME)
+        modal = subsection.edit()
+        self.assertFalse(modal.has_release_date())
+        self.assertFalse(modal.has_due_date())

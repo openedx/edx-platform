@@ -81,6 +81,9 @@ class ProgressTest(unittest.TestCase):
         self.assertEqual(str(self.not_started), "0/17")
         self.assertEqual(str(self.part_done), "2/6")
         self.assertEqual(str(self.done), "7/7")
+        self.assertEqual(str(Progress(2.1234, 7)), '2.12/7')
+        self.assertEqual(str(Progress(2.0034, 7)), '2/7')
+        self.assertEqual(str(Progress(0.999, 7)), '1/7')
 
     def test_ternary_str(self):
         self.assertEqual(self.not_started.ternary_str(), "none")
@@ -124,12 +127,12 @@ class ProgressTest(unittest.TestCase):
         prg1 = Progress(1, 2)
         prg2 = Progress(2, 4)
         prg3 = Progress(1, 2)
-        self.assertTrue(prg1 == prg3)
-        self.assertFalse(prg1 == prg2)
+        self.assertEqual(prg1, prg3)
+        self.assertNotEqual(prg1, prg2)
 
         # Check != while we're at it
-        self.assertTrue(prg1 != prg2)
-        self.assertFalse(prg1 != prg3)
+        self.assertNotEqual(prg1, prg2)
+        self.assertEqual(prg1, prg3)
 
 
 class ModuleProgressTest(unittest.TestCase):

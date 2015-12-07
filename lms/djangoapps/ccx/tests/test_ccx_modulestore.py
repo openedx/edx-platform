@@ -8,57 +8,64 @@ from itertools import izip_longest, chain
 import pytz
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE
 )
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..models import CustomCourseForEdX
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
-class TestCCXModulestoreWrapper(ModuleStoreTestCase):
+class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
     """tests for a modulestore wrapped by CCXModulestoreWrapper
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCCXModulestoreWrapper, cls).setUpClass()
+        cls.course = course = CourseFactory.create()
+        cls.mooc_start = start = datetime.datetime(
+            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+        )
+        cls.mooc_due = due = datetime.datetime(
+            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
+        )
+        # Create a course outline
+        cls.chapters = chapters = [
+            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+        ]
+        cls.sequentials = sequentials = [
+            ItemFactory.create(parent=c) for _ in xrange(2) for c in chapters
+        ]
+        cls.verticals = verticals = [
+            ItemFactory.create(
+                due=due, parent=s, graded=True, format='Homework'
+            ) for _ in xrange(2) for s in sequentials
+        ]
+        cls.blocks = [
+            ItemFactory.create(parent=v, category='html') for _ in xrange(2) for v in verticals
+        ]
 
     def setUp(self):
         """
         Set up tests
         """
         super(TestCCXModulestoreWrapper, self).setUp()
-        self.course = course = CourseFactory.create()
+        self.user = UserFactory.create()
 
         # Create instructor account
         coach = AdminFactory.create()
 
-        # Create a course outline
-        self.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
-        self.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
-        self.chapters = chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
-        ]
-        self.sequentials = sequentials = [
-            ItemFactory.create(parent=c) for _ in xrange(2) for c in chapters
-        ]
-        self.verticals = verticals = [
-            ItemFactory.create(
-                due=due, parent=s, graded=True, format='Homework'
-            ) for _ in xrange(2) for s in sequentials
-        ]
-        self.blocks = [
-            ItemFactory.create(parent=v) for _ in xrange(2) for v in verticals
-        ]
-
         self.ccx = ccx = CustomCourseForEdX(
-            course_id=course.id,
+            course_id=self.course.id,
             display_name='Test CCX',
             coach=coach
         )
         ccx.save()
 
-        self.ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)  # pylint: disable=no-member
+        self.ccx_locator = CCXLocator.from_course_locator(self.course.id, ccx.id)
 
     def get_all_children_bf(self, block):
         """traverse the children of block in a breadth-first order"""

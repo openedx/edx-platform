@@ -52,20 +52,20 @@ class TestSettingsService(TestCase):
     @override_settings(XBLOCK_SETTINGS={xblock_setting_key2: {'b': 1}})
     def test_get_returns_none_or_default_if_bucket_not_found(self):
         """ Test if settings service returns default if setting not found """
-        self.assertEqual(getattr(settings, 'XBLOCK_SETTINGS'), {self.xblock_setting_key2: {'b': 1}})
+        self.assertEqual(settings.XBLOCK_SETTINGS, {self.xblock_setting_key2: {'b': 1}})
         self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock), {})
         self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock, 123), 123)
 
     @override_settings(XBLOCK_SETTINGS={xblock_setting_key1: 42})
     def test_get_returns_correct_value(self):
         """ Test if settings service returns correct bucket """
-        self.assertEqual(getattr(settings, 'XBLOCK_SETTINGS'), {self.xblock_setting_key1: 42})
+        self.assertEqual(settings.XBLOCK_SETTINGS, {self.xblock_setting_key1: 42})
         self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock), 42)
 
     @override_settings(XBLOCK_SETTINGS={xblock_setting_key2: "I'm a setting"})
     def test_get_respects_block_settings_key(self):
         """ Test if settings service respects block_settings_key value """
-        self.assertEqual(getattr(settings, 'XBLOCK_SETTINGS'), {self.xblock_setting_key2: "I'm a setting"})
+        self.assertEqual(settings.XBLOCK_SETTINGS, {self.xblock_setting_key2: "I'm a setting"})
         self.xblock_mock.block_settings_key = self.xblock_setting_key2
         self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock), "I'm a setting")
 
@@ -74,5 +74,5 @@ class TestSettingsService(TestCase):
         """ Test if settings service uses class name if block_settings_key attribute does not exist """
         mixologist = Mixologist([])
         block = mixologist.mix(_DummyBlock)
-        self.assertEqual(getattr(settings, 'XBLOCK_SETTINGS'), {"_DummyBlock": [1, 2, 3]})
+        self.assertEqual(settings.XBLOCK_SETTINGS, {"_DummyBlock": [1, 2, 3]})
         self.assertEqual(self.settings_service.get_settings_bucket(block), [1, 2, 3])

@@ -9,9 +9,11 @@ from bok_choy.promise import EmptyPromise
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
+from ..common.utils import click_css, confirm_prompt
+
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save, set_input_value, click_css, confirm_prompt
+from .utils import set_input_value_and_save, set_input_value
 
 
 class CourseOutlineItem(object):
@@ -512,6 +514,90 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Starts course reindex by clicking reindex button
         """
         self.reindex_button.click()
+
+    def open_exam_settings_dialog(self):
+        """
+        clicks on the settings button of subsection.
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+
+    def change_problem_release_date_in_studio(self):
+        """
+        Sets a new start date
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+        self.q(css="#start_date").fill("01/01/2030")
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_proctored(self):
+        """
+        Makes a Proctored exam.
+        """
+        self.q(css="#id_proctored_exam").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_timed(self):
+        """
+        Makes a timed exam.
+        """
+        self.q(css="#id_timed_exam").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def select_none_exam(self):
+        """
+        Choose "none" exam but do not press enter
+        """
+        self.q(css="#id_not_timed").first.click()
+
+    def select_timed_exam(self):
+        """
+        Choose a timed exam but do not press enter
+        """
+        self.q(css="#id_timed_exam").first.click()
+
+    def select_proctored_exam(self):
+        """
+        Choose a proctored exam but do not press enter
+        """
+        self.q(css="#id_proctored_exam").first.click()
+
+    def select_practice_exam(self):
+        """
+        Choose a practice exam but do not press enter
+        """
+        self.q(css="#id_practice_exam").first.click()
+
+    def time_allotted_field_visible(self):
+        """
+        returns whether the time allotted field is visible
+        """
+        return self.q(css="#id_time_limit_div").visible
+
+    def proctoring_items_are_displayed(self):
+        """
+        Returns True if all the items are found.
+        """
+
+        # The None radio button
+        if not self.q(css="#id_not_timed").present:
+            return False
+
+        # The Timed exam radio button
+        if not self.q(css="#id_timed_exam").present:
+            return False
+
+        # The Proctored exam radio button
+        if not self.q(css="#id_proctored_exam").present:
+            return False
+
+        # The Practice exam radio button
+        if not self.q(css="#id_practice_exam").present:
+            return False
+
+        return True
 
     @property
     def bottom_add_section_button(self):

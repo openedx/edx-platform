@@ -115,6 +115,12 @@
                     return state.youtubeApiAvailable === true;
                 }, 'YouTube API is loaded', 3000);
 
+                window.YT = jasmine.YT;
+
+                // Call the callback that must be called when YouTube API is
+                // loaded. By specification.
+                window.onYouTubeIframeAPIReady();
+
                 runs(function () {
                     // If YouTube API is not loaded, then the code will should create
                     // a global callback that will be called by API once it is loaded.

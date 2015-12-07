@@ -85,6 +85,7 @@ class Status(object):
         names = {
             'correct': _('correct'),
             'incorrect': _('incorrect'),
+            'partially-correct': _('partially correct'),
             'incomplete': _('incomplete'),
             'unanswered': _('unanswered'),
             'unsubmitted': _('unanswered'),
@@ -94,6 +95,7 @@ class Status(object):
             # Translators: these are tooltips that indicate the state of an assessment question
             'correct': _('This is correct.'),
             'incorrect': _('This is incorrect.'),
+            'partially-correct': _('This is partially correct.'),
             'unanswered': _('This is unanswered.'),
             'unsubmitted': _('This is unanswered.'),
             'queued': _('This is being processed.'),
@@ -465,10 +467,12 @@ class ChoiceGroup(InputTypeBase):
             raise Exception(msg)
 
         self.choices = self.extract_choices(self.xml, i18n)
-        self._choices_map = dict(self.choices,)  # pylint: disable=attribute-defined-outside-init
+        self._choices_map = dict(self.choices,)
 
     @classmethod
     def get_attributes(cls):
+        # Make '_' a no-op so we can scrape strings. Using lambda instead of
+        #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
         _ = lambda text: text
         return [Attribute("show_correctness", "always"),
                 Attribute('label', ''),
@@ -896,7 +900,7 @@ class MatlabInput(CodeInput):
         Right now, we only want this button to show up when a problem has not been
         checked.
         """
-        if self.status in ['correct', 'incorrect']:
+        if self.status in ['correct', 'incorrect', 'partially-correct']:
             return False
         else:
             return True
@@ -1214,9 +1218,11 @@ class FormulaEquationInput(InputTypeBase):
 
     Example:
 
-    <formulaequationinput size="50" label="Enter the equation for motion"/>
+    <formulaequationinput size="50" label="Enter the equation for motion" />
 
     options: size -- width of the textbox.
+             trailing_text -- text to show after the input textbox when
+                              rendered, same as textline (useful for units)
     """
 
     template = "formulaequationinput.html"
@@ -1231,6 +1237,7 @@ class FormulaEquationInput(InputTypeBase):
             Attribute('size', '20'),
             Attribute('inline', False),
             Attribute('label', ''),
+            Attribute('trailing_text', ''),
         ]
 
     def _extra_context(self):
@@ -1702,6 +1709,8 @@ class ChoiceTextGroup(InputTypeBase):
         """
         Returns a list of `Attribute` for this problem type
         """
+        # Make '_' a no-op so we can scrape strings. Using lambda instead of
+        #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
         _ = lambda text: text
         return [
             Attribute("show_correctness", "always"),

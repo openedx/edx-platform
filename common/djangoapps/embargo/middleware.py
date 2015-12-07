@@ -54,6 +54,10 @@ class EmbargoMiddleware(object):
         # accidentally lock ourselves out of Django admin
         # during testing.
         re.compile(r'^/admin/'),
+
+        # Do not block access to course metadata. This information is needed for
+        # sever-to-server calls.
+        re.compile(r'^/api/course_structure/v[\d+]/courses/{}/$'.format(settings.COURSE_ID_PATTERN)),
     ]
 
     def __init__(self):

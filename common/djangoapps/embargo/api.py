@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from ipware.ip import get_ip
 
+from student.auth import has_course_author_access
 from embargo.models import CountryAccessRule, RestrictedCourse
 
 
@@ -68,6 +69,10 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
     course_is_restricted = RestrictedCourse.is_restricted_course(course_key)
 
     if not course_is_restricted:
+        return True
+
+    # Always give global and course staff access, regardless of embargo settings.
+    if user is not None and has_course_author_access(user, course_key):
         return True
 
     if ip_address is not None:

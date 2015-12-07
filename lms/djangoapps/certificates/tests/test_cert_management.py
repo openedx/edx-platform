@@ -175,7 +175,12 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             grade_value=None
         )
         xqueue.return_value.regen_cert.assert_called_with(
-            self.user, key, self.course, None, None, True
+            self.user,
+            key,
+            course=self.course,
+            forced_grade=None,
+            template_file=None,
+            generate_pdf=True
         )
         self.assertFalse(BadgeAssertion.objects.filter(user=self.user, course_id=key))
 

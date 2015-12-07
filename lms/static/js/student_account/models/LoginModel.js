@@ -1,58 +1,57 @@
-var edx = edx || {};
-
-(function($, Backbone) {
+;(function (define) {
     'use strict';
+    define([
+        'jquery',
+        'backbone',
+        'jquery.url'
+    ], function ($, Backbone) {
 
-    edx.student = edx.student || {};
-    edx.student.account = edx.student.account || {};
+        return Backbone.Model.extend({
+            defaults: {
+                email: '',
+                password: '',
+                remember: false
+            },
 
-    edx.student.account.LoginModel = Backbone.Model.extend({
+            ajaxType: '',
+            urlRoot: '',
 
-        defaults: {
-            email: '',
-            password: '',
-            remember: false
-        },
+            initialize: function (attributes, options) {
+                this.ajaxType = options.method;
+                this.urlRoot = options.url;
+            },
 
-        ajaxType: '',
+            sync: function (method, model) {
+                var headers = {'X-CSRFToken': $.cookie('csrftoken')},
+                    data = {},
+                    analytics,
+                    courseId = $.url('?course_id');
 
-        urlRoot: '',
+                // If there is a course ID in the query string param,
+                // send that to the server as well so it can be included
+                // in analytics events.
+                if (courseId) {
+                    analytics = JSON.stringify({
+                        enroll_course_id: decodeURIComponent(courseId)
+                    });
+                }
 
-        initialize: function( attributes, options ) {
-            this.ajaxType = options.method;
-            this.urlRoot = options.url;
-        },
+                // Include all form fields and analytics info in the data sent to the server
+                $.extend(data, model.attributes, {analytics: analytics});
 
-        sync: function(method, model) {
-            var headers = { 'X-CSRFToken': $.cookie('csrftoken') },
-                data = {},
-                analytics,
-                courseId = $.url( '?course_id' );
-
-            // If there is a course ID in the query string param,
-            // send that to the server as well so it can be included
-            // in analytics events.
-            if ( courseId ) {
-                analytics = JSON.stringify({
-                    enroll_course_id: decodeURIComponent( courseId )
+                $.ajax({
+                    url: model.urlRoot,
+                    type: model.ajaxType,
+                    data: data,
+                    headers: headers,
+                    success: function () {
+                        model.trigger('sync');
+                    },
+                    error: function (error) {
+                        model.trigger('error', error);
+                    }
                 });
             }
-
-            // Include all form fields and analytics info in the data sent to the server
-            $.extend( data, model.attributes, { analytics: analytics });
-
-            $.ajax({
-                url: model.urlRoot,
-                type: model.ajaxType,
-                data: data,
-                headers: headers,
-                success: function() {
-                    model.trigger('sync');
-                },
-                error: function( error ) {
-                    model.trigger('error', error);
-                }
-            });
-        }
+        });
     });
-})(jQuery, Backbone);
+}).call(this, define || RequireJS.define);

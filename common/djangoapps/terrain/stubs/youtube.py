@@ -92,6 +92,8 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 self._send_video_response(youtube_id, "I'm youtube.")
 
         elif 'get_youtube_api' in self.path:
+            # Delay the response to simulate network latency
+            time.sleep(self.server.config.get('time_to_response', self.DEFAULT_DELAY_SEC))
             if self.server.config.get('youtube_api_blocked'):
                 self.send_response(404, content='', headers={'Content-type': 'text/plain'})
             else:
@@ -117,17 +119,16 @@ class StubYouTubeHandler(StubHttpRequestHandler):
 
         # Construct the response content
         callback = self.get_params['callback']
-        youtube_metadata = json.loads(
-            requests.get(
-                "http://gdata.youtube.com/feeds/api/videos/{id}?v=2&alt=jsonc".format(id=youtube_id)
-            ).text
-        )
+
         data = OrderedDict({
-            'data': OrderedDict({
-                'id': youtube_id,
-                'message': message,
-                'duration': youtube_metadata['data']['duration'],
-            })
+            'items': list(
+                OrderedDict({
+                    'contentDetails': OrderedDict({
+                        'id': youtube_id,
+                        'duration': 'PT2M20S',
+                    })
+                })
+            )
         })
         response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
 

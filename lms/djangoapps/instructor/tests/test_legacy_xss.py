@@ -9,7 +9,7 @@ from nose.plugins.attrib import attr
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from edxmako.tests import mako_middleware_process_request
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from instructor.views import legacy
@@ -18,12 +18,16 @@ from instructor.views import legacy
 
 
 @attr('shard_1')
-class TestXss(ModuleStoreTestCase):
+class TestXss(SharedModuleStoreTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(TestXss, cls).setUpClass()
+        cls._course = CourseFactory.create()
+
     def setUp(self):
         super(TestXss, self).setUp()
 
         self._request_factory = RequestFactory()
-        self._course = CourseFactory.create()
         self._evil_student = UserFactory.create(
             email="robot+evil@edx.org",
             username="evil-robot",

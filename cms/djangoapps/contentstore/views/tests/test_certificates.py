@@ -20,7 +20,9 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from course_modes.tests.factories import CourseModeFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
@@ -32,6 +34,7 @@ FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 CERTIFICATE_JSON = {
     u'name': u'Test certificate',
     u'description': u'Test description',
+    u'is_active': True,
     u'version': CERTIFICATE_SCHEMA_VERSION,
 }
 
@@ -40,6 +43,7 @@ CERTIFICATE_JSON_WITH_SIGNATORIES = {
     u'description': u'Test description',
     u'version': CERTIFICATE_SCHEMA_VERSION,
     u'course_title': 'Course Title Override',
+    u'is_active': True,
     u'signatories': [
         {
             "name": "Bob Smith",
@@ -66,7 +70,7 @@ class HelperMethods(object):
             )
             contentstore().save(content)
 
-    def _add_course_certificates(self, count=1, signatory_count=0):
+    def _add_course_certificates(self, count=1, signatory_count=0, is_active=False):
         """
         Create certificate for the course.
         """
@@ -92,13 +96,11 @@ class HelperMethods(object):
                 'id': i,
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
-                'org_logo_path': '/c4x/test/CSS101/asset/org_logo{}.png'.format(i),
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION,
-                'is_active': False
+                'is_active': is_active
             } for i in xrange(0, count)
         ]
-        self._create_fake_images([certificate['org_logo_path'] for certificate in certificates])
         self.course.certificates = {'certificates': certificates}
         self.save_course()
 
@@ -193,7 +195,6 @@ class CertificatesBaseTestCase(object):
         self.assertTrue('must have name of the certificate' in context.exception)
 
 
-# pylint: disable=no-member
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
@@ -219,7 +220,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
-            u'org_logo_path': '',
+            u'is_active': True,
             u'signatories': []
         }
         response = self.client.ajax_post(
@@ -230,7 +231,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
         content = json.loads(response.content)
-        certificate_id = self._remove_ids(content)  # pylint: disable=unused-variable
+        certificate_id = self._remove_ids(content)
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
@@ -326,6 +327,19 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         self.assertEqual(response.status_code, 403)
         self.assertIn("error", response.content)
 
+    def test_audit_course_mode_is_skipped(self):
+        """
+        Tests audit course mode is skipped when rendering certificates page.
+        """
+        CourseModeFactory.create(course_id=self.course.id)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+        response = self.client.get_html(
+            self._url(),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'verified')
+        self.assertNotContains(response, 'audit')
+
     def test_assign_unique_identifier_to_certificates(self):
         """
         Test certificates have unique ids
@@ -335,6 +349,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
             u'description': u'New test description',
+            u'is_active': True,
             u'signatories': []
         }
 
@@ -386,8 +401,8 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
+            u'is_active': True,
             u'course_title': u'Course Title Override',
-            u'org_logo_path': '',
             u'signatories': []
         }
 
@@ -417,8 +432,8 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
             u'description': u'New test description',
+            u'is_active': True,
             u'course_title': u'Course Title Override',
-            u'org_logo_path': '',
             u'signatories': []
 
         }
@@ -445,16 +460,50 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         self.assertEqual(course_certificates[1].get('name'), u'New test certificate')
         self.assertEqual(course_certificates[1].get('description'), 'New test description')
 
+    def test_can_edit_certificate_without_is_active(self):
+        """
+        Tests user should be able to edit certificate, if is_active attribute is not present
+        for given certificate. Old courses might not have is_active attribute in certificate data.
+        """
+        certificates = [
+            {
+                'id': 1,
+                'name': 'certificate with is_active',
+                'description': 'Description ',
+                'signatories': [],
+                'version': CERTIFICATE_SCHEMA_VERSION,
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.save_course()
+
+        expected = {
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'is_active': True,
+            u'course_title': u'Course Title Override',
+            u'signatories': []
+
+        }
+
+        response = self.client.post(
+            self._url(cid=1),
+            data=json.dumps(expected),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+        content = json.loads(response.content)
+        self.assertEqual(content, expected)
+
     def test_can_delete_certificate_with_signatories(self):
         """
         Delete certificate
         """
         self._add_course_certificates(count=2, signatory_count=1)
-        certificates = self.course.certificates['certificates']
-        org_logo_url = certificates[1]['org_logo_path']
-        image_asset_location = AssetLocation.from_deprecated_string(org_logo_url)
-        content = contentstore().find(image_asset_location)
-        self.assertIsNotNone(content)
         response = self.client.delete(
             self._url(cid=1),
             content_type="application/json",
@@ -471,8 +520,6 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         # Verify that certificates are properly updated in the course.
         certificates = self.course.certificates['certificates']
         self.assertEqual(len(certificates), 1)
-        # make sure certificate org logo is deleted too
-        self.assertRaises(NotFoundError, contentstore().find, image_asset_location)
         self.assertEqual(certificates[0].get('name'), 'Name 0')
         self.assertEqual(certificates[0].get('description'), 'Description 0')
 
@@ -485,6 +532,51 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         self.client.login(username=user.username, password='test')
         response = self.client.delete(
             self._url(cid=1),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_certificate_without_global_staff_permissions(self):
+        """
+        Tests deletion of an active certificate without global staff permission on course.
+        """
+        self._add_course_certificates(count=2, signatory_count=1, is_active=True)
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
+        self.client.login(username=user.username, password='test')
+        response = self.client.delete(
+            self._url(cid=1),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_active_certificate_without_global_staff_permissions(self):
+        """
+        Tests update of an active certificate without global staff permission on course.
+        """
+        self._add_course_certificates(count=2, signatory_count=1, is_active=True)
+        cert_data = {
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'course_title': u'Course Title Override',
+            u'org_logo_path': '',
+            u'is_active': False,
+            u'signatories': []
+        }
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
+        self.client.login(username=user.username, password='test')
+        response = self.client.put(
+            self._url(cid=1),
+            data=json.dumps(cert_data),
             content_type="application/json",
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
@@ -595,6 +687,27 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
         self._add_course_certificates(count=1, signatory_count=2)
         user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.post(
+            test_url,
+            data=json.dumps({"is_active": activate}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEquals(response.status_code, 403)
+
+    @ddt.data(True, False)
+    def test_certificate_activation_without_global_staff_permissions(self, activate):
+        """
+        Tests certificate Activate and Deactivate should not be allowed if user
+        does not have global staff permissions on course.
+        """
+        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        self._add_course_certificates(count=1, signatory_count=2)
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
         self.client.login(username=user.username, password='test')
         response = self.client.post(
             test_url,

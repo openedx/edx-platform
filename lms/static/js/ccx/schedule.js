@@ -86,9 +86,9 @@ var edx = edx || {};
 	      }
 	      else {
 		self.vertical_select.html('').prop('disabled', true);
-	      } 
+	      }
 	    });
-	    
+
 	    this.vertical_select.on('change', function() {
 	      var vertical_location = self.vertical_select.val();
 	      if (vertical_location !== 'all') {
@@ -104,23 +104,41 @@ var edx = edx || {};
 	    // Add unit handler
 	    $('#add-unit-button').on('click', function(event) {
 	      event.preventDefault();
-	      var chapter = self.chapter_select.val(),
-		  sequential = self.sequential_select.val(),
-		  vertical = self.vertical_select.val(),
-		  units = self.find_lineage(self.schedule,
-		    chapter,
-		    sequential === 'all' ? null : sequential,
-		    vertical === 'all' ? null: vertical),
-		  start = self.get_datetime('start'),
-		  due = self.get_datetime('due');
-	      units.map(self.show);
-	      var unit = units[units.length - 1];
-	      self.schedule_apply([unit], self.show);      
-	      if (unit !== undefined && start) { unit.start = start; }
-	      if (unit !== undefined && due) { unit.due = due; }
-	      self.schedule_collection.set(self.schedule);
-	      self.dirty = true;
-	      self.render();
+	      // Default value of time is 00:00.
+	      var start, chapter, sequential, vertical, units, due;
+	      start = self.get_datetime('start');
+	      chapter = self.chapter_select.val();
+	      sequential = self.sequential_select.val();
+	      vertical = self.vertical_select.val();
+	      units = self.find_lineage(
+	        self.schedule,
+	        chapter,
+	        sequential === 'all' ? null : sequential,
+	        vertical === 'all' ? null : vertical
+	      );
+	      due = self.get_datetime('due');
+	      var errorMessage = self.valid_dates(start, due);
+	      if (_.isUndefined(errorMessage)) {
+	        units.map(self.show);
+	        var unit = units[units.length - 1];
+	        if (!_.isUndefined(unit)) {
+	          if (!_.isNull(start)) {
+	            unit.start = start;
+	          }
+	          if (!_.isNull(due)) {
+	            unit.due = due;
+	          }
+	        }
+	        self.schedule_apply([unit], self.show);
+	        self.schedule_collection.set(self.schedule);
+	        self.dirty = true;
+	        self.render();
+	      } else {
+	        self.dirty = false;
+	        $('#ccx_schedule_error_message').text(errorMessage);
+	        $('#ajax-error').show().focus();
+	        $('#dirty-schedule').hide();
+	      }
 	    });
 
 	    // Handle save button
@@ -139,22 +157,27 @@ var edx = edx || {};
               return !node.hidden;});
             this.$el.html(schedule_template({chapters: this.showing}));
             $('table.ccx-schedule .sequential,.vertical').hide();
-            $('table.ccx-schedule .toggle-collapse').on('click', this.toggle_collapse);
+            $('table.ccx-schedule .unit .toggle-collapse').on('click', this.toggle_collapse);
 	    //
 	    // Hidden hover fields for empty date fields
-	    $('table.ccx-schedule .date a').each(function() {
-	      if (! $(this).text()) {
-		$(this).text('Set date').addClass('empty');
+	    $('table.ccx-schedule .date button').each(function() {
+	      if ($(this).text().trim() === gettext("Click to change")) {
+		$(this).html('Set date <span class="sr"> ' +
+			 gettext("Click to change") + '</span>');
 	      }
 	    });
-	    
+
 	    // Handle date edit clicks
-	    $('table.ccx-schedule .date a').attr('href', '#enter-date-modal')
+	    $('table.ccx-schedule .date button').attr('href', '#enter-date-modal')
 	      .leanModal({closeButton: '.close-modal'});
-	    $('table.ccx-schedule .due-date a').on('click', this.enterNewDate('due'));
-	    $('table.ccx-schedule .start-date a').on('click', this.enterNewDate('start'));
+	    $('table.ccx-schedule .due-date button').on('click', this.enterNewDate('due'));
+	    $('table.ccx-schedule .start-date button').on('click', this.enterNewDate('start'));
+	    // click handler for expand all
+	    $('#ccx_expand_all_btn').on('click', self.expandAll);
+	    // click handler for collapse all
+	    $('#ccx_collapse_all_btn').on('click', self.collapseAll);
 	    // Click handler for remove all
-	    $('table.ccx-schedule a#remove-all').on('click', function(event) {
+	    $('table.ccx-schedule button#remove-all').on('click', function(event) {
 	      event.preventDefault();
 	      self.schedule_apply(self.schedule, self.hide);
 	      self.dirty = true;
@@ -162,14 +185,14 @@ var edx = edx || {};
 	      self.render();
 	    });
 	    // Remove unit handler
-	    $('table.ccx-schedule a.remove-unit').on('click', function() {
+	    $('table.ccx-schedule button.remove-unit').on('click', function() {
 	      var row = $(this).closest('tr'),
 		  path = row.data('location').split(' '),
 		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]);
 	      self.schedule_apply([unit], self.hide);
 	      self.schedule_collection.set(self.schedule);
 	      self.dirty = true;
-	      self.render(); 
+	      self.render();
 	    });
 
 
@@ -191,7 +214,13 @@ var edx = edx || {};
 	    }
 
 	    // Show or hide save button
-	    if (this.dirty) {$('#dirty-schedule').show();}
+	    if (this.dirty) {
+	      $('#dirty-schedule').show();
+	      $('html, body').animate(
+	        { scrollTop: $('#dirty-schedule').offset().top },
+	        'slow', function() {$('#dirty-schedule').focus();}
+				);
+      }
 	    else {$('#dirty-schedule').hide();}
 
 	    $('#ajax-error').hide();
@@ -202,8 +231,8 @@ var edx = edx || {};
 	save: function() {
 	    self.schedule_collection.set(self.schedule);
 	    var button = $('#dirty-schedule #save-changes');
-	    button.prop('disabled', true).text(gettext("Saving")+'...');
-	    
+	    button.prop('disabled', true).text(gettext("Saving"));
+
 	    $.ajax({
 		url: save_url,
 		type: 'POST',
@@ -213,14 +242,14 @@ var edx = edx || {};
 		  self.dirty = false;
 		  self.render();
 		  button.prop('disabled', false).text(gettext("Save changes"));
-		  
+
 		  // Update textarea with grading policy JSON, since grading policy
-		  // may have changed.  
+		  // may have changed.
 		  $('#grading-policy').text(data.grading_policy);
 		},
 		error: function(jqXHR) {
 		  console.log(jqXHR.responseText);
-		  $('#ajax-error').show();
+		  $('#ajax-error').show().focus();
 		  $('#dirty-schedule').hide();
 		  $('form#add-unit select,input,button').prop('disabled', true);
 		  button.prop('disabled', false).text(gettext("Save changes"));
@@ -240,9 +269,27 @@ var edx = edx || {};
 	    }
 	},
 
+	valid_dates: function(start, due) {
+          var errorMessage;
+          // Start date is compulsory and due date is optional.
+          if (_.isEmpty(start) && !_.isEmpty(due)) {
+            errorMessage = gettext("Please enter valid start date and time.");
+          } else if (!_.isEmpty(start) && !_.isEmpty(due)) {
+            var requirejs = window.require || RequireJS.require;
+            var moment = requirejs("moment");
+            var parsedDueDate = moment(due, 'YYYY-MM-DD HH:mm');
+            var parsedStartDate = moment(start, 'YYYY-MM-DD HH:mm');
+            if (parsedDueDate.isBefore(parsedStartDate)) {
+              errorMessage = gettext("Due date cannot be before start date.");
+            }
+          }
+          return errorMessage;
+	},
+
 	get_datetime: function(which) {
 	    var date = $('form#add-unit input[name=' + which + '_date]').val();
 	    var time = $('form#add-unit input[name=' + which + '_time]').val();
+	    time = _.isEmpty(time) ? "00:00" : time;
 	    if (date && time) {
 	      return date + ' ' + time; }
 	    return null;
@@ -290,21 +337,48 @@ var edx = edx || {};
 	    var children = self.get_children(row);
 
 	    if (row.is('.expanded')) {
-	      $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
+				$(this).attr('aria-expanded', 'false');
+	      $(this).find(".fa-caret-down").removeClass('fa-caret-down').addClass('fa-caret-right');
 	      row.removeClass('expanded').addClass('collapsed');
-	      children.hide(); 
+	      children.hide();
 	    }
-
 	    else {
-	      $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
+				$(this).attr('aria-expanded', 'true');
+	      $(this).find(".fa-caret-right").removeClass('fa-caret-right').addClass('fa-caret-down');
 	      row.removeClass('collapsed').addClass('expanded');
 	      children.filter('.collapsed').each(function() {
 		children = children.not(self.get_children(this));
 	      });
-	      children.show(); 
+	      children.show();
 	    }
 	},
+  expandAll : function() {
+    $('table.ccx-schedule > tbody > tr').each(function() {
+      var row = $(this);
+      if (!row.is('.expanded')) {
+        var children = self.get_children(row);
+        row.find(".ccx_sr_alert").attr("aria-expanded", "true");
+        row.find(".fa-caret-right").removeClass('fa-caret-right').addClass('fa-caret-down');
+        row.removeClass('collapsed').addClass('expanded');
+        children.filter('.collapsed').each(function() {
+          children = children.not(self.get_children(this));
+        });
+        children.show();
+      }
+    });
+  },
+  collapseAll: function() {
+    $('table.ccx-schedule > tbody > tr').each(function() {
+      var row = $(this);
+      if (row.is('.expanded')) {
+				$(row).find('.ccx_sr_alert').attr('aria-expanded', 'false');
+	      $(row).find('.fa-caret-down').removeClass('fa-caret-down').addClass('fa-caret-right');
+	      row.removeClass('expanded').addClass('collapsed');
+        $('table.ccx-schedule .sequential,.vertical').hide();
+	    }
+    });
 
+  },
 	enterNewDate: function(what) {
 	    return function() {
 	      var row = $(this).closest('tr');
@@ -312,10 +386,27 @@ var edx = edx || {};
 		.data('what', what)
 		.data('location', row.data('location'));
 	      modal.find('h2').text(
-		  what === 'due' ? gettext("Enter Due Date") : 
-		      gettext("Enter Start Date"));
-	      modal.find('label').text(row.find('td:first').text());
+		  what === 'due' ? gettext("Enter Due Date and Time") :
+		      gettext("Enter Start Date and Time"));
 
+        modal.focus();
+
+        $(document).on('focusin', function(event) {
+          try {
+             if (!_.isUndefined(event.target.closest('.modal').id) &&
+               event.target.closest('.modal').id !== 'enter-date-modal' &&
+               event.target.id !== 'enter-date-modal') {
+               event.preventDefault();
+               modal.find('.close-modal').focus();
+             }
+          } catch (err) {
+            event.preventDefault();
+            modal.find('.close-modal').focus();
+          }
+        });
+        modal.find('.close-modal').click(function () {
+          $(document).off('focusin');
+        });
 	      var path = row.data('location').split(' '),
 		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]),
 		  parts = unit[what] ? unit[what].split(' ') : ['', ''],

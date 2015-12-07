@@ -14,7 +14,7 @@
 .rubric {
   margin: 0;
   color: #3C3C3C;
-  
+
   tr {
     margin: 0;
     height: 100%;
@@ -58,7 +58,7 @@
   .selected-grade,
   .selected-grade .rubric-label {
     background: #666;
-    color: white; 
+    color: white;
   }
 
   input[type=radio]:checked + .rubric-label {

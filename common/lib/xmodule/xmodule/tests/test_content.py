@@ -3,7 +3,7 @@
 import os
 import unittest
 import ddt
-from path import path
+from path import Path as path
 from xmodule.contentstore.content import StaticContent, StaticContentStream
 from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation

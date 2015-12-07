@@ -1,7 +1,6 @@
 """
 Acceptance tests for course in studio
 """
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from .base_studio_test import StudioCourseTest
@@ -33,9 +32,9 @@ class CourseTeamPageTest(StudioCourseTest):
         """
         super(CourseTeamPageTest, self).setUp(is_staff)
 
-        self.other_user = self._make_user('other')  # pylint:disable=attribute-defined-outside-init
-        self.dashboard_page = DashboardPage(self.browser)  # pylint:disable=attribute-defined-outside-init
-        self.page = CourseTeamPage(  # pylint:disable=attribute-defined-outside-init
+        self.other_user = self._make_user('other')
+        self.dashboard_page = DashboardPage(self.browser)
+        self.page = CourseTeamPage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
         self._go_to_course_team_page()
@@ -74,9 +73,15 @@ class CourseTeamPageTest(StudioCourseTest):
     def _assert_user_present(self, user, present=True):
         """ Checks if specified user present on Course Team page """
         if present:
-            self.assertIn(user.get('username'), self.page.usernames)
+            self.page.wait_for(
+                lambda: user.get('username') in self.page.usernames,
+                description="Wait for user to be present"
+            )
         else:
-            self.assertNotIn(user.get('username'), self.page.usernames)
+            self.page.wait_for(
+                lambda: user.get('username') not in self.page.usernames,
+                description="Wait for user to be absent"
+            )
 
     def _should_see_dialog(self, dialog_type, dialog_message):
         """ Asserts dialog with specified message is shown """
@@ -127,7 +132,6 @@ class CourseTeamPageTest(StudioCourseTest):
         self.log_in(self.other_user)
         self._assert_current_course(visible=True)
 
-    @flaky  # TODO fix this, see TNL-2667
     def test_added_users_cannot_add_or_delete_other_users(self):
         """
         Scenario: Added users cannot delete or add other users

@@ -4,19 +4,20 @@
   <form method="POST" action="ccx_invite">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <h2> ${_("Batch Enrollment")} </h2>
-  <p>
-    <label for="student-ids">
+  <label for="student-ids" class="sr">${_("Email Addresses/Usernames")}</label>
+  <p id="label_student_ids" class="text-helper">
       ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
-      ${_("You will not get notification for emails that bounce, so please double-check spelling.")} </label>
-    <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
+      ${_("You will not get notification for emails that bounce, so please double-check spelling.")}
   </p>
+  <textarea rows="6" name="student-ids" id="student-ids" aria-describedby="label_student_ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
+
 
   <div class="enroll-option">
-    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
+    <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="auto-enroll-helper" disabled>
     <label style="display:inline" for="auto-enroll">${_("Auto Enroll")}</label>
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
-      <p>
+      <p class="text-helper" id="auto-enroll-helper">
 	${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
 	${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
 	<br /><br />
@@ -26,11 +27,11 @@
   </div>
 
   <div class="enroll-option">
-    <input type="checkbox" name="email-students" value="Notify-students-by-email" checked="yes">
+    <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="email-students-helper">
     <label style="display:inline" for="email-students">${_("Notify users by email")}</label>
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
-      <p>
+      <p class="text-helper" id="email-students-helper">
 	${_("If this option is <em>checked</em>, users will receive an email notification.")}
       </p>
     </div>
@@ -46,12 +47,20 @@
 </div>
 
 <div class="member-lists-management" style="float:left;width:50%">
-  <form method="POST" action="ccx_manage_student">
+  <form method="POST" action="ccx_manage_student" class="ccx-manage-student-form">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <div class="auth-list-container active">
     <div class="member-list-widget">
       <div class="member-list">
         <h2> ${_("Student List Management")}</h2>
+        %if messages:
+          <label for="ccx_std_list_messages" class="sr">${_("CCX student list management response message")}</label>
+          <div id="ccx_std_list_messages" tabindex="-1" class="request-response-error">
+            %for message in messages:
+              ${message}
+            %endfor
+          </div>
+        %endif
         <table>
           <thead>
             <tr>
@@ -63,19 +72,43 @@
           <tbody>
             %for member in ccx_members:
             <tr>
-              <td>${member.student}</td>
-              <td>${member.student.email}</td>
-              <td><div class="revoke"><i class="fa fa-times-circle"></i> Revoke access</div></td>
+              <td>${member.user}</td>
+              <td>${member.user.email}</td>
+              <td><a class="revoke"><i class="fa fa-times-circle" aria-hidden="true"></i> ${_("Revoke access")}</a></td>
             </tr>
             %endfor
           </tbody>
         </table>
       </div>
       <div class="bottom-bar">
-        <input name="student-id" class="add-field" placeholder="Enter username or email" type="text">
+        <label for="student-id" class="sr">${_("Enter username or email")}</label>
+        <input name="student-id" id="student-id" class="add-field" placeholder="${_("Enter username or email")}" type="text">
         <input name="student-action" class="add" value="Add Student" type="button">
+        <div class="enroll-option">
+            <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="auto-enroll-helper" disabled>
+            <label style="display:inline" for="auto-enroll">${_("Auto Enroll")}</label>
+            <div class="hint auto-enroll-hint">
+              <span class="hint-caret"></span>
+              <p class="text-helper" id="auto-enroll-helper">
+                ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
+                ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                <br /><br />
+                ${_("Checking this box has no effect if 'Revoke' is clicked.")}
+              </p>
+            </div>
+        </div>
+        <div class="enroll-option ccx-notify-user">
+            <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="email-students-helper">
+            <label style="display:inline" for="email-students">${_("Notify users by email")}</label>
+            <div class="hint email-students-hint">
+              <span class="hint-caret"></span>
+              <p class="text-helper" id="email-students-helper">
+                ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+              </p>
+            </div>
+        </div>
       </div>
     </div>
   </div>
   </form>
-</div> 
+</div>

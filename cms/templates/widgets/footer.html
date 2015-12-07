@@ -11,21 +11,22 @@ from django.core.urlresolvers import reverse
         <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
       </div>
 
-      <nav class="nav-peripheral">
-        <ol>
-          <li class="nav-item nav-peripheral-tos">
-            <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
-          </li>
-          <li class="nav-item nav-peripheral-pp">
-            <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-          </li>
-          % if settings.TENDER_DOMAIN and user.is_authenticated():
-          <li class="nav-item nav-peripheral-feedback">
-            <a data-rel="edx.org" href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
-          </li>
-          % endif
-        </ol>
-      </nav>
+      % if is_any_marketing_link_set(['TOS', 'PRIVACY']):
+        <nav class="nav-peripheral">
+          <ol>
+            % if is_marketing_link_set('TOS'):
+              <li class="nav-item nav-peripheral-tos">
+                <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+              </li>
+            % endif
+            % if is_marketing_link_set('PRIVACY'):
+              <li class="nav-item nav-peripheral-pp">
+                <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+              </li>
+            % endif
+          </ol>
+        </nav>
+      % endif
     </div>
 
     <div class="footer-content-secondary" aria-label="{_('Legal')}">

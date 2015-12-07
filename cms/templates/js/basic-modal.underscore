@@ -1,13 +1,11 @@
 <div class="wrapper wrapper-modal-window wrapper-modal-window-<%= name %>"
-     aria-describedby="modal-window-description"
      aria-labelledby="modal-window-title"
-     aria-hidden=""
      role="dialog">
     <div class="modal-window-overlay"></div>
-    <div class="modal-window <%= viewSpecificClasses %> modal-<%= size %> modal-type-<%= type %>">
+    <div class="modal-window <%= viewSpecificClasses %> modal-<%= size %> modal-type-<%= type %>" tabindex="-1" aria-labelledby="modal-window-title">
         <div class="<%= name %>-modal">
             <div class="modal-header">
-                <h2 class="title modal-window-title"><%= title %></h2>
+                <h2 id="modal-window-title" class="title modal-window-title"><%= title %></h2>
                 <ul class="editor-modes action-list action-modes">
                 </ul>
             </div>

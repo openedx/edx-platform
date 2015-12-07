@@ -33,9 +33,9 @@ class UsersPageMixin(PageObject):
 
     def is_browser_on_page(self):
         """
-        Returns True iff the browser has loaded the page.
+        Returns True if the browser has loaded the page.
         """
-        return self.q(css='body.view-team').present
+        return self.q(css='body.view-team').present and not self.q(css='.ui-loading').present
 
     @property
     def users(self):
@@ -254,6 +254,7 @@ class UserWrapper(PageObject):
         self.wait_for_element_visibility('.prompt', 'Prompt is visible')
         self.wait_for_element_visibility('.prompt .action-primary', 'Confirmation button is visible')
         self.q(css='.prompt .action-primary').click()
+        self.wait_for_element_absence('.page-prompt .is-shown', 'Confirmation prompt is hidden')
         wait_for_ajax_or_reload(self.browser)
 
     @property

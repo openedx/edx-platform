@@ -2,8 +2,7 @@
 #
 # If you open a pull request that adds a new dependency, you should notify:
 #   * @mollydb to check licensing
-#   * One of @e0d, @feanil, @fredsmith, @maxrothman, or @jibsheet
-#     to check system requirements
+#   * @edx/devops to check system requirements
 
 # Use a modern setuptools instead of distribute
 setuptools==18.0.1
@@ -13,7 +12,7 @@ setuptools==18.0.1
 numpy==1.6.2
 
 # Needed to make sure that options in base.txt are allowed
-pip==6.0.8
+pip==7.1.2
 
 # Needed for meliae
 Cython==0.21.2

@@ -6,7 +6,6 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
-from flaky import flaky
 
 from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
@@ -218,7 +217,6 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
-    @flaky  # TODO fix this, see TNL-2419
     def test_mathjax_rendering(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
 
@@ -233,8 +231,28 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         thread_fixture.push()
         self.setup_thread_page(thread_id)
         self.assertTrue(self.thread_page.is_discussion_body_visible())
-        self.assertTrue(self.thread_page.is_mathjax_preview_available())
-        self.assertTrue(self.thread_page.is_mathjax_rendered())
+        self.thread_page.verify_mathjax_preview_available()
+        self.thread_page.verify_mathjax_rendered()
+
+    def test_markdown_reference_link(self):
+        """
+        Check markdown editor renders reference link correctly
+        and colon(:) in reference link is not converted to %3a
+        """
+        sample_link = "http://example.com/colon:test"
+        thread_content = """[enter link description here][1]\n[1]: http://example.com/colon:test"""
+        thread_id = "test_thread_{}".format(uuid4().hex)
+        thread_fixture = SingleThreadViewFixture(
+            Thread(
+                id=thread_id,
+                body=thread_content,
+                commentable_id=self.discussion_id,
+                thread_type="discussion"
+            )
+        )
+        thread_fixture.push()
+        self.setup_thread_page(thread_id)
+        self.assertEqual(self.thread_page.get_link_href(), sample_link)
 
     def test_marked_answer_comments(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
@@ -298,7 +316,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
 
     def test_page_scroll_on_thread_change_view(self):
         """
-        Check switching between threads changes the page to scroll to bottom
+        Check switching between threads changes the page focus
         """
         # verify threads are rendered on the page
         self.assertTrue(
@@ -309,8 +327,8 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
         self.assertTrue(self.thread_page_2.is_browser_on_page())
 
-        # Verify that window is on top of page.
-        self.thread_page_2.check_window_is_on_top()
+        # Verify that the focus is changed
+        self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
 
 @attr('shard_2')
@@ -374,8 +392,11 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     def setup_view(self):
         view = SingleThreadViewFixture(Thread(id="comment_deletion_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
-            Response(id="response1"),
-            [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
+            Response(id="response1"), [
+                Comment(id="comment_other_author"),
+                Comment(id="comment_self_author", user_id=self.user_id, thread_id="comment_deletion_test_thread")
+            ]
+        )
         view.push()
 
     def test_comment_deletion_as_student(self):

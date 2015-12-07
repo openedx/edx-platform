@@ -100,8 +100,9 @@
   <% if ( isActive ) { %>
   <div class="payment-buttons nav-wizard is-ready center">
     <input type="hidden" name="contribution" value="<%- minPrice %>" />
+    <input type="hidden" name="sku" value="<%- sku %>" />
     <div class="purchase">
-      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %></span></p>
+      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
     </div>
     <div class="pay-options">
       <%

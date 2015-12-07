@@ -9,7 +9,7 @@ import datetime
 
 from textwrap import dedent
 from collections import namedtuple
-from path import path
+from path import Path as path
 
 from opaque_keys.edx.keys import CourseKey
 
@@ -152,6 +152,21 @@ class CourseFixture(XBlockContainerFixture):
         """
         return "<CourseFixture: org='{org}', number='{number}', run='{run}'>".format(**self._course_dict)
 
+    def add_course_details(self, course_details):
+        """
+        Add course details to dict of course details to be updated when configure_course or install is called.
+
+        Arguments:
+            Dictionary containing key value pairs for course updates,
+            e.g. {'start_date': datetime.now() }
+        """
+        if 'start_date' in course_details:
+            course_details['start_date'] = course_details['start_date'].isoformat()
+        if 'end_date' in course_details:
+            course_details['end_date'] = course_details['end_date'].isoformat()
+
+        self._course_details.update(course_details)
+
     def add_update(self, update):
         """
         Add an update to the course.  `update` should be a `CourseUpdateDesc`.
@@ -200,6 +215,33 @@ class CourseFixture(XBlockContainerFixture):
         self._create_xblock_children(self._course_location, self.children)
 
         return self
+
+    def configure_course(self):
+        """
+        Configure Course Settings, take new course settings from self._course_details dict object
+        """
+        self._configure_course()
+
+    @property
+    def course_outline(self):
+        """
+        Retrieves course outline in JSON format.
+        """
+        url = STUDIO_BASE_URL + '/course/' + self._course_key + "?format=json"
+        response = self.session.get(url, headers=self.headers)
+
+        if not response.ok:
+            raise FixtureError(
+                "Could not retrieve course outline json.  Status was {0}".format(
+                    response.status_code))
+
+        try:
+            course_outline_json = response.json()
+        except ValueError:
+            raise FixtureError(
+                "Could not decode course outline as JSON: '{0}'".format(response)
+            )
+        return course_outline_json
 
     @property
     def _course_location(self):

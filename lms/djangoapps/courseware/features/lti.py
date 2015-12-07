@@ -181,10 +181,10 @@ def add_correct_lti_to_course(_step, fields):
         metadata=metadata,
     )
 
-    setattr(world.scenario_dict['LTI'], 'TEST_BASE_PATH', '{host}:{port}'.format(
+    world.scenario_dict['LTI'].TEST_BASE_PATH = '{host}:{port}'.format(
         host=world.browser.host,
         port=world.browser.port,
-    ))
+    )
 
     visit_scenario_item('LTI')
 
@@ -277,7 +277,7 @@ def check_lti_popup(parent_window):
     for window in windows:
         world.browser.switch_to_window(window)
         tabs.append(world.browser.title)
-    assert_equal(tabs, expected_tabs)   # pylint: disable=no-value-for-parameter
+    assert_equal(tabs, expected_tabs)
 
     # Now verify the contents of the LTI window (which is the 2nd window/tab)
     # Note: The LTI opens in a new browser window, but Selenium sticks with the

@@ -6,7 +6,9 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
-from .utils import click_css, confirm_prompt, type_in_codemirror
+from ..common.utils import click_css, confirm_prompt
+
+from .utils import type_in_codemirror
 
 
 class ContainerPage(PageObject):
@@ -305,7 +307,7 @@ class ContainerPage(PageObject):
         Returns:
             list
         """
-        css = '#tab{tab_index} a[data-category={category_type}] span'.format(
+        css = '#tab{tab_index} button[data-category={category_type}] span'.format(
             tab_index=tab_index,
             category_type=category_type
         )

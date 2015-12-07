@@ -7,7 +7,7 @@
  */
  var edx = edx || {};
 
-(function($, gettext, Logger, accessibleModal) {
+(function($, gettext, Logger, accessibleModal, interpolate) {
     'use strict';
 
     edx.dashboard = edx.dashboard || {};
@@ -126,8 +126,18 @@
         });
 
         $(".action-unenroll").click(function(event) {
-            $("#unenroll_course_id").val( $(event.target).data("course-id") );
-            $("#unenroll_course_number").text( $(event.target).data("course-number") );
+            var element = $(event.target);
+            var track_info = element.data("track-info");
+            var course_number = element.data("course-number");
+            var course_name = element.data("course-name");
+            var cert_name_long = element.data("cert-name-long");
+            $('#track-info').html(interpolate(track_info, {
+                course_number: "<span id='unenroll_course_number'>" + course_number + "</span>",
+                course_name: "<span id='unenroll_course_name'>" + course_name + "</span>",
+                cert_name_long: "<span id='unenroll_cert_name'>" + cert_name_long + "</span>"
+            }, true));
+            $('#refund-info').html( element.data("refund-info") );
+            $("#unenroll_course_id").val( element.data("course-id") );
         });
 
         $('#unenroll_form').on('ajax:complete', function(event, xhr) {
@@ -190,7 +200,8 @@
         $("#unregister_block_course").click( function(event) {
             $("#unenroll_course_id").val($(event.target).data("course-id"));
             $("#unenroll_course_number").text($(event.target).data("course-number"));
+            $("#unenroll_course_name").text($(event.target).data("course-name"));
         });
     };
 
-})(jQuery, gettext, Logger, accessible_modal);
+})(jQuery, gettext, Logger, accessible_modal, interpolate); // jshint undef:false

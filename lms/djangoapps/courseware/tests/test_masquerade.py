@@ -2,6 +2,7 @@
 Unit tests for masquerade.
 """
 import json
+import pickle
 from mock import patch
 from nose.plugins.attrib import attr
 from datetime import datetime
@@ -12,6 +13,7 @@ from django.utils.timezone import UTC
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.masquerade import (
+    CourseMasquerade,
     MasqueradingKeyValueStore,
     handle_ajax,
     setup_masquerade,
@@ -394,3 +396,19 @@ class MasqueradingKeyValueStoreTest(TestCase):
                 self.kvs.get(key)
 
         self.assertEqual(self.kvs.get('c'), 'OpenCraft')
+
+
+class CourseMasqueradeTest(TestCase):
+    """
+    Unit tests for the CourseMasquerade class.
+    """
+    def test_unpickling_sets_all_attributes(self):
+        """
+        Make sure that old CourseMasquerade objects receive missing attributes when unpickled from
+        the session.
+        """
+        cmasq = CourseMasquerade(7)
+        del cmasq.user_name
+        pickled_cmasq = pickle.dumps(cmasq)
+        unpickled_cmasq = pickle.loads(pickled_cmasq)
+        self.assertEqual(unpickled_cmasq.user_name, None)

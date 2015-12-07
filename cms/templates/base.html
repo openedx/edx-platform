@@ -2,8 +2,9 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.template.defaultfilters import escapejs
-import json
+from openedx.core.lib.js_utils import (
+    escape_json_dumps, escape_js_string
+)
 %>
 <!doctype html>
 <!--[if lte IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
@@ -36,22 +37,16 @@ import json
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
-  <%block name="view_notes"></%block>
+    <%block name="view_notes"></%block>
 
     <a class="nav-skip" href="#content">${_("Skip to main content")}</a>
 
     <script type="text/javascript">
-      window.baseUrl = ${json.dumps(settings.STATIC_URL)};
-      window.TENDER_SUBDOMAIN = ${json.dumps(settings.TENDER_SUBDOMAIN)};
+      window.baseUrl = "${escape_js_string(settings.STATIC_URL) | n}";
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
-    <script type="text/javascript" src="${static.url("require-config.js")}"></script>
-
-    ## js templates
-    <script id="system-feedback-tpl" type="text/template">
-      <%static:include path="js/system-feedback.underscore" />
-    </script>
+    <script type="text/javascript" src="${static.url("cms/js/require-config.js")}"></script>
 
     <!-- view -->
     <div class="wrapper wrapper-view" dir="${static.dir_rtl()}">
@@ -70,7 +65,6 @@ import json
         <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
       % endif
       <%include file="widgets/footer.html" />
-      <%include file="widgets/tender.html" />
 
       <div id="page-notification"></div>
     </div>
@@ -81,17 +75,19 @@ import json
 
     <%block name="jsextra"></%block>
     <script type="text/javascript">
-      require(['js/factories/common_deps'], function () {
+      require(['common/js/common_libraries'], function () {
           require(['js/factories/base'], function () {
             % if context_course:
               require(['js/factories/course'], function(CourseFactory) {
                   CourseFactory({
-                      id: "${context_course.id | escapejs}",
+                      id: "${escape_js_string(context_course.id) | n}",
                       name: "${context_course.display_name_with_default | h}",
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
-                      revision: "${context_course.location.revision | h}"
+                      display_course_number: "${_(context_course.display_number_with_default)}",
+                      revision: "${context_course.location.revision | h}",
+                      self_paced: ${escape_json_dumps(context_course.self_paced) | n}
                   });
               });
             % endif
@@ -102,6 +98,7 @@ import json
           });
       });
     </script>
+    <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>
   </body>
 </html>

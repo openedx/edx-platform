@@ -2,12 +2,12 @@
 <%def name="online_help_token()"><% return "updates" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-import json
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
-<!-- TODO decode course # from context_course into title -->
+## TODO decode course # from context_course into title.
 <%block name="title">${_("Course Updates")}</%block>
 <%block name="bodyclass">is-signedin course course-info updates view-updates</%block>
 
@@ -26,7 +26,7 @@ from django.template.defaultfilters import escapejs
         "${updates_url}",
         "${handouts_locator | escapejs}",
         "${base_asset_url}",
-        ${json.dumps(push_notification_enabled)}
+        ${escape_json_dumps(push_notification_enabled) | n}
        );
   });
 </%block>
@@ -53,7 +53,7 @@ from django.template.defaultfilters import escapejs
   <div class="wrapper-content wrapper">
     <section class="content">
       <div class="introduction">
-        <p clas="copy">${_('Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML.')}</p>
+        <p class="copy">${_('Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML.')}</p>
       </div>
     </section>
   </div>

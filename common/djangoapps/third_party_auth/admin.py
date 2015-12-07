@@ -2,14 +2,33 @@
 """
 Admin site configuration for third party authentication
 """
+from django import forms
 
 from django.contrib import admin
 
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
-from .models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, SAMLProviderData
+from .models import (
+    OAuth2ProviderConfig,
+    SAMLProviderConfig,
+    SAMLConfiguration,
+    SAMLProviderData,
+    LTIProviderConfig,
+    ProviderApiPermissions
+)
 from .tasks import fetch_saml_metadata
+from third_party_auth.provider import Registry
 
-admin.site.register(OAuth2ProviderConfig, KeyedConfigurationModelAdmin)
+
+class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
+    """ Django Admin class for OAuth2ProviderConfig """
+    def get_list_display(self, request):
+        """ Don't show every single field in the admin change list """
+        return (
+            'name', 'enabled', 'backend_name', 'secondary', 'skip_registration_form',
+            'skip_email_verification', 'change_date', 'changed_by', 'edit_link',
+        )
+
+admin.site.register(OAuth2ProviderConfig, OAuth2ProviderConfigAdmin)
 
 
 class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
@@ -55,10 +74,12 @@ class SAMLConfigurationAdmin(ConfigurationModelAdmin):
 
     def key_summary(self, inst):
         """ Short summary of the key pairs configured """
-        if not inst.public_key or not inst.private_key:
+        public_key = inst.get_setting('SP_PUBLIC_CERT')
+        private_key = inst.get_setting('SP_PRIVATE_KEY')
+        if not public_key or not private_key:
             return u'<em>Key pair incomplete/missing</em>'
-        pub1, pub2 = inst.public_key[0:10], inst.public_key[-10:]
-        priv1, priv2 = inst.private_key[0:10], inst.private_key[-10:]
+        pub1, pub2 = public_key[0:10], public_key[-10:]
+        priv1, priv2 = private_key[0:10], private_key[-10:]
         return u'Public: {}…{}<br>Private: {}…{}'.format(pub1, pub2, priv1, priv2)
     key_summary.allow_tags = True
 
@@ -76,3 +97,50 @@ class SAMLProviderDataAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 admin.site.register(SAMLProviderData, SAMLProviderDataAdmin)
+
+
+class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
+    """ Django Admin class for LTIProviderConfig """
+
+    exclude = (
+        'icon_class',
+        'secondary',
+    )
+
+    def get_list_display(self, request):
+        """ Don't show every single field in the admin change list """
+        return (
+            'name',
+            'enabled',
+            'lti_consumer_key',
+            'lti_max_timestamp_age',
+            'change_date',
+            'changed_by',
+            'edit_link',
+        )
+
+admin.site.register(LTIProviderConfig, LTIProviderConfigAdmin)
+
+
+class ApiPermissionsAdminForm(forms.ModelForm):
+    """ Django admin form for ApiPermissions model """
+    class Meta(object):
+        model = ProviderApiPermissions
+        fields = ['client', 'provider_id']
+
+    provider_id = forms.ChoiceField(choices=[], required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(ApiPermissionsAdminForm, self).__init__(*args, **kwargs)
+        self.fields['provider_id'].choices = (
+            (provider.provider_id, "{} ({})".format(provider.name, provider.provider_id))
+            for provider in Registry.enabled()
+        )
+
+
+class ApiPermissionsAdmin(admin.ModelAdmin):
+    """ Django Admin class for ApiPermissions """
+    list_display = ('client', 'provider_id')
+    form = ApiPermissionsAdminForm
+
+admin.site.register(ProviderApiPermissions, ApiPermissionsAdmin)

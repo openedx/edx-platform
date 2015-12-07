@@ -1,12 +1,16 @@
+// lms - base courseware styling
+// ====================
+// NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
+
 html {
   height: 100%;
   max-height: 100%;
 }
 
-html.video-fullscreen{
+html.video-fullscreen {
   overflow: hidden;
 
-  body{
+  body {
     overflow: hidden;
   }
 }
@@ -26,16 +30,16 @@ html.video-fullscreen{
   .instructor-info-action {
     @extend %t-copy-sub2;
     @include float(right);
-    margin-left: ($baseline/2);
+    @include margin-left($baseline/2);
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);
     background-color: $shadow-l2;
     text-align: right;
     text-transform: uppercase;
-    color: $lighter-base-font-color;
+    color: $staff-color;
 
     &:hover {
-      background-color: $link-hover;
+      background-color: $staff-color;
       color: $white;
     }
   }
@@ -54,12 +58,14 @@ html.video-fullscreen{
 
 .content-wrapper {
 
-  .course-license, .xblock-license {
+  .course-license,
+  .xblock-license {
     @include text-align(right);
     @extend %t-title7;
     display: block;
     width: auto;
     padding: ($baseline/4) 0;
+    color: $gray-d1;
 
     span {
       color: inherit;
@@ -96,20 +102,291 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
-    padding: ($baseline*2);
+    padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
     line-height: 1.6;
+
+    .xblock {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
 
     h1 {
       margin: 0 0 lh();
     }
+    div.timed-exam {
+      h3 {
+        margin-bottom: 12px;
+        font-size: 22px;
+        font-weight: 600;
+      }
+      h1 {
+        margin-bottom: ($baseline/2);
+        font-size: 26px;
+        font-weight: 600;
+      }
+      h4 {
+        margin: 20px 0;
+        font-weight: 600;
+        b.success {
+          color: #2B8048;
+        }
+        b.success {
+          color: #2B8048;
+        }
+        b.failure {
+          color: #CB4765;
+        }
+      }
+      p {
+        color: #797676;
+        strong {
+          font-weight: 600;
+        }
+      }
+      button.gated-sequence {
+        background: $transparent;
+        color: $blue-d1;
+        border: none;
+        box-shadow: none;
+        @include text-align(left);
+        @extend %t-copy-base;
+        width: 100%;
 
+        &:hover {
+          background-color: transparent;
+          color: $link-hover;
+        }
+      }
+
+      span.proctored-exam-code {
+        margin-top: 5px;
+        font-size: 1.3em;
+      }
+      .gated-sequence {
+        color: #147ABA;
+        font-weight: 600;
+        padding: ($baseline / 1.5) ($baseline / 4);
+        a.start-timed-exam {
+          cursor: pointer;
+          color: #147ABA;
+          font-weight: 600;
+          position: relative;
+          top: ($baseline/10);
+          i.fa-arrow-circle-right {
+            font-size: $baseline;
+          }
+        }
+      }
+      .proctored-exam-select-code {
+        margin-left: 30px;
+      }
+
+      .exam-action-button {
+        @extend %t-weight4;
+        margin-right: $baseline;
+        background-image: none;
+        box-shadow: none;
+        text-shadow: none;
+
+        &.btn-pl-primary {
+          @extend %btn-pl-primary-base;
+          border: 0;
+
+          &:hover,
+          &:focus {
+            border: 0;
+          }
+        }
+      }
+
+      background-color: #F2F4F5;
+      padding: 30px;
+      font-size: 16px;
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .1);
+      border: 1px solid #ddd;
+      &.critical-time {
+        border-left: 4px solid #b30101 !important;
+        margin: 0 auto;
+      }
+      &.success {
+        border-left: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
+      &.success-top-bar {
+        border-top: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
+      &.success-left-bar {
+        border-left: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
+      &.message-top-bar {
+        border-top: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
+      &.message-left-bar {
+        border-left: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
+      &.failure {
+        border-left: 4px solid #C93B34 !important;
+        margin: 0 auto;
+      }
+      &.warning {
+        @include border-left(4px solid $warning-color);
+        margin: 0 auto;
+      }
+    }
+
+    div.proctored-exam {
+      @extend .timed-exam;
+
+      .proctored-exam-message {
+        border-top: ($baseline/10) solid rgb(207, 216, 220);
+        padding-top: 25px;
+      }
+
+      .proctored-exam-skip-actions {
+        padding-top: 20px;
+      }
+
+      // specialized padding override just for the entrance page
+      &.entrance {
+        button.gated-sequence {
+          padding: 0 ($baseline*5) 0 ($baseline*2.5);
+        }
+      }
+      hr {
+        border-bottom: 1px solid rgb(207, 216, 220);
+      }
+      .gated-sequence {
+        border-bottom: 2px solid rgb(207, 216, 220);
+        padding: 22px ($baseline*5) 15px 50px;
+        position: relative;
+        span {
+          .fa {
+            position: absolute;
+            font-size: 22px;
+            left: 0;
+            top: $baseline;
+            color: rgb(206, 216, 220);
+          }
+        }
+        .start-timed-exam {
+          margin-bottom:($baseline/2);
+          display: block;
+        }
+        p {
+          color: rgb(63, 58, 59);
+          strong {
+            font-weight: 600;
+          }
+        }
+        > .fa {
+          position: absolute;
+          right: 35px;
+          top: 50%;
+          font-size: 30px;
+          margin-top: -15px;
+          &.fa-arrow-circle-right {
+            top: 30%;
+          }
+        }
+        &:last-child {
+          > .fa {
+            color: rgb(206, 216, 220);
+          }
+          border-bottom: none;
+        }
+        &:last-child {
+          > .practice-exam {
+            color: #147ABA;
+          }
+          border-bottom: none;
+        }
+      }
+    }
+    .proctored-exam-skip-confirm-wrapper {
+      border-left: ($baseline/4) solid $red;
+      padding: $baseline ($baseline*1.5);;
+      background-color: rgb(242, 244, 245);
+
+      .msg-title {
+        @extend %t-title5;
+        @extend %t-strong;
+      }
+
+      .msg-content {
+        color: $gray-l1;
+
+        strong {
+          @extend %t-strong;
+        }
+      }
+
+      .proctored-exam-skip-actions {
+        @include float(right);
+        margin-top: $baseline;
+      }
+    }
+    .footer-sequence {
+      padding: 30px 0px 20px 0px;
+      border-bottom: ($baseline/10) solid #CFD9DD;
+      hr {
+        border-bottom: 1px solid rgb(207, 216, 220);
+      }
+      .clearfix {
+        clear: both;
+      }
+      h4 {
+        margin-bottom: 12px;
+        font-size: 22px;
+        font-weight: 400;
+      }
+      span {
+        margin-bottom: 10px;
+        display: inline-block;
+        font-weight: 600;
+      }
+      p.proctored-exam-option {
+        float: left;
+        width: 80%;
+        margin-bottom: 25px;
+
+      }
+      a.contest-review {
+        float: right;
+        font-size: 12px;
+        margin: 0;
+        width: 20%;
+        text-align: right;
+      }
+      p {
+        margin-bottom: ($baseline/20);
+        color: #797676;
+      }
+      .proctored-exam-instruction{
+        padding: ($baseline/2) 0;
+        border-bottom: 2px solid rgb(207, 216, 220);
+      }
+    }
+    .border-b-0 {
+      border-bottom: none;
+    }
+    .padding-b-0 {
+      padding-bottom: ($baseline/20);
+    }
+    .faq-proctoring-exam {
+      @extend .footer-sequence;
+      border-bottom : none;
+      a.footer-link {
+        display: block;
+        padding: 10px 0px 10px 0px;
+      }
+    }
     p {
       margin-bottom: lh();
-
-      &:empty {
-        display: none;
-        margin-bottom: 0;
-      }
     }
 
     .sequential-status-message {
@@ -202,8 +479,8 @@ div.course-wrapper {
 
         nav.sequence-bottom {
           ul {
-          list-style: none;
-          padding: 0;
+            list-style: none;
+            padding: 0;
           }
         }
       }
@@ -261,11 +538,11 @@ div.course-wrapper {
 
     div.staff_actions {
       p.error {
-        color: $error-red
+        color: $error-color
       }
       p.success {
         color: $success-color;
-     }
+      }
     }
 
     div.staff_info {
@@ -302,7 +579,7 @@ div.course-wrapper {
     }
 
     @media print {
-      padding: 0 2mm;
+      padding: 4mm 2mm 0;
       background: transparent !important;
     }
   }
@@ -314,23 +591,18 @@ div.course-wrapper {
 
       header#open_close_accordion {
         a {
-          background-image: url('../images/slide-right-icon.png');
+          background-image: url('#{$static-path}/images/slide-right-icon.png');
         }
       }
 
-      div#accordion {
+      .accordion {
         visibility: hidden;
         width: 10px;
         padding: 0;
 
-       nav {
-         white-space: pre;
-         overflow: hidden;
-
-         ul {
-           overflow: hidden;
-           white-space: nowrap;
-         }
+        nav {
+          white-space: pre;
+          overflow: hidden;
         }
       }
     }
@@ -349,46 +621,31 @@ div.course-wrapper {
 .xmodule_VideoModule {
   margin-bottom: ($baseline*1.5);
 
-
 }
 
 textarea.short-form-response {
-    height: 200px;
-    padding: ($baseline/4);
-    margin-top: ($baseline/4);
-    margin-bottom: ($baseline/4);
-    width: 100%;
+  height: 200px;
+  padding: ($baseline/4);
+  margin-top: ($baseline/4);
+  margin-bottom: ($baseline/4);
+  width: 100%;
 }
 
 section.self-assessment {
-    textarea.hint {
-        height: 100px;
-        padding: ($baseline/4);
-        margin-top: ($baseline/4);
-        margin-bottom: ($baseline/4);
-    }
+  textarea.hint {
+    height: 100px;
+    padding: ($baseline/4);
+    margin-top: ($baseline/4);
+    margin-bottom: ($baseline/4);
+  }
 
-    div {
-        margin-top: ($baseline/4);
-        margin-bottom: ($baseline/4);
-    }
+  div {
+    margin-top: ($baseline/4);
+    margin-bottom: ($baseline/4);
+  }
 
-    .error {
-        font-size: 14px;
-        font-weight: bold;
-    }
-}
-
-section.foldit {
-   table {
-       margin-top: ($baseline/2);
-   }
-   th {
-        text-align: center;
-   }
-   td {
-       padding-left: ($baseline/4);
-       padding-right: ($baseline/4);
-
-   }
+  .error {
+    font-size: 14px;
+    font-weight: bold;
+  }
 }

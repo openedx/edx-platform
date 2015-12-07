@@ -1,5 +1,6 @@
 import json
 import re
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 
 class GroupIdAssertionMixin(object):
@@ -23,10 +24,10 @@ class GroupIdAssertionMixin(object):
 
     def _assert_html_response_contains_group_info(self, response):
         group_info = {"group_id": None, "group_name": None}
-        match = re.search(r'&quot;group_id&quot;: ([\d]*)', response.content)
+        match = re.search(r'&#34;group_id&#34;: ([\d]*)', response.content)
         if match and match.group(1) != '':
             group_info["group_id"] = int(match.group(1))
-        match = re.search(r'&quot;group_name&quot;: &quot;([^&]*)&quot;', response.content)
+        match = re.search(r'&#34;group_name&#34;: &#34;([^&]*)&#34;', response.content)
         if match:
             group_info["group_name"] = match.group(1)
         self._assert_thread_contains_group_info(group_info)
@@ -144,4 +145,12 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
     def test_non_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
         self.call_view(mock_request, "non_cohorted_topic", self.moderator, invalid_id)
+        self._assert_comments_service_called_without_group_id(mock_request)
+
+    def test_team_discussion_id_not_cohorted(self, mock_request):
+        team = CourseTeamFactory(course_id=self.course.id)
+
+        team.add_user(self.student)  # pylint: disable=no-member
+        self.call_view(mock_request, team.discussion_topic_id, self.student, None)
+
         self._assert_comments_service_called_without_group_id(mock_request)

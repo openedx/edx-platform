@@ -1,7 +1,7 @@
 // studio animations & keyframes
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Fade In - Extend
 // * +Fade Out - Extend
 // * +Rotate Up - Extend
@@ -16,7 +16,7 @@
 // * +Dropped - Extend
 
 // +Fade In - Extend
-// ==================== 
+// ====================
 // fade in keyframes
 @include keyframes(fadeIn) {
   0% {
@@ -38,9 +38,9 @@
 }
 
 // +Fade Out - Extend
-// ==================== 
+// ====================
 // fade out keyframes
-@include keyframes(fadeOut) { 
+@include keyframes(fadeOut) {
   0% {
     opacity: 1.0;
   }
@@ -60,7 +60,7 @@
 }
 
 // +Rotate Up - Extend
-// ==================== 
+// ====================
 // rotate up keyframes
 @include keyframes(rotateUp) {
   0% {
@@ -262,7 +262,7 @@
     }
 }
 
-// flash double animation 
+// flash double animation
 %anim-flashDouble {
   @include animation(flashDouble $tmg-f1 ease-in-out 1);
 }

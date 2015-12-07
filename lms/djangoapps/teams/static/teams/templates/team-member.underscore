@@ -1,0 +1,8 @@
+<li>
+  <span class="team-member">
+    <a class="member-profile" href="<%= memberProfileUrl %>">
+      <p class="tooltip-custom"><%= username %></p>
+      <img class="image-url" src="<%= imageUrl %>" alt="profile page" />
+    </a>
+  </span>
+</li>

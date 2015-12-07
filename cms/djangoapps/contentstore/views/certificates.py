@@ -35,6 +35,7 @@ from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey, AssetKey
 from eventtracking import tracker
 from student.auth import has_studio_write_access
+from student.roles import GlobalStaff
 from util.db import generate_int_id, MYSQL_MAX_INT
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
@@ -175,8 +176,8 @@ class CertificateManager(object):
             "id": certificate_data['id'],
             "name": certificate_data['name'],
             "description": certificate_data['description'],
+            "is_active": certificate_data['is_active'],
             "version": CERTIFICATE_SCHEMA_VERSION,
-            "org_logo_path": certificate_data.get('org_logo_path', ''),
             "signatories": certificate_data['signatories']
         }
 
@@ -208,13 +209,17 @@ class CertificateManager(object):
         return certificate
 
     @staticmethod
-    def get_certificates(course):
+    def get_certificates(course, only_active=False):
         """
-        Retrieve the certificates list from the provided course
+        Retrieve the certificates list from the provided course,
+        if `only_active` is True it would skip inactive certificates.
         """
         # The top-level course field is 'certificates', which contains various properties,
         # including the actual 'certificates' list that we're working with in this context
-        return course.certificates.get('certificates', [])
+        certificates = course.certificates.get('certificates', [])
+        if only_active:
+            certificates = [certificate for certificate in certificates if certificate.get('is_active', False)]
+        return certificates
 
     @staticmethod
     def remove_certificate(request, store, course, certificate_id):
@@ -225,7 +230,6 @@ class CertificateManager(object):
             if int(cert['id']) == int(certificate_id):
                 certificate = course.certificates['certificates'][index]
                 # Remove any signatory assets prior to dropping the entire cert record from the course
-                _delete_asset(course.id, certificate['org_logo_path'])
                 for sig_index, signatory in enumerate(certificate.get('signatories')):  # pylint: disable=unused-variable
                     _delete_asset(course.id, signatory['signature_image_path'])
                 # Now drop the certificate record
@@ -241,7 +245,7 @@ class CertificateManager(object):
         """
         for cert_index, cert in enumerate(course.certificates['certificates']):  # pylint: disable=unused-variable
             if int(cert['id']) == int(certificate_id):
-                for sig_index, signatory in enumerate(cert.get('signatories')):  # pylint: disable=unused-variable
+                for sig_index, signatory in enumerate(cert.get('signatories')):
                     if int(signatory_id) == int(signatory['id']):
                         _delete_asset(course.id, signatory['signature_image_path'])
                         del cert['signatories'][sig_index]
@@ -293,6 +297,9 @@ def certificate_activation_handler(request, course_key_string):
     POST
         json: is_active. update the activation state of certificate
     """
+    # Only global staff (PMs) are able to activate/deactivate certificate configuration
+    if not GlobalStaff().has_user(request.user):
+        raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     try:
@@ -347,12 +354,19 @@ def certificates_list_handler(request, course_key_string):
                 handler_name='certificates.certificate_activation_handler',
                 course_key=course_key
             )
-            course_modes = [mode.slug for mode in CourseMode.modes_for_course(course.id)]
-            certificate_web_view_url = get_lms_link_for_certificate_web_view(
-                user_id=request.user.id,
-                course_key=course_key,
-                mode=course_modes[0]  # CourseMode.modes_for_course returns default mode 'honor' if doesn't find anyone.
-            )
+            course_modes = [
+                mode.slug for mode in CourseMode.modes_for_course(
+                    course_id=course.id, include_expired=True
+                ) if mode.slug != 'audit'
+            ]
+            if len(course_modes) > 0:
+                certificate_web_view_url = get_lms_link_for_certificate_web_view(
+                    user_id=request.user.id,
+                    course_key=course_key,
+                    mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
+                )
+            else:
+                certificate_web_view_url = None
             certificates = None
             is_active = False
             if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
@@ -367,10 +381,11 @@ def certificates_list_handler(request, course_key_string):
                 'certificate_url': certificate_url,
                 'course_outline_url': course_outline_url,
                 'upload_asset_url': upload_asset_url,
-                'certificates': json.dumps(certificates),
+                'certificates': certificates,
                 'course_modes': course_modes,
                 'certificate_web_view_url': certificate_web_view_url,
                 'is_active': is_active,
+                'is_global_staff': GlobalStaff().has_user(request.user),
                 'certificate_activation_handler_url': activation_handler_url
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
@@ -391,7 +406,7 @@ def certificates_list_handler(request, course_key_string):
                 response["Location"] = reverse_course_url(
                     'certificates.certificates_detail_handler',
                     course.id,
-                    kwargs={'certificate_id': new_certificate.id}  # pylint: disable=no-member
+                    kwargs={'certificate_id': new_certificate.id}
                 )
                 store.update_item(course, request.user.id)
                 CertificateManager.track_event('created', {
@@ -431,6 +446,12 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
 
     store = modulestore()
     if request.method in ('POST', 'PUT'):
+        if certificate_id:
+            active_certificates = CertificateManager.get_certificates(course, only_active=True)
+            if int(certificate_id) in [int(certificate["id"]) for certificate in active_certificates]:
+                # Only global staff (PMs) are able to edit active certificate configuration
+                if not GlobalStaff().has_user(request.user):
+                    raise PermissionDenied()
         try:
             new_certificate = CertificateManager.deserialize_certificate(course, request.body)
         except CertificateValidationError as err:
@@ -454,6 +475,13 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
     elif request.method == "DELETE":
         if not match_cert:
             return JsonResponse(status=404)
+
+        active_certificates = CertificateManager.get_certificates(course, only_active=True)
+        if int(certificate_id) in [int(certificate["id"]) for certificate in active_certificates]:
+            # Only global staff (PMs) are able to delete active certificate configuration
+            if not GlobalStaff().has_user(request.user):
+                raise PermissionDenied()
+
         CertificateManager.remove_certificate(
             request=request,
             store=store,

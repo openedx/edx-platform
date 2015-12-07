@@ -8,8 +8,8 @@ from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.javascript import wait_for_js, js_defined
 from ....tests.helpers import YouTubeStubConfig
 from ...lms.video.video import VideoPage
+from ...common.utils import wait_for_notification
 from selenium.webdriver.common.keys import Keys
-from ..utils import wait_for_notification
 
 
 CLASS_SELECTORS = {
@@ -30,7 +30,7 @@ CLASS_SELECTORS = {
 }
 
 BUTTON_SELECTORS = {
-    'create_video': 'a[data-category="video"]',
+    'create_video': 'button[data-category="video"]',
     'handout_download': '.video-handout.video-download-button a',
     'handout_download_editor': '.wrapper-comp-setting.file-uploader .download-action',
     'upload_asset': '.upload-action',

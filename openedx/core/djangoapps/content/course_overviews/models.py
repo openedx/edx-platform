@@ -1,12 +1,16 @@
 """
 Declaration of CourseOverview model
 """
-
 import json
+from django.db import models, transaction
 
-import django.db.models
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
+from django.db.utils import IntegrityError
 from django.utils.translation import ugettext
+from lms.djangoapps import django_comment_client
+from model_utils.models import TimeStampedModel
+
+from opaque_keys.edx.keys import CourseKey
 
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
@@ -15,8 +19,10 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
+from ccx_keys.locator import CCXLocator
 
-class CourseOverview(django.db.models.Model):
+
+class CourseOverview(TimeStampedModel):
     """
     Model for storing and caching basic information about a course.
 
@@ -25,8 +31,17 @@ class CourseOverview(django.db.models.Model):
     a course as part of a user dashboard or enrollment API.
     """
 
+    class Meta(object):
+        app_label = 'course_overviews'
+
+    # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
+    VERSION = 2
+
+    # Cache entry versioning.
+    version = IntegerField()
+
     # Course identification
-    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)  # pylint: disable=invalid-name
+    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
     display_name = TextField(null=True)
     display_number_with_default = TextField()
@@ -45,23 +60,30 @@ class CourseOverview(django.db.models.Model):
 
     # Certification data
     certificates_display_behavior = TextField(null=True)
-    certificates_show_before_end = BooleanField()
-    cert_html_view_enabled = BooleanField()
-    has_any_active_web_certificate = BooleanField()
+    certificates_show_before_end = BooleanField(default=False)
+    cert_html_view_enabled = BooleanField(default=False)
+    has_any_active_web_certificate = BooleanField(default=False)
     cert_name_short = TextField()
     cert_name_long = TextField()
 
     # Grading
-    lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2)
+    lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2, null=True)
 
     # Access parameters
     days_early_for_beta = FloatField(null=True)
-    mobile_available = BooleanField()
-    visible_to_staff_only = BooleanField()
+    mobile_available = BooleanField(default=False)
+    visible_to_staff_only = BooleanField(default=False)
     _pre_requisite_courses_json = TextField()  # JSON representation of list of CourseKey strings
 
-    @staticmethod
-    def _create_from_course(course):
+    # Enrollment details
+    enrollment_start = DateTimeField(null=True)
+    enrollment_end = DateTimeField(null=True)
+    enrollment_domain = TextField(null=True)
+    invitation_only = BooleanField(default=False)
+    max_student_enrollments_allowed = IntegerField(null=True)
+
+    @classmethod
+    def _create_from_course(cls, course):
         """
         Creates a CourseOverview object from a CourseDescriptor.
 
@@ -75,17 +97,40 @@ class CourseOverview(django.db.models.Model):
             CourseOverview: overview extracted from the given course
         """
         from lms.djangoapps.certificates.api import get_active_web_certificate
-        from lms.djangoapps.courseware.courses import course_image_url
+        from openedx.core.lib.courses import course_image_url
 
-        return CourseOverview(
+        # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
+        # If the course has a malformed grading policy such that
+        # course._grading_policy['GRADE_CUTOFFS'] = {}, then
+        # course.lowest_passing_grade will raise a ValueError.
+        # Work around this for now by defaulting to None.
+        try:
+            lowest_passing_grade = course.lowest_passing_grade
+        except ValueError:
+            lowest_passing_grade = None
+
+        display_name = course.display_name
+        start = course.start
+        end = course.end
+        max_student_enrollments_allowed = course.max_student_enrollments_allowed
+        if isinstance(course.id, CCXLocator):
+            from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
+            ccx = get_ccx_from_ccx_locator(course.id)
+            display_name = ccx.display_name
+            start = ccx.start
+            end = ccx.due
+            max_student_enrollments_allowed = ccx.max_student_enrollments_allowed
+
+        return cls(
+            version=cls.VERSION,
             id=course.id,
             _location=course.location,
-            display_name=course.display_name,
+            display_name=display_name,
             display_number_with_default=course.display_number_with_default,
             display_org_with_default=course.display_org_with_default,
 
-            start=course.start,
-            end=course.end,
+            start=start,
+            end=end,
             advertised_start=course.advertised_start,
 
             course_image_url=course_image_url(course),
@@ -98,17 +143,73 @@ class CourseOverview(django.db.models.Model):
             has_any_active_web_certificate=(get_active_web_certificate(course) is not None),
             cert_name_short=course.cert_name_short,
             cert_name_long=course.cert_name_long,
-            lowest_passing_grade=course.lowest_passing_grade,
+            lowest_passing_grade=lowest_passing_grade,
             end_of_course_survey_url=course.end_of_course_survey_url,
 
             days_early_for_beta=course.days_early_for_beta,
             mobile_available=course.mobile_available,
             visible_to_staff_only=course.visible_to_staff_only,
-            _pre_requisite_courses_json=json.dumps(course.pre_requisite_courses)
+            _pre_requisite_courses_json=json.dumps(course.pre_requisite_courses),
+
+            enrollment_start=course.enrollment_start,
+            enrollment_end=course.enrollment_end,
+            enrollment_domain=course.enrollment_domain,
+            invitation_only=course.invitation_only,
+            max_student_enrollments_allowed=max_student_enrollments_allowed,
         )
 
-    @staticmethod
-    def get_from_id(course_id):
+    @classmethod
+    def load_from_module_store(cls, course_id):
+        """
+        Load a CourseDescriptor, create a new CourseOverview from it, cache the
+        overview, and return it.
+
+        Arguments:
+            course_id (CourseKey): the ID of the course overview to be loaded.
+
+        Returns:
+            CourseOverview: overview of the requested course.
+
+        Raises:
+            - CourseOverview.DoesNotExist if the course specified by course_id
+                was not found.
+            - IOError if some other error occurs while trying to load the
+                course from the module store.
+        """
+        store = modulestore()
+        with store.bulk_operations(course_id):
+            course = store.get_course(course_id)
+            if isinstance(course, CourseDescriptor):
+                course_overview = cls._create_from_course(course)
+                try:
+                    with transaction.atomic():
+                        course_overview.save()
+                        CourseOverviewTab.objects.bulk_create([
+                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            for tab in course.tabs
+                        ])
+                except IntegrityError:
+                    # There is a rare race condition that will occur if
+                    # CourseOverview.get_from_id is called while a
+                    # another identical overview is already in the process
+                    # of being created.
+                    # One of the overviews will be saved normally, while the
+                    # other one will cause an IntegrityError because it tries
+                    # to save a duplicate.
+                    # (see: https://openedx.atlassian.net/browse/TNL-2854).
+                    pass
+                return course_overview
+            elif course is not None:
+                raise IOError(
+                    "Error while loading course {} from the module store: {}",
+                    unicode(course_id),
+                    course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                )
+            else:
+                raise cls.DoesNotExist()
+
+    @classmethod
+    def get_from_id(cls, course_id):
         """
         Load a CourseOverview object for a given course ID.
 
@@ -121,8 +222,7 @@ class CourseOverview(django.db.models.Model):
             course_id (CourseKey): the ID of the course overview to be loaded.
 
         Returns:
-            CourseOverview: overview of the requested course. If loading course
-            from the module store failed, returns None.
+            CourseOverview: overview of the requested course.
 
         Raises:
             - CourseOverview.DoesNotExist if the course specified by course_id
@@ -130,25 +230,15 @@ class CourseOverview(django.db.models.Model):
             - IOError if some other error occurs while trying to load the
                 course from the module store.
         """
-        course_overview = None
         try:
-            course_overview = CourseOverview.objects.get(id=course_id)
-        except CourseOverview.DoesNotExist:
-            store = modulestore()
-            with store.bulk_operations(course_id):
-                course = store.get_course(course_id)
-                if isinstance(course, CourseDescriptor):
-                    course_overview = CourseOverview._create_from_course(course)
-                    course_overview.save()
-                elif course is not None:
-                    raise IOError(
-                        "Error while loading course {} from the module store: {}",
-                        unicode(course_id),
-                        course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
-                    )
-                else:
-                    raise CourseOverview.DoesNotExist()
-        return course_overview
+            course_overview = cls.objects.get(id=course_id)
+            if course_overview.version < cls.VERSION:
+                # Throw away old versions of CourseOverview, as they might contain stale data.
+                course_overview.delete()
+                course_overview = None
+        except cls.DoesNotExist:
+            course_overview = None
+        return course_overview or cls.load_from_module_store(course_id)
 
     def clean_id(self, padding_char='='):
         """
@@ -212,6 +302,13 @@ class CourseOverview(django.db.models.Model):
         """
         return course_metadata_utils.has_course_ended(self.end)
 
+    def starts_within(self, days):
+        """
+        Returns True if the course starts with-in given number of days otherwise returns False.
+        """
+
+        return course_metadata_utils.course_starts_within(self.start, days)
+
     def start_datetime_text(self, format_string="SHORT_DATE"):
         """
         Returns the desired text corresponding the course's start date and
@@ -263,3 +360,32 @@ class CourseOverview(django.db.models.Model):
         Returns a list of ID strings for this course's prerequisite courses.
         """
         return json.loads(self._pre_requisite_courses_json)
+
+    @classmethod
+    def get_all_course_keys(cls):
+        """
+        Returns all course keys from course overviews.
+        """
+        return [
+            CourseKey.from_string(course_overview['id'])
+            for course_overview in CourseOverview.objects.values('id')
+        ]
+
+    def is_discussion_tab_enabled(self):
+        """
+        Returns True if course has discussion tab and is enabled
+        """
+        tabs = self.tabs.all()
+        # creates circular import; hence explicitly referenced is_discussion_enabled
+        for tab in tabs:
+            if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
+                return True
+        return False
+
+
+class CourseOverviewTab(models.Model):
+    """
+    Model for storing and caching tabs information of a course.
+    """
+    tab_id = models.CharField(max_length=50)
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs")

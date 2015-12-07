@@ -1,8 +1,8 @@
 // studio - base styling
 // ====================
 
-// Table of Contents 
-// * +Basic Setup 
+// Table of Contents
+// * +Basic Setup
 // * +Typography - Basic
 // * +Typography - Primary Content
 // * +Typography - Secondary Content
@@ -19,7 +19,7 @@
 // * +JS Dependent
 
 // +Basic Setup
-// ==================== 
+// ====================
 html {
   font-size: 62.5%;
   height: 102%; // force scrollbar to prevent jump when scroll appears, cannot use overflow because it breaks drag
@@ -66,7 +66,7 @@ h1 {
 }
 
 // +Typography - Basic
-// ==================== 
+// ====================
 .page-header {
   @extend %t-title3;
   @extend %t-strong;
@@ -111,7 +111,7 @@ h1 {
 }
 
 // +Typography - Primary Content
-// ==================== 
+// ====================
 .content-primary {
 
   .section-header {
@@ -148,7 +148,7 @@ h1 {
 }
 
 // +Typography - Secondary Content
-// ==================== 
+// ====================
 .content-secondary {
 
   .section-header {
@@ -177,7 +177,7 @@ h1 {
 }
 
 // +Typography - Loose Headings  (BT: needs to be removed once html is clean)
-// ==================== 
+// ====================
 .title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
   @extend %t-strong;
 }
@@ -226,13 +226,13 @@ p, ul, ol, dl {
 }
 
 // +Layout - Basic
-// ==================== 
+// ====================
 .wrapper-view {
 
 }
 
 // +Layout - Basic Page Header
-// ==================== 
+// ====================
 .wrapper-mast {
   margin: ($baseline*1.5) 0 0 0;
   padding: 0 $baseline;
@@ -375,7 +375,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Basic Page Content
-// ==================== 
+// ====================
 .wrapper-content {
   margin: 0;
   padding: 0 $baseline;
@@ -419,7 +419,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Primary Content
-// ==================== 
+// ====================
 .content-primary {
 
   .title-1 {
@@ -457,7 +457,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Supplemental Content
-// ==================== 
+// ====================
 .content-supplementary {
 
   > section {
@@ -466,7 +466,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Grandfathered
-// ==================== 
+// ====================
 .main-wrapper {
   position: relative;
   margin: 0 ($baseline*2);
@@ -503,7 +503,7 @@ p, ul, ol, dl {
 }
 
 // +UI - Actions
-// ==================== 
+// ====================
 .new-unit-item,
 .new-subsection-item,
 .new-policy-item {
@@ -535,7 +535,7 @@ p, ul, ol, dl {
 }
 
 // +UI - Misc
-// ==================== 
+// ====================
 hr.divide {
   @extend %cont-text-sr;
 }
@@ -623,7 +623,7 @@ hr.divide {
 
 
 // +Utility - Basic
-// ==================== 
+// ====================
 
 // UI - semantically hide text
 .sr {

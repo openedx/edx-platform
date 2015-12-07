@@ -7,7 +7,7 @@
     <div class="script_placeholder" data-src="${preprocessor['script_src']}"/>
     % endif
 
-    % if status in ('unsubmitted', 'correct', 'incorrect', 'incomplete'):
+    % if status in ('unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
     <div class="${status.classname} ${doinline}" id="status_${id}">
     % endif
     % if hidden:
@@ -50,7 +50,7 @@
 
       % endif
 
-% if status in ('unsubmitted', 'correct', 'incorrect', 'incomplete'):
+% if status in ('unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
 </div>
 % endif
 

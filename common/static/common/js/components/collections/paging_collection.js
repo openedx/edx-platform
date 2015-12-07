@@ -30,12 +30,16 @@
             isZeroIndexed: false,
             perPage: 10,
 
+            isStale: false,
+
             sortField: '',
             sortDirection: 'descending',
             sortableFields: {},
 
             filterField: '',
             filterableFields: {},
+
+            searchString: null,
 
             paginator_core: {
                 type: 'GET',
@@ -51,9 +55,10 @@
             },
 
             server_api: {
-                'page': function () { return this.currentPage; },
-                'page_size': function () { return this.perPage; },
-                'sort_order': function () { return this.sortField; }
+                page: function () { return this.currentPage; },
+                page_size: function () { return this.perPage; },
+                text_search: function () { return this.searchString ? this.searchString : ''; },
+                sort_order: function () { return this.sortField; }
             },
 
             parse: function (response) {
@@ -61,7 +66,11 @@
                 this.currentPage = response.current_page;
                 this.totalPages = response.num_pages;
                 this.start = response.start;
-                this.sortField = response.sort_order;
+
+                // Note: sort_order is not returned when performing a search
+                if (response.sort_order) {
+                    this.sortField = response.sort_order;
+                }
                 return response.results;
             },
 
@@ -81,15 +90,38 @@
              */
             setPage: function (page) {
                 var oldPage = this.currentPage,
-                    self = this;
+                    self = this,
+                    deferred = $.Deferred();
                 this.goTo(page - (this.isZeroIndexed ? 1 : 0), {reset: true}).then(
                     function () {
+                        self.isStale = false;
                         self.trigger('page_changed');
+                        deferred.resolve();
                     },
                     function () {
                         self.currentPage = oldPage;
+                        deferred.fail();
                     }
                 );
+                return deferred.promise();
+            },
+
+
+            /**
+             * Refreshes the collection if it has been marked as stale.
+             * @returns {promise} Returns a promise representing the refresh.
+             */
+            refresh: function() {
+                var deferred = $.Deferred();
+                if (this.isStale) {
+                    this.setPage(1)
+                        .done(function() {
+                            deferred.resolve();
+                        });
+                } else {
+                    deferred.resolve();
+                }
+                return deferred.promise();
             },
 
             /**
@@ -183,7 +215,7 @@
                     }
                 }
                 this.sortField = fieldName;
-                this.setPage(1);
+                this.isStale = true;
             },
 
             /**
@@ -193,7 +225,7 @@
              */
             setSortDirection: function (direction) {
                 this.sortDirection = direction;
-                this.setPage(1);
+                this.isStale = true;
             },
 
             /**
@@ -203,7 +235,19 @@
              */
             setFilterField: function (fieldName) {
                 this.filterField = fieldName;
-                this.setPage(1);
+                this.isStale = true;
+            },
+
+            /**
+             * Sets the string to use for a text search. If no string is specified then
+             * the search is cleared.
+             * @param searchString A string to search on, or null if no search is to be applied.
+             */
+            setSearchString: function(searchString) {
+                if (searchString !== this.searchString) {
+                    this.searchString = searchString;
+                    this.isStale = true;
+                }
             }
         }, {
             SortDirection: {

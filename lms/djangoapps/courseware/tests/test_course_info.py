@@ -3,13 +3,17 @@ Test the course_info xblock
 """
 import mock
 from nose.plugins.attrib import attr
+from urllib import urlencode
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from util.date_utils import strftime_localized
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from student.models import CourseEnrollment
 
 from .helpers import LoginEnrollmentTestCase
@@ -62,6 +66,24 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         ).exists()
         self.assertFalse(enrollment_exists)
 
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    def test_non_live_course(self):
+        """Ensure that a user accessing a non-live course sees a redirect to
+        the student dashboard, not a 404.
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        url = reverse('info', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        start_date = strftime_localized(self.course.start, 'SHORT_DATE')
+        self.assertRedirects(response, '{0}?{1}'.format(reverse('dashboard'), urlencode({'notlive': start_date})))
+
+    def test_nonexistent_course(self):
+        self.setup_user()
+        url = reverse('info', args=['not/a/course'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
 
 @attr('shard_1')
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
@@ -93,3 +115,34 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn(self.xml_data, resp.content)
+
+
+@attr('shard_1')
+@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
+class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
+    """
+    Tests for the info page of self-paced courses.
+    """
+
+    def setUp(self):
+        super(SelfPacedCourseInfoTestCase, self).setUp()
+        self.instructor_paced_course = CourseFactory.create(self_paced=False)
+        self.self_paced_course = CourseFactory.create(self_paced=True)
+        self.setup_user()
+
+    def fetch_course_info_with_queries(self, course, sql_queries, mongo_queries):
+        """
+        Fetch the given course's info page, asserting the number of SQL
+        and Mongo queries.
+        """
+        url = reverse('info', args=[unicode(course.id)])
+        with self.assertNumQueries(sql_queries):
+            with check_mongo_calls(mongo_queries):
+                resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_num_queries_instructor_paced(self):
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 17, 4)
+
+    def test_num_queries_self_paced(self):
+        self.fetch_course_info_with_queries(self.self_paced_course, 17, 4)

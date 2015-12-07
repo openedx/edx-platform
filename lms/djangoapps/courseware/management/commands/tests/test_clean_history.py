@@ -393,9 +393,6 @@ class SmhcForTestingMain(SmhcSayStubbed):
         if smid in self.exception_smids:
             raise Exception("Something went wrong!")
 
-    def commit(self):
-        self.say("(not really committing)")
-
 
 @attr('shard_1')
 class HistoryCleanerMainTest(HistoryCleanerTest):
@@ -413,7 +410,7 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             'No stored state',
             '(not really cleaning 0)',
             '(not really cleaning 1)',
-            '(not really committing)',
+            'Committing',
             'Saved state: {"next_student_module_id": 2}',
         )
 
@@ -434,7 +431,7 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             'Loaded stored state: {"next_student_module_id": 25}',
             '(not really cleaning 25)',
             '(not really cleaning 26)',
-            '(not really committing)',
+            'Committing',
             'Saved state: {"next_student_module_id": 27}'
         )
 
@@ -457,11 +454,11 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             '(not really cleaning 25)',
             '(not really cleaning 26)',
             '(not really cleaning 27)',
-            '(not really committing)',
+            'Committing',
             'Saved state: {"next_student_module_id": 28}',
             '(not really cleaning 28)',
             '(not really cleaning 29)',
-            '(not really committing)',
+            'Committing',
             'Saved state: {"next_student_module_id": 30}',
         )
 
@@ -485,10 +482,10 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             '(not really cleaning 26)',
             "Couldn't clean student_module_id 26:\nTraceback*Exception: Something went wrong!\n",
             '(not really cleaning 27)',
-            '(not really committing)',
+            'Committing',
             'Saved state: {"next_student_module_id": 28}',
             '(not really cleaning 28)',
             '(not really cleaning 29)',
-            '(not really committing)',
+            'Committing',
             'Saved state: {"next_student_module_id": 30}',
         )

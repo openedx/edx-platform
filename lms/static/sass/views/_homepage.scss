@@ -72,6 +72,11 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
       .course-info {
         height: $course-info-height;
+        font-family: $sans-serif;
+
+        h2 {
+          font-family: $sans-serif;
+        }
 
         .course-organization, .course-code, .course-date {
           @extend %t-icon6;

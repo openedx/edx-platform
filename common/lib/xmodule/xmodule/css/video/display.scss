@@ -1,3 +1,66 @@
+// This is for A Font Garde
+// It loads the icon font only when it's available.
+// ---
+// It is scoped to the video player for now, but we
+// will eventually want to move this to the main font
+// sheet, globally, so it applies to all use cases.
+
+// --------
+// Defaults: what displays if the icon font doesn't load.
+// --------
+
+// the html target is necessary for xblocks and xmodules, but works across the board
+html:not('.afontgarde') .icon-fallback-img {
+
+  .fa-play {
+    background: url('#{$static-path}/images/fontawesome/play.svg') center center no-repeat;
+  }
+
+  .fa-pause {
+    background: url('#{$static-path}/images/fontawesome/pause.svg') center center no-repeat;
+  }
+
+  .fa-step-forward {
+    background: url('#{$static-path}/images/fontawesome/step-forward.svg') center center no-repeat;
+  }
+
+  .fa-arrows-alt {
+    background: url('#{$static-path}/images/fontawesome/arrows-alt.svg') center center no-repeat;
+  }
+
+  .fa-caret-right {
+    background: url('#{$static-path}/images/fontawesome/caret-right.svg') center center no-repeat;
+  }
+
+  .fa-caret-left {
+    background: url('#{$static-path}/images/fontawesome/caret-left.svg') center center no-repeat;
+  }
+
+  .fa-caret-up {
+    background: url('#{$static-path}/images/fontawesome/caret-up.svg') center center no-repeat;
+  }
+
+  .fa-compress {
+    background: url('#{$static-path}/images/fontawesome/compress.svg') center center no-repeat;
+  }
+
+  .fa-quote-left {
+    background: url('#{$static-path}/images/fontawesome/quote-left.svg') center center no-repeat;
+  }
+
+  .fa-volume-up {
+    background: url('#{$static-path}/images/fontawesome/volume-up.svg') center center no-repeat;
+  }
+
+  .fa-volume-down {
+    background: url('#{$static-path}/images/fontawesome/volume-down.svg') center center no-repeat;
+  }
+
+  .fa-volume-off {
+    background: url('#{$static-path}/images/fontawesome/volume-off.svg') center center no-repeat;
+  }
+}
+
 & {
     margin-bottom: ($baseline*1.5);
 }
@@ -6,21 +69,25 @@
   display: none;
 }
 
-div.video {
+.video {
   @include clearfix();
-  background: #f3f3f3;
+  background: rgb(240, 243, 245); // UXPL grayscale-cool xx-light;
   display: block;
   margin: 0 -12px;
   padding: 12px;
   border-radius: 5px;
   outline: none;
 
-  &:focus, &:active, &:hover {
+  &:focus,
+  &:active,
+  &:hover {
     border: 0;
   }
 
   &.is-initialized {
-    article.video-wrapper {
+
+    .video-wrapper {
+
       .spinner {
         display: none;
       }
@@ -29,12 +96,14 @@ div.video {
 
   // CASE: video pre-roll state
   &.is-pre-roll {
+
     .slider {
       visibility: hidden;
     }
 
     .video-player {
       position: relative;
+
       &:before {
         display: block;
         content: "";
@@ -44,12 +113,12 @@ div.video {
     }
   }
 
-  div.tc-wrapper {
+  .tc-wrapper {
     @include clearfix();
     position: relative;
   }
 
-  div.focus_grabber {
+  .focus_grabber {
     position: relative;
     display: inline;
     width: 0px;
@@ -60,7 +129,7 @@ div.video {
     margin: 0;
     padding: 0;
 
-    .video-download-button{
+    .video-download-button {
       display: inline-block;
       vertical-align: top;
       margin: ($baseline*0.75) ($baseline/2) 0 0;
@@ -75,16 +144,20 @@ div.video {
         padding: ($baseline*0.75);
         color: $lighter-base-font-color;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background-color: $action-primary-active-bg;
           color: $very-light-text;
         }
       }
     }
+
     .video-tracks {
+
       > a {
         border-radius: 3px 0 0 3px;
       }
+
       > a.external-track {
         border-radius: 3px;
       }
@@ -116,16 +189,17 @@ div.video {
     }
   }
 
-  article.video-wrapper {
-    float: left;
-    margin-right: flex-gutter(9);
+  .video-wrapper {
+    @include float(left);
+    @include margin-right(flex-gutter(9));
     width: flex-grid(6, 9);
     background-color: black;
     position: relative;
 
-    div.video-player-pre, div.video-player-post {
+    .video-player-pre, 
+    .video-player-post {
        height: 50px;
-       background-color: black;
+       background-color: rgb(17, 16, 16) // UXPL grayscale black;
     }
 
     .spinner {
@@ -173,7 +247,7 @@ div.video {
       }
     }
 
-    section.video-player {
+    .video-player {
       overflow: hidden;
       min-height: 300px;
 
@@ -185,7 +259,9 @@ div.video {
         }
       }
 
-      object, iframe, video {
+      object,
+      iframe,
+      video {
         display: block;
         border: none;
         width: 100%;
@@ -201,285 +277,272 @@ div.video {
       }
     }
 
-    section.video-controls {
+    .video-controls {
       @include clearfix();
-      background: #333;
-      border: 1px solid $black;
-      border-top: 0;
-      color: $gray-l3;
       position: relative;
+      border: 0;
+      background: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+      color: rgb(240, 243, 245); // UXPL grayscale-cool xx-light
 
-      &:hover, &:focus {
-        ul, div {
+      &:hover,
+      &:focus {
+
+        ul,
+        div {
           opacity: 1;
         }
       }
 
-      %video-button {
-        @extend %ui-fake-link;
-        @include transition(none);
-        display: block;
-        font-weight: 800;
-        line-height: 46px;
+      %video-control {
+        @extend %t-strong;
+        @extend %t-title7;
+        display: inline-block;
+        vertical-align: middle;
         margin: 0;
-        padding: 0 0 0 15px;
-        overflow: hidden;
-        text-indent: -9999px;
-        -webkit-font-smoothing: antialiased;
-        box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-        color: $white;
-        border-width: 0 1px;
-        border-style: solid;
-        border-color: $black;
+        border: 0;
+        border-radius: 0;
+        padding: ($baseline / 2) ($baseline / 1.5);
+        background: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+        box-shadow: none;
+        text-shadow: none;
+        color: rgb(207, 216, 220); // UXPL grayscale-cool light
 
-        &:hover, &:focus {
-          background-color: #444;
-          color: $white;
-          text-decoration: none;
+        &:hover,
+        &:focus {
+          background: darken(rgb(40, 44, 46), 7%); // UXPL secondary
         }
 
         &:active,
-        &:focus {
-          color: $white;
-          background-color: #444;
-          text-decoration: none;
+        &.is-active,
+        &.active {
+          color: rgb(14, 166, 236); // UXPL primary accent
         }
       }
 
-      div.slider {
+      .control {
+        @extend %video-control;
+
+        .icon-fallback-img {
+
+          .icon {
+            // if the icon font doesn't render, we need to provide dimensions for the svg's
+            width: 1em;
+            height: 1em;
+
+            &.icon-hd {
+              // except when it's text, like with HD
+              // otherwise it's shifted to the right because "HD" is wider than 1em
+              width: auto;
+            }
+          }
+        }
+      }
+
+      .slider {
         @include clearfix();
-        @include transform(scaleY(0.5) translate3d(0, 50%, 0));
-        background: #c2c2c2;
-        border: 1px solid $black;
-        border-radius: 0;
-        border-top: 1px solid $black;
-        box-shadow: inset 0 1px 0 #eee, 0 1px 0 #555;
+        @include transform-origin(bottom left);
+        @include transition(height .7s ease-in-out 0s);
         position: absolute;
-        z-index: 1;
         bottom: 100%;
         left: 0;
         right: 0;
-        height: 14px;
-        margin-left: -1px;
-        margin-right: -1px;
-        -webkit-transition: -webkit-transform 0.7s ease-in-out;
-        -moz-transition: -moz-transform 0.7s ease-in-out;
-        -ms-transition: -ms-transform 0.7s ease-in-out;
-        transition: transform 0.7s ease-in-out;
+        z-index: 1;
+        height: ($baseline / 4);
+        margin-left: 0;
+        border: 0;
+        border-radius: 0;
+        background: rgb(79, 89, 93); // UXPL grayscale-cool dark
 
-        div.ui-widget-header {
-          background: #777;
-          box-shadow: inset 0 1px 0 #999;
+        .ui-widget-header {
+          background: rgb(142, 62, 99); // UXPL secondary dark
+          box-shadow: none;
         }
 
-        div.ui-corner-all.slider-range {
-          background-color: #1e91d3;
+        .ui-corner-all.slider-range {
           opacity: 0.3;
+          background-color: #1e91d3;
         }
 
-        a.ui-slider-handle {
+        .ui-slider-handle {
           @extend %ui-fake-link;
-          @include transform(scale(.7, 1.3) translate3d(-80%, -15%, 0));
-          background: $pink url(../images/slider-handle.png) center center no-repeat;
-          background-size: 50%;
-          border: 1px solid darken($pink, 20%);
-          border-radius: 50%;
-          box-shadow: inset 0 1px 0 lighten($pink, 10%);
-          height: 20px;
-          margin-left: 0;
+          @include transform-origin(bottom left);
+          @include transition(all .7s ease-in-out 0s);
           top: 0;
-          -webkit-transition: -webkit-transform 0.7s ease-in-out;
-          -moz-transition: -moz-transform 0.7s ease-in-out;
-          -ms-transition: -ms-transform 0.7s ease-in-out;
-          transition: transform 0.7s ease-in-out;
-          width: 20px;
+          height: ($baseline / 4);
+          width: ($baseline / 4);
+          margin-left: -($baseline / 8); // center-center causes the control to be beyond the end of the sider
+          border: 0;
+          border-radius: ($baseline / 5);
+          background: rgb(203, 89, 141); // UXPL secondary base
+          box-shadow: none;
 
-          &:focus, &:hover {
-            background-color: lighten($pink, 10%);
+          &:focus,
+          &:hover {
+            background-color: rgb(219, 139, 175); // UXPL secondary light
           }
         }
       }
 
       .vcr {
-        float: left;
+        @include float(left);
         list-style: none;
-        margin: 0 lh() 0 0;
+        @include border-right(1px solid rgb(40, 44, 46)); // UXPL grayscale-cool x-dark
         padding: 0;
 
         @media (max-width: 1120px) {
-          margin-right: lh(0.5);
+          @include margin-right(lh(0.5));
           font-size: em(14);
         }
 
         .video_control {
-          @extend %video-button;
-          float: left;
-          background-image: url('../images/vcr.png');
-          background-position: 15px 15px ;
-          background-repeat: no-repeat;
-          border-left: none;
-          padding: 0 lh(.75);
-          width: 14px;
 
           &:focus {
-            @extend %ui-depth4;
             position: relative;
-            outline: $white dotted thin;
-            outline-offset: -2px;
-          }
-
-          &:empty {
-            height: 46px;
-            background-position: 15px 15px;
-          }
-
-          &.play {
-            background-position: 17px -114px;
-          }
-
-          &.pause {
-            background-position: 16px -50px;
           }
 
           &.skip {
-            background-image: none;
-            text-indent: 0;
-            width: initial;
             white-space: nowrap;
           }
         }
 
-        div.vidtime {
+        .vidtime {
           @extend %t-strong;
-          float: left;
-          line-height: 46px; //height of play pause buttons
-          -webkit-font-smoothing: antialiased;
-          padding-left: lh(.75);
+          @extend %t-title7;
+          @include padding-left(lh(.75));
+          display: inline-block;
+          color: rgb(207, 216, 220); // UXPL grayscale-cool light
+          -webkit-font-smoothing: antialiased;;
+
           @media (max-width: 1120px) {
-            padding-left: lh(0.5);
+            @include padding-left(lh(0.5));
           }
         }
       }
 
-      div.secondary-controls {
-        float: right;
+      .secondary-controls {
+        @include float(right);
+        @include border-left(1px dotted rgb(79, 89, 93)); // UXPL grayscale-cool x-dark
 
-        a.speed-button,
-        div.volume > a,
-        a.add-fullscreen,
-        a.quality-control,
-        a.hide-subtitles {
-          // overflow is used to bypass Firefox CSS :focus outline bug
-          // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
+        .volume,
+        .add-fullscreen,
+        .grouped-controls,
+        .quality-control {
+          @include border-left(1px dotted rgb(79, 89, 93)); // UXPL grayscale-cool x-dark
+        }
+
+        .speed-button,
+        .volume > .control,
+        .add-fullscreen,
+        .quality-control,
+        .toggle-transcript {
+
           &:focus {
-            @extend %ui-depth5;
             position: relative;
-            outline: $white dotted thin;
-            outline-offset: -2px;
-            overflow: auto;
           }
         }
 
         .menu-container {
-          float: left;
           position: relative;
-
-          &.is-opened {
-            .menu {
-              display: block;
-              opacity: 1;
-              padding: 0;
-              margin: 0;
-              list-style: none;
-            }
-          }
 
           .menu {
             @include transition(none);
             @extend %ui-depth1;
-            box-shadow: inset 1px 0 0 #555, 0 1px 0 #444;
-            background-color: #444;
-            border: 1px solid $black;
-            bottom: 46px;
-            display: none;
-            opacity: 0;
             position: absolute;
+            display: none;
+            bottom: ($baseline * 2);
+            @include right(0); // right-align menus since this whole collection is on the right
+            width: 120px;
+            margin: 0;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+            background-color: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+            list-style: none;
 
             li {
               @extend %ui-fake-link;
-              box-shadow:  0 1px 0 #555;
-              border-bottom: 1px solid $black;
-              color: $white;
+              color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
 
-              a {
-                border: 0;
-                color: $white;
+              .speed-option,
+              .control-lang {
+                @include text-align(left);
                 display: block;
+                width: 100%;
+                border: 0;
+                border-radius: 0;
                 padding: lh(0.5);
+                background: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+                box-shadow: none;
+                color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
                 overflow: hidden;
+                text-shadow: none;
                 text-overflow: ellipsis;
                 white-space: nowrap;
 
-                &:hover, &:focus {
-                  background-color: #666;
-                  color: #aaa;
-                  outline-offset: -4px;
+                &:hover,
+                &:focus {
+                  background-color: rgb(79, 89, 93); // UXPL grayscale-cool dark
+                  color: rgb(252, 252, 252); // UXPL grayscale white
                 }
               }
 
-              &.is-active{
-                a {
-                  font-weight: bold;
+              &.is-active {
+
+                .speed-option,
+                .control-lang {
+                  color: rgb(14, 166, 236); // UXPL primary accent
                 }
               }
+            }
+          }
 
-              &:last-child {
-                box-shadow: none;
-                border-bottom: 0;
-                margin-top: 0;
-              }
+          &.is-opened {
+
+            .menu {
+              display: block;
             }
           }
         }
 
-        div.speeds {
-          &.is-opened {
-            .speed-button {
-              background-image: url('../images/open-arrow.png');
+        .speeds,
+        .lang,
+        .grouped-controls {
+          display: inline-block;
+
+          .control {
+
+            .icon-fallback-img {
+              @include float(left);
+              @include transform-origin(center center);
             }
           }
+        }
 
-          .menu{
-            width: 131px;
+        .speeds {
 
-            @media (max-width: 1120px) {
-              width: 80px;
+          &.is-opened {
+
+            .control {
+
+              .icon {
+
+                @include ltr {
+                  @include transform(rotate(-90deg));
+                }
+
+                @include rtl {
+                  @include transform(rotate(90deg));
+                }
+              }
             }
           }
 
           .speed-button {
-            @extend %video-button;
-            @include clearfix();
-            background-image: url('../images/closed-arrow.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
-            min-width: 116px;
-            text-indent: 0;
-
-            @media (max-width: 1120px) {
-              min-width: 0;
-              width: 60px;
-            }
 
             .label {
-              float: left;
-              font-size: em(14);
-              font-weight: normal;
-              letter-spacing: 1px;
-              padding: 0 lh(0.25) 0 lh(0.5);
-              line-height: 46px;
-              text-transform: uppercase;
-              color: #999;
+              @include padding(0 ($baseline/3) 0 0);
+              font-family: $body-font-family;
+              color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
 
               @media (max-width: 1120px) {
                 display: none;
@@ -487,117 +550,115 @@ div.video {
             }
 
             .value {
-              float: left;
+              @include padding(0, lh(0.5), 0, 0);
+              color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
               font-weight: bold;
-              margin-bottom: 0;
-              padding: 0 lh(0.5) 0 0;
 
               @media (max-width: 1120px) {
-                padding: 0 lh(0.5) 0 lh(0.5);
+                padding: 0 lh(0.5);
               }
-
-              line-height: 46px;
-              color: $white;
             }
           }
         }
 
-        div.volume {
-          float: left;
+        .lang {
+
+          .language-menu {
+            width: $baseline;
+            padding: ($baseline / 2) 0;
+          }
+
+          .control {
+
+            .icon {
+
+              @include rtl {
+                @include transform(rotate(-180deg));
+              }
+            }
+          }
+
+          &.is-opened {
+
+            .control {
+
+              .icon {
+
+                @include ltr {
+                  @include transform(rotate(90deg));
+                }
+
+                @include rtl {
+                  @include transform(rotate(90deg));
+                }
+              }
+            }
+          }
+        }
+
+        .volume {
+          display: inline-block;
           position: relative;
 
           &.is-opened {
+
             .volume-slider-container {
               display: block;
               opacity: 1;
             }
           }
 
-          &.is-muted {
-            & > a {
-              background-image: url('../images/mute.png');
-            }
-          }
-
-          & > a {
-            @extend %video-button;
-            @include clearfix();
-            background-image: url('../images/volume.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
-            width: 30px;
-            height: 46px;
-          }
-
           &:not(:first-child) > a {
-            border-left: none;
+            @include border-left(none);
           }
 
           .volume-slider-container {
             @include transition(none);
             @extend %ui-depth1;
-            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
-            background-color: #444;
-            border: 1px solid $black;
-            bottom: 46px;
             display: none;
-            opacity: 0;
             position: absolute;
-            width: 45px;
-            height: 125px;
-            margin-left: -1px;
+            bottom: ($baseline * 2);
+            @include right(0);
+            width: 41px;
+            height: 120px;
+            background-color: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
 
             .volume-slider {
               height: 100px;
-              border: 0;
-              width: 5px;
+              width: ($baseline / 4);
               margin: 14px auto;
-              background: #666;
-              border: 1px solid $black;
-              box-shadow: 0 1px 0 #333;
+              border: 0;
+              background: rgb(79, 89, 93); // UXPL grayscale-cool dark
 
-              a.ui-slider-handle {
+              .ui-slider-handle {
                 @extend %ui-fake-link;
                 @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
-                background: $pink url(../images/slider-handle.png) center center no-repeat;
-                background-size: 50%;
-                border: 1px solid darken($pink, 20%);
-                border-radius: 15px;
-                box-shadow: inset 0 1px 0 lighten($pink, 10%);
+                @include left(-5px);
                 height: 15px;
-                left: -6px;
                 width: 15px;
+                background: rgb(203, 89, 141); // UXPL secondary base
+                border: 0;
+                border-radius: ($baseline / 5);
+
+                &:hover,
+                &:focus {
+                  background: rgb(219, 139, 175); // UXPL secondary light
+                }
               }
 
               .ui-slider-range {
-                background: #ddd;
+                background: rgb(142, 62, 99); // UXPL secondary dark
               }
             }
           }
         }
 
-        a.add-fullscreen {
-          @extend %video-button;
-          background: url(../images/fullscreen.png) center no-repeat;
-          border-left: none;
-          float: left;
-          padding: 0 11px;
-          width: 30px;
-        }
-
-
-        a.quality-control {
-          @extend %video-button;
-          background: url(../images/hd.png) center no-repeat;
-          border-left: none;
-          float: left;
-          padding: 0 11px;
-          width: 30px;
+        .quality-control {
+          font-weight: 700;
+          letter-spacing: -1px;
 
           &.active {
-            background-color: #F44;
-            color: #0ff;
-            text-decoration: none;
+            color: rgb(14, 166, 236); // UXPL primary accent
           }
 
           &.is-hidden {
@@ -605,62 +666,55 @@ div.video {
           }
         }
 
-        div.lang {
-          & > a.hide-subtitles {
-            @extend %video-button;
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555;
-            background: url('../images/cc.png') center no-repeat;
-            border-left: none;
-            border-right: none;
-            padding: 0 11px;
-            width: 30px;
+        .toggle-transcript {
 
-            &.off {
-              opacity: 0.7;
+            &.is-active {
+              color: rgb(14, 166, 236); // UXPL primary accent
             }
-          }
+        }
 
-          .menu.langs-list {
-            right: -1px;
-            width: 150px;
+        .lang {
+
+          & > .hide-subtitles {
+            @include transition(none);
           }
         }
       }
     }
 
-    &:hover section.video-controls {
-      ul, div {
-        opacity: 1;
-      }
+    &:hover {
 
-      div.slider {
-        @include transform(scaleY(1) translate3d(0, 0, 0));
+      .video-controls {
 
-        a.ui-slider-handle {
-          @include transform(scale(1) translate3d(-50%, -15%, 0));
+        .slider {
+          height: ($baseline / 1.5);
+
+          .ui-slider-handle {
+            height: ($baseline / 1.5);
+            width: ($baseline / 1.5);
+          }
         }
       }
     }
   }
 
-  ol.subtitles {
-    padding-left: 0;
-    float: left;
-    max-height: 460px;
+  .subtitles {
+    @include float(left);
     overflow: auto;
-    width: flex-grid(3, 9);
     margin: 0;
+    max-height: 460px;
+    width: flex-grid(3, 9);
+    padding: 0;
     font-size: 14px;
     list-style: none;
     visibility: visible;
 
     li {
       @extend %ui-fake-link;
-      border: 0;
-      color: rgb(29,157,217);
       margin-bottom: 8px;
+      border: 0;
       padding: 0;
+      color: #0074b5; // AA compliant
       line-height: lh();
 
       &.current {
@@ -673,7 +727,8 @@ div.video {
         outline-offset: -1px;
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         text-decoration: underline;
       }
 
@@ -685,13 +740,12 @@ div.video {
 
   &.closed {
 
-    article.video-wrapper {
+    .video-wrapper {
       width: flex-grid(9,9);
-
       background-color: inherit;
     }
 
-    article.video-wrapper section.video-controls.html5 {
+    .video-wrapper .video-controls.html5 {
       bottom: 0;
       left: 0;
       right: 0;
@@ -699,21 +753,22 @@ div.video {
       z-index: 1;
     }
 
-    article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
+    .video-wrapper .video-player-pre,
+    .video-wrapper .video-player-post {
         height: 0;
     }
 
-    article.video-wrapper section.video-player {
+    .video-wrapper .video-player {
       h3 {
         color: black;
       }
     }
 
-    ol.subtitles {
+    .subtitles {
         @extend .is-hidden;
     }
 
-    ol.subtitles.html5 {
+    .subtitles.html5 {
         @extend %ui-depth0;
         background-color: rgba(243, 243, 243, 0.8);
         height: 100%;
@@ -743,63 +798,66 @@ div.video {
     border-radius: 0;
 
     &.closed {
-      div.tc-wrapper {
-        article.video-wrapper {
+      .tc-wrapper {
+        .video-wrapper {
           width: 100%;
         }
       }
     }
 
-    article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
+    .video-wrapper .video-player-pre,
+    .video-wrapper .video-player-post {
         height: 0;
     }
 
-    article.video-wrapper {
+    .video-wrapper {
         position: static;
     }
 
-    article.video-wrapper section.video-player {
+    .video-wrapper .video-player {
       h3 {
         color: white;
       }
     }
 
-    div.tc-wrapper {
+    .tc-wrapper {
       @include clearfix();
       width: 100%;
       height: 100%;
 
       position: static;
 
-      article.video-wrapper {
+      .video-wrapper {
         height: 100%;
         width: 75%;
+        @include margin-right(0);
         vertical-align: middle;
-        margin-right: 0;
 
-        object, iframe, video{
+        object,
+        iframe,
+        video{
           position: absolute;
           width: auto;
           height: auto;
         }
       }
 
-      section.video-controls {
+      .video-controls {
         @extend %ui-depth4;
+        position: absolute;
         bottom: 0;
         left: 0;
-        position: absolute;
         width: 100%;
       }
     }
 
-    ol.subtitles {
-      @include box-sizing(border-box);
-      @include transition(none);
-      background: $black;
+    .subtitles {
       height: 100%;
       width: 25%;
       padding: lh();
+      @include box-sizing(border-box);
+      @include transition(none);
+      background: $black;
       visibility: visible;
 
       li {
@@ -813,9 +871,11 @@ div.video {
   }
 
   &.is-touch {
-    div.tc-wrapper {
-      article.video-wrapper {
-        object, iframe, video {
+    .tc-wrapper {
+      .video-wrapper {
+        object,
+        iframe,
+        video {
           width: 100%;
           height: 100%;
         }
@@ -839,14 +899,28 @@ div.video {
       background-size: 15%;
     }
 
-    .btn-play {
-      text-indent: -999px;
-      overflow: hidden;
+    .btn-play.btn-pre-roll {
+      padding: $baseline;
       border: none;
+      border-radius: $baseline;
+      background: $black-t2;
       box-shadow: none;
-      line-height: 0;
+
+      &:after {
+        // the button class, ties to functionality, also uses an icon font
+        // we're overriding it here so we can use our image instead
+        display: none;
+      }
+
+      img {
+        height: ($baseline * 4);
+        width: ($baseline * 4);
+      }
+
+      &:hover,
+      &:focus {
+        background: $blue;
+      }
     }
   }
 }
-
-

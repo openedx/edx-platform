@@ -12,7 +12,7 @@ from cStringIO import StringIO
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
-from path import path
+from path import Path as path
 from contextlib import contextmanager
 from lazy import lazy
 
@@ -27,7 +27,7 @@ from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore
@@ -820,6 +820,13 @@ class XMLModuleStore(ModuleStoreReadBase):
         This key may represent a course that doesn't exist in this modulestore.
         """
         return CourseLocator(org, course, run, deprecated=True)
+
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        return BlockUsageLocator(course_key, 'course', course_key.run)
 
     def get_courses(self, **kwargs):
         """

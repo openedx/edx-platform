@@ -1,8 +1,7 @@
 # pylint: disable=missing-docstring
-# pylint: disable=redefined-outer-name
 
 from lettuce import world, steps
-from nose.tools import assert_in, assert_true  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_true
 
 from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import add_problem_to_course, answer_problem

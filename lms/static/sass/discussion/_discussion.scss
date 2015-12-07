@@ -1,5 +1,6 @@
 // forums - main app styling
 // ====================
+// NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
 
 body.discussion {
 
@@ -21,9 +22,8 @@ body.discussion {
 
   .edit-post-form {
     @include clearfix();
-    margin-bottom: ($baseline*2);
-    width: 100%;
     @include box-sizing(border-box);
+    width: 100%;
 
     h1 {
       font-size: 20px;
@@ -110,7 +110,6 @@ body.discussion {
   }
 
   .wmd-panel {
-    min-width: 500px;
     width: 100%;
   }
 
@@ -120,14 +119,14 @@ body.discussion {
   }
 
   .wmd-input {
+    @include border-radius(3px, 3px, 0, 0);
     border: 1px solid $gray-l3;
-    border-radius: 3px 3px 0 0;
     width: 100%;
     height: 150px;
     background-color: $gray-l4;
     font-style: normal;
     font-size: 0.8em;
-    font-family: Monaco, 'Lucida Console', monospace;
+    font-family: $f-sans-serif;
     line-height: 1.6em;
 
     &::-webkit-input-placeholder {
@@ -137,18 +136,17 @@ body.discussion {
 
   .wmd-button-row {
     @include transition(all .2s ease-out 0s);
+    @include margin(($baseline/2), ($baseline/4), ($baseline/4), ($baseline/4));
     position: relative;
     overflow: hidden;
-    margin: ($baseline/2) ($baseline/4) ($baseline/4) ($baseline/4);
     padding: 0;
     height: 20px;
   }
 
   .wmd-spacer {
-
+    @include margin-left(14px);
     position: absolute;
     display: inline-block;
-    margin-left: 14px;
     width: 1px;
     height: 20px;
     background-color: Silver;
@@ -156,10 +154,10 @@ body.discussion {
   }
 
   .wmd-button {
+    @include padding-right(3px);
+    @include padding-left(3px);
     position: absolute;
     display: inline-block;
-    padding-right: 3px;
-    padding-left: 2px;
     width: 20px;
     height: 20px;
     background: none;
@@ -177,14 +175,14 @@ body.discussion {
   }
 
   .wmd-spacer1 {
-    left: 50px;
+    @include left(50px);
   }
   .wmd-spacer2 {
-    left: 175px;
+    @include left(175px);
   }
 
   .wmd-spacer3 {
-    left: 300px;
+    @include left(300px);
   }
 
   .wmd-prompt-background {
@@ -201,7 +199,7 @@ body.discussion {
 
     > div {
       font-size: 0.8em;
-      font-family: arial, helvetica, sans-serif;
+      font-family: $sans-serif;
     }
 
     b {
@@ -253,204 +251,13 @@ body.discussion {
     box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
   }
 
-  .blank-slate {
-
-    padding: 40px 40px 10px;
-
-    section {
-      border-bottom: 1px solid $gray-l3;
-    }
-
-    .label {
-      display: block;
-      font-size: 12px;
-    }
-
-    .label-settings {
-      padding-top: $baseline;
-      padding-bottom: $baseline/2;
-      text-transform: uppercase;
-    }
-
-    .home-header {
-      margin: 0;
-    }
-
-    .home-title {
-      font-size: 18px;
-      color: $black;
-      margin-bottom: ($baseline/4);
-    }
-    .home-description {
-      font-size: 12px;
-      line-height: 1;
-      margin-bottom: $baseline/2;
-    }
-    .home-stats {
-      padding: $baseline 0;
-
-      .label-area {
-        display: inline-block;
-        min-width: $baseline*5;
-        width: 25%;
-        vertical-align: middle;
-
-        .profile-link {
-          font-weight: 700;
-        }
-      }
-
-      .stats-grouping {
-        display: inline-block;
-        width: 70%;
-        padding-left: $baseline;
-
-        .profile-stat {
-          display: inline-block;
-          width: 32.5%;
-          vertical-align: middle;
-          font-size: 12px;
-
-          .count {
-            display: inline-block;
-            font-size: 28px;
-            padding: 0 $baseline/2;
-            vertical-align: middle;
-          }
-
-          .profile-stat-label{
-            vertical-align: middle;
-          }
-        }
-      }
-    }
-
-    .home-helpgrid {
-      border-bottom: none;
-      border-radius: 3px;
-      border: 1px solid $gray-l2;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
-    }
-  }
-
-  .helpgrid-row {
-      border-bottom: 1px solid $gray-l2;
-
-      .row-title {
-        padding: 30px $baseline;
-        background-color: #dedede;
-        font-size: 12px;
-      }
-
-      .row-item-full, .row-item {
-        font-size: 12px;
-        padding: 0px $baseline/2;
-        width: 26%;
-        vertical-align: middle;
-
-        .icon {
-          padding: 0 $baseline/2;
-          font-size: 24px;
-          vertical-align: middle;
-          display: table-cell;
-        }
-
-        .fa-stack .icon {
-          padding: 0 $baseline/2;
-        }
-
-        .row-description {
-          vertical-align: middle;
-          display: table-cell;
-        }
-      }
-
-      .row-item-full {
-
-        .notification-checkbox {
-          display: inline-block;
-          padding: $baseline/4 0 $baseline/2 0;
-          @include margin-right($baseline/2);
-          border-radius: 5px;
-          border: 1px solid gray;
-
-          .email-setting {
-            display: inline-block;
-            text-align: center;
-            vertical-align: middle;
-            @include margin-left($baseline/2);
-          }
-
-          .icon {
-            display: inline-block;
-          }
-
-          .email-setting:checked ~ .icon {
-            color: $green;
-          }
-        }
-
-        .row-description {
-          display: inline-block;
-          width:80%;
-        }
-      }
-    }
-
-  .helpgrid-row-navigation {
-    .fa-bars {color: $light-gray;}
-    .fa-search {color: $light-gray;}
-    .fa-sort {color: $light-gray;}
-  }
-
-  .helpgrid-row-participation {
-    .fa-plus {color: $green;}
-    .fa-flag {color: $pink;}
-    .fa-star {color: $blue;}
-  }
-
-  .helpgrid-row-notification {
-    .fa-square {color: $green;}
-    .fa-envelope {color: $light-gray;}
-  }
-
   .discussion-article {
     position: relative;
     min-height: 500px;
-    background-image: url(../images/bg-texture.png);
+    background-image: url('#{$static-path}/images/bg-texture.png');
 
     a {
       word-wrap: break-word;
-    }
-
-    h1 {
-      margin-bottom: ($baseline/4);
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: 0;
-      line-height: 1.2;
-    }
-
-    .posted-details {
-      font-size: 12px;
-      color: $gray-l1;
-
-      .username {
-        font-weight: 700;
-      }
-
-      .timeago, .top-post-status {
-        color: inherit;
-      }
-    }
-
-    .post-context{
-      margin-top: $baseline;
-      font-size: 12px;
-      color: $gray-d1;
-      padding: ($baseline*0.75);
-      background-color: $gray-l6;
-      border-radius: 3px;
     }
 
     p + p {
@@ -461,123 +268,6 @@ body.discussion {
   .discussion-post header,
   .responses li header {
     margin-bottom: $baseline;
-  }
-
-  .responses {
-    &:empty {
-      display: none;
-    }
-
-    list-style: none;
-    margin-top: $baseline;
-    padding: 0px ($baseline*2);
-
-    > li {
-      @include animation(fadeIn .3s);
-      position: relative;
-      margin: 0 -($baseline/2) ($baseline*1.5);
-      border: 1px solid $gray-l2;
-      border-radius: 3px;
-      box-shadow: 0 0 1px $shadow;
-
-      &.staff {
-        padding-top: 38px;
-        border-color: #009fe2;
-      }
-
-      &.community-ta{
-        padding-top: 38px;
-        border-color: $forum-color-community-ta;
-      }
-
-      .staff-banner {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 14px;
-        padding: 1px ($baseline/4);
-        @include box-sizing(border-box);
-        border-radius: 2px 2px 0 0;
-        background: #009fe2;
-        font-size: 9px;
-        font-weight: 700;
-        color: $white;
-        text-transform: uppercase;
-      }
-
-      .community-ta-banner{
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 14px;
-        padding: 1px ($baseline/4);
-        @include box-sizing(border-box);
-        border-radius: 2px 2px 0 0;
-        background: $forum-color-community-ta;
-        font-size: 9px;
-        font-weight: 700;
-        color: $white;
-        text-transform: uppercase;
-      }
-
-      &.loading {
-        height: 0;
-        margin: 0;
-        padding: 0;
-        border: none;
-        box-shadow: none;
-      }
-    }
-
-    .discussion-response {
-      @include box-sizing(border-box);
-      border-radius: 3px 3px 0 0;
-      padding: $baseline;
-      background-color: $white;
-
-      .response-body {
-        ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
-          @include padding-left(40px);
-          @include padding-right(0);
-        }
-      }
-    }
-    .posted-by {
-      font-weight: 700;
-    }
-  }
-
-  .add-response {
-    margin-top: $baseline;
-    padding: 0 ($baseline*1.5);
-
-    .add-response-btn {
-      @include white-button;
-      @include linear-gradient(top, $white 35%, $gray-l4);
-      position: relative;
-      border: 1px solid $gray-l2;
-      padding: 0 18px;
-      width: 100%;
-      box-shadow: 0 1px 1px $shadow-l1;
-      @include text-align(left);
-      font-size: 13px;
-
-      .fa-reply:before { // flip the icon for RTL
-        @include ltr {
-          content: "\f112"; // FA icon arrow to the left
-        }
-
-        @include rtl {
-          content: "\f064"; // FA icon arrow to the right
-        }
-      }
-
-      span.add-response-btn-text {
-        @include padding-left($baseline/5);
-      }
-    }
   }
 
   blockquote {
@@ -598,7 +288,7 @@ body.discussion {
       background: transparent;
 
       span {
-        background-image: url(../images/wmd-buttons-transparent.png);
+        background-image: url('#{$static-path}/images/wmd-buttons-transparent.png');
       }
     }
   }
@@ -673,7 +363,6 @@ body.discussion {
 // inline discussion module and profile thread styling
 .discussion-module {
   @extend .discussion-body;
-  @extend %ui-print-excluded;
 
   position: relative;
   margin: $baseline 0;
@@ -721,7 +410,7 @@ body.discussion {
   }
 
   .loading-animation {
-    background-image: url(../images/spinner.gif);
+    background-image: url('#{$static-path}/images/spinner.gif');
   }
 
   .discussion-show {
@@ -743,7 +432,7 @@ body.discussion {
       @include margin-right(6px);
       width: 21px;
       height: 19px;
-      background: url(../images/show-hide-discussion-icon.png) no-repeat;
+      background: url('#{$static-path}/images/show-hide-discussion-icon.png') no-repeat;
       background-position: -21px 0;
     }
   }
@@ -754,10 +443,10 @@ body.discussion {
   }
 
   section.discussion {
-    margin-top: ($baseline*1.5);
+    clear: both;
+    padding-top: $baseline;
 
     .threads {
-      margin-top: $baseline;
     }
 
     .discussion-thread {
@@ -785,13 +474,7 @@ body.discussion {
           overflow-y: auto;
           max-height: 600px;
 
-          .group-visibility-label {
-            font-weight: 400;
-            margin-bottom: ($baseline*0.5);
-          }
-
           .discussion-post {
-            @include clearfix();
 
             .inline-comment-count {
               @extend %ui-depth2;
@@ -807,36 +490,6 @@ body.discussion {
               font-weight: 400;
               line-height: 25px;
               color: #888;
-            }
-
-            header {
-              padding-bottom: 0;
-              margin-bottom: ($baseline*0.75);
-
-              .posted-details {
-                margin-top: ($baseline/5);
-
-                .username {
-                  display: inline;
-                  font-size: 14px;
-                  font-weight: 700;
-                }
-              }
-
-              h1 {
-                font-size: 19px;
-                font-weight: 700;
-                margin-bottom: 0px !important; // Override courseware CSS
-              }
-
-              h4 {
-                font-size: 16px;
-              }
-            }
-
-            .post-body {
-              font-size: 14px;
-              clear: both;
             }
           }
 
@@ -937,7 +590,7 @@ body.discussion {
     color: $white;
   }
 
-  section.pagination {
+  section.discussion-pagination {
     margin-top: ($baseline*1.5);
 
     nav.discussion-paginator {
@@ -1019,6 +672,10 @@ body.discussion {
   }
 }
 
+.xblock-student_view-discussion {
+  @extend %ui-print-excluded;
+}
+
 // ====================
 
 // post pagination
@@ -1063,12 +720,3 @@ body.discussion {
   }
 }
 
-// ====================
-
-// post metadata - cohorts
-.group-visibility-label {
-    font-size: 12px;
-    color:$black;
-    font-style: italic;
-    background-color: $white;
-  }

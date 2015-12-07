@@ -173,7 +173,6 @@ class TestVertSplitTestVert(SplitTestBase):
             category="vertical",
             display_name="Split test vertical",
         )
-        # pylint: disable=protected-access
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
 
@@ -239,7 +238,6 @@ class TestSplitTestVert(SplitTestBase):
 
         # split_test cond 0 = vert <- {video, problem}
         # split_test cond 1 = vert <- {video, html}
-        # pylint: disable=protected-access
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
 

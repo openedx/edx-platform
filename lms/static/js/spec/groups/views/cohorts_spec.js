@@ -247,8 +247,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
             };
 
             saveFormAndExpectErrors = function(action, errors) {
-                var requestCount = requests.length,
-                    form, expectedTitle;
+                var form, expectedTitle;
                 if (action === 'add') {
                     expectedTitle = 'The cohort cannot be added';
                     form = getAddModal();
@@ -257,7 +256,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                     form = cohortsView.$('.cohort-management-settings-form');
                 }
                 form.find('.action-save').click();
-                expect(requests.length).toBe(requestCount);
+                AjaxHelpers.expectNoRequests(requests);
                 verifyDetailedMessage(expectedTitle, 'error', errors);
             };
 
@@ -706,7 +705,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                 it('shows an error when adding with no students specified', function() {
                     createCohortsView(this, {selectCohort: 1});
                     addStudents('    ');
-                    expect(requests.length).toBe(0);
+                    AjaxHelpers.expectNoRequests(requests);
                     verifyMessage('Enter a username or email.', 'error');
                     expect(getStudentInput().val()).toBe('');
                 });

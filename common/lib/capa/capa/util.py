@@ -6,6 +6,8 @@ from decimal import Decimal
 
 from calc import evaluator
 from cmath import isinf, isnan
+import re
+from lxml import etree
 #-----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
@@ -181,3 +183,15 @@ def sanitize_html(html_code):
         attributes=attributes
     )
     return output
+
+
+def get_inner_html_from_xpath(xpath_node):
+    """
+    Returns inner html as string from xpath node.
+
+    """
+    # returns string from xpath node
+    html = etree.tostring(xpath_node).strip()
+    # strips outer tag from html string
+    inner_html = re.sub('(?ms)<%s[^>]*>(.*)</%s>' % (xpath_node.tag, xpath_node.tag), '\\1', html)
+    return inner_html.strip()

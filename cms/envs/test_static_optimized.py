@@ -17,13 +17,24 @@ from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        'ATOMIC_REQUESTS': True,
     },
 
 }
-######################### Static file overrides ####################################
+
+######################### PIPELINE ####################################
+
+# Use RequireJS optimized storage
+STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+
+# Revert to the default set of finders as we don't want to dynamically pick up files from the pipeline
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # Redirect to the test_root folder within the repo
-TEST_ROOT = REPO_ROOT / "test_root"  # pylint: disable=no-value-for-parameter
+TEST_ROOT = REPO_ROOT / "test_root"
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
 # Store the static files under test root so that they don't overwrite existing static assets

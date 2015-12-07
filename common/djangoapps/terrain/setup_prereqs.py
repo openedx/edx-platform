@@ -28,8 +28,7 @@ SERVICES = {
 
 YOUTUBE_API_URLS = {
     'main': 'https://www.youtube.com/',
-    'player': 'http://www.youtube.com/iframe_api',
-    'metadata': 'http://gdata.youtube.com/feeds/api/videos/',
+    'player': 'https://www.youtube.com/iframe_api',
     # For transcripts, you need to check an actual video, so we will
     # just specify our default video and see if that one is available.
     'transcript': 'http://video.google.com/timedtext?lang=en&v=OEoXaMPEzfM',
@@ -44,7 +43,7 @@ def start_video_server():
     video_source_dir = '{}/data/video'.format(settings.TEST_ROOT)
     video_server = VideoSourceHttpService(port_num=settings.VIDEO_SOURCE_PORT)
     video_server.config['root_dir'] = video_source_dir
-    setattr(world, 'video_source', video_server)
+    world.video_source = video_server
 
 
 @after.all  # pylint: disable=no-member

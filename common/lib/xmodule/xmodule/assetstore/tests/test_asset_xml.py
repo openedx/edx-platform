@@ -2,7 +2,7 @@
 Test for asset XML generation / parsing.
 """
 
-from path import path
+from path import Path as path
 from lxml import etree
 from contracts import ContractNotRespected
 import unittest

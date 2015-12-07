@@ -1,9 +1,14 @@
 """
 Defines the URL routes for this app.
+
+NOTE: These views are deprecated.  These routes are superseded by
+``/api/user/v1/accounts/{username}/image``, found in
+``openedx.core.djangoapps.user_api.urls``.
 """
-from .views import ProfileImageUploadView, ProfileImageRemoveView
 
 from django.conf.urls import patterns, url
+
+from .views import ProfileImageUploadView, ProfileImageRemoveView
 
 USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
 

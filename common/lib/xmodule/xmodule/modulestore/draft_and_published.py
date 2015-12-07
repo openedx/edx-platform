@@ -5,7 +5,7 @@ This module provides an abstraction for Module Stores that support Draft and Pub
 import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
-from . import ModuleStoreEnum
+from . import ModuleStoreEnum, BulkOperationsMixin
 
 # Things w/ these categories should never be marked as version=DRAFT
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
@@ -62,7 +62,7 @@ class BranchSettingMixin(object):
             return self.default_branch_setting_func()
 
 
-class ModuleStoreDraftAndPublished(BranchSettingMixin):
+class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
     """
     A mixin for a read-write database backend that supports two branches, Draft and Published, with
     options to prefer Draft and fallback to Published.
@@ -87,6 +87,11 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
 
     @abstractmethod
     def unpublish(self, location, user_id):
+        """
+        Turn the published version into a draft, removing the published version.
+
+        Raises: InvalidVersionError if called on a DIRECT_ONLY_CATEGORY
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -111,6 +116,23 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
         will get a block (either the one imported or a preexisting one). See xml_importer
         """
         raise NotImplementedError
+
+    def _flag_publish_event(self, course_key):
+        """
+        Wrapper around calls to fire the course_published signal
+        Unless we're nested in an active bulk operation, this simply fires the signal
+        otherwise a publish will be signalled at the end of the bulk operation
+
+        Arguments:
+            course_key - course_key to which the signal applies
+        """
+        if self.signal_handler:
+            bulk_record = self._get_bulk_ops_record(course_key) if isinstance(self, BulkOperationsMixin) else None
+            if bulk_record and bulk_record.active:
+                bulk_record.has_publish_item = True
+            else:
+                # We remove the branch, because publishing always means copying from draft to published
+                self.signal_handler.send("course_published", course_key=course_key.for_branch(None))
 
 
 class UnsupportedRevisionError(ValueError):

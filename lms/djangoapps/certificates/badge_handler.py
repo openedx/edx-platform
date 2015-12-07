@@ -176,7 +176,7 @@ class BadgeHandler(object):
         data = {
             'email': user.email,
             'evidence': self.site_prefix() + reverse(
-                'cert_html_view', kwargs={'user_id': user.id, 'course_id': unicode(self.course_key)}
+                'certificates:html_view', kwargs={'user_id': user.id, 'course_id': unicode(self.course_key)}
             ) + '?evidence_visit=1'
         }
         response = requests.post(self.assertion_url(mode), headers=self.get_headers(), data=data)

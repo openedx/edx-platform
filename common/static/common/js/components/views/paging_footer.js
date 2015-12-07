@@ -23,7 +23,8 @@
                     var onFirstPage = !this.collection.hasPreviousPage(),
                         onLastPage = !this.collection.hasNextPage();
                     if (this.hideWhenOnePage) {
-                        if (this.collection.totalPages <= 1) {
+                        if (_.isUndefined(this.collection.totalPages)
+                                || this.collection.totalPages <= 1) {
                             this.$el.addClass('hidden');
                         } else if (this.$el.hasClass('hidden')) {
                             this.$el.removeClass('hidden');

@@ -3,16 +3,38 @@ Helper functions for managing interactions with the LTI outcomes service defined
 in LTI v1.1.
 """
 
+from hashlib import sha1
+from base64 import b64encode
 import logging
+import uuid
+
 from lxml import etree
 from lxml.builder import ElementMaker
+from oauthlib.oauth1 import Client
+from oauthlib.common import to_unicode
 import requests
+from requests.exceptions import RequestException
 import requests_oauthlib
-import uuid
 
 from lti_provider.models import GradedAssignment, OutcomeService
 
 log = logging.getLogger("edx.lti_provider")
+
+
+class BodyHashClient(Client):
+    """
+    OAuth1 Client that adds body hash support (required by LTI).
+
+    The default Client doesn't support body hashes, so we have to add it ourselves.
+    The spec:
+        https://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
+    """
+    def get_oauth_params(self, request):
+        """Override get_oauth_params to add the body hash."""
+        params = super(BodyHashClient, self).get_oauth_params(request)
+        digest = b64encode(sha1(request.body.encode('UTF-8')).digest())
+        params.append((u'oauth_body_hash', to_unicode(digest)))
+        return params
 
 
 def store_outcome_parameters(request_params, user, lti_consumer):
@@ -67,7 +89,6 @@ def generate_replace_result_xml(result_sourcedid, score):
     consumer. The format of this message is defined in the LTI 1.1 spec.
     """
     # Pylint doesn't recognize members in the LXML module
-    # pylint: disable=no-member
     elem = ElementMaker(nsmap={None: 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'})
     xml = elem.imsx_POXEnvelopeRequest(
         elem.imsx_POXHeader(
@@ -95,6 +116,61 @@ def generate_replace_result_xml(result_sourcedid, score):
     return etree.tostring(xml, xml_declaration=True, encoding='UTF-8')
 
 
+def get_assignments_for_problem(problem_descriptor, user_id, course_key):
+    """
+    Trace the parent hierarchy from a given problem to find all blocks that
+    correspond to graded assignment launches for this user. A problem may
+    show up multiple times for a given user; the problem could be embedded in
+    multiple courses (or multiple times in the same course), or the block could
+    be embedded more than once at different granularities (as an individual
+    problem and as a problem in a vertical, for example).
+
+    Returns a list of GradedAssignment objects that are associated with the
+    given descriptor for the current user.
+    """
+    locations = []
+    current_descriptor = problem_descriptor
+    while current_descriptor:
+        locations.append(current_descriptor.location)
+        current_descriptor = current_descriptor.get_parent()
+    assignments = GradedAssignment.objects.filter(
+        user=user_id, course_key=course_key, usage_key__in=locations
+    )
+    return assignments
+
+
+def send_score_update(assignment, score):
+    """
+    Create and send the XML message to the campus LMS system to update the grade
+    for a single graded assignment.
+    """
+    xml = generate_replace_result_xml(
+        assignment.lis_result_sourcedid, score
+    )
+    try:
+        response = sign_and_send_replace_result(assignment, xml)
+    except RequestException:
+        # failed to send result. 'response' is None, so more detail will be
+        # logged at the end of the method.
+        response = None
+        log.exception("Outcome Service: Error when sending result.")
+
+    # If something went wrong, make sure that we have a complete log record.
+    # That way we can manually fix things up on the campus system later if
+    # necessary.
+    if not (response and check_replace_result_response(response)):
+        log.error(
+            "Outcome Service: Failed to update score on LTI consumer. "
+            "User: %s, course: %s, usage: %s, score: %s, status: %s, body: %s",
+            assignment.user,
+            assignment.course_key,
+            assignment.usage_key,
+            score,
+            response,
+            response.text if response else 'Unknown'
+        )
+
+
 def sign_and_send_replace_result(assignment, xml):
     """
     Take the XML document generated in generate_replace_result_xml, and sign it
@@ -112,7 +188,13 @@ def sign_and_send_replace_result(assignment, xml):
     # message. Testing with Canvas throws an error when this field is included.
     # This code may need to be revisited once we test with other LMS platforms,
     # and confirm whether there's a bug in Canvas.
-    oauth = requests_oauthlib.OAuth1(consumer_key, consumer_secret)
+    oauth = requests_oauthlib.OAuth1(
+        consumer_key,
+        consumer_secret,
+        signature_method='HMAC-SHA1',
+        client_class=BodyHashClient,
+        force_include_body=True
+    )
 
     headers = {'content-type': 'application/xml'}
     response = requests.post(
@@ -121,6 +203,7 @@ def sign_and_send_replace_result(assignment, xml):
         auth=oauth,
         headers=headers
     )
+
     return response
 
 
@@ -131,7 +214,6 @@ def check_replace_result_response(response):
     False if not. The format of this message is defined in the LTI 1.1 spec.
     """
     # Pylint doesn't recognize members in the LXML module
-    # pylint: disable=no-member
     if response.status_code != 200:
         log.error(
             "Outcome service response: Unexpected status code %s",

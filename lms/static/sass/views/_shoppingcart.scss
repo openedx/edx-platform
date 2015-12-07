@@ -822,7 +822,7 @@ $light-border: 1px solid $gray-l5;
 
       // CASE: index of child is even
       &:nth-child(even) {
-        @include margin-left($baseline*1.5);
+        @include margin-left($baseline);
       }
 
       .data-group {

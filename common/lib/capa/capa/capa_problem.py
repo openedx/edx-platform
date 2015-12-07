@@ -574,13 +574,6 @@ class LoncapaProblem(object):
             log.warning("Could not find matching input for id: %s", input_id)
             return {}
 
-    @property
-    def has_responsive_ui(self):
-        """
-        Returns whether this capa problem has support for responsive UI.
-        """
-        return all(responder.has_responsive_ui for responder in self.responders.values())
-
     # ======= Private Methods Below ========
 
     def _process_includes(self):

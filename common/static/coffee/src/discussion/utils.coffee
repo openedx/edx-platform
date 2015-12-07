@@ -1,16 +1,3 @@
-$ ->
-  if !window.$$contents
-    window.$$contents = {}
-  $.fn.extend
-    loading: (takeFocus) ->
-      @$_loading = $("<div class='loading-animation' tabindex='0'><span class='sr'>" + gettext("Loading content") + "</span></div>")
-      $(this).after(@$_loading)
-      if takeFocus
-        DiscussionUtil.makeFocusTrap(@$_loading)
-        @$_loading.focus()
-    loaded: ->
-      @$_loading.remove()
-
 class @DiscussionUtil
 
   @wmdEditors: {}
@@ -111,6 +98,16 @@ class @DiscussionUtil
           event.preventDefault()
     )
 
+  @showLoadingIndicator: (element, takeFocus) ->
+    @$_loading = $("<div class='loading-animation' tabindex='0'><span class='sr'>" + gettext("Loading content") + "</span></div>")
+    element.after(@$_loading)
+    if takeFocus
+      @makeFocusTrap(@$_loading)
+      @$_loading.focus()
+
+  @hideLoadingIndicator: () ->
+    @$_loading.remove()
+
   @discussionAlert: (header, body) ->
     if $("#discussion-alert").length == 0
       alertDiv = $("<div class='modal' role='alertdialog' id='discussion-alert' aria-describedby='discussion-alert-message'/>").css("display", "none")
@@ -141,28 +138,28 @@ class @DiscussionUtil
       return deferred.promise()
 
     params["url"] = URI(params["url"]).addSearch ajax: 1
-    params["beforeSend"] = ->
+    params["beforeSend"] = =>
       if $elem
         $elem.attr("disabled", "disabled")
       if params["$loading"]
         if params["loadingCallback"]?
           params["loadingCallback"].apply(params["$loading"])
         else
-          params["$loading"].loading(params["takeFocus"])
+          @showLoadingIndicator($(params["$loading"]), params["takeFocus"])
     if !params["error"]
       params["error"] = =>
         @discussionAlert(
           gettext("Sorry"),
           gettext("We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.")
         )
-    request = $.ajax(params).always ->
+    request = $.ajax(params).always =>
       if $elem
         $elem.removeAttr("disabled")
       if params["$loading"]
         if params["loadedCallback"]?
           params["loadedCallback"].apply(params["$loading"])
         else
-          params["$loading"].loaded()
+          @hideLoadingIndicator()
     return request
 
   @updateWithUndo: (model, updates, safeAjaxParams, errorMsg) ->

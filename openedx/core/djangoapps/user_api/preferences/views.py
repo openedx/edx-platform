@@ -1,5 +1,6 @@
 """
-NOTE: this API is WIP and has not yet been approved. Do not use this API without talking to Christina or Andy.
+NOTE: this API is WIP and has not yet been approved. Do not use this API
+without talking to Christina or Andy.
 
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
@@ -28,60 +29,62 @@ class PreferencesView(APIView):
     """
         **Use Cases**
 
-            Get or update the user's preference information. Updates are only supported through merge patch.
-            Preference values of null in a patch request are treated as requests to remove the preference.
+            Get or update the user's preference information. Updates are only
+            supported through merge patch. Preference values of null in a
+            patch request are treated as requests to remove the preference.
 
-        **Example Requests**:
+        **Example Requests**
 
             GET /api/user/v1/preferences/{username}/
 
             PATCH /api/user/v1/preferences/{username}/ with content_type "application/merge-patch+json"
 
-        **Response Value for GET**
+        **Response Values for GET**
+
+            If no user exists with the specified username, an HTTP 404 "Not
+            Found" response is returned.
+
+            If a user without "is_staff" access requests preferences for a
+            different user, an HTTP 404 "Not Found" message is returned.
 
             If the user makes the request for her own account, or makes a
-            request for another account and has "is_staff" access, the response
-            contains a JSON dictionary with a key/value pair (of type String)
-            for each preference.
+            request for another account and has "is_staff" access, an HTTP 200
+            "OK" response is returned. The response contains a JSON dictionary
+            with a key/value pair (of type String) for each preference.
 
             The list of preferences depends on your implementation. By default,
-            preferences include:
+            the list includes the following preferences.
 
+            * account_privacy: The user's setting for sharing her personal
+              profile. Possible values are "all_users" or "private".
             * pref-lan: The user's preferred language, as set in account
               settings.
 
-            * account_privacy: The user's setting for sharing her personal
-              profile. Possible values are ``all_users`` or ``private``.
+        **Response Values for PATCH**
 
-            If a user without "is_staff" access requests preferences for a
-            different user, a 404 error is returned.
+            Users can only modify their own preferences. If the
+            requesting user does not have the specified username and has staff
+            access, the request returns an HTTP 403 "Forbidden" response. If
+            the requesting user does not have staff access, the request
+            returns an HTTP 404 "Not Found" response to avoid revealing the
+            existence of the account.
 
-            If the specified username does not exist, a 404 is returned.
+            If no user exists with the specified username, an HTTP 404 "Not
+            Found" response is returned.
 
-        **Response for PATCH**
+            If "application/merge-patch+json" is not the specified content
+            type, a 415 "Unsupported Media Type" response is returned.
 
-            Users can only modify their own preferences. If the requesting user
-            does not have username "username", this method will return with a
-            status of 403 for users with staff access but a 404 for ordinary
-            users to avoid leaking the existence of the account.
+            If validation errors prevent the update, this method returns a 400
+            "Bad Request" response that includes a "field_errors" field that
+            lists all error messages.
 
-            This method will also return a 404 if no user exists with username
-            "username".
+            If a failure at the time of the update prevents the update, a 400
+            "Bad Request" error is returned. The JSON collection contains
+            specific errors.
 
-            If "application/merge-patch+json" is not the specified content_type,
-            this method returns a 415 status.
-
-            If the update could not be completed due to validation errors, this
-            method returns a 400 with all preference-specific error messages in
-            the "field_errors" field of the returned JSON.
-
-            If the update could not be completed due to failure at the time of
-            update, this method returns a 400 with specific errors in the
-            returned JSON.
-
-            If the update is successful, a 204 status is returned with no
-            additional content.
-
+            If the update is successful, an HTTP 204 "No Content" response is
+            returned with no additional content.
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
@@ -104,7 +107,7 @@ class PreferencesView(APIView):
         """
         PATCH /api/user/v1/preferences/{username}/
         """
-        if not request.DATA or not getattr(request.DATA, "keys", None):
+        if not request.data or not getattr(request.data, "keys", None):
             error_message = _("No data provided for user preference update")
             return Response(
                 {
@@ -114,8 +117,8 @@ class PreferencesView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            with transaction.commit_on_success():
-                update_user_preferences(request.user, request.DATA, username=username)
+            with transaction.atomic():
+                update_user_preferences(request.user, request.data, user=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
@@ -142,7 +145,7 @@ class PreferencesDetailView(APIView):
 
             Get, create, update, or delete a specific user preference.
 
-        **Example Requests**:
+        **Example Requests**
 
             GET /api/user/v1/preferences/{username}/{preference_key}
 
@@ -152,38 +155,45 @@ class PreferencesDetailView(APIView):
 
         **Response Values for GET**
 
-            The preference value will be returned as a JSON string.
+            If the specified username or preference does not exist, an HTTP
+            404 "Not Found" response is returned.
 
-            If a user without "is_staff" access has requested preferences for a
-            different user, this method returns a 404.
+            If a user without "is_staff" access requests preferences for a
+            different user, a 404 error is returned.
 
-            If the specified username or preference does not exist, this method
-            returns a 404.
+            If the user makes the request for her own account, or makes a
+            request for another account and has "is_staff" access, an HTTP 200
+            "OK" response is returned that contains a JSON string.
 
         **Response Values for PUT**
 
-            A successful put returns a 204 and no content.
+            Users can only modify their own preferences. If the
+            requesting user does not have the specified username and has staff
+            access, the request returns an HTTP 403 "Forbidden" response. If
+            the requesting user does not have staff access, the request
+            returns an HTTP 404 "Not Found" response to avoid revealing the
+            existence of the account.
 
-            Users can only modify their own preferences. If the requesting user
-            does not have username "username", this method will return with a
-            status of 403 for users with staff access but a 404 for ordinary
-            users to avoid leaking the existence of the account.
+            If the specified preference does not exist, an HTTP 404 "Not
+            Found" response is returned.
 
-            If the specified preference does not exist, this method returns a
-            404.
+            If the request is successful, a 204 "No Content" status is returned
+            with no additional content.
 
-        **Response for DELETE**
+        **Response Values for DELETE**
 
-            A successful delete returns a 204 and no content.
+            Users can only delete their own preferences. If the
+            requesting user does not have the specified username and has staff
+            access, the request returns an HTTP 403 "Forbidden" response. If
+            the requesting user does not have staff access, the request
+            returns an HTTP 404 "Not Found" response to avoid revealing the
+            existence of the account.
 
-            Users can only delete their own preferences. If the requesting user
-            does not have username "username", this method will return with a
-            status of 403 for users with staff access but a 404 for ordinary
-            users to avoid leaking the existence of the account.
+            If the specified preference does not exist, an HTTP 404 "Not
+            Found" response is returned.
 
-            If the specified preference does not exist, this method returns a
-            404.
-
+            If the update is successful, an HTTP 204 "No Content" response is
+            returned with no additional content.
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
@@ -208,7 +218,7 @@ class PreferencesDetailView(APIView):
         PUT /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
-            set_user_preference(request.user, preference_key, request.DATA, username=username)
+            set_user_preference(request.user, preference_key, request.data, username=username)
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:

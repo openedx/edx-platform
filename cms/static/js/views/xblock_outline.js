@@ -13,7 +13,7 @@
  *  - scroll_offset - the scroll offset to use for the locator being shown
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils",
+define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
         "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor"],
     function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor) {
 
@@ -89,6 +89,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     }, true);
                     defaultNewChildName = childInfo.display_name;
                 }
+                /* globals course */
                 return {
                     xblockInfo: xblockInfo,
                     visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(xblockInfo.get('visibility_state')),
@@ -104,7 +105,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     isCollapsed: isCollapsed,
                     includesChildren: this.shouldRenderChildren(),
                     hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
-                    staffOnlyMessage: this.model.get('staff_only_message')
+                    staffOnlyMessage: this.model.get('staff_only_message'),
+                    course: course
                 };
             },
 

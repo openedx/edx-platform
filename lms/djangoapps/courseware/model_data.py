@@ -45,6 +45,8 @@ from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
 from courseware.user_state_client import DjangoXBlockUserStateClient
 
+from openedx.core.djangoapps.call_stack_manager import donottrack
+
 log = logging.getLogger(__name__)
 
 
@@ -368,8 +370,8 @@ class UserStateCache(object):
             self.user.username,
             _all_usage_keys(xblocks, aside_types),
         )
-        for usage_key, field_state in block_field_state:
-            self._cache[usage_key] = field_state
+        for user_state in block_field_state:
+            self._cache[user_state.block_key] = user_state.state
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
@@ -392,11 +394,14 @@ class UserStateCache(object):
 
         Returns: datetime if there was a modified date, or None otherwise
         """
-        return self._client.get_mod_date(
-            self.user.username,
-            kvs_key.block_scope_id,
-            fields=[kvs_key.field_name],
-        ).get(kvs_key.field_name)
+        try:
+            return self._client.get(
+                self.user.username,
+                kvs_key.block_scope_id,
+                fields=[kvs_key.field_name],
+            ).updated
+        except self._client.DoesNotExist:
+            return None
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
@@ -987,6 +992,7 @@ class ScoresClient(object):
 
 
 # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
+@donottrack(StudentModule)
 def set_score(user_id, usage_key, score, max_score):
     """
     Set the score and max_score for the specified user and xblock usage.

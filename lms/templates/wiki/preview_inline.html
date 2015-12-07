@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-{% load wiki_tags i18n %}{% load compressed %}
+{% load wiki_tags i18n %}{% load pipeline %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
-  {% compressed_css 'course' %}  
-  {% compressed_js 'main_vendor' %}
+  {% stylesheet 'course' %}
+  {% javascript 'main_vendor' %}
 </head>
 <body class="modal-preview">
   <section class="container wiki view">
@@ -39,13 +39,8 @@
     </div>
   </section>
   
-  {% compressed_js 'application' %}
-  {% compressed_js 'module-js' %}
-  
-  <script>
-    window.onload = add_schematic_handler(window.onload);
-  </script>
-  
+  {% javascript 'application' %}
+  {% javascript 'module-js' %}
   {% with mathjax_mode='wiki' %}
     {% include "mathjax_include.html" %}
   {% endwith %}

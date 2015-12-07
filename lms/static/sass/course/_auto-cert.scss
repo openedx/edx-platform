@@ -1,4 +1,4 @@
-.wrapper-auto-cert {
+.wrapper-msg.wrapper-auto-cert {
     @include margin(0, 0, 0, 0); // Overrides .wrapper-msg
     @include padding(0, 0, 0, 0); // Overrides .wrapper-msg
     background: none; // Overrides .wrapper-msg
@@ -12,9 +12,8 @@
     .auto-cert-message {
         margin: $baseline 0;
         padding: $baseline;
-        border: 1px solid $m-blue-d1;
-        border-radius: 3px;
-        background: $m-blue-l4;
+        border-left: 3px solid $m-blue-d1;
+        background: $gray-l5;
 
         .has-actions {
 

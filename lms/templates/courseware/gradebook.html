@@ -74,13 +74,24 @@ from django.core.urlresolvers import reverse
         <thead>
           <tr> <!-- Header Row -->
             %for section in templateSummary['section_breakdown']:
-              <th><div class="assignment-label">${section['label']}</div></th>
+              <%
+                tooltip_str = section['detail']
+                # We are making header labels from the first student record. So for tool tip (title),
+                # I am processing this string ```section['detail']``` from student record and removing
+                # all student related data i.e marks, percentage etc to get only the title of homework.
+                if "=" in section['detail']:
+                    tooltip_str = section['detail'][0: section['detail'].rfind('=')]
+
+                if "-" in tooltip_str:
+                    tooltip_str = tooltip_str[0: tooltip_str.rfind('-')]
+              %>
+              <th title="${tooltip_str}"><div class="assignment-label">${section['label']}</div></th>
             %endfor
-            <th><div class="assignment-label">Total</div></th>
+            <th title="${_('Total')}"><div class="assignment-label">${_('Total')}</div></th>
           </tr>
         </thead>
 
-        <%def name="percent_data(fraction)">
+        <%def name="percent_data(fraction, label)">
           <%
             letter_grade = 'None'
             if fraction > 0:
@@ -92,22 +103,38 @@ from django.core.urlresolvers import reverse
 
             data_class = "grade_" + letter_grade
           %>
-          <td class="${data_class}" data-percent="${fraction}">${ "{0:.0f}".format( 100 * fraction ) }</td>
+          <td class="${data_class}" data-percent="${fraction}" title="${label}">${ "{0:.0f}".format( 100 * fraction ) }</td>
         </%def>
 
         <tbody>
           %for student in students:
           <tr>
             %for section in student['grade_summary']['section_breakdown']:
-              ${percent_data( section['percent'] )}
+              ${percent_data( section['percent'], section['detail'] )}
             %endfor
-            ${percent_data( student['grade_summary']['percent'])}
+            ${percent_data( student['grade_summary']['percent'], _('Total'))}
           </tr>
           %endfor
         </tbody>
       </table>
     </div>
+    <span class="grade-book-footer">
+        %if page["previous_offset"] is not None:
+          <a href="${page_url}?offset=${page['previous_offset']}"
+             class="sequence-nav-button button-previous">
+            <span class="icon fa fa-chevron-left" aria-hidden="true"></span><span class="sr">${_('previous page')}</span>
+          </a>
+        %endif
 
+        ${_('Page')} ${page["page_num"]} ${_('of')} ${page["total_pages"]}
+
+        %if page["next_offset"] is not None:
+          <a href="${page_url}?offset=${page['next_offset']}"
+             class="sequence-nav-button button-next">
+            <span class="icon fa fa-chevron-right" aria-hidden="true"></span><span class="sr">${_('next page')}</span>
+          </a>
+        %endif
+    </span>
     %endif
   </section>
 </div>

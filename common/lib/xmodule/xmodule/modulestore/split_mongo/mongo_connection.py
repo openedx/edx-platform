@@ -13,7 +13,13 @@ from time import time
 
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
-from django.core.cache import get_cache, InvalidCacheBackendError
+
+try:
+    from django.core.cache import caches, InvalidCacheBackendError
+    DJANGO_AVAILABLE = True
+except ImportError:
+    DJANGO_AVAILABLE = False
+
 import dogstats_wrapper as dog_stats_api
 
 from contracts import check, new_contract
@@ -24,6 +30,15 @@ from xmodule.modulestore.split_mongo import BlockKey
 
 
 new_contract('BlockData', BlockData)
+
+
+def get_cache(alias):
+    """
+    Return cache for an `alias`
+
+    Note: The primary purpose of this is to mock the cache in test_split_modulestore.py
+    """
+    return caches[alias]
 
 
 def round_power_2(value):
@@ -216,15 +231,16 @@ class CourseStructureCache(object):
     for set and get.
     """
     def __init__(self):
-        self.no_cache_found = False
-        try:
-            self.cache = get_cache('course_structure_cache')
-        except InvalidCacheBackendError:
-            self.no_cache_found = True
+        self.cache = None
+        if DJANGO_AVAILABLE:
+            try:
+                self.cache = get_cache('course_structure_cache')
+            except InvalidCacheBackendError:
+                pass
 
     def get(self, key, course_context=None):
         """Pull the compressed, pickled struct data from cache and deserialize."""
-        if self.no_cache_found:
+        if self.cache is None:
             return None
 
         with TIMER.timer("CourseStructureCache.get", course_context) as tagger:
@@ -245,7 +261,7 @@ class CourseStructureCache(object):
 
     def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
-        if self.no_cache_found:
+        if self.cache is None:
             return None
 
         with TIMER.timer("CourseStructureCache.set", course_context) as tagger:
@@ -309,7 +325,7 @@ class MongoConnection(object):
         if self.database.connection.alive():
             return True
         else:
-            raise HeartbeatFailure("Can't connect to {}".format(self.database.name))
+            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
 
     def get_structure(self, key, course_context=None):
         """
@@ -532,5 +548,6 @@ class MongoConnection(object):
                 ('course', pymongo.ASCENDING),
                 ('run', pymongo.ASCENDING)
             ],
-            unique=True
+            unique=True,
+            background=True
         )

@@ -51,6 +51,20 @@
   text-align: center;
 }
 
+// Below divider rules are moved here from _instructor_2.scss
+// UI: visual dividers
+.divider-lv0 {
+  border-top: ($baseline/5) solid $gray-l4;
+}
+
+.divider-lv1 {
+  border-top: ($baseline/10) solid $gray-l4;
+}
+
+.divider-lv2 {
+  border-top: ($baseline/20) solid $gray-l4;
+}
+
 // for verify_student/make_payment_step.underscore
 .payment-buttons {
 
@@ -76,9 +90,6 @@
 
 // teams temporary
 .view-teams {
-  .global-new, #global-navigation {
-    display: none;
-  }
 
   // Copied from _pagination.scss in cms
   .pagination {
@@ -218,6 +229,202 @@
           border-radius: 3px;
         }
       }
+    }
+  }
+}
+
+//efischer; scratch space for teams instructor tools
+.view-teams {
+  .wrapper-msg {
+    @include clearfix();
+    max-width: grid-width(12);
+    margin: 0 auto;
+    border-top: 3px solid $orange;
+
+    .left-floater {
+      @include float(left);
+      text-transform: uppercase;
+      font-weight: $font-semibold;
+      color: $white;
+      line-height: $body-line-height;
+    }
+
+    .right-floater {
+      @include float(right);
+      line-height: $body-line-height;
+
+      button {
+        background: transparent;
+        border: 1px solid transparent;
+        color: $white;
+        box-shadow: 0 0 0 0;
+        font-weight: $font-regular;
+        text-shadow: 0 0;
+
+        &:hover {
+          color: $orange;
+          background: transparent;
+          border: 1px solid $orange;
+          box-shadow: 0 0 0 0;
+        }
+
+        &:focus {
+         box-shadow: 0 0 0 0;
+        }
+      }
+    }
+  }
+
+  .members-info {
+    margin: 0;
+    padding: 0;
+    li {
+      display: inline;
+    }
+  }
+
+  .edit-members {
+    @extend %ui-no-list;
+
+    .team-member {
+      line-height: $body-line-height;
+      padding: 10px;
+    }
+
+    .member-info-container {
+      display: inline-block;
+      vertical-align: middle;
+      @include margin-left($baseline/2);
+
+      .primary {
+        font-size: 120%;
+      }
+
+      .secondary {
+        color: $lighter-base-font-color;
+        font-size: 80%;
+        display: block;
+      }
+    }
+
+    .member-profile {
+      img {
+        border: 1px solid $gray;
+      }
+    }
+
+    .action-remove-member {
+      color: $blue;
+      background: transparent;
+      border: 1px solid transparent;
+      font: inherit;
+    }
+  }
+  //end instructor tools scratch space
+
+  //efischer TNL-3226
+  .search-field::-ms-clear {
+    width: 0px;
+    height: 0px;
+  }
+}
+
+//efischer - TNL-3189
+//copied from cms/static/sass/elements/_system-feedback.scss#L106
+//along with some "hide the inherited value, we want none" action
+.prompt.warning button {
+  @extend %btn-no-style;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    color: $orange-s2;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: 0px;
+  }
+}
+
+//efischer - TNL-3189
+//copied from cms/static/sass/elements/_system-feedback.scss#L106
+//along with some "hide the inherited value, we want none" action
+.prompt.warning button {
+  @extend %btn-no-style;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    color: $orange-s2;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: 0px;
+  }
+}
+
+// pfogg - ECOM-2604
+// styling for date summary blocks on the course info page
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
+    margin-top: $baseline/2;
+    margin-bottom: $baseline/2;
+    padding: 10px;
+    background-color: $gray-l4;
+    @include border-left(3px solid $gray-l3);
+
+    .description {
+      margin-top: $baseline/2;
+      margin-bottom: $baseline/2;
+      display: inline-block;
+      color: $lighter-base-font-color;
+      font-size: 80%;
+    }
+
+    .date-summary-link {
+      @include float(right);
+      font-size: 80%;
+      font-weight: $font-semibold;
+      a {
+        color: $base-font-color;
+      }
+    }
+
+    .date {
+      color: $lighter-base-font-color;
+      font-size: 80%;
+    }
+
+    &-todays-date {
+      @include border-left(3px solid $blue);
+
+      .heading {
+        font-weight: $font-regular;
+        font-size: 80%;
+      }
+    }
+
+    &-verified-upgrade-deadline {
+      @include border-left(3px solid $green);
+    }
+
+    &-verification-deadline-passed {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-retry {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-upcoming {
+      @include border-left(3px solid $orange);
     }
   }
 }

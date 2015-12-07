@@ -14,6 +14,8 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.utils.html import escape
 
+from opaque_keys.edx.keys import CourseKey
+
 from edxmako.shortcuts import render_to_response
 from survey.models import SurveyForm
 from microsite_configuration import microsite
@@ -92,6 +94,8 @@ def submit_answers(request, survey_name):
     # in a hidden form field
     redirect_url = answers['_redirect_url'] if '_redirect_url' in answers else reverse('dashboard')
 
+    course_key = CourseKey.from_string(answers['course_id']) if 'course_id' in answers else None
+
     allowed_field_names = survey.get_field_names()
 
     # scrub the answers to make sure nothing malicious from the user gets stored in
@@ -102,7 +106,7 @@ def submit_answers(request, survey_name):
         if answer_key in allowed_field_names:
             filtered_answers[answer_key] = escape(answers[answer_key])
 
-    survey.save_user_answers(request.user, filtered_answers)
+    survey.save_user_answers(request.user, filtered_answers, course_key)
 
     response_params = json.dumps({
         # The HTTP end-point for the payment processor.

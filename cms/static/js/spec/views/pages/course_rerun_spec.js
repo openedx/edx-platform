@@ -1,5 +1,5 @@
-define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/view_helpers", "js/views/course_rerun",
-        "js/views/utils/create_course_utils", "js/views/utils/view_utils", "jquery.simulate"],
+define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/view_helpers", "js/views/course_rerun",
+        "js/views/utils/create_course_utils", "common/js/components/utils/view_utils", "jquery.simulate"],
     function ($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
         describe("Create course rerun page", function () {
             var selectors = {
@@ -193,7 +193,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/view_h
                 var requests = AjaxHelpers.requests(this);
                 fillInFields('DemoX', 'DM101', '', 'Demo course');
                 $(selectors.save).click();
-                expect(requests.length).toBe(0);
+                AjaxHelpers.expectNoRequests(requests);
             });
 
             it("can be canceled", function () {

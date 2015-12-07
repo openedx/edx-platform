@@ -1,0 +1,15 @@
+[
+  {
+    "pk": 2,
+    "model": "oauth2.client",
+    "fields": {
+      "name": "programs",
+      "url": "http://example.com/",
+      "client_type": 1,
+      "redirect_uri": "http://example.com/welcome",
+      "user": null,
+      "client_id": "programs-client-id",
+      "client_secret": "programs-client-secret"
+    }
+  }
+]

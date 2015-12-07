@@ -51,13 +51,12 @@ define([
         };
 
         var respondWithMockItems = function(requests) {
-            var requestIndex = requests.length - 1;
-            var request = requests[requestIndex];
+            var request = AjaxHelpers.currentRequest(requests);
             var url = new URI(request.url);
             var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
             var page = queryParameters.page;
             var response = page === "0" ? mockFirstPage : mockSecondPage;
-            AjaxHelpers.respondWithJson(requests, response, requestIndex);
+            AjaxHelpers.respondWithJson(requests, response);
         };
 
         var MockPagingView = PagingView.extend({
@@ -124,7 +123,7 @@ define([
                         pagingView.setPage(2);
                         respondWithMockItems(requests);
                         pagingView.nextPage();
-                        expect(requests.length).toBe(1);
+                        AjaxHelpers.expectNoRequests(requests);
                     });
                 });
 
@@ -144,7 +143,7 @@ define([
                         pagingView.setPage(1);
                         respondWithMockItems(requests);
                         pagingView.previousPage();
-                        expect(requests.length).toBe(1);
+                        AjaxHelpers.expectNoRequests(requests);
                     });
 
                     it('does not move back after a server error', function () {

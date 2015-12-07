@@ -23,7 +23,7 @@ from bson.son import SON
 from datetime import datetime
 from fs.osfs import OSFS
 from mongodb_proxy import MongoProxy, autoretry_read
-from path import path
+from path import Path as path
 from pytz import UTC
 from contracts import contract, new_contract
 
@@ -1033,6 +1033,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return CourseLocator(org, course, run, deprecated=True)
 
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        return BlockUsageLocator(course_key, 'course', course_key.run)
+
     def get_course(self, course_key, depth=0, **kwargs):
         """
         Get the course with the given courseid (org/course/run)
@@ -1877,7 +1884,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         return 1
 
-    # pylint: disable=unused-argument
     @contract(course_key='CourseKey', user_id='int|long')
     def delete_all_asset_metadata(self, course_key, user_id):
         """
@@ -1914,21 +1920,25 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
 
         # Because we often query for some subset of the id, we define this index:
-        self.collection.create_index([
-            ('_id.org', pymongo.ASCENDING),
-            ('_id.course', pymongo.ASCENDING),
-            ('_id.category', pymongo.ASCENDING),
-            ('_id.name', pymongo.ASCENDING),
-        ])
+        self.collection.create_index(
+            [
+                ('_id.tag', pymongo.ASCENDING),
+                ('_id.org', pymongo.ASCENDING),
+                ('_id.course', pymongo.ASCENDING),
+                ('_id.category', pymongo.ASCENDING),
+                ('_id.name', pymongo.ASCENDING),
+                ('_id.revision', pymongo.ASCENDING),
+            ],
+            background=True)
 
         # Because we often scan for all category='course' regardless of the value of the other fields:
-        self.collection.create_index('_id.category')
+        self.collection.create_index('_id.category', background=True)
 
         # Because lms calls get_parent_locations frequently (for path generation):
-        self.collection.create_index('definition.children', sparse=True)
+        self.collection.create_index('definition.children', sparse=True, background=True)
 
         # To allow prioritizing draft vs published material
-        self.collection.create_index('_id.revision')
+        self.collection.create_index('_id.revision', background=True)
 
     # Some overrides that still need to be implemented by subclasses
     def convert_to_draft(self, location, user_id):

@@ -1,12 +1,12 @@
 """
 Serializers for all Course Enrollment related return objects.
-
 """
 import logging
 
 from rest_framework import serializers
-from student.models import CourseEnrollment
+
 from course_modes.models import CourseMode
+from student.models import CourseEnrollment
 
 
 log = logging.getLogger(__name__)
@@ -30,29 +30,36 @@ class StringListField(serializers.CharField):
         return [int(item) for item in items]
 
 
-class CourseField(serializers.RelatedField):
-    """Read-Only representation of course enrollment information.
-
-    Aggregates course information from the CourseDescriptor as well as the Course Modes configured
-    for enrolling in the course.
-
+class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serialize a course descriptor and related information.
     """
 
-    def to_native(self, course, **kwargs):
-        course_id = unicode(course.id)
-        course_modes = ModeSerializer(
-            CourseMode.modes_for_course(course.id, kwargs.get('include_expired', False), only_selectable=False)
-        ).data  # pylint: disable=no-member
+    course_id = serializers.CharField(source="id")
+    enrollment_start = serializers.DateTimeField(format=None)
+    enrollment_end = serializers.DateTimeField(format=None)
+    course_start = serializers.DateTimeField(source="start", format=None)
+    course_end = serializers.DateTimeField(source="end", format=None)
+    invite_only = serializers.BooleanField(source="invitation_only")
+    course_modes = serializers.SerializerMethodField()
 
-        return {
-            "course_id": course_id,
-            "enrollment_start": course.enrollment_start,
-            "enrollment_end": course.enrollment_end,
-            "course_start": course.start,
-            "course_end": course.end,
-            "invite_only": course.invitation_only,
-            "course_modes": course_modes,
-        }
+    def __init__(self, *args, **kwargs):
+        self.include_expired = kwargs.pop("include_expired", False)
+        super(CourseSerializer, self).__init__(*args, **kwargs)
+
+    def get_course_modes(self, obj):
+        """
+        Retrieve course modes associated with the course.
+        """
+        course_modes = CourseMode.modes_for_course(
+            obj.id,
+            include_expired=self.include_expired,
+            only_selectable=False
+        )
+        return [
+            ModeSerializer(mode).data
+            for mode in course_modes
+        ]
 
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
@@ -62,39 +69,14 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     the Course Descriptor and course modes, to give a complete representation of course enrollment.
 
     """
-    course_details = serializers.SerializerMethodField('get_course_details')
+    course_details = CourseSerializer(source="course_overview")
     user = serializers.SerializerMethodField('get_username')
-
-    @property
-    def data(self):
-        serialized_data = super(CourseEnrollmentSerializer, self).data
-
-        # filter the results with empty courses 'course_details'
-        if isinstance(serialized_data, dict):
-            if serialized_data.get('course_details') is None:
-                return None
-
-            return serialized_data
-
-        return [enrollment for enrollment in serialized_data if enrollment.get('course_details')]
-
-    def get_course_details(self, model):
-        if model.course is None:
-            msg = u"Course '{0}' does not exist (maybe deleted), in which User (user_id: '{1}') is enrolled.".format(
-                model.course_id,
-                model.user.id
-            )
-            log.warning(msg)
-            return None
-
-        field = CourseField()
-        return field.to_native(model.course)
 
     def get_username(self, model):
         """Retrieves the username from the associated model."""
         return model.username
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course_details', 'user')
         lookup_field = 'username'

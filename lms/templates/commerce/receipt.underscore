@@ -1,7 +1,10 @@
 <div class="wrapper-content-main payment-confirmation-step">
   <article class="content-main">
     <h3 class="title">
-      <%= gettext( "Thank you! We have received your payment." ) %>
+      <%= interpolate(
+            gettext( "Thank you! We have received your payment for %(course_name)s."),
+            { course_name: "<span class='course_name_placeholder'></span>" }, true
+          ) %>
     </h3>
 
     <% if ( receipt ) { %>
@@ -73,6 +76,9 @@
               </p>
             </div>
         <% } %>
+
+        <div class="report report-receipt report-receipt-provider hidden" id="receipt-provider"></div>
+
       </div>
     </div>
     <% } else { %>

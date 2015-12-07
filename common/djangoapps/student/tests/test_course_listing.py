@@ -2,26 +2,27 @@
 Unit tests for getting the list of courses for a user through iterating all courses and
 by reversing group name formats.
 """
-import mock
-from mock import patch, Mock
+import unittest
 
-from student.tests.factories import UserFactory
+from django.conf import settings
+from django.test.client import Client
+import mock
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
 from student.roles import GlobalStaff
+from student.tests.factories import UserFactory
+from student.views import get_course_enrollments
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.error_module import ErrorDescriptor
-from django.test.client import Client
-from student.models import CourseEnrollment
-from student.views import get_course_enrollments
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     set_prerequisite_courses,
     seed_milestone_relationship_types
 )
-import unittest
-from django.conf import settings
 
 
 class TestCourseListing(ModuleStoreTestCase):
@@ -91,10 +92,12 @@ class TestCourseListing(ModuleStoreTestCase):
         course_key = mongo_store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_key, default_store=ModuleStoreEnum.Type.mongo)
 
-        with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
+        with mock.patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', mock.Mock(side_effect=Exception)):
             self.assertIsInstance(modulestore().get_course(course_key), ErrorDescriptor)
 
-            # get courses through iterating all courses
+            # Invalidate (e.g., delete) the corresponding CourseOverview, forcing get_course to be called.
+            CourseOverview.objects.filter(id=course_key).delete()
+
             courses_list = list(get_course_enrollments(self.student, None, []))
             self.assertEqual(courses_list, [])
 

@@ -71,10 +71,10 @@ function (Initialize) {
                     speed: '1.50',
                     metadata: {
                         'testId': {
-                            duration: 400
+                            duration: 'PT6M40S'
                         },
                         'videoId': {
-                            duration: 100
+                            duration: 'PT1M40S'
                         }
                     },
                     videos: {

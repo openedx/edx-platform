@@ -12,11 +12,6 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
-
 from .common import *
 
 DEBUG = True
@@ -29,8 +24,6 @@ FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--othe
 FEATURES['SUBDOMAIN_BRANDING'] = True
 FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
-FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
-FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
@@ -60,6 +53,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ENV_ROOT / "db" / "edx.db",
+        'ATOMIC_REQUESTS': True,
     }
 }
 
@@ -97,6 +91,11 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_course_structure_mem_cache',
+    },
+    'lms.course_blocks': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': 'lms_course_blocks_cache',
     },
 }
 
@@ -202,9 +201,6 @@ FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
 
-INSTALLED_APPS += ('external_auth',)
-INSTALLED_APPS += ('django_openid_auth',)
-
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  # TODO: accept more endpoints
@@ -273,12 +269,10 @@ PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
 
-##### Segment.io  ######
+##### Segment  ######
 
-# If there's an environment variable set, grab it and turn on Segment.io
-SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
-if SEGMENT_IO_LMS_KEY:
-    FEATURES['SEGMENT_IO_LMS'] = True
+# If there's an environment variable set, grab it
+LMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
 
 ###################### Payment ######################
 

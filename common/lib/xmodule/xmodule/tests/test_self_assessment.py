@@ -1,3 +1,6 @@
+"""
+Test cases covering workflows and behaviors of the Self Assessment feature
+"""
 from datetime import datetime
 import json
 import unittest
@@ -15,6 +18,9 @@ import test_util_open_ended
 
 
 class SelfAssessmentTest(unittest.TestCase):
+    """
+    Test cases covering workflows and behaviors of the Self Assessment feature
+    """
     rubric = '''<rubric><rubric>
         <category>
         <description>Response Quality</description>
@@ -72,15 +78,21 @@ class SelfAssessmentTest(unittest.TestCase):
 
     def test_get_html(self):
         html = self.module.get_html(self.module.system)
-        self.assertTrue("This is sample prompt text" in html)
+        self.assertIn("This is sample prompt text", html)
 
     def test_self_assessment_flow(self):
         responses = {'assessment': '0', 'score_list[]': ['0', '0']}
 
         def get_fake_item(name):
+            """
+            Returns the specified key from the parent workflow container
+            """
             return responses[name]
 
         def get_data_for_location(self, location, student):
+            """
+            Returns a dictionary of keys having zero values
+            """
             return {
                 'count_graded': 0,
                 'count_required': 0,

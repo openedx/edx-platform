@@ -2,7 +2,7 @@
 #
 # If you open a pull request that adds a new dependency, you should notify:
 #   * @mollydb - to check licensing
-#   * One of @e0d, @jarv, or @feanil - to check system requirements
+#   * @edx/devops - to check system requirements
 
 numpy==1.6.2
 networkx==1.7

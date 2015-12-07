@@ -2,7 +2,6 @@
 """
 Unit tests for video-related REST APIs.
 """
-# pylint: disable=attribute-defined-outside-init
 import csv
 import json
 import dateutil.parser

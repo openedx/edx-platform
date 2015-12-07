@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-
 # There is a course creators admin table.
 from ratelimitbackend import admin
-admin.autodiscover()
 
-# pylint: disable=bad-continuation
+from cms.djangoapps.contentstore.views.program import ProgramAuthoringView
+
+
+admin.autodiscover()
 
 # Pattern to match a course key or a library key
 COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
@@ -32,7 +33,7 @@ urlpatterns = patterns(
         'contentstore.views.component_handler', name='component_handler'),
 
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
-        'contentstore.views.xblock.xblock_resource', name='xblock_resource_url'),
+        'openedx.core.djangoapps.common_views.xblock.xblock_resource', name='xblock_resource_url'),
 
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
@@ -183,12 +184,25 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
             'contentstore.views.certificates.certificates_list_handler')
     )
 
+urlpatterns += (
+    # Drops into the Programs authoring app, which handles its own routing.
+    # The view uses a configuration model to determine whether or not to
+    # display the authoring app. If disabled, a 404 is returned.
+    url(r'^program/', ProgramAuthoringView.as_view(), name='programs'),
+)
+
 if settings.DEBUG:
     try:
         from .urls_dev import urlpatterns as dev_urlpatterns
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
+
+if 'debug_toolbar' in settings.INSTALLED_APPS:
+    import debug_toolbar
+    urlpatterns += (
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )
 
 # Custom error pages
 # pylint: disable=invalid-name
@@ -197,6 +211,6 @@ handler500 = 'contentstore.views.render_500'
 
 # display error page templates, for testing purposes
 urlpatterns += (
-    url(r'404', handler404),
-    url(r'500', handler500),
+    url(r'^404$', handler404),
+    url(r'^500$', handler500),
 )
