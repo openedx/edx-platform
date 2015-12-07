@@ -27,10 +27,3 @@
 <div class="section-bkg-wrapper">
     <div id="login-and-registration-container" class="login-register" />
 </div>
-
-% if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
-    ## This overwrites the "footer" block declared in main.html
-    ## with an empty block, effectively hiding the footer
-    ## from logistration pages.
-    <%block name="footer"/>
-% endif
