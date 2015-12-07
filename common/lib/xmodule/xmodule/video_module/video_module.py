@@ -27,6 +27,7 @@ from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
+from opaque_keys.edx.locator import AssetLocator
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.x_module import XModule, module_attr
@@ -34,6 +35,7 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.exceptions import NotFoundError
+from xmodule.contentstore.content import StaticContent
 
 from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
 from .video_utils import create_youtube_string, get_video_from_cdn, get_poster
@@ -714,6 +716,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 # for about a month we did it for Strings also).
                 field_data[attr] = deserialize_field(cls.fields[attr], value)
 
+        course_id = getattr(id_generator, 'target_course_id', None)
+        # Update the handout location with current course_id
+        if 'handout' in field_data.keys() and course_id:
+            handout_location = StaticContent.get_location_from_path(field_data['handout'])
+            if isinstance(handout_location, AssetLocator):
+                handout_new_location = StaticContent.compute_location(course_id, handout_location.path)
+                field_data['handout'] = StaticContent.serialize_asset_key_with_slash(handout_new_location)
+
         # For backwards compatibility: Add `source` if XML doesn't have `download_video`
         # attribute.
         if 'download_video' not in field_data and sources:
@@ -735,7 +745,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             edxval_api.import_from_xml(
                 video_asset_elem,
                 field_data['edx_video_id'],
-                course_id=getattr(id_generator, 'target_course_id', None)
+                course_id=course_id
             )
 
         # load license if it exists
