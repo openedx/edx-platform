@@ -303,6 +303,50 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         course_key = self._map_revision_to_branch(course_key)
         return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
 
+    def fix_draft_constraint(self, course_key, user_id, commit):
+        """
+        If a course doesn't satisfy the "draft constraint" (that the set of
+        published block ids in a course is a subset of the draft block ids),
+        this function will copy the published blocks missing from the draft
+        branch over to the draft branch.
+
+        Returns a tuple (missing_blocks, commit) consisting of:
+            missing_blocks: the blocks that were in the published branch but
+            not in the draft branch
+            commit: whether or not we intended to update the draft branch
+            to include those missing blocks
+        """
+
+        draft_location = self._map_revision_to_branch(
+            course_key, ModuleStoreEnum.RevisionOption.draft_only
+        )
+        published_location = self._map_revision_to_branch(
+            course_key, ModuleStoreEnum.RevisionOption.published_only
+        )
+
+        draft_structure = self._lookup_course(draft_location).structure
+        published_structure = self._lookup_course(published_location).structure
+
+        index_entry = self._get_index_if_valid(draft_location)
+        new_draft_structure = self.version_structure(draft_location, draft_structure, user_id)
+
+        missing_blocks = []
+        for published_block_id, published_block in published_structure['blocks'].iteritems():
+            if published_block_id not in draft_structure['blocks']:
+                new_draft_structure['blocks'].update({published_block_id: published_block})
+                missing_blocks.append(unicode(published_block_id))
+
+        if commit and missing_blocks:
+            self.update_structure(draft_location, new_draft_structure)
+            if index_entry is not None:
+                self._update_head(
+                    draft_location,
+                    index_entry,
+                    draft_location.branch,
+                    new_draft_structure['_id'],
+                )
+        return missing_blocks, commit
+
     def fix_not_found(self, course_key, user_id):
         """
         Fix any children which point to non-existent blocks in the course's published and draft branches

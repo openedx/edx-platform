@@ -480,7 +480,7 @@ class MongoConnection(object):
             from_index: If set, only update an index if it matches the one specified in `from_index`.
         """
         with TIMER.timer("update_course_index", course_context):
-            if from_index:
+            if from_index and False:
                 query = {"_id": from_index["_id"]}
                 # last_update not only tells us when this course was last updated but also helps
                 # prevent collisions

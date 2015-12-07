@@ -703,6 +703,19 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
     return [unicode(item) for item in items]
 
 
+def fix_draft_constraint(course_usage_key, user_id, commit=False):
+    """
+    In the draft constraint, we assume that the set of xblock ids in a published
+    branch of a course is a subset of the set of xblock ids in the draft branch
+    of that same course.
+
+    After this function is executed, a course may be altered such that this
+    condition is satisfied, without changing the published branch of the course.
+    """
+    store = modulestore()
+    return store.fix_draft_constraint(course_usage_key, user_id, commit)
+
+
 def _get_xblock(usage_key, user):
     """
     Returns the xblock for the specified usage key. Note: if failing to find a key with a category
