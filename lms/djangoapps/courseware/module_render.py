@@ -412,31 +412,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
     }
 
-    # This is a hacky way to pass settings to the combined open ended xmodule
-    # It needs an S3 interface to upload images to S3
-    # It needs the open ended grading interface in order to get peer grading to be done
-    # this first checks to see if the descriptor is the correct one, and only sends settings if it is
-
-    # Get descriptor metadata fields indicating needs for various settings
-    needs_open_ended_interface = getattr(descriptor, "needs_open_ended_interface", False)
-    needs_s3_interface = getattr(descriptor, "needs_s3_interface", False)
-
-    # Initialize interfaces to None
-    open_ended_grading_interface = None
-    s3_interface = None
-
-    # Create interfaces if needed
-    if needs_open_ended_interface:
-        open_ended_grading_interface = settings.OPEN_ENDED_GRADING_INTERFACE
-        open_ended_grading_interface['mock_peer_grading'] = settings.MOCK_PEER_GRADING
-        open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
-    if needs_s3_interface:
-        s3_interface = {
-            'access_key': getattr(settings, 'AWS_ACCESS_KEY_ID', ''),
-            'secret_access_key': getattr(settings, 'AWS_SECRET_ACCESS_KEY', ''),
-            'storage_bucket_name': getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'openended')
-        }
-
     def inner_get_module(descriptor):
         """
         Delegate to get_module_for_descriptor_internal() with all values except `descriptor` set.
@@ -725,8 +700,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         publish=publish,
         anonymous_student_id=anonymous_student_id,
         course_id=course_id,
-        open_ended_grading_interface=open_ended_grading_interface,
-        s3_interface=s3_interface,
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, course_id)),

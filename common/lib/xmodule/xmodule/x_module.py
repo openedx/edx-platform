@@ -1583,7 +1583,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
             replace_urls, descriptor_runtime, user=None, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
-            open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
@@ -1677,9 +1676,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
 
         if publish:
             self.publish = publish
-
-        self.open_ended_grading_interface = open_ended_grading_interface
-        self.s3_interface = s3_interface
 
         self.cache = cache or DoNothingCache()
         self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
