@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
+from django.conf import settings
 from django_comment_common.models import (
     Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
 from django_comment_common.utils import seed_permissions_roles
@@ -178,7 +179,6 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack
     def test_redirect_to_course(self, course_id, course_key):
-
         # Create a user and enroll in a course
         response = self._auto_auth({
             'username': 'test',
@@ -193,8 +193,12 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         self.assertEqual(enrollment.user.username, "test")
 
         # Check that the redirect was to the course info/outline page
-        urls = ('/info', 'course/{}'.format(course_key.to_deprecated_string()))
-        self.assertTrue(response.url.endswith(urls))  # pylint: disable=no-member
+        if settings.ROOT_URLCONF == 'lms.urls':
+            url_pattern = '/info'
+        else:
+            url_pattern = '/course/{}'.format(unicode(course_key))
+
+        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
 
     def test_redirect_to_main(self):
         # Create user and redirect to 'home' (cms) or 'dashboard' (lms)
@@ -205,8 +209,12 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         }, status_code=302)
 
         # Check that the redirect was to either /dashboard or /home
-        urls = ('/dashboard', '/home')
-        self.assertTrue(response.url.endswith(urls))  # pylint: disable=no-member
+        if settings.ROOT_URLCONF == 'lms.urls':
+            url_pattern = '/dashboard'
+        else:
+            url_pattern = '/home'
+
+        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
 
     def _auto_auth(self, params=None, status_code=None, **kwargs):
         """
