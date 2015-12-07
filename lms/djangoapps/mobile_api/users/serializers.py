@@ -55,6 +55,14 @@ class CourseOverviewField(serializers.RelatedField):
             ).to_json(),
 
             # various URLs
+            # course_image is sent in both new and old formats
+            # (within media to be compatible with the new Course API)
+            'media': {
+                'course_image': {
+                    'uri': course_overview.course_image_url,
+                    'name': 'Course Image',
+                }
+            },
             'course_image': course_overview.course_image_url,
             'course_about': reverse(
                 'about_course',
