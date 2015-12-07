@@ -295,6 +295,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.downloadable: 'ready',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
+        CertificateStatuses.auditing: 'auditing',
     }
 
     default_status = 'processing'
@@ -309,7 +310,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     if cert_status is None:
         return default_info
 
-    is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing')
+    is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
 
     if course_overview.certificates_display_behavior == 'early_no_info' and is_hidden_status:
         return {}
@@ -325,7 +326,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if (status in ('generating', 'ready', 'notpassing', 'restricted') and
+    if (status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing') and
             course_overview.end_of_course_survey_url is not None):
         status_dict.update({
             'show_survey_button': True,
@@ -373,7 +374,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     cert_status['download_url']
                 )
 
-    if status in ('generating', 'ready', 'notpassing', 'restricted'):
+    if status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing'):
         if 'grade' not in cert_status:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).

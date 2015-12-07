@@ -7,6 +7,7 @@ import json
 import textwrap
 import urllib
 
+from collections import OrderedDict
 from datetime import datetime
 from django.utils.translation import ugettext as _
 
@@ -1414,20 +1415,22 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    '{platform_name} now offers financial assistance for learners who want to earn verified certificates but'
+    '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
     ' who may not be able to pay the Verified Certificate fee. Eligible learners receive 90{percent_sign} off'
     ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
     ' audit track for a course that offers Verified Certificates, and then complete this application.'
-    ' Note that you must complete a separate application for each course you take.'
+    ' Note that you must complete a separate application for each course you take.\n We will use this'
+    'information to evaluate your application for financial assistance and to further develop our'
+    'financial assistance program.'
 ).format(
     percent_sign="%",
     platform_name=settings.PLATFORM_NAME
 ).split('\n')
 
 
-FA_INCOME_LABEL = _('Annual Income')
+FA_INCOME_LABEL = _('Annual Household Income')
 FA_REASON_FOR_APPLYING_LABEL = _(
-    'Tell us about your current financial situation, including any unusual circumstances.'
+    'Tell us about your current financial situation.'
 )
 FA_GOALS_LABEL = _(
     'Tell us about your learning or professional goals. How will a Verified Certificate in'
@@ -1435,7 +1438,7 @@ FA_GOALS_LABEL = _(
 )
 FA_EFFORT_LABEL = _(
     'Tell us about your plans for this course. What steps will you take to help you complete'
-    ' the course work a receive a certificate?'
+    ' the course work and receive a certificate?'
 )
 FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
 
@@ -1461,6 +1464,7 @@ def financial_assistance_request(request):
             return HttpResponseForbidden()
 
         course_id = data['course']
+        course = modulestore().get_course(CourseKey.from_string(course_id))
         legal_name = data['name']
         email = data['email']
         country = data['country']
@@ -1473,52 +1477,40 @@ def financial_assistance_request(request):
     except ValueError:
         # Thrown if JSON parsing fails
         return HttpResponseBadRequest('Could not parse request JSON.')
+    except InvalidKeyError:
+        # Thrown if course key parsing fails
+        return HttpResponseBadRequest('Could not parse request course key.')
     except KeyError as err:
         # Thrown if fields are missing
         return HttpResponseBadRequest('The field {} is required.'.format(err.message))
 
-    ticket_body = textwrap.dedent(
-        '''
-        Annual Income: {income}
-        Country: {country}
-
-        {reason_label}
-        {separator}
-            {reason_for_applying}
-
-        {goals_label}
-        {separator}
-            {goals}
-
-        {effort_label}
-        {separator}
-            {effort}
-
-        This user {allowed_for_marketing} allowed this content to be used for edX marketing purposes.
-        '''.format(
-            income=income,
-            country=country,
-            reason_label=FA_REASON_FOR_APPLYING_LABEL,
-            reason_for_applying=reason_for_applying,
-            goals_label=FA_GOALS_LABEL,
-            goals=goals,
-            effort_label=FA_EFFORT_LABEL,
-            effort=effort,
-            allowed_for_marketing='HAS' if marketing_permission else 'HAS NOT',
-            separator='=' * 16
-        )
-    )
-
     zendesk_submitted = _record_feedback_in_zendesk(
         legal_name,
         email,
-        'Financial assistance request for user {username} in course {course_id}'.format(
+        'Financial assistance request for learner {username} in course {course_name}'.format(
             username=username,
-            course_id=course_id
+            course_name=course.display_name
         ),
-        ticket_body,
-        {'issue_type': 'Financial Assistance', 'course_id': course_id},
-        {'Client IP': ip_address}
+        'Financial Assistance Request',
+        {'course_id': course_id},
+        # Send the application as additional info on the ticket so
+        # that it is not shown when support replies. This uses
+        # OrderedDict so that information is presented in the right
+        # order.
+        OrderedDict((
+            ('Username', username),
+            ('Full Name', legal_name),
+            ('Course ID', course_id),
+            ('Annual Household Income', income),
+            ('Country', country),
+            ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
+            (FA_REASON_FOR_APPLYING_LABEL, '\n' + reason_for_applying + '\n\n'),
+            (FA_GOALS_LABEL, '\n' + goals + '\n\n'),
+            (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
+            ('Client IP', ip_address),
+        )),
+        group_name='Financial Assistance',
+        require_update=True
     )
 
     if not zendesk_submitted:
@@ -1629,7 +1621,8 @@ def financial_assistance_form(request):
                 'type': 'checkbox',
                 'required': False,
                 'instructions': _(
-                    'Annual income and personal information such as email address will not be shared.'
+                    'Annual income and personal information such as email address will not be shared. '
+                    'Financial information will not be used for marketing purposes.'
                 ),
                 'restrictions': {}
             }
