@@ -205,6 +205,11 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_web_certificate(self):
+        CourseMode.objects.create(
+            course_id=self.course.id,
+            mode_display_name="Honor",
+            mode_slug=CourseMode.HONOR,
+        )
         self.login_and_enroll()
 
         self.course.cert_html_view_enabled = True

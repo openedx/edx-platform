@@ -86,6 +86,7 @@ class CertificateStatuses(object):
     regenerating = 'regenerating'
     restricted = 'restricted'
     unavailable = 'unavailable'
+    auditing = 'auditing'
 
 
 class CertificateSocialNetworks(object):
@@ -305,10 +306,20 @@ def certificate_status_for_student(student, course_id):
         }
         if generated_certificate.grade:
             cert_status['grade'] = generated_certificate.grade
+
+        if generated_certificate.mode == 'audit':
+            course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(course_id)]
+            # Short term fix to make sure old audit users with certs still see their certs
+            # only do this if there if no honor mode
+            if 'honor' not in course_mode_slugs:
+                cert_status['status'] = CertificateStatuses.auditing
+                return cert_status
+
         if generated_certificate.status == CertificateStatuses.downloadable:
             cert_status['download_url'] = generated_certificate.download_url
 
         return cert_status
+
     except GeneratedCertificate.DoesNotExist:
         pass
     return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}
