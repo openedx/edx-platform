@@ -1,6 +1,7 @@
 """
 Tests of the instructor dashboard spoc gradebook
 """
+from mock import patch
 
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
@@ -10,6 +11,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 
+from instructor.views.gradebook_api import list_report_downloads_by_course_key
 
 USER_COUNT = 11
 
@@ -80,6 +82,33 @@ class TestGradebook(SharedModuleStoreTestCase):
         ))
 
         self.assertEquals(self.response.status_code, 200)
+
+    def test_list_report_downloads_by_course_key(self):
+        with patch('instructor_task.models.LocalFSReportStore.links_for') as mock_links_for:
+            mock_links_for.return_value = [
+                ('mock_file_name_1', 'https://1.mock.url'),
+                ('mock_file_name_2', 'https://2.mock.url'),
+            ]
+            response = list_report_downloads_by_course_key(self.course.id)
+
+        expected_response = {
+            "downloads": [
+                {
+                    "url": "https://1.mock.url",
+                    "link": '<a href="https://1.mock.url">mock_file_name_1</a>',
+                    "name": "mock_file_name_1"
+                },
+                {
+                    "url": "https://2.mock.url",
+                    "link": '<a href="https://2.mock.url">mock_file_name_2</a>',
+                    "name": "mock_file_name_2"
+                }
+            ]
+        }
+        self.assertJSONEqual(
+            str(response.content),
+            expected_response
+        )
 
 
 @attr('shard_1')

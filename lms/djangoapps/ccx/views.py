@@ -10,7 +10,6 @@ import pytz
 
 from contextlib import contextmanager
 from copy import deepcopy
-from cStringIO import StringIO
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -29,10 +28,11 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 
+from util.json_request import JsonResponse
+
 from courseware.courses import get_course_by_id
 
 from courseware.field_overrides import disable_overrides
-from courseware.grades import iterate_grades_for
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
@@ -44,7 +44,10 @@ from student.models import CourseEnrollment
 
 from instructor.access import allow_access
 from instructor.views.api import _split_input_list
-from instructor.views.gradebook_api import get_grade_book_page
+from lms.djangoapps.instructor_task.api import submit_calculate_grades_csv
+from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
+
+from instructor.views.gradebook_api import get_grade_book_page, list_report_downloads_by_course_key
 from instructor.views.tools import get_student_from_identifier
 from instructor.enrollment import (
     enroll_email,
@@ -144,10 +147,18 @@ def dashboard(request, course, ccx=None):
         context['save_url'] = reverse(
             'save_ccx', kwargs={'course_id': ccx_locator})
         context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+
         context['gradebook_url'] = reverse(
             'ccx_gradebook', kwargs={'course_id': ccx_locator})
+
+        # grade book download
         context['grades_csv_url'] = reverse(
-            'ccx_grades_csv', kwargs={'course_id': ccx_locator})
+            'ccx_grades_csv', kwargs={'course_id': ccx_locator}
+        )
+        context['list_ready_downloads'] = reverse(
+            'list_ready_downloads', kwargs={'course_id': ccx_locator}
+        )
+
         context['grading_policy'] = json.dumps(grading_policy, indent=4)
         context['grading_policy_url'] = reverse(
             'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
@@ -696,6 +707,20 @@ def ccx_gradebook(request, course, ccx=None):
         })
 
 
+@transaction.non_atomic_requests
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def list_ready_downloads(__, course, ccx=None):
+    """
+    List grade book CSV files that are available for download.
+    """
+    if not ccx:
+        raise Http404
+
+    ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    return list_report_downloads_by_course_key(ccx_key)
+
+
 # Grades can potentially be written - if so, let grading manage the transaction.
 @transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -708,44 +733,15 @@ def ccx_grades_csv(request, course, ccx=None):
         raise Http404
 
     ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
-    with ccx_course(ccx_key) as course:
-        prep_course_for_grading(course, request)
-
-        enrolled_students = User.objects.filter(
-            courseenrollment__course_id=ccx_key,
-            courseenrollment__is_active=1
-        ).order_by('username').select_related("profile")
-        grades = iterate_grades_for(course, enrolled_students)
-
-        header = None
-        rows = []
-        for student, gradeset, __ in grades:
-            if gradeset:
-                # We were able to successfully grade this student for this
-                # course.
-                if not header:
-                    # Encode the header row in utf-8 encoding in case there are
-                    # unicode characters
-                    header = [section['label'].encode('utf-8')
-                              for section in gradeset[u'section_breakdown']]
-                    rows.append(["id", "email", "username", "grade"] + header)
-
-                percents = {
-                    section['label']: section.get('percent', 0.0)
-                    for section in gradeset[u'section_breakdown']
-                    if 'label' in section
-                }
-
-                row_percents = [percents.get(label, 0.0) for label in header]
-                rows.append([student.id, student.email, student.username,
-                             gradeset['percent']] + row_percents)
-
-        buf = StringIO()
-        writer = csv.writer(buf)
-        for row in rows:
-            writer.writerow(row)
-
-        response = HttpResponse(buf.getvalue(), content_type='text/csv')
-        response['Content-Disposition'] = 'attachment'
-
-        return response
+    try:
+        submit_calculate_grades_csv(request, ccx_key)
+        success_status = _("The grade book is being created."
+                           " Grade book will shortly appear under 'Available for Download' section.")
+        return JsonResponse({"status": success_status}, status=202)
+    except AlreadyRunningError:
+        already_running_status = _("The grade report is currently being created."
+                                   " To view the status of the report, see Pending Instructor Tasks below."
+                                   " You will be able to download the report when it is complete.")
+        return JsonResponse({
+            "status": already_running_status
+        }, status=400)

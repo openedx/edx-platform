@@ -13,6 +13,12 @@ from django.core.urlresolvers import reverse
   <%static:css group='style-vendor-tinymce-content'/>
   <%static:css group='style-vendor-tinymce-skin'/>
   <%static:css group='style-course'/>
+
+  <script src="${static.url('xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.core.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.grid.js')}"></script>
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/smoothness/jquery-ui-1.8.16.custom.css')}">
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/slick.grid.css')}">
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='ccx_coach'" />
