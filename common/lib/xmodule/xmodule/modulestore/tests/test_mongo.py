@@ -214,7 +214,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         # 6, but due to a lack of cache flushing between
         # test case runs, we will get back 7.
         # When we fix the caching issue, we should reduce this
-        # to 6 and remove the 'treexport_peer_component' course_id
+        # to 6 and remove the 'ChildTest' course_id
         # from the list below
         assert_equals(len(courses), 7)
         course_ids = [course.id for course in courses]
@@ -230,8 +230,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 ['edX', 'toy', '2012_Fall'],
                 ['guestx', 'foo', 'bar'],
                 # This course below is due to a caching issue in the modulestore
-                # which is not cleared between test runs. This means
-                ['edX', 'treeexport_peer_component', 'export_peer_component'],
+                # which is not cleared between test runs.
+                ['TestX', 'ChildTest', '1234_A1'],
             ]
         ]:
             assert_in(course_key, course_ids)
@@ -263,13 +263,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             assert_in(course_key, course_ids)
 
         courses = self.draft_store.get_courses(org='edX')
-        # note, the number of courses expected is really
-        # 5, but due to a lack of cache flushing between
-        # test case runs, we will get back 6.
-        # When we fix the caching issue, we should reduce this
-        # to 6 and remove the 'treexport_peer_component' course_id
-        # from the list below
-        assert_equals(len(courses), 6)
+        assert_equals(len(courses), 5)
         course_ids = [course.id for course in courses]
 
         for course_key in [
@@ -280,9 +274,6 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 ['edX', 'test_import_course', '2012_Fall'],
                 ['edX', 'test_unicode', '2012_Fall'],
                 ['edX', 'toy', '2012_Fall'],
-                # This course below is due to a caching issue in the modulestore
-                # which is not cleared between test runs. This means
-                ['edX', 'treeexport_peer_component', 'export_peer_component'],
             ]
         ]:
             assert_in(course_key, course_ids)
