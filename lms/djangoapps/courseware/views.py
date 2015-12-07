@@ -1421,8 +1421,8 @@ FINANCIAL_ASSISTANCE_HEADER = _(
     ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
     ' audit track for a course that offers Verified Certificates, and then complete this application.'
     ' Note that you must complete a separate application for each course you take.\n We will use this'
-    'information to evaluate your application for financial assistance and to further develop our'
-    'financial assistance program.'
+    ' information to evaluate your application for financial assistance and to further develop our'
+    ' financial assistance program.'
 ).format(
     percent_sign="%",
     platform_name=settings.PLATFORM_NAME
