@@ -1403,6 +1403,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
+            'disable_footer': True,
             'disable_window_wrap': True,
             'disable_preview_menu': True,
             'staff_access': bool(has_access(request.user, 'staff', course)),
