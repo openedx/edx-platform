@@ -27,6 +27,10 @@ urlpatterns = patterns(
 
     url(r'^ccx_grades.csv$',
         'ccx.views.ccx_grades_csv', name='ccx_grades_csv'),
+
+    url(r'^list_ready_downloads$',
+        'ccx.views.list_ready_downloads', name='list_ready_downloads'),
+
     url(r'^ccx_set_grading_policy$',
         'ccx.views.set_grading_policy', name='ccx_set_grading_policy'),
 )
