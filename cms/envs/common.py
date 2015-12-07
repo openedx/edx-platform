@@ -997,7 +997,6 @@ ADVANCED_COMPONENT_TYPES = [
     'videoannotation',  # module for annotating video (with annotation table)
     'imageannotation',  # module for annotating image (with annotation table)
     'word_cloud',
-    'graphical_slider_tool',
     'lti',
     'lti_consumer',
     'library_content',
@@ -1115,7 +1114,11 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 ################################ Deprecated Blocks Info ################################
 
-DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
+DEPRECATED_BLOCK_TYPES = [
+    'peergrading',
+    'combinedopenended',
+    'graphical_slider_tool',
+]
 
 #### PROCTORING CONFIGURATION DEFAULTS
 
