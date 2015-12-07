@@ -9,24 +9,27 @@ define([
     function( $, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView ) {
         'use strict';
 
+        var checkPaymentButtons,
+            expectPaymentSubmitted,
+            goToPayment,
+            expectPaymentDisabledBecauseInactive,
+            expectPaymentButtonEnabled,
+            expectPriceSelected,
+            createView,
+            SERVER_ERROR_MSG = 'An error occurred!';
+
         describe( 'edx.verify_student.MakePaymentStepView', function() {
 
-            var PAYMENT_PARAMS = {
-                orderId: "test-order",
-                signature: "abcd1234"
-            };
-
             var STEP_DATA = {
-                minPrice: "12",
-                currency: "usd",
-                processors: ["test-payment-processor"],
-                courseKey: "edx/test/test",
-                courseModeSlug: 'verified'
+                minPrice: '12',
+                currency: 'usd',
+                processors: ['test-payment-processor'],
+                courseKey: 'edx/test/test',
+                courseModeSlug: 'verified',
+                isABTesting: true
             };
 
-            var SERVER_ERROR_MSG = "An error occurred!";
-
-            var createView = function( stepDataOverrides ) {
+            createView = function( stepDataOverrides ) {
                 var view = new MakePaymentStepView({
                     el: $( '#current-step-container' ),
                     stepData: _.extend( _.clone( STEP_DATA ), stepDataOverrides ),
@@ -38,7 +41,7 @@ define([
                 return view;
             };
 
-            var expectPriceSelected = function( price ) {
+            expectPriceSelected = function( price ) {
                 var sel = $( 'input[name="contribution"]' );
 
                 // check that contribution value is same as price given
@@ -46,28 +49,29 @@ define([
                 expect( sel.val() ).toEqual(price);
             };
 
-            var expectPaymentButtonEnabled = function( isEnabled ) {
+            expectPaymentButtonEnabled = function( isEnabled ) {
                 var el = $( '.payment-button'),
                     appearsDisabled = el.hasClass( 'is-disabled' ),
                     isDisabled = el.prop( 'disabled' );
 
-                expect( !appearsDisabled ).toEqual( isEnabled );
-                expect( !isDisabled ).toEqual( isEnabled );
+                expect( appearsDisabled ).not.toEqual( isEnabled );
+                expect( isDisabled ).not.toEqual( isEnabled );
             };
 
-            var expectPaymentDisabledBecauseInactive = function() {
+            expectPaymentDisabledBecauseInactive = function() {
                 var payButton = $( '.payment-button' );
 
                 // Payment button should be hidden
                 expect( payButton.length ).toEqual(0);
             };
 
-            var goToPayment = function( requests, kwargs ) {
+
+            goToPayment = function( requests, kwargs ) {
                 var params = {
-                    contribution: kwargs.amount || "",
-                    course_id: kwargs.courseId || "",
-                    processor: kwargs.processor || "",
-                    sku: kwargs.sku || ""
+                    contribution: kwargs.amount || '',
+                    course_id: kwargs.courseId || '',
+                    processor: kwargs.processor || '',
+                    sku: kwargs.sku || ''
                 };
 
                 // Click the "go to payment" button
@@ -75,30 +79,32 @@ define([
 
                 // Verify that the request was made to the server
                 AjaxHelpers.expectPostRequest(
-                    requests, "/verify_student/create_order/", $.param( params )
+                    requests, '/verify_student/create_order/', $.param( params )
                 );
 
                 // Simulate the server response
                 if ( kwargs.succeeds ) {
                     // TODO put fixture responses in the right place
-                    AjaxHelpers.respondWithJson( requests, {payment_page_url: 'http://payment-page-url/', payment_form_data: {foo: 'bar'}} );
+                    AjaxHelpers.respondWithJson(
+                        requests, {payment_page_url: 'http://payment-page-url/', payment_form_data: {foo: 'bar'}}
+                    );
                 } else {
                     AjaxHelpers.respondWithTextError( requests, 400, SERVER_ERROR_MSG);
                 }
             };
 
-            var expectPaymentSubmitted = function( view, params ) {
+            expectPaymentSubmitted = function( view, params ) {
                 var form;
 
                 expect(view.submitForm).toHaveBeenCalled();
                 form = view.submitForm.mostRecentCall.args[0];
 
                 expect(form.serialize()).toEqual($.param(params));
-                expect(form.attr('method')).toEqual("POST");
+                expect(form.attr('method')).toEqual('POST');
                 expect(form.attr('action')).toEqual('http://payment-page-url/');
             };
 
-            var checkPaymentButtons = function( requests, buttons ) {
+            checkPaymentButtons = function( requests, buttons ) {
                 var $el = $( '.payment-button' );
                 expect($el.length).toEqual(_.size(buttons));
                 _.each(buttons, function( expectedText, expectedId ) {
@@ -108,8 +114,8 @@ define([
                     buttonEl.removeAttr('disabled');
                     expect( buttonEl.length ).toEqual( 1 );
                     expect( buttonEl[0] ).toHaveClass( 'payment-button' );
-                    expect( buttonEl[0] ).toHaveClass( 'action-primary' );
                     expect( buttonEl[0] ).toHaveText( expectedText );
+                    expect( buttonEl[0] ).toHaveClass( 'action-primary-blue' );
 
                     buttonEl[0].click();
                     expect( buttonEl[0] ).toHaveClass( 'is-selected' );
@@ -124,11 +130,18 @@ define([
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
 
                 setFixtures( '<div id="current-step-container"></div>' );
-                TemplateHelpers.installTemplate( 'templates/verify_student/make_payment_step' );
+                TemplateHelpers.installTemplate( 'templates/verify_student/make_payment_step_ab_testing' );
+            });
+
+            it( 'A/B Testing: check Initialize method with AB testing enable ', function() {
+                var view = createView();
+                expect( view.templateName ).toEqual('make_payment_step_ab_testing');
+                expect( view.btnClass ).toEqual('action-primary-blue');
+
             });
 
             it( 'shows users only minimum price', function() {
-                var view = createView({}),
+                var view = createView(),
                     requests = AjaxHelpers.requests(this);
 
                 expectPriceSelected( STEP_DATA.minPrice );
@@ -142,21 +155,21 @@ define([
                 expectPaymentSubmitted( view, {foo: 'bar'} );
             });
 
-            it( 'provides working payment buttons for a single processor', function() {
+            it( 'A/B Testing: provides working payment buttons for a single processor', function() {
                 createView({processors: ['cybersource']});
-                checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: "Checkout"});
+                checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: 'Checkout'});
             });
 
-            it( 'provides working payment buttons for multiple processors', function() {
+            it( 'A/B Testing: provides working payment buttons for multiple processors', function() {
                 createView({processors: ['cybersource', 'paypal', 'other']});
                 checkPaymentButtons( AjaxHelpers.requests(this), {
-                    cybersource: "Checkout",
-                    paypal: "Checkout with PayPal",
-                    other: "Checkout with other"
+                    cybersource: 'Checkout',
+                    paypal: 'Checkout with PayPal',
+                    other: 'Checkout with other'
                 });
             });
 
-            it( 'by default minimum price is selected if no suggested prices are given', function() {
+            it( 'A/B Testing: by default minimum price is selected if no suggested prices are given', function() {
                 var view = createView(),
                     requests = AjaxHelpers.requests( this );
 
@@ -172,7 +185,7 @@ define([
                 expectPaymentSubmitted( view, {foo: 'bar'} );
             });
 
-            it( 'min price is always selected even if contribution amount is provided', function() {
+            it( 'A/B Testing: min price is always selected even if contribution amount is provided', function() {
                 // Pre-select a price NOT in the suggestions
                 createView({
                     contributionAmount: '99.99'
@@ -182,14 +195,14 @@ define([
                 expectPriceSelected( STEP_DATA.minPrice );
             });
 
-            it( 'disables payment for inactive users', function() {
+            it( 'A/B Testing: disables payment for inactive users', function() {
                 createView({ isActive: false });
                 expectPaymentDisabledBecauseInactive();
             });
 
-            it( 'displays an error if the order could not be created', function() {
+            it( 'A/B Testing: displays an error if the order could not be created', function() {
                 var requests = AjaxHelpers.requests( this ),
-                    view = createView({});
+                    view = createView();
 
                 goToPayment( requests, {
                     amount: STEP_DATA.minPrice,
@@ -205,22 +218,6 @@ define([
 
                 // Expect that the payment button is re-enabled
                 expectPaymentButtonEnabled( true );
-            });
-
-            it('displays an error if no payment processors are available', function () {
-                var view = createView({processors: []});
-                expect(view.errorModel.get('shown')).toBe(true);
-                expect(view.errorModel.get('errorTitle')).toEqual(
-                    'All payment options are currently unavailable.'
-                );
-                expect(view.errorModel.get('errorMsg')).toEqual(
-                    'Try the transaction again in a few minutes.'
-                );
-            });
-            it( 'check Initialize method without AB testing ', function() {
-                var view = createView();
-                expect( view.templateName ).toEqual('make_payment_step');
-                expect( view.btnClass ).toEqual('action-primary');
             });
 
         });
