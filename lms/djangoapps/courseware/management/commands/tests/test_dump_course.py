@@ -24,11 +24,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-XML_COURSE_DIRS = ['toy', 'simple', 'open_ended']
+XML_COURSE_DIRS = ['toy', 'simple']
 MAPPINGS = {
     'edX/toy/2012_Fall': 'xml',
     'edX/simple/2012_Fall': 'xml',
-    'edX/open_ended/2012_Fall': 'xml',
 }
 
 TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
@@ -92,7 +91,7 @@ class CommandsTestBase(ModuleStoreTestCase):
         self.assertEqual(course_ids, dumped_ids)
 
     def test_correct_course_structure_metadata(self):
-        course_id = unicode(modulestore().make_course_key('edX', 'open_ended', '2012_Fall'))
+        course_id = unicode(modulestore().make_course_key('edX', 'simple', '2012_Fall'))
         args = [course_id]
         kwargs = {'modulestore': 'default'}
 
