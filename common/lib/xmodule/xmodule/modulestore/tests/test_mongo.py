@@ -210,13 +210,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         '''Make sure the course objects loaded properly'''
         courses = self.draft_store.get_courses()
 
-        # note, the number of courses expected is really
-        # 6, but due to a lack of cache flushing between
-        # test case runs, we will get back 7.
-        # When we fix the caching issue, we should reduce this
-        # to 6 and remove the 'ChildTest' course_id
-        # from the list below
-        assert_equals(len(courses), 7)
+        assert_equals(len(courses), 6)
         course_ids = [course.id for course in courses]
 
         for course_key in [
@@ -229,9 +223,6 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 ['edX', 'test_unicode', '2012_Fall'],
                 ['edX', 'toy', '2012_Fall'],
                 ['guestx', 'foo', 'bar'],
-                # This course below is due to a caching issue in the modulestore
-                # which is not cleared between test runs.
-                ['TestX', 'ChildTest', '1234_A1'],
             ]
         ]:
             assert_in(course_key, course_ids)

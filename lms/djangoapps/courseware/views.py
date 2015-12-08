@@ -67,8 +67,6 @@ from .entrance_exams import (
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from course_modes.models import CourseMode
 
-from open_ended_grading import open_ended_notifications
-from open_ended_grading.views import StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
@@ -1124,25 +1122,6 @@ def submission_history(request, course_id, student_username, location):
     }
 
     return render_to_response('courseware/submission_history.html', context)
-
-
-def notification_image_for_tab(course_tab, user, course):
-    """
-    Returns the notification image path for the given course_tab if applicable, otherwise None.
-    """
-
-    tab_notification_handlers = {
-        StaffGradingTab.type: open_ended_notifications.staff_grading_notifications,
-        PeerGradingTab.type: open_ended_notifications.peer_grading_notifications,
-        OpenEndedGradingTab.type: open_ended_notifications.combined_notifications
-    }
-
-    if course_tab.name in tab_notification_handlers:
-        notifications = tab_notification_handlers[course_tab.name](course, user)
-        if notifications and notifications['pending_grading']:
-            return notifications['img_path']
-
-    return None
 
 
 def get_static_tab_contents(request, course, tab):
