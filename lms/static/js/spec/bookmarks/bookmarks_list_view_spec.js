@@ -20,7 +20,7 @@ define(['backbone',
                 loadFixtures('js/fixtures/bookmarks/bookmarks.html');
                 TemplateHelpers.installTemplates(
                     [
-                        'templates/message_view',
+                        'templates/fields/message_banner',
                         'templates/bookmarks/bookmarks-list'
                     ]
                 );

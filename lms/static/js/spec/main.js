@@ -741,7 +741,8 @@
         'lms/include/js/spec/discovery/discovery_spec.js',
         'lms/include/js/spec/ccx/schedule_spec.js',
         'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
-        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js'
+        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
+        'lms/include/js/spec/views/message_banner_spec.js'
     ]);
 
 }).call(this, requirejs, define);

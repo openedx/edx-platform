@@ -116,7 +116,6 @@ fixture_paths:
     - support/templates
     - js/fixtures/bookmarks
     - templates/bookmarks
-    - templates/message_view.underscore
 
 requirejs:
   paths:

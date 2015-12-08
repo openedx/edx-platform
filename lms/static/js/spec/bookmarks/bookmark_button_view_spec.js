@@ -118,7 +118,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             it("shows an error message for HTTP 500", function () {
                 var requests = AjaxHelpers.requests(this),
-                    $messageBanner = $('.coursewide-message-banner'),
+                    $messageBanner = $('.message-banner'),
                     bookmarkButtonView = createBookmarkButtonView(false);
                 bookmarkButtonView.$el.click();
 

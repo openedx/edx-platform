@@ -11,7 +11,7 @@
         'js/views/message_banner',
         'string_utils'
     ], function (gettext, $, _, Backbone, Logger, AccountSettingsModel, AccountPreferencesModel, FieldsView,
-                 LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews, MessageView) {
+                 LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews, MessageBannerView) {
 
         return function (options) {
 
@@ -36,9 +36,8 @@
 
             var editable = options.own_profile ? 'toggle' : 'never';
 
-            var messageView = new MessageView({
-                el: $('.message-banner'),
-                templateId: '#message_banner-tpl'
+            var messageView = new MessageBannerView({
+                el: $('.message-banner')
             });
 
             var accountPrivacyFieldView = new LearnerProfileFieldsView.AccountPrivacyFieldView({

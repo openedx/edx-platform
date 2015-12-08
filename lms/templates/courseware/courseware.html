@@ -59,12 +59,6 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
-% for template_name in ["message_view"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="${template_name}.underscore" />
-</script>
-% endfor
-
 </%block>
 
 <%block name="headextra">
@@ -131,7 +125,7 @@ ${fragment.foot_html()}
 
 </%block>
 
-<div class="coursewide-message-banner" aria-live="polite"></div>
+<div class="message-banner" aria-live="polite"></div>
 
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />

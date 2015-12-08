@@ -2,7 +2,7 @@
     'use strict';
     define(['gettext', 'jquery', 'underscore', 'backbone', 'js/bookmarks/views/bookmarks_list',
             'js/bookmarks/collections/bookmarks', 'js/views/message_banner'],
-        function (gettext, $, _, Backbone, BookmarksListView, BookmarksCollection, MessageView) {
+        function (gettext, $, _, Backbone, BookmarksListView, BookmarksCollection, MessageBannerView) {
 
         return Backbone.View.extend({
 
@@ -26,8 +26,8 @@
                 this.bookmarksListView = new BookmarksListView(
                     {
                         collection: bookmarksCollection,
-                        loadingMessageView: new MessageView({el: $(this.loadingMessageElement)}),
-                        errorMessageView: new MessageView({el: $(this.errorMessageElement)})
+                        loadingMessageView: new MessageBannerView({el: $(this.loadingMessageElement)}),
+                        errorMessageView: new MessageBannerView({el: $(this.errorMessageElement)})
                     }
                 );
             },
