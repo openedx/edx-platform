@@ -365,11 +365,128 @@
                     font-weight: bold;
                     color: $blue-s3;
                 }
+                .share-button {
+                    @extend %t-action3;
+                    @extend %button-reset;
+                    background: $gray-l6;
+                    color: $gray-d1;
+                    padding: ($baseline / 4) ($baseline / 2);
+                    margin-bottom: ($baseline / 2);
+                    display: inline-block;
+                    border-radius: 5px;
+                    border: 2px solid $gray-d1;
+                    cursor: pointer;
+                    transition: background .5s;
+                    .share-prefix {
+                        display: inline-block;
+                        vertical-align: middle;
+                    }
+                    .share-icon-container {
+                        display: inline-block;
+                        img.icon-mozillaopenbadges {
+                            max-width: 1.5em;
+                            margin-right: .25em;
+                        }
+                    }
+                    &:hover {
+                        background: $gray-l4;
+                    }
+                    &:active {
+                        box-shadow: inset 0 4px 15px 0 $black-t2;
+                        transition: none;
+                    }
+                }
             }
         }
         .badge-placeholder {
             background-color: $gray-l7;
             box-shadow: inset 0 0 4px 0 $gray-l4;
         }
+    }
+
+    // ------------------------------
+    // #BADGES MODAL
+    // ------------------------------
+    .badges-overlay {
+        @extend %ui-depth1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: $dark-trans-bg; /* dim the background */
+        width: 100%;
+        height: 100%;
+        vertical-align: middle;
+
+        .badges-modal {
+            @extend %t-copy-lead1;
+            @extend %ui-depth2;
+            color: $lighter-base-font-color;
+            box-sizing: content-box;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 700px;
+            max-height: calc(100% - 100px);
+            margin-right: auto;
+            margin-left: auto;
+            border-top: rem(10) solid $blue-l2;
+            background: $light-gray3;
+            padding-right: ($baseline * 2);
+            padding-left: ($baseline * 2);
+            padding-bottom: ($baseline);
+            overflow-x: hidden;
+
+            .modal-header {
+                margin-top: ($baseline / 2);
+                margin-bottom: ($baseline / 2);
+            }
+
+            .close {
+                @extend %button-reset;
+                @extend %t-strong;
+                color: $lighter-base-font-color;
+                position: absolute;
+                right: ($baseline);
+                top: $baseline;
+                cursor: pointer;
+                padding: ($baseline / 4) ($baseline / 2);
+                @include transition(all $tmg-f2 ease-in-out 0s);
+                &:focus, &:hover {
+                    background-color: $blue-d2;
+                    border-radius: 3px;
+                    color: $white;
+                }
+            }
+
+            .badges-steps {
+                display: table;
+            }
+
+            .image-container{
+                // Lines the image up with the content of the above list.
+                @include ltr {
+                    @include padding-left(2em);
+                }
+                @include rtl {
+                    @include padding-right(1em);
+                    float: right;
+                }
+            }
+
+            .backpack-logo {
+                @include float(right);
+                @include margin-left($baseline);
+            }
+        }
+    }
+
+    .modal-hr {
+        display: block;
+        border: none;
+        background-color: $light-gray;
+        height: rem(2);
+        width: 100%;
     }
 }
