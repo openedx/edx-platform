@@ -28,6 +28,7 @@ class ProgramAuthoringView(View):
                 'show_programs_header': programs_config.is_studio_tab_enabled,
                 'authoring_app_config': programs_config.authoring_app_config,
                 'programs_api_url': programs_config.public_api_url,
+                'programs_token_url': reverse('programs_id_token'),
                 'studio_home_url': reverse('home'),
             })
         else:
