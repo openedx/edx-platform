@@ -1024,6 +1024,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
+    # Gather metrics for New Relic so we can slice data in New Relic Insights
+    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
+
     with modulestore().bulk_operations(course_key):
         instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
 
