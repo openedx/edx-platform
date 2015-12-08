@@ -1478,22 +1478,22 @@ def financial_assistance_request(request):
         ip_address = get_ip(request)
     except ValueError:
         # Thrown if JSON parsing fails
-        return HttpResponseBadRequest('Could not parse request JSON.')
+        return HttpResponseBadRequest(u'Could not parse request JSON.')
     except InvalidKeyError:
         # Thrown if course key parsing fails
-        return HttpResponseBadRequest('Could not parse request course key.')
+        return HttpResponseBadRequest(u'Could not parse request course key.')
     except KeyError as err:
         # Thrown if fields are missing
-        return HttpResponseBadRequest('The field {} is required.'.format(err.message))
+        return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
 
     zendesk_submitted = _record_feedback_in_zendesk(
         legal_name,
         email,
-        'Financial assistance request for learner {username} in course {course_name}'.format(
+        u'Financial assistance request for learner {username} in course {course_name}'.format(
             username=username,
             course_name=course.display_name
         ),
-        'Financial Assistance Request',
+        u'Financial Assistance Request',
         {'course_id': course_id},
         # Send the application as additional info on the ticket so
         # that it is not shown when support replies. This uses
