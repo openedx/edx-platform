@@ -238,10 +238,12 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
     def login_staff(self):
         """ Login as a staff user """
+        self.logout()
         self.login(self.test_user.email, 'test')
 
     def login_student(self):
         """ Login as a student """
+        self.logout()
         self.login(self.student_user.email, 'test')
 
     def submit_answer(self, response1, response2):
