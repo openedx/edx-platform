@@ -84,6 +84,11 @@ from util.milestones_helpers import (
     is_valid_course_key,
     set_prerequisite_courses,
 )
+from util.organizations_helpers import (
+    add_organization_course,
+    get_organization_by_short_name,
+    organizations_enabled,
+)
 from util.string_utils import _has_non_ascii_characters
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
@@ -738,8 +743,17 @@ def _create_new_course(request, org, number, run, fields):
     Returns the URL for the course overview page.
     Raises DuplicateCourseError if the course already exists
     """
+    org_data = get_organization_by_short_name(org)
+    if not org_data and organizations_enabled():
+        return JsonResponse(
+            {'error': _('You must link this course to an organization in order to continue. '
+                        'Organization you selected does not exist in the system, '
+                        'you will need to add it to the system')},
+            status=400
+        )
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
+    add_organization_course(org_data, new_course.id)
     return JsonResponse({
         'url': reverse_course_url('course_handler', new_course.id),
         'course_key': unicode(new_course.id),
