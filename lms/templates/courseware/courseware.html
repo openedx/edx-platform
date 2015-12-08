@@ -25,12 +25,6 @@ ${page_title_breadcrumbs(course_name())}
 
 <%block name="header_extras">
 
-% for template_name in ["message_banner"]:
-    <script type="text/template" id="${template_name}-tpl">
-        <%static:include path="fields/${template_name}.underscore" />
-    </script>
-% endfor
-
 % for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="common/templates/${template_name}.underscore" />
@@ -52,12 +46,6 @@ ${page_title_breadcrumbs(course_name())}
     </script>
   % endfor
 % endif
-
-% for template_name in ["bookmarks-list"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="bookmarks/${template_name}.underscore" />
-</script>
-% endfor
 
 </%block>
 
@@ -90,6 +78,10 @@ ${page_title_breadcrumbs(course_name())}
         CourseSearchFactory(courseId);
     </%static:require_module>
   % endif
+
+  <%static:require_module module_name="js/bookmarks/bookmarks_factory" class_name="BookmarksFactory">
+    BookmarksFactory();
+  </%static:require_module>
 
   <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:

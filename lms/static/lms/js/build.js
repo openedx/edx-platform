@@ -31,6 +31,7 @@
             'js/student_profile/views/learner_profile_factory',
             'js/views/message_banner',
             'teams/js/teams_tab_factory',
+            'js/bookmarks/bookmarks_factory',
             'support/js/certificates_factory'
         ]),
 
