@@ -270,17 +270,22 @@ def _can_enroll_courselike(user, courselike):
     return ACCESS_DENIED
 
 
-def _has_access_course_desc(user, action, course):
+def _has_access_courselike(user, action, courselike):
     """
-    Check if user has access to a course descriptor.
+    Check if user has access to a course.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        action (string): The action that is being checked.
+        courselike (CourseDescriptor or CourseOverview): The object
+            representing the course that the user wants to access.
 
     Valid actions:
 
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
     'load_mobile' -- can load from a mobile context
-    'enroll' -- enroll.  Checks for enrollment window,
-                  ACCESS_REQUIRE_STAFF_FOR_COURSE,
+    'enroll' -- enroll.  Checks for enrollment window.
     'see_exists' -- can see that the course exists.
     'staff' -- staff access to course.
     'see_in_catalog' -- user is able to see the course listed in the course catalog.
@@ -303,25 +308,6 @@ def _has_access_course_desc(user, action, course):
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
         it's past the enrollment period, they should still see it.
         """
-        # VS[compat] -- this setting should go away once all courses have
-        # properly configured enrollment_start times (if course should be
-        # staff-only, set enrollment_start far in the future.)
-        if settings.FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=(
-                    "location:has_access_course_desc_see_exists",
-                    u"course:{}".format(course),
-                )
-            )
-
-            # if this feature is on, only allow courses that have ispublic set to be
-            # seen by non-staff
-            if course.ispublic:
-                debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
-                return ACCESS_GRANTED
-            return _has_staff_access_to_descriptor(user, course, course.id)
-
         return ACCESS_GRANTED if (can_enroll() or can_load()) else ACCESS_DENIED
 
     def can_see_in_catalog():
