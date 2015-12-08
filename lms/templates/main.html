@@ -79,7 +79,6 @@ from branding import api as branding_api
   % else:
     <%static:js group='main_vendor'/>
     <%static:js group='application'/>
-    <%static:js group='module-js'/>
   % endif
 
   <script>
@@ -91,6 +90,10 @@ from branding import api as branding_api
     }).call(this, require || RequireJS.require);
   </script>
   <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
+
+  % if not disable_courseware_js:
+    <%static:js group='module-js'/>
+  % endif
 
   <%block name="headextra"/>
 

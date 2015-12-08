@@ -732,7 +732,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         self.assertEqual(reg1.unit_cost, 0)
         self.assertEqual(reg1.line_cost, 0)
-        self.assertEqual(reg1.mode, CourseMode.DEFAULT_MODE_SLUG)
+        self.assertEqual(reg1.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
         self.assertEqual(reg1.user, self.user)
         self.assertEqual(reg1.status, "cart")
         self.assertEqual(self.cart.total_cost, 0)
@@ -742,7 +742,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         self.assertEqual(course_reg_code_item.unit_cost, 0)
         self.assertEqual(course_reg_code_item.line_cost, 0)
-        self.assertEqual(course_reg_code_item.mode, CourseMode.DEFAULT_MODE_SLUG)
+        self.assertEqual(course_reg_code_item.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
         self.assertEqual(course_reg_code_item.user, self.user)
         self.assertEqual(course_reg_code_item.status, "cart")
         self.assertEqual(self.cart.total_cost, 0)
