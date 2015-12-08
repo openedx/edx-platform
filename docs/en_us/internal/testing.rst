@@ -732,6 +732,27 @@ To view JavaScript code style quality run this command.
 
 
 
+Code Complexity Tools
+----------------------
+
+Two tools are available for evaluating complexity of edx-platform code:
+
+- `radon <https://radon.readthedocs.org/en/latest/>`__ for Python code complexity.
+   * To obtain complexity, run 
+
+::
+
+       paver run_complexity
+
+- `plato <https://github.com/es-analysis/plato>`__ for JavaScript code complexity. Several options are available on the command line; see documentation. 
+    * Below, the following command will produce an html report in a subdirectory called "jscomplexity"
+
+::
+
+       plato -q -x common/static/js/vendor/ -t common -l .jshintrc -r -d jscomplexity common/static/js/
+
+
+
 Testing using queue servers
 ---------------------------
 
