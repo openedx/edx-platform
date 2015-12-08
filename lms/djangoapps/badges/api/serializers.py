@@ -1,5 +1,5 @@
 """
-Serializers for badging
+Serializers for Badges
 """
 from rest_framework import serializers
 

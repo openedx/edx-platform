@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from edxmako.shortcuts import render_to_response, marketing_link
 from microsite_configuration import microsite
@@ -87,6 +88,9 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'country_options': list(countries),
             'find_courses_url': marketing_link('COURSES'),
             'language_options': settings.ALL_LANGUAGES,
+            'badges_logo': staticfiles_storage.url('certificates/images/backpack-logo.png'),
+            'badges_icon': staticfiles_storage.url('certificates/images/ico-mozillaopenbadges.png'),
+            'backpack_ui_img': staticfiles_storage.url('certificates/images/backpack-ui.png'),
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         },
         'disable_courseware_js': True,
