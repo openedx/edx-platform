@@ -13,6 +13,7 @@ from microsite_configuration import microsite
 import auth_exchange.views
 
 from config_models.views import ConfigurationModelCurrentAPIView
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 # Uncomment the next two lines to enable the admin:
@@ -98,6 +99,7 @@ urlpatterns = (
     url(r'^api/val/v0/', include('edxval.urls')),
 
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
+    url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
@@ -113,12 +115,6 @@ else:
     urlpatterns += (
         url(r'^login$', 'student.views.signin_user', name="signin_user"),
         url(r'^register$', 'student.views.register_user', name="register_user"),
-    )
-
-if settings.FEATURES.get("ENABLE_CREDIT_API"):
-    # Credit API end-points
-    urlpatterns += (
-        url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
     )
 
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
@@ -743,6 +739,7 @@ if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
 
 urlpatterns += (
     url(r'config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
+    url(r'config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
 )
 
 urlpatterns = patterns(*urlpatterns)
@@ -777,3 +774,22 @@ urlpatterns += (
 urlpatterns += (
     url(r'^api/', include('edx_proctoring.urls')),
 )
+
+if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
+    urlpatterns += (
+        url(
+            r'^financial-assistance/$',
+            'courseware.views.financial_assistance',
+            name='financial_assistance'
+        ),
+        url(
+            r'^financial-assistance/apply/$',
+            'courseware.views.financial_assistance_form',
+            name='financial_assistance_form'
+        ),
+        url(
+            r'^financial-assistance/submit/$',
+            'courseware.views.financial_assistance_request',
+            name='submit_financial_assistance_request'
+        )
+    )

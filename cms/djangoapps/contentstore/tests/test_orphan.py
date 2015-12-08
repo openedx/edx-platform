@@ -10,7 +10,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from student.models import CourseEnrollment
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 
 class TestOrphanBase(CourseTestCase):
@@ -93,21 +93,27 @@ class TestOrphan(TestOrphanBase):
         )
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = course.location.replace(category='chapter', name='OrphanChapter')
-        self.assertIn(location.to_deprecated_string(), orphans)
+        self.assertIn(unicode(location), orphans)
         location = course.location.replace(category='vertical', name='OrphanVert')
-        self.assertIn(location.to_deprecated_string(), orphans)
+        self.assertIn(unicode(location), orphans)
         location = course.location.replace(category='html', name='OrphanHtml')
-        self.assertIn(location.to_deprecated_string(), orphans)
+        self.assertIn(unicode(location), orphans)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_delete_orphans(self, default_store):
+    @ddt.data(
+        (ModuleStoreEnum.Type.split, 9, 6),
+        (ModuleStoreEnum.Type.mongo, 30, 13),
+    )
+    @ddt.unpack
+    def test_delete_orphans(self, default_store, max_mongo_calls, min_mongo_calls):
         """
         Test that the orphan handler deletes the orphans
         """
         course = self.create_course_with_orphans(default_store)
         orphan_url = reverse_course_url('orphan_handler', course.id)
 
-        self.client.delete(orphan_url)
+        with check_mongo_calls_range(max_mongo_calls, min_mongo_calls):
+            self.client.delete(orphan_url)
+
         orphans = json.loads(
             self.client.get(orphan_url, HTTP_ACCEPT='application/json').content
         )

@@ -387,10 +387,10 @@ class CourseFields(object):
         # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
         # his students.
         display_name=_("Enable CCX"),
-        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
-        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
-        # his students.
         help=_(
+            # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+            # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+            # his students.
             "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
             " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
         ),

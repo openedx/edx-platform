@@ -183,7 +183,7 @@ def certificate_downloadable_status(student, course_key):
 
     if current_status['status'] == CertificateStatuses.downloadable:
         response_data['is_downloadable'] = True
-        response_data['download_url'] = current_status['download_url']
+        response_data['download_url'] = get_certificate_url(student.id, course_key)
 
     return response_data
 

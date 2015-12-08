@@ -68,8 +68,6 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
-FEATURES['ENABLE_CREDIT_API'] = True
-
 # Enable this feature for course staff grade downloads, to enable acceptance tests
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
@@ -275,6 +273,14 @@ AUTHENTICATION_BACKENDS = (
     'third_party_auth.lti.LTIAuthBackend',
 ) + AUTHENTICATION_BACKENDS
 
+THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
+    'custom1': {
+        'secret_key': 'opensesame',
+        'url': '/misc/my-custom-registration-form',
+        'error_url': '/misc/my-custom-sso-error-page'
+    },
+}
+
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
@@ -337,13 +343,13 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
-    'FAQ': 'help',
+    'HELP_CENTER': 'help-center',
     'COURSES': 'courses',
     'ROOT': 'root',
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy',
-    'JOBS': 'jobs',
+    'CAREERS': 'careers',
     'NEWS': 'news',
     'PRESS': 'press',
     'BLOG': 'blog',
@@ -353,6 +359,7 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
+SUPPORT_SITE_LINK = 'https://support.example.com'
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
@@ -550,3 +557,6 @@ AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
+
+# Financial assistance page
+FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True

@@ -693,12 +693,13 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
     items = store.get_orphans(course_usage_key)
     branch = course_usage_key.branch
     if commit:
-        for itemloc in items:
-            revision = ModuleStoreEnum.RevisionOption.all
-            # specify branches when deleting orphans
-            if branch == ModuleStoreEnum.BranchName.published:
-                revision = ModuleStoreEnum.RevisionOption.published_only
-            store.delete_item(itemloc, user_id, revision=revision)
+        with store.bulk_operations(course_usage_key):
+            for itemloc in items:
+                revision = ModuleStoreEnum.RevisionOption.all
+                # specify branches when deleting orphans
+                if branch == ModuleStoreEnum.BranchName.published:
+                    revision = ModuleStoreEnum.RevisionOption.published_only
+                store.delete_item(itemloc, user_id, revision=revision)
     return [unicode(item) for item in items]
 
 

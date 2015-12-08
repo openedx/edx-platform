@@ -604,7 +604,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
-        profile_page.upload_file(filename='cohort_users_only_username.csv')
+        profile_page.upload_file(filename='generic_csv.csv')
         self.assertEqual(
             profile_page.profile_image_message,
             "The file must be one of the following types: .gif, .png, .jpeg, .jpg."

@@ -38,6 +38,7 @@ from certificates.api import (
 )
 from certificates.models import (
     GeneratedCertificate,
+    CertificateStatuses,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
     BadgeAssertion
@@ -351,7 +352,8 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
         else:
             user_certificate = GeneratedCertificate.objects.get(
                 user=user,
-                course_id=course_key
+                course_id=course_key,
+                status=CertificateStatuses.downloadable
             )
 
     # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...

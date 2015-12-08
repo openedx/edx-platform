@@ -2,13 +2,9 @@
 This file contains celery tasks for credit course views.
 """
 
-import datetime
-from pytz import UTC
-
-from django.conf import settings
-
 from celery import task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 

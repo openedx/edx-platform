@@ -3,19 +3,18 @@ Course API Views
 """
 
 from rest_framework.exceptions import NotFound
-from rest_framework.views import APIView, Response
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-
-from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 
 from .api import course_detail, list_courses
+from .serializers import CourseSerializer
 
 
-@view_auth_classes()
-class CourseDetailView(APIView):
+class CourseDetailView(RetrieveAPIView):
     """
     **Use Cases**
 
@@ -89,21 +88,26 @@ class CourseDetailView(APIView):
             }
     """
 
-    def get(self, request, course_key_string):
+    serializer_class = CourseSerializer
+    lookup_url_kwarg = 'course_key_string'
+
+    def get_object(self):
         """
-        GET /api/courses/v1/courses/{course_key}/
+        Return the requested course object, if the user has appropriate
+        permissions.
         """
 
-        username = request.query_params.get('username', request.user.username)
+        username = self.request.query_params.get('username', self.request.user.username)
+        course_key_string = self.kwargs[self.lookup_url_kwarg]
         try:
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError:
             raise NotFound()
-        content = course_detail(request, username, course_key)
-        return Response(content)
+
+        return course_detail(self.request, username, course_key)
 
 
-class CourseListView(APIView):
+class CourseListView(ListAPIView):
     """
     **Use Cases**
 
@@ -158,11 +162,12 @@ class CourseListView(APIView):
             ]
     """
 
-    def get(self, request):
-        """
-        GET /api/courses/v1/courses/
-        """
-        username = request.query_params.get('username', request.user.username)
+    pagination_class = NamespacedPageNumberPagination
+    serializer_class = CourseSerializer
 
-        content = list_courses(request, username)
-        return Response(content)
+    def get_queryset(self):
+        """
+        Return a list of courses visible to the user.
+        """
+        username = self.request.query_params.get('username', self.request.user.username)
+        return list_courses(self.request, username)

@@ -278,7 +278,25 @@
                 // Expect that an error is displayed and that auth complete is not triggered
                 expect(view.$errors).not.toHaveClass('hidden');
                 expect(authComplete).toBe(false);
-                expect(view.$errors.text()).toContain('Please check your internet connection and try again.');
+                expect(view.$errors.text()).toContain(
+                    'An error has occurred. Check your Internet connection and try again.'
+                );
+            });
+            it('displays an error if there is a server error', function () {
+                createLoginView(this);
+
+                // Submit the form, with successful validation
+                submitForm(true);
+
+                // Simulate an error from the LMS servers
+                AjaxHelpers.respondWithError(requests, 500);
+
+                // Expect that an error is displayed and that auth complete is not triggered
+                expect(view.$errors).not.toHaveClass('hidden');
+                expect(authComplete).toBe(false);
+                expect(view.$errors.text()).toContain(
+                    'An error has occurred. Try refreshing the page, or check your Internet connection.'
+                );
             });
         });
     });

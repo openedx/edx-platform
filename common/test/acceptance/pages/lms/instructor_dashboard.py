@@ -1001,7 +1001,7 @@ class CertificatesPage(PageObject):
         Wait for Certificate Exceptions to be rendered on page
         """
         self.wait_for_element_visibility(
-            'div.certificate_exception-container',
+            'div.certificate-exception-container',
             'Certificate Exception Section is visible'
         )
         self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
@@ -1032,16 +1032,31 @@ class CertificatesPage(PageObject):
         self.get_selector('#notes').fill(free_text_note)
         self.get_selector('#add-exception').click()
 
+        self.wait_for_ajax()
         self.wait_for(
             lambda: student in self.get_selector('div.white-listed-students table tr:last-child td').text,
             description='Certificate Exception added to list'
         )
+
+    def remove_first_certificate_exception(self):
+        """
+        Remove Certificate Exception from the white list.
+        """
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+        self.get_selector('div.white-listed-students table tr td .delete-exception').first.click()
+        self.wait_for_ajax()
 
     def click_generate_certificate_exceptions_button(self):  # pylint: disable=invalid-name
         """
         Click 'Generate Exception Certificates' button in 'Certificates Exceptions' section
         """
         self.get_selector('#generate-exception-certificates').click()
+
+    def fill_user_name_field(self, student):
+        """
+        Fill username/email field with given text
+        """
+        self.get_selector('#certificate-exception').fill(student)
 
     def click_add_exception_button(self):
         """
@@ -1082,7 +1097,7 @@ class CertificatesPage(PageObject):
         """
         Returns the "Certificate Exceptions" section.
         """
-        return self.get_selector('div.certificate_exception-container')
+        return self.get_selector('div.certificate-exception-container')
 
     @property
     def last_certificate_exception(self):

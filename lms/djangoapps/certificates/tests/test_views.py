@@ -215,7 +215,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
             grade="0.95",
             key='the_key',
             distinction=True,
-            status='generated',
+            status='downloadable',
             mode='honor',
             name=self.user.profile.name,
         )

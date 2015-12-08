@@ -351,7 +351,7 @@ class EventsTestMixin(TestCase):
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
-        self.reset_event_tracking()
+        self.start_time = datetime.now()
 
     def reset_event_tracking(self):
         """Drop any events that have been collected thus far and start collecting again from scratch."""

@@ -115,9 +115,9 @@ def _footer_copyright():
         else microsite.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
 
-    # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-    # Please do not translate any of these trademarks and company names.
     return _(
+        # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+        # Please do not translate any of these trademarks and company names.
         u"\u00A9 {org_name}.  All rights reserved except where noted.  "
         u"EdX, Open edX and the edX and Open EdX logos are registered trademarks "
         u"or trademarks of edX Inc."
@@ -178,9 +178,9 @@ def _footer_navigation_links():
             ("about", marketing_link("ABOUT"), _("About")),
             ("blog", marketing_link("BLOG"), _("Blog")),
             ("news", marketing_link("NEWS"), _("News")),
-            ("faq", marketing_link("FAQ"), _("FAQs")),
+            ("help-center", settings.SUPPORT_SITE_LINK, _("Help Center")),
             ("contact", marketing_link("CONTACT"), _("Contact")),
-            ("jobs", marketing_link("JOBS"), _("Jobs")),
+            ("careers", marketing_link("CAREERS"), _("Careers")),
             ("donate", marketing_link("DONATE"), _("Donate")),
             ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
         ]

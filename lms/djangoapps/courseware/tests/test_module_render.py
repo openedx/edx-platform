@@ -27,6 +27,7 @@ from xblock.core import XBlock
 from xblock.fragment import Fragment
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from course_modes.models import CourseMode
 from courseware import module_render as render
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
 from courseware.field_overrides import OverrideFieldData
@@ -724,9 +725,9 @@ class TestProctoringRendering(ModuleStoreTestCase):
             )
 
     @ddt.data(
-        ('honor', False, None, None),
+        (CourseMode.DEFAULT_MODE_SLUG, False, None, None),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'eligible',
             {
@@ -737,7 +738,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'submitted',
             {
@@ -748,7 +749,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'error',
             {
@@ -759,7 +760,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             None,
             {
@@ -770,7 +771,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'declined',
             {
@@ -781,7 +782,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'submitted',
             {
@@ -792,7 +793,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'verified',
             {
@@ -803,7 +804,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'rejected',
             {
@@ -814,7 +815,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'error',
             {
@@ -851,56 +852,56 @@ class TestProctoringRendering(ModuleStoreTestCase):
 
     @ddt.data(
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             None,
             'Try a proctored exam',
             True
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'submitted',
             'You have submitted this practice proctored exam',
             False
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'error',
             'There was a problem with your practice proctoring session',
             True
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             None,
             'This exam is proctored',
             False
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'submitted',
             'You have submitted this proctored exam for review',
             True
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'verified',
             'Your proctoring session was reviewed and passed all requirements',
             False
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'rejected',
             'Your proctoring session was reviewed and did not pass requirements',
             True
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'error',
             'There was a problem with your proctoring session',

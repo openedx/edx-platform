@@ -30,16 +30,16 @@ html.video-fullscreen {
   .instructor-info-action {
     @extend %t-copy-sub2;
     @include float(right);
-    margin-left: ($baseline/2);
+    @include margin-left($baseline/2);
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);
     background-color: $shadow-l2;
     text-align: right;
     text-transform: uppercase;
-    color: $lighter-base-font-color;
+    color: $staff-color;
 
     &:hover {
-      background-color: $link-hover;
+      background-color: $staff-color;
       color: $white;
     }
   }
@@ -100,7 +100,7 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
-    padding: ($baseline*2);
+    padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
     line-height: 1.6;
 
     .xblock {

@@ -354,14 +354,19 @@ def certificates_list_handler(request, course_key_string):
                 handler_name='certificates.certificate_activation_handler',
                 course_key=course_key
             )
-            course_modes = [mode.slug for mode in CourseMode.modes_for_course(
-                course_id=course.id, include_expired=True
-            )]
-            certificate_web_view_url = get_lms_link_for_certificate_web_view(
-                user_id=request.user.id,
-                course_key=course_key,
-                mode=course_modes[0]  # CourseMode.modes_for_course returns default mode 'honor' if doesn't find anyone.
-            )
+            course_modes = [
+                mode.slug for mode in CourseMode.modes_for_course(
+                    course_id=course.id, include_expired=True
+                ) if mode.slug != 'audit'
+            ]
+            if len(course_modes) > 0:
+                certificate_web_view_url = get_lms_link_for_certificate_web_view(
+                    user_id=request.user.id,
+                    course_key=course_key,
+                    mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
+                )
+            else:
+                certificate_web_view_url = None
             certificates = None
             is_active = False
             if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):

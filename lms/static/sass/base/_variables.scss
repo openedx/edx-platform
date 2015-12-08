@@ -67,8 +67,6 @@ $gray-d2:   shade($gray,40%) !default;
 $gray-d3:   shade($gray,60%) !default;
 $gray-d4:   shade($gray,80%) !default;
 
-
-$blue: rgb(0, 120, 176);
 $yellow: rgb(255, 252, 221);
 
 $pink: rgb(182,37,103);
@@ -302,6 +300,9 @@ $audit-color-lvl2: tint($audit-color-lvl1, 33%);
 
 // edx-specific: credit
 $credit-color-base: rgb(244,195,0); // accessible with black text
+
+// edx-specific: Studio/Staff actions
+$staff-color: $pink;
 
 
 // ----------------------------

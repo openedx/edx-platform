@@ -11,6 +11,7 @@ from .ora import StubOraService
 from .lti import StubLtiService
 from .video_source import VideoSourceHttpService
 from .edxnotes import StubEdxNotesService
+from .programs import StubProgramsService
 
 
 USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
@@ -23,6 +24,7 @@ SERVICES = {
     'lti': StubLtiService,
     'video': VideoSourceHttpService,
     'edxnotes': StubEdxNotesService,
+    'programs': StubProgramsService,
 }
 
 # Log to stdout, including debug messages

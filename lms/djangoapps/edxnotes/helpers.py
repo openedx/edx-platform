@@ -22,7 +22,7 @@ from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from capa.util import sanitize_html
 from courseware.views import get_current_child
 from courseware.access import has_access
-from openedx.core.djangoapps.util.helpers import get_id_token
+from openedx.core.lib.token_utils import get_id_token
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
