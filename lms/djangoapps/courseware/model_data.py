@@ -45,7 +45,6 @@ from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
 from courseware.user_state_client import DjangoXBlockUserStateClient
 
-from openedx.core.djangoapps.call_stack_manager import donottrack
 
 log = logging.getLogger(__name__)
 
@@ -992,7 +991,6 @@ class ScoresClient(object):
 
 
 # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
-@donottrack(StudentModule)
 def set_score(user_id, usage_key, score, max_score):
     """
     Set the score and max_score for the specified user and xblock usage.
