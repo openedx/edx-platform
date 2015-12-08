@@ -15,7 +15,11 @@
                             row = $('<div class="row">');
                             this.$el.append(row);
                         }
-                        var item = new BadgeView({model: badge}).render().el;
+                        var item = new BadgeView({
+                            model: badge,
+                            badgeMeta: this.badgeMeta,
+                            ownProfile: this.ownProfile
+                        }).render().el;
                         row.append(item);
                         this.itemViews.push(item);
                     }, this);

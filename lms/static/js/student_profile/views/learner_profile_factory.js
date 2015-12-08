@@ -131,7 +131,13 @@
             var badgeListContainer = new BadgeListContainer({
                 'attributes': {'class': 'badge-set-display'},
                 'collection': badgeCollection,
-                'find_courses_url': options.find_courses_url
+                'find_courses_url': options.find_courses_url,
+                'ownProfile': options.own_profile,
+                'badgeMeta': {
+                    'badges_logo': options.badges_logo,
+                    'backpack_ui_img': options.backpack_ui_img,
+                    'badges_icon': options.badges_icon
+                }
             });
 
             var learnerProfileView = new LearnerProfileView({
