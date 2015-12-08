@@ -317,9 +317,9 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         })
 
     @ddt.data(
-        ('course-v1:test_course+test_org+test_run',
-         '/asset-v1:test_course+test_org+test_run+type@asset+block@test.png'),
-        ('test_course/test_org/test_run', '/c4x/test_course/test_org/asset/test.png')
+        ('course-v1:test_org+test_course+test_run',
+         '/asset-v1:test_org+test_course+test_run+type@asset+block@test.png'),
+        ('test_org/test_course/test_run', '/c4x/test_org/test_course/asset/test.png')
     )
     @ddt.unpack
     def test_from_xml_when_handout_is_course_asset(self, course_id_string, expected_handout_link):
@@ -338,7 +338,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
-              <handout src="/asset-v1:test_course_1+test_org_1+test_run_1+type@asset+block@test.png"/>
+              <handout src="/asset-v1:test_org_1+test_course_1+test_run_1+type@asset+block@test.png"/>
               <transcript language="uk" src="ukrainian_translation.srt" />
               <transcript language="de" src="german_translation.srt" />
             </video>
