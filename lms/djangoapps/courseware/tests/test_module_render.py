@@ -2055,13 +2055,13 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         super(TestDisabledXBlockTypes, self).setUp()
 
         for store in self.store.modulestores:
-            store.disabled_xblock_types = ('combinedopenended', 'peergrading', 'video')
+            store.disabled_xblock_types = ('video',)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_item(self, default_ms):
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            for block_type in ('peergrading', 'combinedopenended', 'video'):
+            for block_type in ('video',):
                 item = ItemFactory(category=block_type, parent=course)
                 item = self.store.get_item(item.scope_ids.usage_id)
                 self.assertEqual(item.__class__.__name__, 'RawDescriptorWithMixins')
