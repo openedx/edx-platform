@@ -31,7 +31,6 @@ from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, Descripto
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
-from xmodule.combined_open_ended_module import CombinedOpenEndedDescriptor
 from xmodule.discussion_module import DiscussionDescriptor
 from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
@@ -54,7 +53,6 @@ from xmodule.tests import get_test_descriptor_system, get_test_system
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
     CapaDescriptor: [{}],
-    CombinedOpenEndedDescriptor: [{}],
     DiscussionDescriptor: [{}],
     GraphicalSliderToolDescriptor: [{}],
     HtmlDescriptor: [{}],
