@@ -600,21 +600,16 @@ class formula(object):
         """
         Handle requests to snuggletex API to convert the Ascii math to MathML
         """
-        # url = 'http://192.168.1.2:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-        # url = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
         url = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
 
-        if 1:
-            payload = {
-                'asciiMathInput': asciimath,
-                'asciiMathML': mathml,
-                #'asciiMathML':unicode(mathml).encode('utf-8'),
-            }
-            headers = {'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"}
-            request = requests.post(url, data=payload, headers=headers, verify=False)
-            request.encoding = 'utf-8'
-            ret = request.text
-            # print "encoding: ", request.encoding
+        payload = {
+            'asciiMathInput': asciimath,
+            'asciiMathML': mathml,
+        }
+        headers = {'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"}
+        request = requests.post(url, data=payload, headers=headers, verify=False)
+        request.encoding = 'utf-8'
+        ret = request.text
 
         mode = 0
         cmathml = []
@@ -629,153 +624,4 @@ class formula(object):
                 cmathml.append(k)
         cmathml = '\n'.join(cmathml[2:])
         cmathml = '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' + unescape(cmathml) + '\n</math>'
-        # print cmathml
         return cmathml
-
-#-----------------------------------------------------------------------------
-
-
-def test1():
-    """Test XML strings - addition"""
-    xmlstr = """
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-   <apply>
-      <plus/>
-      <cn>1</cn>
-      <cn>2</cn>
-   </apply>
-</math>
-    """
-    return formula(xmlstr)
-
-
-def test2():
-    """Test XML strings - addition, Greek alpha"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-   <apply>
-      <plus/>
-      <cn>1</cn>
-      <apply>
-         <times/>
-         <cn>2</cn>
-     <ci>α</ci>
-      </apply>
-   </apply>
-</math>
-    """
-    return formula(xmlstr)
-
-
-def test3():
-    """Test XML strings - addition, Greek gamma"""
-    xmlstr = """
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-   <apply>
-      <divide/>
-      <cn>1</cn>
-      <apply>
-         <plus/>
-         <cn>2</cn>
-         <ci>γ</ci>
-      </apply>
-   </apply>
-</math>
-    """
-    return formula(xmlstr)
-
-
-def test4():
-    """Test XML strings - addition, Greek alpha, mfrac"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mstyle displaystyle="true">
-    <mn>1</mn>
-    <mo>+</mo>
-    <mfrac>
-      <mn>2</mn>
-      <mi>α</mi>
-    </mfrac>
-  </mstyle>
-</math>
-"""
-    return formula(xmlstr)
-
-
-def test5():
-    """Test XML strings - sum of two matrices"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mstyle displaystyle="true">
-    <mrow>
-      <mi>cos</mi>
-      <mrow>
-        <mo>(</mo>
-        <mi>&#x3B8;</mi>
-        <mo>)</mo>
-      </mrow>
-    </mrow>
-    <mo>&#x22C5;</mo>
-    <mrow>
-      <mo>[</mo>
-      <mtable>
-        <mtr>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-        </mtr>
-        <mtr>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-        </mtr>
-      </mtable>
-      <mo>]</mo>
-    </mrow>
-    <mo>+</mo>
-    <mrow>
-      <mo>[</mo>
-      <mtable>
-        <mtr>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-        </mtr>
-        <mtr>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-        </mtr>
-      </mtable>
-      <mo>]</mo>
-    </mrow>
-  </mstyle>
-</math>
-"""
-    return formula(xmlstr)
-
-
-def test6():
-    """Test XML strings - imaginary numbers"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mstyle displaystyle="true">
-    <mn>1</mn>
-    <mo>+</mo>
-    <mi>i</mi>
-  </mstyle>
-</math>
-"""
-    return formula(xmlstr, options='imaginary')
