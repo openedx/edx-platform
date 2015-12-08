@@ -3,12 +3,10 @@ Django module container for classes and operations related to the "Course Module
 """
 import logging
 from cStringIO import StringIO
-from math import exp
 from lxml import etree
 from path import Path as path
 import requests
 from datetime import datetime
-import dateutil.parser
 from lazy import lazy
 
 from xmodule import course_metadata_utils
@@ -1264,7 +1262,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         flag = self.is_new
         if flag is None:
             # Use a heuristic if the course has not been flagged
-            announcement, start, now = self._sorting_dates()
+            announcement, start, now = course_metadata_utils.sorting_dates(
+                self.start, self.advertised_start, self.announcement
+            )
             if announcement and (now - announcement).days < 30:
                 # The course has been announced for less that month
                 return True
@@ -1284,41 +1284,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns a tuple that can be used to sort the courses according
         the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
-        (advertized) start dates of the course if available.
+        (advertised) start dates of the course if available.
 
         The lower the number the "newer" the course.
         """
-        # Make courses that have an announcement date shave a lower
-        # score than courses than don't, older courses should have a
-        # higher score.
-        announcement, start, now = self._sorting_dates()
-        scale = 300.0  # about a year
-        if announcement:
-            days = (now - announcement).days
-            score = -exp(-days / scale)
-        else:
-            days = (now - start).days
-            score = exp(days / scale)
-        return score
-
-    def _sorting_dates(self):
-        # utility function to get datetime objects for dates used to
-        # compute the is_new flag and the sorting_score
-
-        announcement = self.announcement
-        if announcement is not None:
-            announcement = announcement
-
-        try:
-            start = dateutil.parser.parse(self.advertised_start)
-            if start.tzinfo is None:
-                start = start.replace(tzinfo=UTC())
-        except (ValueError, AttributeError):
-            start = self.start
-
-        now = datetime.now(UTC())
-
-        return announcement, start, now
+        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
 
     @lazy
     def grading_context(self):
