@@ -3,6 +3,7 @@ Tests for CourseDetails
 """
 
 import datetime
+import ddt
 from django.utils.timezone import UTC
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -10,9 +11,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
+@ddt.ddt
 class CourseDetailsTestCase(ModuleStoreTestCase):
     """
     Tests the first course settings page (course dates, overview, etc.).
@@ -111,11 +113,19 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             )
         self.assertFalse(updated_details.self_paced)
 
-    def test_fetch_effort(self):
-        effort_value = 'test_hours_of_effort'
+    @ddt.data(*ABOUT_ATTRIBUTES)
+    def test_fetch_about_attribute(self, attribute_name):
+        attribute_value = 'test_value'
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-            CourseDetails.update_about_item(self.course, 'effort', effort_value, self.user.id)
-        self.assertEqual(CourseDetails.fetch_effort(self.course.id), effort_value)
+            CourseDetails.update_about_item(self.course, attribute_name, attribute_value, self.user.id)
+        self.assertEqual(CourseDetails.fetch_about_attribute(self.course.id, attribute_name), attribute_value)
+
+    def test_fetch_about_attribute_error(self):
+        attribute_name = 'not_an_about_attribute'
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            CourseDetails.update_about_item(self.course, attribute_name, 'test_value', self.user.id)
+        with self.assertRaises(ValueError):
+            CourseDetails.fetch_about_attribute(self.course.id, attribute_name)
 
     def test_fetch_video(self):
         video_value = 'test_video_id'
