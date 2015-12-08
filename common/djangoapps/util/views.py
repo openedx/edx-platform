@@ -205,8 +205,8 @@ def _record_feedback_in_zendesk(
     zendesk_api = _ZendeskApi()
 
     additional_info_string = (
-        "Additional information:\n\n" +
-        "\n".join("%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
+        u"Additional information:\n\n" +
+        u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
     )
 
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team

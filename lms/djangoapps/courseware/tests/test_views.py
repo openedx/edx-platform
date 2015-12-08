@@ -184,7 +184,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     """
     def setUp(self):
         super(ViewsTestCase, self).setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
@@ -434,7 +434,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': unicode(usage_key),
         })
         response = self.client.get(url)
-        response_content = HTMLParser().unescape(response.content)
+        response_content = HTMLParser().unescape(response.content.decode('utf-8'))
 
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
@@ -547,7 +547,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         self.assertEqual(
             ticket_subject,
-            'Financial assistance request for learner {username} in course {course}'.format(
+            u'Financial assistance request for learner {username} in course {course}'.format(
                 username=username,
                 course=self.course.display_name
             )
