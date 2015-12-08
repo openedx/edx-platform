@@ -2949,7 +2949,7 @@ def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable
         """
         inner method to build dict of csv data as row errors.
         """
-        row_errors[key].append(_('user "{user}" in row#    {row}').format(user=_user, row=row_count))
+        row_errors[key].append(_('user "{user}" in row# {row}').format(user=_user, row=row_count))
 
     if 'students_list' in request.FILES:
         try:
