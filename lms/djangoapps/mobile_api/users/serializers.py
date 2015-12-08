@@ -4,12 +4,9 @@ Serializer for user API
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from django.template import defaultfilters
-
 from courseware.access import has_access
 from student.models import CourseEnrollment, User
 from certificates.api import certificate_downloadable_status
-from xmodule.course_module import DEFAULT_START_DATE
 
 
 class CourseOverviewField(serializers.RelatedField):
@@ -19,17 +16,6 @@ class CourseOverviewField(serializers.RelatedField):
 
     def to_representation(self, course_overview):
         course_id = unicode(course_overview.id)
-
-        if course_overview.advertised_start is not None:
-            start_type = 'string'
-            start_display = course_overview.advertised_start
-        elif course_overview.start != DEFAULT_START_DATE:
-            start_type = 'timestamp'
-            start_display = defaultfilters.date(course_overview.start, 'DATE_FORMAT')
-        else:
-            start_type = 'empty'
-            start_display = None
-
         request = self.context.get('request')
         return {
             # identifiers
@@ -40,8 +26,8 @@ class CourseOverviewField(serializers.RelatedField):
 
             # dates
             'start': course_overview.start,
-            'start_display': start_display,
-            'start_type': start_type,
+            'start_display': course_overview.start_display,
+            'start_type': course_overview.start_type,
             'end': course_overview.end,
 
             # notification info
