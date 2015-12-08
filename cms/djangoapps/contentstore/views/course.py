@@ -739,6 +739,7 @@ def _create_new_course(request, org, number, run, fields):
     Raises DuplicateCourseError if the course already exists
     """
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
+    store_for_new_course = str('mongo')
     new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
     return JsonResponse({
         'url': reverse_course_url('course_handler', new_course.id),
