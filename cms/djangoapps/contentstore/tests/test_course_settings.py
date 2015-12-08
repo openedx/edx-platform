@@ -771,7 +771,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             {
                 "advertised_start": {"value": "start A"},
                 "days_early_for_beta": {"value": 2},
-                "advanced_modules": {"value": ['combinedopenended']},
+                "advanced_modules": {"value": ['notes']},
             },
             user=self.user
         )
@@ -781,7 +781,7 @@ class CourseMetadataEditingTest(CourseTestCase):
 
         # Tab gets tested in test_advanced_settings_munge_tabs
         self.assertIn('advanced_modules', test_model, 'Missing advanced_modules')
-        self.assertEqual(test_model['advanced_modules']['value'], ['combinedopenended'], 'advanced_module is not updated')
+        self.assertEqual(test_model['advanced_modules']['value'], ['notes'], 'advanced_module is not updated')
 
     def test_validate_from_json_wrong_inputs(self):
         # input incorrectly formatted data
