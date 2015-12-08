@@ -167,7 +167,7 @@ def certificate_downloadable_status(student, course_key):
         course_key (CourseKey): ID associated with the course
 
     Returns:
-        Dict containing student passed status also download url for cert if available
+        Dict containing student passed status also download url, uuid for cert if available
     """
     current_status = certificate_status_for_student(student, course_key)
 
@@ -178,12 +178,14 @@ def certificate_downloadable_status(student, course_key):
         'is_downloadable': False,
         'is_generating': True if current_status['status'] in [CertificateStatuses.generating,
                                                               CertificateStatuses.error] else False,
-        'download_url': None
+        'download_url': None,
+        'uuid': None,
     }
 
     if current_status['status'] == CertificateStatuses.downloadable:
         response_data['is_downloadable'] = True
         response_data['download_url'] = current_status['download_url'] or get_certificate_url(student.id, course_key)
+        response_data['uuid'] = current_status['uuid']
 
     return response_data
 
@@ -332,19 +334,27 @@ def example_certificates_status(course_key):
     return ExampleCertificateSet.latest_status(course_key)
 
 
-def get_certificate_url(user_id, course_id):
+def get_certificate_url(user_id=None, course_id=None, uuid=None):
     """
-    :return certificate url
+    :return certificate url for web or pdf certs. In case of web certs returns either old
+    or new cert url based on given parameters. For web certs if `uuid` is it would return
+    new uuid based cert url url otherwise old url.
     """
     url = ""
     if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        url = reverse(
-            'certificates:html_view',
-            kwargs={
-                "user_id": str(user_id),
-                "course_id": unicode(course_id),
-            }
-        )
+        if uuid:
+            url = reverse(
+                'certificates:render_cert_by_uuid',
+                kwargs=dict(certificate_uuid=uuid)
+            )
+        elif user_id and course_id:
+            url = reverse(
+                'certificates:html_view',
+                kwargs={
+                    "user_id": str(user_id),
+                    "course_id": unicode(course_id),
+                }
+            )
     else:
         try:
             if isinstance(course_id, basestring):

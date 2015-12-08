@@ -162,7 +162,7 @@ class GeneratedCertificate(models.Model):
 
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
-    verify_uuid = models.CharField(max_length=32, blank=True, default='')
+    verify_uuid = models.CharField(max_length=32, blank=True, default='', db_index=True)
     download_uuid = models.CharField(max_length=32, blank=True, default='')
     download_url = models.CharField(max_length=128, blank=True, default='')
     grade = models.CharField(max_length=5, blank=True, default='')
@@ -301,7 +301,8 @@ def certificate_status_for_student(student, course_id):
             user=student, course_id=course_id)
         cert_status = {
             'status': generated_certificate.status,
-            'mode': generated_certificate.mode
+            'mode': generated_certificate.mode,
+            'uuid': generated_certificate.verify_uuid,
         }
         if generated_certificate.grade:
             cert_status['grade'] = generated_certificate.grade
@@ -311,7 +312,7 @@ def certificate_status_for_student(student, course_id):
         return cert_status
     except GeneratedCertificate.DoesNotExist:
         pass
-    return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}
+    return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
 
 
 def certificate_info_for_user(user, course_id, grade, user_is_whitelisted=None):
