@@ -142,7 +142,11 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             }
         )
 
-    def test_with_downloadable_pdf_cert(self):
+    def verify_downloadable_pdf_cert(self):
+        """
+        Verifies certificate_downloadable_status returns the
+        correct response for PDF certificates.
+        """
         GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course.id,
@@ -159,6 +163,13 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'download_url': 'www.google.com'
             }
         )
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_pdf_cert_with_html_enabled(self):
+        self.verify_downloadable_pdf_cert()
+
+    def test_pdf_cert_with_html_disabled(self):
+        self.verify_downloadable_pdf_cert()
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_with_downloadable_web_cert(self):
