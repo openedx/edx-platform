@@ -474,8 +474,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u"We can't find the user (username/email={user}) you've entered. "
-            u"Make sure the username or email address is correct, then try again.".format(user=invalid_user)
+            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user)
         )
 
     def test_certificate_exception_missing_username_and_email_error(self):
@@ -501,7 +500,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         self.assertEqual(
             res_json['message'],
             u'Student username/email field is required and can not be empty. '
-            u'Kindly fill in username/email and then press "Add Exception" button.'
+            u'Kindly fill in username/email and then press "Add to Exception List" button.'
         )
 
     def test_certificate_exception_duplicate_user_error(self):
@@ -591,8 +590,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            "The user (username/email={user}) you have entered is not enrolled in this course. "
-            "Make sure the username or email address is correct, then try again.".format(
+            "{user} is not enrolled in this course. Please check your spelling and retry.".format(
                 user=self.certificate_exception['user_name']
             )
         )
@@ -646,7 +644,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u"Invalid Json data, Please refresh the page and then try again."
+            u"The record is not in the correct format. Please add a valid username or email address."
         )
 
     def test_remove_certificate_exception_non_existing_error(self):

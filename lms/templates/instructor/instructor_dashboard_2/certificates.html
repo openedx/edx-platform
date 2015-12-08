@@ -117,14 +117,15 @@ import json
 
     <div class="certificate-exception-container">
         <hr>
-        <h2> ${_("Certificate Exceptions")} </h2>
-         <p class="under-heading-text">
-             ${_("Use this to generate certificates for users who did not pass the course but have been given an exception by the Course Team to earn a certificate.")}
+        <h2> ${_("SET CERTIFICATE EXCEPTIONS")} </h2>
+         <p class="under-heading info">
+             ${_("Set exceptions to generate certificates for learners who did not qualify for a certificate but have " \
+              "been given an exception by the course team. After you add learners to the exception list, click Generate " \
+              "Exception Certificates below.")}
          </p>
         <div class="certificate-exception-section">
-            <div class="bulk-white-list-exception"></div>
-            <br />
             <div id="certificate-white-list-editor"></div>
+            <div class="bulk-white-list-exception"></div>
             <div class="white-listed-students" id="white-listed-students"></div>
             <br/>
         </div>

@@ -737,7 +737,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            'User (username/email={user}) already in exception list.'.format(user=self.user_name),
+            '{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -784,8 +784,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "We can't find the user (username/email={user}) you've entered. "
-            "Make sure the username or email address is correct, then try again.".format(user=invalid_user),
+            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -818,8 +817,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "The user (username/email={user}) you have entered is not enrolled in this course. "
-            "Make sure the username or email address is correct, then try again.".format(user=new_user),
+            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -840,6 +838,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            'Certificate generation started for white listed students.',
+            self.user_name + ' has been successfully added to the exception list. Click Generate Exception Certificate'
+                             ' below to send the certificate.',
             self.certificates_section.message.text
         )
