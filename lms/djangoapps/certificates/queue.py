@@ -306,7 +306,7 @@ class XQueueCertInterface(object):
                 #   Despite blowing up the xml parser, bad values here are fine
                 grade_contents = None
 
-            if is_whitelisted or grade_contents is not None:
+            if is_whitelisted or grade_contents is not None or course.no_grade:
 
                 if is_whitelisted:
                     LOGGER.info(
