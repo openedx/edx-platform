@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 from wiki.models import reverse
 
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_course_overview_with_access
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from util.request import course_id_from_url
@@ -29,7 +29,7 @@ class WikiAccessMiddleware(object):
         if course_id:
             # See if we are able to view the course. If we are, redirect to it
             try:
-                _course = get_course_with_access(request.user, 'load', course_id)
+                get_course_overview_with_access(request.user, 'load', course_id)
                 return redirect("/courses/{course_id}/wiki/{path}".format(course_id=course_id.to_deprecated_string(), path=wiki_path))
             except Http404:
                 # Even though we came from the course, we can't see it. So don't worry about it.
