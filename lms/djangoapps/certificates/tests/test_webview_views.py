@@ -33,6 +33,7 @@ from certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     LinkedInAddToProfileConfigurationFactory,
     BadgeAssertionFactory,
+    GeneratedCertificateFactory,
 )
 from util import organizations_helpers as organizations_api
 from django.test.client import RequestFactory
@@ -80,10 +81,9 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.client.login(username=self.user.username, password='foo')
         self.request = RequestFactory().request()
 
-        self.cert = GeneratedCertificate.objects.create(
+        self.cert = GeneratedCertificateFactory.create(
             user=self.user,
             course_id=self.course_id,
-            verify_uuid=uuid4(),
             download_uuid=uuid4(),
             download_url="http://www.example.com/certificates/download",
             grade="0.95",
@@ -164,11 +164,9 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         Test: LinkedIn share URL.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
+        test_url = get_certificate_url(uuid=self.cert.verify_uuid)
         response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
         self.assertIn(urllib.quote_plus(self.request.build_absolute_uri(test_url)), response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -178,12 +176,9 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         Test: LinkedIn share URL should not be visible when called from within a microsite (for now)
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
+        test_url = get_certificate_url(uuid=self.cert.verify_uuid)
         response = self.client.get(test_url)
-
+        self.assertEqual(response.status_code, 200)
         # the URL should not be present
         self.assertNotIn(urllib.quote_plus(self.request.build_absolute_uri(test_url)), response.content)
 

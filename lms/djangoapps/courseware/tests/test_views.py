@@ -184,7 +184,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     """
     def setUp(self):
         super(ViewsTestCase, self).setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
@@ -434,7 +434,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': unicode(usage_key),
         })
         response = self.client.get(url)
-        response_content = HTMLParser().unescape(response.content)
+        response_content = HTMLParser().unescape(response.content.decode('utf-8'))
 
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
@@ -522,59 +522,61 @@ class ViewsTestCase(ModuleStoreTestCase):
         effort = "I'm done, okay? You just give me my money, and you and I, we're done."
         data = {
             'username': username,
-            'course_id': course,
-            'legal_name': legal_name,
+            'course': course,
+            'name': legal_name,
             'email': self.user.email,
             'country': country,
             'income': income,
             'reason_for_applying': reason_for_applying,
             'goals': goals,
             'effort': effort,
-            'marketing_permission': False,
+            'mktg-permission': False,
         }
         response = self._submit_financial_assistance_form(data)
         self.assertEqual(response.status_code, 204)
 
         __, ___, ticket_subject, ticket_body, tags, additional_info = mock_record_feedback.call_args[0]
-        for info in (country, income, reason_for_applying, goals, effort):
-            self.assertIn(info, ticket_body)
-        self.assertIn('This user HAS NOT allowed this content to be used for edX marketing purposes.', ticket_body)
+        mocked_kwargs = mock_record_feedback.call_args[1]
+        group_name = mocked_kwargs['group_name']
+        require_update = mocked_kwargs['require_update']
+        private_comment = '\n'.join(additional_info.values())
+        for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
+            self.assertIn(info, private_comment)
+
+        self.assertEqual(additional_info['Allowed for marketing purposes'], 'No')
 
         self.assertEqual(
             ticket_subject,
-            'Financial assistance request for user {username} in course {course}'.format(
+            u'Financial assistance request for learner {username} in course {course}'.format(
                 username=username,
-                course=course
+                course=self.course.display_name
             )
         )
-        self.assertDictContainsSubset(
-            {
-                'issue_type': 'Financial Assistance',
-                'course_id': course
-            },
-            tags
-        )
+        self.assertDictContainsSubset({'course_id': course}, tags)
         self.assertIn('Client IP', additional_info)
+        self.assertEqual(group_name, 'Financial Assistance')
+        self.assertTrue(require_update)
 
     @patch.object(views, '_record_feedback_in_zendesk', return_value=False)
     def test_zendesk_submission_failed(self, _mock_record_feedback):
         response = self._submit_financial_assistance_form({
             'username': self.user.username,
-            'course_id': '',
-            'legal_name': '',
+            'course': unicode(self.course.id),
+            'name': '',
             'email': '',
             'country': '',
             'income': '',
             'reason_for_applying': '',
             'goals': '',
             'effort': '',
-            'marketing_permission': False,
+            'mktg-permission': False,
         })
         self.assertEqual(response.status_code, 500)
 
     @ddt.data(
         ({}, 400),
-        ({'username': 'wwhite'}, 403)
+        ({'username': 'wwhite'}, 403),
+        ({'username': 'dummy', 'course': 'bad course ID'}, 400)
     )
     @ddt.unpack
     def test_submit_financial_assistance_errors(self, data, status):
@@ -908,10 +910,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"View Certificate")
 
         self.assertContains(resp, u"You can keep working for a higher grade")
-        cert_url = certs_api.get_certificate_url(
-            user_id=self.user.id,
-            course_id=self.course.id
-        )
+        cert_url = certs_api.get_certificate_url(uuid=certificate.verify_uuid)
         self.assertContains(resp, cert_url)
 
         # when course certificate is not active

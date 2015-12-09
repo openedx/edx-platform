@@ -86,6 +86,7 @@ class CertificateStatuses(object):
     regenerating = 'regenerating'
     restricted = 'restricted'
     unavailable = 'unavailable'
+    auditing = 'auditing'
 
 
 class CertificateSocialNetworks(object):
@@ -162,7 +163,7 @@ class GeneratedCertificate(models.Model):
 
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
-    verify_uuid = models.CharField(max_length=32, blank=True, default='')
+    verify_uuid = models.CharField(max_length=32, blank=True, default='', db_index=True)
     download_uuid = models.CharField(max_length=32, blank=True, default='')
     download_url = models.CharField(max_length=128, blank=True, default='')
     grade = models.CharField(max_length=5, blank=True, default='')
@@ -301,17 +302,28 @@ def certificate_status_for_student(student, course_id):
             user=student, course_id=course_id)
         cert_status = {
             'status': generated_certificate.status,
-            'mode': generated_certificate.mode
+            'mode': generated_certificate.mode,
+            'uuid': generated_certificate.verify_uuid,
         }
         if generated_certificate.grade:
             cert_status['grade'] = generated_certificate.grade
+
+        if generated_certificate.mode == 'audit':
+            course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(course_id)]
+            # Short term fix to make sure old audit users with certs still see their certs
+            # only do this if there if no honor mode
+            if 'honor' not in course_mode_slugs:
+                cert_status['status'] = CertificateStatuses.auditing
+                return cert_status
+
         if generated_certificate.status == CertificateStatuses.downloadable:
             cert_status['download_url'] = generated_certificate.download_url
 
         return cert_status
+
     except GeneratedCertificate.DoesNotExist:
         pass
-    return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}
+    return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
 
 
 def certificate_info_for_user(user, course_id, grade, user_is_whitelisted=None):

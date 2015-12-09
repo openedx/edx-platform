@@ -247,13 +247,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         test to check that that the same coupon code applied on multiple
         items in the cart.
         """
-        for course_key, cost in ((self.course_key, 40), (self.testing_course.id, 20)):
-            CourseMode(
-                course_id=course_key,
-                mode_slug=CourseMode.DEFAULT_MODE_SLUG,
-                mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
-                min_price=cost
-            ).save()
+
         self.login_user()
         # add first course to user cart
         resp = self.client.post(

@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import openedx.core.djangoapps.call_stack_manager.core
 import model_utils.fields
 import xmodule_django.models
 import django.utils.timezone
@@ -69,7 +68,6 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
                 ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
-            bases=(openedx.core.djangoapps.call_stack_manager.core.CallStackMixin, models.Model),
         ),
         migrations.CreateModel(
             name='StudentModuleHistory',
@@ -85,7 +83,6 @@ class Migration(migrations.Migration):
             options={
                 'get_latest_by': 'created',
             },
-            bases=(openedx.core.djangoapps.call_stack_manager.core.CallStackMixin, models.Model),
         ),
         migrations.CreateModel(
             name='XModuleStudentInfoField',
