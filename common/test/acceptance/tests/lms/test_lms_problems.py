@@ -19,12 +19,13 @@ class ProblemsTest(UniqueCourseTest):
     """
     Base class for tests of problems in the LMS.
     """
-    USERNAME = "joe_student"
-    EMAIL = "joe@example.com"
-    PASSWORD = "keep it secret; keep it safe."
 
     def setUp(self):
         super(ProblemsTest, self).setUp()
+
+        self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
+        self.email = "{username}@example.com".format(username=self.username)
+        self.password = "keep it secret; keep it safe."
 
         self.xqueue_grade_response = None
 
@@ -46,9 +47,9 @@ class ProblemsTest(UniqueCourseTest):
         # Auto-auth register for the course.
         AutoAuthPage(
             self.browser,
-            username=self.USERNAME,
-            email=self.EMAIL,
-            password=self.PASSWORD,
+            username=self.username,
+            email=self.email,
+            password=self.password,
             course_id=self.course_id,
             staff=False
         ).visit()
@@ -382,7 +383,7 @@ class LogoutDuringAnswering(ProblemsTest):
         login_page = CombinedLoginAndRegisterPage(self.browser)
         login_page.wait_for_page()
 
-        login_page.login(self.EMAIL, self.PASSWORD)
+        login_page.login(self.email, self.password)
 
         problem_page.wait_for_page()
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
