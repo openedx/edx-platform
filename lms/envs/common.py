@@ -54,7 +54,6 @@ COPYRIGHT_YEAR = "2015"
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
-COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
 DISCUSSION_SETTINGS = {
