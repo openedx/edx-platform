@@ -523,6 +523,16 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
 
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED, PLATFORM_NAME=u'Űńíćődé Űńívéŕśítӳ')
+    def test_render_html_view_with_unicode_platform_name(self):
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course)
+        )
+        self._add_course_certificates(count=1, signatory_count=0)
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_preview_mode(self):
         """
