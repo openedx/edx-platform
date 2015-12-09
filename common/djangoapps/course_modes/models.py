@@ -1,15 +1,15 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+from datetime import datetime, timedelta
 import pytz
-from datetime import datetime
 
+from collections import namedtuple, defaultdict
+from config_models.models import ConfigurationModel
 from django.core.exceptions import ValidationError
 from django.db import models
-from collections import namedtuple, defaultdict
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
-
+from django.utils.translation import ugettext_lazy as _
 from xmodule_django.models import CourseKeyField
 
 Mode = namedtuple('Mode',
@@ -54,19 +54,20 @@ class CourseMode(models.Model):
     # For example, if there is a verified mode that expires on 1/1/2015,
     # then users will be able to upgrade into the verified mode before that date.
     # Once the date passes, users will no longer be able to enroll as verified.
-    expiration_datetime = models.DateTimeField(
+    _expiration_datetime = models.DateTimeField(
         default=None, null=True, blank=True,
         verbose_name=_(u"Upgrade Deadline"),
         help_text=_(
             u"OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
             u"Leave this blank if users can enroll in this mode until enrollment closes for the course."
         ),
+        db_column='expiration_datetime',
     )
 
     # The system prefers to set this automatically based on default settings. But
     # if the field is set manually we want a way to indicate that so we don't
     # overwrite the manual setting of the field.
-    expiration_datetime_is_explicit = models.BooleanField(default=True)
+    expiration_datetime_is_explicit = models.BooleanField(default=False)
 
     # DEPRECATED: the `expiration_date` field has been replaced by `expiration_datetime`
     expiration_date = models.DateField(default=None, null=True, blank=True)
@@ -150,6 +151,17 @@ class CourseMode(models.Model):
         """
         return self.mode_slug
 
+    @property
+    def expiration_datetime(self):
+        """ Return _expiration_datetime. """
+        return self._expiration_datetime
+
+    @expiration_datetime.setter
+    def expiration_datetime(self, new_datetime):
+        """ Saves datetime to _expiration_datetime and sets the explicit flag. """
+        self.expiration_datetime_is_explicit = True
+        self._expiration_datetime = new_datetime
+
     @classmethod
     def all_modes_for_courses(cls, course_id_list):
         """Find all modes for a list of course IDs, including expired modes.
@@ -223,8 +235,8 @@ class CourseMode(models.Model):
             Q(course_id=course_id) &
             Q(min_price__gt=0) &
             (
-                Q(expiration_datetime__isnull=True) |
-                Q(expiration_datetime__gte=now)
+                Q(_expiration_datetime__isnull=True) |
+                Q(_expiration_datetime__gte=now)
             )
         )
         return [mode.to_tuple() for mode in found_course_modes]
@@ -259,7 +271,7 @@ class CourseMode(models.Model):
         # Filter out expired course modes if include_expired is not set
         if not include_expired:
             found_course_modes = found_course_modes.filter(
-                Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=now)
+                Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
             )
 
         # Credit course modes are currently not shown on the track selection page;
@@ -633,3 +645,19 @@ class CourseModesArchive(models.Model):
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
+
+
+class CourseModeExpirationConfig(ConfigurationModel):
+    """
+    Configuration for time period from end of course to auto-expire a course mode.
+    """
+    verification_window = models.DurationField(
+        default=timedelta(days=10),
+        help_text=_(
+            "The time period before a course ends in which a course mode will expire"
+        )
+    )
+
+    def __unicode__(self):
+        """ Returns the unicode date of the verification window. """
+        return unicode(self.verification_window)
