@@ -6,12 +6,13 @@
             'underscore',
             'gettext',
             'js/financial-assistance/models/financial_assistance_model',
-            'text!js/financial-assistance/templates/financial_assessment_form.underscore',
-            'text!js/financial-assistance/templates/financial_assessment_submitted.underscore',
             'js/student_account/views/FormView',
-            'text!templates/student_account/form_field.underscore'
+            'text!../../../templates/financial-assistance/financial_assessment_form.underscore',
+            'text!../../../templates/financial-assistance/financial_assessment_submitted.underscore',
+            'text!templates/student_account/form_field.underscore',
+            'string_utils'
          ],
-         function(Backbone, $, _, gettext, FinancialAssistanceModel, formViewTpl, successTpl, FormView, formFieldTpl) {
+         function(Backbone, $, _, gettext, FinancialAssistanceModel, FormView, formViewTpl, successTpl, formFieldTpl) {
             return FormView.extend({
                 el: '.financial-assistance-wrapper',
                 events: {
@@ -54,7 +55,7 @@
                     this.model.set( context.user_details );
                     this.listenTo( this.model, 'error', this.saveError );
                     this.model.on('sync', this.renderSuccess, this);
-                    
+
                     // Build the form
                     this.buildForm( fields );
                 },
