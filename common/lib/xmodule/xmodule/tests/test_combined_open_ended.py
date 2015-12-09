@@ -58,7 +58,11 @@ class OpenEndedChildTest(unittest.TestCase):
     rubric = '''<rubric><rubric>
         <category>
         <description>Response Quality</description>
-        <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>
+            The response is not a satisfactory answer to the question.
+            It either fails to address the question or does so in a limited way,
+            with no evidence of higher-order thinking.
+        </option>
         <option>Second option</option>
         </category>
          </rubric></rubric>'''
@@ -183,7 +187,11 @@ class OpenEndedModuleTest(unittest.TestCase):
     rubric = etree.XML('''<rubric>
         <category>
         <description>Response Quality</description>
-        <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>
+            The response is not a satisfactory answer to the question.
+            It either fails to address the question or does so in a limited way,
+            with no evidence of higher-order thinking.
+        </option>
         </category>
          </rubric>''')
     max_score = 4
@@ -212,7 +220,9 @@ class OpenEndedModuleTest(unittest.TestCase):
       <openendedparam>
             <initial_display>Enter essay here.</initial_display>
             <answer_display>This is the answer.</answer_display>
-            <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+            <grader_payload>
+                {"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}
+            </grader_payload>
         </openendedparam>
     ''')
     definition = {'oeparam': oeparam}
@@ -365,9 +375,9 @@ class OpenEndedModuleTest(unittest.TestCase):
     def test_latest_post_assessment(self):
         self.update_score_single()
         assessment = self.openendedmodule.latest_post_assessment(self.test_system)
-        self.assertFalse(assessment == '')
+        self.assertNotEqual(assessment, '')
         # check for errors
-        self.assertFalse('errors' in assessment)
+        self.assertNotIn('errors', assessment)
 
     def test_update_score_single(self):
         self.update_score_single()
@@ -466,7 +476,11 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     rubric = '''<rubric><rubric>
         <category>
         <description>Response Quality</description>
-        <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>
+            The response is not a satisfactory answer to the question.
+            It either fails to address the question or does so in a limited way,
+            with no evidence of higher-order thinking.
+        </option>
         <option>Second option</option>
         </category>
          </rubric></rubric>'''
@@ -492,7 +506,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
       <openendedparam>
             <initial_display>Enter essay here.</initial_display>
             <answer_display>This is the answer.</answer_display>
-            <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+            <grader_payload>
+                {"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}
+            </grader_payload>
         </openendedparam>
     ''')
 
@@ -511,7 +527,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             <openendedparam>
                     <initial_display>Enter essay here.</initial_display>
                     <answer_display>This is the answer.</answer_display>
-                    <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+                    <grader_payload>
+                        {"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}
+                    </grader_payload>
            </openendedparam>
     </openended>'''
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
@@ -702,9 +720,18 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             <rubric>
                 <category>
                     <description>Response Quality</description>
-                    <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
-                    <option>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option>
-                    <option>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option>
+                    <option>
+                        The response is not a satisfactory answer to the question.  It either fails to address
+                        the question or does so in a limited way, with no evidence of higher-order thinking.
+                    </option>
+                    <option>
+                        The response is a marginal answer to the question.  It may contain some elements of a
+                        proficient response, but it is inaccurate or incomplete.
+                    </option>
+                    <option>
+                        The response is a proficient answer to the question.  It is generally correct, although
+                        it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.
+                    </option>
                     <option>The response is correct, complete, and contains evidence of higher-order thinking.</option>
                 </category>
             </rubric>
@@ -839,7 +866,10 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     rubric = '''<rubric><rubric>
         <category>
         <description>Response Quality</description>
-        <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>
+            The response is not a satisfactory answer to the question.  It either fails to address the question
+            or does so in a limited way, with no evidence of higher-order thinking.
+        </option>
         <option>Second option</option>
         </category>
          </rubric></rubric>'''
@@ -851,7 +881,9 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
       <openendedparam>
             <initial_display>Enter essay here.</initial_display>
             <answer_display>This is the answer.</answer_display>
-            <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+            <grader_payload>
+                {"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}
+            </grader_payload>
         </openendedparam>
     ''')
 
@@ -870,7 +902,9 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
             <openendedparam>
                     <initial_display>Enter essay here.</initial_display>
                     <answer_display>This is the answer.</answer_display>
-                    <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+                    <grader_payload>
+                        {"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}
+                    </grader_payload>
            </openendedparam>
     </openended>'''
 
@@ -1135,13 +1169,50 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
             'queuekey': "",
             'xqueue_body': json.dumps({
                 'score': 0,
-                'feedback': json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.",
-                                        "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
+                'feedback': json.dumps({
+                    "spelling": "Spelling: Ok.",
+                    "grammar": "Grammar: Ok.",
+                    "markup-text": " all of us can think of a book that we hope none of our children or any other "
+                                   "children have taken off the shelf . but if i have the right to remove that book "
+                                   "from the shelf that work i abhor then you also have exactly the same right and "
+                                   "so does everyone else . and then we <bg>have no books left</bg> "
+                                   "on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author "
+                                   "write a persuasive essay to a newspaper reflecting your vies on censorship "
+                                   "<bg>in libraries . do</bg> you believe that certain materials , such as books , "
+                                   "music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves "
+                                   "if they are found <bg>offensive ? support your</bg> position with convincing "
+                                   "arguments from your own experience , observations <bg>, and or reading .</bg> "
+                }),
                 'grader_type': "ML",
                 'success': True,
                 'grader_id': 1,
                 'submission_id': 1,
-                'rubric_xml': "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
+                'rubric_xml': '''
+                    <rubric>
+                        <category>
+                            <description>Writing Applications</description>
+                            <score>0</score>
+                            <option points='0'>
+                                The essay loses focus, has little information or supporting details, and the
+                                organization makes it difficult to follow.
+                            </option>
+                            <option points='1'>
+                                The essay presents a mostly unified theme, includes sufficient information to convey
+                                the theme, and is generally organized well.
+                            </option>
+                        </category>
+                        <category>
+                            <description> Language Conventions </description>
+                            <score>0</score>
+                            <option points='0'>
+                                The essay demonstrates a reasonable command of proper spelling and grammar.
+                            </option>
+                            <option points='1'>
+                                The essay demonstrates superior command of proper spelling and grammar.
+                            </option>
+                        </category>
+                    </rubric>
+                ''',
                 'rubric_scores_complete': True,
             })
         }
@@ -1202,13 +1273,49 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
             'queuekey': "",
             'xqueue_body': json.dumps({
                 'score': 0,
-                'feedback': json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.",
-                                        "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
+                'feedback': json.dumps({
+                    "spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.",
+                    "markup-text": " all of us can think of a book that we hope none of our children or any other "
+                                   "children have taken off the shelf . but if i have the right to remove that book "
+                                   "from the shelf that work i abhor then you also have exactly the same right and "
+                                   "so does everyone else . and then we <bg>have no books left</bg> on the shelf for "
+                                   "any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay "
+                                   "to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> "
+                                   "you believe that certain materials , such as books , music , movies , magazines , "
+                                   "<bg>etc . , should be</bg> removed from the shelves if they are found "
+                                   "<bg>offensive ? support your</bg> position with convincing arguments from your "
+                                   "own experience , observations <bg>, and or reading .</bg> "
+                }),
                 'grader_type': "ML",
                 'success': True,
                 'grader_id': 1,
                 'submission_id': 1,
-                'rubric_xml': "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
+                'rubric_xml': '''
+                    <rubric>
+                        <category>
+                            <description>Writing Applications</description>
+                            <score>0</score>
+                            <option points='0'>
+                                The essay loses focus, has little information or supporting details, and
+                                the organization makes it difficult to follow.
+                            </option>
+                            <option points='1'>
+                                The essay presents a mostly unified theme, includes sufficient
+                                information to convey the theme, and is generally organized well.
+                            </option>
+                        </category>
+                        <category>
+                            <description> Language Conventions </description>
+                            <score>0</score>
+                            <option points='0'>
+                                The essay demonstrates a reasonable command of proper spelling and grammar.
+                            </option>
+                            <option points='1'>
+                                The essay demonstrates superior command of proper spelling and grammar.
+                            </option>
+                        </category>
+                    </rubric>
+                ''',
                 'rubric_scores_complete': True,
             })
         }

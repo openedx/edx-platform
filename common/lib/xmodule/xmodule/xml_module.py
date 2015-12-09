@@ -13,7 +13,7 @@ from xmodule.modulestore import EdxJSONEncoder
 
 import dogstats_wrapper as dog_stats_api
 
-from lxml.etree import (  # pylint: disable=no-name-in-module
+from lxml.etree import (
     Element, ElementTree, XMLParser,
 )
 
@@ -517,7 +517,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         else:
             return super(XmlDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
 
-    def export_to_xml(self, resource_fs):  # pylint: disable=unused-argument
+    def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
         underneath it.  May also write required resources out to resource_fs.
@@ -536,7 +536,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         #    b) call super(..).export_to_xml(..)
         node = Element(self.category)
         super(XmlDescriptor, self).add_xml_to_node(node)
-        return etree.tostring(node)  # pylint: disable=no-member
+        return etree.tostring(node)
 
     def add_xml_to_node(self, node):
         """

@@ -25,7 +25,7 @@
 profile = no
 ignore = ,migrations
 persistent = yes
-load-plugins = edx_lint.pylint
+load-plugins = edx_lint.pylint,pylint_django
 
 [MESSAGES CONTROL]
 disable = 
@@ -73,7 +73,7 @@ class-attribute-rgx = ([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$
 inlinevar-rgx = [A-Za-z_][A-Za-z0-9_]*$
 good-names = f,i,j,k,db,ex,Run,_,__
 bad-names = foo,bar,baz,toto,tutu,tata
-no-docstring-rgx = __.*__|test_.+|setUp|tearDown
+no-docstring-rgx = __.*__$|test_.+|setUp$|setUpClass$|tearDown$|tearDownClass$|Meta$
 docstring-min-length = -1
 
 [FORMAT]
@@ -97,6 +97,7 @@ ignore-imports = no
 ignore-mixin-members = yes
 ignored-classes = SQLObject
 zope = no
+unsafe-load-any-extension = yes
 generated-members = 
 	REQUEST,
 	acl_users,
@@ -152,4 +153,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 6a610602e4c093047ed189c9a0d4ba796c7d1622
+# d1176b1265180b3207835622b1d89b3087196517

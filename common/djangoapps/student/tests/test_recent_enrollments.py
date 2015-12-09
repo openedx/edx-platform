@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment, DashboardConfiguration
-from student.views import get_course_enrollments, _get_recently_enrolled_courses  # pylint: disable=protected-access
+from student.views import get_course_enrollments, _get_recently_enrolled_courses
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -127,22 +127,21 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self.assertContains(response, "Thank you for enrolling in")
 
     @ddt.data(
-        #Register as an honor in any course modes with no payment option
+        # Register as honor in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'honor', True),
         ([('honor', 0)], 'honor', True),
-        ([], 'honor', True),
-        #Register as an honor in any course modes which has payment option
+        # Register as honor in any course modes which has payment option
         ([('honor', 10)], 'honor', False),  # This is a paid course
         ([('audit', 0), ('honor', 0), ('professional', 20)], 'honor', True),
         ([('audit', 0), ('honor', 0), ('verified', 20)], 'honor', True),
         ([('audit', 0), ('honor', 0), ('verified', 20), ('professional', 20)], 'honor', True),
-        ([], 'honor', True),
-        #Register as an audit in any course modes with no payment option
+        # Register as audit in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'audit', True),
         ([('audit', 0)], 'audit', True),
-        #Register as an audit in any course modes which has no payment option
+        ([], 'audit', True),
+        # Register as audit in any course modes which has no payment option
         ([('audit', 0), ('honor', 0), ('verified', 10)], 'audit', True),
-        #Register as a verified in any course modes which has payment option
+        # Register as verified in any course modes which has payment option
         ([('professional', 20)], 'professional', False),
         ([('verified', 20)], 'verified', False),
         ([('professional', 20), ('verified', 20)], 'verified', False),

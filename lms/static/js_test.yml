@@ -64,7 +64,10 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/date.js
     - xmodule_js/common_static/js/vendor/moment.min.js
     - xmodule_js/common_static/js/vendor/moment-with-locales.min.js
-    - xmodule_js/common_static/js/utils/edx.utils.validate.js
+    - xmodule_js/common_static/common/js/utils/edx.utils.validate.js
+    - xmodule_js/common_static/js/vendor/slick.core.js
+    - xmodule_js/common_static/js/vendor/slick.grid.js
+    - xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js
 
 # Paths to source JavaScript files
 src_paths:

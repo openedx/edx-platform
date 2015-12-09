@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from student.models import UserProfile
 from student.tests.factories import UserFactory
+from django.core.cache import cache
 
 
 @ddt.ddt
@@ -77,3 +78,22 @@ class UserProfilePropertiesTest(TestCase):
         self._set_gender(None)
 
         self.assertIsNone(self.profile.gender_display)
+
+    def test_invalidate_cache_user_profile_country_updated(self):
+
+        country = 'us'
+        self.profile.country = country
+        self.profile.save()
+
+        cache_key = UserProfile.country_cache_key_name(self.user.id)
+        self.assertIsNone(cache.get(cache_key))
+
+        cache.set(cache_key, self.profile.country)
+        self.assertEqual(cache.get(cache_key), country)
+
+        country = 'bd'
+        self.profile.country = country
+        self.profile.save()
+
+        self.assertNotEqual(cache.get(cache_key), country)
+        self.assertIsNone(cache.get(cache_key))

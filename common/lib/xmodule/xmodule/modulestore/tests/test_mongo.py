@@ -758,6 +758,13 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
 
+    def test_make_course_usage_key(self):
+        """Test that we get back the appropriate usage key for the root of a course key."""
+        course_key = CourseLocator(org="edX", course="101", run="2015")
+        root_block_key = self.draft_store.make_course_usage_key(course_key)
+        self.assertEqual(root_block_key.block_type, "course")
+        self.assertEqual(root_block_key.name, "2015")
+
 
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     '''

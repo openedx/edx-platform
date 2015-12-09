@@ -1,111 +1,145 @@
-# encoding: utf-8
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+import model_utils.fields
+import xmodule_django.models
+import django.utils.timezone
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'StudentModule'
-        db.create_table('courseware_studentmodule', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('module_type', self.gf('django.db.models.fields.CharField')(default='problem', max_length=32)),
-            ('module_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('state', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal('courseware', ['StudentModule'])
-
-        # Adding unique constraint on 'StudentModule', fields ['student', 'module_id', 'module_type']
-        db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
-
-    def backwards(self, orm):
-
-        # Removing unique constraint on 'StudentModule', fields ['student', 'module_id', 'module_type']
-        db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
-
-        # Deleting model 'StudentModule'
-        db.delete_table('courseware_studentmodule')
-
-    models = {
-        'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'about': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'avatar_type': ('django.db.models.fields.CharField', [], {'default': "'n'", 'max_length': '1'}),
-            'bronze': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
-            'consecutive_days_visit_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'blank': 'True'}),
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'date_of_birth': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'display_tag_filter_strategy': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'email_isvalid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'email_key': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True'}),
-            'email_tag_filter_strategy': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'gold': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
-            'gravatar': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ignored_tags': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'interesting_tags': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'last_seen': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'location': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'new_response_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'questions_per_page': ('django.db.models.fields.SmallIntegerField', [], {'default': '10'}),
-            'real_name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'reputation': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1'}),
-            'seen_response_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'show_country': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'silver': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'w'", 'max_length': '2'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
-            'website': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'courseware.studentmodule': {
-            'Meta': {'unique_together': "(('student', 'module_id', 'module_type'),)", 'object_name': 'StudentModule'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'grade': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'module_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'module_type': ('django.db.models.fields.CharField', [], {'default': "'problem'", 'max_length': '32'}),
-            'state': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
-        }
-    }
-
-    complete_apps = ['courseware']
+    operations = [
+        migrations.CreateModel(
+            name='OfflineComputedGrade',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
+                ('updated', models.DateTimeField(auto_now=True, db_index=True)),
+                ('gradeset', models.TextField(null=True, blank=True)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='OfflineComputedGradeLog',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
+                ('seconds', models.IntegerField(default=0)),
+                ('nstudents', models.IntegerField(default=0)),
+            ],
+            options={
+                'ordering': ['-created'],
+                'get_latest_by': 'created',
+            },
+        ),
+        migrations.CreateModel(
+            name='StudentFieldOverride',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
+                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('location', xmodule_django.models.LocationKeyField(max_length=255, db_index=True)),
+                ('field', models.CharField(max_length=255)),
+                ('value', models.TextField(default=b'null')),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='StudentModule',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('module_type', models.CharField(default=b'problem', max_length=32, db_index=True, choices=[(b'problem', b'problem'), (b'video', b'video'), (b'html', b'html'), (b'course', b'course'), (b'chapter', b'Section'), (b'sequential', b'Subsection'), (b'library_content', b'Library Content')])),
+                ('module_state_key', xmodule_django.models.LocationKeyField(max_length=255, db_column=b'module_id', db_index=True)),
+                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('state', models.TextField(null=True, blank=True)),
+                ('grade', models.FloatField(db_index=True, null=True, blank=True)),
+                ('max_grade', models.FloatField(null=True, blank=True)),
+                ('done', models.CharField(default=b'na', max_length=8, db_index=True, choices=[(b'na', b'NOT_APPLICABLE'), (b'f', b'FINISHED'), (b'i', b'INCOMPLETE')])),
+                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
+                ('modified', models.DateTimeField(auto_now=True, db_index=True)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='StudentModuleHistory',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('version', models.CharField(db_index=True, max_length=255, null=True, blank=True)),
+                ('created', models.DateTimeField(db_index=True)),
+                ('state', models.TextField(null=True, blank=True)),
+                ('grade', models.FloatField(null=True, blank=True)),
+                ('max_grade', models.FloatField(null=True, blank=True)),
+                ('student_module', models.ForeignKey(to='courseware.StudentModule')),
+            ],
+            options={
+                'get_latest_by': 'created',
+            },
+        ),
+        migrations.CreateModel(
+            name='XModuleStudentInfoField',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('field_name', models.CharField(max_length=64, db_index=True)),
+                ('value', models.TextField(default=b'null')),
+                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
+                ('modified', models.DateTimeField(auto_now=True, db_index=True)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='XModuleStudentPrefsField',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('field_name', models.CharField(max_length=64, db_index=True)),
+                ('value', models.TextField(default=b'null')),
+                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
+                ('modified', models.DateTimeField(auto_now=True, db_index=True)),
+                ('module_type', xmodule_django.models.BlockTypeKeyField(max_length=64, db_index=True)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='XModuleUserStateSummaryField',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('field_name', models.CharField(max_length=64, db_index=True)),
+                ('value', models.TextField(default=b'null')),
+                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
+                ('modified', models.DateTimeField(auto_now=True, db_index=True)),
+                ('usage_id', xmodule_django.models.LocationKeyField(max_length=255, db_index=True)),
+            ],
+        ),
+        migrations.AlterUniqueTogether(
+            name='xmoduleuserstatesummaryfield',
+            unique_together=set([('usage_id', 'field_name')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='xmodulestudentprefsfield',
+            unique_together=set([('student', 'module_type', 'field_name')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='xmodulestudentinfofield',
+            unique_together=set([('student', 'field_name')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='studentmodule',
+            unique_together=set([('student', 'module_state_key', 'course_id')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='studentfieldoverride',
+            unique_together=set([('course_id', 'field', 'location', 'student')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='offlinecomputedgrade',
+            unique_together=set([('user', 'course_id')]),
+        ),
+    ]

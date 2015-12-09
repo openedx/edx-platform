@@ -5,6 +5,8 @@ whether a user has satisfied those requirements.
 
 import logging
 
+from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements, InvalidCreditCourse
 from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
 from openedx.core.djangoapps.credit.models import (
@@ -14,8 +16,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditEligibility,
 )
 
-from opaque_keys.edx.keys import CourseKey
-
+# TODO: Cleanup this mess! ECOM-2908
 
 log = logging.getLogger(__name__)
 
@@ -246,8 +247,7 @@ def set_credit_requirement_status(username, course_key, req_namespace, req_name,
     # Find the requirement we're trying to set
     req_to_update = next((
         req for req in reqs
-        if req.namespace == req_namespace
-        and req.name == req_name
+        if req.namespace == req_namespace and req.name == req_name
     ), None)
 
     # If we can't find the requirement, then the most likely explanation
@@ -356,6 +356,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "reason": {},
                         "status": "failed",
                         "status_date": "2015-06-26 07:49:13",
+                        "order": 0,
                     },
                     {
                         "namespace": "proctored_exam",
@@ -365,6 +366,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "reason": {},
                         "status": "satisfied",
                         "status_date": "2015-06-26 11:07:42",
+                        "order": 1,
                     },
                     {
                         "namespace": "grade",
@@ -374,6 +376,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "reason": {"final_grade": 0.95},
                         "status": "satisfied",
                         "status_date": "2015-06-26 11:07:44",
+                        "order": 2,
                     },
                 ]
 
@@ -394,6 +397,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
             "reason": requirement_status.reason if requirement_status else None,
             "status": requirement_status.status if requirement_status else None,
             "status_date": requirement_status.modified if requirement_status else None,
+            "order": requirement.order,
         })
     return statuses
 

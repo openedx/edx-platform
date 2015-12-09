@@ -614,7 +614,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "title": "Another Test Title",
                 "body": "More content",
                 "pinned": False,
-                "closed": True,
+                "closed": False,
                 "abuse_flaggers": [],
                 "votes": {"up_count": 9},
                 "comments_count": 18,
@@ -644,12 +644,12 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 4,
-                "comment_count": 5,
+                "comment_count": 6,
                 "unread_comment_count": 3,
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
                 "endorsed_comment_list_url": None,
                 "non_endorsed_comment_list_url": None,
-                "editable_fields": ["abuse_flagged", "following", "voted"],
+                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
                 "has_endorsed": True,
                 "read": True,
             },
@@ -668,13 +668,13 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "raw_body": "More content",
                 "rendered_body": "<p>More content</p>",
                 "pinned": False,
-                "closed": True,
+                "closed": False,
                 "following": False,
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 9,
-                "comment_count": 18,
-                "unread_comment_count": 0,
+                "comment_count": 19,
+                "unread_comment_count": 1,
                 "comment_list_url": None,
                 "endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=True"
@@ -682,7 +682,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "non_endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
-                "editable_fields": ["abuse_flagged", "following", "voted"],
+                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
                 "has_endorsed": False,
                 "read": False,
             },
@@ -1085,7 +1085,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
             {
-                "recursive": ["True"],
+                "recursive": ["False"],
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
                 "resp_skip": ["70"],
@@ -1146,8 +1146,8 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 4,
-                "children": [],
                 "editable_fields": ["abuse_flagged", "voted"],
+                "children": [],
             },
             {
                 "id": "test_comment_2",
@@ -1166,8 +1166,8 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "abuse_flagged": True,
                 "voted": False,
                 "vote_count": 7,
-                "children": [],
                 "editable_fields": ["abuse_flagged", "voted"],
+                "children": [],
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1368,12 +1368,13 @@ class CreateThreadTest(
 
     @mock.patch("eventtracking.tracker.emit")
     def test_basic(self, mock_emit):
-        self.register_post_thread_response({
+        cs_thread = make_minimal_cs_thread({
             "id": "test_id",
             "username": self.user.username,
             "created_at": "2015-05-19T00:00:00Z",
             "updated_at": "2015-05-19T00:00:00Z",
         })
+        self.register_post_thread_response(cs_thread)
         with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
             actual = create_thread(self.request, self.minimal_data)
         expected = {
@@ -1396,14 +1397,15 @@ class CreateThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             'read': False,
-            'has_endorsed': False
+            'has_endorsed': False,
+            'response_count': 0,
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1941,14 +1943,15 @@ class UpdateThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "comment_count": 0,
+            "comment_count": 1,
             "unread_comment_count": 0,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             'read': False,
             'has_endorsed': False,
+            'response_count': 0
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1964,6 +1967,8 @@ class UpdateThreadTest(
                 "anonymous_to_peers": ["False"],
                 "closed": ["False"],
                 "pinned": ["False"],
+                "read": ["False"],
+                "requested_user_id": [str(self.user.id)],
             }
         )
 
@@ -2986,7 +2991,7 @@ class RetrieveThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
@@ -2995,8 +3000,8 @@ class RetrieveThreadTest(
             "pinned": False,
             "closed": False,
             "following": False,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -3026,7 +3031,7 @@ class RetrieveThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
@@ -3035,8 +3040,8 @@ class RetrieveThreadTest(
             "pinned": False,
             "closed": False,
             "following": False,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -3046,7 +3051,7 @@ class RetrieveThreadTest(
             "type": "discussion",
             "response_count": 0,
         }
-        non_author_user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
+        non_author_user = UserFactory.create()
         self.register_get_user_response(non_author_user)
         CourseEnrollmentFactory.create(user=non_author_user, course_id=self.course.id)
         self.register_thread()

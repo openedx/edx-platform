@@ -5,7 +5,7 @@ Does not include any access control, be sure to check access before calling.
 """
 import logging
 
-from .models import CustomCourseForEdX
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 log = logging.getLogger("edx.ccx")

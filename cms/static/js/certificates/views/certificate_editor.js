@@ -12,7 +12,10 @@ define([ // jshint ignore:line
 function($, _, Backbone, gettext,
          ListItemEditorView, SignatoryModel, SignatoryEditorView) {
     'use strict';
-    var MAX_SIGNATORIES_LIMIT = 4;
+
+    // If signatories limit is required to specific value then we can change it.
+    // However, Setting this limit to 100 that will allow PMs to add as many signatories as they want.
+    var MAX_SIGNATORIES_LIMIT = 100;
     var CertificateEditorView = ListItemEditorView.extend({
         tagName: 'div',
         events: {

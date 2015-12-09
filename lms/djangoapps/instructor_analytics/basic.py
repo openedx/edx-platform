@@ -4,6 +4,7 @@ Student and course analytics.
 Serve miscellaneous course and student data
 """
 import json
+import datetime
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, CourseRegCodeItem,
     RegistrationCodeRedemption, CourseRegistrationCodeInvoiceItem
@@ -19,6 +20,9 @@ from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
 from edx_proctoring.api import get_all_exam_attempts
 from courseware.models import StudentModule
+from certificates.models import GeneratedCertificate
+from django.db.models import Count
+from certificates.models import CertificateStatuses
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -28,16 +32,17 @@ ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
 SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_name', 'company_contact_email', 'recipient_name',
-                 'recipient_email', 'customer_reference_number', 'internal_reference')
+                 'recipient_email', 'customer_reference_number', 'internal_reference', 'created')
 
 SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_contact_email', 'purchase_time',
                        'customer_reference_number', 'recipient_name', 'recipient_email', 'bill_to_street1',
                        'bill_to_street2', 'bill_to_city', 'bill_to_state', 'bill_to_postalcode',
-                       'bill_to_country', 'order_type',)
+                       'bill_to_country', 'order_type', 'created')
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
 COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
+CERTIFICATE_FEATURES = ('course_id', 'mode', 'status', 'grade', 'created_date', 'is_active', 'error_reason')
 
 UNAVAILABLE = "[unavailable]"
 
@@ -75,8 +80,8 @@ def sale_order_record_features(course_id, features):
         sale_order_dict = dict((feature, getattr(purchased_course.order, feature))
                                for feature in sale_order_features)
 
-        quantity = int(getattr(purchased_course, 'qty'))
-        unit_cost = float(getattr(purchased_course, 'unit_cost'))
+        quantity = int(purchased_course.qty)
+        unit_cost = float(purchased_course.unit_cost)
         sale_order_dict.update({"quantity": quantity})
         sale_order_dict.update({"total_amount": quantity * unit_cost})
 
@@ -142,16 +147,20 @@ def sale_record_features(course_id, features):
         total_used_codes = RegistrationCodeRedemption.objects.filter(
             registration_code__in=sale.courseregistrationcode_set.all()
         ).count()
-        sale_dict.update({"invoice_number": getattr(invoice, 'id')})
+        sale_dict.update({"invoice_number": invoice.id})
         sale_dict.update({"total_codes": sale.courseregistrationcode_set.all().count()})
         sale_dict.update({'total_used_codes': total_used_codes})
 
         codes = [reg_code.code for reg_code in sale.courseregistrationcode_set.all()]
 
         # Extracting registration code information
-        obj_course_reg_code = sale.courseregistrationcode_set.all()[:1].get()
-        course_reg_dict = dict((feature, getattr(obj_course_reg_code, feature))
-                               for feature in course_reg_features)
+        if len(codes) > 0:
+            obj_course_reg_code = sale.courseregistrationcode_set.all()[:1].get()
+            course_reg_dict = dict((feature, getattr(obj_course_reg_code, feature))
+                                   for feature in course_reg_features)
+        else:
+            course_reg_dict = dict((feature, None)
+                                   for feature in course_reg_features)
 
         course_reg_dict['course_id'] = course_id.to_deprecated_string()
         course_reg_dict.update({'codes': ", ".join(codes)})
@@ -160,6 +169,32 @@ def sale_record_features(course_id, features):
         return sale_dict
 
     return [sale_records_info(sale, features) for sale in sales]
+
+
+def issued_certificates(course_key, features):
+    """
+    Return list of issued certificates as dictionaries against the given course key.
+
+    issued_certificates(course_key, features)
+    would return [
+        {course_id: 'abc', 'total_issued_certificate': '5', 'mode': 'honor'}
+        {course_id: 'abc', 'total_issued_certificate': '10', 'mode': 'verified'}
+        {course_id: 'abc', 'total_issued_certificate': '15', 'mode': 'Professional Education'}
+    ]
+    """
+
+    report_run_date = datetime.date.today().strftime("%B %d, %Y")
+    certificate_features = [x for x in CERTIFICATE_FEATURES if x in features]
+    generated_certificates = list(GeneratedCertificate.objects.filter(
+        course_id=course_key,
+        status=CertificateStatuses.downloadable
+    ).values(*certificate_features).annotate(total_issued_certificate=Count('mode')))
+
+    # Report run date
+    for data in generated_certificates:
+        data['report_run_date'] = report_run_date
+
+    return generated_certificates
 
 
 def enrolled_students_features(course_key, features):
@@ -306,7 +341,7 @@ def coupon_codes_features(features, coupons_list, course_id):
         seats_purchased_using_coupon = 0
         total_discounted_amount = 0
         for coupon_redemption in coupon_redemptions:
-            cart_items = coupon_redemption.order.orderitem_set.select_subclasses()
+            cart_items = coupon_redemption.order.orderitem_set.all().select_subclasses()
             found_items = []
             for item in cart_items:
                 if getattr(item, 'course_id', None):
@@ -348,7 +383,7 @@ def list_problem_responses(course_key, problem_location):
     """
     problem_key = UsageKey.from_string(problem_location)
     # Are we dealing with an "old-style" problem location?
-    run = getattr(problem_key, 'run')
+    run = problem_key.run
     if not run:
         problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
     if problem_key.course_key != course_key:
@@ -389,7 +424,7 @@ def course_registration_features(features, registration_codes, csv_type):
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
         course_registration_dict['company_name'] = None
         if registration_code.invoice_item:
-            course_registration_dict['company_name'] = getattr(registration_code.invoice_item.invoice, 'company_name')
+            course_registration_dict['company_name'] = registration_code.invoice_item.invoice.company_name
         course_registration_dict['redeemed_by'] = None
         if registration_code.invoice_item:
             sale_invoice = registration_code.invoice_item.invoice
@@ -408,8 +443,9 @@ def course_registration_features(features, registration_codes, csv_type):
         #  They have not been redeemed yet
         if csv_type is not None:
             try:
-                redeemed_by = getattr(registration_code.registrationcoderedemption_set.get(registration_code=registration_code), 'redeemed_by')
-                course_registration_dict['redeemed_by'] = getattr(redeemed_by, 'email')
+                redemption_set = registration_code.registrationcoderedemption_set
+                redeemed_by = redemption_set.get(registration_code=registration_code).redeemed_by
+                course_registration_dict['redeemed_by'] = redeemed_by.email
             except ObjectDoesNotExist:
                 pass
 

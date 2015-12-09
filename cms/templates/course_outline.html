@@ -1,12 +1,13 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "outline" %></%def>
 <%!
-import json
 import logging
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
+from openedx.core.lib.js_utils import escape_json_dumps
 from contentstore.utils import reverse_usage_url
 from microsite_configuration import microsite
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -15,7 +16,7 @@ from microsite_configuration import microsite
 
 <%block name="requirejs">
     require(["js/factories/outline"], function (OutlineFactory) {
-        OutlineFactory(${json.dumps(course_structure) | n}, ${json.dumps(initial_state) | n});
+        OutlineFactory(${escape_json_dumps(course_structure) | n}, ${escape_json_dumps(initial_state) | n});
     });
 </%block>
 
@@ -161,6 +162,16 @@ from microsite_configuration import microsite
                       </li>
                     </ul>
                 </div>
+                % if SelfPacedConfiguration.current().enabled:
+                    <div class="status-pacing">
+                        <h2 class=status-pacing-label>${_("Course Pacing:")}</h2>
+                        % if context_course.self_paced:
+                            <p class="status-pacing-value">${_("Self-Paced")}</p>
+                        % else:
+                            <p class="status-pacing-value">${_("Instructor-Paced")}</p>
+                        % endif
+                    </div>
+               % endif
             </div>
 
             <div class="wrapper-dnd">

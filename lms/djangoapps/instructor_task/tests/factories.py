@@ -9,7 +9,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class InstructorTaskFactory(DjangoModelFactory):
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = InstructorTask
 
     task_type = 'rescore_problem'

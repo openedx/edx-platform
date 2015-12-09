@@ -4,6 +4,7 @@ URLs for LMS
 
 from django.conf import settings
 from django.conf.urls import patterns, include, url
+from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
@@ -11,12 +12,15 @@ import django.contrib.auth.views
 from microsite_configuration import microsite
 import auth_exchange.views
 
+from config_models.views import ConfigurationModelCurrentAPIView
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
 
 # Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
-# pylint: disable=bad-continuation
 urlpatterns = (
     '',
 
@@ -24,8 +28,6 @@ urlpatterns = (
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
-
-    url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^event$', 'track.views.user_track'),
@@ -47,17 +49,17 @@ urlpatterns = (
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
-    url(r'^password_change/$', django.contrib.auth.views.password_change,
-        name='auth_password_change'),
-    url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
-        name='auth_password_change_done'),
+    url(r'^password_change/$', 'django.contrib.auth.views.password_change',
+        name='password_change'),
+    url(r'^password_change_done/$', 'django.contrib.auth.views.password_change_done',
+        name='password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'student.views.password_reset_confirm_wrapper',
-        name='auth_password_reset_confirm'),
-    url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
-        name='auth_password_reset_complete'),
-    url(r'^password_reset_done/$', django.contrib.auth.views.password_reset_done,
-        name='auth_password_reset_done'),
+        name='password_reset_confirm'),
+    url(r'^password_reset_complete/$', 'django.contrib.auth.views.password_reset_complete',
+        name='password_reset_complete'),
+    url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done',
+        name='password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
@@ -81,6 +83,9 @@ urlpatterns = (
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
 
+    # Course API
+    url(r'^api/courses/', include('course_api.urls')),
+
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
@@ -92,6 +97,7 @@ urlpatterns = (
     url(r'^api/val/v0/', include('edxval.urls')),
 
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
+    url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
@@ -107,12 +113,6 @@ else:
     urlpatterns += (
         url(r'^login$', 'student.views.signin_user', name="signin_user"),
         url(r'^register$', 'student.views.register_user', name="register_user"),
-    )
-
-if settings.FEATURES.get("ENABLE_CREDIT_API"):
-    # Credit API end-points
-    urlpatterns += (
-        url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
     )
 
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
@@ -156,10 +156,9 @@ urlpatterns += (
 
 # Favicon
 favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
-urlpatterns += ((
+urlpatterns += (url(
     r'^favicon\.ico$',
-    'django.views.generic.simple.redirect_to',
-    {'url': settings.STATIC_URL + favicon_path}
+    RedirectView.as_view(url=settings.STATIC_URL + favicon_path, permanent=True)
 ),)
 
 # Semi-static views only used by edX, not by themes
@@ -307,17 +306,9 @@ if settings.COURSEWARE_ENABLED:
         # xblock Resource URL
         url(
             r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
-            'courseware.module_render.xblock_resource',
+            'openedx.core.djangoapps.common_views.xblock.xblock_resource',
             name='xblock_resource_url',
         ),
-
-        # Software Licenses
-
-        # TODO: for now, this is the endpoint of an ajax replay
-        # service that retrieve and assigns license numbers for
-        # software assigned to a course. The numbers have to be loaded
-        # into the database.
-        url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
 
         url(
             r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
@@ -331,10 +322,6 @@ if settings.COURSEWARE_ENABLED:
 
         # TODO: These views need to be updated before they work
         url(r'^calculate$', 'util.views.calculate'),
-        # TODO: We should probably remove the circuit package. I believe it was only used in the old way of saving wiki
-        # circuits for the wiki
-        # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
-        # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
@@ -494,8 +481,9 @@ if settings.COURSEWARE_ENABLED:
     if settings.FEATURES["ENABLE_TEAMS"]:
         # Teams endpoints
         urlpatterns += (
-            url(r'^api/team/', include('teams.api_urls')),
-            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
+            url(r'^api/team/', include('lms.djangoapps.teams.api_urls')),
+            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN),
+                include('lms.djangoapps.teams.urls'), name="teams_endpoints"),
         )
 
     # allow course staff to change to student view of courseware
@@ -655,12 +643,6 @@ if settings.FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
         url(r'^edinsights_service/', include('edinsights.core.urls')),
     )
 
-# FoldIt views
-urlpatterns += (
-    # The path is hardcoded into their app...
-    url(r'^comm/foldit_ops', 'foldit.views.foldit_ops', name="foldit_ops"),
-)
-
 if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += (
         url(r'^debug/run_python$', 'debug.views.run_python'),
@@ -739,6 +721,11 @@ if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
         url(r'^lti_provider/', include('lti_provider.urls')),
     )
 
+urlpatterns += (
+    url(r'config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
+    url(r'config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
+)
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
@@ -771,3 +758,22 @@ urlpatterns += (
 urlpatterns += (
     url(r'^api/', include('edx_proctoring.urls')),
 )
+
+if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
+    urlpatterns += (
+        url(
+            r'^financial-assistance/$',
+            'courseware.views.financial_assistance',
+            name='financial_assistance'
+        ),
+        url(
+            r'^financial-assistance/apply/$',
+            'courseware.views.financial_assistance_form',
+            name='financial_assistance_form'
+        ),
+        url(
+            r'^financial-assistance/submit/$',
+            'courseware.views.financial_assistance_request',
+            name='submit_financial_assistance_request'
+        )
+    )

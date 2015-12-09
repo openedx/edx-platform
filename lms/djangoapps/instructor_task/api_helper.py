@@ -9,6 +9,7 @@ import json
 import logging
 
 from django.utils.translation import ugettext as _
+from util.db import outer_atomic
 
 from celery.result import AsyncResult
 from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
@@ -47,13 +48,6 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     Throws AlreadyRunningError if the task is already in progress.
     Includes the creation of an arbitrary value for task_id, to be
     submitted with the task call to celery.
-
-    The InstructorTask.create method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
 
     Note that there is a chance of a race condition here, when two users
     try to run the same task at almost exactly the same time.  One user
@@ -327,22 +321,18 @@ def submit_task(request, task_type, task_class, course_key, task_input, task_key
     the `request` provided by the originating server request.  Then the task is submitted to run
     asynchronously, using the specified `task_class` and using the task_id constructed for it.
 
+    Cannot be inside an atomic block.
+
     `AlreadyRunningError` is raised if the task is already running.
-
-    The _reserve_task method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
-
     """
-    # check to see if task is already running, and reserve it otherwise:
-    instructor_task = _reserve_task(course_key, task_type, task_key, task_input, request.user)
+    with outer_atomic():
+        # check to see if task is already running, and reserve it otherwise:
+        instructor_task = _reserve_task(course_key, task_type, task_key, task_input, request.user)
 
-    # submit task:
+    # make sure all data has been committed before handing off task to celery.
+
     task_id = instructor_task.task_id
-    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]  # pylint: disable=no-member
+    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]
     task_class.apply_async(task_args, task_id=task_id)
 
     return instructor_task

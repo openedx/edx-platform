@@ -39,16 +39,19 @@ site_status_msg = get_site_status_msg(course_id)
 <header class="${"global slim" if course and not disable_courseware_header else "global-new"}" aria-label="Main" role="banner">
   <div class="${'rwd ' if responsive else ''}wrapper-header nav-container">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
-      <a href="${marketing_link('ROOT')}" title="Home page" itemprop="url">
+      <a href="${marketing_link('ROOT')}" itemprop="url">
         <%block name="navigation_logo">
-            <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}" title="${platform_name()}" itemprop="url" />
-            <span class="sr">${_("Home Page")}</span>
+            <img src="${static.url(branding.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}" itemprop="logo" />
         </%block>
       </a>
     </h1>
 
     % if course and not disable_courseware_header:
-    <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    <h2 class="course-header">
+      <span class="provider">${course.display_org_with_default | h}:</span>
+      <span class="course-number">${course.display_number_with_default | h}</span>
+      <span class="course-name">${course.display_name_with_default}</span>
+    </h2>
     % endif
 
     % if user.is_authenticated():
@@ -80,7 +83,7 @@ site_status_msg = get_site_status_msg(course_id)
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
+        <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</button>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>

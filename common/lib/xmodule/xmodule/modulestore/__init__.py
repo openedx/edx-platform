@@ -759,7 +759,6 @@ class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
         pass
 
 
-# pylint: disable=abstract-method
 class ModuleStoreRead(ModuleStoreAssetBase):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
@@ -907,6 +906,14 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @abstractmethod
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        pass
+
+    @abstractmethod
     def get_courses(self, **kwargs):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
@@ -1009,7 +1016,6 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
 
-# pylint: disable=abstract-method
 class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
@@ -1323,7 +1329,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         if self.contentstore:
             self.contentstore._drop_database()  # pylint: disable=protected-access
-        super(ModuleStoreWriteBase, self)._drop_database()  # pylint: disable=protected-access
+        super(ModuleStoreWriteBase, self)._drop_database()
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
         """

@@ -36,7 +36,7 @@ from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from model_utils.models import StatusModel, TimeStampedModel
 from model_utils import Choices
-from verify_student.ssencrypt import (
+from lms.djangoapps.verify_student.ssencrypt import (
     random_aes_key, encrypt_and_encode,
     generate_signed_message, rsa_encrypt
 )
@@ -150,7 +150,7 @@ class PhotoVerification(StatusModel):
     # user IDs or something too easily guessable.
     receipt_id = models.CharField(
         db_index=True,
-        default=lambda: generateUUID(),
+        default=generateUUID,
         max_length=255,
     )
 
@@ -188,7 +188,8 @@ class PhotoVerification(StatusModel):
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "verify_student"
         abstract = True
         ordering = ['-created_at']
 
@@ -647,6 +648,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
         if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            # fake photo id key is set only for initial verification
+            self.photo_id_key = 'fake-photo-id-key'
+            self.save()
             return
 
         aes_key = random_aes_key()
@@ -934,6 +938,8 @@ class VerificationDeadline(TimeStampedModel):
     then that course does not have a deadline.  This means that users
     can submit photos at any time.
     """
+    class Meta(object):
+        app_label = "verify_student"
 
     course_key = CourseKeyField(
         max_length=255,
@@ -948,6 +954,11 @@ class VerificationDeadline(TimeStampedModel):
             u"to submit photos for verification."
         )
     )
+
+    # The system prefers to set this automatically based on default settings. But
+    # if the field is set manually we want a way to indicate that so we don't
+    # overwrite the manual setting of the field.
+    deadline_is_explicit = models.BooleanField(default=True)
 
     # Maintain a history of changes to deadlines for auditing purposes
     history = HistoricalRecords()
@@ -1043,7 +1054,8 @@ class VerificationCheckpoint(models.Model):
     checkpoint_location = models.CharField(max_length=255)
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "verify_student"
         unique_together = ('course_id', 'checkpoint_location')
 
     def __unicode__(self):
@@ -1095,7 +1107,7 @@ class VerificationCheckpoint(models.Model):
             VerificationStatus object if found any else None
         """
         try:
-            return self.checkpoint_status.filter(user_id=user_id).latest()  # pylint: disable=no-member
+            return self.checkpoint_status.filter(user_id=user_id).latest()
         except ObjectDoesNotExist:
             return None
 
@@ -1109,21 +1121,15 @@ class VerificationCheckpoint(models.Model):
             course_id (CourseKey): CourseKey
             checkpoint_location (str): Verification checkpoint location
 
+        Raises:
+            IntegrityError if create fails due to concurrent create.
+
         Returns:
             VerificationCheckpoint object if exists otherwise None
         """
-        try:
+        with transaction.atomic():
             checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
             return checkpoint
-        except IntegrityError:
-            log.info(
-                u"An integrity error occurred while getting-or-creating the verification checkpoint "
-                "for course %s at location %s.  This can occur if two processes try to get-or-create "
-                "the checkpoint at the same time and the database is set to REPEATABLE READ. "
-                "We will try committing the transaction and retrying."
-            )
-            transaction.commit()
-            return cls.objects.get(course_id=course_id, checkpoint_location=checkpoint_location)
 
 
 class VerificationStatus(models.Model):
@@ -1152,7 +1158,8 @@ class VerificationStatus(models.Model):
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "verify_student"
         get_latest_by = "timestamp"
         verbose_name = "Verification Status"
         verbose_name_plural = "Verification Statuses"
@@ -1308,6 +1315,15 @@ class InCourseReverificationConfiguration(ConfigurationModel):
     pass
 
 
+class IcrvStatusEmailsConfiguration(ConfigurationModel):
+    """Toggle in-course reverification (ICRV) status emails
+
+    Disabled by default. When disabled, ICRV status emails will not be sent.
+    When enabled, ICRV status emails are sent.
+    """
+    pass
+
+
 class SkippedReverification(models.Model):
     """Model for tracking skipped Reverification of a user against a specific
     course.
@@ -1320,10 +1336,12 @@ class SkippedReverification(models.Model):
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "verify_student"
         unique_together = (('user', 'course_id'),)
 
     @classmethod
+    @transaction.atomic
     def add_skipped_reverification_attempt(cls, checkpoint, user_id, course_id):
         """Create skipped reverification object.
 

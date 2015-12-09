@@ -13,23 +13,23 @@ dependencies:
     - bundle install
 
     - pip install setuptools
-    - pip install -r requirements/edx/paver.txt
+    - pip install --exists-action w -r requirements/edx/paver.txt
 
     # Mirror what paver install_prereqs does.
     # After a successful build, CircleCI will
     # cache the virtualenv at that state, so that
     # the next build will not need to install them
     # from scratch again.
-    - pip install -r requirements/edx/pre.txt
-    - pip install -r requirements/edx/github.txt
-    - pip install -r requirements/edx/local.txt
+    - pip install --exists-action w -r requirements/edx/pre.txt 
+    - pip install --exists-action w -r requirements/edx/github.txt
+    - pip install --exists-action w -r requirements/edx/local.txt
 
     # HACK: within base.txt stevedore had a
     # dependency on a version range of pbr.
     # Install a version which falls within that range.
-    - pip install pbr==0.9.0
-    - pip install -r requirements/edx/base.txt
-    - if [ -e requirements/edx/post.txt ]; then pip install -r requirements/edx/post.txt ; fi
+    - pip install  --exists-action w pbr==0.9.0
+    - pip install --exists-action w -r requirements/edx/base.txt
+    - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
 
     - pip install coveralls==1.0
 
@@ -42,6 +42,7 @@ test:
     # to understand how multiple containers can be used to
     # run subsets of tests in parallel.
     - ./scripts/all-tests.sh:
+        timeout: 900  # if a command runs this many seconds without output, kill it
         parallel: true
 
   post:

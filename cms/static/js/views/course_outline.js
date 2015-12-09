@@ -141,16 +141,21 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
 
             editXBlock: function() {
                 var enable_proctored_exams = false;
-                if (this.model.get('category') === 'sequential' &&
-                    this.parentView.parentView.model.has('enable_proctored_exams')) {
-
-                    enable_proctored_exams = this.parentView.parentView.model.get('enable_proctored_exams');
+                var enable_timed_exams = false;
+                if (this.model.get('category') === 'sequential') {
+                    if (this.parentView.parentView.model.has('enable_proctored_exams')) {
+                        enable_proctored_exams = this.parentView.parentView.model.get('enable_proctored_exams');
+                    }
+                    if (this.parentView.parentView.model.has('enable_timed_exams')) {
+                        enable_timed_exams = this.parentView.parentView.model.get('enable_timed_exams');
+                    }
                 }
 
                 var modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
                     onSave: this.refresh.bind(this),
                     parentInfo: this.parentInfo,
                     enable_proctored_exams: enable_proctored_exams,
+                    enable_timed_exams: enable_timed_exams,
                     xblockType: XBlockViewUtils.getXBlockType(
                         this.model.get('category'), this.parentView.model, true
                     )

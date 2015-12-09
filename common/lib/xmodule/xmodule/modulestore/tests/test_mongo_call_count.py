@@ -108,9 +108,9 @@ class CountMongoCallsCourseTraversal(TestCase):
         # The line below shows the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 143),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 41),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 143),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 143),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 41),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 4),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 4),
         # TODO: The call count below seems like a bug - should be 4?

@@ -132,3 +132,16 @@ class TestOverrideProvider(FieldOverrideProvider):
     @classmethod
     def enabled_for(cls, course):
         return True
+
+
+def inject_field_overrides(blocks, course, user):
+    """
+    Apparently the test harness doesn't use LmsFieldStorage, and I'm
+    not sure if there's a way to poke the test harness to do so.  So,
+    we'll just inject the override field storage in this brute force
+    manner.
+    """
+    OverrideFieldData.provider_classes = None
+    for block in blocks:
+        block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
+            user, course, block._field_data)   # pylint: disable=protected-access

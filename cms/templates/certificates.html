@@ -2,9 +2,9 @@
 <%def name="online_help_token()"><% return "certificates" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-import json
 from contentstore import utils
 from django.utils.translation import ugettext as _
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="title">${_("Course Certificates")}</%block>
@@ -30,7 +30,7 @@ CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
 
 <%block name="requirejs">
   require(["js/certificates/factories/certificates_page_factory"], function(CertificatesPageFactory) {
-      CertificatesPageFactory(${json.dumps(certificates)}, "${certificate_url}", "${course_outline_url}", ${json.dumps(course_modes)}, ${json.dumps(certificate_web_view_url)}, ${json.dumps(is_active)}, ${json.dumps(certificate_activation_handler_url)} );
+      CertificatesPageFactory(${escape_json_dumps(certificates) | n}, "${certificate_url}", "${course_outline_url}", ${escape_json_dumps(course_modes) | n}, ${escape_json_dumps(certificate_web_view_url) | n}, ${escape_json_dumps(is_active) | n}, ${escape_json_dumps(certificate_activation_handler_url) | n} );
   });
 </%block>
 

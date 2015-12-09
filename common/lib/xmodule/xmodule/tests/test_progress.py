@@ -127,12 +127,12 @@ class ProgressTest(unittest.TestCase):
         prg1 = Progress(1, 2)
         prg2 = Progress(2, 4)
         prg3 = Progress(1, 2)
-        self.assertTrue(prg1 == prg3)
-        self.assertFalse(prg1 == prg2)
+        self.assertEqual(prg1, prg3)
+        self.assertNotEqual(prg1, prg2)
 
         # Check != while we're at it
-        self.assertTrue(prg1 != prg2)
-        self.assertFalse(prg1 != prg3)
+        self.assertNotEqual(prg1, prg2)
+        self.assertEqual(prg1, prg3)
 
 
 class ModuleProgressTest(unittest.TestCase):

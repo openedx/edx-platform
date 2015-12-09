@@ -31,7 +31,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
         except AttributeError:
             return None
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseMode
         fields = ('name', 'currency', 'price', 'sku', 'expires')
 

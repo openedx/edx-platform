@@ -65,6 +65,8 @@ from instructor.views.api import require_finance_admin
 from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from instructor.views.api import _split_input_list, common_exceptions_400, generate_unique_password
 from instructor_task.api_helper import AlreadyRunningError
+from certificates.tests.factories import GeneratedCertificateFactory
+from certificates.models import CertificateStatuses
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 
@@ -1273,7 +1275,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         create paid course mode.
         """
         paid_course = CourseFactory.create()
-        CourseModeFactory.create(course_id=paid_course.id, min_price=50)
+        CourseModeFactory.create(course_id=paid_course.id, min_price=50, mode_slug=CourseMode.HONOR)
         CourseInstructorRole(paid_course.id).add_users(self.instructor)
         return paid_course
 
@@ -1403,7 +1405,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
     def test_unenroll_and_enroll_verified(self):
         """
         Test that unenrolling and enrolling a student from a verified track
-        results in that student being in an honor track
+        results in that student being in the default track
         """
         course_enrollment = CourseEnrollment.objects.get(
             user=self.enrolled_student, course_id=self.course.id
@@ -1420,7 +1422,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         course_enrollment = CourseEnrollment.objects.get(
             user=self.enrolled_student, course_id=self.course.id
         )
-        self.assertEqual(course_enrollment.mode, u'honor')
+        self.assertEqual(course_enrollment.mode, CourseMode.DEFAULT_MODE_SLUG)
 
     def _change_student_enrollment(self, user, course, action):
         """
@@ -2136,7 +2138,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                                       company_contact_email='test@123', recipient_name='R1',
                                       recipient_email='', customer_reference_number='PO#23')
 
-        paid_course_reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        paid_course_reg_item = PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course.id,
+            mode_slug=CourseMode.HONOR
+        )
         # update the quantity of the cart item paid_course_reg_item
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': paid_course_reg_item.id, 'qty': '4'})
         self.assertEqual(resp.status_code, 200)
@@ -3853,6 +3859,118 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             u'header': [u'Unit', u'Extended Due Date'],
             u'title': u'Due date extensions for %s (%s)' % (
                 self.user1.profile.name, self.user1.username)})
+
+
+@attr('shard_1')
+class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
+    """
+    Test data dumps for issued certificates.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseIssuedCertificatesData, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(TestCourseIssuedCertificatesData, self).setUp()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+    def generate_certificate(self, course_id, mode, status):
+        """
+        Generate test certificate
+        """
+        test_user = UserFactory()
+        GeneratedCertificateFactory.create(
+            user=test_user,
+            course_id=course_id,
+            mode=mode,
+            status=status
+        )
+
+    def test_certificates_features_against_status(self):
+        """
+        Test certificates with status 'downloadable' should be in the response.
+        """
+        url = reverse('get_issued_certificates', kwargs={'course_id': unicode(self.course.id)})
+        # firstly generating downloadable certificates with 'honor' mode
+        certificate_count = 3
+        for __ in xrange(certificate_count):
+            self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.generating)
+
+        response = self.client.get(url)
+        res_json = json.loads(response.content)
+        self.assertIn('certificates', res_json)
+        self.assertEqual(len(res_json['certificates']), 0)
+
+        # Certificates with status 'downloadable' should be in response.
+        self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
+        response = self.client.get(url)
+        res_json = json.loads(response.content)
+        self.assertIn('certificates', res_json)
+        self.assertEqual(len(res_json['certificates']), 1)
+
+    def test_certificates_features_group_by_mode(self):
+        """
+        Test for certificate csv features against mode. Certificates should be group by 'mode' in reponse.
+        """
+        url = reverse('get_issued_certificates', kwargs={'course_id': unicode(self.course.id)})
+        # firstly generating downloadable certificates with 'honor' mode
+        certificate_count = 3
+        for __ in xrange(certificate_count):
+            self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
+
+        response = self.client.get(url)
+        res_json = json.loads(response.content)
+        self.assertIn('certificates', res_json)
+        self.assertEqual(len(res_json['certificates']), 1)
+
+        # retrieve the first certificate from the list, there should be 3 certificates for 'honor' mode.
+        certificate = res_json['certificates'][0]
+        self.assertEqual(certificate.get('total_issued_certificate'), 3)
+        self.assertEqual(certificate.get('mode'), 'honor')
+        self.assertEqual(certificate.get('course_id'), str(self.course.id))
+
+        # Now generating downloadable certificates with 'verified' mode
+        for __ in xrange(certificate_count):
+            self.generate_certificate(
+                course_id=self.course.id,
+                mode='verified',
+                status=CertificateStatuses.downloadable
+            )
+
+        response = self.client.get(url)
+        res_json = json.loads(response.content)
+        self.assertIn('certificates', res_json)
+
+        # total certificate count should be 2 for 'verified' mode.
+        self.assertEqual(len(res_json['certificates']), 2)
+
+        # retrieve the second certificate from the list
+        certificate = res_json['certificates'][1]
+        self.assertEqual(certificate.get('total_issued_certificate'), 3)
+        self.assertEqual(certificate.get('mode'), 'verified')
+
+    def test_certificates_features_csv(self):
+        """
+        Test for certificate csv features.
+        """
+        url = reverse('get_issued_certificates', kwargs={'course_id': unicode(self.course.id)})
+        url += '?csv=true'
+        # firstly generating downloadable certificates with 'honor' mode
+        certificate_count = 3
+        for __ in xrange(certificate_count):
+            self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
+
+        current_date = datetime.date.today().strftime("%B %d, %Y")
+        response = self.client.get(url)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        self.assertEqual(response['Content-Disposition'], 'attachment; filename={0}'.format('issued_certificates.csv'))
+        self.assertEqual(
+            response.content.strip(),
+            '"CourseID","Certificate Type","Total Certificates Issued","Date Report Run"\r\n"'
+            + str(self.course.id) + '","honor","3","' + current_date + '"'
+        )
 
 
 @attr('shard_1')

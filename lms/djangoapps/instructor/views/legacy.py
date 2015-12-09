@@ -20,6 +20,7 @@ from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -47,7 +48,6 @@ from instructor_task.api import (
 from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
 from class_dashboard import dashboard_data
-from psychometrics import psychoanalyze
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -77,6 +77,8 @@ def split_by_comma_and_whitespace(a_str):
     return re.split(r'[\s,]', a_str)
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
@@ -94,7 +96,7 @@ def instructor_dashboard(request, course_id):
     plots = []
     datatable = {}
 
-    # the instructor dashboard page is modal: grades, psychometrics, admin
+    # the instructor dashboard page is modal: grades, admin
     # keep that state in request.session (defaults to grades mode)
     idash_mode = request.POST.get('idash_mode', '')
     idash_mode_key = u'idash_mode:{0}'.format(course_id)
@@ -129,7 +131,7 @@ def instructor_dashboard(request, course_id):
     def return_csv(func, datatable, file_pointer=None):
         """Outputs a CSV file from the contents of a datatable."""
         if file_pointer is None:
-            response = HttpResponse(mimetype='text/csv')
+            response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = (u'attachment; filename={0}'.format(func)).encode('utf-8')
         else:
             response = file_pointer
@@ -317,18 +319,6 @@ def instructor_dashboard(request, course_id):
             datatable = ret['datatable']
 
     #----------------------------------------
-    # psychometrics
-
-    elif action == 'Generate Histogram and IRT Plot':
-        problem = request.POST['Problem']
-        nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
-        msg += nmsg
-        track.views.server_track(request, "psychometrics-histogram-generation", {"problem": unicode(problem)}, page="idashboard")
-
-    if idash_mode == 'Psychometrics':
-        problems = psychoanalyze.problems_with_psychometric_data(course_key)
-
-    #----------------------------------------
     # analytics
     def get_analytics_result(analytics_name):
         """Return data for an Analytic piece, or None if it doesn't exist. It
@@ -432,8 +422,6 @@ def instructor_dashboard(request, course_id):
 
         'show_email_tab': show_email_tab,  # email
 
-        'problems': problems,  # psychometrics
-        'plots': plots,  # psychometrics
         'course_errors': modulestore().get_course_errors(course.id),
         'instructor_tasks': instructor_tasks,
         'offline_grade_log': offline_grades_available(course_key),
@@ -631,17 +619,21 @@ class GradeTable(object):
         self.grades = {}
         self._current_row = {}
 
-    def _add_grade_to_row(self, component, score):
+    def _add_grade_to_row(self, component, score, possible=None):
         """Creates component if needed, and assigns score
 
         Args:
             component (str): Course component being graded
             score (float): Score of student on component
+            possible (float): Max possible score for the component
 
         Returns:
            None
         """
         component_index = self.components.setdefault(component, len(self.components))
+        if possible is not None:
+            # send a tuple instead of a single value
+            score = (score, possible)
         self._current_row[component_index] = score
 
     @contextmanager
@@ -681,7 +673,10 @@ class GradeTable(object):
         return self.components.keys()
 
 
-def get_student_grade_summary_data(request, course, get_grades=True, get_raw_scores=False, use_offline=False):
+def get_student_grade_summary_data(
+        request, course, get_grades=True, get_raw_scores=False,
+        use_offline=False, get_score_max=False
+):
     """
     Return data arrays with student identity and grades for specified course.
 
@@ -697,6 +692,11 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
     data = list (one per student) of lists of data corresponding to the fields
 
     If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.
+
+    If get_score_max is True, two values will be returned for each grade -- the
+    total number of points earned and the total number of points possible. For
+    example, if two points are possible and one is earned, (1, 2) will be
+    returned instead of 0.5 (the default).
     """
     course_key = course.id
     enrolled_students = User.objects.filter(
@@ -723,9 +723,18 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
             log.debug(u'student=%s, gradeset=%s', student, gradeset)
             with gtab.add_row(student.id) as add_grade:
                 if get_raw_scores:
-                    # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
+                    # The following code calls add_grade, which is an alias
+                    # for the add_row method on the GradeTable class. This adds
+                    # a grade for each assignment. Depending on whether
+                    # get_score_max is True, it will return either a single
+                    # value as a float between 0 and 1, or a two-tuple
+                    # containing the earned score and possible score for
+                    # the assignment (see docstring).
                     for score in gradeset['raw_scores']:
-                        add_grade(score.section, getattr(score, 'earned', score[0]))
+                        if get_score_max is True:
+                            add_grade(score.section, score.earned, score.possible)
+                        else:
+                            add_grade(score.section, score.earned)
                 else:
                     for grade_item in gradeset['section_breakdown']:
                         add_grade(grade_item['label'], grade_item['percent'])

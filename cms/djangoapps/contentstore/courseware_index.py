@@ -7,13 +7,13 @@ import re
 from six import add_metaclass
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy, ugettext as _
 from django.core.urlresolvers import resolve
 
-from contentstore.utils import course_image_url
 from contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
 from eventtracking import tracker
+from openedx.core.lib.courses import course_image_url
 from search.search_engine_base import SearchEngine
 from xmodule.annotator_mixin import html_to_text
 from xmodule.modulestore import ModuleStoreEnum
@@ -350,7 +350,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         'category': 'courseware_index'
     }
 
-    UNNAMED_MODULE_NAME = _("(Unnamed)")
+    UNNAMED_MODULE_NAME = ugettext_lazy("(Unnamed)")
 
     @classmethod
     def normalize_structure_key(cls, structure_key):
@@ -417,7 +417,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         while parent is not None:
             path_component_name = parent.display_name
             if not path_component_name:
-                path_component_name = cls.UNNAMED_MODULE_NAME
+                path_component_name = unicode(cls.UNNAMED_MODULE_NAME)
             location_path.append(path_component_name)
             parent = parent.get_parent()
         location_path.reverse()
@@ -640,3 +640,22 @@ class CourseAboutSearchIndexer(object):
             "Successfully added %s course to the course discovery index",
             course_id
         )
+
+    @classmethod
+    def _get_location_info(cls, normalized_structure_key):
+        """ Builds location info dictionary """
+        return {"course": unicode(normalized_structure_key), "org": normalized_structure_key.org}
+
+    @classmethod
+    def remove_deleted_items(cls, structure_key):
+        """ Remove item from Course About Search_index """
+        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
+        if not searcher:
+            return
+
+        response = searcher.search(
+            doc_type=cls.DISCOVERY_DOCUMENT_TYPE,
+            field_dictionary=cls._get_location_info(structure_key)
+        )
+        result_ids = [result["data"]["id"] for result in response["results"]]
+        searcher.remove(cls.DISCOVERY_DOCUMENT_TYPE, result_ids)

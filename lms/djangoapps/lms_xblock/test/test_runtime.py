@@ -8,7 +8,7 @@ from ddt import ddt, data
 from mock import Mock
 from unittest import TestCase
 from urlparse import urlparse
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator, SlashSeparatedCourseKey
 from lms.djangoapps.lms_xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
 from xblock.fields import ScopeIds
 
@@ -39,12 +39,40 @@ class TestQuoteSlashes(TestCase):
         self.assertNotIn('/', quote_slashes(test_string))
 
 
+class BlockMock(Mock):
+    """Mock class that we fill with our "handler" methods."""
+
+    def handler(self, _context):
+        """
+        A test handler method.
+        """
+        pass
+
+    def handler1(self, _context):
+        """
+        A test handler method.
+        """
+        pass
+
+    def handler_a(self, _context):
+        """
+        A test handler method.
+        """
+        pass
+
+    @property
+    def location(self):
+        """Create a functional BlockUsageLocator for testing URL generation."""
+        course_key = CourseLocator(org="mockx", course="100", run="2015")
+        return BlockUsageLocator(course_key, block_type='mock_type', block_id="mock_id")
+
+
 class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
         super(TestHandlerUrl, self).setUp()
-        self.block = Mock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
+        self.block = BlockMock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
         self.course_key = SlashSeparatedCourseKey("org", "course", "run")
         self.runtime = LmsModuleSystem(
             static_url='/static',

@@ -20,14 +20,21 @@ from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Boolean, List
+from xblock.fragment import Fragment
 
 log = logging.getLogger("edx.courseware")
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
-class HtmlFields(object):
+class HtmlBlock(object):
+    """
+    This will eventually subclass XBlock and merge HtmlModule and HtmlDescriptor
+    into one. For now, it's a place to put the pieces that are already sharable
+    between the two (field information and XBlock handlers).
+    """
     display_name = String(
         display_name=_("Display Name"),
         help=_("This name appears in the horizontal navigation at the top of the page."),
@@ -37,14 +44,20 @@ class HtmlFields(object):
         default=_("Text")
     )
     data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
-    source_code = String(help=_("Source code for LaTeX documents. This feature is not well-supported."), scope=Scope.settings)
+    source_code = String(
+        help=_("Source code for LaTeX documents. This feature is not well-supported."),
+        scope=Scope.settings
+    )
     use_latex_compiler = Boolean(
         help=_("Enable LaTeX templates?"),
         default=False,
         scope=Scope.settings
     )
     editor = String(
-        help=_("Select Visual to enter content and have the editor automatically create the HTML. Select Raw to edit HTML directly. If you change this setting, you must save the component and then re-open it for editing."),
+        help=_(
+            "Select Visual to enter content and have the editor automatically create the HTML. Select Raw to edit "
+            "HTML directly. If you change this setting, you must save the component and then re-open it for editing."
+        ),
         display_name=_("Editor"),
         default="visual",
         values=[
@@ -54,8 +67,25 @@ class HtmlFields(object):
         scope=Scope.settings
     )
 
+    @XBlock.supports("multi_device")
+    def student_view(self, _context):
+        """
+        Return a fragment that contains the html for the student view
+        """
+        return Fragment(self.get_html())
 
-class HtmlModuleMixin(HtmlFields, XModule):
+    def get_html(self):
+        """
+        When we switch this to an XBlock, we can merge this with student_view,
+        but for now the XModule mixin requires that this method be defined.
+        """
+        # pylint: disable=no-member
+        if self.system.anonymous_student_id:
+            return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+        return self.data
+
+
+class HtmlModuleMixin(HtmlBlock, XModule):
     """
     Attributes and methods used by HtmlModules internally.
     """
@@ -73,23 +103,15 @@ class HtmlModuleMixin(HtmlFields, XModule):
     js_module_name = "HTMLModule"
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
-    def get_html(self):
-        if self.system.anonymous_student_id:
-            return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
-        return self.data
-
 
 @edxnotes
 class HtmlModule(HtmlModuleMixin):
     """
     Module for putting raw html in a course
     """
-    @XBlock.supports("multi_device")
-    def student_view(self, context):
-        return super(HtmlModule, self).student_view(context)
 
 
-class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: disable=abstract-method
+class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: disable=abstract-method
     """
     Module for putting raw html in a course
     """
@@ -106,28 +128,31 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: d
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
     @classmethod
-    def backcompat_paths(cls, path):
+    def backcompat_paths(cls, filepath):
+        """
+        Get paths for html and xml files.
+        """
 
         dog_stats_api.increment(
             DEPRECATION_VSCOMPAT_EVENT,
             tags=["location:html_descriptor_backcompat_paths"]
         )
 
-        if path.endswith('.html.xml'):
-            path = path[:-9] + '.html'  # backcompat--look for html instead of xml
-        if path.endswith('.html.html'):
-            path = path[:-5]  # some people like to include .html in filenames..
+        if filepath.endswith('.html.xml'):
+            filepath = filepath[:-9] + '.html'  # backcompat--look for html instead of xml
+        if filepath.endswith('.html.html'):
+            filepath = filepath[:-5]  # some people like to include .html in filenames..
         candidates = []
-        while os.sep in path:
-            candidates.append(path)
-            _, _, path = path.partition(os.sep)
+        while os.sep in filepath:
+            candidates.append(filepath)
+            _, _, filepath = filepath.partition(os.sep)
 
         # also look for .html versions instead of .xml
-        nc = []
+        new_candidates = []
         for candidate in candidates:
             if candidate.endswith('.xml'):
-                nc.append(candidate[:-4] + '.html')
-        return candidates + nc
+                new_candidates.append(candidate[:-4] + '.html')
+        return candidates + new_candidates
 
     @classmethod
     def filter_templates(cls, template, course):
@@ -216,8 +241,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: d
                         break
 
             try:
-                with system.resources_fs.open(filepath) as file:
-                    html = file.read().decode('utf-8')
+                with system.resources_fs.open(filepath) as infile:
+                    html = infile.read().decode('utf-8')
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html) and len(html) > 0:
                         msg = "Couldn't parse html in {0}, content = {1}".format(filepath, html)

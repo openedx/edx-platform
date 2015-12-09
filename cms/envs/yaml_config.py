@@ -85,11 +85,6 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
-# Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
-    'djcelery': 'ignore',
-}
-
 # Rename the exchange and queues for each variant
 
 QUEUE_VARIANT = CONFIG_PREFIX.lower()
@@ -145,7 +140,7 @@ ENV_TOKENS = convert_tokens(ENV_TOKENS)
 # into settings some dictionary settings
 # need to be merged from common.py
 
-ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 

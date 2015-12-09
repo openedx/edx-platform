@@ -2,9 +2,7 @@
 """
 Modulestore configuration for test cases.
 """
-import datetime
 import functools
-import pytz
 from uuid import uuid4
 
 from mock import patch
@@ -22,7 +20,6 @@ from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
 
 
@@ -445,93 +442,3 @@ class ModuleStoreTestCase(TestCase):
             self.store.update_item(course, user_id)
         updated_course = self.store.get_course(course.id)
         return updated_course
-
-    def create_sample_course(self, org, course, run, block_info_tree=None, course_fields=None):
-        """
-        create a course in the default modulestore from the collection of BlockInfo
-        records defining the course tree
-        Returns:
-            course_loc: the CourseKey for the created course
-        """
-        if block_info_tree is None:
-            block_info_tree = default_block_info_tree
-
-        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
-            course = self.store.create_course(org, course, run, self.user.id, fields=course_fields)
-            self.course_loc = course.location  # pylint: disable=attribute-defined-outside-init
-
-            def create_sub_tree(parent_loc, block_info):
-                """Recursively creates a sub_tree on this parent_loc with this block."""
-                block = self.store.create_child(
-                    self.user.id,
-                    # TODO remove version_agnostic() when we impl the single transaction
-                    parent_loc.version_agnostic(),
-                    block_info.category, block_id=block_info.block_id,
-                    fields=block_info.fields,
-                )
-                for tree in block_info.sub_tree:
-                    create_sub_tree(block.location, tree)
-                setattr(self, block_info.block_id, block.location.version_agnostic())
-
-            for tree in block_info_tree:
-                create_sub_tree(self.course_loc, tree)
-
-            # remove version_agnostic when bulk write works
-            self.store.publish(self.course_loc.version_agnostic(), self.user.id)
-        return self.course_loc.course_key.version_agnostic()
-
-    def create_toy_course(self, org='edX', course='toy', run='2012_Fall'):
-        """
-        Create an equivalent to the toy xml course
-        """
-        with self.store.bulk_operations(self.store.make_course_key(org, course, run), emit_signals=False):
-            self.toy_loc = self.create_sample_course(  # pylint: disable=attribute-defined-outside-init
-                org, course, run, TOY_BLOCK_INFO_TREE,
-                {
-                    "textbooks": [["Textbook", "https://s3.amazonaws.com/edx-textbooks/guttag_computation_v3/"]],
-                    "wiki_slug": "toy",
-                    "display_name": "Toy Course",
-                    "graded": True,
-                    "discussion_topics": {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
-                    "graceperiod": datetime.timedelta(days=2, seconds=21599),
-                    "start": datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
-                    "xml_attributes": {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
-                    "pdf_textbooks": [
-                        {
-                            "tab_title": "Sample Multi Chapter Textbook",
-                            "id": "MyTextbook",
-                            "chapters": [
-                                {"url": "/static/Chapter1.pdf", "title": "Chapter 1"},
-                                {"url": "/static/Chapter2.pdf", "title": "Chapter 2"}
-                            ]
-                        }
-                    ],
-                    "course_image": "just_a_test.jpg",
-                }
-            )
-            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.toy_loc):
-                self.store.create_item(
-                    self.user.id, self.toy_loc, "about", block_id="short_description",
-                    fields={"data": "A course about toys."}
-                )
-                self.store.create_item(
-                    self.user.id, self.toy_loc, "about", block_id="effort",
-                    fields={"data": "6 hours"}
-                )
-                self.store.create_item(
-                    self.user.id, self.toy_loc, "about", block_id="end_date",
-                    fields={"data": "TBD"}
-                )
-                self.store.create_item(
-                    self.user.id, self.toy_loc, "course_info", "handouts",
-                    fields={"data": "<a href='/static/handouts/sample_handout.txt'>Sample</a>"}
-                )
-                self.store.create_item(
-                    self.user.id, self.toy_loc, "static_tab", "resources",
-                    fields={"display_name": "Resources"},
-                )
-                self.store.create_item(
-                    self.user.id, self.toy_loc, "static_tab", "syllabus",
-                    fields={"display_name": "Syllabus"},
-                )
-            return self.toy_loc

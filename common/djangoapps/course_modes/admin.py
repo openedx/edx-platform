@@ -26,19 +26,22 @@ from course_modes.models import CourseMode
 # The admin page will work in both LMS and Studio,
 # but the test suite for Studio will fail because
 # the verification deadline table won't exist.
-from verify_student import models as verification_models  # pylint: disable=import-error
+from lms.djangoapps.verify_student import models as verification_models
 
 
 class CourseModeForm(forms.ModelForm):
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseMode
+        fields = '__all__'
 
     COURSE_MODE_SLUG_CHOICES = (
         [(CourseMode.DEFAULT_MODE_SLUG, CourseMode.DEFAULT_MODE_SLUG)] +
         [(mode_slug, mode_slug) for mode_slug in CourseMode.VERIFIED_MODES] +
         [(CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.NO_ID_PROFESSIONAL_MODE)] +
-        [(mode_slug, mode_slug) for mode_slug in CourseMode.CREDIT_MODES]
+        [(mode_slug, mode_slug) for mode_slug in CourseMode.CREDIT_MODES] +
+        # need to keep legacy modes around for awhile
+        [(CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)]
     )
 
     mode_slug = forms.ChoiceField(choices=COURSE_MODE_SLUG_CHOICES, label=_("Mode"))

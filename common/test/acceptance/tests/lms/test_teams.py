@@ -45,6 +45,8 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
         self.tab_nav = TabNavPage(self.browser)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.teams_page = TeamsPage(self.browser, self.course_id)
+        # TODO: Refactor so resetting events database is not necessary
+        self.reset_event_tracking()
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
@@ -673,10 +675,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
                 user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
                 self.create_membership(user_info['username'], team['id'])
             team['open_slots'] = self.max_team_size - i
-            # Parse last activity date, removing microseconds because
-            # the Django ORM does not support them. Will be fixed in
-            # Django 1.8.
-            team['last_activity_at'] = parse(team['last_activity_at']).replace(microsecond=0)
+
         # Re-authenticate as staff after creating users
         AutoAuthPage(
             self.browser,
@@ -1384,7 +1383,10 @@ class EditTeamTest(TeamFormActions):
                 }
             },
         ]
-        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+        with self.assert_events_match_during(
+            event_filter=self.only_team_events,
+            expected_events=expected_events,
+        ):
             self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()

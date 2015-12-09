@@ -27,8 +27,9 @@ from xblock.core import XBlock
 from xblock.fragment import Fragment
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from course_modes.models import CourseMode
 from courseware import module_render as render
-from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
+from courseware.courses import get_course_with_access, get_course_info_section
 from courseware.field_overrides import OverrideFieldData
 from courseware.model_data import FieldDataCache
 from courseware.module_render import hash_resource, get_module_for_descriptor
@@ -38,6 +39,7 @@ from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.lib.courses import course_image_url
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE,
@@ -47,7 +49,7 @@ from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
 from openedx.core.djangoapps.credit.models import CreditCourse
@@ -127,7 +129,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         super(ModuleRenderTestCase, self).setUp()
 
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.toy_course = modulestore().get_course(self.course_key)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
@@ -403,7 +405,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         super(TestHandleXBlockCallback, self).setUp()
 
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.location = self.course_key.make_usage_key('chapter', 'Overview')
         self.toy_course = modulestore().get_course(self.course_key)
         self.mock_user = UserFactory.create()
@@ -602,8 +604,11 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
 @ddt.ddt
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
-    def setup_modulestore(self, default_ms, num_finds, num_sends):
-        self.course_key = self.create_toy_course()
+    def setup_request_and_course(self, num_finds, num_sends):
+        """
+        Sets up the toy course in the modulestore and the request object.
+        """
+        self.course_key = ToyCourseFactory.create().id  # pylint: disable=attribute-defined-outside-init
         self.chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
         factory = RequestFactory()
@@ -612,9 +617,9 @@ class TestTOC(ModuleStoreTestCase):
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
         with self.modulestore.bulk_operations(self.course_key):
             with check_mongo_calls(num_finds, num_sends):
-                self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+                self.toy_course = self.store.get_course(self.course_key, depth=2)  # pylint: disable=attribute-defined-outside-init
                 self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                    self.toy_loc, self.request.user, self.toy_course, depth=2
+                    self.course_key, self.request.user, self.toy_course, depth=2
                 )
 
     # Mongo makes 3 queries to load the course to depth 2:
@@ -632,7 +637,7 @@ class TestTOC(ModuleStoreTestCase):
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
-            self.setup_modulestore(default_ms, setup_finds, setup_sends)
+            self.setup_request_and_course(setup_finds, setup_sends)
 
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
@@ -672,7 +677,7 @@ class TestTOC(ModuleStoreTestCase):
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
-            self.setup_modulestore(default_ms, setup_finds, setup_sends)
+            self.setup_request_and_course(setup_finds, setup_sends)
             section = 'Welcome'
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
@@ -699,7 +704,7 @@ class TestTOC(ModuleStoreTestCase):
 
 @attr('shard_1')
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
     def setUp(self):
@@ -707,23 +712,23 @@ class TestProctoringRendering(ModuleStoreTestCase):
         Set up the initial mongo datastores
         """
         super(TestProctoringRendering, self).setUp()
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
         factory = RequestFactory()
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
-        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
+        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access
         with self.modulestore.bulk_operations(self.course_key):
-            self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+            self.toy_course = self.store.get_course(self.course_key, depth=2)
             self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                self.toy_loc, self.request.user, self.toy_course, depth=2
+                self.course_key, self.request.user, self.toy_course, depth=2
             )
 
     @ddt.data(
-        ('honor', False, None, None),
+        (CourseMode.DEFAULT_MODE_SLUG, False, None, None),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'eligible',
             {
@@ -734,7 +739,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'submitted',
             {
@@ -745,7 +750,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'error',
             {
@@ -756,7 +761,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             None,
             {
@@ -767,7 +772,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'declined',
             {
@@ -778,7 +783,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'submitted',
             {
@@ -789,7 +794,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'verified',
             {
@@ -800,7 +805,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'rejected',
             {
@@ -811,7 +816,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             }
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'error',
             {
@@ -848,56 +853,56 @@ class TestProctoringRendering(ModuleStoreTestCase):
 
     @ddt.data(
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             None,
             'Try a proctored exam',
             True
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'submitted',
             'You have submitted this practice proctored exam',
             False
         ),
         (
-            'honor',
+            CourseMode.DEFAULT_MODE_SLUG,
             True,
             'error',
             'There was a problem with your practice proctoring session',
             True
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             None,
             'This exam is proctored',
             False
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'submitted',
             'You have submitted this proctored exam for review',
             True
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'verified',
             'Your proctoring session was reviewed and passed all requirements',
             False
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'rejected',
             'Your proctoring session was reviewed and did not pass requirements',
             True
         ),
         (
-            'verified',
+            CourseMode.VERIFIED,
             False,
             'error',
             'There was a problem with your proctoring session',
@@ -963,7 +968,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         sequence = self.modulestore.get_item(usage_key)
 
         sequence.is_time_limited = True
-        sequence.is_proctored_enabled = True
+        sequence.is_proctored_exam = True
         sequence.is_practice_exam = is_practice_exam
 
         self.modulestore.update_item(sequence, self.user.id)
@@ -1475,7 +1480,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         super(TestAnonymousStudentId, self).setUp(create_user=False)
         self.user = UserFactory()
-        self.course_key = self.create_toy_course()
+        self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))
@@ -1762,17 +1767,6 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertEqual(module.scope_ids.user_id, user2.id)
         self.assertEqual(module.descriptor.scope_ids.user_id, user2.id)
 
-    @patch('courseware.module_render.make_psychometrics_data_update_handler')
-    @patch.dict(settings.FEATURES, {'ENABLE_PSYCHOMETRICS': True})
-    def test_psychometrics_anonymous(self, psycho_handler):
-        """
-        Make sure that noauth modules with anonymous users don't have
-        the psychometrics callback bound.
-        """
-        module = self.get_module_for_user(self.anon_user)
-        module.system.rebind_noauth_module_to_user(module, self.anon_user)
-        self.assertFalse(psycho_handler.called)
-
 
 @attr('shard_1')
 @ddt.ddt
@@ -1868,8 +1862,9 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
             course=self.course
         )
 
-        self.assertFalse(getattr(runtime, u'user_is_beta_tester'))
-        self.assertEqual(getattr(runtime, u'days_early_for_beta'), 5)
+        # pylint: disable=no-member
+        self.assertFalse(runtime.user_is_beta_tester)
+        self.assertEqual(runtime.days_early_for_beta, 5)
 
 
 class PureXBlockWithChildren(PureXBlock):
@@ -2055,7 +2050,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     """
     Tests that verify disabled XBlock types are not loaded.
     """
-    # pylint: disable=attribute-defined-outside-init, no-member
+    # pylint: disable=no-member
     def setUp(self):
         super(TestDisabledXBlockTypes, self).setUp()
 

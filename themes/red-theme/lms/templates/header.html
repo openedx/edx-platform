@@ -43,7 +43,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
-            <img src="${static.url("images/logo.png")}" alt="${platform_name()}"/>
+            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}"/>
         </%block>
       </a>
     </h1>

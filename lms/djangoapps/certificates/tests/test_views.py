@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import UserFactory
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -26,21 +26,12 @@ from certificates.models import (
     ExampleCertificateSet,
     ExampleCertificate,
     GeneratedCertificate,
-    BadgeAssertion,
-    CertificateStatuses,
     CertificateHtmlViewConfiguration,
-    CertificateSocialNetworks,
-    CertificateTemplate,
 )
 
 from certificates.tests.factories import (
-    CertificateHtmlViewConfigurationFactory,
-    LinkedInAddToProfileConfigurationFactory,
     BadgeAssertionFactory,
 )
-from util import organizations_helpers as organizations_api
-from django.test.client import RequestFactory
-import urllib
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -196,16 +187,6 @@ class UpdateExampleCertificateViewTest(TestCase):
         self.assertEqual(content['return_code'], 0)
 
 
-def fakemicrosite(name, default=None):
-    """
-    This is a test mocking function to return a microsite configuration
-    """
-    if name == 'microsite_config_key':
-        return 'test_microsite'
-    else:
-        return default
-
-
 @attr('shard_1')
 class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
     """
@@ -229,12 +210,11 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.cert = GeneratedCertificate.objects.create(
             user=self.user,
             course_id=self.course_id,
-            verify_uuid=uuid4(),
             download_uuid=uuid4(),
             grade="0.95",
             key='the_key',
             distinction=True,
-            status='generated',
+            status='downloadable',
             mode='honor',
             name=self.user.profile.name,
         )
@@ -279,7 +259,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-    @patch("microsite_configuration.microsite.get_value", fakemicrosite)
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_microsite(self):
         test_configuration_string = """{
@@ -294,18 +273,20 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 "logo_src": "/static/certificates/images/logo-edx.svg",
                 "logo_url": "http://www.edx.org"
             },
-            "test_microsite": {
-                "accomplishment_class_append": "accomplishment-certificate",
-                "platform_name": "platform_microsite",
-                "company_about_url": "http://www.microsite.org/about-us",
-                "company_privacy_url": "http://www.microsite.org/edx-privacy-policy",
-                "company_tos_url": "http://www.microsite.org/microsite-terms-service",
-                "company_verified_certificate_url": "http://www.microsite.org/verified-certificate",
-                "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
-                "logo_src": "/static/certificates/images/logo-microsite.svg",
-                "logo_url": "http://www.microsite.org",
-                "company_about_description": "This is special microsite aware company_about_description content",
-                "company_about_title": "Microsite title"
+            "microsites": {
+                "testmicrosite": {
+                    "accomplishment_class_append": "accomplishment-certificate",
+                    "platform_name": "platform_microsite",
+                    "company_about_url": "http://www.microsite.org/about-us",
+                    "company_privacy_url": "http://www.microsite.org/edx-privacy-policy",
+                    "company_tos_url": "http://www.microsite.org/microsite-terms-service",
+                    "company_verified_certificate_url": "http://www.microsite.org/verified-certificate",
+                    "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
+                    "logo_src": "/static/certificates/images/logo-microsite.svg",
+                    "logo_url": "http://www.microsite.org",
+                    "company_about_description": "This is special microsite aware company_about_description content",
+                    "company_about_title": "Microsite title"
+                }
             },
             "honor": {
                 "certificate_type": "Honor Code"
@@ -319,13 +300,12 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
             course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
-        response = self.client.get(test_url)
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('platform_microsite', response.content)
         self.assertIn('http://www.microsite.org', response.content)
         self.assertIn('This is special microsite aware company_about_description content', response.content)
         self.assertIn('Microsite title', response.content)
 
-    @patch("microsite_configuration.microsite.get_value", fakemicrosite)
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_microsite_configuration_missing(self):
         test_configuration_string = """{
@@ -352,7 +332,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
             course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
-        response = self.client.get(test_url)
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('edX', response.content)
         self.assertNotIn('platform_microsite', response.content)
         self.assertNotIn('http://www.microsite.org', response.content)

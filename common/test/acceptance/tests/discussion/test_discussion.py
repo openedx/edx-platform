@@ -6,7 +6,6 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
-from flaky import flaky
 
 from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
@@ -218,7 +217,6 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
-    @flaky  # TODO fix this, see TNL-2419
     def test_mathjax_rendering(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
 
@@ -233,8 +231,8 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         thread_fixture.push()
         self.setup_thread_page(thread_id)
         self.assertTrue(self.thread_page.is_discussion_body_visible())
-        self.assertTrue(self.thread_page.is_mathjax_preview_available())
-        self.assertTrue(self.thread_page.is_mathjax_rendered())
+        self.thread_page.verify_mathjax_preview_available()
+        self.thread_page.verify_mathjax_rendered()
 
     def test_markdown_reference_link(self):
         """
@@ -318,7 +316,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
 
     def test_page_scroll_on_thread_change_view(self):
         """
-        Check switching between threads changes the page to scroll to bottom
+        Check switching between threads changes the page focus
         """
         # verify threads are rendered on the page
         self.assertTrue(
@@ -329,8 +327,8 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
         self.assertTrue(self.thread_page_2.is_browser_on_page())
 
-        # Verify that window is on top of page.
-        self.thread_page_2.check_window_is_on_top()
+        # Verify that the focus is changed
+        self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
 
 @attr('shard_2')

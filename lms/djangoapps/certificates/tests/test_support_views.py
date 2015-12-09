@@ -5,8 +5,10 @@ Tests for certificate app views used by the support team.
 import json
 
 import ddt
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import UserFactory
@@ -15,6 +17,9 @@ from student.roles import GlobalStaff, SupportStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from certificates.models import GeneratedCertificate, CertificateStatuses
+
+FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
+FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 
 class CertificateSupportTestCase(TestCase):
@@ -132,6 +137,27 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.assertEqual(retrieved_cert["grade"], unicode(self.CERT_GRADE))
         self.assertEqual(retrieved_cert["status"], self.CERT_STATUS)
         self.assertEqual(retrieved_cert["type"], self.CERT_MODE)
+        self.assertEqual(retrieved_cert["download_url"], self.CERT_DOWNLOAD_URL)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_download_link(self):
+        self.cert.download_url = ''
+        self.cert.save()
+
+        response = self._search(self.STUDENT_USERNAME)
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+
+        self.assertEqual(len(results), 1)
+        retrieved_cert = results[0]
+
+        self.assertEqual(
+            retrieved_cert["download_url"],
+            reverse(
+                'certificates:html_view',
+                kwargs={"user_id": self.student.id, "course_id": self.CERT_COURSE_KEY}  # pylint: disable=no-member
+            )
+        )
 
     def _search(self, query):
         """Execute a search and return the response. """

@@ -681,6 +681,16 @@ class MiscCourseTests(ContentStoreTestCase):
         for expected in expected_types:
             self.assertIn(expected, resp.content)
 
+    @ddt.data("<script>alert(1)</script>", "alert('hi')", "</script><script>alert(1)</script>")
+    def test_container_handler_xss_prevent(self, malicious_code):
+        """
+        Test that XSS attack is prevented
+        """
+        resp = self.client.get_html(get_url('container_handler', self.vert_loc) + '?action=' + malicious_code)
+        self.assertEqual(resp.status_code, 200)
+        # Test that malicious code does not appear in html
+        self.assertNotIn(malicious_code, resp.content)
+
     @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page

@@ -190,31 +190,23 @@ class ThreadSerializer(_ContentSerializer):
     pinned = serializers.SerializerMethodField(read_only=True)
     closed = serializers.BooleanField(read_only=True)
     following = serializers.SerializerMethodField()
-    comment_count = serializers.IntegerField(source="comments_count", read_only=True)
-    unread_comment_count = serializers.IntegerField(source="unread_comments_count", read_only=True)
+    comment_count = serializers.SerializerMethodField(read_only=True)
+    unread_comment_count = serializers.SerializerMethodField(read_only=True)
     comment_list_url = serializers.SerializerMethodField()
     endorsed_comment_list_url = serializers.SerializerMethodField()
     non_endorsed_comment_list_url = serializers.SerializerMethodField()
-    read = serializers.BooleanField(read_only=True)
+    read = serializers.BooleanField(required=False)
     has_endorsed = serializers.BooleanField(read_only=True, source="endorsed")
-    response_count = serializers.IntegerField(source="resp_total", read_only=True)
+    response_count = serializers.IntegerField(source="resp_total", read_only=True, required=False)
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
-    # TODO: https://openedx.atlassian.net/browse/MA-1359
     def __init__(self, *args, **kwargs):
-        remove_fields = kwargs.pop('remove_fields', None)
         super(ThreadSerializer, self).__init__(*args, **kwargs)
         # Compensate for the fact that some threads in the comments service do
         # not have the pinned field set
         if self.instance and self.instance.get("pinned") is None:
             self.instance["pinned"] = False
-        if self.instance and self.instance.get("resp_total") is None:
-            self.instance["resp_total"] = None
-        if remove_fields:
-            # for multiple fields in a list
-            for field_name in remove_fields:
-                self.fields.pop(field_name)
 
     def get_pinned(self, obj):
         """
@@ -260,6 +252,18 @@ class ThreadSerializer(_ContentSerializer):
         """Returns the URL to retrieve the thread's non-endorsed comments."""
         return self.get_comment_list_url(obj, endorsed=False)
 
+    def get_comment_count(self, obj):
+        """Increments comment count to include post and returns total count of
+        contributions (i.e. post + responses + comments) for the thread"""
+        return obj["comments_count"] + 1
+
+    def get_unread_comment_count(self, obj):
+        """Increments comment count to include post if thread is unread and returns
+        total count of unread contributions (i.e. post + responses + comments) for the thread"""
+        if not obj["read"]:
+            return obj["unread_comments_count"] + 1
+        return obj["unread_comments_count"]
+
     def create(self, validated_data):
         thread = Thread(user_id=self.context["cc_requester"]["id"], **validated_data)
         thread.save()
@@ -268,7 +272,7 @@ class ThreadSerializer(_ContentSerializer):
     def update(self, instance, validated_data):
         for key, val in validated_data.items():
             instance[key] = val
-        instance.save()
+        instance.save(params={"requested_user_id": self.context["cc_requester"]["id"]})
         return instance
 
 
@@ -286,9 +290,18 @@ class CommentSerializer(_ContentSerializer):
     endorsed_by = serializers.SerializerMethodField()
     endorsed_by_label = serializers.SerializerMethodField()
     endorsed_at = serializers.SerializerMethodField()
-    children = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
+
+    def __init__(self, *args, **kwargs):
+        remove_fields = kwargs.pop('remove_fields', None)
+        super(CommentSerializer, self).__init__(*args, **kwargs)
+
+        if remove_fields:
+            # for multiple fields in a list
+            for field_name in remove_fields:
+                self.fields.pop(field_name)
 
     def get_endorsed_by(self, obj):
         """

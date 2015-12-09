@@ -2,10 +2,13 @@
 
 # For Harvard courses:
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
--e git+https://github.com/open-craft/problem-builder.git@859df4155c0031b5a70e7f7e9744b67b3ed331d7#egg=xblock-problem-builder
+-e git+https://github.com/open-craft/problem-builder.git@90b2ecd8e948f34162e558b22f60e90287385f32#egg=xblock-problem-builder
 
 # Oppia XBlock
--e git+https://github.com/oppia/xblock.git@cd5479ee1138abfa278857d0113a45c2d05a983f#egg=oppia-xblock
+-e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
+
+# Microsoft's Office Mix XBlock:
+-e git+https://github.com/OfficeDev/xblock-officemix.git@3f876b5f0267b017812620239533a29c7d562d24#egg=officemix
 
 # This repository contains schoolyourself-xblock, which is used in
 # edX's "AlgebraX" and "GeometryX" courses.

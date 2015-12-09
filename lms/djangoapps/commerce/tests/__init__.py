@@ -11,8 +11,8 @@ import httpretty
 import jwt
 import mock
 
-from ecommerce_api_client import auth
-from commerce import ecommerce_api_client
+from edx_rest_api_client import auth
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from student.tests.factories import UserFactory
 
 JSON = 'application/json'
@@ -29,14 +29,14 @@ TEST_PAYMENT_DATA = {
 
 
 @override_settings(ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
-class EcommerceApiClientTest(TestCase):
+class EdxRestApiClientTest(TestCase):
     """ Tests to ensure the client is initialized properly. """
 
     TEST_USER_EMAIL = 'test@example.com'
     TEST_CLIENT_ID = 'test-client-id'
 
     def setUp(self):
-        super(EcommerceApiClientTest, self).setUp()
+        super(EdxRestApiClientTest, self).setUp()
 
         self.user = UserFactory()
         self.user.email = self.TEST_USER_EMAIL
@@ -61,7 +61,7 @@ class EcommerceApiClientTest(TestCase):
 
         mock_tracker = mock.Mock()
         mock_tracker.resolve_context = mock.Mock(return_value={'client_id': self.TEST_CLIENT_ID, 'ip': '127.0.0.1'})
-        with mock.patch('commerce.tracker.get_tracker', return_value=mock_tracker):
+        with mock.patch('openedx.core.djangoapps.commerce.utils.tracker.get_tracker', return_value=mock_tracker):
             ecommerce_api_client(self.user).baskets(1).post()
 
         # make sure the request's JWT token payload included correct tracking context values.

@@ -56,7 +56,9 @@ class LTIModuleTest(LogicTest):
 
         self.user_id = self.xmodule.runtime.anonymous_student_id
         self.lti_id = self.xmodule.lti_id
-        self.unquoted_resource_link_id = u'{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(self.xmodule.runtime.hostname)
+        self.unquoted_resource_link_id = u'{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(
+            self.xmodule.runtime.hostname
+        )
 
         sourced_id = u':'.join(urllib.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
 
@@ -104,7 +106,10 @@ class LTIModuleTest(LogicTest):
             'action': action
         }
 
-    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
+    @patch(
+        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        return_value=('test_client_key', u'test_client_secret')
+    )
     def test_authorization_header_not_present(self, _get_key_secret):
         """
         Request has no Authorization header.
@@ -125,7 +130,10 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(expected_response, real_response)
 
-    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
+    @patch(
+        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        return_value=('test_client_key', u'test_client_secret')
+    )
     def test_authorization_header_empty(self, _get_key_secret):
         """
         Request Authorization header has no value.
@@ -350,7 +358,10 @@ class LTIModuleTest(LogicTest):
             self.xmodule.get_client_key_secret()
 
     @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=True))
-    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', Mock(return_value=('test_client_key', u'test_client_secret')))
+    @patch(
+        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        Mock(return_value=('test_client_key', u'test_client_secret'))
+    )
     def test_successful_verify_oauth_body_sign(self):
         """
         Test if OAuth signing was successful.
@@ -397,7 +408,7 @@ class LTIModuleTest(LogicTest):
             '<imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version>'
             '<imsx_messageIdentifier>edX_fix</imsx_messageIdentifier></imsx_POXRequestHeaderInfo>'
             '</imsx_POXHeader><imsx_POXBody><replaceResultRequest><resultRecord><sourcedGUID>'
-            '<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2:363979ef768ca171b50f9d1bfb322131</sourcedId>'
+            '<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2:363979ef768ca171b50f9d1bfb322131</sourcedId>'  # pylint: disable=line-too-long
             '</sourcedGUID><result><resultScore><language>en</language><textString>0.32</textString></resultScore>'
             '</result></resultRecord></replaceResultRequest></imsx_POXBody></imsx_POXEnvelopeRequest>'
         )
@@ -428,7 +439,10 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(self.defaults['action'], action)
 
     @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=False))
-    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', Mock(return_value=('test_client_key', u'test_client_secret')))
+    @patch(
+        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        Mock(return_value=('test_client_key', u'test_client_secret'))
+    )
     def test_failed_verify_oauth_body_sign(self):
         """
         Oauth signing verify fail.
@@ -445,7 +459,7 @@ class LTIModuleTest(LogicTest):
         LTI 1.1 will be used. Otherwise fake namespace will be added to XML.
         """
         mock_request = Mock()
-        mock_request.headers = {  # pylint: disable=no-space-before-operator
+        mock_request.headers = {
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': u'OAuth oauth_nonce="135685044251684026041377608307", \

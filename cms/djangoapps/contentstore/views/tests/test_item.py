@@ -1459,7 +1459,7 @@ class TestXBlockInfo(ItemTest):
         self.validate_course_xblock_info(json_response, course_outline=True)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 5, 5),
+        (ModuleStoreEnum.Type.split, 4, 4),
         (ModuleStoreEnum.Type.mongo, 5, 7),
     )
     @ddt.unpack
@@ -1642,7 +1642,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
-        self.assertEqual(xblock_info['course_graders'], '["Homework", "Lab", "Midterm Exam", "Final Exam"]')
+        self.assertEqual(xblock_info['course_graders'], ['Homework', 'Lab', 'Midterm Exam', 'Final Exam'])
         self.assertEqual(xblock_info['start'], '2030-01-01T00:00:00Z')
         self.assertEqual(xblock_info['graded'], False)
         self.assertEqual(xblock_info['due'], None)
@@ -1731,7 +1731,7 @@ class TestXBlockInfo(ItemTest):
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
     def test_proctored_exam_xblock_info(self):
         self.course.enable_proctored_exams = True
         self.course.save()
@@ -1749,7 +1749,7 @@ class TestXBlockInfo(ItemTest):
         sequential = ItemFactory.create(
             parent_location=self.chapter.location, category='sequential',
             display_name="Test Lesson 1", user_id=self.user.id,
-            is_proctored_enabled=True, is_time_limited=True,
+            is_proctored_exam=True, is_time_limited=True,
             default_time_limit_minutes=100
         )
         sequential = modulestore().get_item(sequential.location)
@@ -1759,7 +1759,7 @@ class TestXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS,
         )
         # exam proctoring should be enabled and time limited.
-        self.assertEqual(xblock_info['is_proctored_enabled'], True)
+        self.assertEqual(xblock_info['is_proctored_exam'], True)
         self.assertEqual(xblock_info['is_time_limited'], True)
         self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
 

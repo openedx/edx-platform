@@ -16,7 +16,7 @@ import edxmako
 from .core import comprehensive_theme_changes
 
 
-def with_comp_theme(theme_dir):
+def with_comprehensive_theme(theme_dir):
     """
     A decorator to run a test with a particular comprehensive theme.
 
@@ -34,7 +34,7 @@ def with_comp_theme(theme_dir):
     def _decorator(func):                       # pylint: disable=missing-docstring
         @wraps(func)
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
-            with override_settings(COMP_THEME_DIR=theme_dir, **changes['settings']):
+            with override_settings(COMPREHENSIVE_THEME_DIR=theme_dir, **changes['settings']):
                 with edxmako.save_lookups():
                     for template_dir in changes['mako_paths']:
                         edxmako.paths.add_lookup('main', template_dir, prepend=True)
@@ -60,8 +60,8 @@ def with_is_edx_domain(is_edx_domain):
     # decorators, which is confusing.
     def _decorator(func):                       # pylint: disable=missing-docstring
         if is_edx_domain:
-            # This applies @with_comp_theme to the func.
-            func = with_comp_theme(settings.REPO_ROOT / "themes" / "edx.org")(func)
+            # This applies @with_comprehensive_theme to the func.
+            func = with_comprehensive_theme(settings.REPO_ROOT / "themes" / "edx.org")(func)
 
         # This applies @patch.dict() to the func to set IS_EDX_DOMAIN.
         func = patch.dict('django.conf.settings.FEATURES', {"IS_EDX_DOMAIN": is_edx_domain})(func)

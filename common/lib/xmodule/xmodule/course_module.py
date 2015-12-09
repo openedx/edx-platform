@@ -28,7 +28,8 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
@@ -270,17 +271,12 @@ class CourseFields(object):
         scope=Scope.settings,
         deprecated=True  # Deprecated because someone would not edit this value within Studio.
     )
-    show_chat = Boolean(
-        display_name=_("Show Chat Widget"),
-        help=_("Enter true or false. When true, students can see the chat widget in the course."),
-        default=False,
-        scope=Scope.settings
-    )
     tabs = CourseTabList(help="List of tabs to enable in this course", scope=Scope.settings, default=[])
     end_of_course_survey_url = String(
         display_name=_("Course Survey URL"),
         help=_("Enter the URL for the end-of-course survey. If your course does not have a survey, enter null."),
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=True  # We wish to remove this entirely, TNL-3399
     )
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
@@ -391,10 +387,10 @@ class CourseFields(object):
         # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
         # his students.
         display_name=_("Enable CCX"),
-        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
-        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
-        # his students.
         help=_(
+            # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+            # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+            # his students.
             "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
             " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
         ),
@@ -421,6 +417,7 @@ class CourseFields(object):
     )
     has_children = True
     checklists = List(
+        help=_("Checklist to Follow When Developing a Course"),
         scope=Scope.settings,
         default=[
             {
@@ -791,7 +788,8 @@ class CourseFields(object):
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),
-        scope=Scope.settings
+        scope=Scope.settings,
+        default=""
     )
 
     max_student_enrollments_allowed = Integer(
@@ -911,7 +909,17 @@ class CourseFields(object):
     enable_proctored_exams = Boolean(
         display_name=_("Enable Proctored Exams"),
         help=_(
-            "Enter true or false. If this value is true, timed and proctored exams are enabled in your course."
+            "Enter true or false. If this value is true, proctored exams are enabled in your course. "
+            "Note that enabling proctored exams will also enable timed exams."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
+    enable_timed_exams = Boolean(
+        display_name=_("Enable Timed Exams"),
+        help=_(
+            "Enter true or false. If this value is true, timed exams are enabled in your course."
         ),
         default=False,
         scope=Scope.settings
@@ -925,6 +933,17 @@ class CourseFields(object):
         ),
         default=0.8,
         scope=Scope.settings,
+    )
+
+    self_paced = Boolean(
+        display_name=_("Self Paced"),
+        help=_(
+            "Set this to \"true\" to mark this course as self-paced. Self-paced courses do not have "
+            "due dates for assignments, and students can progress through the course at any rate before "
+            "the course ends."
+        ),
+        default=False,
+        scope=Scope.settings
     )
 
 
@@ -958,7 +977,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             # Then remove show_timezone so that if the user clears out the due_date_display_format,
             # they get the default date display.
             self.due_date_display_format = "DATE_TIME"
-            delattr(self, 'show_timezone')
+            del self.show_timezone
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
@@ -1572,3 +1591,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if p.scheme != scheme
         ]
         self.user_partitions = other_partitions + partitions  # pylint: disable=attribute-defined-outside-init
+
+    @property
+    def can_toggle_course_pacing(self):
+        """
+        Whether or not the course can be set to self-paced at this time.
+
+        Returns:
+          bool: False if the course has already started, True otherwise.
+        """
+        return datetime.now(UTC()) <= self.start

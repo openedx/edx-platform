@@ -1,3 +1,6 @@
+"""
+Programmatic integration point for User API Accounts sub-application
+"""
 from django.utils.translation import ugettext as _
 from django.db import transaction, IntegrityError
 import datetime
@@ -5,6 +8,8 @@ from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, validate_slug, ValidationError
+from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
+from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
 
 from student.models import User, UserProfile, Registration
 from student import views as student_views
@@ -67,7 +72,7 @@ def get_account_settings(request, username=None, configuration=None, view=None):
         username = requesting_user.username
 
     try:
-        existing_user = User.objects.get(username=username)
+        existing_user = User.objects.select_related('profile').get(username=username)
     except ObjectDoesNotExist:
         raise UserNotFound()
 
@@ -182,6 +187,13 @@ def update_account_settings(requesting_user, update, username=None):
         for serializer in user_serializer, legacy_profile_serializer:
             serializer.save()
 
+        # if any exception is raised for user preference (i.e. account_privacy), the entire transaction for user account
+        # patch is rolled back and the data is not saved
+        if 'account_privacy' in update:
+            update_user_preferences(
+                requesting_user, {'account_privacy': update["account_privacy"]}, existing_user
+            )
+
         if "language_proficiencies" in update:
             new_language_proficiencies = update["language_proficiencies"]
             emit_setting_changed_event(
@@ -206,6 +218,8 @@ def update_account_settings(requesting_user, update, username=None):
             existing_user_profile.set_meta(meta)
             existing_user_profile.save()
 
+    except PreferenceValidationError as err:
+        raise AccountValidationError(err.preference_errors)
     except Exception as err:
         raise AccountUpdateError(
             u"Error thrown when saving account updates: '{}'".format(err.message)
@@ -236,7 +250,7 @@ def _get_user_and_profile(username):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-@transaction.commit_on_success
+@transaction.atomic
 def create_account(username, password, email):
     """Create a new user account.
 

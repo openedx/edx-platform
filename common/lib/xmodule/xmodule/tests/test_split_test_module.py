@@ -68,7 +68,7 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
             parent=sequence,
             attribs={
                 'user_partition_id': '0',
-                'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/split_test_cond0", "1": "i4x://edX/xml_test_course/html/split_test_cond1"}'
+                'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/split_test_cond0", "1": "i4x://edX/xml_test_course/html/split_test_cond1"}'  # pylint: disable=line-too-long
             }
         )
         xml.HtmlFactory(parent=split_test, url_name='split_test_cond0', text='HTML FOR GROUP 0')
@@ -135,7 +135,10 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
-        self.assertEquals(self.split_test_module.child_descriptor.url_name, self.split_test_module.child_descriptor.url_name)
+        self.assertEquals(
+            self.split_test_module.child_descriptor.url_name,
+            self.split_test_module.child_descriptor.url_name
+        )
 
     # Patch the definition_to_xml for the html children.
     @patch('xmodule.html_module.HtmlDescriptor.definition_to_xml')

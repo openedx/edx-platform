@@ -13,7 +13,7 @@ class CreditCourseAdmin(admin.ModelAdmin):
     list_filter = ('enabled',)
     search_fields = ('course_key',)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CreditCourse
 
 
@@ -23,7 +23,7 @@ class CreditProviderAdmin(admin.ModelAdmin):
     list_filter = ('active',)
     search_fields = ('provider_id', 'display_name')
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CreditProvider
 
 
@@ -32,7 +32,7 @@ class CreditEligibilityAdmin(admin.ModelAdmin):
     list_display = ('course', 'username', 'deadline')
     search_fields = ('username', 'course__course_key')
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CreditEligibility
 
 
@@ -43,7 +43,7 @@ class CreditRequestAdmin(admin.ModelAdmin):
     readonly_fields = ('uuid',)
     search_fields = ('uuid', 'username', 'course__course_key', 'provider__provider_id')
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CreditRequest
 
 

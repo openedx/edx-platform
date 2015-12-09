@@ -93,11 +93,11 @@ class CapaModule(CapaMixin, XModule):
             result = handlers[dispatch](data)
 
         except NotFoundError as err:
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             raise ProcessingError(not_found_error_message), None, traceback_obj
 
         except Exception as err:
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             raise ProcessingError(generic_error_message), None, traceback_obj
 
         after = self.get_progress()
@@ -230,9 +230,11 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         Returns whether the given view has support for the given functionality.
         """
         if functionality == "multi_device":
-            return self.lcp.has_multi_device_support
-        else:
-            return False
+            return all(
+                responsetypes.registry.get_class_for_tag(tag).multi_device_support
+                for tag in self.problem_types
+            )
+        return False
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

@@ -14,11 +14,6 @@ import os
 from path import Path as path
 from tempfile import mkdtemp
 
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
-
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
@@ -128,11 +123,14 @@ FEATURES['ENABLE_TEAMS'] = True
 # Enable custom content licensing
 FEATURES['LICENSING'] = True
 
+# Use the auto_auth workflow for creating users and logging them in
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
 
-FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080

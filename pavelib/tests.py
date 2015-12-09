@@ -11,7 +11,7 @@ from optparse import make_option
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable=invalid-name
+    colorize = lambda color, text: text
 
 __test__ = False  # do not collect
 
@@ -194,8 +194,6 @@ def coverage(options):
     """
     Build the html, xml, and diff coverage reports
     """
-    compare_branch = getattr(options, 'compare_branch', 'origin/master')
-
     report_dir = Env.REPORT_DIR
     rcfile = Env.PYTHON_COVERAGERC
 
@@ -262,4 +260,4 @@ def diff_coverage(options):
             )
         )
 
-        print("\n")
+        print "\n"

@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 import json
 import logging
 from provider.utils import long_token
+from provider.oauth2.models import Client
 from social.backends.base import BaseAuth
 from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
@@ -59,7 +60,7 @@ class AuthNotConfigured(SocialAuthBaseException):
         self.provider_name = provider_name
 
     def __str__(self):
-        return _('Authentication with {} is currently unavailable.').format(  # pylint: disable=no-member
+        return _('Authentication with {} is currently unavailable.').format(
             self.provider_name
         )
 
@@ -104,7 +105,8 @@ class ProviderConfig(ConfigurationModel):
 
     # "enabled" field is inherited from ConfigurationModel
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         abstract = True
 
     @property
@@ -135,6 +137,14 @@ class ProviderConfig(ConfigurationModel):
         # This is generally the same thing as the UID, expect when one backend is used for multiple providers
         assert self.match_social_auth(social_auth)
         return social_auth.uid
+
+    def get_social_auth_uid(self, remote_id):
+        """
+        Return the uid in social auth.
+
+        This is default implementation. Subclass may override with a different one.
+        """
+        return remote_id
 
     @classmethod
     def get_register_form_data(cls, pipeline_kwargs):
@@ -203,7 +213,8 @@ class OAuth2ProviderConfig(ProviderConfig):
     )
     other_settings = models.TextField(blank=True, help_text="Optional JSON object with advanced settings, if any.")
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "Provider Configuration (OAuth)"
         verbose_name_plural = verbose_name
 
@@ -282,7 +293,8 @@ class SAMLProviderConfig(ProviderConfig):
         super(SAMLProviderConfig, self).clean()
         self.other_settings = clean_json(self.other_settings, dict)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "Provider Configuration (SAML IdP)"
         verbose_name_plural = "Provider Configuration (SAML IdPs)"
 
@@ -304,6 +316,10 @@ class SAMLProviderConfig(ProviderConfig):
         assert self.match_social_auth(social_auth)
         # Remove the prefix from the UID
         return social_auth.uid[len(self.idp_slug) + 1:]
+
+    def get_social_auth_uid(self, remote_id):
+        """ Get social auth uid from remote id by prepending idp_slug to the remote id """
+        return '{}:{}'.format(self.idp_slug, remote_id)
 
     def get_config(self):
         """
@@ -373,7 +389,8 @@ class SAMLConfiguration(ConfigurationModel):
         ),
     )
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "SAML Configuration"
         verbose_name_plural = verbose_name
 
@@ -439,7 +456,8 @@ class SAMLProviderData(models.Model):
     sso_url = models.URLField(verbose_name="SSO URL")
     public_key = models.TextField()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "SAML Provider Data"
         verbose_name_plural = verbose_name
         ordering = ('-fetched_at', )
@@ -493,6 +511,16 @@ class LTIProviderConfig(ProviderConfig):
             'The name that the LTI Tool Consumer will use to identify itself'
         )
     )
+
+    lti_hostname = models.CharField(
+        default='localhost',
+        max_length=255,
+        help_text=(
+            'The domain that  will be acting as the LTI consumer.'
+        ),
+        db_index=True
+    )
+
     lti_consumer_secret = models.CharField(
         default=long_token,
         max_length=255,
@@ -542,6 +570,27 @@ class LTIProviderConfig(ProviderConfig):
             return self.lti_consumer_secret
         return getattr(settings, 'SOCIAL_AUTH_LTI_CONSUMER_SECRETS', {}).get(self.lti_consumer_key, '')
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
+
+
+class ProviderApiPermissions(models.Model):
+    """
+    This model links OAuth2 client with provider Id.
+
+    It gives permission for a OAuth2 client to access the information under certain IdPs.
+    """
+    client = models.ForeignKey(Client)
+    provider_id = models.CharField(
+        max_length=255,
+        help_text=(
+            'Uniquely identify a provider. This is different from backend_name.'
+        )
+    )
+
+    class Meta(object):
+        app_label = "third_party_auth"
+        verbose_name = "Provider API Permission"
+        verbose_name_plural = verbose_name + 's'

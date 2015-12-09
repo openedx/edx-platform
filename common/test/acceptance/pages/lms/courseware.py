@@ -118,6 +118,16 @@ class CoursewarePage(CoursePage):
         self.q(css=".xblock-student_view .timed-exam .start-timed-exam").first.click()
         self.wait_for_element_presence(".proctored_exam_status .exam-timer", "Timer bar")
 
+    def stop_timed_exam(self):
+        """
+        clicks the stop this timed exam link
+        """
+        self.q(css=".proctored_exam_status button.exam-button-turn-in-exam").first.click()
+        self.wait_for_element_absence(".proctored_exam_status .exam-button-turn-in-exam", "End Exam Button gone")
+        self.wait_for_element_presence("button[name='submit-proctored-exam']", "Submit Exam Button")
+        self.q(css="button[name='submit-proctored-exam']").first.click()
+        self.wait_for_element_absence(".proctored_exam_status .exam-timer", "Timer bar")
+
     def start_proctored_exam(self):
         """
         clicks the start this timed exam link
@@ -126,6 +136,33 @@ class CoursewarePage(CoursePage):
 
         # Wait for the unique exam code to appear.
         # elf.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+
+    @property
+    def entrance_exam_message_selector(self):
+        """
+        Return the entrance exam status message selector on the top of courseware page.
+        """
+        return self.q(css='#content .container section.course-content .sequential-status-message')
+
+    def has_entrance_exam_message(self):
+        """
+        Returns boolean indicating presence entrance exam status message container div.
+        """
+        return self.entrance_exam_message_selector.is_present()
+
+    def has_passed_message(self):
+        """
+        Returns boolean indicating presence of passed message.
+        """
+        return self.entrance_exam_message_selector.is_present() \
+            and "You have passed the entrance exam" in self.entrance_exam_message_selector.text[0]
+
+    @property
+    def chapter_count_in_navigation(self):
+        """
+        Returns count of chapters available on LHS navigation.
+        """
+        return len(self.q(css='nav.course-navigation a.chapter'))
 
     @property
     def is_timer_bar_present(self):

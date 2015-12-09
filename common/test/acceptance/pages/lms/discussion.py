@@ -28,7 +28,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         return self.q(css=self.thread_selector + " " + selector)
 
     def is_browser_on_page(self):
-        return self.q(css=self.thread_selector).present
+        return self.q(css=self.thread_selector).visible
 
     def _get_element_text(self, selector):
         """
@@ -116,11 +116,19 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def is_discussion_body_visible(self):
         return self._is_element_visible(".post-body")
 
-    def is_mathjax_preview_available(self):
-        return self.q(css=".MathJax_Preview").text[0] == ""
+    def verify_mathjax_preview_available(self):
+        """ Checks that MathJax Preview css class is present """
+        self.wait_for(
+            lambda: len(self.q(css=".MathJax_Preview").text) > 0 and self.q(css=".MathJax_Preview").text[0] == "",
+            description="MathJax Preview is rendered"
+        )
 
-    def is_mathjax_rendered(self):
-        return self._is_element_visible(".MathJax")
+    def verify_mathjax_rendered(self):
+        """ Checks that MathJax css class is present """
+        self.wait_for(
+            lambda: self._is_element_visible(".MathJax"),
+            description="MathJax Preview is rendered"
+        )
 
     def is_response_visible(self, comment_id):
         """Returns true if the response is viewable onscreen"""
@@ -346,12 +354,11 @@ class DiscussionTabSingleThreadPage(CoursePage):
         with self.thread_page._secondary_action_menu_open(".forum-thread-main-wrapper"):
             self._find_within(".forum-thread-main-wrapper .action-close").first.click()
 
-    @wait_for_js
-    def is_window_on_top(self):
+    def is_focused_on_element(self, selector):
         """
-        Check if window's scroll is at top
+        Check if the focus is on element
         """
-        return self.browser.execute_script("return $('html, body').offset().top") == 0
+        return self.browser.execute_script("return $('{}').is(':focus')".format(selector))
 
     def _thread_is_rendered_successfully(self, thread_id):
         return self.q(css=".discussion-article[data-id='{}']".format(thread_id)).visible
@@ -373,13 +380,13 @@ class DiscussionTabSingleThreadPage(CoursePage):
         """
         return len(self.q(css=".forum-nav-thread").results) == thread_count
 
-    def check_window_is_on_top(self):
+    def check_focus_is_set(self, selector):
         """
-        Check window is on top of the page
+        Check focus is set
         """
         EmptyPromise(
-            self.is_window_on_top,
-            "Window is on top"
+            lambda: self.is_focused_on_element(selector),
+            "Focus is on other element"
         ).fulfill()
 
 

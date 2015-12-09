@@ -143,7 +143,11 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        return self.value_for_text_field(field_id)
+        query = self.q(css='.u-field-{} .u-field-value'.format(field_id))
+        if not query.present:
+            return None
+
+        return query.text[0]
 
     def value_for_text_field(self, field_id, value=None, press_enter=True):
         """
@@ -175,7 +179,7 @@ class FieldsMixin(object):
 
         query = self.q(css=field_selector)
         query.fill(value)
-        query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
+        query.results[0].send_keys(u'\ue007')  # Press Enter
 
     def get_non_editable_mode_value(self, field_id):
         """

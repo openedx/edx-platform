@@ -39,13 +39,8 @@
     </div>
   </section>
   
-  {% compressed_js 'application' %}
-  {% compressed_js 'module-js' %}
-  
-  <script>
-    window.onload = add_schematic_handler(window.onload);
-  </script>
-  
+  {% javascript 'application' %}
+  {% javascript 'module-js' %}
   {% with mathjax_mode='wiki' %}
     {% include "mathjax_include.html" %}
   {% endwith %}

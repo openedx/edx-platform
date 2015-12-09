@@ -3,11 +3,9 @@ test utils
 """
 from nose.plugins.attrib import attr
 
-from ccx.tests.factories import (  # pylint: disable=import-error
-    CcxFactory,
-)
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
-from student.tests.factories import (  # pylint: disable=import-error
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import (
     AdminFactory,
 )
 from xmodule.modulestore.tests.django_utils import (
@@ -33,7 +31,7 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
 
     def call_fut(self, course_id):
         """call the function under test in this test case"""
-        from ccx.utils import get_ccx_from_ccx_locator
+        from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
         return get_ccx_from_ccx_locator(course_id)
 
     def test_non_ccx_locator(self):

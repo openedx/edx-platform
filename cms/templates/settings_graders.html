@@ -8,6 +8,8 @@
   import json
   from contentstore import utils
   from django.utils.translation import ugettext as _
+  from models.settings.encoder import CourseSettingsEncoder
+  from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="header_extras">
@@ -23,7 +25,7 @@
 </%block>
 <%block name="requirejs">
     require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
-        SettingsGradersFactory(_.extend(${course_details|n}, {is_credit_course: ${json.dumps(is_credit_course)}}), "${grading_url}");
+        SettingsGradersFactory(_.extend(${escape_json_dumps(course_details, cls=CourseSettingsEncoder) | n}, {is_credit_course: ${escape_json_dumps(is_credit_course) | n}}), "${grading_url}");
     });
 </%block>
 

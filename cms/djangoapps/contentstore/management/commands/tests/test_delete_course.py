@@ -7,8 +7,8 @@ import mock
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core.management import CommandError
-from contentstore.management.commands.delete_course import Command  # pylint: disable=import-error
-from contentstore.tests.utils import CourseTestCase  # pylint: disable=import-error
+from contentstore.management.commands.delete_course import Command
+from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 

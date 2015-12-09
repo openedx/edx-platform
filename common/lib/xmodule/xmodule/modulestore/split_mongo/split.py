@@ -70,6 +70,7 @@ from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
 from xmodule.modulestore import (
@@ -948,6 +949,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         This key may represent a course that doesn't exist in this modulestore.
         """
         return CourseLocator(org, course, run)
+
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        locator_cls = CCXBlockUsageLocator if isinstance(course_key, CCXLocator) else BlockUsageLocator
+        return locator_cls(course_key, 'course', 'course')
 
     def _get_structure(self, structure_id, depth, head_validation=True, **kwargs):
         """
@@ -1944,7 +1953,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             else:
                 return None
 
-    # pylint: disable=unused-argument
     def create_xblock(
             self, runtime, course_key, block_type, block_id=None, fields=None,
             definition_id=None, parent_xblock=None, **kwargs
@@ -2059,7 +2067,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             else:
                 block_key = BlockKey(xblock.scope_ids.block_type, block_id)
             new_usage_id = xblock.scope_ids.usage_id.replace(block_id=block_key.id)
-            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)  # pylint: disable=protected-access
+            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)
         else:
             is_new = False
             block_key = BlockKey(xblock.scope_ids.block_type, xblock.scope_ids.usage_id.block_id)

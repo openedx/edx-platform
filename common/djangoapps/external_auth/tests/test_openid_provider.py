@@ -260,27 +260,100 @@ class OpenIdProviderTest(TestCase):
         # clear the ratelimit cache so that we don't fail other logins
         cache.clear()
 
+    def _attempt_login_and_perform_final_response(self, user, profile_name):
+        """
+        Performs full procedure of a successful OpenID provider login for user,
+        all required data is taken form ``user`` attribute which is an instance
+        of ``User`` model. As a convenience this method will also set
+        ``profile.name`` for the user.
+        """
+        url = reverse('openid-provider-login')
+
+        # login to the client so that we can persist session information
+        user.profile.name = profile_name
+        user.profile.save()
+        # It is asssumed that user's password is test (default for UserFactory)
+        self.client.login(username=user.username, password='test')
+        # login once to get the right session information
+        self.attempt_login(200)
+        post_args = {
+            'email': user.email,
+            'password': 'test'
+        }
+
+        # call url again, this time with username and password
+        return self.client.post(url, post_args)
+
+    @skipUnless(
+        settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'), 'OpenID not enabled')
+    def test_provider_login_can_handle_unicode_email(self):
+        user = UserFactory(email=u"user.ąęł@gmail.com")
+        resp = self._attempt_login_and_perform_final_response(user, u"Jan ĄĘŁ")
+        location = resp['Location']
+        parsed_url = urlparse(location)
+        parsed_qs = parse_qs(parsed_url.query)
+        self.assertEquals(parsed_qs['openid.ax.type.ext1'][0], 'http://axschema.org/contact/email')
+        self.assertEquals(parsed_qs['openid.ax.type.ext0'][0], 'http://axschema.org/namePerson')
+        self.assertEquals(parsed_qs['openid.ax.value.ext0.1'][0],
+                          user.profile.name.encode('utf-8'))  # pylint: disable=no-member
+        self.assertEquals(parsed_qs['openid.ax.value.ext1.1'][0],
+                          user.email.encode('utf-8'))  # pylint: disable=no-member
+
+    @skipUnless(
+        settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'), 'OpenID not enabled')
+    def test_provider_login_can_handle_unicode_email_invalid_password(self):
+        user = UserFactory(email=u"user.ąęł@gmail.com")
+        url = reverse('openid-provider-login')
+
+        # login to the client so that we can persist session information
+        user.profile.name = u"Jan ĄĘ"
+        user.profile.save()
+        # It is asssumed that user's password is test (default for UserFactory)
+        self.client.login(username=user.username, password='test')
+        # login once to get the right session information
+        self.attempt_login(200)
+        # We trigger situation where user password is invalid at last phase
+        # of openid login
+        post_args = {
+            'email': user.email,
+            'password': 'invalid-password'
+        }
+
+        # call url again, this time with username and password
+        return self.client.post(url, post_args)
+
+    @skipUnless(
+        settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'), 'OpenID not enabled')
+    def test_provider_login_can_handle_unicode_email_inactive_account(self):
+        user = UserFactory(email=u"user.ąęł@gmail.com", username=u"ąęół")
+        url = reverse('openid-provider-login')
+
+        # login to the client so that we can persist session information
+        user.profile.name = u'Jan ĄĘ'
+        user.profile.save()  # pylint: disable=no-member
+        self.client.login(username=user.username, password='test')
+        # login once to get the right session information
+        self.attempt_login(200)
+        # We trigger situation where user is not active at final phase of
+        # OpenId login.
+        user.is_active = False
+        user.save()  # pylint: disable=no-member
+        post_args = {
+            'email': user.email,
+            'password': 'test'
+        }
+        # call url again, this time with username and password
+        self.client.post(url, post_args)
+
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_openid_final_response(self):
 
-        url = reverse('openid-provider-login')
         user = UserFactory()
 
         # login to the client so that we can persist session information
         for name in ['Robot 33', '☃']:
-            user.profile.name = name
-            user.profile.save()
-            self.client.login(username=user.username, password='test')
-            # login once to get the right session information
-            self.attempt_login(200)
-            post_args = {
-                'email': user.email,
-                'password': 'test',
-            }
-
-            # call url again, this time with username and password
-            resp = self.client.post(url, post_args)
+            resp = self._attempt_login_and_perform_final_response(user, name)
             # all information is embedded in the redirect url
             location = resp['Location']
             # parse the url

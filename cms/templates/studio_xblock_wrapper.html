@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext as _
 from contentstore.views.helpers import xblock_studio_url
 from contentstore.utils import is_visible_to_specific_content_groups
-import json
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 <%
 xblock_url = xblock_studio_url(xblock)
@@ -10,7 +10,7 @@ show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 collapsible_class = "is-collapsible" if xblock.has_children else ""
 label = xblock.display_name_with_default or xblock.scope_ids.block_type
-messages = json.dumps(xblock.validate().to_json())
+messages = xblock.validate().to_json()
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -24,7 +24,7 @@ messages = json.dumps(xblock.validate().to_json())
 <script>
     require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
         XBlockValidationFactory(
-            ${messages},
+            ${escape_json_dumps(messages) | n},
             $.parseJSON("${bool(xblock_url)}".toLowerCase()),  // xblock_url will be None or a string
             $.parseJSON("${bool(is_root)}".toLowerCase()),  // is_root will be None or a boolean
             $('div.xblock-validation-messages[data-locator="${xblock.location | h}"]')

@@ -1,3 +1,7 @@
+"""
+API library for Django REST Framework permissions-oriented workflows
+"""
+
 from django.conf import settings
 from rest_framework import permissions
 from django.http import Http404
@@ -6,6 +10,9 @@ from student.roles import CourseStaffRole
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
+    """
+    Django REST Framework permissions class used to manage API Key integrations
+    """
     def has_permission(self, request, view):
         """
         Check for permissions by matching the configured API key and header
@@ -73,3 +80,16 @@ class IsStaffOrReadOnly(permissions.BasePermission):
         return (request.user.is_staff or
                 CourseStaffRole(obj.course_id).has_user(request.user) or
                 request.method in permissions.SAFE_METHODS)
+
+
+class IsStaffOrOwner(permissions.BasePermission):
+    """
+    Permission that allows access to admin users or the owner of an object.
+    The owner is considered the User object represented by obj.user.
+    """
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_staff or obj.user == request.user
+
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_staff or (user.username == request.GET.get('username'))

@@ -6,6 +6,7 @@ import json
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.models import StudentModule
+from instructor.access import allow_access
 from instructor.services import InstructorService
 from instructor.tests.test_tools import msk_from_problem_urlname
 from nose.plugins.attrib import attr
@@ -114,3 +115,21 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             self.other_problem_urlname
         )
         self.assertIsNone(result)
+
+    def test_is_user_staff(self):
+        """
+        Test to assert that the usrr is staff or not
+        """
+        result = self.service.is_course_staff(
+            self.student,
+            unicode(self.course.id)
+        )
+        self.assertFalse(result)
+
+        # allow staff access to the student
+        allow_access(self.course, self.student, 'staff')
+        result = self.service.is_course_staff(
+            self.student,
+            unicode(self.course.id)
+        )
+        self.assertTrue(result)
