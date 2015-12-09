@@ -178,7 +178,6 @@ MOCK_MODULES = [
     'get_account_settings',
     'update_account_settings',
     'serializers',
-    'profile_images.images',
     'xmodule.course_module',
     'user_api.accounts.api',
     'user_api.accounts.serializers',
@@ -190,7 +189,9 @@ MOCK_MODULES = [
     'ccx_keys',
     'ccx_keys.locator',
     'user_api.preferences.api',
-    'rest_framework_oauth.authentication'
+    'rest_framework_oauth.authentication',
+    'certificates.api',
+    'courseware.date_summary',
 ]
 
 for mod_name in MOCK_MODULES:
