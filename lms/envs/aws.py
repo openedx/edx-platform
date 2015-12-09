@@ -597,6 +597,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     # dict with an arbitrary 'secret_key' and a 'url'.
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = AUTH_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
+    # This setting governs the use of X-Forwarded-Host and X-Forwarded-Port header values instead of
+    # django's request.get_host and request.META['SERVER_PORT']. If not set, defaults to True, so that
+    # X-Forwarded-* headers will be used.
     SOCIAL_AUTH_RESPECT_X_FORWARDED_HEADERS = ENV_TOKENS.get('SOCIAL_AUTH_RESPECT_X_FORWARDED_HEADERS')
 
 ##### OAUTH2 Provider ##############
