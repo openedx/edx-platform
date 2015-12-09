@@ -1,3 +1,4 @@
+# coding=UTF-8
 """
 Factories for use in tests of XBlocks.
 """
@@ -98,7 +99,7 @@ class CourseFactory(XModuleFactory):
     """
     org = Sequence('org.{}'.format)
     number = Sequence('course_{}'.format)
-    display_name = Sequence('Run {}'.format)
+    display_name = Sequence(u'Teꜱᴛ Run {}'.format)
 
     # pylint: disable=unused-argument
     @classmethod
