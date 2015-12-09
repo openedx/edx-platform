@@ -372,22 +372,30 @@ class EditingSectionsTest(CourseOutlineTest):
 
         # Verify fields
         self.assertTrue(modal.has_release_date())
+        self.assertTrue(modal.has_release_time())
         self.assertTrue(modal.has_due_date())
+        self.assertTrue(modal.has_due_time())
         self.assertTrue(modal.has_policy())
 
         # Verify initial values
         self.assertEqual(modal.release_date, u'1/1/1970')
+        self.assertEqual(modal.release_time, u'00:00')
         self.assertEqual(modal.due_date, u'')
+        self.assertEqual(modal.due_time, u'')
         self.assertEqual(modal.policy, u'Not Graded')
 
         # Set new values
         modal.release_date = '3/12/1972'
+        modal.release_time = '04:01'
         modal.due_date = '7/21/2014'
+        modal.due_time = '23:39'
         modal.policy = 'Lab'
 
         modal.save()
         self.assertIn(u'Released: Mar 12, 1972', subsection.release_date)
+        self.assertIn(u'04:01', subsection.release_date)
         self.assertIn(u'Due: Jul 21, 2014', subsection.due_date)
+        self.assertIn(u'23:39', subsection.due_date)
         self.assertIn(u'Lab', subsection.policy)
 
     def test_can_edit_section(self):
