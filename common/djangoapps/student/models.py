@@ -45,6 +45,7 @@ from simple_history.models import HistoricalRecords
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
+from appsembler_lms.models import Organization
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -276,6 +277,8 @@ class UserProfile(models.Model):
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True)
+
+    organization = models.ForeignKey(Organization, null=True)
 
     @property
     def has_profile_image(self):
