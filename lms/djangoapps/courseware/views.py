@@ -1531,7 +1531,7 @@ def financial_assistance_form(request):
         {'name': enrollment.course_overview.display_name, 'value': unicode(enrollment.course_id)}
         for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created')
         if CourseMode.objects.filter(
-            Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gt=datetime.now(UTC())),
+            Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
             course_id=enrollment.course_id,
             mode_slug=CourseMode.VERIFIED
         ).exists()
