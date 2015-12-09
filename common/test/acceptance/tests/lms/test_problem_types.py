@@ -11,6 +11,7 @@ from nose.plugins.attrib import attr
 from selenium.webdriver import ActionChains
 
 from capa.tests.response_xml_factory import (
+    AnnotationResponseXMLFactory,
     ChoiceResponseXMLFactory,
     ChoiceTextResponseXMLFactory,
     CodeResponseXMLFactory,
@@ -21,6 +22,7 @@ from capa.tests.response_xml_factory import (
     NumericalResponseXMLFactory,
     OptionResponseXMLFactory,
     StringResponseXMLFactory,
+    SymbolicResponseXMLFactory,
 )
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -223,6 +225,59 @@ class ProblemTypeTestMixin(object):
 
         # Run the accessibility audit.
         self.problem_page.a11y_audit.check_for_accessibility_errors()
+
+
+class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+    """
+    TestCase Class for Annotation Problem Type
+    """
+    problem_name = 'ANNOTATION TEST PROBLEM'
+    problem_type = 'annotationresponse'
+
+    factory = AnnotationResponseXMLFactory()
+
+    factory_kwargs = {
+        'title': 'Annotation Problem',
+        'text': 'The text being annotated',
+        'comment': 'What do you think the about this text?',
+        'comment_prompt': 'Type your answer below.',
+        'tag_prompt': 'Which of these items most applies to the text?',
+        'options': [
+            ('dog', 'correct'),
+            ('cat', 'incorrect'),
+            ('fish', 'partially-correct'),
+        ]
+    }
+
+    status_indicators = {
+        'correct': ['span.correct'],
+        'incorrect': ['span.incorrect'],
+        'partially-correct': ['span.partially-correct'],
+        'unanswered': ['span.unanswered'],
+    }
+
+    def setUp(self, *args, **kwargs):
+        """
+        Additional setup for AnnotationProblemTypeTest
+        """
+        super(AnnotationProblemTypeTest, self).setUp(*args, **kwargs)
+        self.problem_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'label',  # TODO: AC-293
+            ]
+        })
+
+    def answer_problem(self, correct):
+        """
+        Answer annotation problem.
+        """
+        choice = 0 if correct else 1
+        answer = 'Student comment'
+
+        self.problem_page.q(css='div.problem textarea.comment').fill(answer)
+        self.problem_page.q(
+            css='div.problem span.tag'.format(choice=choice)
+        ).nth(choice).click()
 
 
 class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -764,3 +819,41 @@ class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         chain.move_by_offset(offset, offset)
         chain.click()
         chain.perform()
+
+
+class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+    """
+    TestCase Class for Symbolic Problem Type
+    """
+    problem_name = 'SYMBOLIC TEST PROBLEM'
+    problem_type = 'symbolicresponse'
+
+    factory = SymbolicResponseXMLFactory()
+
+    factory_kwargs = {
+        'expect': '2*x+3*y',
+    }
+
+    status_indicators = {
+        'correct': ['span div.correct'],
+        'incorrect': ['span div.incorrect'],
+        'unanswered': ['span div.unanswered'],
+    }
+
+    def setUp(self, *args, **kwargs):
+        """
+        Additional setup for SymbolicProblemTypeTest
+        """
+        super(SymbolicProblemTypeTest, self).setUp(*args, **kwargs)
+        self.problem_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'label',  # TODO: AC-294
+            ]
+        })
+
+    def answer_problem(self, correct):
+        """
+        Answer symbolic problem.
+        """
+        choice = "2*x+3*y" if correct else "3*a+4*b"
+        self.problem_page.fill_answer(choice)
