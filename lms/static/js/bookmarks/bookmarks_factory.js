@@ -5,7 +5,7 @@
         ],
         function(BookmarksListButton) {
             return function() {
-                return new BookmarksListButton()
+                return new BookmarksListButton();
             };
         }
     );

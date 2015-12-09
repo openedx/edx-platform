@@ -74,7 +74,7 @@ ${page_title_breadcrumbs(course_name())}
   <%static:js group='discussion'/>
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
-        var courseId = $('#courseware-search-results').data('courseId');
+        var courseId = $('.courseware-results').data('courseId');
         CourseSearchFactory(courseId);
     </%static:require_module>
   % endif
