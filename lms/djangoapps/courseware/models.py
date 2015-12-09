@@ -25,7 +25,6 @@ from model_utils.models import TimeStampedModel
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
-from openedx.core.djangoapps.call_stack_manager import CallStackManager, CallStackMixin
 from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
 log = logging.getLogger(__name__)
 
@@ -72,21 +71,10 @@ class ChunkingManager(models.Manager):
         return res
 
 
-class ChunkingCallStackManager(CallStackManager, ChunkingManager):
-    """
-    A derived class of ChunkingManager, and CallStackManager
-
-    Class is currently unused but remains as part of the CallStackManger work. To re-enable see comment in StudentModule
-    """
-    pass
-
-
-class StudentModule(CallStackMixin, models.Model):
+class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
     """
-    # Changed back to ChunkingManager from ChunkingCallStackManger. To re-enable CallStack Management change the line
-    # back to: objects = ChunkingCallStackManager() Ticket: PLAT-881
     objects = ChunkingManager()
     MODEL_TAGS = ['course_id', 'module_type']
 
@@ -161,11 +149,11 @@ class StudentModule(CallStackMixin, models.Model):
         return unicode(repr(self))
 
 
-class StudentModuleHistory(CallStackMixin, models.Model):
+class StudentModuleHistory(models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
     explode in size."""
-    objects = CallStackManager()
+    objects = ChunkingManager()
     HISTORY_SAVING_TYPES = {'problem'}
 
     class Meta(object):
@@ -196,6 +184,9 @@ class StudentModuleHistory(CallStackMixin, models.Model):
                                                  grade=instance.grade,
                                                  max_grade=instance.max_grade)
             history_entry.save()
+
+    def __unicode__(self):
+        return unicode(repr(self))
 
 
 class XBlockFieldBase(models.Model):
