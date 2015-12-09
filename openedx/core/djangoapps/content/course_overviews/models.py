@@ -457,10 +457,15 @@ class CourseOverview(TimeStampedModel):
         """
         # Note: If a newly created course is not returned in this QueryList,
         # make sure the "publish" signal was emitted when the course was
-        # created.  For tests using CourseFactory, use emit_signals=True.
+        # created. For tests using CourseFactory, use emit_signals=True.
         course_overviews = CourseOverview.objects.all()
+
         if org:
-            course_overviews = course_overviews.filter(org=org)
+            # In rare cases, courses belonging to the same org may be accidentally assigned
+            # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
+            # Case-insensitive exact matching allows us to deal with this kind of dirty data.
+            course_overviews = course_overviews.filter(org__iexact=org)
+
         return course_overviews
 
     @classmethod

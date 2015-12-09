@@ -1,14 +1,13 @@
 """
-Tests for Blocks Views
+Tests for Course API views.
 """
+from hashlib import md5
 
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
 from .mixins import CourseApiFactoryMixin, TEST_PASSWORD
-
 from ..views import CourseDetailView
 
 
@@ -77,6 +76,31 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     def test_as_honor_for_staff(self):
         self.setup_user(self.honor_user)
         self.verify_response(expected_status_code=403, params={'username': self.staff_user.username})
+
+    @SharedModuleStoreTestCase.modifies_courseware
+    def test_filter_by_org(self):
+        """Verify that CourseOverviews are filtered by the provided org key."""
+        self.setup_user(self.staff_user)
+
+        # Create a second course to be filtered out of queries.
+        alternate_course = self.create_course(
+            org=md5(self.course.org).hexdigest()
+        )
+
+        self.assertNotEqual(alternate_course.org, self.course.org)
+
+        # No filtering.
+        unfiltered_response = self.verify_response()
+        for org in [self.course.org, alternate_course.org]:
+            self.assertTrue(
+                any(course['org'] == org for course in unfiltered_response.data['results'])  # pylint: disable=no-member
+            )
+
+        # With filtering.
+        filtered_response = self.verify_response(params={'org': self.course.org})
+        self.assertTrue(
+            all(course['org'] == self.course.org for course in filtered_response.data['results'])  # pylint: disable=no-member
+        )
 
     def test_not_logged_in(self):
         self.client.logout()
