@@ -297,7 +297,10 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
             resp = self.client.get(url)
 
-            self.assertNotContains(resp, '/static/js/lms-proctoring.js')
+            # by default courses allow for timed exams so the proctoring
+            # JS will be included as that contains the timer bar
+            # that appears at the top of the LMS
+            self.assertContains(resp, '/static/js/lms-proctoring.js')
 
             # now set up a course which is proctored enabled
 

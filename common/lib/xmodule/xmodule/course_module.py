@@ -715,7 +715,7 @@ class CourseFields(object):
         help=_(
             "Enter true or false. If this value is true, timed exams are enabled in your course."
         ),
-        default=False,
+        default=True,
         scope=Scope.settings
     )
 
