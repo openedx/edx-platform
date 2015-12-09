@@ -1,11 +1,12 @@
 """
 Helper methods related to EdxNotes.
 """
-
 import json
 import logging
 from json import JSONEncoder
 from uuid import uuid4
+import urlparse
+from urllib import urlencode
 
 import requests
 from datetime import datetime
@@ -34,6 +35,8 @@ HIGHLIGHT_TAG = "span"
 HIGHLIGHT_CLASS = "note-highlight"
 # OAuth2 Client name for edxnotes
 CLIENT_NAME = "edx-notes"
+DEFAULT_PAGE = 1
+DEFAULT_PAGE_SIZE = 10
 
 
 class NoteJSONEncoder(JSONEncoder):
@@ -63,19 +66,32 @@ def get_token_url(course_id):
     })
 
 
-def send_request(user, course_id, path="", query_string=None):
+def send_request(user, course_id, page, page_size, path="", text=None):
     """
-    Sends a request with appropriate parameters and headers.
+    Sends a request to notes api with appropriate parameters and headers.
+
+    Arguments:
+        user: Current logged in user
+        course_id: Course id
+        page: requested or default page number
+        page_size: requested or default page size
+        path: `search` or `annotations`. This is used to calculate notes api endpoint.
+        text: text to search.
+
+    Returns:
+        Response received from notes api
     """
     url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
         "course_id": unicode(course_id).encode("utf-8"),
+        "page": page,
+        "page_size": page_size,
     }
 
-    if query_string:
+    if text:
         params.update({
-            "text": query_string,
+            "text": text,
             "highlight": True,
             "highlight_tag": HIGHLIGHT_TAG,
             "highlight_class": HIGHLIGHT_CLASS,
@@ -239,39 +255,89 @@ def get_index(usage_key, children):
     return children.index(usage_key)
 
 
-def search(user, course, query_string):
+def construct_pagination_urls(request, course_id, api_next_url, api_previous_url):
     """
-    Returns search results for the `query_string(str)`.
+    Construct next and previous urls for LMS. `api_next_url` and `api_previous_url`
+    are returned from notes api but we need to transform them according to LMS notes
+    views by removing and replacing extra information.
+
+    Arguments:
+        request: HTTP request object
+        course_id: course id
+        api_next_url: notes api next url
+        api_previous_url: notes api previous url
+
+    Returns:
+        next_url: lms notes next url
+        previous_url: lms notes previous url
     """
-    response = send_request(user, course.id, "search", query_string)
-    try:
-        content = json.loads(response.content)
-        collection = content["rows"]
-    except (ValueError, KeyError):
-        log.warning("invalid JSON: %s", response.content)
-        raise EdxNotesParseError(_("Server error. Please try again in a few minutes."))
+    def lms_url(url):
+        """
+        Create lms url from api url.
+        """
+        if url is None:
+            return None
 
-    content.update({
-        "rows": preprocess_collection(user, course, collection)
-    })
+        keys = ('page', 'page_size', 'text')
+        parsed = urlparse.urlparse(url)
+        query_params = urlparse.parse_qs(parsed.query)
 
-    return json.dumps(content, cls=NoteJSONEncoder)
+        encoded_query_params = urlencode({key: query_params.get(key)[0] for key in keys if key in query_params})
+        return "{}?{}".format(request.build_absolute_uri(base_url), encoded_query_params)
+
+    base_url = reverse("notes", kwargs={"course_id": course_id})
+    next_url = lms_url(api_next_url)
+    previous_url = lms_url(api_previous_url)
+
+    return next_url, previous_url
 
 
-def get_notes(user, course):
+def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, text=None):
     """
-    Returns all notes for the user.
+    Returns paginated list of notes for the user.
+
+    Arguments:
+        request: HTTP request object
+        course: Course descriptor
+        page: requested or default page number
+        page_size: requested or default page size
+        text: text to search. If None then return all results for the current logged in user.
+
+    Returns:
+        Paginated dictionary with these key:
+            start: start of the current page
+            current_page: current page number
+            next: url for next page
+            previous: url for previous page
+            count: total number of notes available for the sent query
+            num_pages: number of pages available
+            results: list with notes info dictionary. each item in this list will be a dict
     """
-    response = send_request(user, course.id, "annotations")
+    path = 'search' if text else 'annotations'
+    response = send_request(request.user, course.id, page, page_size, path, text)
+
     try:
         collection = json.loads(response.content)
     except ValueError:
-        return None
+        raise EdxNotesParseError(_("Invalid response received from notes api."))
 
-    if not collection:
-        return None
+    # Verify response dict structure
+    expected_keys = ['count', 'results', 'num_pages', 'start', 'next', 'previous', 'current_page']
+    keys = collection.keys()
+    if not keys or not all(key in expected_keys for key in keys):
+        raise EdxNotesParseError(_("Invalid response received from notes api."))
 
-    return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
+    filtered_results = preprocess_collection(request.user, course, collection['results'])
+    collection['results'] = filtered_results
+
+    collection['next'], collection['previous'] = construct_pagination_urls(
+        request,
+        course.id,
+        collection['next'],
+        collection['previous']
+    )
+
+    return json.dumps(collection, cls=NoteJSONEncoder)
 
 
 def get_endpoint(api_url, path=""):

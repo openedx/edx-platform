@@ -26,7 +26,7 @@ import json
 
         % if notes:
         <div class="wrapper-notes-search">
-          <form role="search" action="${search_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
+          <form role="search" action="${notes_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
             <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
             <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search notes for...')}" required>
             <button type="submit" class="search-notes-submit">
