@@ -40,8 +40,6 @@ def send_login_to_AMC(sender, instance, update_fields, **kwargs):
                 response = requests.post(url, data=payload)
                 if response.status_code == 200:
                     logger.info("User {} first login sent to AMC.".format(instance.email))
-                elif response.status_code == 404:
-                    logger.warning("User {} first login sent to AMC but not to Hubspot.".format(instance.email))
                 else:
                     logger.warning("User first login NOT received by AMC for user {}".format(instance.email))
 
