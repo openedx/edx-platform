@@ -1132,9 +1132,4 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
 
         # Limit the scope of the audit to the video player only.
         self.video.a11y_audit.config.set_scope(include=["div.video"])
-        self.video.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-223
-            ],
-        })
         self.video.a11y_audit.check_for_accessibility_errors()
