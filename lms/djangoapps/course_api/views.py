@@ -1,15 +1,12 @@
 """
 Course API Views
 """
-
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
-
 from .api import course_detail, list_courses
 from .serializers import CourseSerializer
 
@@ -127,6 +124,11 @@ class CourseListView(ListAPIView):
             The username of the specified user whose visible courses we
             want to see.  Defaults to the current user.
 
+        org (optional):
+            If specified, visible `CourseDescriptor` objects are filtered
+            such that only those belonging to the organization with the provided
+            org code (e.g., "HarvardX") are returned. Case-insensitive.
+
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
@@ -170,4 +172,6 @@ class CourseListView(ListAPIView):
         Return a list of courses visible to the user.
         """
         username = self.request.query_params.get('username', self.request.user.username)
-        return list_courses(self.request, username)
+        org = self.request.query_params.get('org')
+
+        return list_courses(self.request, username, org=org)
