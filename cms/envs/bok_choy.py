@@ -115,9 +115,8 @@ MOCK_SEARCH_BACKING_FILE = (
     TEST_ROOT / "index_file.dat"
 ).abspath()
 
-# Generate a random UUID so that different runs of acceptance tests don't break each other
-import uuid
-SECRET_KEY = uuid.uuid4().hex
+# this secret key should be the same as lms/envs/bok_choy.py's
+SECRET_KEY = "very_secret_bok_choy_key"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
