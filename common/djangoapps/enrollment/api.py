@@ -7,6 +7,8 @@ import importlib
 import logging
 from django.conf import settings
 from django.core.cache import cache
+from opaque_keys.edx.keys import CourseKey
+
 from course_modes.models import CourseMode
 from enrollment import errors
 
@@ -372,9 +374,8 @@ def _default_course_mode(course_id):
     Returns:
         str
     """
-    course_enrollment_info = _data_api().get_course_enrollment_info(course_id, include_expired=False)
-    course_modes = course_enrollment_info["course_modes"]
-    available_modes = [m['slug'] for m in course_modes]
+    course_modes = CourseMode.modes_for_course(CourseKey.from_string(course_id))
+    available_modes = [m.slug for m in course_modes]
 
     if CourseMode.DEFAULT_MODE_SLUG in available_modes:
         return CourseMode.DEFAULT_MODE_SLUG

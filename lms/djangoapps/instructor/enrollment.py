@@ -119,7 +119,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if CourseMode.is_white_label(course_id):
             course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         else:
-            course_mode = CourseMode.DEFAULT_MODE_SLUG
+            course_mode = None
 
         if previous_state.enrollment:
             course_mode = previous_state.mode

@@ -1,6 +1,8 @@
 """
 Tests for student enrollment.
 """
+from mock import patch, Mock
+
 import ddt
 from django.core.cache import cache
 from nose.tools import raises
@@ -67,12 +69,15 @@ class EnrollmentTest(TestCase):
     def test_enroll_no_mode_success(self, course_modes, expected_mode):
         # Add a fake course enrollment information to the fake data API
         fake_data_api.add_course(self.COURSE_ID, course_modes=course_modes)
-        # Enroll in the course and verify the URL we get sent to
-        result = api.add_enrollment(self.USERNAME, self.COURSE_ID)
-        self.assertIsNotNone(result)
-        self.assertEquals(result['student'], self.USERNAME)
-        self.assertEquals(result['course']['course_id'], self.COURSE_ID)
-        self.assertEquals(result['mode'], expected_mode)
+        with patch('enrollment.api.CourseMode.modes_for_course') as mock_modes_for_course:
+            mock_course_modes = [Mock(slug=mode) for mode in course_modes]
+            mock_modes_for_course.return_value = mock_course_modes
+            # Enroll in the course and verify the URL we get sent to
+            result = api.add_enrollment(self.USERNAME, self.COURSE_ID)
+            self.assertIsNotNone(result)
+            self.assertEquals(result['student'], self.USERNAME)
+            self.assertEquals(result['course']['course_id'], self.COURSE_ID)
+            self.assertEquals(result['mode'], expected_mode)
 
     @ddt.data(
         ['professional'],
