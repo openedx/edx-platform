@@ -373,6 +373,36 @@ class TestCreateAccountValidation(TestCase):
         params["email"] = "not_an_email_address"
         assert_email_error("A properly formatted e-mail is required")
 
+    @override_settings(
+        REGISTRATION_EMAIL_PATTERNS_ALLOWED=[
+            r'.*@edx.org',  # Naive regex omitting '^', '$' and '\.' should still work.
+            r'^.*@(.*\.)?example\.com$',
+            r'^(^\w+\.\w+)@school.tld$',
+        ]
+    )
+    @ddt.data(
+        ('bob@we-are.bad', False),
+        ('bob@edx.org.we-are.bad', False),
+        ('staff@edx.org', True),
+        ('student@example.com', True),
+        ('student@sub.example.com', True),
+        ('mr.teacher@school.tld', True),
+        ('student1234@school.tld', False),
+    )
+    @ddt.unpack
+    def test_email_pattern_requirements(self, email, expect_success):
+        """
+        Test the REGISTRATION_EMAIL_PATTERNS_ALLOWED setting, a feature which
+        can be used to only allow people register if their email matches a
+        against a whitelist of regexs.
+        """
+        params = dict(self.minimal_params)
+        params["email"] = email
+        if expect_success:
+            self.assert_success(params)
+        else:
+            self.assert_error(params, "email", "Unauthorized email address.")
+
     def test_password(self):
         params = dict(self.minimal_params)
 
