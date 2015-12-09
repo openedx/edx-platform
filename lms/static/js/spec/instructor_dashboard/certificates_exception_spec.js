@@ -98,7 +98,7 @@ define([
                     {
                         id: 1, user_id: 1, user_name: 'test1', user_email: 'test1@test.com',
                         course_id: 'edX/test/course', created: "Thursday, October 29, 2015",
-                        notes: 'test notes for test certificate exception'
+                        notes: 'test notes for test certificate exception', certificate_generated: ''
                     }
                 );
 
@@ -106,7 +106,7 @@ define([
                     {
                         id: 2, user_id: 2, user_name: 'test2', user_email: 'test2@test.com',
                         course_id: 'edX/test/course', created: "Thursday, October 29, 2015",
-                        notes: 'test notes for test certificate exception'
+                        notes: 'test notes for test certificate exception', certificate_generated: ''
                     }
                 );
             });
@@ -142,6 +142,7 @@ define([
                          user_email: "",
                          created: "",
                          notes: "test3 notes",
+                         certificate_generated : '',
                          new: true}
                         ]
                 };

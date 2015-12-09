@@ -673,7 +673,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, notes)
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
         # Verify that added exceptions are also synced with backend
         # Revisit Page
@@ -685,7 +684,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # validate certificate exception synced with server is visible in certificate exceptions list
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
     def test_instructor_can_remove_certificate_exception(self):
         """
@@ -701,13 +699,11 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, notes)
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
         # Remove Certificate Exception
         self.certificates_section.remove_first_certificate_exception()
         self.assertNotIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertNotIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertNotIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
         # Verify that added exceptions are also synced with backend
         # Revisit Page
@@ -719,7 +715,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # validate certificate exception synced with server is visible in certificate exceptions list
         self.assertNotIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertNotIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertNotIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
     def test_error_on_duplicate_certificate_exception(self):
         """
