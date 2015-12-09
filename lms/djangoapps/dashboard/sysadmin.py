@@ -38,7 +38,6 @@ from courseware.courses import get_course_by_id
 import dashboard.git_import as git_import
 from django_comment_client.management_utils import rename_user as rename_user_util
 from dashboard.git_import import GitImportError
-from dashboard.sysadmin_extensions import sysadmin_course_tabs
 from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
@@ -382,48 +381,6 @@ class Users(SysadminDashboardView):
         return render_to_response(self.template_name, context)
 
 
-class CourseTabs(SysadminDashboardView):
-    """
-    Handles rendering the view and processing requests for Edit Course Tabs
-    """
-
-    def get(self, request):
-        """
-        Displays the form for Edit Course Tabs
-        """
-
-        if not request.user.is_superuser:
-            raise Http404
-
-        context = {
-            'msg': self.msg,
-            'djangopid': os.getpid(),
-            'modeflag': {'course_tabs': 'active-section'},
-            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
-        }
-        return render_to_response(self.template_name, context)
-
-    def post(self, request):
-        """Handle requests to Edit Course Tabs"""
-
-        if not request.user.is_superuser:
-            raise Http404
-
-        action = request.POST.get('action', '')
-        track.views.server_track(request, action, {}, page='course_tabs_sysdashboard')
-
-        if action in ['get_current_tabs', 'delete_tab', 'insert_tab']:
-            self.msg = sysadmin_course_tabs.process_request(action, request)
-
-        context = {
-            'msg': self.msg,
-            'djangopid': os.getpid(),
-            'modeflag': {'course_tabs': 'active-section'},
-            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
-        }
-        return render_to_response(self.template_name, context)
-
-
 class Courses(SysadminDashboardView):
     """
     This manages adding/updating courses from git, deleting courses, and
@@ -637,7 +594,6 @@ class Courses(SysadminDashboardView):
                                  page='courses_sysdashboard')
 
         courses = {course.id: course for course in self.get_courses()}
-
         if action == 'add_course':
             gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
             branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
