@@ -692,6 +692,7 @@ def course_info(request, course_id):
             'course': course,
             'staff_access': staff_access,
             'masquerade': masquerade,
+            'masquerade_user': user,
             'studio_url': studio_url,
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,

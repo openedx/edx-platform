@@ -188,7 +188,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
 
     def test_get_course_info_section_render(self):
         # Test render works okay
-        course_info = get_course_info_section(self.request, self.course, 'handouts')
+        course_info = get_course_info_section(self.request, self.request.user, self.course, 'handouts')
         self.assertEqual(course_info, u"<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>")
 
         # Test when render raises an exception
@@ -196,7 +196,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
             mock_module_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
-            course_info = get_course_info_section(self.request, self.course, 'handouts')
+            course_info = get_course_info_section(self.request, self.request.user, self.course, 'handouts')
             self.assertIn("this module is temporarily unavailable", course_info)
 
     def test_get_course_about_section_render(self):
@@ -226,7 +226,7 @@ class XmlCoursesRenderTest(ModuleStoreTestCase):
         request = get_request_for_user(UserFactory.create())
 
         # Test render works okay. Note the href is different in XML courses.
-        course_info = get_course_info_section(request, course, 'handouts')
+        course_info = get_course_info_section(request, request.user, course, 'handouts')
         self.assertEqual(course_info, "<a href='/static/toy/handouts/sample_handout.txt'>Sample</a>")
 
         # Test when render raises an exception
@@ -234,7 +234,7 @@ class XmlCoursesRenderTest(ModuleStoreTestCase):
             mock_module_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
-            course_info = get_course_info_section(request, course, 'handouts')
+            course_info = get_course_info_section(request, request.user, course, 'handouts')
             self.assertIn("this module is temporarily unavailable", course_info)
 
 
