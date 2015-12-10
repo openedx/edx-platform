@@ -277,3 +277,18 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         with patch('django.http.HttpResponse.set_cookie') as mock_delete_cookie:
             SafeSessionMiddleware().process_response(self.request, self.client.response)
             self.assertTrue(mock_delete_cookie.called)
+
+    def test_error_from_mobile_app(self):
+        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = 'not-a-safe-cookie'
+        self.request.path = '/xblock/block-v1:org+course+run+type@html+block@block_id'
+
+        with self.assert_parse_error():
+            request_response = SafeSessionMiddleware().process_request(self.request)
+            self.assertEquals(request_response.status_code, 401)
+
+        self.assertTrue(self.request.need_to_delete_cookie)
+        self.cookies_from_request_to_response()
+
+        with patch('django.http.HttpResponse.set_cookie') as mock_delete_cookie:
+            SafeSessionMiddleware().process_response(self.request, self.client.response)
+            self.assertTrue(mock_delete_cookie.called)

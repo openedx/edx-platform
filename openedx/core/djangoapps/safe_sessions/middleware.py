@@ -56,11 +56,13 @@ the entire cookie and use it to impersonate the victim.
 
 """
 
+import re
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
+from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from hashlib import sha256
 from logging import getLogger
@@ -339,6 +341,17 @@ class SafeSessionMiddleware(SessionMiddleware):
         cookie and redirects the user to the login page.
         """
         _mark_cookie_for_deletion(request)
+
+        # TODO (MA-1825): This is a TEMPORARY HACK until we have a better way
+        # of detecting whether the request is coming from a mobile app. The
+        # mobile apps have custom handling of authentication failures. They
+        # should *not* be redirected to the website's login page.
+        if re.match(
+                r'^/xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
+                request.path,
+        ):
+            return HttpResponse(status=401)
+
         return redirect_to_login(request.path)
 
     @staticmethod
