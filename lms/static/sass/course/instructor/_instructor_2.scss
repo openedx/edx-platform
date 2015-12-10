@@ -2105,7 +2105,7 @@ input[name="subject"] {
 // --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#certificates {
 
-  %btn-blue {
+  .btn-blue {
     @extend %btn-primary-blue;
     padding: ($baseline/2.5) ($baseline/2);
     text-shadow: none;
@@ -2118,6 +2118,46 @@ input[name="subject"] {
         border-top-style: groove;
         color: $black;
       }
+  .certificates-wrapper{
+    .message{
+      @extend %exception-message;
+    }
+  }
+
+  p.under-heading {
+    margin: 12px 0 12px 0;
+    line-height: 23px;
+  }
+
+  hr.section-divider{
+    margin: 25px 0;
+    border-top: 7px solid #646464;
+  }
+
+  .certificate-generation-history{
+    table{
+      thead{
+        tr{
+          td.task-name{
+            width: 150px;
+          }
+          td.task-date{
+            width: 200px;
+          }
+        }
+      }
+
+      tbody{
+        tr{
+          td{
+            padding: 5px;
+            vertical-align: middle;
+            text-align: left;;
+          }
+        }
+      }
+    }
+  }
 
   #certificate-white-list-editor {
     .certificate-exception-inputs {
@@ -2133,10 +2173,6 @@ input[name="subject"] {
       }
       .message {
         @extend %exception-message;
-      }
-
-      .button-blue {
-        @extend %btn-blue;
       }
     }
   }
@@ -2155,16 +2191,15 @@ input[name="subject"] {
         text-align: left;
         color: $gray;
 
-        &.date, &.email {
-          width: 230px;
-        }
-
-        &.user-id {
-          width: 60px;
+        &.date{
+          width: 150px;
         }
 
         &.user-name {
-          width: 150px;
+          width: 120px;
+        }
+        &.user-email {
+          width: 200px;
         }
 
         &.action {
@@ -2211,10 +2246,6 @@ input[name="subject"] {
       }
     }
 
-    .button-blue {
-        @extend %btn-blue;
-    }
-
     .message {
         @extend %exception-message;
       }
@@ -2224,10 +2255,6 @@ input[name="subject"] {
     h3 {
       border-bottom: 1px groove black;
       display: inline-block;
-    }
-    p.under-heading {
-      margin: 12px 0 12px 0;
-      line-height: 23px;
     }
   }
 
@@ -2249,10 +2276,6 @@ input[name="subject"] {
       }
       .arrow {
         font-weight: bold;
-      }
-
-      .button-blue {
-        @extend %btn-blue;
       }
     }
   }

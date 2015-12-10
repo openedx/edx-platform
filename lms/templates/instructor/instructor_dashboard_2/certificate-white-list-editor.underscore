@@ -6,7 +6,7 @@
     <textarea class='notes-field' id="notes" rows="10" placeholder="Free text notes" aria-describedby='notes-field-tip'></textarea>
     </div>
     <div>
-        <button type="button" class="button-blue" id="add-exception" ><%= gettext("Add to Exception List") %> </button>
+        <button type="button" class="btn-blue" id="add-exception" ><%= gettext("Add to Exception List") %> </button>
     </div>
     <div class='message hidden'></div>
 </div>

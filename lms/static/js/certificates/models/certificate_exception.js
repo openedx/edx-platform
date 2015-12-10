@@ -21,6 +21,7 @@
                     user_name: '',
                     user_email: '',
                     created: '',
+                    certificate_generated: '',
                     notes: ''
                 },
 
