@@ -25,7 +25,7 @@ define([
 
             var EXPECTED_ERRORS = {
                 user_name_or_email_required: 'Student username/email field is required and can not be empty. ' +
-                'Kindly fill in username/email and then press "Add Exception" button.'
+                'Kindly fill in username/email and then press "Add to Exception List" button.'
             };
 
             beforeEach(function() {
@@ -338,7 +338,7 @@ define([
 
                 var error_messages = {
                     empty_user_name_email: 'Student username/email field is required and can not be empty. ' +
-                    'Kindly fill in username/email and then press "Add Exception" button.',
+                    'Kindly fill in username/email and then press "Add to Exception List" button.',
                     duplicate_user: "<p>" + (duplicate_user) + " already in exception list.</p>"
                 };
 

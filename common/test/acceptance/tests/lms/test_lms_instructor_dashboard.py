@@ -754,7 +754,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
 
         self.assertIn(
             'Student username/email field is required and can not be empty. '
-            'Kindly fill in username/email and then press "Add Exception" button.',
+            'Kindly fill in username/email and then press "Add to Exception List" button.',
             self.certificates_section.message.text
         )
 
