@@ -1638,8 +1638,8 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         super(TestXmoduleRuntimeEvent, self).setUp()
         self.homework = self.add_graded_section_to_course('homework')
         self.problem = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
-        self.grade_dict = {'value': 0.18, 'max_value': 32, 'user_id': self.student_user.id}
-        self.delete_dict = {'value': None, 'max_value': None, 'user_id': self.student_user.id}
+        self.grade_dict = {'value': 0.18, 'max_value': 32}
+        self.delete_dict = {'value': None, 'max_value': None}
 
     def get_module_for_user(self, user):
         """Helper function to get useful module at self.location in self.course_id for user"""
