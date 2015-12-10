@@ -42,6 +42,7 @@ from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
+from instructor.access import allow_access
 from instructor.views.api import _split_input_list
 from instructor.views.gradebook_api import get_grade_book_page
 from instructor.views.tools import get_student_from_identifier
@@ -132,7 +133,10 @@ def dashboard(request, course, ccx=None):
     }
 
     if ccx:
-        ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)
+        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+        # At this point we are done with verification that current user is ccx coach.
+        assign_coach_role_to_ccx(ccx_locator, request.user, course.id)
+
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
             ccx, course, 'grading_policy', course.grading_policy)
@@ -147,6 +151,7 @@ def dashboard(request, course, ccx=None):
         context['grading_policy'] = json.dumps(grading_policy, indent=4)
         context['grading_policy_url'] = reverse(
             'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
+
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
@@ -208,7 +213,29 @@ def create_ccx(request, course, ccx=None):
         email_params=email_params,
     )
 
+    assign_coach_role_to_ccx(ccx_id, request.user, course.id)
+
     return redirect(url)
+
+
+def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
+    """
+    Check if user has ccx_coach role on master course then assign him coach role on ccx only
+    if role is not already assigned. Because of this coach can open dashboard from master course
+    as well as ccx.
+    :param ccx_locator: CCX key
+    :param user: User to whom we want to assign role.
+    :param master_course_id: Master course key
+    """
+    coach_role_on_master_course = CourseCcxCoachRole(master_course_id)
+    # check if user has coach role on master course
+    if coach_role_on_master_course.has_user(user):
+        # Check if user has coach role on ccx.
+        role = CourseCcxCoachRole(ccx_locator)
+        if not role.has_user(user):
+            # assign user role coach on ccx
+            with ccx_course(ccx_locator) as course:
+                allow_access(course, user, "ccx_coach", send_email=False)
 
 
 @ensure_csrf_cookie
