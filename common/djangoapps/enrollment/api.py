@@ -7,6 +7,8 @@ import importlib
 import logging
 from django.conf import settings
 from django.core.cache import cache
+from opaque_keys.edx.keys import CourseKey
+
 from course_modes.models import CourseMode
 from enrollment import errors
 
@@ -133,7 +135,7 @@ def get_enrollment(user_id, course_id):
     return _data_api().get_course_enrollment(user_id, course_id)
 
 
-def add_enrollment(user_id, course_id, mode=CourseMode.DEFAULT_MODE_SLUG, is_active=True):
+def add_enrollment(user_id, course_id, mode=None, is_active=True):
     """Enrolls a user in a course.
 
     Enrolls a user in a course. If the mode is not specified, this will default to `CourseMode.DEFAULT_MODE_SLUG`.
@@ -180,6 +182,8 @@ def add_enrollment(user_id, course_id, mode=CourseMode.DEFAULT_MODE_SLUG, is_act
             }
         }
     """
+    if mode is None:
+        mode = _default_course_mode(course_id)
     _validate_course_mode(course_id, mode, is_active=is_active)
     return _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
@@ -359,15 +363,35 @@ def get_enrollment_attributes(user_id, course_id):
     return _data_api().get_enrollment_attributes(user_id, course_id)
 
 
+def _default_course_mode(course_id):
+    """Return the default enrollment for a course.
+
+    Special case the default enrollment to return if nothing else is found.
+
+    Arguments:
+        course_id (str): The course to check against for available course modes.
+
+    Returns:
+        str
+    """
+    course_modes = CourseMode.modes_for_course(CourseKey.from_string(course_id))
+    available_modes = [m.slug for m in course_modes]
+
+    if CourseMode.DEFAULT_MODE_SLUG in available_modes:
+        return CourseMode.DEFAULT_MODE_SLUG
+    elif 'audit' in available_modes:
+        return 'audit'
+    elif 'honor' in available_modes:
+        return 'honor'
+
+    return CourseMode.DEFAULT_MODE_SLUG
+
+
 def _validate_course_mode(course_id, mode, is_active=None):
     """Checks to see if the specified course mode is valid for the course.
 
     If the requested course mode is not available for the course, raise an error with corresponding
     course enrollment information.
-
-    'honor' is special cased. If there are no course modes configured, and the specified mode is
-    'honor', return true, allowing the enrollment to be 'honor' even if the mode is not explicitly
-    set for the course.
 
     Arguments:
         course_id (str): The course to check against for available course modes.
