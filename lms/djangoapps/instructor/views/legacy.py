@@ -309,26 +309,6 @@ def instructor_dashboard(request, course_id):
                     msg2, __ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
 
-    #----------------------------------------
-    # enrollment
-
-    elif action == 'Enroll multiple students':
-
-        is_shib_course = uses_shib(course)
-        students = request.POST.get('multiple_students', '')
-        auto_enroll = bool(request.POST.get('auto_enroll'))
-        email_students = bool(request.POST.get('email_students'))
-        secure = request.is_secure()
-        ret = _do_enroll_students(course, course_key, students, secure=secure, auto_enroll=auto_enroll, email_students=email_students, is_shib_course=is_shib_course)
-        datatable = ret['datatable']
-
-    elif action == 'Unenroll multiple students':
-
-        students = request.POST.get('multiple_students', '')
-        email_students = bool(request.POST.get('email_students'))
-        ret = _do_unenroll_students(course_key, students, email_students=email_students)
-        datatable = ret['datatable']
-
     elif action == 'List sections available in remote gradebook':
 
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-sections')
