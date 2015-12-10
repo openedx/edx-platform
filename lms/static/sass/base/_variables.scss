@@ -519,8 +519,11 @@ $light-gray: rgb(221,221,221) !default;
 
 // used by descriptor css
 $lightGrey: rgb(237,241,245) !default;
+$mediumGrey: #ced2db;
 $darkGrey: rgb(136,145,161) !default;
+$extraDarkGrey: #3d4043;
 $lightGrey1: $gray-l3 !default;
+$paleYellow: #fffcf1;
 $blue-d1: shade($blue,20%);
 $blue-d2: shade($blue,40%);
 $blue-d4: shade($blue,80%);
