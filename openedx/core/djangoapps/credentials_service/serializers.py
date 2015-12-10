@@ -13,7 +13,7 @@ class AbstractCredentialSerializer(serializers.ModelSerializer):
         model = AbstractCredential
 
 
-class CredentialRelatedFieldRelatedField(serializers.RelatedField):
+class CredentialRelatedField(serializers.RelatedField):
     """
     A custom field to use for the user credential generic relationship.
     """
@@ -24,13 +24,13 @@ class CredentialRelatedFieldRelatedField(serializers.RelatedField):
         if isinstance(value, ProgramCertificate):
             return {
                 'credential_type': 'program-certificate',
-                'program-certificate': value.program_id
+                'program-id': value.program_id
             }
         elif isinstance(value, CourseCertificate):
             return {
                 'credential_type': 'course-certificate',
                 'certificate_type': value.certificate_type,
-                'course-certificate': value.course_id,
+                'course-id': value.course_id,
             }
         raise Exception('Unexpected type of tagged object')
 
@@ -46,7 +46,7 @@ class UserCredentialSerializer(serializers.ModelSerializer):
     """ User Credential Serializer """
 
     attributes = UserCredentialAttributeSerializer(many=True, read_only=True)
-    credential = CredentialRelatedFieldRelatedField(read_only='True')
+    credential = CredentialRelatedField(read_only='True')
 
     class Meta(object):
         model = UserCredential

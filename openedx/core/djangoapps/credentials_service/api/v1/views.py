@@ -2,7 +2,7 @@
 Credentials service API views (v1).
 """
 from openedx.core.djangoapps.credentials_service import serializers
-from openedx.core.djangoapps.credentials_service.models import UserCredential
+from openedx.core.djangoapps.credentials_service.models import UserCredential, ProgramCertificate
 from openedx.core.lib.api import parsers
 from rest_framework import mixins, viewsets
 
@@ -18,19 +18,19 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     **Example Requests**
 
         # Return a list of user credentials in the system.
-        GET /api/v1/credentials/
+        GET api/credentials/v1/users/
 
         If the request is successful, the HTTP status will be 200 and the response body will
         contain a JSON-formatted array of user credentials.
 
         # Create a new user credentials.
-        POST /api/v1/credentials/
+        POST api/credentials/v1/users/
 
         If the request is successful, the HTTP status will be 201 and the response body will
         contain a JSON-formatted representation of the newly-created user credentials.
 
         # Update existing user credentials.
-        PATCH /api/v1/credentials/{credential_id}
+        PATCH api/credentials/v1/users/{credential_id}
 
         If the request is successful, the HTTP status will be 200 and the response body will
         contain a JSON-formatted representation of the newly-updated user credentials.
@@ -48,6 +48,8 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         * credential: It will represent the credential type from AbstractCredential model.
 
     """
+    lookup_field = 'username'
     queryset = UserCredential.objects.all()
     serializer_class = serializers.UserCredentialSerializer
     parser_classes = (parsers.MergePatchParser,)
+

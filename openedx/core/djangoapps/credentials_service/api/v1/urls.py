@@ -7,7 +7,8 @@ from openedx.core.djangoapps.credit import routers
 
 
 router = routers.SimpleRouter()  # pylint: disable=invalid-name
-router.register(r'credentials', views.UserCredentialViewSet,  base_name='credentials')
+router.register(r'users', views.UserCredentialViewSet,  base_name='users_credentials')
+
 V1_URLS = router.urls
 
 urlpatterns = patterns(
