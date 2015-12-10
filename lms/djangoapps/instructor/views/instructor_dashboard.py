@@ -186,7 +186,6 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)}),
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
@@ -196,6 +195,9 @@ def instructor_dashboard_2(request, course_id):
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
         'certificate_exception_view_url': certificate_exception_view_url
     }
+    if settings.FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD']:
+        context['old_dashboard_url'] = reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)})
+
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
