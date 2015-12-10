@@ -684,9 +684,9 @@ def course_info(request, course_id):
             url_to_enroll = marketing_link('COURSES')
 
         show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(user, course.id)
-
         context = {
             'request': request,
+            'masquerade_user': user,
             'course_id': course_key.to_deprecated_string(),
             'cache': None,
             'course': course,
