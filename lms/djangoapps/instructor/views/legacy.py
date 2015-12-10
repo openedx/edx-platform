@@ -14,6 +14,7 @@ import requests
 import urllib
 
 from collections import defaultdict, OrderedDict
+import dogstats_wrapper as dog_stats_api
 from markupsafe import escape
 from requests.status_codes import codes
 from StringIO import StringIO
@@ -68,6 +69,8 @@ FORUM_ROLE_REMOVE = 'remove'
 
 # For determining if a shibboleth course
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
+# For datadog events
+DEPRECATION_LD_EVENT = 'deprecation.legacydash'
 
 
 def split_by_comma_and_whitespace(a_str):
@@ -185,23 +188,51 @@ def instructor_dashboard(request, course_id):
 
     if action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
+        dog_stats_api.increment(
+            DEPRECATION_LD_EVENT,
+            tags=(
+                "legacydash:dump_list_enrolled_students",
+                u"course:{}".format(course),
+            )
+        )
         datatable = get_student_grade_summary_data(request, course, get_grades=False, use_offline=use_offline)
         datatable['title'] = _('List of students enrolled in {course_key}').format(course_key=course_key.to_deprecated_string())
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
+        dog_stats_api.increment(
+            DEPRECATION_LD_EVENT,
+            tags=(
+                "legacydash:dump_raw_grades",
+                u"course:{}".format(course),
+            )
+        )
         datatable = get_student_grade_summary_data(request, course, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = _('Raw Grades of students enrolled in {course_key}').format(course_key=course_key)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
     elif 'Download CSV of all RAW grades' in action:
+        dog_stats_api.increment(
+            DEPRECATION_LD_EVENT,
+            tags=(
+                "legacydash:download_csv_raw_grades",
+                u"course:{}".format(course),
+            )
+        )
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
         return return_csv('grades_{0}_raw.csv'.format(course_key.to_deprecated_string()),
                           get_student_grade_summary_data(request, course, get_raw_scores=True, use_offline=use_offline))
 
     elif 'Download CSV of answer distributions' in action:
+        dog_stats_api.increment(
+            DEPRECATION_LD_EVENT,
+            tags=(
+                "legacydash:csv_answer_distributions",
+                u"course:{}".format(course),
+            )
+        )
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
         return return_csv('answer_dist_{0}.csv'.format(course_key.to_deprecated_string()), get_answers_distribution(request, course_key))
 
