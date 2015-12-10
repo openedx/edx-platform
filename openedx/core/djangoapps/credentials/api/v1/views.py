@@ -1,55 +1,72 @@
 """
 Credentials API views (v1).
 """
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-import json
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from openedx.core.djangoapps.credentials.api.v1 import serializers
 
 
-@login_required()
-def generate_program_credential(request):
-    user = request.user
-    if not user.is_staff:
-        return HttpResponseForbidden()
+class GenerateProgramsCredentialView(APIView):
+    serializer_class = serializers.GenerateProgramsCredentialSerializer
+    permission_classes = (IsAuthenticated, IsAdminUser)
 
-    program_id = request.GET.get('program_id')
-    if not program_id:
-        return HttpResponseBadRequest()
+    def post(self, request):
+        serializer = serializers.GenerateProgramsCredentialSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    usernames = request.GET.get('users')
-    if not usernames:
-        return HttpResponseBadRequest()
+        credential_data = serializer.validated_data
+        usernames = credential_data['usernames'].split(',')
 
-    usernames = usernames.split(',')
-    whitelist = request.GET.get('whitelist')
-    whitelist_reason = request.GET.get('whitelist_reason')
+        data_for_credentials_service = [
+            self._get_user_context_for_program(username=username, program_id=credential_data['program_id'],
+                                               whitelist=credential_data['is_whitelist'],
+                                               whitelist_reason=credential_data['whitelist_reason']) for username in
+            usernames if User.objects.filter(username=username).exists()
+        ]
 
+        # TODO call credential service for generating credentials
 
-    data_for_credentials_service = [
-        _get_user_context_for_program(username=username, program_id=program_id, whitelist=whitelist,
-                                      whitelist_reason=whitelist_reason) for username in usernames if
-        User.objects.filter(username=username).exists()
-    ]
-    # TODO call credential service for generating credentials
-
-    # only for testing purpose
-    return HttpResponse(json.dumps(data_for_credentials_service), content_type='application/json')
-
-
-def _get_user_context_for_program(username, program_id, whitelist=False, whitelist_reason=None):
-
-    # TODO add attributes for white listing
-    credential_info = {
-        "username": username,
-        "program_id": program_id,
+        # sample response data which will be received from credentials service
+        response = {
+            "credential_type": "program-certificate",
+            "credential_id": 123,
+            "username": "edxapp",
+            "program_id": 1,
+            "status": "(awarded|revoked)",
+            "uuid": "abc123",
+            "attributes": [
+                {"namespace": "whitelist", "name": "Whitelist", "value": "Reason"}
+            ]
         }
 
-    if whitelist:
-        credential_info.update({
-            "attributes": {
-            "namespace": "whitelist", "name": "program_whitelist", "value": whitelist_reason
-        }
-    })
+        return Response(response)
 
-    return credential_info
+    def _get_user_context_for_program(self, username, program_id, whitelist, whitelist_reason=None):
+        """ Helper method that will return dict of credential info on the basis of user input.
+
+        Arguments:
+            username (string): username for which credential need to be created
+            program_id (int): unique id for X-series program
+            whitelist (boolesan): True if credentials are created for a whitelist user
+            whitelist_reason (string): reason for white listing
+
+        Returns:
+            dict that contains required input for credential
+        """
+        credential_info = {
+            "username": username,
+            "program_id": program_id,
+            }
+
+        if whitelist:
+            credential_info.update({
+                "attributes": {
+                "namespace": "whitelist", "name": "program_whitelist", "value": whitelist_reason
+            }
+        })
+        return credential_info
