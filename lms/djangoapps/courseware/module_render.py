@@ -716,7 +716,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             "reverification": ReverificationService(),
             'proctoring': ProctoringService(),
             'credit': CreditService(),
-            'reverification': ReverificationService(),
             'bookmarks': BookmarksService(user=user),
         },
         get_user_role=lambda: get_user_role(user, course_id),
