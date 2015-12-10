@@ -158,7 +158,7 @@ def xml_store_config(data_dir, source_dirs=None):
     return store
 
 
-@patch('xmodule.modulestore.django.create_modulestore_instance')
+@patch('xmodule.modulestore.django.create_modulestore_instance', autospec=True)
 def drop_mongo_collections(mock_create):
     """
     If using a Mongo-backed modulestore & contentstore, drop the collections.
