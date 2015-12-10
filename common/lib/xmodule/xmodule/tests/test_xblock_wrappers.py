@@ -34,7 +34,6 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.discussion_module import DiscussionDescriptor
 from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
-from xmodule.peer_grading_module import PeerGradingDescriptor
 from xmodule.poll_module import PollDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
@@ -56,7 +55,6 @@ LEAF_XMODULES = {
     DiscussionDescriptor: [{}],
     GraphicalSliderToolDescriptor: [{}],
     HtmlDescriptor: [{}],
-    PeerGradingDescriptor: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
     # This is being excluded because it has dependencies on django
