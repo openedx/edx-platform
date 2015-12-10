@@ -76,18 +76,6 @@ def url_class(is_active):
           </li>
       % endfor
       <%block name="extratabs" />
-      <%
-          course_id = unicode(course.id)
-      %>
-      ## Only display the return link for MiMos or Exams
-      % if course_id.startswith('ref/m') or course_id.startswith('ref/e'):
-        <li class="back-to-track">
-          <a href="${marketing_link('ROOT')}/return/${course.id}">
-            <i class="fa fa-long-arrow-left"></i>
-            Revenir au cours
-          </a>
-        </li>
-      %endif
     </ol>
   </div>
 </nav>
