@@ -98,7 +98,9 @@ define([
                 completeForm,
                 validSubmission,
                 successfulSubmission,
-                failedSubmission;
+                failedSubmission,
+                invalidCountry,
+                validCountry;
 
             completeForm = function() {
                 var options = context.fields[0].options,
@@ -129,6 +131,20 @@ define([
                 view.model.trigger('error', {status: 500});
                 expect(view.$('.js-success-message').length).toEqual(0);
                 expect(view.$('.submission-error')).not.toHaveClass('hidden');
+            };
+
+            invalidCountry = function() {
+                expect(view.$('.js-success-message').length).toEqual(0);
+                expect(view.$('.submission-error')).not.toHaveClass('hidden');
+                expect(view.$('#user-country-title')).toHaveClass('error');
+                expect(view.$('.js-submit-form').prop('disabled')).toBeTruthy();
+            };
+
+            validCountry = function() {
+                expect(view.$('.js-success-message').length).toEqual(0);
+                expect(view.$('.submission-error')).toHaveClass('hidden');
+                expect(view.$('#user-country-title')).not.toHaveClass('error');
+                expect(view.$('.js-submit-form').prop('disabled')).toBeFalsy();
             };
 
             beforeEach(function() {
@@ -188,6 +204,25 @@ define([
             it('should allow form resubmission after an API error is returned', function() {
                 failedSubmission();
                 successfulSubmission();
+            });
+
+            it('renders with valid country', function(){
+                validCountry();
+            });
+
+            describe('when no country', function(){
+                beforeEach(function() {
+                    context.user_details.country = '';
+
+                    view = new FinancialAssistanceFormView({
+                        el: '.financial-assistance-wrapper',
+                        context: context
+                    });
+                });
+
+                it('renders invalid country', function() {
+                    invalidCountry();
+                });
             });
         });
     }

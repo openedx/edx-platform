@@ -121,6 +121,10 @@
     .title {
       @extend %fa-copy;
       padding: 0;
+
+      &.error {
+        color: $red;
+      }
     }
 
     .data {
