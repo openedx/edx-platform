@@ -99,7 +99,6 @@ class LibraryContentFields(object):
         values=_get_capa_types(),
         scope=Scope.settings,
     )
-    filters = String(default="")  # TBD
     has_score = Boolean(
         display_name=_("Scored"),
         help=_("Set this value to True if this module is either a graded assignment or a practice problem."),
