@@ -520,7 +520,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
 
-        mode = request.data.get('mode', CourseMode.DEFAULT_MODE_SLUG)
+        mode = request.data.get('mode')
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
@@ -532,7 +532,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if mode != CourseMode.DEFAULT_MODE_SLUG and not has_api_key_permissions:
+        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions:
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
                 data={
