@@ -31,7 +31,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_key'])
         except InvalidKeyError:
-            raise CommandError("Invalid course_key: '%s'. Proper syntax: 'org/number/run' " % options['course_key'])
+            raise CommandError("Invalid course_key: '%s'." % options['course_key'])
 
         if not modulestore().get_course(course_key):
             raise CommandError("Course with '%s' key not found." % options['course_key'])

@@ -33,13 +33,21 @@ class DeleteCourseTest(CourseTestCase):
             run=course_run
         )
 
+    def test_invalid_key_not_found(self):
+        """
+        Test for when a course key is malformed
+        """
+        errstring = "Invalid course_key: 'foo/TestX/TS01/2015_Q7'."
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('delete_course', 'foo/TestX/TS01/2015_Q7')
+
     def test_course_key_not_found(self):
         """
         Test for when a non-existing course key is entered
         """
-        errstring = "Invalid course_key: 'TestX/TS01/2015_Q7'. Proper syntax: 'org/number/run' "
+        errstring = "Course with 'TestX/TS01/2015_Q7' key not found."
         with self.assertRaisesRegexp(CommandError, errstring):
-            call_command('delete_course','TestX/TS01/2015_Q7')
+            call_command('delete_course', 'TestX/TS01/2015_Q7')
 
     def test_course_deleted(self):
         """
@@ -51,5 +59,5 @@ class DeleteCourseTest(CourseTestCase):
 
         with mock.patch(self.YESNO_PATCH_LOCATION) as patched_yes_no:
             patched_yes_no.return_value = True
-            call_command('delete_course','TestX/TS01/2015_Q1', "commit")
+            call_command('delete_course', 'TestX/TS01/2015_Q1')
             self.assertIsNone(modulestore().get_course(SlashSeparatedCourseKey("TestX", "TS01", "2015_Q1")))
