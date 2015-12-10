@@ -52,11 +52,11 @@ class GenerateProgramsCredentialView(APIView):
         Arguments:
             username (string): username for which credential need to be created
             program_id (int): unique id for X-series program
-            whitelist (boolesan): True if credentials are created for a whitelist user
+            whitelist (boolean): True if credentials are created for a whitelist user
             whitelist_reason (string): reason for white listing
 
         Returns:
-            dict that contains required input for credential
+            Returns dict that contains required input for credential
         """
         credential_info = {
             "username": username,
