@@ -429,8 +429,8 @@ COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
 # comprehensive theming system
-COMP_THEME_DIR = "/home/darwish/devstack/edx-platform/themes/default"
-THEME_NAME = "default"
+COMP_THEME_DIR = "/home/darwish/devstack/edx-platform/themes/default-theme/"
+THEME_ROOT = path("/home/darwish/devstack/edx-platform/themes/")
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -480,9 +480,9 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
     'oauth2_handler.UserInfoHandler'
 )
 
-################################## EDX WEB #####################################
-# This is where we stick our compiled template files. Most of the app uses Mako
-# templates
+################################## TEMPLATE CONFIGURATION #####################################
+# Mako templating
+# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATES = {}
@@ -491,42 +491,64 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
                           COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
 
-# This is where Django Template lookup is defined. There are a few of these
-# still left lying around.
-TEMPLATE_DIRS = [
-    PROJECT_ROOT / "templates",
-    COMMON_ROOT / 'templates',
-    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
-    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-    COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+# Django templating
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Don't look for template source files inside installed applications.
+        'APP_DIRS': False,
+        # Instead, look for template source files in these dirs.
+        'DIRS': [
+            PROJECT_ROOT / "templates",
+            COMMON_ROOT / 'templates',
+            COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+            COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+            COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+        ],
+        # Options specific to this backend.
+        'OPTIONS': {
+            'loaders': [
+                'edxmako.makoloader.MakoFilesystemLoader',
+                'edxmako.makoloader.MakoAppDirectoriesLoader',
+
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+
+            ],
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
+                'django.contrib.auth.context_processors.auth',  # this is required for admin
+                'django.template.context_processors.csrf',
+
+                # Added for django-wiki
+                'django.template.context_processors.media',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+                'sekizai.context_processors.sekizai',
+
+                # Hack to get required link URLs to password reset templates
+                'edxmako.shortcuts.marketing_link_context_processor',
+
+                # Allows the open edX footer to be leveraged in Django Templates.
+                'edxmako.shortcuts.open_source_footer_context_processor',
+
+                # Shoppingcart processor (detects if request.user has a cart)
+                'shoppingcart.context_processor.user_has_cart_context_processor',
+
+                # Allows the open edX footer to be leveraged in Django Templates.
+                'edxmako.shortcuts.microsite_footer_context_processor',
+            ],
+            # Change 'debug' in your environment settings files - not here.
+            'debug': False
+        }
+    }
 ]
+DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',
-
-    # Added for django-wiki
-    'django.core.context_processors.media',
-    'django.core.context_processors.tz',
-    'django.contrib.messages.context_processors.messages',
-    'sekizai.context_processors.sekizai',
-
-    # Hack to get required link URLs to password reset templates
-    'edxmako.shortcuts.marketing_link_context_processor',
-
-    # Allows the open edX footer to be leveraged in Django Templates.
-    'edxmako.shortcuts.open_source_footer_context_processor',
-
-    # Shoppingcart processor (detects if request.user has a cart)
-    'shoppingcart.context_processor.user_has_cart_context_processor',
-
-    # Allows the open edX footer to be leveraged in Django Templates.
-    'edxmako.shortcuts.microsite_footer_context_processor',
-)
+###############################################################################################
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = (
@@ -778,12 +800,12 @@ CODE_JAIL = {
 COURSES_WITH_UNSAFE_CODE = []
 
 ############################### DJANGO BUILT-INS ###############################
-# Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
+# Change DEBUG in your environment settings files, not here
 DEBUG = False
-TEMPLATE_DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # CMS base
 CMS_BASE = 'localhost:8001'
@@ -1102,16 +1124,6 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'edxmako.makoloader.MakoFilesystemLoader',
-    'edxmako.makoloader.MakoAppDirectoriesLoader',
-
-    # 'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-
-)
-
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'microsite_configuration.middleware.MicrositeMiddleware',
@@ -1155,11 +1167,8 @@ MIDDLEWARE_CLASSES = (
 
     # Detects user-requested locale from 'accept-language' header in http request.
     # Must be after DarkLangMiddleware.
-    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
-    # 'django.middleware.locale.LocaleMiddleware',
-    'django_locale.middleware.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
@@ -1274,6 +1283,9 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
+    'js/vendor/afontgarde/afontgarde.js',
+    'js/vendor/afontgarde/edx-icons.js',
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
@@ -1377,6 +1389,7 @@ credit_web_view_js = [
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
+            'js/vendor/afontgarde/afontgarde.css',
             'css/vendor/font-awesome.css',
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
@@ -1803,8 +1816,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'djcelery',
-    'south',
 
     # Common views
     'openedx.core.djangoapps.common_views',
@@ -1824,7 +1837,6 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'django.contrib.staticfiles',
     'static_replace',
 
     # Theming
@@ -1837,7 +1849,7 @@ INSTALLED_APPS = (
     'static_template_view',
     'staticbook',
     'track',
-    'eventtracking.django',
+    'eventtracking.django.apps.EventTrackingConfig',
     'util',
     'certificates',
     'dashboard',
@@ -1862,6 +1874,8 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'oauth2_provider',
 
+    'third_party_auth',
+
     # We don't use this directly (since we use OAuth2), but we need to install it anyway.
     # When a user is deleted, Django queries all tables with a FK to the auth_user table,
     # and since django-rest-framework-oauth imports this, it will try to access tables
@@ -1878,7 +1892,10 @@ INSTALLED_APPS = (
     'sekizai',
     #'wiki.plugins.attachments',
     'wiki.plugins.links',
-    'wiki.plugins.notifications',
+    # Notifications were enabled, but only 11 people used it in three years. It
+    # got tangled up during the Django 1.8 migration, so we are disabling it.
+    # See TNL-3783 for details.
+    #'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
     # Foldit integration
@@ -1922,7 +1939,7 @@ INSTALLED_APPS = (
     'enrollment',
 
     # Student Identity Verification
-    'verify_student',
+    'lms.djangoapps.verify_student',
 
     # Dark-launching languages
     'dark_lang',
@@ -1949,6 +1966,7 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
+    'social.apps.django_app.default',
 
     # Surveys
     'survey',
@@ -1976,7 +1994,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     # Course teams
-    'teams',
+    'lms.djangoapps.teams',
 
     'xblock_django',
 
@@ -1985,7 +2003,14 @@ INSTALLED_APPS = (
 
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
+
+    'sorl.thumbnail',
 )
+
+# Migrations which are not in the standard module "migrations"
+MIGRATION_MODULES = {
+    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
+}
 
 ######################### CSRF #########################################
 
@@ -1998,6 +2023,7 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'openedx.core.lib.api.paginators.DefaultPagination',
     'PAGE_SIZE': 10,
+    'URL_FORMAT_OVERRIDE': None,
 }
 
 
@@ -2222,10 +2248,6 @@ PASSWORD_MAX_LENGTH = None
 PASSWORD_COMPLEXITY = {"UPPER": 1, "LOWER": 1, "DIGITS": 1}
 PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
 PASSWORD_DICTIONARY = []
-
-##################### LinkedIn #####################
-INSTALLED_APPS += ('django_openid_auth',)
-
 
 ############################ ORA 2 ############################################
 
@@ -2627,7 +2649,7 @@ PROFILE_IMAGE_BACKEND = {
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
-PROFILE_IMAGE_DEFAULT_FILENAME = 'images/default-theme/default'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'images/default-theme/default-profile'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 # This secret key is used in generating unguessable URLs to users'
 # profile images.  Once it has been set, changing it will make the
@@ -2653,6 +2675,9 @@ CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
 # Maximum number of retries per task for errors that are not related
 # to throttling.
 CREDIT_TASK_MAX_RETRIES = 5
+
+# Dummy secret key for dev/test
+SECRET_KEY = 'dev key'
 
 # Secret keys shared with credit providers.
 # Used to digitally sign credit requests (us --> provider)
@@ -2702,3 +2727,12 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+#### Custom Courses for EDX (CCX) configuration
+
+# This is an arbitrary hard limit.
+# The reason we introcuced this number is because we do not want the CCX
+# to compete with the MOOC.
+CCX_MAX_STUDENTS_ALLOWED = 200
+
+THEME_NAME = "default-theme"

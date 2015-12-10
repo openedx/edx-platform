@@ -74,7 +74,7 @@ def enable_theme():
     )
 
     # Calculate the location of the theme's files
-    theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
+    theme_root = settings.ENV_ROOT / "edx-platform" / "themes" / settings.THEME_NAME
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
     # avoid collisions with default edX static files

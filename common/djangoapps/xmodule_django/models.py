@@ -123,7 +123,7 @@ class OpaqueKeyField(models.CharField):
             # CharFields should use '' as their empty value, rather than None
 
         try:
-                assert isinstance(value, self.KEY_CLASS), "%s is not an instance of %s" % (value, self.KEY_CLASS)
+            assert isinstance(value, self.KEY_CLASS), "%s is not an instance of %s" % (value, self.KEY_CLASS)
         except:
             return ''
         return unicode(_strip_value(value))
