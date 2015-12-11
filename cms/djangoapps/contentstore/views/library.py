@@ -17,6 +17,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django_sudo_helpers.decorators import sudo_required
+from sudo.utils import revoke_sudo_privileges
 from edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -68,6 +70,11 @@ def _display_library(library_key_string, request):
     """
     Displays single library
     """
+
+    # Revoke sudo privileges from a request explicitly
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False) and request.is_sudo(region=library_key_string):
+        revoke_sudo_privileges(request, region=library_key_string)
+
     library_key = CourseKey.from_string(library_key_string)
     if not isinstance(library_key, LibraryLocator):
         log.exception("Non-library key passed to content libraries API.")  # Should never happen due to url regex
@@ -197,6 +204,7 @@ def library_blocks_view(library, user, response_format):
     })
 
 
+@sudo_required
 def manage_library_users(request, library_key_string):
     """
     Studio UI for editing the users within a library.

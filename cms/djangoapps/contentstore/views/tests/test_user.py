@@ -14,6 +14,7 @@ from student import auth
 class UsersTestCase(CourseTestCase):
     def setUp(self):
         super(UsersTestCase, self).setUp()
+        self.grant_sudo_access(unicode(self.course.id), self.user_password)
         self.ext_user = User.objects.create_user(
             "joe", "joe@comedycentral.com", "haha")
         self.ext_user.is_active = True

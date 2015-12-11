@@ -2,6 +2,9 @@
 Django admin page for course modes
 """
 from django.conf import settings
+from pytz import timezone, UTC
+from django.contrib import admin
+from course_modes.models import CourseMode
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin

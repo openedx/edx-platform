@@ -180,6 +180,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # Create instructor account
         self.coach = coach = AdminFactory.create()
         self.client.login(username=coach.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         # create an instance of modulestore
         self.mstore = modulestore()
 
@@ -851,6 +852,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course = get_course_by_id(self.ccx_key, depth=None)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
+        self.grant_sudo_access(unicode(self._course.id), 'test')
         self.addCleanup(RequestCache.clear_request_cache)
 
     @patch('ccx.views.render_to_response', intercept_renderer)

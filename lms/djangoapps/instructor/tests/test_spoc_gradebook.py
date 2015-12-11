@@ -59,6 +59,7 @@ class TestGradebook(SharedModuleStoreTestCase):
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
 
         for user in self.users:

@@ -36,7 +36,7 @@ class TestInstructorEnrollsStudent(SharedModuleStoreTestCase, LoginEnrollmentTes
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
-
+        self.grant_sudo_access(unicode(self.course.id), "test")
         self.users = [
             UserFactory.create(username="student%d" % i, email="student%d@test.com" % i)
             for i in xrange(USER_COUNT)
@@ -54,7 +54,6 @@ class TestInstructorEnrollsStudent(SharedModuleStoreTestCase, LoginEnrollmentTes
         """
 
         course = self.course
-
         # Run the Un-enroll students command
         url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(

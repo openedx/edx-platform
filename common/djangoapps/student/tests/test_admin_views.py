@@ -17,6 +17,9 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
         self.user.save()
         self.course = CourseFactory.create(org='edx')
 
+        self.client.login(username=self.user.username, password='test')
+        self.grant_sudo_access('django_admin', 'test')
+
     def test_save_valid_data(self):
 
         data = {
@@ -25,8 +28,6 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
             'org': 'edx',
             'email': self.user.email
         }
-
-        self.client.login(username=self.user.username, password='test')
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -51,8 +52,6 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
             'course_id': unicode(self.course.id)
         }
 
-        self.client.login(username=self.user.username, password='test')
-
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
         self.assertRedirects(response, reverse('admin:student_courseaccessrole_changelist'))
@@ -68,8 +67,6 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
             'email': self.user.email,
 
         }
-
-        self.client.login(username=self.user.username, password='test')
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -87,8 +84,6 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
             'org': 'myorg'
 
         }
-
-        self.client.login(username=self.user.username, password='test')
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -108,8 +103,6 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
             'org': 'edx',
             'email': email
         }
-
-        self.client.login(username=self.user.username, password='test')
 
         # Adding new role with invalid data
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -135,8 +128,6 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
             'org': 'edxxx',
             'email': self.user.email
         }
-
-        self.client.login(username=self.user.username, password='test')
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)

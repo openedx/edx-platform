@@ -1,0 +1,27 @@
+{% extends "main_django.html" %}
+{% load i18n third_party_auth_links %}
+
+{% block title %}<title>{% trans "Confirm Your Password" %}</title>{% endblock %}
+
+{% block body %}
+<section class="sudo" id="sudo">
+    <div class="inner-wrapper">
+        <header>
+          <h2>{% trans "Confirm Your Password to Access the Instructor Dashboard" %}</h2>
+        </header>
+        <hr />
+        <div id="">
+            <form class="form sudo-form" method="post">{% csrf_token %}
+            <div class="field text required">{{ form.as_p }}</div>
+            <p class="form-actions">
+                {# Translators: this is a button to submit password. #}
+                <button type="submit" class="action action-primary">{% trans 'Submit' %}</button>
+            </p>
+            </form>
+        </div>
+    </div>
+
+    {% third_party_auth_links %}
+
+</section>
+{% endblock %}

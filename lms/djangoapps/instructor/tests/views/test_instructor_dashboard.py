@@ -2,6 +2,7 @@
 Unit tests for instructor_dashboard.py.
 """
 import ddt
+import unittest
 from mock import patch
 
 from django.conf import settings
@@ -14,6 +15,7 @@ from ccx.tests.test_views import setup_students_and_grades
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from django_sudo_helpers.tests import utils
 from instructor.views.gradebook_api import calculate_page_info
 
 from common.test.utils import XssTestMixin
@@ -66,6 +68,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         # Create instructor account
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), 'test')
 
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -232,6 +235,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         student_cart.purchase()
 
         self.client.login(username=self.instructor.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(self.course.id)
@@ -293,3 +297,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
+
+    @unittest.skipUnless(utils.DJANGO_SUDO_FEATURE_ENABLED, 'django-sudo not enabled')
+    def test_sudo_required_on_dashboard(self):
+        """
+        Test that sudo_required redirect user to password page.
+        """
+        # Logout to remove sudo access.
+        self.client.logout()
+        self.client.login(username=self.instructor.username, password="test")
+        response = self.client.get(self.url, content_type='html', HTTP_ACCEPT='html')
+        self.assertEqual(response.status_code, 302)

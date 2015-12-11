@@ -3,14 +3,14 @@
 Tests the "preview" selector in the LMS that allows changing between Staff, Student, and Content Groups.
 """
 
-
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest, create_user_partition_json
+from ..helpers import UniqueCourseTest, create_user_partition_json, get_modal_alert
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage
+from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentAdminPage
 from ...pages.lms.staff_view import StaffPage
+from ...pages.common.sudo_page import SudoPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from bok_choy.promise import EmptyPromise
 from xmodule.partitions.partitions import Group
@@ -42,8 +42,9 @@ class StaffViewTest(UniqueCourseTest):
 
         # Auto-auth register for the course.
         # Do this as global staff so that you will see the Staff View
+        self.staff_password = 'test'
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
-                     course_id=self.course_id, staff=True).visit()
+                     course_id=self.course_id, staff=True, password=self.staff_password).visit()
 
     def _goto_staff_page(self):
         """
@@ -108,26 +109,41 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
     """
+
+    def _goto_student_admin_section(self):
+        """
+        Get sudo access and return student admin section.
+        """
+        instructor_page = InstructorDashboardPage(self.browser, self.course_id)
+        sudo_page = SudoPage(self.browser, instructor_page)
+        sudo_page.wait_for_page()
+        sudo_page.submit_sudo_password_and_get_access(self.staff_password)
+
+        student_admin_section = StudentAdminPage(self.browser)
+        student_admin_section.wait_for_page()
+        return student_admin_section
+
     def test_reset_attempts_empty(self):
         """
         Test that we reset even when there is no student state
         """
 
         staff_debug_page = self._goto_staff_page().open_staff_debug_info()
-        staff_debug_page.reset_attempts()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.USERNAME), msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_reset_attempts_button()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
 
     def test_delete_state_empty(self):
         """
         Test that we delete properly even when there isn't state to delete.
         """
         staff_debug_page = self._goto_staff_page().open_staff_debug_info()
-        staff_debug_page.delete_state()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state '
-                         'for user {}'.format(self.USERNAME), msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_delete_student_state_button()
+        self.assertEqual(len(student_admin_section.top_notification.text[0]), 0)
 
     def test_reset_attempts_state(self):
         """
@@ -137,10 +153,11 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.reset_attempts()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.USERNAME), msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_reset_attempts_button()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
 
     def test_rescore_state(self):
         """
@@ -150,9 +167,11 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.rescore()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully rescored problem for user STAFF_TESTER', msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_rescore_submissions_button()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
 
     def test_student_state_delete(self):
         """
@@ -162,10 +181,10 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.delete_state()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state '
-                         'for user {}'.format(self.USERNAME), msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_delete_student_state_button()
+        self.assertEqual(len(student_admin_section.top_notification.text[0]), 0)
 
     def test_student_by_email(self):
         """
@@ -175,10 +194,11 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.reset_attempts(self.EMAIL)
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.EMAIL), msg)
+        staff_debug_page.click_student_grade_adjustments(self.EMAIL)
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_reset_attempts_button()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
 
     def test_bad_student(self):
         """
@@ -188,10 +208,10 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.delete_state('INVALIDUSER')
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Failed to delete student state. '
-                         'User does not exist.', msg)
+        staff_debug_page.click_student_grade_adjustments('INVALIDUSER')
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_delete_student_state_button()
+        self.assertGreater(len(student_admin_section.top_notification.text[0]), 0)
 
     def test_reset_attempts_for_problem_loaded_via_ajax(self):
         """
@@ -202,10 +222,11 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.reset_attempts()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.USERNAME), msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_reset_attempts_button()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
 
     def test_rescore_state_for_problem_loaded_via_ajax(self):
         """
@@ -216,9 +237,11 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.rescore()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully rescored problem for user STAFF_TESTER', msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_rescore_submissions_button()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
 
     def test_student_state_delete_for_problem_loaded_via_ajax(self):
         """
@@ -229,10 +252,10 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_page.answer_problem()
 
         staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.delete_state()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state '
-                         'for user {}'.format(self.USERNAME), msg)
+        staff_debug_page.click_student_grade_adjustments()
+        student_admin_section = self._goto_student_admin_section()
+        student_admin_section.click_delete_student_state_button()
+        self.assertEqual(len(student_admin_section.top_notification.text[0]), 0)
 
 
 @attr('shard_3')
@@ -351,7 +374,11 @@ class CourseWithContentGroupsTest(StaffViewTest):
         Each cohort is assigned one student.
         """
         instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
-        instructor_dashboard_page.visit()
+        sudo_page = SudoPage(self.browser, instructor_dashboard_page)
+        sudo_page.visit()
+        sudo_page.wait_for_page()
+        sudo_page.submit_sudo_password_and_get_access(self.staff_password)
+
         cohort_management_page = instructor_dashboard_page.select_cohort_management()
         cohort_management_page.is_cohorted = True
 

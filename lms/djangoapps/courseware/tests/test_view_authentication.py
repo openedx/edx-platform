@@ -67,6 +67,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                     'book_index': index})
             for index, __ in enumerate(course.textbooks)
         ])
+        self.grant_sudo_access(unicode(course.id), 'test')
         for url in urls:
             self.assert_request_status_code(404, url)
 
@@ -81,6 +82,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                     'book_index': index})
             for index in xrange(len(course.textbooks))
         ])
+        self.grant_sudo_access(unicode(course.id), 'test')
         for url in urls:
             self.assert_request_status_code(200, url)
 
@@ -207,6 +209,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         urls = [reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()}),
                 reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})]
 
+        self.grant_sudo_access(unicode(self.course.id), 'test')
+        self.grant_sudo_access(unicode(self.test_course.id), 'test')
         # Shouldn't be able to get to the instructor pages
         for url in urls:
             self.assert_request_status_code(404, url)
@@ -218,6 +222,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.staff_user)
 
+        self.grant_sudo_access(unicode(self.course.id), 'test')
+        self.grant_sudo_access(unicode(self.test_course.id), 'test')
         # Now should be able to get to self.course, but not  self.test_course
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.assert_request_status_code(200, url)
@@ -232,6 +238,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.instructor_user)
 
+        self.grant_sudo_access(unicode(self.course.id), 'test')
+        self.grant_sudo_access(unicode(self.test_course.id), 'test')
         # Now should be able to get to self.course, but not  self.test_course
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.assert_request_status_code(200, url)
@@ -245,6 +253,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         and student profile pages for course in their org.
         """
         self.login(self.org_staff_user)
+        self.grant_sudo_access(unicode(self.course.id), 'test')
+        self.grant_sudo_access(unicode(self.test_course.id), 'test')
+        self.grant_sudo_access(unicode(self.other_org_course.id), 'test')
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.assert_request_status_code(200, url)
 
@@ -260,6 +271,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         and student profile pages for course in their org.
         """
         self.login(self.org_instructor_user)
+        self.grant_sudo_access(unicode(self.course.id), 'test')
+        self.grant_sudo_access(unicode(self.test_course.id), 'test')
+        self.grant_sudo_access(unicode(self.other_org_course.id), 'test')
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.assert_request_status_code(200, url)
 
@@ -275,6 +289,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.global_staff_user)
 
+        self.grant_sudo_access(unicode(self.course.id), 'test')
+        self.grant_sudo_access(unicode(self.test_course.id), 'test')
         # and now should be able to load both
         urls = [reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()}),
                 reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})]
@@ -386,6 +402,26 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # unenroll and try again
         self.login(self.global_staff_user)
         self.assertTrue(self.enroll(self.course))
+
+    def test_org_instructor_cannot_access_without_sudo(self):
+        """
+        Test that org instructor cannot load the instructor dashboard without sudo access
+        and it redirect org instructor to sudo password page.
+        """
+        self.login(self.org_instructor_user)
+        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        response = self.assert_request_status_code(401, url)
+        self.assertIn('Unauthorized', response.content)
+
+    def test_org_staff_cannot_access_without_sudo(self):
+        """
+        Test that org staff cannot load the instructor dashboard without sudo access
+        and it redirect org staff to sudo password page.
+        """
+        self.login(self.org_staff_user)
+        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        response = self.assert_request_status_code(401, url)
+        self.assertIn('Unauthorized', response.content)
 
 
 @attr('shard_1')

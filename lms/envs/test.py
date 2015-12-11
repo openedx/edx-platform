@@ -40,6 +40,8 @@ LOG_OVERRIDES = [
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
 
+SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', 'unittest')
+
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
@@ -557,3 +559,6 @@ FEATURES['ORGANIZATIONS_APP'] = True
 
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+
+######### Django-sudo ##########
+FEATURES['ENABLE_DJANGO_SUDO'] = True
