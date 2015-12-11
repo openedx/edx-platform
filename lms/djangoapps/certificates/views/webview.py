@@ -34,7 +34,9 @@ from certificates.api import (
     get_certificate_url,
     emit_certificate_event,
     has_html_certificates_enabled,
-    get_certificate_template
+    get_certificate_template,
+    get_certificate_header_context,
+    get_certificate_footer_context,
 )
 from certificates.models import (
     GeneratedCertificate,
@@ -539,6 +541,10 @@ def render_html_view(request, user_id, course_id):
 
     # Append microsite overrides
     _update_microsite_context(context, configuration)
+
+    # Add certificate header/footer data to current context
+    context.update(get_certificate_header_context(is_secure=request.is_secure()))
+    context.update(get_certificate_footer_context())
 
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
     context.update(course.cert_html_view_overrides)

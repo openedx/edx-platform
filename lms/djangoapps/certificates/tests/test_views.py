@@ -305,7 +305,9 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('platform_microsite', response.content)
-        self.assertIn('http://www.microsite.org', response.content)
+
+        # logo url is taken from microsite configuration setting
+        self.assertIn('http://test_microsite.localhost', response.content)
         self.assertIn('This is special microsite aware company_about_description content', response.content)
         self.assertIn('Microsite title', response.content)
 

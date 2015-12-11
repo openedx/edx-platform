@@ -25,6 +25,7 @@ from branding.models import BrandingApiConfig
 
 
 log = logging.getLogger("edx.footer")
+EMPTY_URL = '#'
 
 
 def is_enabled():
@@ -329,3 +330,64 @@ def _absolute_url_staticfile(is_secure, name):
     # For local development, the returned URL will be relative,
     # so we need to make it absolute.
     return _absolute_url(is_secure, url_path)
+
+
+def get_microsite_url(name):
+    """
+    Look up and return the value for given url name in microsite configuration.
+    URLs are saved in "urls" dictionary inside Microsite Configuration.
+
+    Return 'EMPTY_URL' if given url name is not defined in microsite configuration urls.
+    """
+    urls = microsite.get_value("urls", default={})
+    return urls.get(name) or EMPTY_URL
+
+
+def get_url(name):
+    """
+    Lookup and return page url, lookup is performed in the following order
+
+    1. get microsite url, If microsite URL override exists, return it
+    2. Otherwise return the marketing URL.
+
+    :return: string containing page url.
+    """
+    # If a microsite URL override exists, return it.  Otherwise return the marketing URL.
+    microsite_url = get_microsite_url(name)
+    if microsite_url != EMPTY_URL:
+        return microsite_url
+
+    # get marketing link, if marketing is disabled then platform url will be used instead.
+    url = marketing_link(name)
+
+    return url or EMPTY_URL
+
+
+def get_base_url(is_secure):
+    """
+    Return Base URL for site/microsite.
+    Arguments:
+        is_secure (bool): If true, use HTTPS as the protocol.
+    """
+    return _absolute_url(is_secure=is_secure, url_path="")
+
+
+def get_tos_and_honor_code_url():
+    """
+    Lookup and return terms of services page url
+    """
+    return get_url("TOS_AND_HONOR")
+
+
+def get_privacy_url():
+    """
+    Lookup and return privacy policies page url
+    """
+    return get_url("PRIVACY")
+
+
+def get_about_url():
+    """
+    Lookup and return About page url
+    """
+    return get_url("ABOUT")
