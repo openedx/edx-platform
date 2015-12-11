@@ -141,7 +141,7 @@ class XmlParserMixin(object):
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
 
-    metadata_to_export_to_policy = ('discussion_topics', 'checklists')
+    metadata_to_export_to_policy = ('discussion_topics',)
 
     @staticmethod
     def _get_metadata_from_xml(xml_object, remove=True):
