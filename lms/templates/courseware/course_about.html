@@ -13,7 +13,7 @@ from openedx.core.lib.courses import course_image_url
 <%block name="headextra">
   ## OG (Open Graph) title and description added below to give social media info to display
   ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
-  <meta property="og:title" content="${course.display_name_with_default}" />
+  <meta property="og:title" content="${course.display_name_with_default_escaped}" />
   <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}" />
 </%block>
 
@@ -102,7 +102,7 @@ from openedx.core.lib.courses import course_image_url
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="pagetitle">${course.display_name_with_default}</%block>
+<%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -111,7 +111,7 @@ from openedx.core.lib.courses import course_image_url
       <section class="intro">
         <hgroup>
           <h1>
-            ${course.display_name_with_default}
+            ${course.display_name_with_default_escaped}
             % if not self.theme_enabled():
               <a href="#">${course.display_org_with_default | h}</a>
             % endif
@@ -220,10 +220,10 @@ from openedx.core.lib.courses import course_image_url
             ##       or something allowing themes to do whatever they
             ##       want here (and on this whole page, really).
             % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+enrolled+in+${course.number}+${course.display_name_with_default}!+(http://class.stanford.edu)" class="share">
+              <a href="http://twitter.com/intent/tweet?text=I+just+enrolled+in+${course.number}+${course.display_name_with_default_escaped}!+(http://class.stanford.edu)" class="share">
                 <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
               </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20enrolled%20in%20${course.number}%20${course.display_name_with_default}+(http://class.stanford.edu)" class="share">
+              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20enrolled%20in%20${course.number}%20${course.display_name_with_default_escaped}+(http://class.stanford.edu)" class="share">
                 <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
               </a>
             % else:
@@ -235,7 +235,7 @@ from openedx.core.lib.courses import course_image_url
                 ## Twitter account. {url} should appear at the end of the text.
                 tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
                     number=course.number,
-                    title=course.display_name_with_default,
+                    title=course.display_name_with_default_escaped,
                     account=microsite.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
                     url=u"http://{domain}{path}".format(
                         domain=site_domain,
@@ -250,7 +250,7 @@ from openedx.core.lib.courses import course_image_url
                     subject=_("Take a course with {platform} online").format(platform=platform_name),
                     body=_("I just enrolled in {number} {title} through {platform} {url}").format(
                         number=course.number,
-                        title=course.display_name_with_default,
+                        title=course.display_name_with_default_escaped,
                         platform=platform_name,
                         url=u"http://{domain}{path}".format(
                             domain=site_domain,

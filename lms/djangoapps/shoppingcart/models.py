@@ -1578,7 +1578,7 @@ class PaidCourseRegistration(OrderItem):
         item.unit_cost = cost
         item.list_price = cost
         item.line_desc = _(u'Registration for Course: {course_name}').format(
-            course_name=course.display_name_with_default)
+            course_name=course.display_name_with_default_escaped)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments
@@ -1755,7 +1755,7 @@ class CourseRegCodeItem(OrderItem):
         item.list_price = cost
         item.qty = qty
         item.line_desc = _(u'Enrollment codes for Course: {course_name}').format(
-            course_name=course.display_name_with_default)
+            course_name=course.display_name_with_default_escaped)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments

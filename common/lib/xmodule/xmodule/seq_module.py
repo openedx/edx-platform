@@ -224,7 +224,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'path': " > ".join(display_names + [child.display_name or '']),
             }
             if childinfo['title'] == '':
-                childinfo['title'] = child.display_name_with_default
+                childinfo['title'] = child.display_name_with_default_escaped
             contents.append(childinfo)
 
         params = {

@@ -12,7 +12,7 @@ from contentstore.views.helpers import xblock_studio_url, xblock_type_display_na
 from django.utils.translation import ugettext as _
 from openedx.core.lib.js_utils import escape_json_dumps
 %>
-<%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock) | h}</%block>
+<%block name="title">${xblock.display_name_with_default_escaped} ${xblock_type_display_name(xblock) | h}</%block>
 <%block name="bodyclass">is-signedin course container view-container</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -55,15 +55,15 @@ from openedx.core.lib.js_utils import escape_json_dumps
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                        <a href="${ancestor_url | h}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                        <a href="${ancestor_url | h}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default_escaped | h}</a>
                     % else:
-                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
+                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default_escaped | h}</span>
                     % endif
                 % endfor
             </small>
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
-                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default | h}</span></h1>
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default_escaped | h}</span></h1>
             </div>
         </div>
 
