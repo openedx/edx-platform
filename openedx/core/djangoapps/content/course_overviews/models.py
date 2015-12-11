@@ -447,45 +447,20 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
-    def get_all_courses(cls, force_reseeding=False, org=None):
+    def get_all_courses(cls, org=None):
         """
         Returns all CourseOverview objects in the database.
 
         Arguments:
-            force_reseeding (bool): Optional parameter.
-
-                If True, the modulestore is used as the source of truth for
-                the list of courses, even if the CourseOverview table was
-                previously seeded.  However, only non-existing CourseOverview
-                entries or those with older data model versions or will get
-                populated.
-
-                If False, the list of courses is retrieved from the
-                CourseOverview table if it was previously seeded, falling
-                back to the modulestore if it wasn't seeded.
-
             org (string): Optional parameter that allows filtering
                 by organization.
         """
-        if force_reseeding or not CourseOverviewGeneratedHistory.objects.first():
-            # Seed the CourseOverview table with data for all
-            # courses in the system.
-            course_keys = [course.id for course in modulestore().get_courses()]
-            course_overviews = cls.get_select_courses(course_keys)
-            num_courses = len(course_overviews)
-            CourseOverviewGeneratedHistory.objects.create(num_courses=num_courses)
-            if org:
-                course_overviews = [c for c in course_overviews if c.org == org]
-
-        else:
-            # Note: If a newly created course is not returned in this QueryList,
-            # make sure the "publish" signal was emitted when the course was
-            # created.  For tests using CourseFactory, use emit_signals=True.
-            # Or pass True for force_reseeding.
-            course_overviews = CourseOverview.objects.all()
-            if org:
-                course_overviews = course_overviews.filter(org=org)
-
+        # Note: If a newly created course is not returned in this QueryList,
+        # make sure the "publish" signal was emitted when the course was
+        # created.  For tests using CourseFactory, use emit_signals=True.
+        course_overviews = CourseOverview.objects.all()
+        if org:
+            course_overviews = course_overviews.filter(org=org)
         return course_overviews
 
     @classmethod
@@ -516,14 +491,3 @@ class CourseOverviewTab(models.Model):
     """
     tab_id = models.CharField(max_length=50)
     course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs")
-
-
-class CourseOverviewGeneratedHistory(TimeStampedModel):
-    """
-    Model for keeping track of when CourseOverview Models are
-    generated/seeded.
-    """
-    num_courses = IntegerField(null=True)
-
-    def __unicode__(self):
-        return self.num_courses
