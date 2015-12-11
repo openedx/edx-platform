@@ -82,6 +82,7 @@
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
             'js/ccx/schedule': 'js/ccx/schedule',
+            'js/ccx/async_grade_book_download': 'js/ccx/async_grade_book_download',
 
             // Discussion classes loaded explicitly until they are converted to use RequireJS
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',

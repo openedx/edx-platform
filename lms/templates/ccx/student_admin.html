@@ -1,11 +1,38 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="jsextra">
+  <%static:js group='ccx'/>
+</%block>
 
 <section>
   <h2>${_('Student Grades')}</h2>
   <p>
     <a href="${gradebook_url}">${_('View gradebook')}</a>
   </p>
-  <p>
-    <a href="${grades_csv_url}">${_('Download student grades')}</a>
-  </p>
+  <br/>
+  <div id="ccx_grade_book_download">
+    <p>
+      <a href="#" data-endpoint="${grades_csv_url}" id="ccx-calculate-grades-csv">
+        ${_("Generate Grade Report")}
+      </a>
+    </p>
+    <br/>
+    <div class="request-response msg msg-confirm copy" id="ccx-gradebook-request-response"></div>
+    <div class="request-response-error msg msg-error copy" id="ccx-gradebook-request-response-error"></div>
+    <br>
+    <p><b>${_("Grade Book Available for Download")}</b></p>
+    ## Translators: a table of URL links to report files appears after this sentence.
+    <p>${_("<b>Note</b>: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")}</p><br>
+    <br/>
+    <div class="report-downloads-table" id="ccx_report-downloads-table" data-endpoint="${list_ready_downloads}"></div>
+  </div>
 </section>
+<script>
+$(function() {
+  var view = new edx.ccx.grade_book_download.GradeBookDownloadView({
+    el: $('#ccx_grade_book_download')
+  });
+  view.render();
+});
+</script>
