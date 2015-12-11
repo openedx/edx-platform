@@ -5,6 +5,7 @@ Test data created by CourseSerializer
 from datetime import datetime
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 
@@ -29,13 +30,20 @@ class TestCourseSerializerFields(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     def _get_request(self, user=None):
         """
-        Build a Request object for the specified user
+        Build a Request object for the specified user.
         """
         if user is None:
             user = self.honor_user
         request = Request(self.request_factory.get('/'))
         request.user = user
         return request
+
+    def _get_result(self, course):
+        """
+        Return the CourseSerializer for the specified course.
+        """
+        course_overview = CourseOverview.get_from_id(course.id)
+        return CourseSerializer(course_overview, context={'request': self._get_request()}).data
 
     def test_basic(self):
         expected_data = {
@@ -55,15 +63,15 @@ class TestCourseSerializerFields(CourseApiFactoryMixin, ModuleStoreTestCase):
             'start': u'2015-07-17T12:00:00Z',
             'start_type': u'timestamp',
             'start_display': u'July 17, 2015',
-            'end': u'2015-09-19T18:00:00',
-            'enrollment_start': u'2015-06-15T00:00:00',
-            'enrollment_end': u'2015-07-15T00:00:00',
+            'end': u'2015-09-19T18:00:00Z',
+            'enrollment_start': u'2015-06-15T00:00:00Z',
+            'enrollment_end': u'2015-07-15T00:00:00Z',
             'blocks_url': u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
             'effort': u'6 hours',
         }
         course = self.create_course()
         CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)  # pylint: disable=no-member
-        result = CourseSerializer(course, context={'request': self._get_request()}).data
+        result = self._get_result(course)
         self.assertDictEqual(result, expected_data)
 
     def test_advertised_start(self):
@@ -72,14 +80,14 @@ class TestCourseSerializerFields(CourseApiFactoryMixin, ModuleStoreTestCase):
             start=datetime(2015, 3, 15),
             advertised_start=u'The Ides of March'
         )
-        result = CourseSerializer(course, context={'request': self._get_request()}).data
+        result = self._get_result(course)
         self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
         self.assertEqual(result['start_type'], u'string')
         self.assertEqual(result['start_display'], u'The Ides of March')
 
     def test_empty_start(self):
         course = self.create_course(start=DEFAULT_START_DATE, course=u'custom')
-        result = CourseSerializer(course, context={'request': self._get_request()}).data
+        result = self._get_result(course)
         self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
         self.assertEqual(result['start_type'], u'empty')
         self.assertIsNone(result['start_display'])

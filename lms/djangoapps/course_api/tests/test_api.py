@@ -3,13 +3,15 @@ Test for course API
 """
 
 from django.contrib.auth.models import AnonymousUser
-from rest_framework.exceptions import NotFound, PermissionDenied
+from django.http import Http404
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
-from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from ..api import course_detail, list_courses
 from .mixins import CourseApiFactoryMixin
@@ -23,12 +25,12 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
     def setUpClass(cls):
         super(CourseApiTestMixin, cls).setUpClass()
         cls.request_factory = APIRequestFactory()
+        CourseOverview.get_all_courses()  # seed the CourseOverview table
 
     def verify_course(self, course, course_id=u'edX/toy/2012_Fall'):
         """
         Ensure that the returned course is the course we just created
         """
-        self.assertIsInstance(course, CourseDescriptor)
         self.assertEqual(course_id, str(course.id))
 
 
@@ -43,7 +45,8 @@ class CourseDetailTestMixin(CourseApiTestMixin):
         """
         request = Request(self.request_factory.get('/'))
         request.user = requesting_user
-        return course_detail(request, target_user.username, course_key)
+        with check_mongo_calls(0):
+            return course_detail(request, target_user.username, course_key)
 
 
 class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
@@ -64,11 +67,11 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
 
     def test_get_nonexistent_course(self):
         course_key = CourseKey.from_string(u'edX/toy/nope')
-        with self.assertRaises(NotFound):
+        with self.assertRaises(Http404):
             self._make_api_call(self.honor_user, self.honor_user, course_key)
 
     def test_hidden_course_for_honor(self):
-        with self.assertRaises(NotFound):
+        with self.assertRaises(Http404):
             self._make_api_call(self.honor_user, self.honor_user, self.hidden_course.id)
 
     def test_hidden_course_for_staff(self):
@@ -76,7 +79,7 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
         self.verify_course(course, course_id=u'edX/hidden/2012_Fall')
 
     def test_hidden_course_for_staff_as_honor(self):
-        with self.assertRaises(NotFound):
+        with self.assertRaises(Http404):
             self._make_api_call(self.staff_user, self.honor_user, self.hidden_course.id)
 
 
@@ -91,7 +94,8 @@ class CourseListTestMixin(CourseApiTestMixin):
         """
         request = Request(self.request_factory.get('/'))
         request.user = requesting_user
-        return list_courses(request, specified_user.username)
+        with check_mongo_calls(0):
+            return list_courses(request, specified_user.username)
 
     def verify_courses(self, courses):
         """

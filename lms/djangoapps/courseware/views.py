@@ -37,11 +37,17 @@ from courseware.access import has_access, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
 from courseware.courses import (
-    get_courses, get_course, get_course_by_id,
-    get_studio_url, get_course_with_access,
+    get_courses,
+    get_course,
+    get_course_by_id,
+    get_permission_for_course_about,
+    get_studio_url,
+    get_course_overview_with_access,
+    get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
-    UserNotEnrolled)
+    UserNotEnrolled
+)
 from courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -802,11 +808,8 @@ def course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        permission_name = microsite.get_value(
-            'COURSE_ABOUT_VISIBILITY_PERMISSION',
-            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
-        )
-        course = get_course_with_access(request.user, permission_name, course_key)
+        permission = get_permission_for_course_about()
+        course = get_course_with_access(request.user, permission, course_key)
 
         if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
@@ -1066,7 +1069,7 @@ def submission_history(request, course_id, student_username, location):
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid location.')))
 
-    course = get_course_with_access(request.user, 'load', course_key)
+    course = get_course_overview_with_access(request.user, 'load', course_key)
     staff_access = bool(has_access(request.user, 'staff', course))
 
     # Permission Denied if they don't have staff access and are trying to see

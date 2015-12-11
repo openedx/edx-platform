@@ -8,7 +8,7 @@ import json
 from django.http import HttpResponse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_overview_with_access
 from courseware.access import has_access
 from class_dashboard import dashboard_data
 
@@ -21,7 +21,7 @@ def has_instructor_access_for_class(user, course_id):
     Returns true if the `user` is an instructor for the course.
     """
 
-    course = get_course_with_access(user, 'staff', course_id, depth=None)
+    course = get_course_overview_with_access(user, 'staff', course_id)
     return bool(has_access(user, 'staff', course))
 
 

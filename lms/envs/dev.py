@@ -188,7 +188,6 @@ OPEN_ENDED_GRADING_INTERFACE = {
 
 ############################## LMS Migration ##################################
 FEATURES['ENABLE_LMS_MIGRATION'] = True
-FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
 FEATURES['XQA_SERVER'] = 'http://xqa:server@content-qa.edX.mit.edu/xqa'
 
 INSTALLED_APPS += ('lms_migration',)

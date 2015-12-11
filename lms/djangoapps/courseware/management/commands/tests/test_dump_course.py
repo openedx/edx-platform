@@ -153,7 +153,6 @@ class CommandsTestBase(ModuleStoreTestCase):
             self.assertIn('children', element)
             self.assertIn('category', element)
             self.assertIn('inherited_metadata', element)
-            self.assertIsNone(element['inherited_metadata']['ispublic'])
             # ... but does not contain inherited metadata containing a default value:
             self.assertNotIn('due', element['inherited_metadata'])
 
@@ -169,7 +168,6 @@ class CommandsTestBase(ModuleStoreTestCase):
             self.assertIn('children', element)
             self.assertIn('category', element)
             self.assertIn('inherited_metadata', element)
-            self.assertIsNone(element['inherited_metadata']['ispublic'])
             # ... and contains inherited metadata containing a default value:
             self.assertIsNone(element['inherited_metadata']['due'])
 

@@ -60,10 +60,13 @@ class CourseDetails(object):
         self.self_paced = None
 
     @classmethod
-    def _fetch_about_attribute(cls, course_key, attribute):
+    def fetch_about_attribute(cls, course_key, attribute):
         """
         Retrieve an attribute from a course's "about" info
         """
+        if attribute not in ABOUT_ATTRIBUTES + ['video']:
+            raise ValueError("'{0}' is not a valid course about attribute.".format(attribute))
+
         usage_key = course_key.make_usage_key('about', attribute)
         try:
             value = modulestore().get_item(usage_key).data
@@ -96,7 +99,7 @@ class CourseDetails(object):
         course_details.intro_video = cls.fetch_youtube_video_id(course_key)
 
         for attribute in ABOUT_ATTRIBUTES:
-            value = cls._fetch_about_attribute(course_key, attribute)
+            value = cls.fetch_about_attribute(course_key, attribute)
             if value is not None:
                 setattr(course_details, attribute, value)
 
@@ -107,7 +110,7 @@ class CourseDetails(object):
         """
         Returns the course about video ID.
         """
-        raw_video = cls._fetch_about_attribute(course_key, 'video')
+        raw_video = cls.fetch_about_attribute(course_key, 'video')
         if raw_video:
             return cls.parse_video_tag(raw_video)
 
@@ -119,13 +122,6 @@ class CourseDetails(object):
         video_id = cls.fetch_youtube_video_id(course_key)
         if video_id:
             return "http://www.youtube.com/watch?v={0}".format(video_id)
-
-    @classmethod
-    def fetch_effort(cls, course_key):
-        """
-        Returns the hours per week of effort for the course.
-        """
-        return cls._fetch_about_attribute(course_key, 'effort')
 
     @classmethod
     def update_about_item(cls, course, about_key, data, user_id, store=None):

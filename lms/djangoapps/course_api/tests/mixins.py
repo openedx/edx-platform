@@ -26,6 +26,7 @@ class CourseApiFactoryMixin(object):
             end=datetime(2015, 9, 19, 18, 0, 0),
             enrollment_start=datetime(2015, 6, 15, 0, 0, 0),
             enrollment_end=datetime(2015, 7, 15, 0, 0, 0),
+            emit_signals=True,
             **kwargs
         )
 
