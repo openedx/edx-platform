@@ -1,7 +1,6 @@
 from setuptools import setup, find_packages
 
 XMODULES = [
-    "abtest = xmodule.abtest_module:ABTestDescriptor",
     "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "chapter = xmodule.seq_module:SequenceDescriptor",
     "combinedopenended = xmodule.combined_open_ended_module:CombinedOpenEndedDescriptor",
