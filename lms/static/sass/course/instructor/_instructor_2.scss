@@ -2160,6 +2160,7 @@ input[name="subject"] {
   }
 
   #certificate-white-list-editor {
+    padding-top: 5px;
     .certificate-exception-inputs {
       .student-username-or-email {
         width: 300px;
@@ -2179,7 +2180,9 @@ input[name="subject"] {
 
   .white-listed-students {
     margin-top: 10px;
+    padding-top: 5px;
     table {
+      margin-top: 5px;
       width: 100%;
       word-wrap: break-word;
 
@@ -2260,6 +2263,7 @@ input[name="subject"] {
 
   .bulk-white-list-exception {
     margin-top: 10px;
+    padding-top: 5px;
     .white-list-csv {
       .bulk-exception-results {
         margin-top: 10px;
@@ -2271,6 +2275,7 @@ input[name="subject"] {
         .message {
           padding: 5px 10px;
           margin: 2px;
+          border-top-style: none;
         }
 
       }

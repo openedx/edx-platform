@@ -161,23 +161,30 @@
                                 break;
 
                             case MESSAGE_GROUP.data_format_error:
-                                text = qty > 1 ? gettext(qty + ' records are not in correct format'):
-                                    gettext(qty + ' record is not in correct format');
+                                text = qty > 1 ? gettext(qty + ' records are not in correct format and not added to' +
+                                    ' the exception list'):
+                                    gettext(qty + ' record is not in correct format and not added to the exception' +
+                                        ' list');
                                 break;
 
                             case MESSAGE_GROUP.user_not_exist:
-                                text = qty > 1 ? gettext(qty + ' learners do not exist in LMS'):
-                                    gettext(qty + ' learner does not exist in LMS');
+                                text = qty > 1 ? gettext(qty + ' learners do not exist in LMS and not added to the' +
+                                    ' exception list'):
+                                    gettext(qty + ' learner does not exist in LMS and not added to the exception list');
                                 break;
 
                             case MESSAGE_GROUP.user_already_white_listed:
-                                text = qty > 1 ? gettext(qty + ' learners are already white listed'):
-                                    gettext(qty + ' learner is already white listed');
+                                text = qty > 1 ? gettext(qty + ' learners are already white listed and not added to' +
+                                    ' the exception list'):
+                                    gettext(qty + ' learner is already white listed and not added to the exception ' +
+                                        'list');
                                 break;
 
                             case MESSAGE_GROUP.user_not_enrolled:
-                                text = qty > 1 ? gettext(qty + ' learners are not enrolled in course'):
-                                    gettext(qty + ' learner is not enrolled in course');
+                                text = qty > 1 ? gettext(qty + ' learners are not enrolled in course and not added to' +
+                                    ' the exception list'):
+                                    gettext(qty + ' learner is not enrolled in course and not added to the exception' +
+                                        ' list');
                                 break;
                         }
                         return text;
@@ -199,8 +206,7 @@
                 chooseFile: function(event) {
                     if (event && event.preventDefault) { event.preventDefault(); }
                     if (event.currentTarget.files.length === 1) {
-                        this.$el.find(DOM_SELECTORS.upload_csv_button).removeClass('is-disabled')
-                            .addClass('btn-blue');
+                        this.$el.find(DOM_SELECTORS.upload_csv_button).removeClass('disabled');
                         this.$el.find(DOM_SELECTORS.browse_file).val(
                             event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf("\\") + 1));
                     }
