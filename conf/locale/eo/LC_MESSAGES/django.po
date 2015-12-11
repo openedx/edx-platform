@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-04 16:24+0000\n"
-"PO-Revision-Date: 2015-12-04 16:24:15.917177\n"
+"POT-Creation-Date: 2015-12-11 17:49+0000\n"
+"PO-Revision-Date: 2015-12-11 17:49:32.708299\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -240,7 +240,7 @@ msgstr ""
 msgid "Professional Ed"
 msgstr "Pröféssïönäl Éd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#: common/djangoapps/course_modes/models.py
+#: common/djangoapps/course_modes/models.py lms/djangoapps/courseware/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: lms/templates/courseware/courseware.html
 msgid "Course"
@@ -6247,7 +6247,6 @@ msgid "Percent of Students"
 msgstr "Pérçént öf Stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/folditchallenge.html
 msgid "Score"
 msgstr "Sçöré Ⱡ'σяєм ιρѕ#"
 
@@ -6564,6 +6563,88 @@ msgstr ""
 #: lms/djangoapps/courseware/views.py
 msgid "Certificate is being created."
 msgstr "Çértïfïçäté ïs ßéïng çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"{platform_name} now offers financial assistance for learners who want to earn verified certificates but who may not be able to pay the Verified Certificate fee. Eligible learners receive 90{percent_sign} off the Verified Certificate fee for a course.\n"
+"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take."
+msgstr ""
+"{platform_name} nöw öfférs fïnänçïäl ässïstänçé för léärnérs whö wänt tö éärn vérïfïéd çértïfïçätés ßüt whö mäý nöt ßé äßlé tö päý thé Vérïfïéd Çértïfïçäté féé. Élïgïßlé léärnérs réçéïvé 90{percent_sign} öff thé Vérïfïéd Çértïfïçäté féé för ä çöürsé.\n"
+"Tö äpplý för fïnänçïäl ässïstänçé, énröll ïn thé äüdït träçk för ä çöürsé thät öfférs Vérïfïéd Çértïfïçätés, änd thén çömplété thïs äpplïçätïön. Nöté thät ýöü müst çömplété ä sépäräté äpplïçätïön för éäçh çöürsé ýöü täké.#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Annual Income"
+msgstr "Ànnüäl Ìnçömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your current financial situation, including any unusual "
+"circumstances."
+msgstr ""
+"Téll üs äßöüt ýöür çürrént fïnänçïäl sïtüätïön, ïnçlüdïng äný ünüsüäl "
+"çïrçümstänçés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your learning or professional goals. How will a Verified "
+"Certificate in this course help you achieve these goals?"
+msgstr ""
+"Téll üs äßöüt ýöür léärnïng ör pröféssïönäl göäls. Höw wïll ä Vérïfïéd "
+"Çértïfïçäté ïn thïs çöürsé hélp ýöü äçhïévé thésé göäls? Ⱡ'σяє#"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your plans for this course. What steps will you take to help "
+"you complete the course work a receive a certificate?"
+msgstr ""
+"Téll üs äßöüt ýöür pläns för thïs çöürsé. Whät stéps wïll ýöü täké tö hélp "
+"ýöü çömplété thé çöürsé wörk ä réçéïvé ä çértïfïçäté? Ⱡ'σя#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Use between 250 and 500 words or so in your response."
+msgstr ""
+"Ûsé ßétwéén 250 änd 500 wörds ör sö ïn ýöür réspönsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Select the course for which you want to earn a verified certificate. If the "
+"course does not appear in the list, make sure that you have enrolled in the "
+"audit track for the course."
+msgstr ""
+"Séléçt thé çöürsé för whïçh ýöü wänt tö éärn ä vérïfïéd çértïfïçäté. Ìf thé "
+"çöürsé döés nöt äppéär ïn thé lïst, mäké süré thät ýöü hävé énrölléd ïn thé "
+"äüdït träçk för thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ι#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "income in USD ($)"
+msgstr "ïnçömé ïn ÛSD ($) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Specify your annual income in USD."
+msgstr ""
+"Spéçïfý ýöür ännüäl ïnçömé ïn ÛSD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"I allow edX to use the information provided in this application for edX "
+"marketing purposes."
+msgstr ""
+"Ì ällöw édX tö üsé thé ïnförmätïön prövïdéd ïn thïs äpplïçätïön för édX "
+"märkétïng pürpösés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Annual income and personal information such as email address will not be "
+"shared."
+msgstr ""
+"Ànnüäl ïnçömé änd pérsönäl ïnförmätïön süçh äs émäïl äddréss wïll nöt ßé "
+"shäréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
@@ -12253,10 +12334,6 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕι#"
 
-#: lms/templates/admin_dashboard.html
-msgid "{platform_name}-wide Summary"
-msgstr "{platform_name}-wïdé Sümmärý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 #: lms/templates/instructor/staff_grading.html
@@ -12427,48 +12504,6 @@ msgstr "Déßüg:  Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "Éxtérnäl Àüthéntïçätïön fäïléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/folditbasic.html
-msgid "Due:"
-msgstr "Düé: Ⱡ'σяєм ι#"
-
-#: lms/templates/folditbasic.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-msgid "Status:"
-msgstr "Stätüs: Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/folditbasic.html
-msgid "You have successfully gotten to level {goal_level}."
-msgstr ""
-"Ýöü hävé süççéssfüllý göttén tö lévél {goal_level}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/folditbasic.html
-msgid "You have not yet gotten to level {goal_level}."
-msgstr ""
-"Ýöü hävé nöt ýét göttén tö lévél {goal_level}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/folditbasic.html
-msgid "Completed puzzles"
-msgstr "Çömplétéd püzzlés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/folditbasic.html
-msgid "Level"
-msgstr "Lévél Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/folditbasic.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Submitted"
-msgstr "Süßmïttéd Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/folditchallenge.html
-msgid "Puzzle Leaderboard"
-msgstr "Püzzlé Léädérßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/templates/folditchallenge.html
-msgid "User"
-msgstr "Ûsér Ⱡ'σяєм ι#"
 
 #: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"
@@ -14986,10 +15021,6 @@ msgstr ""
 " tö lét üs knöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Psychometrics"
-msgstr "Psýçhömétrïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "Àdmïn Ⱡ'σяєм ιρѕ#"
@@ -15095,10 +15126,6 @@ msgid "Student-specific grade inspection and adjustment"
 msgstr ""
 "Stüdént-spéçïfïç grädé ïnspéçtïön änd ädjüstmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Select a problem and an action:"
-msgstr "Séléçt ä prößlém änd än äçtïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -15217,6 +15244,10 @@ msgstr "Täsk Ìd Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Requester"
 msgstr "Réqüéstér Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/courseware/legacy_instructor_dashboard.html
+msgid "Submitted"
+msgstr "Süßmïttéd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Task State"
@@ -17198,6 +17229,105 @@ msgstr ""
 msgid "Donation Actions"
 msgstr "Dönätïön Àçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Financial Assistance Application"
+msgstr ""
+"Fïnänçïäl Àssïstänçé Àpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "A Note to Learners"
+msgstr "À Nöté tö Léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Dear edX Learner,"
+msgstr "Déär édX Léärnér, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"EdX Financial Assistance is a program we created to give learners in all "
+"financial circumstances a chance to earn a Verified Certificate upon "
+"successful completion of an edX course."
+msgstr ""
+"ÉdX Fïnänçïäl Àssïstänçé ïs ä prögräm wé çréätéd tö gïvé léärnérs ïn äll "
+"fïnänçïäl çïrçümstänçés ä çhänçé tö éärn ä Vérïfïéd Çértïfïçäté üpön "
+"süççéssfül çömplétïön öf än édX çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"If you are interested in working toward a Verified Certificate, but cannot "
+"afford to pay the fee, please apply now. Please note space is limited."
+msgstr ""
+"Ìf ýöü äré ïntéréstéd ïn wörkïng töwärd ä Vérïfïéd Çértïfïçäté, ßüt çännöt "
+"äfförd tö päý thé féé, pléäsé äpplý nöw. Pléäsé nöté späçé ïs lïmïtéd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"In order to be eligible for edX Financial Assistance, you must demonstrate "
+"that paying the Verified Certificate fee would cause you economic hardship. "
+"To apply, you will be asked to answer a few questions about why you are "
+"applying and how the Verified Certificate will benefit you."
+msgstr ""
+"Ìn ördér tö ßé élïgïßlé för édX Fïnänçïäl Àssïstänçé, ýöü müst démönsträté "
+"thät päýïng thé Vérïfïéd Çértïfïçäté féé wöüld çäüsé ýöü éçönömïç härdshïp. "
+"Tö äpplý, ýöü wïll ßé äskéd tö änswér ä féw qüéstïöns äßöüt whý ýöü äré "
+"äpplýïng änd höw thé Vérïfïéd Çértïfïçäté wïll ßénéfït ýöü. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ є#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"Once your application is approved, we'll email to let you know and give you "
+"instructions for how to verify your identity on edX.org; then you can start "
+"working toward completing your edX course."
+msgstr ""
+"Önçé ýöür äpplïçätïön ïs äpprövéd, wé'll émäïl tö lét ýöü knöw änd gïvé ýöü "
+"ïnstrüçtïöns för höw tö vérïfý ýöür ïdéntïtý ön édX.örg; thén ýöü çän stärt "
+"wörkïng töwärd çömplétïng ýöür édX çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"EdX is committed to making it possible for you to take high quality courses "
+"from leading institutions regardless of your financial situation, earn a "
+"Verified Certificate, and share your success with others."
+msgstr ""
+"ÉdX ïs çömmïttéd tö mäkïng ït pössïßlé för ýöü tö täké hïgh qüälïtý çöürsés "
+"fröm léädïng ïnstïtütïöns régärdléss öf ýöür fïnänçïäl sïtüätïön, éärn ä "
+"Vérïfïéd Çértïfïçäté, änd shäré ýöür süççéss wïth öthérs. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
+" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Sincerely, Anant"
+msgstr "Sïnçérélý, Ànänt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Back to Student FAQs"
+msgstr "Bäçk tö Stüdént FÀQs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Apply for Financial Assistance"
+msgstr "Àpplý för Fïnänçïäl Àssïstänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
 msgstr "{course_number} Stäff Grädïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -17304,6 +17434,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generate Example Certificates"
 msgstr "Généräté Éxämplé Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Status:"
+msgstr "Stätüs: Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generating example {name} certificate"
@@ -19109,10 +19243,6 @@ msgid "Show Background Task History for Problem"
 msgstr ""
 "Shöw Bäçkgröünd Täsk Hïstörý för Prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
-
-#: lms/templates/licenses/serial_numbers.html
-msgid "None Available"
-msgstr "Nöné Àväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"

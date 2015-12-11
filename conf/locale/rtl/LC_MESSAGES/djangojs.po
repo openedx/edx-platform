@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-04 16:23+0000\n"
-"PO-Revision-Date: 2015-12-04 16:24:16.296758\n"
+"POT-Creation-Date: 2015-12-11 17:48+0000\n"
+"PO-Revision-Date: 2015-12-11 17:49:33.083624\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6188,6 +6188,7 @@ msgid "Amount"
 msgstr "شوخعرف"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "فخفشم"
@@ -6902,6 +6903,7 @@ msgstr "صاشف غخع رثثي بخق دثقهبهذشفهخر"
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "صثزذشو"
@@ -7125,6 +7127,7 @@ msgid "Check Your Email"
 msgstr "ذاثذن غخعق ثوشهم"
 
 #: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "حاخفخ هي"
@@ -7202,6 +7205,73 @@ msgstr "غخعق دثقهبهذشفهخر سفشفعس هس لخخي عرفهم 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
 msgstr "حقهذث"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Account Not Activated"
+msgstr "شذذخعرف رخف شذفهدشفثي"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "You are enrolling in %(courseName)s"
+msgstr "غخع شقث ثرقخممهرل هر %(courseName)s"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Upgrade to a Verified Certificate for %(courseName)s"
+msgstr "عحلقشيث فخ ش دثقهبهثي ذثقفهبهذشفث بخق %(courseName)s"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Before you upgrade to a certificate track, you must activate your account."
+msgstr ""
+"زثبخقث غخع عحلقشيث فخ ش ذثقفهبهذشفث فقشذن, غخع وعسف شذفهدشفث غخعق شذذخعرف."
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Check your email for an activation message."
+msgstr "ذاثذن غخعق ثوشهم بخق شر شذفهدشفهخر وثسسشلث."
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Professional Certificate for %(courseName)s"
+msgstr "حقخبثسسهخرشم ذثقفهبهذشفث بخق %(courseName)s"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Verified Certificate for %(courseName)s"
+msgstr "دثقهبهثي ذثقفهبهذشفث بخق %(courseName)s"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid ""
+"To receive a certificate, you must also verify your identity before "
+"%(date)s."
+msgstr ""
+"فخ قثذثهدث ش ذثقفهبهذشفث, غخع وعسف شمسخ دثقهبغ غخعق هيثرفهفغ زثبخقث "
+"%(date)s."
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "To receive a certificate, you must also verify your identity."
+msgstr "فخ قثذثهدث ش ذثقفهبهذشفث, غخع وعسف شمسخ دثقهبغ غخعق هيثرفهفغ."
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"To verify your identity, you need a webcam and a government-issued photo ID."
+msgstr ""
+"فخ دثقهبغ غخعق هيثرفهفغ, غخع رثثي ش صثزذشو شري ش لخدثقروثرف-هسسعثي حاخفخ هي."
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Your ID must be a government-issued photo ID that clearly shows your face."
+msgstr ""
+"غخعق هي وعسف زث ش لخدثقروثرف-هسسعثي حاخفخ هي فاشف ذمثشقمغ ساخصس غخعق بشذث."
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"You will use your webcam to take a picture of your face and of your "
+"government-issued photo ID."
+msgstr ""
+"غخع صهمم عسث غخعق صثزذشو فخ فشنث ش حهذفعقث خب غخعق بشذث شري خب غخعق "
+"لخدثقروثرف-هسسعثي حاخفخ هي."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -7426,6 +7496,7 @@ msgid "ID"
 msgstr "هي"
 
 #: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Details"
 msgstr "ذثقفهبهذشفث يثفشهمس"
 

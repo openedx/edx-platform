@@ -1823,15 +1823,15 @@ msgstr "Intente usar otro navegador. Por ejemplo Google Chrome."
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr ""
+msgstr "Alta Definición"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr ""
+msgstr "Apagar"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
-msgstr ""
+msgstr "Encender"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
@@ -1872,6 +1872,9 @@ msgid ""
 "to navigate the different speeds, then press ENTER to change to the selected"
 " speed."
 msgstr ""
+"Velocidad: Presione ARRIBA para acceder al menú luego use las teclas de "
+"ARRIBA y ABAJO para cambiar a diferentes velocidades, entonces presionas "
+"ENTER para cambiar a la velocidad seleccionada."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -1887,7 +1890,7 @@ msgstr "No mostrar nuevamente"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcript"
-msgstr ""
+msgstr "Desactivar transcripción"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1898,7 +1901,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "Abrir menú de lenguaje"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1914,11 +1917,11 @@ msgstr "El texto se mostrará cuando"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr ""
+msgstr "Activar transcripción"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr ""
+msgstr "Desactivar transcripción"
 
 #: common/lib/xmodule/xmodule/public/js/library_content_edit.js
 msgid "Updating with latest library content"
@@ -2221,6 +2224,7 @@ msgstr "Mostrando %(first_index)s-%(last_index)s de un total de %(num_items)s"
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
 msgstr ""
+"La dirección de correo que ha ingresado no está en el formato correcto."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
@@ -2232,7 +2236,7 @@ msgstr ""
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
-msgstr ""
+msgstr "Por favor ingrese su %(field)s."
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -2854,6 +2858,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating survey results. Please try again."
 msgstr ""
+"Error generando los resultados de encuesta. Por favor intente nuevamente."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
@@ -3683,11 +3688,11 @@ msgstr "Guardar cambios"
 
 #: lms/static/js/ccx/schedule.js
 msgid "Please enter valid start date and time."
-msgstr ""
+msgstr "Por favor ingrese fecha y hora de inicio válida."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Due date cannot be before start date."
-msgstr ""
+msgstr "Fecha límite no puede ser menor al a fecha de inicio."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Due Date and Time"
@@ -3700,50 +3705,52 @@ msgstr "Ingrese fecha y hora"
 #: lms/static/js/certificates/models/certificate_exception.js
 msgid "Student username/email field is required and can not be empty. "
 msgstr ""
+"Campos nombre de usuario / email del estudiante son requeridos y no pueden "
+"estar vacíos."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid "Errors!"
-msgstr ""
+msgstr "Errores !"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
-msgstr ""
+msgstr "alumnos fueron agregados a la lista de excepciones"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is successfully added to the exception list"
-msgstr ""
+msgstr "alumno fue agregado a la lista de excepción"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format"
-msgstr ""
+msgstr "registros no están en el formato correcto"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " record is not in correct format"
-msgstr ""
+msgstr "registro no está en el formato correcto"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners do not exist in LMS"
-msgstr ""
+msgstr "estudiante no existe en LMS"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner does not exist in LMS"
-msgstr ""
+msgstr "estudiante no existe en LMS"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are already white listed"
-msgstr ""
+msgstr "estudiantes fueron puestos en lista blanca"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is already white listed"
-msgstr ""
+msgstr "estudiante ya está en lista blanca"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are not enrolled in course"
-msgstr ""
+msgstr "estudiantes no están inscritos en el curso"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course"
-msgstr ""
+msgstr "estudiante no esta inscrito en el curso"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
