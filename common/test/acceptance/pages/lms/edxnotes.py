@@ -563,7 +563,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Clicks cancel button.
         """
-        self.q(css=self._bounded_selector(".annotator-cancel")).first.click()
+        self.q(css=self._bounded_selector(".annotator-close")).first.click()
         self.wait_for_notes_invisibility("Note is canceled.")
         return self
 
@@ -604,8 +604,7 @@ class EdxNoteHighlight(NoteChild):
             text = element.text[0].strip()
         else:
             text = None
-        self.q(css=("body")).first.click()
-        self.wait_for_notes_invisibility()
+        self.cancel()
         return text
 
     @text.setter
@@ -628,8 +627,7 @@ class EdxNoteHighlight(NoteChild):
         if tags:
             for tag in tags:
                 tag_text.append(tag.text)
-        self.q(css="body").first.click()
-        self.wait_for_notes_invisibility()
+        self.cancel()
         return tag_text
 
     @tags.setter

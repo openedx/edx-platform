@@ -72,6 +72,7 @@ define([
         },
 
         showLoadingMessage: function () {
+            this.doCleanup();
             this.$el.html(this.loadingTemplate());
             this.$el.show();
             this.$contentElement.hide();
@@ -81,6 +82,15 @@ define([
             this.$el.html(this.errorTemplate());
             this.$el.show();
             this.$contentElement.hide();
+        },
+
+        doCleanup: function () {
+            // Empty any loading/error message and empty the el
+            // Bookmarks share the same container element, So we are doing
+            // this to ensure that elements are in clean/initial state
+            $('#loading-message').html('');
+            $('#error-message').html('');
+            this.$el.html('');
         },
 
         loadNext: function (event) {

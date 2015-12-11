@@ -917,6 +917,14 @@ class XMLModuleStore(ModuleStoreReadBase):
         log.warning("get_all_asset_metadata request of XML modulestore - not implemented.")
         return []
 
+    def fill_in_run(self, course_key):
+        """
+        A no-op.
+
+        Added to simplify tests which use the XML-store directly.
+        """
+        return course_key
+
 
 class LibraryXMLModuleStore(XMLModuleStore):
     """

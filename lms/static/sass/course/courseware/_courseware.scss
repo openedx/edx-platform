@@ -403,6 +403,10 @@ div.course-wrapper {
       }
     }
 
+    .sequence .path {
+      margin-bottom: ($baseline/2);
+    }
+
     div#seq_content {
       h1 {
         background: none;
@@ -647,5 +651,13 @@ section.self-assessment {
   .error {
     font-size: 14px;
     font-weight: bold;
+  }
+}
+
+.courseware-results-wrapper {
+  padding: ($baseline*2);
+
+  .courseware-results {
+    display: none;
   }
 }

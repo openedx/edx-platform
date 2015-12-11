@@ -48,6 +48,7 @@ from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -742,6 +743,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             "reverification": ReverificationService(),
             'proctoring': ProctoringService(),
             'credit': CreditService(),
+            'bookmarks': BookmarksService(user=user),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
