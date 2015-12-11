@@ -7,7 +7,6 @@ from django.http import Http404
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 from lms.djangoapps.courseware.courses import get_courses, get_course_with_access
-
 from .permissions import can_view_courses_for_username
 
 
@@ -50,7 +49,7 @@ def course_detail(request, username, course_key):
     return course
 
 
-def list_courses(request, username):
+def list_courses(request, username, org=None):
     """
     Return a list of available courses.
 
@@ -66,10 +65,19 @@ def list_courses(request, username):
             The name of the user the logged-in user would like to be
             identified as
 
+    Keyword Arguments:
+        org (string):
+            If specified, visible `CourseDescriptor` objects are filtered
+            such that only those belonging to the organization with the provided
+            org code (e.g., "HarvardX") are returned. Case-insensitive.
 
     Return value:
         List of `CourseDescriptor` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
     courses = get_courses(user)
+
+    if org is not None:
+        courses = [course for course in courses if course.location.org.lower() == org.lower()]
+
     return courses
