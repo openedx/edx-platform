@@ -1418,10 +1418,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
     '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
-    ' who may not be able to pay the Verified Certificate fee. Eligible learners receive 90{percent_sign} off'
+    ' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'
     ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
     ' audit track for a course that offers Verified Certificates, and then complete this application.'
-    ' Note that you must complete a separate application for each course you take.\n We will use this'
+    ' Note that you must complete a separate application for each course you take.\n We plan to use this'
     ' information to evaluate your application for financial assistance and to further develop our'
     ' financial assistance program.'
 ).format(
@@ -1432,7 +1432,7 @@ FINANCIAL_ASSISTANCE_HEADER = _(
 
 FA_INCOME_LABEL = _('Annual Household Income')
 FA_REASON_FOR_APPLYING_LABEL = _(
-    'Tell us about your current financial situation.'
+    'Tell us about your current financial situation. Why do you need assistance?'
 )
 FA_GOALS_LABEL = _(
     'Tell us about your learning or professional goals. How will a Verified Certificate in'
@@ -1568,11 +1568,11 @@ def financial_assistance_form(request):
                 'name': 'income',
                 'type': 'text',
                 'label': FA_INCOME_LABEL,
-                'placeholder': _('income in USD ($)'),
+                'placeholder': _('income in US Dollars ($)'),
                 'defaultValue': '',
                 'required': True,
                 'restrictions': {},
-                'instructions': _('Specify your annual income in USD.')
+                'instructions': _('Specify your annual household income in US Dollars.')
             },
             {
                 'name': 'reason_for_applying',
@@ -1617,15 +1617,13 @@ def financial_assistance_form(request):
                 'placeholder': '',
                 'name': 'mktg-permission',
                 'label': _(
-                    'I allow edX to use the information provided in this application for edX marketing purposes.'
+                    'I allow edX to use the information provided in this application '
+                    '(except for financial information) for edX marketing purposes.'
                 ),
                 'defaultValue': '',
                 'type': 'checkbox',
                 'required': False,
-                'instructions': _(
-                    'Annual income and personal information such as email address will not be shared. '
-                    'Financial information will not be used for marketing purposes.'
-                ),
+                'instructions': '',
                 'restrictions': {}
             }
         ],
