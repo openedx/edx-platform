@@ -1,4 +1,6 @@
 """ Tests for API permissions classes. """
+
+import ddt
 from django.test import TestCase, RequestFactory
 
 from openedx.core.lib.api.permissions import IsStaffOrOwner
@@ -10,8 +12,10 @@ class TestObject(object):
     user = None
 
 
+@ddt.ddt
 class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """
+
     def setUp(self):
         super(IsStaffOrOwnerTests, self).setUp()
         self.permission = IsStaffOrOwner()
@@ -50,11 +54,22 @@ class IsStaffOrOwnerTests(TestCase):
         self.request.user = UserFactory.create(is_staff=True)
         self.assertTrue(self.permission.has_permission(self.request, None))
 
-    def test_has_permission_as_owner(self):
-        """ Owners always have permission. """
+    def test_has_permission_as_owner_with_get(self):
+        """ Owners always have permission to make GET actions. """
         user = UserFactory.create()
         request = RequestFactory().get('/?username={}'.format(user.username))
         request.user = user
+        self.assertTrue(self.permission.has_permission(request, None))
+
+    @ddt.data('patch', 'post', 'put')
+    def test_has_permission_as_owner_with_edit(self, action):
+        """ Owners always have permission to edit. """
+        user = UserFactory.create()
+
+        data = {'username': user.username}
+        request = getattr(RequestFactory(), action)('/', data, format='json')
+        request.user = user
+        request.data = data  # Note (CCB): This is a hack that should be fixed. (ECOM-3171)
         self.assertTrue(self.permission.has_permission(request, None))
 
     def test_has_permission_as_non_owner(self):
