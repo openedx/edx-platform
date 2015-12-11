@@ -44,6 +44,7 @@
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 亚仑 <fl_meng@163.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 周歆荷 <lotus351@outlook.com>, 2015
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 汤和果 <hgtang93@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013

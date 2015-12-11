@@ -169,14 +169,15 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Cristian Salamea <ovnicraft@gmail.com>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2015-12-03 21:16+0000\n"
-"PO-Revision-Date: 2015-11-24 13:39+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"PO-Revision-Date: 2015-12-07 17:08+0000\n"
+"Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21173,6 +21174,8 @@ msgstr "El artículo \"%s\" y sus hijos han sido restaurados."
 msgid ""
 "The article %(title)s is now set to display revision #%(revision_number)d"
 msgstr ""
+"El artículo %(title)s está ahora publicado para mostrar la revisión "
+"#%(revision_number)d"
 
 #: wiki/views/article.py
 msgid "New title"

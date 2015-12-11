@@ -30,6 +30,7 @@
 # omarithawi <oithawi@qrf.org>, 2015
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # SiddigSami <siddigsami@live.com>, 2014-2015
+# Soha Assali <soha+transifex@qordoba.com>, 2015
 # Tariq Hamid <ou63@outlook.com>, 2015
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -882,7 +883,7 @@ msgstr "التنسيقات"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 msgid "Fullscreen"
-msgstr "العرض بشاشة كاملة"
+msgstr "عرض بشاشة كاملة"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1812,15 +1813,15 @@ msgstr "يُرجى محاولة استخدام متصفّح آخر، مثل غو
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr ""
+msgstr "دقّة عالية"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr ""
+msgstr "غير مفعّل"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
-msgstr ""
+msgstr "مفعّل"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
@@ -1864,6 +1865,8 @@ msgstr[5] "%(value)s ثوانٍ"
 msgid ""
 "Volume: Click on this button to mute or unmute this video or press UP or "
 msgstr ""
+"التحكّم بالصوت: يُرجى النقر على هذا الزر لكتم أو إلغاء كتم صوت هذا الفيديو، "
+"أو الضغط على الزر \"أعلى\" أو"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1871,6 +1874,9 @@ msgid ""
 "to navigate the different speeds, then press ENTER to change to the selected"
 " speed."
 msgstr ""
+"سرعة العرض: الضغط على الزر \"أعلى\" للدخول إلى قائمة ضبط السرعة ومن ثم "
+"استخدام زريّ الأسهم \"أعلى\" و\"أسفل\" للانتقال بين سرعات العرض المختلفة ومن"
+" ثم الضغط على زر \"Enter\" لاعتماد السرعة المختارة."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -1886,7 +1892,7 @@ msgstr "يُرجى عدم إظهار هذا مرّة أخرى."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcript"
-msgstr ""
+msgstr "إخفاء نص الكلام المدوّن"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1894,10 +1900,13 @@ msgid ""
 " DOWN arrow keys to navigate language options. Press ENTER to change to the "
 "selected language."
 msgstr ""
+"اللغة: الضغط على زر السهم \"أعلى\" للدخول إلى قائمة ضبط اللغة ومن ثم استخدام"
+" زريّ الأسهم \"أعلى\" و\"أسفل\" للانتقال بين خيارات اللغات المختلفة ومن ثم "
+"الضغط على زر \"Enter\" لاعتماد اللغة المختارة."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "فتح قائمة اللغات المتوفرة"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1913,11 +1922,11 @@ msgstr "سيجري عرض العنوان الفرعي عندما"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr ""
+msgstr "عرض نص الكلام المدوّن"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr ""
+msgstr "إخفاء النص"
 
 #: common/lib/xmodule/xmodule/public/js/library_content_edit.js
 msgid "Updating with latest library content"
@@ -2089,7 +2098,7 @@ msgstr "المحادثة الحالية"
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
 msgid "Search Results"
-msgstr "البحث في النتائج"
+msgstr "بحث في النتائج"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
@@ -2218,19 +2227,19 @@ msgstr "إظهار %(first_index)s-%(last_index)s من أصل %(num_items)s."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
-msgstr ""
+msgstr "صيغة عنوان البريد الإلكتروني الذي ذكرته غير صحيحة"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
-msgstr ""
+msgstr "يجب أن تحوي الحقول %(field)s على %(count) حرفًا على الأقل"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s can only contain up to %(count)d characters."
-msgstr ""
+msgstr "يجب ألا يتجاوز عدد أحرف الحقول %(field)s الـ %(count) حرفًا."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
-msgstr ""
+msgstr "يُرجى إدخال بيانات %(field)s."
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -2499,11 +2508,11 @@ msgstr "نأسف لحدوث خطأ غير متوقَّع. يُرجى إعادة 
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
-msgstr ""
+msgstr "النشاط الأخير"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "open slots"
-msgstr ""
+msgstr "الشواغر المتاحة"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
@@ -2526,21 +2535,23 @@ msgstr "تحديث"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team Name (Required) *"
-msgstr ""
+msgstr "اسم الفريق (مطلوب)*"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "A name that identifies your team (maximum 255 characters)."
-msgstr ""
+msgstr "اسم يعرّف بفريقك (255 حرفًا على الأكثر)."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team Description (Required) *"
-msgstr ""
+msgstr "وصف تعريفي بالفريق (مطلوب)*"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid ""
 "A short description of the team to help other learners understand the goals "
 "or direction of the team (maximum 300 characters)."
 msgstr ""
+"وصف قصير حول الفريق لمساعدة المتعلمين الآخرين على فهم أهدافه أو توجّهه (300 "
+"حرفًا على الأكثر)."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -2548,10 +2559,10 @@ msgid "Language"
 msgstr "اللغة"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid ""
 "The language that team members primarily use to communicate with each other."
 msgstr ""
+"اللغة الرئيسية التي يعتمدها أفراد الفريق بشكل أساسي للتواصل فيما بينهم"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -2559,9 +2570,8 @@ msgid "Country"
 msgstr "البلد"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "The country that team members primarily identify with."
-msgstr ""
+msgstr "البلد الذي يعتمده أعضاء الفريق بشكل أساسي للتعريف بأنفسهم."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/views/fields.js
@@ -2570,53 +2580,55 @@ msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Check the highlighted fields below and try again."
-msgstr ""
+msgstr "يُرجى الاطلاع على الحقول المميزة بإشارة والمحاولة من جديد."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Enter team name."
-msgstr ""
+msgstr "أدخل اسم الفريق."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team name cannot have more than 255 characters."
-msgstr ""
+msgstr "يجب ألا يتجاوز اسم الفريق 255 حرفًا."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Enter team description."
-msgstr ""
+msgstr "أدخل وصف تعريفي بالفريق."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team description cannot have more than 300 characters."
-msgstr ""
+msgstr "يجب ألا يتجاوز اسم الفريق 300 حرفًا."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "An error occurred while removing the member from the team. Try again."
-msgstr ""
+msgstr "نأسف لحدوث خطأ أثناء إستبعاد عضو من الفريق. يُرجى إعادة المحاولة."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "This team does not have any members."
-msgstr ""
+msgstr "لا يضم الفريق أيّ أعضاء."
 
 #. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
 #. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
-msgstr ""
+msgstr "انضم بتاريخ %(date)"
 
 #. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
 #. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
-msgstr ""
+msgstr "النشاط الأخير بتاريخ %(date)"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Remove this team member?"
-msgstr ""
+msgstr "أتوّد استبعاد عضو الفريق هذا؟"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
 "This learner will be removed from the team, allowing another learner to take"
 " the available spot."
 msgstr ""
+"سيجري استبعاد هذا المتعلّم من الفريق، الأمر الذي سيفسح لمتعلّم الآخر المجال "
+"لشغل الشاغر المتاح."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
@@ -2627,33 +2639,35 @@ msgstr "حذف"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
-msgstr ""
+msgstr "أتودّ حذف هذا الفريق؟"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
 "Deleting a team is permanent and cannot be undone. All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
+"إن عملية حذف هذا الفريق دائمة ولا يمكن التراجع عنها. سيُستبعد بذلك جميع "
+"أعضاء الفريق وسيتعذّر الوصول إلى مناقشات أعضاء الفريق في المستقبل."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"%(team)s\" successfully deleted."
-msgstr ""
+msgstr "لقد جرى حذف الفرق \"%(team)s\" بنجاح."
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
-msgstr ""
+msgstr "حاليًا، أنت لست عضوًا في أي فريق."
 
 #. Translators: "and others" refers to fact that additional members of a team
 #. exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
-msgstr ""
+msgstr "وآخرين"
 
 #. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
 #. http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity %(date)s"
-msgstr ""
+msgstr "النشاط الأخير بتاريخ %(date)"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
@@ -2662,17 +2676,19 @@ msgstr "مشاهدة %(span_start)s %(team_name)s %(span_end)s"
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "An error occurred. Try again."
-msgstr ""
+msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
-msgstr ""
+msgstr "أتوّد ترك هذا الفريق؟"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
 "If you leave, you can no longer post in this team's discussions. Your place "
 "will be available to another learner."
 msgstr ""
+"في حال اخترت ترك الفريق، لن تتمكّن مستقبلًا من المشاركة في نقاشات أعضائه إلى"
+" جانب إتاحة الشاغر الذي ستتركه لمتعلّم آخر."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2682,29 +2698,29 @@ msgstr "تأكيد"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team."
-msgstr ""
+msgstr "لقد انتسبت في وقت سابق إلى فريق آخر."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
-msgstr ""
+msgstr "هذا الفريق مكتمل"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
 msgid "%(memberCount)s / %(maxMemberCount)s Member"
 msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%(memberCount)s / %(maxMemberCount) عضو"
+msgstr[1] "%(memberCount)s / %(maxMemberCount) عضو"
+msgstr[2] "%(memberCount)s / %(maxMemberCount) عضو"
+msgstr[3] "%(memberCount)s / %(maxMemberCount) عضو"
+msgstr[4] "%(memberCount)s / %(maxMemberCount) عضو"
+msgstr[5] "%(memberCount)s / %(maxMemberCount) عضو"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
-msgstr ""
+msgstr "جميع الفرق"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Topics"
-msgstr ""
+msgstr "المواضيع"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Teams"
@@ -2720,7 +2736,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
-msgstr ""
+msgstr "فريقي"
 
 #. Translators: sr_start and sr_end surround text meant only for screen
 #. readers.
@@ -2729,11 +2745,13 @@ msgstr ""
 #. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse %(sr_start)s teams %(sr_end)s"
-msgstr ""
+msgstr "تصفّح %(sr_start) الفرق %(sr_end)"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
 msgstr ""
+"عذرًا لم نتمكّن من إتمام طلبك. الرجاء طلب تحميل الصفحة من جديد والمحاولة "
+"مرّة أخرى."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -2741,35 +2759,41 @@ msgid ""
 " and try again. If the issue persists, click the Help tab to report the "
 "problem."
 msgstr ""
+"عذرًا لم نتمكّن من إتمام طلبك نظرًا لوجود مشكلة في المخدّم. الرجاء طلب تحميل"
+" الصفحة من جديد والمحاولة مرّة أخرى. في حال استمرت المشكلة، يُرجى النقر على "
+"علامة تبويب ’مساعدة‘ لإعلام فريق الدعم بالمشكلة."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
-msgstr ""
+msgstr "بحث الفريق"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Showing results for \"%(searchString)s\""
-msgstr ""
+msgstr "تظهر نتائج البحث ذات الصلة بالعبارة \"%(searchString)\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
-msgstr ""
+msgstr "إنشاء فريق جديد"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Create a new team if you can't find an existing team to join, or if you "
 "would like to learn with friends you know."
 msgstr ""
+"أنشئ فريقًا جديدًا في حال لم تجد فريقًا موجودًا للانضمام إليه أو كنت ترغب "
+"بالتعلّم برفقة أصدقاء تعرفهم."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 msgid "Edit Team"
-msgstr ""
+msgstr "تعديل الفريق"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "If you make significant changes, make sure you notify members of the team "
 "before making these changes."
 msgstr ""
+"في حال أجريت تعديلات مهمّة، تأكّد من إخطار بقية أعضاء الفريق قبل اعتماد هذه "
+"التغييرات."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Membership"
@@ -2780,14 +2804,15 @@ msgid ""
 "You can remove members from this team, especially if they have not "
 "participated in the team's activity."
 msgstr ""
+"يمكنك استبعاد أعضاء من هذا الفريق، وخاصةً في حال عدم مشاركتهم بأنشطة الفريق."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
-msgstr ""
+msgstr "بحث في الفرق"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "All Topics"
-msgstr ""
+msgstr "كافّة المواضيع"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"%(route)s\" could not be found."
@@ -2799,7 +2824,7 @@ msgstr "نأسف لتعذّر إيجاد الموضوع \"%(topic)s\"."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The team \"%(team)s\" could not be found."
-msgstr ""
+msgstr "نأسف لتعذّر إيجاد الفريق \"%(team)s\""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -2813,7 +2838,7 @@ msgstr[5] "%(team_count)s فريقاً"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
-msgstr ""
+msgstr "الموضوع"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the %(topic_name)s Topic"
@@ -2834,10 +2859,14 @@ msgid ""
 "find a team to join, {create_span_start}create a new team in this "
 "topic{span_end}."
 msgstr ""
+"{browse_span_start}تصفّح فرق في موضوعات أخرى{span_end} أو "
+"{search_span_start} ابحث في الفرق{span_end} ضمن هذا الموضوع. في حال لم "
+"تتمكّن من إيجاد فريق للانضمام إليه، {create_span_start}أنشئ فريقًا جديدًا "
+"ضمن هذا الموضوع{span_end}."
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"
-msgstr ""
+msgstr "كافّة المواضيع"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
@@ -2853,19 +2882,20 @@ msgstr "محتوى المنشور"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading data..."
-msgstr ""
+msgstr "جاري تحميل البيانات..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting issued certificates list."
-msgstr ""
+msgstr "نأسف لحدوث خطأ أثناء إعداد قائمة الشهادات الممنوحة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
+"نأسف لحدوث خطأ أثناء إعداد نتائج الامتحانات المراقبة. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating survey results. Please try again."
-msgstr ""
+msgstr "نأسف لحدوث خطأ أثناء إعداد نتائج الاستبيان. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
@@ -2886,8 +2916,8 @@ msgstr "نأسف لحدوث خطأ في الحصول على قائمة الطل�
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
-"نأسف لحدوث خطأ في إنشاء لائحة الطلّاب الذين قد يسجّلون. يُرجى المحاولة مرّة "
-"أخرى."
+"نأسف لحدوث خطأ في إنشاء لائحة الطلّاب الذين قد يسجّلون. يُرجى إعادة "
+"المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
@@ -2899,8 +2929,7 @@ msgstr "نأسف لحدوث خطأ في استحداث الدرجات. يُرج�
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
-msgstr ""
-"نأسف لحدوث خطأ في إنشاء تقرير درجات المسائل. يُرجى المحاولة مرّة أخرى."
+msgstr "نأسف لحدوث خطأ في إنشاء تقرير درجات المسائل. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3290,7 +3319,7 @@ msgid ""
 " correct and try again."
 msgstr ""
 "نأسف لحدوث خطأ. يُرجى التأكّد من صحّة اسم المستخدم للطالب أو بريده "
-"الإلكتروني ثمّ المحاولة مجدّدًا."
+"الإلكتروني ثمّ إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
@@ -3657,9 +3686,8 @@ msgid "All units"
 msgstr "جميع الوحدات"
 
 #: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
-#: lms/templates/ccx/schedule.underscore
 msgid "Click to change"
-msgstr ""
+msgstr "أضغط للتغير"
 
 #: lms/static/js/ccx/schedule.js
 msgid "Select a chapter"
@@ -3671,67 +3699,68 @@ msgstr "حفظ التغييرات"
 
 #: lms/static/js/ccx/schedule.js
 msgid "Please enter valid start date and time."
-msgstr ""
+msgstr "يُرجى إدخال تاريخ بدء وتوقيت صالحين."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Due date cannot be before start date."
-msgstr ""
+msgstr "لايمكن أن يسبق تاريخ الاستحقاق تاريخ الابتداء."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Due Date and Time"
-msgstr ""
+msgstr "يُرجى إدخال تاريخ وتوقيت الاستحقاق."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Start Date and Time"
-msgstr ""
+msgstr "يُرجى إدخال تاريخ وتوقيت البدء"
 
 #: lms/static/js/certificates/models/certificate_exception.js
 msgid "Student username/email field is required and can not be empty. "
 msgstr ""
+"اسم المستخدم/البريد الإلكتروني الخاص بالطالب مطلوب ولا يمكن تركه شاغرًا."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid "Errors!"
-msgstr ""
+msgstr "أخطاء!"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
-msgstr ""
+msgstr "جرى إضافة المتعلّمين بنجاح إلى قائمة الإستثناء"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is successfully added to the exception list"
-msgstr ""
+msgstr "جرت إضافة المتعلّم بنجاح إلى قائمة الإستثناء"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format"
-msgstr ""
+msgstr "السجّلات ليست بالصيغة الصحيحة"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " record is not in correct format"
-msgstr ""
+msgstr "السجلّ ليس بالصيغة الصحيحة"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners do not exist in LMS"
-msgstr ""
+msgstr "لا يوجد متعلّمين في LMS."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner does not exist in LMS"
-msgstr ""
+msgstr "لا يوجد متعلّم في LMS."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are already white listed"
-msgstr ""
+msgstr "سبق إدراج المتعلّمين على اللائحة البيضاء في وقت سابق"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is already white listed"
-msgstr ""
+msgstr "سبق أُدراج المتعلّم على اللائحة البيضاء في وقتٍ سابق"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are not enrolled in course"
-msgstr ""
+msgstr "لم يُسجّل المتعلّمون في المساق."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course"
-msgstr ""
+msgstr "لم يُسجّل المتعلّم في المساق"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3774,7 +3803,7 @@ msgstr "عذرًا، لم نجد أي نتائج لـ\"%s\"."
 #: lms/static/js/discovery/views/search_form.js
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
-msgstr "نأسف لحدوث خطأ، يُرجى البحث مجدّدًا."
+msgstr "نأسف لحدوث خطأ، يُرجى إعادة البحث مجدّدًا."
 
 #: lms/static/js/edxnotes/plugins/accessibility.js
 msgid "Focus grabber"
@@ -3842,7 +3871,7 @@ msgstr "[لا يوجد أي وسم]"
 #: lms/static/js/groups/views/cohort_form.js
 #: lms/static/js/groups/views/cohorts.js
 msgid "We've encountered an error. Refresh your browser and then try again."
-msgstr "نأسف لحدوث خطأ. يُجرى إعادة فتح متصفّحك ثمّ المحاولة مجدّدًا."
+msgstr "نأسف لحدوث خطأ. يُجرى إعادة فتح متصفّحك ثمّ إعادة المحاولة."
 
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -3989,15 +4018,15 @@ msgstr "هل تريد البدء بإعداد الشهادات لجميع الط
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while generating certificates. Please try again."
-msgstr "نأسف لحدوث خطأ أثناء إعداد الشهادات. يُرجى المحاولة مرّة أخرى."
+msgstr "نأسف لحدوث خطأ أثناء إعداد الشهادات. يُرجى إعادة المحاولة."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Start regenerating certificates for students in this course?"
-msgstr ""
+msgstr "هل تودّ معاودة البدء بإعداد الشهادات لطلّاب هذا المساق؟"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while regenerating certificates. Please try again."
-msgstr ""
+msgstr "نأسف لحدوث خطأ أثناء إعادة إعداد الشهادات. يُرجى إعادة المحاولة."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
@@ -4005,7 +4034,7 @@ msgid ""
 " to try again."
 msgstr ""
 "نأسف لحدوث مشكلة أثناء إعداد التقرير. يُرجى اختيار \"إنشاء ملخّص تنفيذي\" "
-"للمحاولة مرّة أخرى."
+"لإعادة المحاولة."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -4109,12 +4138,13 @@ msgstr "جاري تحميل مساقاتك"
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An error has occurred. Check your Internet connection and try again."
 msgstr ""
+"نأسف لحدوث خطأ، يُرجى التأكّد من اتصالك بالإنترنت وإعادة المحاولة لاحقًا."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
-msgstr ""
+msgstr "نأسف لحدوث خطأ. يُرجى تحديث الصفحة أو تأكّد من اتصالك بالإنترنت."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information (required)"
@@ -4219,6 +4249,8 @@ msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
 "the message to update your email address."
 msgstr ""
+"لقد قمنا بإرسال رسالة تأكيد إلى عنوان البريد الإلكتروني {email_address}. "
+"الرجاء النقر على الرابط المتاح في هذه الرسالة لتحديث عنوان بريدك الإلكتروني."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4232,6 +4264,8 @@ msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
 "reset your password."
 msgstr ""
+"لقد قمنا بإرسال رسالة إلى عنوان البريد الإلكتروني {email_address}. الرجاء "
+"النقر على الرابط المتاح في هذه الرسالة لإعادة ضبط كلمة السر."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink"
@@ -4365,11 +4399,11 @@ msgstr "الدفع بواسطة {processor}"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "All payment options are currently unavailable."
-msgstr ""
+msgstr "جميع خيارات السداد غير متوفّرة حاليًا."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Try the transaction again in a few minutes."
-msgstr ""
+msgstr "الرجاء معاودة طلب العملية مجدّدًا بعد بضع دقائق."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "An error has occurred. Please try again."
@@ -4475,7 +4509,7 @@ msgstr "جاري الحذف"
 
 #: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
-msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة ثمّ المحاولة مرّة أخرى."
+msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة ثمّ إعادة المحاولة."
 
 #: lms/static/js/views/image_field.js
 msgid "The file must be at least {size} in size."
@@ -4630,7 +4664,7 @@ msgstr "الشهادة"
 
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
-msgstr ""
+msgstr "أعدّ شهادتك"
 
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
@@ -4653,7 +4687,7 @@ msgstr "يُرجى تحميل صورة الموقِّع."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Image must be in PNG format."
-msgstr ""
+msgstr "يجب أن تكون الصورة بصيغة PNG."
 
 #: cms/static/js/collections/group.js
 #, c-format
@@ -5040,7 +5074,7 @@ msgstr "مجموعة المحتوى"
 
 #: cms/static/js/views/content_group_list.js
 msgid "Add your first content group"
-msgstr ""
+msgstr "أضف مجموعة المحتوى الأولى"
 
 #: cms/static/js/views/content_group_list.js
 msgid "You have not created any content groups yet."
@@ -5096,7 +5130,7 @@ msgstr "ضبط إعدادات المجموعة"
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "Add your first group configuration"
-msgstr ""
+msgstr "أضف أوّل إعداداتك للمجموعة"
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "You have not created any group configurations yet."
@@ -5480,7 +5514,7 @@ msgstr "لم تُحدَّد الدرجة الدنيا للنجاح في المس
 
 #: cms/static/js/views/settings/main.js
 msgid "Course pacing cannot be changed once a course has started."
-msgstr ""
+msgstr "لا يمكن تغيير  تنظيم المساق بمجرّد ابتدائه."
 
 #: cms/static/js/views/settings/main.js
 msgid "%(hours)s:%(minutes)s (current UTC time)"

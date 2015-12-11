@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-04 16:23+0000\n"
-"PO-Revision-Date: 2015-12-04 16:24:16.296758\n"
+"POT-Creation-Date: 2015-12-11 17:48+0000\n"
+"PO-Revision-Date: 2015-12-11 17:49:33.083624\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6871,6 +6871,7 @@ msgid "Amount"
 msgstr "Àmöünt Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
@@ -7674,6 +7675,7 @@ msgstr "Whät Ýöü Nééd för Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Wéßçäm Ⱡ'σяєм ιρѕυ#"
@@ -7936,6 +7938,7 @@ msgid "Check Your Email"
 msgstr "Çhéçk Ýöür Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "Phötö ÌD Ⱡ'σяєм ιρѕυм ∂#"
@@ -8032,6 +8035,85 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
 msgstr "prïçé Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Account Not Activated"
+msgstr "Àççöünt Nöt Àçtïvätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "You are enrolling in %(courseName)s"
+msgstr "Ýöü äré énröllïng ïn %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Upgrade to a Verified Certificate for %(courseName)s"
+msgstr ""
+"Ûpgrädé tö ä Vérïfïéd Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Before you upgrade to a certificate track, you must activate your account."
+msgstr ""
+"Béföré ýöü üpgrädé tö ä çértïfïçäté träçk, ýöü müst äçtïväté ýöür äççöünt. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Check your email for an activation message."
+msgstr ""
+"Çhéçk ýöür émäïl för än äçtïvätïön méssägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Professional Certificate for %(courseName)s"
+msgstr ""
+"Pröféssïönäl Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Verified Certificate for %(courseName)s"
+msgstr ""
+"Vérïfïéd Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid ""
+"To receive a certificate, you must also verify your identity before "
+"%(date)s."
+msgstr ""
+"Tö réçéïvé ä çértïfïçäté, ýöü müst älsö vérïfý ýöür ïdéntïtý ßéföré "
+"%(date)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "To receive a certificate, you must also verify your identity."
+msgstr ""
+"Tö réçéïvé ä çértïfïçäté, ýöü müst älsö vérïfý ýöür ïdéntïtý. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"To verify your identity, you need a webcam and a government-issued photo ID."
+msgstr ""
+"Tö vérïfý ýöür ïdéntïtý, ýöü nééd ä wéßçäm änd ä gövérnmént-ïssüéd phötö ÌD."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Your ID must be a government-issued photo ID that clearly shows your face."
+msgstr ""
+"Ýöür ÌD müst ßé ä gövérnmént-ïssüéd phötö ÌD thät çléärlý shöws ýöür fäçé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"You will use your webcam to take a picture of your face and of your "
+"government-issued photo ID."
+msgstr ""
+"Ýöü wïll üsé ýöür wéßçäm tö täké ä pïçtüré öf ýöür fäçé änd öf ýöür "
+"gövérnmént-ïssüéd phötö ÌD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8281,6 +8363,7 @@ msgid "ID"
 msgstr "ÌD Ⱡ'σя#"
 
 #: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Details"
 msgstr "Çértïfïçäté Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 

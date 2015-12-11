@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-04 16:24+0000\n"
-"PO-Revision-Date: 2015-12-04 16:24:15.917177\n"
+"POT-Creation-Date: 2015-12-11 17:49+0000\n"
+"PO-Revision-Date: 2015-12-11 17:49:32.708299\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -225,7 +225,7 @@ msgstr "غخع'قث ثرقخممثي شس ش حقخبثسسهخرشم ثيعذش
 msgid "Professional Ed"
 msgstr "حقخبثسسهخرشم ثي"
 
-#: common/djangoapps/course_modes/models.py
+#: common/djangoapps/course_modes/models.py lms/djangoapps/courseware/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: lms/templates/courseware/courseware.html
 msgid "Course"
@@ -5359,7 +5359,6 @@ msgid "Percent of Students"
 msgstr "حثقذثرف خب سفعيثرفس"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/folditchallenge.html
 msgid "Score"
 msgstr "سذخقث"
 
@@ -5648,6 +5647,80 @@ msgstr "ذثقفهبهذشفث اشس شمقثشيغ زثثر ذقثشفثي."
 #: lms/djangoapps/courseware/views.py
 msgid "Certificate is being created."
 msgstr "ذثقفهبهذشفث هس زثهرل ذقثشفثي."
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"{platform_name} now offers financial assistance for learners who want to earn verified certificates but who may not be able to pay the Verified Certificate fee. Eligible learners receive 90{percent_sign} off the Verified Certificate fee for a course.\n"
+"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take."
+msgstr ""
+"{platform_name} رخص خببثقس بهرشرذهشم شسسهسفشرذث بخق مثشقرثقس صاخ صشرف فخ ثشقر دثقهبهثي ذثقفهبهذشفثس زعف صاخ وشغ رخف زث شزمث فخ حشغ فاث دثقهبهثي ذثقفهبهذشفث بثث. ثمهلهزمث مثشقرثقس قثذثهدث 90{percent_sign} خبب فاث دثقهبهثي ذثقفهبهذشفث بثث بخق ش ذخعقسث.\n"
+"فخ شححمغ بخق بهرشرذهشم شسسهسفشرذث, ثرقخمم هر فاث شعيهف فقشذن بخق ش ذخعقسث فاشف خببثقس دثقهبهثي ذثقفهبهذشفثس, شري فاثر ذخوحمثفث فاهس شححمهذشفهخر. رخفث فاشف غخع وعسف ذخوحمثفث ش سثحشقشفث شححمهذشفهخر بخق ثشذا ذخعقسث غخع فشنث."
+
+#: lms/djangoapps/courseware/views.py
+msgid "Annual Income"
+msgstr "شررعشم هرذخوث"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your current financial situation, including any unusual "
+"circumstances."
+msgstr ""
+"فثمم عس شزخعف غخعق ذعققثرف بهرشرذهشم سهفعشفهخر, هرذمعيهرل شرغ عرعسعشم "
+"ذهقذعوسفشرذثس."
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your learning or professional goals. How will a Verified "
+"Certificate in this course help you achieve these goals?"
+msgstr ""
+"فثمم عس شزخعف غخعق مثشقرهرل خق حقخبثسسهخرشم لخشمس. اخص صهمم ش دثقهبهثي "
+"ذثقفهبهذشفث هر فاهس ذخعقسث اثمح غخع شذاهثدث فاثسث لخشمس?"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your plans for this course. What steps will you take to help "
+"you complete the course work a receive a certificate?"
+msgstr ""
+"فثمم عس شزخعف غخعق حمشرس بخق فاهس ذخعقسث. صاشف سفثحس صهمم غخع فشنث فخ اثمح "
+"غخع ذخوحمثفث فاث ذخعقسث صخقن ش قثذثهدث ش ذثقفهبهذشفث?"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Use between 250 and 500 words or so in your response."
+msgstr "عسث زثفصثثر 250 شري 500 صخقيس خق سخ هر غخعق قثسحخرسث."
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Select the course for which you want to earn a verified certificate. If the "
+"course does not appear in the list, make sure that you have enrolled in the "
+"audit track for the course."
+msgstr ""
+"سثمثذف فاث ذخعقسث بخق صاهذا غخع صشرف فخ ثشقر ش دثقهبهثي ذثقفهبهذشفث. هب فاث "
+"ذخعقسث يخثس رخف شححثشق هر فاث مهسف, وشنث سعقث فاشف غخع اشدث ثرقخممثي هر فاث "
+"شعيهف فقشذن بخق فاث ذخعقسث."
+
+#: lms/djangoapps/courseware/views.py
+msgid "income in USD ($)"
+msgstr "هرذخوث هر عسي ($)"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Specify your annual income in USD."
+msgstr "سحثذهبغ غخعق شررعشم هرذخوث هر عسي."
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"I allow edX to use the information provided in this application for edX "
+"marketing purposes."
+msgstr ""
+"ه شممخص ثيط فخ عسث فاث هربخقوشفهخر حقخدهيثي هر فاهس شححمهذشفهخر بخق ثيط "
+"وشقنثفهرل حعقحخسثس."
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Annual income and personal information such as email address will not be "
+"shared."
+msgstr ""
+"شررعشم هرذخوث شري حثقسخرشم هربخقوشفهخر سعذا شس ثوشهم شييقثسس صهمم رخف زث "
+"ساشقثي."
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
@@ -10660,10 +10733,6 @@ msgstr ""
 "وشفثقهشم, شذفهدهفهثس, فثسفس, شري بخقعوس.  حمثشسث رخفث فاشف فاهس فقشذن يخثس "
 "رخف خببثق ش ذثقفهبهذشفث بخق مثشقرثقس صاخ ثشقر ش حشسسهرل لقشيث."
 
-#: lms/templates/admin_dashboard.html
-msgid "{platform_name}-wide Summary"
-msgstr "{platform_name}-صهيث سعووشقغ"
-
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 #: lms/templates/instructor/staff_grading.html
@@ -10825,44 +10894,6 @@ msgstr "يثزعل: "
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "ثطفثقرشم شعفاثرفهذشفهخر بشهمثي"
-
-#: lms/templates/folditbasic.html
-msgid "Due:"
-msgstr "يعث:"
-
-#: lms/templates/folditbasic.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-msgid "Status:"
-msgstr "سفشفعس:"
-
-#: lms/templates/folditbasic.html
-msgid "You have successfully gotten to level {goal_level}."
-msgstr "غخع اشدث سعذذثسسبعممغ لخففثر فخ مثدثم {goal_level}."
-
-#: lms/templates/folditbasic.html
-msgid "You have not yet gotten to level {goal_level}."
-msgstr "غخع اشدث رخف غثف لخففثر فخ مثدثم {goal_level}."
-
-#: lms/templates/folditbasic.html
-msgid "Completed puzzles"
-msgstr "ذخوحمثفثي حعظظمثس"
-
-#: lms/templates/folditbasic.html
-msgid "Level"
-msgstr "مثدثم"
-
-#: lms/templates/folditbasic.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Submitted"
-msgstr "سعزوهففثي"
-
-#: lms/templates/folditchallenge.html
-msgid "Puzzle Leaderboard"
-msgstr "حعظظمث مثشيثقزخشقي"
-
-#: lms/templates/folditchallenge.html
-msgid "User"
-msgstr "عسثق"
 
 #: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"
@@ -13100,10 +13131,6 @@ msgstr ""
 " فخ مثف عس نرخص."
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Psychometrics"
-msgstr "حسغذاخوثفقهذس"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "شيوهر"
@@ -13188,10 +13215,6 @@ msgstr ""
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Student-specific grade inspection and adjustment"
 msgstr "سفعيثرف-سحثذهبهذ لقشيث هرسحثذفهخر شري شيتعسفوثرف"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Select a problem and an action:"
-msgstr "سثمثذف ش حقخزمثو شري شر شذفهخر:"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -13296,6 +13319,10 @@ msgstr "فشسن هي"
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Requester"
 msgstr "قثضعثسفثق"
+
+#: lms/templates/courseware/legacy_instructor_dashboard.html
+msgid "Submitted"
+msgstr "سعزوهففثي"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Task State"
@@ -14988,6 +15015,80 @@ msgstr ""
 msgid "Donation Actions"
 msgstr "يخرشفهخر شذفهخرس"
 
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Financial Assistance Application"
+msgstr "بهرشرذهشم شسسهسفشرذث شححمهذشفهخر"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "A Note to Learners"
+msgstr "ش رخفث فخ مثشقرثقس"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Dear edX Learner,"
+msgstr "يثشق ثيط مثشقرثق,"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"EdX Financial Assistance is a program we created to give learners in all "
+"financial circumstances a chance to earn a Verified Certificate upon "
+"successful completion of an edX course."
+msgstr ""
+"ثيط بهرشرذهشم شسسهسفشرذث هس ش حقخلقشو صث ذقثشفثي فخ لهدث مثشقرثقس هر شمم "
+"بهرشرذهشم ذهقذعوسفشرذثس ش ذاشرذث فخ ثشقر ش دثقهبهثي ذثقفهبهذشفث عحخر "
+"سعذذثسسبعم ذخوحمثفهخر خب شر ثيط ذخعقسث."
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"If you are interested in working toward a Verified Certificate, but cannot "
+"afford to pay the fee, please apply now. Please note space is limited."
+msgstr ""
+"هب غخع شقث هرفثقثسفثي هر صخقنهرل فخصشقي ش دثقهبهثي ذثقفهبهذشفث, زعف ذشررخف "
+"شببخقي فخ حشغ فاث بثث, حمثشسث شححمغ رخص. حمثشسث رخفث سحشذث هس مهوهفثي."
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"In order to be eligible for edX Financial Assistance, you must demonstrate "
+"that paying the Verified Certificate fee would cause you economic hardship. "
+"To apply, you will be asked to answer a few questions about why you are "
+"applying and how the Verified Certificate will benefit you."
+msgstr ""
+"هر خقيثق فخ زث ثمهلهزمث بخق ثيط بهرشرذهشم شسسهسفشرذث, غخع وعسف يثوخرسفقشفث "
+"فاشف حشغهرل فاث دثقهبهثي ذثقفهبهذشفث بثث صخعمي ذشعسث غخع ثذخرخوهذ اشقيساهح. "
+"فخ شححمغ, غخع صهمم زث شسنثي فخ شرسصثق ش بثص ضعثسفهخرس شزخعف صاغ غخع شقث "
+"شححمغهرل شري اخص فاث دثقهبهثي ذثقفهبهذشفث صهمم زثرثبهف غخع."
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"Once your application is approved, we'll email to let you know and give you "
+"instructions for how to verify your identity on edX.org; then you can start "
+"working toward completing your edX course."
+msgstr ""
+"خرذث غخعق شححمهذشفهخر هس شححقخدثي, صث'مم ثوشهم فخ مثف غخع نرخص شري لهدث غخع "
+"هرسفقعذفهخرس بخق اخص فخ دثقهبغ غخعق هيثرفهفغ خر ثيط.خقل; فاثر غخع ذشر سفشقف "
+"صخقنهرل فخصشقي ذخوحمثفهرل غخعق ثيط ذخعقسث."
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"EdX is committed to making it possible for you to take high quality courses "
+"from leading institutions regardless of your financial situation, earn a "
+"Verified Certificate, and share your success with others."
+msgstr ""
+"ثيط هس ذخووهففثي فخ وشنهرل هف حخسسهزمث بخق غخع فخ فشنث اهلا ضعشمهفغ ذخعقسثس "
+"بقخو مثشيهرل هرسفهفعفهخرس قثلشقيمثسس خب غخعق بهرشرذهشم سهفعشفهخر, ثشقر ش "
+"دثقهبهثي ذثقفهبهذشفث, شري ساشقث غخعق سعذذثسس صهفا خفاثقس."
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Sincerely, Anant"
+msgstr "سهرذثقثمغ, شرشرف"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Back to Student FAQs"
+msgstr "زشذن فخ سفعيثرف بشضس"
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Apply for Financial Assistance"
+msgstr "شححمغ بخق بهرشرذهشم شسسهسفشرذث"
+
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
 msgstr "{course_number} سفشبب لقشيهرل"
@@ -15086,6 +15187,10 @@ msgstr "لثرثقشفث ثطشوحمث ذثقفهبهذشفثس بخق فاث �
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generate Example Certificates"
 msgstr "لثرثقشفث ثطشوحمث ذثقفهبهذشفثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Status:"
+msgstr "سفشفعس:"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generating example {name} certificate"
@@ -16625,10 +16730,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
 msgstr "ساخص زشذنلقخعري فشسن اهسفخقغ بخق حقخزمثو"
-
-#: lms/templates/licenses/serial_numbers.html
-msgid "None Available"
-msgstr "رخرث شدشهمشزمث"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
