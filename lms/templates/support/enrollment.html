@@ -1,0 +1,30 @@
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.lib.js_utils import escape_json_dumps
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="js_extra">
+<%static:require_module module_name="support/js/enrollment_factory" class_name="EnrollmentFactory">
+    new EnrollmentFactory({
+        user: ${escape_json_dumps(username)},
+        enrollmentsUrl: ${escape_json_dumps(enrollmentsUrl)},
+        enrollmentSupportUrl: ${escape_json_dumps(enrollmentSupportUrl)},
+    });
+</%static:require_module>
+</%block>
+
+<%block name="pagetitle">
+${_("Enrollment")}
+</%block>
+
+<%block name="content">
+<section class="container outside-app">
+  <h1>${_("Student Support: Enrollment")}</h1>
+  <div class="enrollment-content"></div>
+</section>
+</%block>

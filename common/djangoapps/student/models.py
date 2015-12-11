@@ -1489,7 +1489,7 @@ class ManualEnrollmentAudit(models.Model):
         """
         saves the student manual enrollment information
         """
-        cls.objects.create(
+        return cls.objects.create(
             enrolled_by=user,
             enrolled_email=email,
             state_transition=state_transition,
