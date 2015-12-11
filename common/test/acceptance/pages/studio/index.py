@@ -85,6 +85,85 @@ class DashboardPage(PageObject):
         """
         self.q(css='.wrapper-create-library .new-library-save').click()
 
+    @property
+    def new_course_button(self):
+        """
+        Returns "New Course" button.
+        """
+        return self.q(css='.new-course-button')
+
+    def is_new_course_form_visible(self):
+        """
+        Is the new course form visible?
+        """
+        return self.q(css='.wrapper-create-course').visible
+
+    def click_new_course_button(self):
+        """
+        Click "New Course" button
+        """
+        self.q(css='.new-course-button').first.click()
+        self.wait_for_ajax()
+
+    def fill_new_course_form(self, display_name, org, number, run):
+        """
+        Fill out the form to create a new course.
+        """
+        field = lambda fn: self.q(css='.wrapper-create-course #new-course-{}'.format(fn))
+        field('name').fill(display_name)
+        field('org').fill(org)
+        field('number').fill(number)
+        field('run').fill(run)
+
+    def is_new_course_form_valid(self):
+        """
+        Returns `True` if new course form is valid otherwise `False`.
+        """
+        return (
+            self.q(css='.wrapper-create-course .new-course-save:not(.is-disabled)').present and
+            not self.q(css='.wrapper-create-course .wrap-error.is-shown').present
+        )
+
+    def submit_new_course_form(self):
+        """
+        Submit the new course form.
+        """
+        self.q(css='.wrapper-create-course .new-course-save').first.click()
+        self.wait_for_ajax()
+
+    @property
+    def error_notification(self):
+        """
+        Returns error notification element.
+        """
+        return self.q(css='.wrapper-notification-error.is-shown')
+
+    @property
+    def error_notification_message(self):
+        """
+        Returns text of error message.
+        """
+        self.wait_for_element_visibility(
+            ".wrapper-notification-error.is-shown .message", "Error message is visible"
+        )
+        return self.error_notification.results[0].find_element_by_css_selector('.message').text
+
+    @property
+    def course_org_field(self):
+        """
+        Returns course organization input.
+        """
+        return self.q(css='.wrapper-create-course #new-course-org')
+
+    def select_item_in_autocomplete_widget(self, item_text):
+        """
+        Selects item in autocomplete where text of item matches item_text.
+        """
+        self.wait_for_element_visibility(
+            ".ui-autocomplete .ui-menu-item", "Autocomplete widget is visible"
+        )
+        self.q(css='.ui-autocomplete .ui-menu-item a').filter(lambda el: el.text == item_text)[0].click()
+
     def list_courses(self):
         """
         List all the courses found on the page's list of libraries.
@@ -101,6 +180,15 @@ class DashboardPage(PageObject):
             'url': element.find_element_by_css_selector('a.course-link').get_attribute('href'),
         }
         return self.q(css='.courses li.course-item').map(div2info).results
+
+    def has_course(self, org, number, run):
+        """
+        Returns `True` if course for given org, number and run exists on the page otherwise `False`
+        """
+        for course in self.list_courses():
+            if course['org'] == org and course['number'] == number and course['run'] == run:
+                return True
+        return False
 
     def list_libraries(self):
         """

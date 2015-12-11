@@ -180,6 +180,8 @@ FEATURES = {
 
     # Special Exams, aka Timed and Proctored Exams
     'ENABLE_SPECIAL_EXAMS': False,
+
+    'ORGANIZATIONS_APP': False,
 }
 
 ENABLE_JASMINE = False
@@ -924,6 +926,9 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    # Organizations App (http://github.com/edx/edx-organizations)
+    'organizations',
 )
 
 

@@ -41,6 +41,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 var requests = AjaxHelpers.requests(this);
                 var redirectSpy = spyOn(ViewUtils, 'redirect');
                 $('.new-course-button').click()
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/organizations');
+                AjaxHelpers.respondWithJson(requests, ['DemoX', 'DemoX2', 'DemoX3']);
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
                 $('.new-course-save').click();
                 AjaxHelpers.expectJsonRequest(requests, 'POST', '/course/', {
@@ -53,11 +55,14 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                     url: 'dummy_test_url'
                 });
                 expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
+                $(".new-course-org").autocomplete("destroy");
             });
 
             it("displays an error when saving fails", function () {
                 var requests = AjaxHelpers.requests(this);
                 $('.new-course-button').click();
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/organizations');
+                AjaxHelpers.respondWithJson(requests, ['DemoX', 'DemoX2', 'DemoX3']);
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
                 $('.new-course-save').click();
                 AjaxHelpers.respondWithJson(requests, {
@@ -67,6 +72,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 expect($('#course_creation_error')).toContainText('error message');
                 expect($('.new-course-save')).toHaveClass('is-disabled');
                 expect($('.new-course-save')).toHaveAttr('aria-disabled', 'true');
+                $(".new-course-org").autocomplete("destroy");
             });
 
             it("saves new libraries", function () {

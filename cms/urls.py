@@ -4,7 +4,7 @@ from django.conf.urls import patterns, include, url
 from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.program import ProgramAuthoringView, ProgramsIdTokenView
-
+from cms.djangoapps.contentstore.views.organization import OrganizationListView
 
 admin.autodiscover()
 
@@ -41,6 +41,7 @@ urlpatterns = patterns(
 
     url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
     url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
+    url(r'^organizations$', OrganizationListView.as_view(), name='organizations'),
 
     # temporary landing page for edge
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
