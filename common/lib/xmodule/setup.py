@@ -3,7 +3,6 @@ from setuptools import setup, find_packages
 XMODULES = [
     "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "chapter = xmodule.seq_module:SequenceDescriptor",
-    "combinedopenended = xmodule.combined_open_ended_module:CombinedOpenEndedDescriptor",
     "conditional = xmodule.conditional_module:ConditionalDescriptor",
     "course = xmodule.course_module:CourseDescriptor",
     "customtag = xmodule.template_module:CustomTagDescriptor",
@@ -12,7 +11,6 @@ XMODULES = [
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "library_content = xmodule.library_content_module:LibraryContentDescriptor",
     "error = xmodule.error_module:ErrorDescriptor",
-    "peergrading = xmodule.peer_grading_module:PeerGradingDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
     "problem = xmodule.capa_module:CapaDescriptor",
     "problemset = xmodule.seq_module:SequenceDescriptor",

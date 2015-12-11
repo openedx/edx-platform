@@ -30,11 +30,11 @@ from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 
-__all__ = ['OPEN_ENDED_COMPONENT_TYPES',
-           'ADVANCED_COMPONENT_POLICY_KEY',
-           'container_handler',
-           'component_handler'
-           ]
+__all__ = [
+    'ADVANCED_COMPONENT_POLICY_KEY',
+    'container_handler',
+    'component_handler'
+]
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +43,6 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 # Constants for determining if these components should be enabled for this course
 SPLIT_TEST_COMPONENT_TYPE = 'split_test'
-OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
 
 if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):

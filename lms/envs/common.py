@@ -1029,26 +1029,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 # Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 
-################################# open ended grading config  #####################
-
-#By setting up the default settings with an incorrect user name and password,
-# will get an error when attempting to connect
-OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://example.com/peer_grading',
-    'username': 'incorrect_user',
-    'password': 'incorrect_pass',
-    'staff_grading': 'staff_grading',
-    'peer_grading': 'peer_grading',
-    'grading_controller': 'grading_controller'
-}
-
-# Used for testing, debugging peer grading
-MOCK_PEER_GRADING = False
-
-# Used for testing, debugging staff grading
-MOCK_STAFF_GRADING = False
-
-
 ################################# EdxNotes config  #########################
 
 # Configure the LMS to use our stub EdxNotes implementation
@@ -1313,8 +1293,6 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
-staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
-open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
 instructor_dash_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js')) +
@@ -1499,8 +1477,8 @@ PIPELINE_CSS = {
 }
 
 
-common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)    # pylint: disable=line-too-long
-project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)  # pylint: disable=line-too-long
+common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)    # pylint: disable=line-too-long
+project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)  # pylint: disable=line-too-long
 
 
 PIPELINE_JS = {
@@ -1550,14 +1528,6 @@ PIPELINE_JS = {
     'discussion_vendor': {
         'source_filenames': discussion_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
-    },
-    'staff_grading': {
-        'source_filenames': staff_grading_js,
-        'output_filename': 'js/staff_grading.js',
-    },
-    'open_ended': {
-        'source_filenames': open_ended_js,
-        'output_filename': 'js/open_ended.js',
     },
     'notes': {
         'source_filenames': notes_js,
@@ -1828,7 +1798,6 @@ INSTALLED_APPS = (
     'dashboard',
     'instructor',
     'instructor_task',
-    'open_ended_grading',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',

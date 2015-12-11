@@ -1628,9 +1628,9 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
 
         self.course_fixture.create_xblock(
             parent_vertical.locator,
-            XBlockFixtureDesc('combinedopenended', "Open", data=load_data_str('ora_peer_problem.xml'))
+            XBlockFixtureDesc('poll', "Poll", data=load_data_str('poll_markdown.xml'))
         )
-        self.course_fixture.create_xblock(parent_vertical.locator, XBlockFixtureDesc('peergrading', 'Peer'))
+        self.course_fixture.create_xblock(parent_vertical.locator, XBlockFixtureDesc('survey', 'Survey'))
 
     def _verify_deprecation_warning_info(
             self,
@@ -1663,56 +1663,56 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
 
     def test_no_deprecation_warning_message_present(self):
         """
-        Scenario: Verify that deprecation warning message is not shown if ORA1
-            advance modules are not present and also no ORA1 component exist in
+        Scenario: Verify that deprecation warning message is not shown if no deprecated
+            advance modules are not present and also no deprecated component exist in
             course outline.
 
         When I goto course outline
-        Then I don't see ORA1 deprecated warning
+        Then I don't see any deprecation warning
         """
         self.course_outline_page.visit()
         self.assertFalse(self.course_outline_page.deprecated_warning_visible)
 
     def test_deprecation_warning_message_present(self):
         """
-        Scenario: Verify deprecation warning message if ORA1 advance modules
-            and ORA1 components are present.
+        Scenario: Verify deprecation warning message if deprecated modules
+            and components are present.
 
-        Given I have ORA1 advance modules present in `Advanced Module List`
-        And I have created 2 ORA1 components
+        Given I have "poll" advance modules present in `Advanced Module List`
+        And I have created 2 poll components
         When I go to course outline
-        Then I see ORA1 deprecated warning
-        And I see correct ORA1 deprecated warning heading text
-        And I see correct ORA1 deprecated warning advance modules remove text
-        And I see list of ORA1 components with correct display names
+        Then I see poll deprecated warning
+        And I see correct poll deprecated warning heading text
+        And I see correct poll deprecated warning advance modules remove text
+        And I see list of poll components with correct display names
         """
-        self._add_deprecated_advance_modules(block_types=['peergrading', 'combinedopenended'])
+        self._add_deprecated_advance_modules(block_types=['poll', 'survey'])
         self._create_deprecated_components()
         self.course_outline_page.visit()
         self._verify_deprecation_warning_info(
             deprecated_blocks_present=True,
             components_present=True,
-            components_display_name_list=['Open', 'Peer'],
-            deprecated_modules_list=['peergrading', 'combinedopenended']
+            components_display_name_list=['Poll', 'Survey'],
+            deprecated_modules_list=['poll', 'survey']
         )
 
     def test_deprecation_warning_with_no_displayname(self):
         """
-        Scenario: Verify deprecation warning message if  ORA1 components are present.
+        Scenario: Verify deprecation warning message if poll components are present.
 
-        Given I have created 1 ORA1 deprecated component
+        Given I have created 1 poll deprecated component
         When I go to course outline
-        Then I see ORA1 deprecated warning
-        And I see correct ORA1 deprecated warning heading text
-        And I see list of ORA1 components with correct message
+        Then I see poll deprecated warning
+        And I see correct poll deprecated warning heading text
+        And I see list of poll components with correct message
         """
         parent_vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
 
-        # Create a deprecated ORA1 component with display_name to be empty and make sure
+        # Create a deprecated component with display_name to be empty and make sure
         # the deprecation warning is displayed with
         self.course_fixture.create_xblock(
             parent_vertical.locator,
-            XBlockFixtureDesc(category='combinedopenended', display_name="", data=load_data_str('ora_peer_problem.xml'))
+            XBlockFixtureDesc(category='poll', display_name="", data=load_data_str('poll_markdown.xml'))
         )
         self.course_outline_page.visit()
 
@@ -1722,44 +1722,44 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
             components_display_name_list=[self.DEFAULT_DISPLAYNAME],
         )
 
-    def test_warning_with_ora1_advance_modules_only(self):
+    def test_warning_with_poll_advance_modules_only(self):
         """
         Scenario: Verify that deprecation warning message is shown if only
-            ORA1 advance modules are present and no ORA1 component exist.
+            poll advance modules are present and no poll component exist.
 
-        Given I have ORA1 advance modules present in `Advanced Module List`
+        Given I have poll advance modules present in `Advanced Module List`
         When I go to course outline
-        Then I see ORA1 deprecated warning
-        And I see correct ORA1 deprecated warning heading text
-        And I see correct ORA1 deprecated warning advance modules remove text
-        And I don't see list of ORA1 components
+        Then I see poll deprecated warning
+        And I see correct poll deprecated warning heading text
+        And I see correct poll deprecated warning advance modules remove text
+        And I don't see list of poll components
         """
-        self._add_deprecated_advance_modules(block_types=['peergrading', 'combinedopenended'])
+        self._add_deprecated_advance_modules(block_types=['poll', 'survey'])
         self.course_outline_page.visit()
         self._verify_deprecation_warning_info(
             deprecated_blocks_present=True,
             components_present=False,
-            deprecated_modules_list=['peergrading', 'combinedopenended']
+            deprecated_modules_list=['poll', 'survey']
         )
 
-    def test_warning_with_ora1_components_only(self):
+    def test_warning_with_poll_components_only(self):
         """
         Scenario: Verify that deprecation warning message is shown if only
-            ORA1 component exist and no ORA1 advance modules are present.
+            poll component exist and no poll advance modules are present.
 
-        Given I have created two ORA1 components
+        Given I have created two poll components
         When I go to course outline
-        Then I see ORA1 deprecated warning
-        And I see correct ORA1 deprecated warning heading text
-        And I don't see ORA1 deprecated warning advance modules remove text
-        And I see list of ORA1 components with correct display names
+        Then I see poll deprecated warning
+        And I see correct poll deprecated warning heading text
+        And I don't see poll deprecated warning advance modules remove text
+        And I see list of poll components with correct display names
         """
         self._create_deprecated_components()
         self.course_outline_page.visit()
         self._verify_deprecation_warning_info(
             deprecated_blocks_present=False,
             components_present=True,
-            components_display_name_list=['Open', 'Peer']
+            components_display_name_list=['Poll', 'Survey']
         )
 
 

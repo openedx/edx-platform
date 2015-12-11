@@ -771,7 +771,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             {
                 "advertised_start": {"value": "start A"},
                 "days_early_for_beta": {"value": 2},
-                "advanced_modules": {"value": ['combinedopenended']},
+                "advanced_modules": {"value": ['notes']},
             },
             user=self.user
         )
@@ -781,7 +781,7 @@ class CourseMetadataEditingTest(CourseTestCase):
 
         # Tab gets tested in test_advanced_settings_munge_tabs
         self.assertIn('advanced_modules', test_model, 'Missing advanced_modules')
-        self.assertEqual(test_model['advanced_modules']['value'], ['combinedopenended'], 'advanced_module is not updated')
+        self.assertEqual(test_model['advanced_modules']['value'], ['notes'], 'advanced_module is not updated')
 
     def test_validate_from_json_wrong_inputs(self):
         # input incorrectly formatted data
@@ -905,48 +905,21 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         Test that adding and removing specific advanced components adds and removes tabs.
         """
-        open_ended_tab = {"type": "open_ended", "name": "Open Ended Panel"}
-        peer_grading_tab = {"type": "peer_grading", "name": "Peer grading"}
-
         # First ensure that none of the tabs are visible
-        self.assertNotIn(open_ended_tab, self.course.tabs)
-        self.assertNotIn(peer_grading_tab, self.course.tabs)
         self.assertNotIn(self.notes_tab, self.course.tabs)
 
-        # Now add the "combinedopenended" component and verify that the tab has been added
-        self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["combinedopenended"]}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertIn(open_ended_tab, course.tabs)
-        self.assertIn(peer_grading_tab, course.tabs)
-        self.assertNotIn(self.notes_tab, course.tabs)
-
-        # Now enable student notes and verify that the "My Notes" tab has also been added
-        self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["combinedopenended", "notes"]}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertIn(open_ended_tab, course.tabs)
-        self.assertIn(peer_grading_tab, course.tabs)
-        self.assertIn(self.notes_tab, course.tabs)
-
-        # Now remove the "combinedopenended" component and verify that the tab is gone
+        # Now enable student notes and verify that the "My Notes" tab has been added
         self.client.ajax_post(self.course_setting_url, {
             ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
         })
         course = modulestore().get_course(self.course.id)
-        self.assertNotIn(open_ended_tab, course.tabs)
-        self.assertNotIn(peer_grading_tab, course.tabs)
         self.assertIn(self.notes_tab, course.tabs)
 
-        # Finally disable student notes and verify that the "My Notes" tab is gone
+        # Disable student notes and verify that the "My Notes" tab is gone
         self.client.ajax_post(self.course_setting_url, {
             ADVANCED_COMPONENT_POLICY_KEY: {"value": [""]}
         })
         course = modulestore().get_course(self.course.id)
-        self.assertNotIn(open_ended_tab, course.tabs)
-        self.assertNotIn(peer_grading_tab, course.tabs)
         self.assertNotIn(self.notes_tab, course.tabs)
 
     def test_advanced_components_munge_tabs_validation_failure(self):
