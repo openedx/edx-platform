@@ -295,7 +295,18 @@ class @Problem
             @updateProgress response
           else
             @gentle_alert response.success
-        Logger.log 'problem_graded', [@answers, response.contents], @id
+
+        answer_dict = {}
+        for element in @inputs.serializeArray()
+          answer_dict[element.name] = element.value
+        # It'd be nice to log things like hints from the HTML
+        # but we don't want to log the entire thing for now. It
+        # can get big.
+        log_data =
+          answers : answer_dict
+          success : response.success
+          #html: response.contents
+        Logger.log 'problem_graded', log_data, @id
 
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
@@ -321,7 +332,18 @@ class @Problem
           @$('div.action button.check').focus()
         else
           @gentle_alert response.success
-      Logger.log 'problem_graded', [@answers, response.contents], @id
+      answer_dict = {}
+      for element in @inputs.serializeArray()
+        answer_dict[element.name] = element.value
+      # It'd be nice to log things like hints from the HTML
+      # but we don't want to log the entire thing for now. It
+      # can get big.
+      log_data =
+        answers : answer_dict
+        success : response.success
+        #html: response.contents
+      Logger.log 'problem_graded', log_data, @id
+
     ).always(@enableCheckButtonAfterResponse)
 
   reset: =>
