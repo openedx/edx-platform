@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 import jwt
 from provider.oauth2.models import Client
 
-from student.models import UserProfile
+from student.models import UserProfile, anonymous_id_for_user
 
 
 def get_id_token(user, client_name):
@@ -54,7 +54,7 @@ def get_id_token(user, client_name):
         'exp': now + datetime.timedelta(seconds=expires_in),
         'iat': now,
         'aud': client.client_id,
-        'sub': user.id,
+        'sub': anonymous_id_for_user(user, None),
     }
 
     return jwt.encode(payload, client.client_secret)
