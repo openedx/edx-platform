@@ -22,14 +22,16 @@ def is_request_from_mobile_app(request):
     Args:
         request (HttpRequest)
     """
-    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
-    return (
-        (
-            getattr(settings, 'MOBILE_APP_USER_AGENT_ID', None) and
-            settings.MOBILE_APP_USER_AGENT_ID.lower() in user_agent
-        ) or
-        is_request_from_mobile_web_view(request)
-    )
+    if is_request_from_mobile_web_view(request):
+        return True
+
+    if getattr(settings, 'MOBILE_APP_USER_AGENT_REGEXES', None):
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        for user_agent_regex in settings.MOBILE_APP_USER_AGENT_REGEXES:
+            if re.match(user_agent_regex, user_agent):
+                return True
+
+    return False
 
 
 PATHS_ACCESSED_BY_MOBILE_WITH_SESSION_COOKIES = [

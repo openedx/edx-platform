@@ -2708,4 +2708,6 @@ MAX_BOOKMARKS_PER_COURSE = 100
 REGISTRATION_EXTENSION_FORM = None
 
 # Identifier included in the User Agent from open edX mobile apps.
-MOBILE_APP_USER_AGENT_ID = 'edX/org.edx.mobile'
+MOBILE_APP_USER_AGENT_REGEXES = [
+    r'edX/org.edx.mobile',
+]
