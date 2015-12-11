@@ -41,6 +41,23 @@ def url_name_for_course_location(location):
     return location.name
 
 
+def display_name_w_default_escaped(course):
+    """
+    Calculates the display name for a course.
+
+    As per display_name_with_default(), but with HTML escaping.
+
+    NB: this function is deprecated and will (eventually) be removed.
+    Rather use display_name_with_default, and ensure the caller
+    escapes any HTML.
+
+    Arguments:
+        course (CourseDescriptor|CourseOverview): descriptor or overview of
+            said course.
+    """
+    return course.display_name_with_default.replace('<', '&lt;').replace('>', '&gt;')
+
+
 def display_name_with_default(course):
     """
     Calculates the display name for a course.
@@ -60,11 +77,10 @@ def display_name_with_default(course):
         course (CourseDescriptor|CourseOverview): descriptor or overview of
             said course.
     """
-    # TODO: Consider changing this to use something like xml.sax.saxutils.escape
     return (
         course.display_name if course.display_name is not None
         else course.url_name.replace('_', ' ')
-    ).replace('<', '&lt;').replace('>', '&gt;')
+    )
 
 
 def number_for_course_location(location):

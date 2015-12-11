@@ -226,7 +226,7 @@ def get_course_about_section(request, course, section_key):
             )
             return None
     elif section_key == "title":
-        return course.display_name_with_default
+        return course.display_name_w_default_escaped
     elif section_key == "university":
         return get_course_university_about_section(course)
     elif section_key == "number":

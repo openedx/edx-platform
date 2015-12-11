@@ -92,7 +92,7 @@ class CapaFields(object):
         help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
-        # use display_name_with_default for those
+        # use display_name_w_default_escaped for those
         default=_("Blank Advanced Problem")
     )
     attempts = Integer(
@@ -658,7 +658,7 @@ class CapaMixin(CapaFields):
             check_button_checking = False
 
         content = {
-            'name': self.display_name_with_default,
+            'name': self.display_name_w_default_escaped,
             'html': html,
             'weight': self.weight,
         }

@@ -202,7 +202,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
             }
             if childinfo['title'] == '':
-                childinfo['title'] = child.display_name_with_default
+                childinfo['title'] = child.display_name_w_default_escaped
             contents.append(childinfo)
 
         params = {

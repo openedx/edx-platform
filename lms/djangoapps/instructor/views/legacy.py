@@ -991,7 +991,7 @@ def send_mail_to_student(student, param_dict):
 
     # add some helpers and microconfig subsitutions
     if 'course' in param_dict:
-        param_dict['course_name'] = param_dict['course'].display_name_with_default
+        param_dict['course_name'] = param_dict['course'].display_name_w_default_escaped
     param_dict['site_name'] = microsite.get_value(
         'SITE_NAME',
         param_dict.get('site_name', '')
