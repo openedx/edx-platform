@@ -48,9 +48,9 @@ class CrowdsourcehinterProblemTest(UniqueCourseTest):
                 XBlockFixtureDesc('vertical', 'Test Unit').add_children(
                     XBlockFixtureDesc('problem', 'text input problem', data=problem_data),
                     XBlockFixtureDesc('crowdsourcehinter', 'test crowdsourcehinter')
-                    )
                 )
             )
+        )
 
         course_fix.add_children(children).install()
 
