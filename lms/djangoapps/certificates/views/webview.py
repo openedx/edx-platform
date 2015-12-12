@@ -271,7 +271,7 @@ def _update_social_context(request, context, course, user, user_certificate, pla
         )
     )
 
-    share_url = request.build_absolute_uri(get_certificate_url(uuid=user_certificate.verify_uuid))
+    share_url = request.build_absolute_uri(get_certificate_url(course_id=course.id, uuid=user_certificate.verify_uuid))
     context['share_url'] = share_url
     twitter_url = ''
     if context.get('twitter_share_enabled', False):

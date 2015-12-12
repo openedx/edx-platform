@@ -340,7 +340,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
             if course_overview.has_any_active_web_certificate:
                 status_dict.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': get_certificate_url(uuid=cert_status['uuid'])
+                    'cert_web_view_url': get_certificate_url(course_id=course_overview.id, uuid=cert_status['uuid'])
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course
