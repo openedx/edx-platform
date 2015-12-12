@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 from openedx.core.djangoapps.credentials_service.models import UserCredential, AbstractCredential, \
     UserCredentialAttribute, ProgramCertificate, CourseCertificate
 
+
 class CredentialRelatedField(serializers.RelatedField):
     """
     A custom field to use for the user credential generic relationship.
@@ -15,7 +16,7 @@ class CredentialRelatedField(serializers.RelatedField):
         Serialize objects to a simple textual representation.
         """
         if isinstance(value, ProgramCertificate):
-            return ProgramCertificateSerializer(value).data
+            return ProgramCertificateBaseSerializer(value).data
 
 
 class UserCredentialAttributeSerializer(serializers.ModelSerializer):
@@ -25,26 +26,33 @@ class UserCredentialAttributeSerializer(serializers.ModelSerializer):
         fields = ('user_credential', 'namespace', 'name', 'value')
 
 
-
 class UserCredentialSerializer(serializers.ModelSerializer):
     """ User Credential Serializer """
 
+    credential_object = CredentialRelatedField(read_only='True')
     attributes = UserCredentialAttributeSerializer(many=True, read_only=True)
-    credential = CredentialRelatedField(read_only='True')
 
     class Meta(object):
         model = UserCredential
         fields = (
-            'username', 'credential_id', 'credential',
+            'username', 'object_id', 'credential_object',
             'status', 'download_url', 'uuid', 'attributes'
         )
 
 
-class ProgramCertificateSerializer(serializers.ModelSerializer):
+class ProgramCertificateBaseSerializer(serializers.ModelSerializer):
     """ User Credential Attribute Serializer """
-    # user_credentials = UserCredentialSerializer(read_only='True')
-    # attributes = UserCredentialAttributeSerializer(many=True, read_only=True)
-
     class Meta(object):
         model = ProgramCertificate
 
+
+class ProgramCertificateSerializer(ProgramCertificateBaseSerializer):
+    """ User Credential Attribute Serializer """
+    user_credential = serializers.SerializerMethodField("get_users")
+
+    class Meta(object):
+        model = ProgramCertificate
+        fields = ('user_credential', 'program_id')
+
+    def get_users(self, program):
+        return UserCredentialSerializer(program.user_credentials.all(), many=True).data

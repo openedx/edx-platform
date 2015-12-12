@@ -13,8 +13,8 @@ from rest_framework import generics
 class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
 
-    lookup_field = 'username'
     queryset = UserCredential.objects.all()
+    lookup_field = 'username'
     serializer_class = serializers.UserCredentialSerializer
     parser_classes = (parsers.MergePatchParser,)
 
