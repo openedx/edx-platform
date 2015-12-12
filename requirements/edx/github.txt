@@ -50,7 +50,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 # Third Party XBlocks
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
 -e git+https://github.com/Stanford-Online/DoneXBlock.git@0a38297377c262313b4677ec44deb9fac4db5afb#egg=done-xblock
--e git+https://github.com/openlearninginitiative/xblock-submit-and-compare.git@f89d3debd58003a5bfedfbaad06072ec2082259d#egg=xblock-submit-and-compare
+-e git+https://github.com/Stanford-Online/xblock-submit-and-compare.git@959a6173bc2050e5e78d8df1d38a2efeb1fe4e24#egg=xblock-submit-and-compare
 -e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/opaque-keys.git@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
