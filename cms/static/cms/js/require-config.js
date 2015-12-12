@@ -284,6 +284,9 @@ require.config({
             exports: "osda",
             deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars", "URI"]
         },
+        "draggabilly": {
+            exports: "Draggabilly"
+        }
         // end of annotation tool files
     }
 });
