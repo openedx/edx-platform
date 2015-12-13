@@ -17,7 +17,11 @@ class CredentialRelatedField(serializers.RelatedField):
         """
         if isinstance(value, ProgramCertificate):
             return value.program_id
-            # return ProgramCertificateBaseSerializer(value).data
+        elif isinstance(value, CourseCertificate):
+            return {
+                'course_id': value.course_id,
+                'certificate_type': value.certificate_type
+            }
 
 
 class UserCredentialAttributeSerializer(serializers.ModelSerializer):
@@ -56,5 +60,26 @@ class ProgramCertificateSerializer(ProgramCertificateBaseSerializer):
         model = ProgramCertificate
         fields = ('user_credential', 'program_id')
 
+
     def get_users(self, program):
         return UserCredentialSerializer(program.user_credentials.all(), many=True).data
+
+
+class CourseCertificateBaseSerializer(serializers.ModelSerializer):
+    """ User Credential Attribute Serializer """
+    class Meta(object):
+        model = CourseCertificate
+        fields = ('course_id', 'certificate_type', )
+
+
+class CourseCertificateSerializer(ProgramCertificateBaseSerializer):
+    """ User Credential Attribute Serializer """
+    user_credential = serializers.SerializerMethodField("get_users")
+
+    class Meta(object):
+        model = CourseCertificate
+        fields = ('user_credential', 'course_id', 'certificate_type',)
+
+
+    def get_users(self, course):
+        return UserCredentialSerializer(course.user_credentials.all(), many=True).data
