@@ -980,7 +980,7 @@ def _progress(request, course_key, student_id):
             if certs_api.get_active_web_certificate(course) is not None:
                 context.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': certs_api.get_certificate_url(uuid=cert_status['uuid']),
+                    'cert_web_view_url': certs_api.get_certificate_url(course_id=course_key, uuid=cert_status['uuid']),
                 })
             else:
                 context.update({

@@ -82,9 +82,6 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
-        cert = self._create_certificate(enrollment_mode)
-        test_url = get_certificate_url(uuid=cert.verify_uuid)
-
         certificates = [
             {
                 'id': 0,
@@ -99,6 +96,9 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         self.course.cert_html_view_enabled = True
         self.course.save()   # pylint: disable=no-member
         self.store.update_item(self.course, self.user.id)
+
+        cert = self._create_certificate(enrollment_mode)
+        test_url = get_certificate_url(course_id=self.course.id, uuid=cert.verify_uuid)
 
         response = self.client.get(reverse('dashboard'))
 

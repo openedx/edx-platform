@@ -79,10 +79,34 @@ class CertificateSupportTestCase(TestCase):
 
 
 @ddt.ddt
-class CertificateSearchTests(CertificateSupportTestCase):
+class CertificateSearchTests(ModuleStoreTestCase, CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
+    def setUp(self):
+        """
+        Create a course
+        """
+        super(CertificateSearchTests, self).setUp()
+        self.course = CourseFactory()
+        self.course.cert_html_view_enabled = True
+
+        #course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Name 1',
+                'description': 'Description 1',
+                'course_title': 'course_title_1',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()  # pylint: disable=no-member
+        self.store.update_item(self.course, self.user.id)
 
     @ddt.data(
         (GlobalStaff, True),
@@ -141,6 +165,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
+        self.cert.course_id = self.course.id  # pylint: disable=no-member
         self.cert.download_url = ''
         self.cert.save()
 
@@ -155,7 +180,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
             retrieved_cert["download_url"],
             reverse(
                 'certificates:html_view',
-                kwargs={"user_id": self.student.id, "course_id": self.CERT_COURSE_KEY}  # pylint: disable=no-member
+                kwargs={"user_id": self.student.id, "course_id": self.course.id}  # pylint: disable=no-member
             )
         )
 

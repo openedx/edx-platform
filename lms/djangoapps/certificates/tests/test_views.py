@@ -198,6 +198,9 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='refundable course'
         )
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
         self.course_id = self.course.location.course_key
         self.user = UserFactory.create(
             email='joe_user@edx.org',
