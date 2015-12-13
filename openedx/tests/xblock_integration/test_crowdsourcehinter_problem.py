@@ -4,7 +4,7 @@ Javascript tests for the crowdsourcehinter xblock
 from textwrap import dedent
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from pages.crowdsourcehinter_problem import CrowdsourcehinterProblemPage
+from openedx.tests.xblock_integration.pages.crowdsourcehinter_problem import CrowdsourcehinterProblemPage
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 
