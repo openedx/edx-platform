@@ -16,7 +16,8 @@ class CredentialRelatedField(serializers.RelatedField):
         Serialize objects to a simple textual representation.
         """
         if isinstance(value, ProgramCertificate):
-            return ProgramCertificateBaseSerializer(value).data
+            return value.program_id
+            # return ProgramCertificateBaseSerializer(value).data
 
 
 class UserCredentialAttributeSerializer(serializers.ModelSerializer):
@@ -44,6 +45,7 @@ class ProgramCertificateBaseSerializer(serializers.ModelSerializer):
     """ User Credential Attribute Serializer """
     class Meta(object):
         model = ProgramCertificate
+        fields = ('program_id',)
 
 
 class ProgramCertificateSerializer(ProgramCertificateBaseSerializer):
