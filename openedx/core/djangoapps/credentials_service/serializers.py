@@ -34,13 +34,13 @@ class UserCredentialAttributeSerializer(serializers.ModelSerializer):
 class UserCredentialSerializer(serializers.ModelSerializer):
     """ User Credential Serializer """
 
-    credential_object = CredentialRelatedField(read_only='True')
+    credential = CredentialRelatedField(read_only='True')
     attributes = UserCredentialAttributeSerializer(many=True, read_only=True)
 
     class Meta(object):
         model = UserCredential
         fields = (
-            'username', 'object_id', 'credential_object',
+            'username', 'credential_id', 'credential',
             'status', 'download_url', 'uuid', 'attributes'
         )
 

@@ -43,8 +43,8 @@ class SignatoryFactory(factory.django.DjangoModelFactory):
     class Meta(object):
         model = models.Signatory
 
-    name = FuzzyText('foo')
-    title = FuzzyText('bar')
+    name = factory.Sequence(u'name{0}'.format)
+    title = factory.Sequence(u'title{0}'.format)
     image = factory.LazyAttribute(
         lambda _: ContentFile(
             ImageField()._make_data(  # pylint: disable=protected-access
@@ -69,10 +69,6 @@ class AbstractCertificateFactory(AbstractCredentialFactory):
         model = models.AbstractCertificate
         abstract = True
 
-    # signatories = factory.SubFactory(SignatoryFactory)
-    # template = factory.SubFactory(CertificateTemplateFactory)
-    # title = FuzzyText('Audit Certificate')
-
 
 class ProgramCertificateFactory(factory.django.DjangoModelFactory):
     class Meta(object):
@@ -81,7 +77,7 @@ class ProgramCertificateFactory(factory.django.DjangoModelFactory):
     program_id = factory.Sequence(lambda n: n)
     site = factory.SubFactory(SiteFactory)
     template = factory.SubFactory(CertificateTemplateFactory)
-    title = FuzzyText('programs title')
+    title = factory.Sequence(u'title{0}'.format)
 
     @factory.post_generation
     def post(self, create, extracted, **kwargs):
@@ -99,9 +95,8 @@ class UserCredentialFactory(factory.django.DjangoModelFactory):
     credential_object = factory.SubFactory(ProgramCertificateFactory)
     username = FuzzyText('Home Template')
     status = 'awarded'
-    download_url = 'aa'
+    download_url = factory.Sequence(u'http://www.google{0}.com'.format)
     uuid = factory.LazyAttribute(lambda o: uuid.uuid4().hex)  # pylint: disable=undefined-variable
-
 
 
 class UserCredentialAttributeFactory(factory.django.DjangoModelFactory):
@@ -109,6 +104,6 @@ class UserCredentialAttributeFactory(factory.django.DjangoModelFactory):
         model = models.UserCredentialAttribute
 
     user_credential = factory.SubFactory(UserCredentialFactory)
-    namespace = 'name space'
-    name = 'testing name'
-    value = 'testing value'
+    namespace = factory.Sequence(u'namespace{0}'.format)
+    name = factory.Sequence(u'name{0}'.format)
+    value = factory.Sequence(u'value{0}'.format)
