@@ -178,6 +178,7 @@ class AdvancedSettingsPage(CoursePage):
             'display_name',
             'info_sidebar_name',
             'is_new',
+            'ispublic',
             'issue_badges',
             'max_student_enrollments_allowed',
             'no_grade',
