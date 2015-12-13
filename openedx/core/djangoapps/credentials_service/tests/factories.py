@@ -104,3 +104,11 @@ class UserCredentialFactory(factory.django.DjangoModelFactory):
 
 
 
+class UserCredentialAttributeFactory(factory.django.DjangoModelFactory):
+    class Meta(object):
+        model = models.UserCredentialAttribute
+
+    user_credential = factory.SubFactory(UserCredentialFactory)
+    namespace = 'name space'
+    name = 'testing name'
+    value = 'testing value'
