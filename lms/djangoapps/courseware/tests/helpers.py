@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from courseware.access import has_access
+from courseware.access import has_access, COURSE_OVERVIEW_SUPPORTED_ACTIONS
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import Registration
 
@@ -151,27 +151,30 @@ class CourseAccessTestMixin(TestCase):
         """
         Assert that a user has access to the given action for a given course.
 
-        Test with both the given course and with a CourseOverview of the given
-        course.
+        Test with both the given course and, if the action is supported, with
+        a CourseOverview of the given course.
 
         Arguments:
             user (User): a user.
             action (str): type of access to test.
+                See access.py:COURSE_OVERVIEW_SUPPORTED_ACTIONS.
             course (CourseDescriptor): a course.
         """
         self.assertTrue(has_access(user, action, course))
-        self.assertTrue(has_access(user, action, CourseOverview.get_from_id(course.id)))
+        if action in COURSE_OVERVIEW_SUPPORTED_ACTIONS:
+            self.assertTrue(has_access(user, action, CourseOverview.get_from_id(course.id)))
 
     def assertCannotAccessCourse(self, user, action, course):
         """
         Assert that a user lacks access to the given action the given course.
 
-        Test with both the given course and with a CourseOverview of the given
-        course.
+        Test with both the given course and, if the action is supported, with
+        a CourseOverview of the given course.
 
         Arguments:
             user (User): a user.
             action (str): type of access to test.
+                See access.py:COURSE_OVERVIEW_SUPPORTED_ACTIONS.
             course (CourseDescriptor): a course.
 
         Note:
@@ -181,4 +184,5 @@ class CourseAccessTestMixin(TestCase):
             stack traces of failed tests easier to understand at a glance.
         """
         self.assertFalse(has_access(user, action, course))
-        self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))
+        if action in COURSE_OVERVIEW_SUPPORTED_ACTIONS:
+            self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))

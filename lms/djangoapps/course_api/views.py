@@ -2,7 +2,7 @@
 Course API Views
 """
 
-from django.http import Http404
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from opaque_keys import InvalidKeyError
@@ -102,7 +102,7 @@ class CourseDetailView(RetrieveAPIView):
         try:
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError:
-            raise Http404()
+            raise NotFound()
 
         return course_detail(self.request, username, course_key)
 
