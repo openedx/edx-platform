@@ -34,16 +34,6 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
         return Response([], status=status.HTTP_200_OK)
 
-
-class CredentialsByProgramsViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-        mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-
-    lookup_field = 'program_id'
-    queryset = ProgramCertificate.objects.all()
-    serializer_class = serializers.ProgramCertificateSerializer
-
-    parser_classes = (parsers.MergePatchParser,)
-
     def create(self, request, *args, **kwargs):
         # api/credentials/v1/programs/
         # {
@@ -99,6 +89,17 @@ class CredentialsByProgramsViewSet(mixins.CreateModelMixin, mixins.ListModelMixi
             UserCredentialAttribute.objects.bulk_create(attr_list)
 
         return Response([], status=status.HTTP_200_OK)
+
+
+class CredentialsByProgramsViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+        mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+
+    lookup_field = 'program_id'
+    queryset = ProgramCertificate.objects.all()
+    serializer_class = serializers.ProgramCertificateSerializer
+
+    parser_classes = (parsers.MergePatchParser,)
+
 
 
 class CredentialsByCoursesViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
