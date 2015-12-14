@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from opaque_keys.edx.locator import BlockUsageLocator
 from student.roles import get_aggregate_exclusion_user_ids
 
 from edx_notifications.lib.publisher import (
@@ -16,7 +17,17 @@ from edx_notifications.lib.publisher import (
 from edx_notifications.data import NotificationMessage
 
 from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
+
+from xmodule.modulestore.django import modulestore
+
 log = logging.getLogger(__name__)
+
+
+def _get_parent_content_id(html_content_id):
+    html_usage_id = BlockUsageLocator.from_string(html_content_id)
+    html_module = modulestore().get_item(html_usage_id)
+    parent_module = html_module.get_parent()
+    return str(parent_module.scope_ids.usage_id)
 
 
 @receiver(post_save, sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
@@ -26,6 +37,8 @@ def handle_cmc_post_save_signal(sender, instance, created, **kwargs):
     """
     content_id = unicode(instance.content_id)
     detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
+    if 'html' in content_id:
+        content_id = _get_parent_content_id(content_id)
     if created and not any(category in content_id for category in detached_categories):
         try:
             progress = StudentProgress.objects.get(user=instance.user, course_id=instance.course_id)
