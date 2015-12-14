@@ -33,7 +33,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        course_keys = []
         if options['all']:
             course_keys = [course.id for course in modulestore().get_courses()]
         else:
@@ -42,9 +41,6 @@ class Command(BaseCommand):
             try:
                 course_keys = [CourseKey.from_string(arg) for arg in args]
             except InvalidKeyError:
-                log.fatal('Invalid key specified.')
-
-            if not course_keys:
-                log.fatal('No courses specified.')
+                raise CommandError('Invalid key specified.')
 
         CourseOverview.get_select_courses(course_keys)
