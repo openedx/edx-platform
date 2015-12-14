@@ -33,12 +33,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        course_keys = []
         if options['all']:
-            # Have CourseOverview generate course overviews for all
-            # the courses in the system.
-            CourseOverview.get_all_courses(force_reseeding=True)
+            course_keys = [course.id for course in modulestore().get_courses()]
         else:
-            course_keys = []
             if len(args) < 1:
                 raise CommandError('At least one course or --all must be specified.')
             try:
@@ -49,4 +47,4 @@ class Command(BaseCommand):
             if not course_keys:
                 log.fatal('No courses specified.')
 
-            CourseOverview.get_select_courses(course_keys)
+        CourseOverview.get_select_courses(course_keys)

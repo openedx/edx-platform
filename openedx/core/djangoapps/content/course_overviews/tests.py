@@ -450,7 +450,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         )
 
     def test_get_all_courses(self):
-        course_ids = [CourseFactory.create().id for __ in range(3)]
+        course_ids = [CourseFactory.create(emit_signals=True).id for __ in range(3)]
         self.assertSetEqual(
             {course_overview.id for course_overview in CourseOverview.get_all_courses()},
             set(course_ids),
@@ -462,21 +462,13 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             CourseOverview.get_all_courses()
             self.assertFalse(mock_get_from_id.called)
 
-            CourseOverview.get_all_courses(force_reseeding=True)
-            self.assertTrue(mock_get_from_id.called)
-
     def test_get_all_courses_by_org(self):
         org_courses = []  # list of lists of courses
         for index in range(2):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + unicode(index))
+                CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
                 for __ in range(3)
             ])
-
-        self.assertSetEqual(
-            {c.id for c in CourseOverview.get_all_courses(org='test_org_0', force_reseeding=True)},
-            {c.id for c in org_courses[0]},
-        )
 
         self.assertSetEqual(
             {c.id for c in CourseOverview.get_all_courses(org='test_org_1')},
