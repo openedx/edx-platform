@@ -14,6 +14,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   constructor: (element) ->
     @element = element
+    @problem_id_data = $(@element[0].closest('.xmodule_edit')).data('usage-id')
+    @problem_id = @problem_id_data.split('@')[2]
+    window.problem_id = @problem_id
 
     if $(".markdown-box", @element).length != 0
       @markdown_editor = CodeMirror.fromTextArea($(".markdown-box", element)[0], {
@@ -517,6 +520,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       var line, i, curlabel, prevlabel = '';
       var didinput = false;
       for (i = 0; i < split.length; i++) {
+        var id = 'problem_label_' + window.problem_id + '_2_1';
         line = split[i];
         if (match = line.match(/>>(.*)<</)) {
           curlabel = match[1].replace(/&/g, '&amp;')
@@ -524,7 +528,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
-          line = line.replace(/>>|<</g, '');
+
+          line = '<p class="problem-label" id="' + id + '">' + line.replace(/>>|<</g, '') + '</p>';
         } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
           // reset label to prevent gobbling up previous one (if multiple questions)
           curlabel = '';
