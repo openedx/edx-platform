@@ -480,6 +480,7 @@ class EdxNoteHighlight(NoteChild):
     ADDER_SELECTOR = ".annotator-adder"
     VIEWER_SELECTOR = ".annotator-viewer"
     EDITOR_SELECTOR = ".annotator-editor"
+    NOTE_SELECTOR = ".annotator-note"
 
     def __init__(self, browser, element, parent_id):
         super(EdxNoteHighlight, self).__init__(browser, parent_id)
@@ -548,7 +549,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Clicks on the note viewer.
         """
-        self.q(css=self._bounded_selector(self.VIEWER_SELECTOR)).first.click()
+        self.q(css=self.NOTE_SELECTOR).first.click()
         return self
 
     def show(self):
