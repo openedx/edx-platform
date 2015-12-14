@@ -20,6 +20,9 @@ class CourseOutlineItem(object):
     """
     A mixin class for any :class:`PageObject` shown in a course outline.
     """
+    # Note there are a few pylint disable=no-member occurances in this class, because
+    # it was written assuming it is going to be a mixin to a PageObject and will have functions
+    # such as self.wait_for_ajax, which doesn't exist on a generic `object`.
     BODY_SELECTOR = None
     EDIT_BUTTON_SELECTOR = '.xblock-field-value-edit'
     NAME_SELECTOR = '.item-title'
@@ -33,7 +36,7 @@ class CourseOutlineItem(object):
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
         try:
-            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
+            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)  # pylint: disable=no-member
         except AttributeError:
             return "{}(<browser>)".format(self.__class__.__name__)
 
@@ -43,6 +46,7 @@ class CourseOutlineItem(object):
         """
         # If the item doesn't have a body selector or locator, then it can't be bounded
         # This happens in the context of the CourseOutlinePage
+        # pylint: disable=no-member
         if self.BODY_SELECTOR and hasattr(self, 'locator'):
             return '{}[data-locator="{}"] {}'.format(
                 self.BODY_SELECTOR,
@@ -57,7 +61,7 @@ class CourseOutlineItem(object):
         """
         Returns the display name of this object.
         """
-        name_element = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).first
+        name_element = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).first  # pylint: disable=no-member
         if name_element:
             return name_element.text[0]
         else:
@@ -68,14 +72,14 @@ class CourseOutlineItem(object):
         """
         Returns True if the item has a status message, False otherwise.
         """
-        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).first.visible
+        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).first.visible  # pylint: disable=no-member
 
     @property
     def status_message(self):
         """
         Returns the status message of this item.
         """
-        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).text[0]
+        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).text[0]  # pylint: disable=no-member
 
     @property
     def has_staff_lock_warning(self):
@@ -85,13 +89,13 @@ class CourseOutlineItem(object):
     @property
     def is_staff_only(self):
         """ Returns True if the visiblity state of this item is staff only (has a black sidebar) """
-        return "is-staff-only" in self.q(css=self._bounded_selector(''))[0].get_attribute("class")
+        return "is-staff-only" in self.q(css=self._bounded_selector(''))[0].get_attribute("class")  # pylint: disable=no-member
 
     def edit_name(self):
         """
         Puts the item's name into editable form.
         """
-        self.q(css=self._bounded_selector(self.EDIT_BUTTON_SELECTOR)).first.click()
+        self.q(css=self._bounded_selector(self.EDIT_BUTTON_SELECTOR)).first.click()  # pylint: disable=no-member
 
     def enter_name(self, new_name):
         """
@@ -105,12 +109,13 @@ class CourseOutlineItem(object):
         """
         self.edit_name()
         set_input_value_and_save(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
-        self.wait_for_ajax()
+        self.wait_for_ajax()  # pylint: disable=no-member
 
     def finalize_name(self):
         """
         Presses ENTER, saving the value of the display name for this item.
         """
+        # pylint: disable=no-member
         self.q(css=self._bounded_selector(self.NAME_INPUT_SELECTOR)).results[0].send_keys(Keys.ENTER)
         self.wait_for_ajax()
 
@@ -126,29 +131,42 @@ class CourseOutlineItem(object):
         """
         Return whether this outline item's display name is in its editable form.
         """
+        # pylint: disable=no-member
         return "is-editing" in self.q(
             css=self._bounded_selector(self.NAME_FIELD_WRAPPER_SELECTOR)
         )[0].get_attribute("class")
 
     def edit(self):
-        self.q(css=self._bounded_selector(self.CONFIGURATION_BUTTON_SELECTOR)).first.click()
+        """
+        Puts the item into editable form.
+        """
+        self.q(css=self._bounded_selector(self.CONFIGURATION_BUTTON_SELECTOR)).first.click()  # pylint: disable=no-member
         modal = CourseOutlineModal(self)
-        EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')
+        EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')  # pylint: disable=unnecessary-lambda
         return modal
 
     @property
     def release_date(self):
-        element = self.q(css=self._bounded_selector(".status-release-value"))
+        """
+        Returns the release date from the page. Date is "mm/dd/yyyy" string.
+        """
+        element = self.q(css=self._bounded_selector(".status-release-value"))  # pylint: disable=no-member
         return element.first.text[0] if element.present else None
 
     @property
     def due_date(self):
-        element = self.q(css=self._bounded_selector(".status-grading-date"))
+        """
+        Returns the due date from the page. Date is "mm/dd/yyyy" string.
+        """
+        element = self.q(css=self._bounded_selector(".status-grading-date"))  # pylint: disable=no-member
         return element.first.text[0] if element.present else None
 
     @property
     def policy(self):
-        element = self.q(css=self._bounded_selector(".status-grading-value"))
+        """
+        Select the grading format with `value` in the drop-down list.
+        """
+        element = self.q(css=self._bounded_selector(".status-grading-value"))  # pylint: disable=no-member
         return element.first.text[0] if element.present else None
 
     def publish(self):
@@ -157,7 +175,7 @@ class CourseOutlineItem(object):
         """
         click_css(self, self._bounded_selector('.action-publish'), require_notification=False)
         modal = CourseOutlineModal(self)
-        EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')
+        EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')  # pylint: disable=unnecessary-lambda
         modal.publish()
 
     @property
@@ -165,7 +183,7 @@ class CourseOutlineItem(object):
         """
         Returns the link for publishing a unit.
         """
-        return self.q(css=self._bounded_selector('.action-publish')).first
+        return self.q(css=self._bounded_selector('.action-publish')).first  # pylint: disable=no-member
 
 
 class CourseOutlineContainer(CourseOutlineItem):
@@ -186,6 +204,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         if not child_class:
             child_class = self.CHILD_CLASS
 
+        # pylint: disable=no-member
         return child_class(
             self.browser,
             self.q(css=child_class.BODY_SELECTOR).filter(
@@ -200,6 +219,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         if not child_class:
             child_class = self.CHILD_CLASS
+        # pylint: disable=no-member
         return self.q(css=self._bounded_selector(child_class.BODY_SELECTOR)).map(
             lambda el: child_class(self.browser, el.get_attribute('data-locator'))).results
 
@@ -227,10 +247,13 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         Toggle the expansion of this subsection.
         """
-
+        # pylint: disable=no-member
         self.browser.execute_script("jQuery.fx.off = true;")
 
         def subsection_expanded():
+            """
+            Returns whether or not this subsection is expanded.
+            """
             add_button = self.q(css=self._bounded_selector(self.ADD_BUTTON_SELECTOR)).first.results
             return add_button and add_button[0].is_displayed()
 
@@ -253,7 +276,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         Return whether this outline item is currently collapsed.
         """
-        return "is-collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]
+        return "is-collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]  # pylint: disable=no-member
 
 
 class CourseOutlineChild(PageObject, CourseOutlineItem):
@@ -742,6 +765,9 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
 
 class CourseOutlineModal(object):
+    """
+    Page object specifically for a modal window on the course outline page.
+    """
     MODAL_SELECTOR = ".wrapper-modal-window"
 
     def __init__(self, page):
@@ -754,26 +780,47 @@ class CourseOutlineModal(object):
         return " ".join([self.MODAL_SELECTOR, selector])
 
     def is_shown(self):
+        """
+        Return whether or not the modal defined by self.MODAL_SELECTOR is shown.
+        """
         return self.page.q(css=self.MODAL_SELECTOR).present
 
     def find_css(self, selector):
+        """
+        Find the given css selector on the page.
+        """
         return self.page.q(css=self._bounded_selector(selector))
 
     def click(self, selector, index=0):
+        """
+        Perform a Click action on the given selector.
+        """
         self.find_css(selector).nth(index).click()
 
     def save(self):
+        """
+        Click the save action button, and wait for the ajax call to return.
+        """
         self.click(".action-save")
         self.page.wait_for_ajax()
 
     def publish(self):
+        """
+        Click the publish action button, and wait for the ajax call to return.
+        """
         self.click(".action-publish")
         self.page.wait_for_ajax()
 
     def cancel(self):
+        """
+        Click the cancel action button.
+        """
         self.click(".action-cancel")
 
     def has_release_date(self):
+        """
+        Check if the input box for the release date exists in the subsection's settings window
+        """
         return self.find_css("#start_date").present
 
     def has_release_time(self):
@@ -783,6 +830,9 @@ class CourseOutlineModal(object):
         return self.find_css("#start_time").present
 
     def has_due_date(self):
+        """
+        Check if the input box for the due date exists in the subsection's settings window
+        """
         return self.find_css("#due_date").present
 
     def has_due_time(self):
@@ -792,6 +842,9 @@ class CourseOutlineModal(object):
         return self.find_css("#due_time").present
 
     def has_policy(self):
+        """
+        Check if the input for the  grading policy is present.
+        """
         return self.find_css("#grading_type").present
 
     def set_date(self, property_name, input_selector, date):
@@ -806,7 +859,7 @@ class CourseOutlineModal(object):
             current_month, current_year = datetime.datetime.today().month, datetime.datetime.today().year
         date_diff = 12 * (year - current_year) + month - current_month
         selector = "a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
-        for i in xrange(abs(date_diff)):
+        for __ in xrange(abs(date_diff)):
             self.page.q(css=selector).click()
         self.page.q(css="a.ui-state-default").nth(day - 1).click()  # set day
         self.page.wait_for_element_invisibility("#ui-datepicker-div", "datepicker should be closed")
@@ -826,12 +879,15 @@ class CourseOutlineModal(object):
 
     @property
     def release_date(self):
+        """
+        Returns the unit's release date. Date is "mm/dd/yyyy" string.
+        """
         return self.find_css("#start_date").first.attrs('value')[0]
 
     @release_date.setter
     def release_date(self, date):
         """
-        Date is "mm/dd/yyyy" string.
+        Sets the unit's release date to `date`. Date is "mm/dd/yyyy" string.
         """
         self.set_date('release_date', "#start_date", date)
 
@@ -851,12 +907,15 @@ class CourseOutlineModal(object):
 
     @property
     def due_date(self):
+        """
+        Returns the due date from the page. Date is "mm/dd/yyyy" string.
+        """
         return self.find_css("#due_date").first.attrs('value')[0]
 
     @due_date.setter
     def due_date(self, date):
         """
-        Date is "mm/dd/yyyy" string.
+        Sets the due date for the unit. Date is "mm/dd/yyyy" string.
         """
         self.set_date('due_date', "#due_date", date)
 
