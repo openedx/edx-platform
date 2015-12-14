@@ -444,14 +444,14 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
     def test_get_select_courses(self):
         course_ids = [CourseFactory.create().id for __ in range(3)]
         select_course_ids = course_ids[:len(course_ids) - 1]  # all items except the last
-        self.assertSetEqual(
+        self.assertEqual(
             {course_overview.id for course_overview in CourseOverview.get_select_courses(select_course_ids)},
             set(select_course_ids),
         )
 
     def test_get_all_courses(self):
         course_ids = [CourseFactory.create(emit_signals=True).id for __ in range(3)]
-        self.assertSetEqual(
+        self.assertEqual(
             {course_overview.id for course_overview in CourseOverview.get_all_courses()},
             set(course_ids),
         )
@@ -470,12 +470,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 for __ in range(3)
             ])
 
-        self.assertSetEqual(
+        self.assertEqual(
+            {c.id for c in CourseOverview.get_all_courses()},
+            {c.id for c in org_courses[0] + org_courses[1]},
+        )
+
+        self.assertEqual(
             {c.id for c in CourseOverview.get_all_courses(org='test_org_1')},
             {c.id for c in org_courses[1]},
         )
 
-        self.assertSetEqual(
-            {c.id for c in CourseOverview.get_all_courses()},
-            {c.id for c in org_courses[0] + org_courses[1]},
+        # Test case-insensitivity.
+        self.assertEqual(
+            {c.id for c in CourseOverview.get_all_courses(org='TEST_ORG_1')},
+            {c.id for c in org_courses[1]},
         )
