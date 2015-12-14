@@ -40,7 +40,7 @@ class UserCredentialSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = UserCredential
         fields = (
-            'username', 'credential_id', 'credential',
+            'id', 'username', 'credential_id', 'credential',
             'status', 'download_url', 'uuid', 'attributes'
         )
 
