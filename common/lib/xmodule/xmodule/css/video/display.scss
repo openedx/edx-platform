@@ -247,6 +247,22 @@ html:not('.afontgarde') .icon-fallback-img {
       }
     }
 
+    .closed-captions {
+      position: absolute;
+      width: 85%;
+      left: 5%;
+      top: 70%;
+      text-align: center;
+    }
+
+    .closed-captions.is-visible {
+      max-height: ($baseline * 3);
+      border-radius: ($baseline / 5);
+      padding: 8px ($baseline / 2) 8px ($baseline * 1.5);
+      background: rgba(0, 0, 0, .75);
+      color: $yellow;
+    }
+
     .video-player {
       overflow: hidden;
       min-height: 300px;
@@ -701,39 +717,44 @@ html:not('.afontgarde') .icon-fallback-img {
   .subtitles {
     @include float(left);
     overflow: auto;
-    margin: 0;
     max-height: 460px;
     width: flex-grid(3, 9);
     padding: 0;
     font-size: 14px;
-    list-style: none;
     visibility: visible;
 
-    li {
-      @extend %ui-fake-link;
-      margin-bottom: 8px;
-      border: 0;
+    .subtitles-menu {
+      height: 100%;
+      margin: 0;
       padding: 0;
-      color: #0074b5; // AA compliant
-      line-height: lh();
+      list-style: none;
 
-      &.current {
-        color: #333;
-        font-weight: 700;
-      }
+      li {
+        @extend %ui-fake-link;
+        margin-bottom: 8px;
+        border: 0;
+        padding: 0;
+        color: #0074b5; // AA compliant
+        line-height: lh();
 
-      &.focused {
-        outline: #000 dotted thin;
-        outline-offset: -1px;
-      }
+        &.current {
+          color: #333;
+          font-weight: 700;
+        }
 
-      &:hover,
-      &:focus {
-        text-decoration: underline;
-      }
+        &.focused {
+          outline: #000 dotted thin;
+          outline-offset: -1px;
+        }
 
-      &:empty {
-        margin-bottom: 0;
+        &:hover,
+        &:focus {
+          text-decoration: underline;
+        }
+
+        &:empty {
+          margin-bottom: 0;
+        }
       }
     }
   }
