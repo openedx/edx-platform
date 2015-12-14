@@ -19,6 +19,7 @@ from courseware.courses import get_course
 from instructor.enrollment import enroll_email
 from student.forms import AccountCreationForm
 from student.views import _do_create_account
+from .models import Organization
 from .permissions import SecretKeyPermission
 from .serializers import UserSignupSerializer
 
@@ -86,6 +87,18 @@ class UserSignupAPIView(GenericAPIView):
             except ValidationError as e:
                 return HttpResponse(status=status.HTTP_403_FORBIDDEN)
             # create_comments_service_user(user)  # TODO: do we need this? if so, fix it
+
+            # if the organization does not exist yet, create it
+            try:
+                organization = Organization.objects.get(key=data.get('org'))
+            except Organization.DoesNotExist:
+                organization = Organization(key=data.get('org'),
+                                            display_name=data.get('org_name'))
+                organization.save()
+
+            # add the organization to the user
+            profile.organization = organization
+            profile.save()
 
             user.is_active = True
             user.save()
