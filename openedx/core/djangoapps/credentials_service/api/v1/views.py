@@ -7,10 +7,12 @@ from openedx.core.djangoapps.credentials_service import filters
 from openedx.core.djangoapps.credentials_service.models import UserCredential, ProgramCertificate, CourseCertificate, \
     UserCredentialAttribute
 from openedx.core.lib.api import parsers
-from rest_framework import mixins, viewsets, parsers as drf_parsers
+from rest_framework import mixins, viewsets,generics, parsers as drf_parsers
 
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
+
 
 log = logging.getLogger(__name__)
 
@@ -27,37 +29,60 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         """
         PATCH /api/credentials/v1/users/{username}/
         Only to update the certificate status.
+        {
+            "id": 1,
+            "username": "tester",
+            "credential": {
+                "program_id": 1001
+            },
+            "status": "revoked",
+            "download_url": "",
+            "uuid": "2a2f5562-b876-44c8-b16e-f62ea3a1a2e6",
+            "attributes": []
+        }
         """
-        UserCredential.objects.filter(pk=request.data.get('id')).update(
-            status=request.data.get('status')
-        )
+        # if id exists in db then return the object otherwise return 404
+        credential = generics.get_object_or_404(UserCredential, pk=request.data.get('id'))
+        credential.status = request.data.get('status')
+        credential.save()
 
-        return Response([], status=status.HTTP_200_OK)
+        serializer = self.get_serializer(credential)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        # api/credentials/v1/programs/
-        # {
-        #     "credentials": [
-        #       {
-        #         "username": "user1",
-        #         "program_id": 100,
-        #         "attributes": [{
-        #             "namespace": "white-list",
-        #             "name": "grade",
-        #             "value": "8.0"
-        #         }]
-        #      },
-        #       {
-        #         "username": "user2",
-        #         "program_id": 100,
-        #         "attributes": [{
-        #             "namespace": "white-list",
-        #             "name": "grade",
-        #             "value": "10"
-        #         }]
-        #      }
-        #     ]
-        # }
+        """
+        # api/credentials/v1/users/
+        {
+            "credentials": [
+              {
+                "username": "user1",
+                "program_id": 100,
+                "attributes": [{
+                    "namespace": "white-list",
+                    "name": "grade",
+                    "value": "8.0"
+                }]
+             },
+              {
+                "username": "user2",
+                "program_id": 100,
+                "attributes": [
+                    {
+                        "namespace": "white-list",
+                        "name": "grade",
+                        "value": "10"
+                    },
+                    {
+                        "namespace": "white-list",
+                        "name": "grade",
+                        "value": "10"
+                    }
+                ]
+             }
+            ]
+        }
+        """
 
         for credential in request.data.get('credentials'):
 
@@ -65,13 +90,7 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
             username = credential.get('username')
             attributes = credential.get('attributes')
 
-            try:
-                program = ProgramCertificate.objects.get(program_id=program_id)
-            except:
-                msg = (u'program id {id} not found').format(id=program_id)
-                log.warning(msg)
-                continue
-
+            program = generics.get_object_or_404(ProgramCertificate, program_id=program_id)
             new_credential = UserCredential(username=username, credential=program)
             new_credential.save()
 

@@ -16,7 +16,9 @@ class CredentialRelatedField(serializers.RelatedField):
         Serialize objects to a simple textual representation.
         """
         if isinstance(value, ProgramCertificate):
-            return value.program_id
+            return {
+                'program_id': value.program_id
+            }
         elif isinstance(value, CourseCertificate):
             return {
                 'course_id': value.course_id,
@@ -28,7 +30,7 @@ class UserCredentialAttributeSerializer(serializers.ModelSerializer):
     """ User Credential Attribute Serializer """
     class Meta(object):
         model = UserCredentialAttribute
-        fields = ('user_credential', 'namespace', 'name', 'value')
+        fields = ('namespace', 'name', 'value')
 
 
 class UserCredentialSerializer(serializers.ModelSerializer):
@@ -40,9 +42,12 @@ class UserCredentialSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = UserCredential
         fields = (
-            'id', 'username', 'credential_id', 'credential',
+            'id', 'username', 'credential',
             'status', 'download_url', 'uuid', 'attributes'
         )
+        paginate_by = 10
+        paginate_by_param = "page_size"
+
 
 
 class ProgramCertificateBaseSerializer(serializers.ModelSerializer):
@@ -56,8 +61,7 @@ class ProgramCertificateSerializer(ProgramCertificateBaseSerializer):
     """ User Credential Attribute Serializer """
     user_credential = serializers.SerializerMethodField("get_users")
 
-    class Meta(object):
-        model = ProgramCertificate
+    class Meta(ProgramCertificateBaseSerializer.Meta):
         fields = ('user_credential', 'program_id')
 
     def get_users(self, program):
@@ -71,14 +75,13 @@ class CourseCertificateBaseSerializer(serializers.ModelSerializer):
         fields = ('course_id', 'certificate_type', )
 
 
-class CourseCertificateSerializer(ProgramCertificateBaseSerializer):
+class CourseCertificateSerializer(CourseCertificateBaseSerializer):
     """ User Credential Attribute Serializer """
     user_credential = serializers.SerializerMethodField("get_users")
 
-    class Meta(object):
+    class Meta(CourseCertificateBaseSerializer.Meta):
         model = CourseCertificate
         fields = ('user_credential', 'course_id', 'certificate_type',)
-
 
     def get_users(self, course):
         return UserCredentialSerializer(course.user_credentials.all(), many=True).data
