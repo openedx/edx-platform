@@ -2765,6 +2765,7 @@ OPTIONAL_APPS = (
     'mentoring',
     'problem_builder',
     'edx_sga',
+    'diagnostic_feedback',
 
     # edx-ora2
     'submissions',
