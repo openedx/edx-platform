@@ -278,7 +278,7 @@ class UserProfile(models.Model):
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True)
 
-    organization = models.ForeignKey(Organization, null=True)
+    organization = models.ForeignKey('appsembler_lms.Organization', null=True)
 
     @property
     def has_profile_image(self):
