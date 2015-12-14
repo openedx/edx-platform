@@ -294,9 +294,9 @@ class CertificateGenerationHistory(TimeStampedModel):
                 [CertificateStatuses.readable_statuses.get(status, "") for status in statuses]
             )
 
-        # If statuses_to_regenerate is not present in task_input then, certificate generation task was run to
-        # generate certificates for white listed students
-        return "for exceptions"
+        # If students is present in task_input then, certificate generation task was run to
+        # generate certificates for white listed students otherwise it is for all students.
+        return "For exceptions" if 'students' in task_input_json else "All learners"
 
     class Meta(object):
         app_label = "certificates"
