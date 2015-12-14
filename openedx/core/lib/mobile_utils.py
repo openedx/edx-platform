@@ -26,10 +26,11 @@ def is_request_from_mobile_app(request):
         return True
 
     if getattr(settings, 'MOBILE_APP_USER_AGENT_REGEXES', None):
-        user_agent = request.META.get('HTTP_USER_AGENT', '')
-        for user_agent_regex in settings.MOBILE_APP_USER_AGENT_REGEXES:
-            if re.match(user_agent_regex, user_agent):
-                return True
+        user_agent = request.META.get('HTTP_USER_AGENT')
+        if user_agent:
+            for user_agent_regex in settings.MOBILE_APP_USER_AGENT_REGEXES:
+                if re.match(user_agent_regex, user_agent):
+                    return True
 
     return False
 
