@@ -91,9 +91,6 @@ from django.core.urlresolvers import reverse
         %if studio_url:
         <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
         %endif
-        %if settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
-        <a class="instructor-info-action" href="${ old_dashboard_url }"> ${_("Revert to Legacy Dashboard")} </a>
-        %endif
       </div>
 
     <h1>${_("Instructor Dashboard")}</h1>

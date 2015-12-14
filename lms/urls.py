@@ -547,7 +547,6 @@ urlpatterns += (
         ),
         include(COURSE_URLS)
     ),
-    # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
     # Cohorts management
     url(
@@ -751,13 +750,6 @@ if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
             'courseware.views.submission_history',
             name='submission_history',
         ),
-    )
-
-
-if settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
-    urlpatterns += (
-        url(r'^courses/{}/legacy_instructor_dash$'.format(settings.COURSE_ID_PATTERN),
-            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard_legacy"),
     )
 
 if settings.FEATURES.get('CLASS_DASHBOARD'):
