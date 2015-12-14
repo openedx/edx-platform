@@ -92,7 +92,7 @@ from instructor.views import INVOICE_KEY
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
-from certificates.models import CertificateWhitelist, GeneratedCertificate
+from certificates.models import CertificateWhitelist, GeneratedCertificate, CertificateStatuses
 
 from bulk_email.models import CourseEmail
 from student.models import get_user_by_username_or_email
@@ -2708,7 +2708,7 @@ def start_certificate_regeneration(request, course_id):
         )
 
     # Check if the selected statuses are allowed
-    allowed_statuses = GeneratedCertificate.get_unique_statuses(course_key=course_key, flat=True)
+    allowed_statuses = [CertificateStatuses.downloadable, CertificateStatuses.error, CertificateStatuses.notpassing]
     if not set(certificates_statuses).issubset(allowed_statuses):
         return JsonResponse(
             {'message': _('Please select certificate statuses from the list only.')},
@@ -2789,11 +2789,18 @@ def add_certificate_exception(course_key, student, certificate_exception):
         }
     )
 
+    generated_certificate = GeneratedCertificate.objects.filter(
+        user=student,
+        course_id=course_key,
+        status=CertificateStatuses.downloadable,
+    ).first()
+
     exception = dict({
         'id': certificate_white_list.id,
         'user_email': student.email,
         'user_name': student.username,
         'user_id': student.id,
+        'certificate_generated': generated_certificate and generated_certificate.created_date.strftime("%B %d, %Y"),
         'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
     })
 
