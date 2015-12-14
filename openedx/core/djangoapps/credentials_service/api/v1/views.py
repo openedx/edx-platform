@@ -1,7 +1,7 @@
 """
 Credentials service API views (v1).
 """
-from django.contrib.contenttypes.models import ContentType
+import logging
 from openedx.core.djangoapps.credentials_service import serializers
 from openedx.core.djangoapps.credentials_service import filters
 from openedx.core.djangoapps.credentials_service.models import UserCredential, ProgramCertificate, CourseCertificate, \
@@ -9,9 +9,10 @@ from openedx.core.djangoapps.credentials_service.models import UserCredential, P
 from openedx.core.lib.api import parsers
 from rest_framework import mixins, viewsets, parsers as drf_parsers
 
-from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
+
+log = logging.getLogger(__name__)
 
 
 class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
@@ -25,6 +26,7 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     def partial_update(self, request, *args, **kwargs):
         """
         PATCH /api/credentials/v1/users/{username}/
+        Only to update the certificate status.
         """
         UserCredential.objects.filter(pk=request.data.get('id')).update(
             status=request.data.get('status')
@@ -76,7 +78,8 @@ class CredentialsByProgramsViewSet(mixins.CreateModelMixin, mixins.ListModelMixi
             try:
                 program = ProgramCertificate.objects.get(program_id=program_id)
             except:
-                # TODO error log
+                msg = (u'program id {id} not found').format(id=program_id)
+                log.warning(msg)
                 continue
 
             new_credential = UserCredential(username=username, credential=program)
