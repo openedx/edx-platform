@@ -60,7 +60,6 @@ class ProgramCertificateSerializer(ProgramCertificateBaseSerializer):
         model = ProgramCertificate
         fields = ('user_credential', 'program_id')
 
-
     def get_users(self, program):
         return UserCredentialSerializer(program.user_credentials.all(), many=True).data
 

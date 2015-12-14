@@ -22,67 +22,81 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     serializer_class = serializers.UserCredentialSerializer
     parser_classes = (parsers.MergePatchParser,  drf_parsers.JSONParser)
 
-    def create(self, request, *args, **kwargs):
-        """ Creates refunds, if eligible orders exist. """
-        username = request.data.get('username')
-        download_url = request.data.get('download_url')
-
     def partial_update(self, request, *args, **kwargs):
         """
-        PATCH /api/user/v1/preferences/{username}/
+        PATCH /api/credentials/v1/users/{username}/
         """
-        UserCredential.objects.filter(pk = request.data.get('id')).update(
-            status = request.data.get('status')
+        UserCredential.objects.filter(pk=request.data.get('id')).update(
+            status=request.data.get('status')
         )
-        return Response('done', status=status.HTTP_200_OK)
 
-    def update(request, *args, **kwargs):
-        """
-        PATCH /api/user/v1/preferences/{username}/
-        """
-        pass
+        return Response([], status=status.HTTP_200_OK)
 
 
 class CredentialsByProgramsViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
 
-    # TODO docstrings.
-
     lookup_field = 'program_id'
     queryset = ProgramCertificate.objects.all()
     serializer_class = serializers.ProgramCertificateSerializer
-    # filter_backends = (
-    #     filters.ProgramSearchFilterBackend,
-    # )
 
     parser_classes = (parsers.MergePatchParser,)
 
     def create(self, request, *args, **kwargs):
-        program_id = request.data.get('program_id')
-        username = request.data.get('username')
-        attributes = request.data.get('attributes')
-        try:
-            program = ProgramCertificate.objects.get(program_id=program_id)
-        except ProgramCertificate.DoesNotExist():
-            return
+        # api/credentials/v1/programs/
+        # {
+        #     "credentials": [
+        #       {
+        #         "username": "user1",
+        #         "program_id": 100,
+        #         "attributes": [{
+        #             "namespace": "white-list",
+        #             "name": "grade",
+        #             "value": "8.0"
+        #         }]
+        #      },
+        #       {
+        #         "username": "user2",
+        #         "program_id": 100,
+        #         "attributes": [{
+        #             "namespace": "white-list",
+        #             "name": "grade",
+        #             "value": "10"
+        #         }]
+        #      }
+        #     ]
+        # }
 
-        new_credenential = UserCredential(username=username, credential=program)
-        new_credenential.save()
+        for credential in request.data.get('credentials'):
 
-        attrs_list =[]
-        for attr in attributes:
-            attrs_list.append(
-                UserCredentialAttribute(
-                    user_credential=new_credenential,
-                    namespace=attr.get('namespace'),
-                    name=attr.get('name'),
-                    value=attr.get('value')
+            program_id = credential.get('program_id')
+            username = credential.get('username')
+            attributes = credential.get('attributes')
+
+            try:
+                program = ProgramCertificate.objects.get(program_id=program_id)
+            except:
+                # TODO error log
+                continue
+
+            new_credential = UserCredential(username=username, credential=program)
+            new_credential.save()
+
+            attr_list = []
+            for attr in attributes:
+                attr_list.append(
+                    UserCredentialAttribute(
+                        user_credential=new_credential,
+                        namespace=attr.get('namespace'),
+                        name=attr.get('name'),
+                        value=attr.get('value')
+                    )
                 )
-            )
 
-        UserCredentialAttribute.objects.bulk_create(attrs_list)
+            UserCredentialAttribute.objects.bulk_create(attr_list)
 
-        return Response('done', status=status.HTTP_200_OK)
+        return Response([], status=status.HTTP_200_OK)
+
 
 class CredentialsByCoursesViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
