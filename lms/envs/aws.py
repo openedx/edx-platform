@@ -580,6 +580,19 @@ STUDENT_FILEUPLOAD_MAX_SIZE = ENV_TOKENS.get("STUDENT_FILEUPLOAD_MAX_SIZE", STUD
 
 # Modules having these categories would be excluded from progress calculations
 PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
+PROGRESS_DETACHED_APPS = ['group_project_v2']
+for app in PROGRESS_DETACHED_APPS:
+    try:
+        app_module = __import__(app, fromlist=['app_config'])
+    except ImportError:
+        continue
+
+    app_config = getattr(app_module, 'app_config', None)
+    if not app_config:
+        continue
+
+    detached_module_categories = getattr(app_config, 'PROGRESS_DETACHED_CATEGORIES', [])
+    PROGRESS_DETACHED_CATEGORIES.extend(detached_module_categories)
 
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
