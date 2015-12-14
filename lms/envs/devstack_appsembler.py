@@ -9,3 +9,6 @@ OAUTH_ENFORCE_SECURE = False
 # disable caching in dev environment
 #CACHES['general']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
 #CACHES['default']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+
+
+INSTALLED_APPS += ('appsembler_lms',)
