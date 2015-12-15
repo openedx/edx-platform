@@ -73,11 +73,6 @@ FEATURES = {
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
-    # When True, will override certain branding with university specific values
-    # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
-    # university to use for branding purposes
-    'SUBDOMAIN_BRANDING': False,
-
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
@@ -674,7 +669,6 @@ OPTIMIZELY_PROJECT_ID = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
-SUBDOMAIN_BRANDING = {}
 VIRTUAL_UNIVERSITIES = []
 
 ############# XBlock Configuration ##########

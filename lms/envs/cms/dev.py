@@ -10,8 +10,6 @@ from ..dev import *
 
 FEATURES['AUTH_USE_CERTIFICATES'] = False
 
-SUBDOMAIN_BRANDING['edge'] = 'edge'
-SUBDOMAIN_BRANDING['preview.edge'] = 'edge'
 VIRTUAL_UNIVERSITIES = ['edge']
 
 # Turn off this flag because it will render 'Edit / QA' links for all instructor viewings of

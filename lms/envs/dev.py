@@ -20,7 +20,6 @@ TEMPLATE_DEBUG = True
 HTTPS = 'off'
 FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
-FEATURES['SUBDOMAIN_BRANDING'] = True
 FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
@@ -126,16 +125,6 @@ COURSE_LISTINGS = {
     'harvard': ['HarvardX/CS50x/2012H'],
     'mit': ['MITx/3.091/MIT_2012_Fall'],
     'sjsu': ['MITx/6.002x-EE98/2012_Fall_SJSU'],
-}
-
-
-SUBDOMAIN_BRANDING = {
-    'sjsu': 'MITx',
-    'mit': 'MITx',
-    'berkeley': 'BerkeleyX',
-    'harvard': 'HarvardX',
-    'openedx': 'openedx',
-    'edge': 'edge',
 }
 
 # List of `university` landing pages to display, even though they may not
