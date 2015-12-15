@@ -12,6 +12,7 @@ from rest_framework import mixins, viewsets,generics, parsers as drf_parsers
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
+from rest_framework.permissions import IsAuthenticated
 
 
 log = logging.getLogger(__name__)
@@ -22,8 +23,14 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
     queryset = UserCredential.objects.all()
     lookup_field = 'username'
+    filter_backends = (
+        filters.CredentialStatusQueryFilterBackend,
+        filters.CredentialIdQueryFilterBackend,
+    )
     serializer_class = serializers.UserCredentialSerializer
     parser_classes = (parsers.MergePatchParser,  drf_parsers.JSONParser)
+    permission_classes = (IsAuthenticated,)
+
 
     def partial_update(self, request, *args, **kwargs):
         """

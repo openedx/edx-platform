@@ -22,32 +22,20 @@ class BaseQueryFilterBackend(filters.BaseFilterBackend):
         else:
             return queryset
 
-
-class ProgramSearchFilterBackend(filters.BaseFilterBackend):
+class CredentialStatusQueryFilterBackend(BaseQueryFilterBackend):
     """
-    Depending on the group membership of the requesting user, filter program
-    results according to their status:
-
-      - ADMINS can see programs with any status other than 'deleted'
-      - LEARNERS can see programs with any status other than 'deleted' or 'unpublished'
+    Allows for filtering credentials by their status using a query string argument.
     """
+    query_parameter = 'status'
+    lookup_filter = 'status'
 
-    def filter_queryset(self, request, queryset, view):
-        #from nose.tools import set_trace; set_trace()
-        #program_id = request.__dict__['parser_context']['kwargs']['program_id']
-        # from nose.tools import set_trace; set_trace()
-        program = queryset.filter(program_id=int(200))
-        return UserCredential.objects.filter(
-            credential_content_type=ContentType.objects.get_for_model(
-                ProgramCertificate
-            ),
-            credential_id=program[0].id
-        )
 
-#
-# class ProgramStatusQueryFilterBackend(ProgramStatusRoleFilterBackend):
-#     """
-#     Allows for filtering programs by their status using a query string argument.
-#     """
-#     query_parameter = 'username'
-#     lookup_filter = 'username'
+class CredentialIdQueryFilterBackend(BaseQueryFilterBackend):
+    """
+    Allows for filtering credentials by their ID using a query string argument.
+    """
+    query_parameter = 'id'
+    lookup_filter = 'id'
+
+
+
