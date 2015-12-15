@@ -20,6 +20,8 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from django.conf import settings
+from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 
 from openedx.core.lib.api.permissions import IsUserInUrl
 
@@ -32,6 +34,9 @@ from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
 from .serializers import BookmarkSerializer
 
 log = logging.getLogger(__name__)
+
+# Default error message for user
+DEFAULT_USER_MESSAGE = ugettext_noop(u'An error has occurred. Please try again.')
 
 
 class BookmarksPagination(DefaultPagination):
@@ -71,7 +76,7 @@ class BookmarksViewMixin(object):
         optional_fields = params.get('fields', '').split(',')
         return DEFAULT_FIELDS + [field for field in optional_fields if field in OPTIONAL_FIELDS]
 
-    def error_response(self, message, error_status=status.HTTP_400_BAD_REQUEST):
+    def error_response(self, developer_message, user_message=None, error_status=status.HTTP_400_BAD_REQUEST):
         """
         Create and return a Response.
 
@@ -80,10 +85,13 @@ class BookmarksViewMixin(object):
                 and user_message fields.
             status: The status of the response. Default is HTTP_400_BAD_REQUEST.
         """
+        if not user_message:
+            user_message = developer_message
+
         return Response(
             {
-                "developer_message": message,
-                "user_message": _(message)  # pylint: disable=translation-of-non-string
+                "developer_message": developer_message,
+                "user_message": _(user_message)  # pylint: disable=translation-of-non-string
             },
             status=error_status
         )
@@ -219,25 +227,36 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         POST /api/bookmarks/v1/bookmarks/
         Request data: {"usage_id": "<usage-id>"}
         """
+
         if not request.data:
-            return self.error_response(ugettext_noop(u'No data provided.'))
+            return self.error_response(ugettext_noop(u'No data provided.'), DEFAULT_USER_MESSAGE)
 
         usage_id = request.data.get('usage_id', None)
         if not usage_id:
-            return self.error_response(ugettext_noop(u'Parameter usage_id not provided.'))
+            return self.error_response(ugettext_noop(u'Parameter usage_id not provided.'), DEFAULT_USER_MESSAGE)
 
         try:
             usage_key = UsageKey.from_string(unquote_slashes(usage_id))
         except InvalidKeyError:
             error_message = ugettext_noop(u'Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message)
+            return self.error_response(error_message, DEFAULT_USER_MESSAGE)
 
         try:
             bookmark = api.create_bookmark(user=self.request.user, usage_key=usage_key)
         except ItemNotFoundError:
             error_message = ugettext_noop(u'Block with usage_id: {usage_id} not found.').format(usage_id=usage_id)
             log.error(error_message)
+            return self.error_response(error_message, DEFAULT_USER_MESSAGE)
+        except BookmarksLimitReachedError:
+            error_message = ugettext_noop(
+                u'You can create up to {max_num_bookmarks_per_course} bookmarks.'
+                u' You must remove some bookmarks before you can add new ones.'
+            ).format(max_num_bookmarks_per_course=settings.MAX_BOOKMARKS_PER_COURSE)
+            log.info(
+                u'Attempted to create more than %s bookmarks',
+                settings.MAX_BOOKMARKS_PER_COURSE
+            )
             return self.error_response(error_message)
 
         return Response(bookmark, status=status.HTTP_201_CREATED)
@@ -301,7 +320,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         except InvalidKeyError:
             error_message = ugettext_noop(u'Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message, status.HTTP_404_NOT_FOUND)
+            return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, username=None, usage_id=None):  # pylint: disable=unused-argument
         """
@@ -323,7 +342,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
                 u'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message, status.HTTP_404_NOT_FOUND)
+            return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
         return Response(bookmark_data)
 
@@ -343,6 +362,6 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
                 u'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message, status.HTTP_404_NOT_FOUND)
+            return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
         return Response(status=status.HTTP_204_NO_CONTENT)

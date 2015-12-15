@@ -74,9 +74,7 @@ class Bookmark(TimeStampedModel):
             ItemNotFoundError: If no block exists for the usage_key.
         """
         data = dict(data)
-
         usage_key = data.pop('usage_key')
-        usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
         with modulestore().bulk_operations(usage_key.course_key):
             block = modulestore().get_item(usage_key)

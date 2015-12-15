@@ -4,8 +4,6 @@
         function (gettext, $, _, Backbone, MessageBannerView) {
 
         return Backbone.View.extend({
-
-            errorIcon: '<i class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></i>',
             errorMessage: gettext('An error has occurred. Please try again.'),
 
             srAddBookmarkText: gettext('Click to add'),
@@ -14,6 +12,8 @@
             events: {
                 'click': 'toggleBookmark'
             },
+
+            showBannerInterval: 5000,   // time in ms
 
             initialize: function (options) {
                 this.apiUrl = options.apiUrl;
@@ -36,7 +36,7 @@
             addBookmark: function() {
                 var view = this;
                 $.ajax({
-                    data: {usage_id:  view.usageId},
+                    data: {usage_id: view.usageId},
                     type: "POST",
                     url: view.apiUrl,
                     dataType: 'json',
@@ -44,8 +44,10 @@
                         view.$el.trigger('bookmark:add');
                         view.setBookmarkState(true);
                     },
-                    error: function() {
-                        view.showError();
+                    error: function (jqXHR) {
+                        var response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
+                        var userMessage = response ? response.user_message : '';
+                        view.showError(userMessage);
                     }
                 });
             },
@@ -79,13 +81,21 @@
                 }
             },
 
-            showError: function() {
+            showError: function (errorText) {
+                var errorMsg = errorText || this.errorMessage;
+
                 if (!this.messageView) {
                     this.messageView = new MessageBannerView({
-                        el: $('.message-banner')
+                        el: $('.message-banner'),
+                        type: 'error'
                     });
                 }
-                this.messageView.showMessage(this.errorMessage, this.errorIcon);
+                this.messageView.showMessage(errorMsg);
+
+                // Hide message automatically after some interval
+                setTimeout(_.bind(function () {
+                    this.messageView.hideMessage();
+                }, this), this.showBannerInterval);
             }
         });
     });
