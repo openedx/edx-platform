@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.views.decorators.http import require_GET
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access
@@ -18,8 +19,9 @@ from edxnotes.helpers import (
     get_edxnotes_id_token,
     get_notes,
     is_feature_enabled,
-    search,
     get_course_position,
+    DEFAULT_PAGE,
+    DEFAULT_PAGE_SIZE,
 )
 
 
@@ -44,13 +46,13 @@ def edxnotes(request, course_id):
 
     context = {
         "course": course,
-        "search_endpoint": reverse("search_notes", kwargs={"course_id": course_id}),
+        "search_endpoint": reverse("notes", kwargs={"course_id": course_id}),
         "notes": notes,
         "debug": json.dumps(settings.DEBUG),
         'position': None,
     }
 
-    if not notes:
+    if len(json.loads(notes)['results']) == 0:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2
         )
@@ -66,27 +68,49 @@ def edxnotes(request, course_id):
     return render_to_response("edxnotes/edxnotes.html", context)
 
 
+@require_GET
 @login_required
-def search_notes(request, course_id):
+def notes(request, course_id):
     """
-    Handles search requests.
+    Notes view to handle list and search requests.
+
+    Query parameters:
+        page: page number
+        page_size: number of notes per page
+        text: text string to search
+
+    Arguments:
+        request: HTTP request object
+        course_id: course id
     """
     course_key = CourseKey.from_string(course_id)
-    course = get_course_with_access(request.user, "load", course_key)
+    course = get_course_with_access(request.user, 'load', course_key)
 
     if not is_feature_enabled(course):
         raise Http404
 
-    if "text" not in request.GET:
-        return HttpResponseBadRequest()
+    page = request.GET.get('page') or DEFAULT_PAGE
+    page_size = request.GET.get('page_size') or DEFAULT_PAGE_SIZE
 
-    query_string = request.GET["text"]
+    path = 'annotations'
+    query_string = None
+    if 'text' in request.GET:
+        query_string = request.GET.get('text')
+        path = 'search'
+
     try:
-        search_results = search(request.user, course, query_string)
+        notes_info = get_notes(
+            request.user,
+            course,
+            page=page,
+            page_size=page_size,
+            path=path,
+            query_string=query_string
+        )
     except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
         return JsonResponseBadRequest({"error": err.message}, status=500)
 
-    return HttpResponse(search_results)
+    return HttpResponse(notes_info)
 
 
 # pylint: disable=unused-argument
