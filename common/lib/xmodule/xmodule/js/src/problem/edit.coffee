@@ -529,7 +529,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
 
-          line = '<p class="problem-label" id="' + id + '">' + line.replace(/>>|<</g, '') + '</p>';
+          line = '<p class="problem-label" id="' + id + '" aria-hidden="true">' + line.replace(/>>|<</g, '') + '</p>';
         } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
           // reset label to prevent gobbling up previous one (if multiple questions)
           curlabel = '';
