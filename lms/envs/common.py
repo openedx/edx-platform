@@ -73,30 +73,10 @@ FEATURES = {
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
-    # When True, will only publicly list courses by the subdomain.
-    'SUBDOMAIN_COURSE_LISTINGS': False,
-    # Expects you to define COURSE_LISTINGS, a dictionary mapping
-    # subdomains to lists of course_ids
-    # COURSE_LISTINGS = {
-    #     'default': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #         'HarvardX/CS50x/2012',
-    #         'MITx/3.091x/2012_Fall',
-    #     ],
-    #     'openedx': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #     ],
-    # }
-    # To see it in action, add the following to your /etc/hosts file:
-    #     127.0.0.1 openedx.dev
-
     # When True, will override certain branding with university specific values
     # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
-
-    'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
-                                       # set to None to do no university selection
 
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py

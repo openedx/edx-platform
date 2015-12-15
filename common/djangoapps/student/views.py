@@ -156,13 +156,9 @@ def index(request, extra_context=None, user=AnonymousUser()):
     """
     if extra_context is None:
         extra_context = {}
-    # The course selection work is done in courseware.courses.
-    domain = settings.FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
-    # do explicit check, because domain=None is valid
-    if domain is False:
-        domain = request.META.get('HTTP_HOST')
 
-    courses = get_courses(user, domain=domain)
+    courses = get_courses(user)
+
     if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
         courses = sort_by_start_date(courses)
