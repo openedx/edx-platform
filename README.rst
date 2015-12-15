@@ -1,4 +1,4 @@
-This is the main edX platform which consists of LMS and Studio.
+This is a test, please ignore.
 
 
 Installation
