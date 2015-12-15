@@ -1006,6 +1006,8 @@ ADVANCED_COMPONENT_TYPES = [
     'pb-dashboard',
     'poll',
     'survey',
+    'activetable',
+    'vectordraw',
     # Some of the XBlocks from pmitros repos are sometimes prototypes.
     # Use with caution.
     'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
