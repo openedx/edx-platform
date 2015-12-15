@@ -14,6 +14,7 @@ from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule_django.models import CourseKeyField, LocationKeyField
+from django.conf import settings
 
 from . import PathItem
 
@@ -58,6 +59,29 @@ class Bookmark(TimeStampedModel):
 
     def __unicode__(self):
         return self.resource_id
+
+    @classmethod
+    def can_create_more(cls, data):
+        """
+        Determine if a new Bookmark can be created for the course
+        based on limit defined in django.conf.settings.COURSE_BOOKMARKS["MAX_LIMIT_PER_COURSE"]
+
+        Arguments:
+            data (dict): The data to create the object with.
+        Returns:
+            Boolean
+        """
+        max_bookmarks_per_course = settings.COURSE_BOOKMARKS['MAX_LIMIT_PER_COURSE']
+        data = dict(data)
+
+        user = data['user']
+        course_key = data['usage_key'].course_key
+
+        # User can create up to max_bookmarks_per_course bookmarks
+        if cls.objects.filter(user=user, course_key=course_key).count() == max_bookmarks_per_course:
+            return False
+
+        return True
 
     @classmethod
     def create(cls, data):

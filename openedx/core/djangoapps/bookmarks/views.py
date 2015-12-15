@@ -20,6 +20,8 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from django.conf import settings
+from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 
 from openedx.core.lib.api.permissions import IsUserInUrl
 
@@ -237,6 +239,13 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
             bookmark = api.create_bookmark(user=self.request.user, usage_key=usage_key)
         except ItemNotFoundError:
             error_message = ugettext_noop(u'Block with usage_id: {usage_id} not found.').format(usage_id=usage_id)
+            log.error(error_message)
+            return self.error_response(error_message)
+        except BookmarksLimitReachedError:
+            max_bookmarks_per_course = settings.COURSE_BOOKMARKS["MAX_LIMIT_PER_COURSE"]
+            error_message = ugettext_noop(u'You can create up to {0} bookmarks.'
+                                          u' You must remove some bookmarks before you can add new ones.')\
+                .format(max_bookmarks_per_course)
             log.error(error_message)
             return self.error_response(error_message)
 

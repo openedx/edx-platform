@@ -7,6 +7,10 @@ from .models import Bookmark
 from .serializers import BookmarkSerializer
 
 
+class BookmarksLimitReachedError(Exception):
+    pass
+
+
 def get_bookmark(user, usage_key, fields=None):
     """
     Return data for a bookmark.
@@ -80,10 +84,16 @@ def create_bookmark(user, usage_key):
     Raises:
         ItemNotFoundError: If no block exists for the usage_key.
     """
-    bookmark, created = Bookmark.create({
+
+    data = {
         'user': user,
         'usage_key': usage_key
-    })
+    }
+
+    if not Bookmark.can_create_more(data):
+        raise BookmarksLimitReachedError()
+
+    bookmark, created = Bookmark.create(data)
     if created:
         _track_event('edx.bookmark.added', bookmark)
     return BookmarkSerializer(bookmark, context={'fields': DEFAULT_FIELDS + OPTIONAL_FIELDS}).data
