@@ -27,14 +27,15 @@ log = logging.getLogger(__name__)
 
 
 def _get_parent_content_id(html_content_id):
+    """ Gets parent block content id """
     try:
         html_usage_id = BlockUsageLocator.from_string(html_content_id)
         html_module = modulestore().get_item(html_usage_id)
         parent_module = html_module.get_parent()
         return str(parent_module.scope_ids.usage_id)
-    except (InvalidKeyError, ItemNotFoundError) as e:
+    except (InvalidKeyError, ItemNotFoundError) as exception:
         # something has gone wrong - the best we can do is to return original content id
-        log.warn("Error getting parent content_id for html module: %s", e.message)
+        log.warn("Error getting parent content_id for html module: %s", exception.message)
         return html_content_id
 
 
