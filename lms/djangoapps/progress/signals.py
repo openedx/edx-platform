@@ -31,8 +31,7 @@ def _get_parent_content_id(html_content_id):
     try:
         html_usage_id = BlockUsageLocator.from_string(html_content_id)
         html_module = modulestore().get_item(html_usage_id)
-        parent_module = html_module.get_parent()
-        return str(parent_module.scope_ids.usage_id)
+        return unicode(html_module.parent)
     except (InvalidKeyError, ItemNotFoundError) as exception:
         # something has gone wrong - the best we can do is to return original content id
         log.warn("Error getting parent content_id for html module: %s", exception.message)
@@ -46,6 +45,8 @@ def handle_cmc_post_save_signal(sender, instance, created, **kwargs):
     """
     content_id = unicode(instance.content_id)
     detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
+    # HTML modules can be children of progress-detached and progress-included modules, so using parent id for
+    # progress-detached check
     if 'html' in content_id:
         content_id = _get_parent_content_id(content_id)
     if created and not any(category in content_id for category in detached_categories):
