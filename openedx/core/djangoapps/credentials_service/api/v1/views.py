@@ -51,8 +51,12 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         # if id exists in db then return the object otherwise return 404
         credential = generics.get_object_or_404(UserCredential, pk=request.data.get('id'))
         credential.status = request.data.get('status')
-        credential.save()
+        if not credential.status:
+            return Response({
+                'message': 'Only status of credential is allowed to update'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
+        credential.save()
         serializer = self.get_serializer(credential)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -125,7 +129,6 @@ class CredentialsByProgramsViewSet(mixins.CreateModelMixin, mixins.ListModelMixi
     serializer_class = serializers.ProgramCertificateSerializer
 
     parser_classes = (parsers.MergePatchParser,)
-
 
 
 class CredentialsByCoursesViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,

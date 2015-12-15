@@ -49,7 +49,6 @@ class UserCredentialSerializer(serializers.ModelSerializer):
         paginate_by_param = "page_size"
 
 
-
 class ProgramCertificateBaseSerializer(serializers.ModelSerializer):
     """ User Credential Attribute Serializer """
     class Meta(object):
