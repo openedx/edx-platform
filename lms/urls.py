@@ -102,7 +102,7 @@ urlpatterns = (
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
 
     # User Credentials (certificates) API endpoints
-    url(r'^api/credentials/', include('openedx.core.djangoapps.credentials_service.urls')),
+    url(r'^api/credentials/', include('openedx.core.djangoapps.credentials_service.urls', app_name="credentials", namespace='credentials')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:

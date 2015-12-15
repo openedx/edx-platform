@@ -17,7 +17,7 @@ class CredentialSerializerTests(TestCase):
     def setUp(self):
         super(CredentialSerializerTests, self).setUp()
         self.program_id = 1100
-        self.program_cert = ProgramCertificateFactory.create(program_id= self.program_id)
+        self.program_cert = ProgramCertificateFactory.create(program_id=self.program_id)
         self.user_credenential = UserCredentialFactory.create(credential=self.program_cert)
         self.attr = UserCredentialAttributeFactory.create(user_credential=self.user_credenential)
         self.maxDiff = None
@@ -68,23 +68,24 @@ class CredentialSerializerTests(TestCase):
         serialize_data = serializers.ProgramCertificateSerializer(self.program_cert)
         expected = {
             'program_id': '100',
-            'user_credential': [{
-                "credential_id": self.user_credenential.credential_id,
-                "username": self.user_credenential.username,
-                "status": self.user_credenential.status,
-                "download_url": self.user_credenential.download_url,
-                "uuid": self.user_credenential.uuid,
-                "credential": self.program_id,
-                "attributes": [
-                    {
-                        "user_credential": self.attr.id,
-                        "namespace": self.attr.namespace,
-                        "name": self.attr.name,
-                        "value": self.attr.value
-                    }
-                ]
-            }]
+            'user_credential': [
+                {
+                    "credential_id": self.user_credenential.credential_id,
+                    "username": self.user_credenential.username,
+                    "status": self.user_credenential.status,
+                    "download_url": self.user_credenential.download_url,
+                    "uuid": self.user_credenential.uuid,
+                    "credential": self.program_id,
+                    "attributes": [
+                        {
+                            "user_credential": self.attr.id,
+                            "namespace": self.attr.namespace,
+                            "name": self.attr.name,
+                            "value": self.attr.value
+                        }
+                    ]
+                }
+            ]
         }
 
         self.assertDictEqual(serialize_data.data, expected)
-
