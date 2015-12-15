@@ -49,6 +49,7 @@ class CourseMetadata(object):
         'is_proctored_enabled',
         'is_time_limited',
         'is_practice_exam',
+        'exam_review_rules',
         'self_paced'
     ]
 

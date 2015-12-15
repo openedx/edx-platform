@@ -84,7 +84,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getContext: function () {
             return $.extend({
                 xblockInfo: this.model,
-                introductionMessage: this.getIntroductionMessage()
+                introductionMessage: this.getIntroductionMessage(),
+                enable_proctored_exams: this.options.enable_proctored_exams,
+                enable_timed_exams: this.options.enable_timed_exams
             });
         },
 
@@ -114,6 +116,78 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 gettext('Change the settings for %(display_name)s'),
                 { display_name: this.model.get('display_name') }, true
             );
+        },
+
+        initializeEditors: function () {
+            var special_exams_editors = this.options.special_exam_editors;
+            if (typeof special_exams_editors !== 'undefined' && special_exams_editors.length > 0) {
+                var tabs_html = this.loadTemplate('settings-tab-section');
+                this.$('.modal-section').html(tabs_html);
+                this.options.editors = _.map(this.options.editors, function (Editor) {
+                    return new Editor({
+                        parentElement: this.$('.modal-section .general-settings'),
+                        model: this.model,
+                        xblockType: this.options.xblockType,
+                        enable_proctored_exams: this.options.enable_proctored_exams,
+                        enable_timed_exams: this.options.enable_timed_exams
+                    });
+                }, this);
+
+                this.options.special_exam_editors = _.map(special_exams_editors, function (Editor) {
+                    return new Editor({
+                        parentElement: this.$('.modal-section .advanced-settings'),
+                        model: this.model,
+                        xblockType: this.options.xblockType,
+                        enable_proctored_exams: this.options.enable_proctored_exams,
+                        enable_timed_exams: this.options.enable_timed_exams
+                    });
+                }, this);
+                this.hideAdvancedSettings();
+            } else {
+                CourseOutlineXBlockModal.prototype.initializeEditors.call(this);
+            }
+        },
+
+        events: {
+            'click .action-save': 'save',
+            'click .general-settings-button': 'showGeneralSettings',
+            'click .advanced-settings-button': 'showAdvancedSettings'
+        },
+
+        /**
+         * Return request data.
+         * @return {Object}
+         */
+        getRequestData: function () {
+            var combined_editors = this.options.editors.concat(this.options.special_exam_editors);
+            var requestData = _.map(combined_editors, function (editor) {
+                return editor.getRequestData();
+            });
+            return $.extend.apply(this, [true, {}].concat(requestData));
+        },
+
+        hideAdvancedSettings: function() {
+            this.$('.modal-section .general-settings-button').addClass('active');
+            this.$('.modal-section .advanced-settings-button').removeClass('active');
+            this.$('.modal-section .general-settings').show();
+            this.$('.modal-section .advanced-settings').hide();
+
+        },
+
+        hideGeneralSettings: function() {
+            this.$('.modal-section .general-settings-button').removeClass('active');
+            this.$('.modal-section .advanced-settings-button').addClass('active');
+            this.$('.modal-section .general-settings').hide();
+            this.$('.modal-section .advanced-settings').show();
+        },
+        showGeneralSettings: function (event) {
+            event.preventDefault();
+            this.hideAdvancedSettings();
+        },
+
+        showAdvancedSettings: function (event) {
+            event.preventDefault();
+            this.hideGeneralSettings();
         }
     });
 
@@ -267,20 +341,40 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-settings-timed-examination',
         events : {
             'change #id_not_timed': 'notTimedExam',
-            'change #id_timed_exam': 'showTimeLimit',
-            'change #id_practice_exam': 'showTimeLimit',
-            'change #id_proctored_exam': 'showTimeLimit',
+            'change #id_timed_exam': 'setTimedExam',
+            'change #id_practice_exam': 'setPracticeExam',
+            'change #id_proctored_exam': 'setProctoredExam',
             'focusout #id_time_limit': 'timeLimitFocusout'
         },
         notTimedExam: function (event) {
             event.preventDefault();
             this.$('#id_time_limit_div').hide();
+            this.$('.exam-review-rules-list-fields').hide();
             this.$('#id_time_limit').val('00:00');
         },
-        showTimeLimit: function (event) {
-            event.preventDefault();
+        selectSpecialExam: function (showRulesField) {
             this.$('#id_time_limit_div').show();
-            this.$('#id_time_limit').val("00:30");
+            if (!this.isValidTimeLimit(this.$('#id_time_limit').val())) {
+                this.$('#id_time_limit').val('00:30');
+            }
+            if (showRulesField) {
+                this.$('.exam-review-rules-list-fields').show();
+            }
+            else {
+                this.$('.exam-review-rules-list-fields').hide();
+            }
+        },
+        setTimedExam: function (event) {
+            event.preventDefault();
+            this.selectSpecialExam(false);
+        },
+        setPracticeExam: function (event) {
+            event.preventDefault();
+            this.selectSpecialExam(false);
+        },
+        setProctoredExam: function (event) {
+            event.preventDefault();
+            this.selectSpecialExam(true);
         },
         timeLimitFocusout: function(event) {
             event.preventDefault();
@@ -301,6 +395,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.setExamType(this.model.get('is_time_limited'), this.model.get('is_proctored_exam'),
                             this.model.get('is_practice_exam'));
             this.setExamTime(this.model.get('default_time_limit_minutes'));
+
+            this.setReviewRules(this.model.get('exam_review_rules'));
         },
         setExamType: function(is_time_limited, is_proctored_exam, is_practice_exam) {
             if (!is_time_limited) {
@@ -309,12 +405,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
 
             this.$('#id_time_limit_div').show();
+            this.$('.exam-review-rules-list-fields').hide();
 
             if (this.options.enable_proctored_exams && is_proctored_exam) {
                 if (is_practice_exam) {
                     this.$('#id_practice_exam').prop('checked', true);
                 } else {
                     this.$('#id_proctored_exam').prop('checked', true);
+                    this.$('.exam-review-rules-list-fields').show();
                 }
             } else {
                 // Since we have an early exit at the top of the method
@@ -326,6 +424,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         setExamTime: function(value) {
             var time = this.convertTimeLimitMinutesToString(value);
             this.$('#id_time_limit').val(time);
+        },
+        setReviewRules: function (value) {
+            this.$('#id_exam_review_rules').val(value);
         },
         isValidTimeLimit: function(time_limit) {
             var pattern = new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
@@ -351,6 +452,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var is_practice_exam;
             var is_proctored_exam;
             var time_limit = this.getExamTimeLimit();
+            var exam_review_rules = this.$('#id_exam_review_rules').val();
 
             if (this.$("#id_not_timed").is(':checked')){
                 is_time_limited = false;
@@ -374,6 +476,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 metadata: {
                     'is_practice_exam': is_practice_exam,
                     'is_time_limited': is_time_limited,
+                    'exam_review_rules': exam_review_rules,
                     // We have to use the legacy field name
                     // as the Ajax handler directly populates
                     // the xBlocks fields. We will have to
@@ -584,6 +687,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getEditModal: function (xblockInfo, options) {
             var editors = [];
+            var special_exam_editors = [];
 
             if (xblockInfo.isChapter()) {
                 editors = [ReleaseDateEditor, StaffLockEditor];
@@ -592,7 +696,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
                 var enable_special_exams = (options.enable_proctored_exams || options.enable_timed_exams);
                 if (enable_special_exams) {
-                    editors.push(TimedExaminationPreferenceEditor);
+                    special_exam_editors.push(TimedExaminationPreferenceEditor);
                 }
 
                 editors.push(StaffLockEditor);
@@ -610,6 +714,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
             return new SettingsXBlockModal($.extend({
                 editors: editors,
+                special_exam_editors: special_exam_editors,
                 model: xblockInfo
             }, options));
         },

@@ -11,7 +11,7 @@ import warnings
 
 from lxml import etree
 from xblock.core import XBlock
-from xblock.fields import Integer, Scope, Boolean
+from xblock.fields import Integer, Scope, Boolean, String
 from xblock.fragment import Fragment
 
 from .exceptions import NotFoundError
@@ -85,6 +85,15 @@ class ProctoringFields(object):
             "This setting indicates whether this exam is a proctored exam."
         ),
         default=False,
+        scope=Scope.settings,
+    )
+
+    exam_review_rules = String(
+        display_name=_("Software Secure Review Rules"),
+        help=_(
+            "This setting indicates what rules the proctoring team should follow when viewing the videos."
+        ),
+        default='',
         scope=Scope.settings,
     )
 
