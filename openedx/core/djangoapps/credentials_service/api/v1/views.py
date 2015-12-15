@@ -29,7 +29,7 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     )
     serializer_class = serializers.UserCredentialSerializer
     parser_classes = (parsers.MergePatchParser,  drf_parsers.JSONParser)
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
 
     def partial_update(self, request, *args, **kwargs):
@@ -118,7 +118,7 @@ class UserCredentialViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
             UserCredentialAttribute.objects.bulk_create(attr_list)
 
-        return Response([], status=status.HTTP_200_OK)
+        return Response([], status=status.HTTP_201_CREATED)
 
 
 class CredentialsByProgramsViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,

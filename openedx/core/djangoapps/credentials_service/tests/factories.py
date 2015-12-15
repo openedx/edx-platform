@@ -5,6 +5,7 @@ Factories for tests of Programs.
 
 # pylint: disable=missing-docstring,unnecessary-lambda
 import uuid
+from django.contrib.auth.models import User
 
 from django.contrib.sites.models import Site
 import factory
@@ -113,3 +114,17 @@ class UserCredentialAttributeFactory(factory.django.DjangoModelFactory):
     namespace = factory.Sequence(u'namespace{0}'.format)
     name = factory.Sequence(u'name{0}'.format)
     value = factory.Sequence(u'value{0}'.format)
+
+
+class UserFactory(factory.DjangoModelFactory):
+    username = factory.Sequence(lambda n: 'the_j_meister nummer %d' % n)
+    email = factory.Sequence(lambda n: 'example_%s@example.com' % n)
+    first_name = 'test'
+    last_name = 'user'
+    password = factory.PostGenerationMethodCall('set_password', 'dummy-password')
+    is_active = True
+    is_superuser = False
+    is_staff = False
+
+    class Meta:
+        model = User
