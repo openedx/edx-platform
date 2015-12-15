@@ -100,7 +100,8 @@ html.video-fullscreen {
 div.course-wrapper {
   position: relative;
 
-  section.course-content {
+  section.course-content,
+  section.courseware-results-wrapper {
     @extend .content;
     padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
     line-height: 1.6;
@@ -655,9 +656,10 @@ section.self-assessment {
 }
 
 .courseware-results-wrapper {
-  padding: ($baseline*2);
+  display: none;
 
-  .courseware-results {
-    display: none;
+  &.is-shown {
+    display: table-cell;
   }
+
 }
