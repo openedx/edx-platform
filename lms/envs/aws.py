@@ -18,6 +18,7 @@ Common traits:
 
 import datetime
 import json
+import importlib
 
 from .common import *
 from openedx.core.lib.logsettings import get_logger_config
@@ -314,7 +315,6 @@ if FEATURES.get('AUTH_USE_CAS'):
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
-        import importlib
         CAS_USER_DETAILS_RESOLVER = getattr(
             importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
             CAS_ATTRIBUTE_CALLBACK['function']
@@ -493,12 +493,8 @@ PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussio
 PROGRESS_DETACHED_APPS = ['group_project_v2']
 for app in PROGRESS_DETACHED_APPS:
     try:
-        app_module = __import__(app, fromlist=['app_config'])
+        app_config = importlib.import_module('.app_config', app)
     except ImportError:
-        continue
-
-    app_config = getattr(app_module, 'app_config', None)
-    if not app_config:
         continue
 
     detached_module_categories = getattr(app_config, 'PROGRESS_DETACHED_CATEGORIES', [])
