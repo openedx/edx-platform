@@ -15,6 +15,9 @@ from openedx.core.djangoapps.credentials_service.tests.factories import ProgramC
 from openedx.core.djangoapps.credentials_service.tests.mixin import UserCredentialSerializer
 
 
+JSON_CONTENT_TYPE = 'application/json'
+
+
 class TestGenerateProgramsCredentialView(TestCase, UserCredentialSerializer):
     def setUp(self):
         super(TestGenerateProgramsCredentialView, self).setUp()
@@ -81,3 +84,40 @@ class TestGenerateProgramsCredentialView(TestCase, UserCredentialSerializer):
 
         expected = {'count': 2, 'next': None, 'previous': None, 'num_pages': 1, 'results': results}
         self.assertDictEqual(json.loads(response.content), expected)
+
+    def _attempt_update_user_credential(self, data):
+        """ Helper method that attempts to path an existing credential object.
+
+        Arguments:
+          data (dict): Data to be converted to JSON and sent to the API.
+
+        Returns:
+          Response: HTTP response from the API.
+        """
+
+        path = reverse("credentials:v1:users_credentials-detail", args=[self.user_credential.username])
+        return self.client.patch(path=path, data=json.dumps(data), content_type=JSON_CONTENT_TYPE)
+
+    def test_patch_user_credentials(self):
+        """ Verify that status of credentials will be updated with patch request. """
+        data = {
+            "id": 1,
+            "status": "revoked",
+        }
+        response = self._attempt_update_user_credential(data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)['status'], data['status'])
+
+    def test_patch_only_status(self):
+        """ Verify that users allow to update only status of credentials will
+         be updated with patch request.
+         """
+        data = {
+            "id": 1,
+            "download_url": "dummy-url",
+        }
+        response = self._attempt_update_user_credential(data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertDictEqual(json.loads(response.content), {'message': 'Only status of credential allowed to update'})
