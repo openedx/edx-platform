@@ -1,7 +1,7 @@
 """
 URLs for the credentials service.
 """
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 
 urlpatterns = [
     url(r'^v1/',

@@ -5,14 +5,14 @@ Factories for tests of Programs.
 
 # pylint: disable=missing-docstring,unnecessary-lambda
 import uuid
-from django.contrib.contenttypes.models import ContentType
+
 from django.contrib.sites.models import Site
-from openedx.core.djangoapps.credentials_service import models
 import factory
 from django.core.files.base import ContentFile
-from factory.django import DjangoModelFactory, ImageField
+from factory.django import ImageField
 from factory.fuzzy import FuzzyText
-from openedx.core.djangoapps.credentials_service.models import ProgramCertificate
+
+from openedx.core.djangoapps.credentials_service import models
 
 
 class SiteFactory(factory.django.DjangoModelFactory):
@@ -35,6 +35,7 @@ class SiteConfigurationFactory(factory.django.DjangoModelFactory):
 class CertificateTemplateFactory(factory.django.DjangoModelFactory):
     class Meta(object):
         model = models.CertificateTemplate
+
     name = FuzzyText('Home Template')
     content = FuzzyText('foo')
 
@@ -47,9 +48,13 @@ class SignatoryFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(u'title{0}'.format)
     image = factory.LazyAttribute(
         lambda _: ContentFile(
-            ImageField()._make_data(  # pylint: disable=protected-access
-            {'color': 'blue', 'width': 50, 'height': 50, 'format': 'PNG'}
-            ), 'test.png'
+            ImageField()._make_data(
+                # pylint: disable=protected-access
+                {
+                    'color': 'blue', 'width': 50, 'height': 50, 'format': 'PNG'
+                }
+            ),
+            'test.png'
         )
     )
 
@@ -63,6 +68,7 @@ class AbstractCredentialFactory(factory.django.DjangoModelFactory):
         obj = model_class(*args, **kwargs)
         obj.save()
         return obj
+
 
 class AbstractCertificateFactory(AbstractCredentialFactory):
     class Meta(object):
@@ -92,11 +98,11 @@ class UserCredentialFactory(factory.django.DjangoModelFactory):
     class Meta(object):
         model = models.UserCredential
 
-    credential_object = factory.SubFactory(ProgramCertificateFactory)
-    username = FuzzyText('Home Template')
+    credential = factory.SubFactory(ProgramCertificateFactory)
+    username = 'dummy-user'
     status = 'awarded'
     download_url = factory.Sequence(u'http://www.google{0}.com'.format)
-    uuid = factory.LazyAttribute(lambda o: uuid.uuid4().hex)  # pylint: disable=undefined-variable
+    uuid = factory.LazyAttribute(lambda o: uuid.uuid4())  # pylint: disable=undefined-variable
 
 
 class UserCredentialAttributeFactory(factory.django.DjangoModelFactory):
