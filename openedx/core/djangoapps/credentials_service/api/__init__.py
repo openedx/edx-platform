@@ -1,3 +1,0 @@
-"""
-APIs for credentials service.
-"""
