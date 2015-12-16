@@ -13,6 +13,7 @@
 
             el: '.courseware-results',
             coursewareContentEl: '#course-content',
+            coursewareResultsWrapperEl: '.courseware-results-wrapper',
 
             errorIcon: '<i class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></i>',
             loadingIcon: '<i class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
@@ -97,8 +98,9 @@
             },
 
             hideBookmarks: function () {
-              this.$el.hide();
-              $(this.coursewareContentEl).show();
+                this.$el.hide();
+                $(this.coursewareResultsWrapperEl).hide();
+                $(this.coursewareContentEl).css('display', 'table-cell');
             },
 
             showBookmarksContainer: function () {
@@ -106,6 +108,7 @@
                 // Empty el if it's not empty to get the clean state.
                 this.$el.html('');
                 this.$el.show();
+                $(this.coursewareResultsWrapperEl).css('display', 'table-cell');
             },
 
             showLoadingMessage: function () {

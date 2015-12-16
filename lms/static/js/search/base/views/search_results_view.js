@@ -37,8 +37,7 @@ define([
             }));
             this.renderItems();
             this.$el.find(this.spinner).hide();
-            this.$contentElement.hide();
-            this.$el.show();
+            this.showResults();
             return this;
         },
 
@@ -71,17 +70,20 @@ define([
             this.$contentElement.show();
         },
 
-        showLoadingMessage: function () {
-            this.doCleanup();
-            this.$el.html(this.loadingTemplate());
+        showResults: function() {
             this.$el.show();
             this.$contentElement.hide();
         },
 
+        showLoadingMessage: function () {
+            this.doCleanup();
+            this.$el.html(this.loadingTemplate());
+            this.showResults();
+        },
+
         showErrorMessage: function () {
             this.$el.html(this.errorTemplate());
-            this.$el.show();
-            this.$contentElement.hide();
+            this.showResults();
         },
 
         doCleanup: function () {

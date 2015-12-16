@@ -213,7 +213,7 @@ class BookmarksTest(BookmarksTestMixin):
         """
         self.bookmarks_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
+        self.assertEqual(self.bookmarks_page.results_header_text(), 'My Bookmarks')
 
     def _verify_breadcrumbs(self, num_units, modified_name=None):
         """
@@ -285,7 +285,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup()
         self.assertTrue(self.bookmarks_page.bookmarks_button_visible())
         self.bookmarks_page.click_bookmarks_button()
-        self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
+        self.assertEqual(self.bookmarks_page.results_header_text(), 'My Bookmarks')
         self.assertEqual(self.bookmarks_page.empty_header_text(), 'You have not bookmarked any courseware pages yet.')
 
         empty_list_text = ("Use bookmarks to help you easily return to courseware pages. To bookmark a page, "
