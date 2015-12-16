@@ -73,7 +73,7 @@ class BookmarksViewMixin(object):
         optional_fields = params.get('fields', '').split(',')
         return DEFAULT_FIELDS + [field for field in optional_fields if field in OPTIONAL_FIELDS]
 
-    def error_response(self, message, error_status=status.HTTP_400_BAD_REQUEST):
+    def error_response(self, developer_message, user_message=None, error_status=status.HTTP_400_BAD_REQUEST):
         """
         Create and return a Response.
 
@@ -82,10 +82,13 @@ class BookmarksViewMixin(object):
                 and user_message fields.
             status: The status of the response. Default is HTTP_400_BAD_REQUEST.
         """
+        if not user_message:
+            user_message = developer_message
+
         return Response(
             {
-                "developer_message": message,
-                "user_message": _(message)  # pylint: disable=translation-of-non-string
+                "developer_message": developer_message,
+                "user_message": _(user_message)  # pylint: disable=translation-of-non-string
             },
             status=error_status
         )
@@ -221,28 +224,30 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         POST /api/bookmarks/v1/bookmarks/
         Request data: {"usage_id": "<usage-id>"}
         """
+        default_user_message = ugettext_noop(u'No data provided.')
+
         if not request.data:
-            return self.error_response(ugettext_noop(u'No data provided.'))
+            return self.error_response(ugettext_noop(u'No data provided.'), default_user_message)
 
         usage_id = request.data.get('usage_id', None)
         if not usage_id:
-            return self.error_response(ugettext_noop(u'Parameter usage_id not provided.'))
+            return self.error_response(ugettext_noop(u'Parameter usage_id not provided.'), default_user_message)
 
         try:
             usage_key = UsageKey.from_string(unquote_slashes(usage_id))
         except InvalidKeyError:
             error_message = ugettext_noop(u'Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message)
+            return self.error_response(error_message, default_user_message)
 
         try:
             bookmark = api.create_bookmark(user=self.request.user, usage_key=usage_key)
         except ItemNotFoundError:
             error_message = ugettext_noop(u'Block with usage_id: {usage_id} not found.').format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message)
+            return self.error_response(error_message, default_user_message)
         except BookmarksLimitReachedError:
-            max_bookmarks_per_course = settings.COURSE_BOOKMARKS["MAX_LIMIT_PER_COURSE"]
+            max_bookmarks_per_course = settings.COURSE_BOOKMARKS['MAX_LIMIT_PER_COURSE']
             error_message = ugettext_noop(u'You can create up to {0} bookmarks.'
                                           u' You must remove some bookmarks before you can add new ones.')\
                 .format(max_bookmarks_per_course)
@@ -310,7 +315,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         except InvalidKeyError:
             error_message = ugettext_noop(u'Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message, status.HTTP_404_NOT_FOUND)
+            return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, username=None, usage_id=None):  # pylint: disable=unused-argument
         """
@@ -332,7 +337,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
                 u'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message, status.HTTP_404_NOT_FOUND)
+            return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
         return Response(bookmark_data)
 
@@ -352,6 +357,6 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
                 u'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message, status.HTTP_404_NOT_FOUND)
+            return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
