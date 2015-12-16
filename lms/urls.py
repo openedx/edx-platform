@@ -204,7 +204,10 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
     # Make the assumptions that the templates are all in the same dir
     # and that they all match the name of the key (plus extension)
-    template = "%s.html" % key.lower()
+    if 'site_map' in key.lower():
+        template = "%s.xml" % key.lower()
+    else:
+        template = "%s.html" % key.lower()
 
     # To allow theme templates to inherit from default templates,
     # prepend a standard prefix
