@@ -52,7 +52,7 @@ def course_detail(request, username, course_key):
     )
 
 
-def list_courses(request, username, org=None):
+def list_courses(request, username, org=None, filter_=None):
     """
     Return a list of available courses.
 
@@ -73,9 +73,12 @@ def list_courses(request, username, org=None):
             If specified, visible `CourseOverview` objects are filtered
             such that only those belonging to the organization with the provided
             org code (e.g., "HarvardX") are returned. Case-insensitive.
+        filter_ (dict):
+            If specified, visible `CourseOverview` objects are filtered
+            by the given key-value pairs.
 
     Return value:
         List of `CourseOverview` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
-    return get_courses(user, org=org)
+    return get_courses(user, org=org, filter_=filter_)

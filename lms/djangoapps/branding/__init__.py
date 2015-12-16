@@ -17,7 +17,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
-def get_visible_courses(org=None):
+def get_visible_courses(org=None, filter_=None):
     """
     Return the set of CourseOverviews that should be visible in this branded instance
     """
@@ -26,13 +26,16 @@ def get_visible_courses(org=None):
     if org and microsite_org:
         # When called in the context of a microsite, return an empty result if the org
         # passed by the caller does not match the designated microsite org.
-        courses = CourseOverview.get_all_courses(org=org) if org == microsite_org else []
+        courses = CourseOverview.get_all_courses(
+            org=org,
+            filter_=filter_,
+        ) if org == microsite_org else []
     else:
         # We only make it to this point if one of org or microsite_org is defined.
         # If both org and microsite_org were defined, the code would have fallen into the
         # first branch of the conditional above, wherein an equality check is performed.
         target_org = org or microsite_org
-        courses = CourseOverview.get_all_courses(org=target_org)
+        courses = CourseOverview.get_all_courses(org=target_org, filter_=filter_)
 
     courses = sorted(courses, key=lambda course: course.number)
 
