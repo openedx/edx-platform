@@ -104,7 +104,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         (ModuleStoreEnum.Type.mongo, 2, 3, 4),
         (ModuleStoreEnum.Type.mongo, 4, 3, 4),
         (ModuleStoreEnum.Type.mongo, 2, 4, 5),
-        (ModuleStoreEnum.Type.mongo, 4, 4, 6),
+        # (ModuleStoreEnum.Type.mongo, 4, 4, 6), Too slow.
         (ModuleStoreEnum.Type.split, 2, 2, 3),
         (ModuleStoreEnum.Type.split, 4, 2, 3),
         (ModuleStoreEnum.Type.split, 2, 3, 3),

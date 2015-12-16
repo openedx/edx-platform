@@ -69,7 +69,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
                 api.get_bookmark(user=self.other_user, usage_key=self.vertical_1.location)
 
     @ddt.data(
-        1, 10, 100
+        1, 10, 20
     )
     def test_get_bookmarks(self, count):
         """
