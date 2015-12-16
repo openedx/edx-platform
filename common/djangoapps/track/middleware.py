@@ -33,6 +33,7 @@ META_KEY_TO_CONTEXT_KEY = {
     'HTTP_REFERER': 'referer',
     'HTTP_ACCEPT_LANGUAGE': 'accept_language',
 }
+TRUNCATION_LENGTH = 4096
 
 
 class TrackMiddleware(object):
@@ -79,7 +80,7 @@ class TrackMiddleware(object):
 
             # TODO: Confirm no large file uploads
             event = json.dumps(event)
-            event = event[:512]
+            event = self.truncate_openended_responses(event)
 
             views.server_track(request, request.META['PATH_INFO'], event)
         except:
@@ -204,3 +205,36 @@ class TrackMiddleware(object):
             pass
 
         return response
+
+    def truncate_openended_responses(self, event):
+        """
+        Truncates the tracking log entry for problems for which the
+        student response can be long winded.
+
+        event: json, Constructed from POST and GET request params
+        """
+        event_json = json.loads(event)
+        event_post_keys = event_json['POST'].keys()
+
+        if 'student_answer' in event_json['POST'] and isinstance(event_json['POST']['student_answer'], list):
+            student_answer = event_json['POST']['student_answer']
+            truncated_answers = []
+            for answer in student_answer:
+                chunk_length = TRUNCATION_LENGTH / len(student_answer)
+                truncated_answer = answer[:chunk_length]
+                truncated_answers.append(truncated_answer)
+            event_json['POST']['student_answer'] = truncated_answers
+            return json.dumps(event_json)
+        for key in event_post_keys:
+            if key[:15] == '{"submission":[':
+                event_json['POST'].pop(key)
+                submission = json.loads(key)
+                truncated_prompts = []
+                for prompt_submission in submission['submission']:
+                    chunk_length = TRUNCATION_LENGTH / len(submission['submission'])
+                    truncated_prompt = prompt_submission[:chunk_length]
+                    truncated_prompts.append(truncated_prompt)
+                event_json['POST']['submission'] = truncated_prompts
+                return json.dumps(event_json)
+        # We didn't catch a particular type of problem so truncate anyway.
+        return event[:TRUNCATION_LENGTH]
