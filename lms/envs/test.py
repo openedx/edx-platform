@@ -557,3 +557,6 @@ FEATURES['ORGANIZATIONS_APP'] = True
 
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+
+# Course Content Bookmarks Settings
+MAX_BOOKMARKS_PER_COURSE = 5
