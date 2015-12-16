@@ -55,12 +55,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.course = CourseFactory.create(display_name='An Introduction to API Testing')
             self.course_id = unicode(self.course.id)
 
-            if store_type == ModuleStoreEnum.Type.mongo:
-                bulk_operations_manager = self.store.bulk_operations
-            else:
-                bulk_operations_manager = noop_contextmanager
-
-            with bulk_operations_manager(self.course.id):
+            with self.store.bulk_operations(self.course.id):
 
                 self.chapter_1 = ItemFactory.create(
                     parent_location=self.course.location, category='chapter', display_name='Week 1'
@@ -116,7 +111,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
         self.other_course = CourseFactory.create(display_name='An Introduction to API Testing 2')
 
-        with bulk_operations_manager(self.other_course.id):
+        with self.store.bulk_operations(self.other_course.id):
 
             self.other_chapter_1 = ItemFactory.create(
                 parent_location=self.other_course.location, category='chapter', display_name='Other Week 1'
@@ -157,12 +152,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             course = CourseFactory.create()
             display_name = 0
 
-            if store_type == ModuleStoreEnum.Type.mongo:
-                bulk_operations_manager = self.store.bulk_operations
-            else:
-                bulk_operations_manager = noop_contextmanager
-
-            with bulk_operations_manager(course.id):
+            with self.store.bulk_operations(course.id):
                 blocks_at_next_level = [course]
 
                 for __ in range(depth):
@@ -186,12 +176,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
             course = CourseFactory.create()
 
-            if store_type == ModuleStoreEnum.Type.mongo:
-                bulk_operations_manager = self.store.bulk_operations
-            else:
-                bulk_operations_manager = noop_contextmanager
-
-            with bulk_operations_manager(course.id):
+            with self.store.bulk_operations(course.id):
                 blocks = [ItemFactory.create(
                     parent_location=course.location, category='chapter', display_name=unicode(index)
                 ) for index in range(count)]
@@ -348,13 +333,13 @@ class BookmarkModelTests(BookmarksTestsBase):
         (ModuleStoreEnum.Type.mongo, 6, 2, 2),
         (ModuleStoreEnum.Type.mongo, 2, 3, 3),
         (ModuleStoreEnum.Type.mongo, 4, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 6, 3, 3),
+        # (ModuleStoreEnum.Type.mongo, 6, 3, 3), Too slow.
         (ModuleStoreEnum.Type.mongo, 2, 4, 4),
-        (ModuleStoreEnum.Type.mongo, 4, 4, 4),
+        # (ModuleStoreEnum.Type.mongo, 4, 4, 4),
         (ModuleStoreEnum.Type.split, 2, 2, 2),
         (ModuleStoreEnum.Type.split, 4, 2, 2),
         (ModuleStoreEnum.Type.split, 2, 3, 2),
-        (ModuleStoreEnum.Type.split, 4, 3, 2),
+        # (ModuleStoreEnum.Type.split, 4, 3, 2),
         (ModuleStoreEnum.Type.split, 2, 4, 2),
     )
     @ddt.unpack
