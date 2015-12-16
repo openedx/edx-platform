@@ -727,6 +727,29 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     expect($('.modal-section .advanced-settings-button')).toHaveClass('active');
                 });
 
+                it('can select valid time', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectAdvancedSettings();
+
+                    var default_time = "00:30";
+                    var valid_times = ["00:30", "23:00", "24:00", "99:00"];
+                    var invalid_times = ["00:00", "100:00", "01:60"];
+                    var time_limit, i;
+
+                    for (i = 0; i < valid_times.length; i++){
+                        time_limit = valid_times[i];
+                        selectTimedExam(time_limit);
+                        expect($("#id_time_limit").val()).toEqual(time_limit);
+                    }
+                    for (i = 0; i < invalid_times.length; i++){
+                        time_limit = invalid_times[i];
+                        selectTimedExam(time_limit);
+                        expect($("#id_time_limit").val()).not.toEqual(time_limit);
+                        expect($("#id_time_limit").val()).toEqual(default_time);
+                    }
+                });
+
                 it('can be edited', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();

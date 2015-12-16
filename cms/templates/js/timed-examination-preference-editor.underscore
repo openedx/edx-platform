@@ -55,7 +55,7 @@
                       value="" aria-describedby="time-limit-description"
                       placeholder="HH:MM" class="time_limit release-time time input input-text" autocomplete="off" />
                 </li>
-                <p class='field-message' id='time-limit-description'><%- gettext('Learners see warnings when 20% and 5% of the allotted time remains. You can grant learners extra time to complete the exam through the Instructor Dashboard.') %></p>
+                <p class='field-message' id='time-limit-description'><%- gettext('Select a time allotment for the exam. If it is over 24 hours, type in the amount of time. You can grant individual learners extra time to complete the exam through the Instructor Dashboard.') %></p>
             </ul>
         </div>
         <div class='exam-review-rules-list-fields is-hidden'>
