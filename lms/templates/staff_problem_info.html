@@ -6,6 +6,7 @@ from django.template.defaultfilters import escapejs
 
 ## The JS for this is defined in xqa_interface.html
 ${block_content}
+%if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool', 'library_content']:
 %  if edit_link:
   <div>
       <a href="${edit_link}">Edit</a>
@@ -141,3 +142,5 @@ $(function () {
     );
 });
 </script>
+%endif
+
