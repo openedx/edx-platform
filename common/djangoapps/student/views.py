@@ -21,7 +21,7 @@ from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.core import mail
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
@@ -338,13 +338,9 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         # showing the certificate web view button if certificate is ready state and feature flags are enabled.
         if has_html_certificates_enabled(course_overview.id, course_overview):
             if course_overview.has_any_active_web_certificate:
-                certificate_url = get_certificate_url(
-                    user_id=user.id,
-                    course_id=unicode(course_overview.id),
-                )
                 status_dict.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': u'{url}'.format(url=certificate_url)
+                    'cert_web_view_url': get_certificate_url(course_id=course_overview.id, uuid=cert_status['uuid'])
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course
@@ -1802,6 +1798,7 @@ def auto_auth(request):
     * `course_id`: Enroll the student in the course with `course_id`
     * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
     * `no_login`: Define this to create the user but not login
+    * `redirect`: Set to "true" will redirect to course if course_id is defined, otherwise it will redirect to dashboard
 
     If username, email, or password are not provided, use
     randomly generated credentials.
@@ -1826,6 +1823,7 @@ def auto_auth(request):
     if course_id:
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
+    redirect_when_done = request.GET.get('redirect', '').lower() == 'true'
     login_when_done = 'no_login' not in request.GET
 
     form = AccountCreationForm(
@@ -1888,8 +1886,32 @@ def auto_auth(request):
     create_comments_service_user(user)
 
     # Provide the user with a valid CSRF token
-    # then return a 200 response
-    if request.META.get('HTTP_ACCEPT') == 'application/json':
+    # then return a 200 response unless redirect is true
+    if redirect_when_done:
+        # Redirect to course info page if course_id is known
+        if course_id:
+            try:
+                # redirect to course info page in LMS
+                redirect_url = reverse(
+                    'info',
+                    kwargs={'course_id': course_id}
+                )
+            except NoReverseMatch:
+                # redirect to course outline page in Studio
+                redirect_url = reverse(
+                    'course_handler',
+                    kwargs={'course_key_string': course_id}
+                )
+        else:
+            try:
+                # redirect to dashboard for LMS
+                redirect_url = reverse('dashboard')
+            except NoReverseMatch:
+                # redirect to home for Studio
+                redirect_url = reverse('home')
+
+        return redirect(redirect_url)
+    elif request.META.get('HTTP_ACCEPT') == 'application/json':
         response = JsonResponse({
             'created_status': u"Logged in" if login_when_done else "Created",
             'username': username,

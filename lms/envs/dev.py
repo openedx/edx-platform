@@ -24,12 +24,11 @@ FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--othe
 FEATURES['SUBDOMAIN_BRANDING'] = True
 FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
-FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = True
+FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = False
 FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
 FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
@@ -176,20 +175,8 @@ if os.path.isdir(DATA_DIR):
 
 EDX_PLATFORM_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
 
-############################ Open ended grading config  #####################
-
-OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://127.0.0.1:3033/',
-    'username': 'lms',
-    'password': 'abcd',
-    'staff_grading': 'staff_grading',
-    'peer_grading': 'peer_grading',
-    'grading_controller': 'grading_controller'
-}
-
 ############################## LMS Migration ##################################
 FEATURES['ENABLE_LMS_MIGRATION'] = True
-FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
 FEATURES['XQA_SERVER'] = 'http://xqa:server@content-qa.edX.mit.edu/xqa'
 
 INSTALLED_APPS += ('lms_migration',)

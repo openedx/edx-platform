@@ -19,7 +19,6 @@
       <%
             course_key = context_course.id
             index_url = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(course_key)})
-            checklists_url = reverse('contentstore.views.checklists_handler', kwargs={'course_key_string': unicode(course_key)})
             course_team_url = reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_key)})
             assets_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
             textbooks_url = reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)})
@@ -113,9 +112,6 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item nav-course-tools-checklists">
-                    <a href="${checklists_url}">${_("Checklists")}</a>
-                  </li>
                   <li class="nav-item nav-course-tools-import">
                     <a href="${import_url}">${_("Import")}</a>
                   </li>

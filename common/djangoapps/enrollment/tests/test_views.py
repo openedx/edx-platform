@@ -150,10 +150,9 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         throttle = EnrollmentUserThrottle()
         self.rate_limit, rate_duration = throttle.parse_rate(throttle.rate)
 
-        self.course = CourseFactory.create()
-        # Load a CourseOverview. This initial load should result in a cache
-        # miss; the modulestore is queried and course metadata is cached.
-        __ = CourseOverview.get_from_id(self.course.id)
+        # Pass emit_signals when creating the course so it would be cached
+        # as a CourseOverview.
+        self.course = CourseFactory.create(emit_signals=True)
 
         self.user = UserFactory.create(
             username=self.USERNAME,
@@ -336,7 +335,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         requesting user.
         """
         # Create another course, and enroll self.user in both courses.
-        other_course = CourseFactory.create()
+        other_course = CourseFactory.create(emit_signals=True)
         for course in self.course, other_course:
             CourseModeFactory.create(
                 course_id=unicode(course.id),
@@ -345,7 +344,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
             )
             self.assert_enrollment_status(
                 course_id=unicode(course.id),
-                max_mongo_calls=1,
+                max_mongo_calls=0,
             )
         # Verify the user himself can see both of his enrollments.
         self._assert_enrollments_visible_in_list([self.course, other_course])

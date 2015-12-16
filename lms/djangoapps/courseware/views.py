@@ -30,17 +30,24 @@ from django.views.decorators.cache import cache_control
 from ipware.ip import get_ip
 from markupsafe import escape
 from rest_framework import status
+import newrelic.agent
 
 from courseware import grades
 from courseware.access import has_access, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
 from courseware.courses import (
-    get_courses, get_course, get_course_by_id,
-    get_studio_url, get_course_with_access,
+    get_courses,
+    get_course,
+    get_course_by_id,
+    get_permission_for_course_about,
+    get_studio_url,
+    get_course_overview_with_access,
+    get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
-    UserNotEnrolled)
+    UserNotEnrolled
+)
 from courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -60,8 +67,6 @@ from .entrance_exams import (
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from course_modes.models import CourseMode
 
-from open_ended_grading import open_ended_notifications
-from open_ended_grading.views import StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
@@ -318,6 +323,10 @@ def index(request, course_id, chapter=None, section=None,
     """
 
     course_key = CourseKey.from_string(course_id)
+
+    # Gather metrics for New Relic so we can slice data in New Relic Insights
+    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
 
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
 
@@ -797,11 +806,8 @@ def course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        permission_name = microsite.get_value(
-            'COURSE_ABOUT_VISIBILITY_PERMISSION',
-            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
-        )
-        course = get_course_with_access(request.user, permission_name, course_key)
+        permission = get_permission_for_course_about()
+        course = get_course_with_access(request.user, permission, course_key)
 
         if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
@@ -967,18 +973,14 @@ def _progress(request, course_key, student_id):
     }
 
     if show_generate_cert_btn:
-        context.update(certs_api.certificate_downloadable_status(student, course_key))
+        cert_status = certs_api.certificate_downloadable_status(student, course_key)
+        context.update(cert_status)
         # showing the certificate web view button if feature flags are enabled.
         if certs_api.has_html_certificates_enabled(course_key, course):
             if certs_api.get_active_web_certificate(course) is not None:
                 context.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': u'{url}'.format(
-                        url=certs_api.get_certificate_url(
-                            user_id=student.id,
-                            course_id=unicode(course.id)
-                        )
-                    )
+                    'cert_web_view_url': certs_api.get_certificate_url(course_id=course_key, uuid=cert_status['uuid']),
                 })
             else:
                 context.update({
@@ -1065,7 +1067,7 @@ def submission_history(request, course_id, student_username, location):
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid location.')))
 
-    course = get_course_with_access(request.user, 'load', course_key)
+    course = get_course_overview_with_access(request.user, 'load', course_key)
     staff_access = bool(has_access(request.user, 'staff', course))
 
     # Permission Denied if they don't have staff access and are trying to see
@@ -1120,25 +1122,6 @@ def submission_history(request, course_id, student_username, location):
     }
 
     return render_to_response('courseware/submission_history.html', context)
-
-
-def notification_image_for_tab(course_tab, user, course):
-    """
-    Returns the notification image path for the given course_tab if applicable, otherwise None.
-    """
-
-    tab_notification_handlers = {
-        StaffGradingTab.type: open_ended_notifications.staff_grading_notifications,
-        PeerGradingTab.type: open_ended_notifications.peer_grading_notifications,
-        OpenEndedGradingTab.type: open_ended_notifications.combined_notifications
-    }
-
-    if course_tab.name in tab_notification_handlers:
-        notifications = tab_notification_handlers[course_tab.name](course, user)
-        if notifications and notifications['pending_grading']:
-            return notifications['img_path']
-
-    return None
 
 
 def get_static_tab_contents(request, course, tab):
@@ -1417,10 +1400,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
     '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
-    ' who may not be able to pay the Verified Certificate fee. Eligible learners receive 90{percent_sign} off'
+    ' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'
     ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
     ' audit track for a course that offers Verified Certificates, and then complete this application.'
-    ' Note that you must complete a separate application for each course you take.\n We will use this'
+    ' Note that you must complete a separate application for each course you take.\n We plan to use this'
     ' information to evaluate your application for financial assistance and to further develop our'
     ' financial assistance program.'
 ).format(
@@ -1431,7 +1414,7 @@ FINANCIAL_ASSISTANCE_HEADER = _(
 
 FA_INCOME_LABEL = _('Annual Household Income')
 FA_REASON_FOR_APPLYING_LABEL = _(
-    'Tell us about your current financial situation.'
+    'Tell us about your current financial situation. Why do you need assistance?'
 )
 FA_GOALS_LABEL = _(
     'Tell us about your learning or professional goals. How will a Verified Certificate in'
@@ -1530,7 +1513,7 @@ def financial_assistance_form(request):
         {'name': enrollment.course_overview.display_name, 'value': unicode(enrollment.course_id)}
         for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created')
         if CourseMode.objects.filter(
-            Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gt=datetime.now(UTC())),
+            Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
             course_id=enrollment.course_id,
             mode_slug=CourseMode.VERIFIED
         ).exists()
@@ -1540,6 +1523,7 @@ def financial_assistance_form(request):
         'header_text': FINANCIAL_ASSISTANCE_HEADER,
         'student_faq_url': marketing_link('FAQ'),
         'dashboard_url': reverse('dashboard'),
+        'account_settings_url': reverse('account_settings'),
         'platform_name': settings.PLATFORM_NAME,
         'user_details': {
             'email': user.email,
@@ -1567,11 +1551,11 @@ def financial_assistance_form(request):
                 'name': 'income',
                 'type': 'text',
                 'label': FA_INCOME_LABEL,
-                'placeholder': _('income in USD ($)'),
+                'placeholder': _('income in US Dollars ($)'),
                 'defaultValue': '',
                 'required': True,
                 'restrictions': {},
-                'instructions': _('Specify your annual income in USD.')
+                'instructions': _('Specify your annual household income in US Dollars.')
             },
             {
                 'name': 'reason_for_applying',
@@ -1616,15 +1600,13 @@ def financial_assistance_form(request):
                 'placeholder': '',
                 'name': 'mktg-permission',
                 'label': _(
-                    'I allow edX to use the information provided in this application for edX marketing purposes.'
+                    'I allow edX to use the information provided in this application '
+                    '(except for financial information) for edX marketing purposes.'
                 ),
                 'defaultValue': '',
                 'type': 'checkbox',
                 'required': False,
-                'instructions': _(
-                    'Annual income and personal information such as email address will not be shared. '
-                    'Financial information will not be used for marketing purposes.'
-                ),
+                'instructions': '',
                 'restrictions': {}
             }
         ],

@@ -17,8 +17,6 @@ define([
                 server_error_message: "Error while regenerating certificates. Please try again."
             };
             var expected = {
-                error_class: 'msg-error',
-                success_class: 'msg-success',
                 url: 'test/url/',
                 postData : [],
                 selected_statuses: ['downloadable', 'error'],
@@ -27,29 +25,37 @@ define([
 
             var select_options = function(option_values){
                 $.each(option_values, function(index, element){
-                    $("#certificate-statuses option[value=" + element + "]").attr('selected', 'selected');
+                    $("#certificate-regenerating-form input[value=" + element + "]").click();
                 });
             };
 
             beforeEach(function() {
-                var fixture = '<section id = "certificates"><h2>Regenerate Certificates</h2>' +
+                var fixture = '<section id="certificates">' +
                     '<form id="certificate-regenerating-form" method="post" action="' + expected.url + '">' +
-                    '   <p id="status-multi-select-tip">Select one or more certificate statuses ' +
-                    '       below using your mouse and ctrl or command key.</p>' +
-                    '   <select class="multi-select" multiple id="certificate-statuses" ' +
-                    '       name="certificate_statuses" aria-describedby="status-multi-select-tip">' +
-                    '       <option value="downloadable">Downloadable (2)</option>' +
-                    '       <option value="error">Error (2)</option>' +
-                    '       <option value="generating">Generating (1)</option>' +
-                    '   </select>' +
-                    '   <label for="certificate-statuses">' +
-                    '       Select certificate statuses that need regeneration and click Regenerate ' +
-                    '       Certificates button.' +
-                    '   </label>' +
-                    '   <input type="button" id="btn-start-regenerating-certificates" value="Regenerate Certificates"' +
-                    '   data-endpoint="' + expected.url + '"/>' +
+                    '<p class="under-heading">To regenerate certificates for your course, ' +
+                    '   chose the learners who will receive regenerated certificates and click <br> ' +
+                    '   Regenerate Certificates.' +
+                    '</p>' +
+                    '<input id="certificate_status_downloadable" type="checkbox" name="certificate_statuses" ' +
+                    '   value="downloadable">' +
+                    '<label style="display: inline" for="certificate_status_downloadable">' +
+                    '   Regenerate for learners who have already received certificates. (3)' +
+                    '</label><br>' +
+                    '<input id="certificate_status_notpassing" type="checkbox" name="certificate_statuses" ' +
+                    '   value="notpassing">' +
+                    '<label style="display: inline" for="certificate_status_notpassing"> ' +
+                    '   Regenerate for learners who have not received certificates. (1)' +
+                    '</label><br>' +
+                    '<input id="certificate_status_error" type="checkbox" name="certificate_statuses" ' +
+                    '   value="error">' +
+                    '<label style="display: inline" for="certificate_status_error"> ' +
+                    '   Regenerate for learners in an error state. (0)' +
+                    '</label><br>' +
+                    '<input type="button" class="btn-blue" id="btn-start-regenerating-certificates" ' +
+                    '   value="Regenerate Certificates" data-endpoint="' + expected.url + '">' +
                     '</form>' +
-                    '<div class="message certificate-regeneration-status"></div></section>';
+                    '<div class="message certificate-regeneration-status"></div>' +
+                    '</section>';
 
                 setFixtures(fixture);
                 onCertificatesReady();
@@ -87,7 +93,6 @@ define([
 
                 $regenerate_certificates_button.click();
                 AjaxHelpers.respondWithError(requests, 500, {message: MESSAGES.server_error_message});
-                expect($certificate_regeneration_status).toHaveClass(expected.error_class);
                 expect($certificate_regeneration_status.text()).toEqual(MESSAGES.server_error_message);
             });
 
@@ -97,7 +102,6 @@ define([
 
                 $regenerate_certificates_button.click();
                 AjaxHelpers.respondWithError(requests, 400, {message: MESSAGES.error_message});
-                expect($certificate_regeneration_status).toHaveClass(expected.error_class);
                 expect($certificate_regeneration_status.text()).toEqual(MESSAGES.error_message);
             });
 
@@ -107,7 +111,6 @@ define([
 
                 $regenerate_certificates_button.click();
                 AjaxHelpers.respondWithJson(requests, {message: MESSAGES.success_message, success: true});
-                expect($certificate_regeneration_status).toHaveClass(expected.success_class);
                 expect($certificate_regeneration_status.text()).toEqual(MESSAGES.success_message);
             });
 

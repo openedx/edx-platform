@@ -3,10 +3,13 @@ Course API
 """
 
 from django.contrib.auth.models import User
-from django.http import Http404
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import PermissionDenied
 
-from lms.djangoapps.courseware.courses import get_courses, get_course_with_access
+from lms.djangoapps.courseware.courses import (
+    get_courses,
+    get_course_overview_with_access,
+    get_permission_for_course_about,
+)
 
 from .permissions import can_view_courses_for_username
 
@@ -43,11 +46,11 @@ def course_detail(request, username, course_key):
         `CourseDescriptor` object representing the requested course
     """
     user = get_effective_user(request.user, username)
-    try:
-        course = get_course_with_access(user, 'see_exists', course_key)
-    except Http404:
-        raise NotFound()
-    return course
+    return get_course_overview_with_access(
+        user,
+        get_permission_for_course_about(),
+        course_key,
+    )
 
 
 def list_courses(request, username):
@@ -71,5 +74,4 @@ def list_courses(request, username):
         List of `CourseDescriptor` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
-    courses = get_courses(user)
-    return courses
+    return get_courses(user)

@@ -1,17 +1,20 @@
 """Tests covering the Programs listing on the Studio home."""
+import json
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 import httpretty
+import mock
 from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, ModuleStoreTestCase):
+class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModuleStoreTestCase):
     """Verify Program listing behavior."""
     def setUp(self):
         super(TestProgramListing, self).setUp()
@@ -70,7 +73,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, ModuleStoreT
             self.assertIn(program_name, response.content)
 
 
-class TestProgramAuthoringView(ProgramsApiConfigMixin, ModuleStoreTestCase):
+class TestProgramAuthoringView(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Verify the behavior of the program authoring app's host view."""
     def setUp(self):
         super(TestProgramAuthoringView, self).setUp()
@@ -118,3 +121,43 @@ class TestProgramAuthoringView(ProgramsApiConfigMixin, ModuleStoreTestCase):
         student = UserFactory(is_staff=False)
         self.client.login(username=student.username, password='test')
         self._assert_status(404)
+
+
+class TestProgramsIdTokenView(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
+    """Tests for the programs id_token endpoint."""
+
+    def setUp(self):
+        super(TestProgramsIdTokenView, self).setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password='test')
+        self.path = reverse('programs_id_token')
+
+    def test_config_disabled(self):
+        """Ensure the endpoint returns 404 when Programs authoring is disabled."""
+        self.create_config(enable_studio_tab=False)
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 404)
+
+    def test_not_logged_in(self):
+        """Ensure the endpoint denies access to unauthenticated users."""
+        self.create_config()
+        self.client.logout()
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(settings.LOGIN_URL, response['Location'])
+
+    @mock.patch('cms.djangoapps.contentstore.views.program.get_id_token', return_value='test-id-token')
+    def test_config_enabled(self, mock_get_id_token):
+        """
+        Ensure the endpoint responds with a valid JSON payload when authoring
+        is enabled.
+        """
+        self.create_config()
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+        payload = json.loads(response.content)
+        self.assertEqual(payload, {"id_token": "test-id-token"})
+        # this comparison is a little long-handed because we need to compare user instances directly
+        user, client_name = mock_get_id_token.call_args[0]
+        self.assertEqual(user, self.user)
+        self.assertEqual(client_name, "programs")

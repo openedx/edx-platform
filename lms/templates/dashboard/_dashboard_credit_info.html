@@ -13,9 +13,6 @@
 
         error = credit_status['error']
 
-
-        status = 'eligible'
-
         # Translators: provider_name is the name of a credit provider or university (e.g. State University)
         credit_msg = _("You have completed this course and are eligible to purchase course credit. Select <strong>Get Credit</strong> to get started.")
         credit_msg_class = "credit-eligibility-msg"
@@ -35,7 +32,7 @@
                 "at the {link_to_provider_site} website. Select <b>Request Credit</b> to get started.").format(
                     link_to_provider_site=provider_link,
                 )
-                credit_msg_class = "credit-request-pending-msg"
+                credit_msg_class = "credit-request-not-started-msg"
                 credit_btn_label = _("Request Credit")
                 credit_btn_class = 'pending-credit-btn'
             elif request_status == 'pending':
@@ -77,7 +74,7 @@
         </p>
         <div class="credit-action">
             % if credit_btn_label:
-                <a class="btn credit-btn ${credit_btn_class}" href="${credit_btn_href}" target="_blank" data-course-key="${credit_status['course_key']}" data-user="${user.username}" data-provider="${credit_status['provider_id']}">
+                <a class="btn credit-btn ${credit_btn_class}" href="${credit_btn_href | h}" target="_blank" data-course-key="${credit_status['course_key'] | h}" data-user="${user.username | h}" data-provider="${credit_status['provider_id'] | h}">
                     ${credit_btn_label}
                 </a>
             % endif

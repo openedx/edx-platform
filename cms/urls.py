@@ -3,8 +3,8 @@ from django.conf.urls import patterns, include, url
 # There is a course creators admin table.
 from ratelimitbackend import admin
 
-from cms.djangoapps.contentstore.views.program import ProgramAuthoringView
-
+from cms.djangoapps.contentstore.views.program import ProgramAuthoringView, ProgramsIdTokenView
+from cms.djangoapps.contentstore.views.organization import OrganizationListView
 
 admin.autodiscover()
 
@@ -41,6 +41,7 @@ urlpatterns = patterns(
 
     url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
     url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
+    url(r'^organizations$', OrganizationListView.as_view(), name='organizations'),
 
     # temporary landing page for edge
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
@@ -92,7 +93,6 @@ urlpatterns += patterns(
         'course_notifications_handler'),
     url(r'^course_rerun/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_rerun_handler', name='course_rerun_handler'),
     url(r'^container/{}$'.format(settings.USAGE_KEY_PATTERN), 'container_handler'),
-    url(r'^checklists/{}/(?P<checklist_index>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'checklists_handler'),
     url(r'^orphan/{}$'.format(settings.COURSE_KEY_PATTERN), 'orphan_handler'),
     url(r'^assets/{}/{}?$'.format(settings.COURSE_KEY_PATTERN, settings.ASSET_KEY_PATTERN), 'assets_handler'),
     url(r'^import/{}$'.format(COURSELIKE_KEY_PATTERN), 'import_handler'),
@@ -185,9 +185,10 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
     )
 
 urlpatterns += (
+    # These views use a configuration model to determine whether or not to
+    # display the Programs authoring app. If disabled, a 404 is returned.
+    url(r'^programs/id_token/$', ProgramsIdTokenView.as_view(), name='programs_id_token'),
     # Drops into the Programs authoring app, which handles its own routing.
-    # The view uses a configuration model to determine whether or not to
-    # display the authoring app. If disabled, a 404 is returned.
     url(r'^program/', ProgramAuthoringView.as_view(), name='programs'),
 )
 

@@ -24,9 +24,13 @@
           <td class="unit">
             <button class="toggle-collapse ccx-button-link" aria-expanded="false">
               <i class="fa fa-caret-right"></i>
-              <span class="sr"><%- gettext('toggle chapter') %>&nbsp;<%= chapter.display_name %></span>
+              <span class="sr">
+                <%- interpolate(gettext('toggle chapter %(displayName)s'),
+                  {displayName: chapter.display_name}, true) %>
+              </span>
             </button>
-            <span class="sr"><%- gettext('Section') %>&nbsp;</span><%= chapter.display_name %>
+            <span class="sr">
+              <%- gettext('Section') %>&nbsp;</span><%= chapter.display_name %>
           </td>
           <td class="date start-date">
             <button class="ccx-button-link">
@@ -34,13 +38,11 @@
               <span class="sr"><%- gettext('Click to change') %></span>
             </button>
           </td>
-          <td class="date due-date">
-            <button class="ccx-button-link">
-              <%= chapter.due %>
-              <span class="sr"><%- gettext('Click to change') %></span>
-            </button>
+          <td class="date due-date no-link">
+            <%- gettext('N/A') %>
           </td>
-          <td><button class="remove-unit ccx-button-link" aria-label="Remove chapter <%= chapter.display_name %>">
+          <td><button class="remove-unit ccx-button-link" aria-label="<%- interpolate(
+                gettext('Remove chapter %(chapterDisplayName)s'), {chapterDisplayName: chapter.display_name}, true) %>">
             <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove') %>
           </button></td>
         </tr>
@@ -50,7 +52,10 @@
             <td class="unit">
               <button class="toggle-collapse ccx-button-link" aria-expanded="false">
                  <i class="fa fa-caret-right"></i>
-                 <span class="sr"><%- gettext('toggle subsection') %>&nbsp;<%= child.display_name %></span>
+                 <span class="sr">
+                     <%- interpolate(gettext('toggle subsection %(displayName)s'),
+                      {displayName: child.display_name}, true) %>
+                 </span>
               </button>
               <span class="sr"><%- gettext('Subsection') %>&nbsp;</span><%= child.display_name %>
             </td>
@@ -66,32 +71,45 @@
                 <span class="sr"><%- gettext('Click to change') %></span>
               </button>
             </td>
-            <td><button class="remove-unit ccx-button-link" aria-label="Remove subsection <%= child.display_name %>">
+            <td><button class="remove-unit ccx-button-link" aria-label="<%- interpolate(
+                gettext('Remove subsection %(subsectionDisplayName)s'), {subsectionDisplayName: child.display_name}, true) %>">
               <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove') %>
             </button></td>
           </tr>
           <% _.each(child.children, function(subchild) { %>
-            <tr class="vertical" data-dapth="3"
+            <tr class="vertical" data-depth="3"
                 data-location="<%= chapter.location %> <%= child.location %> <%= subchild.location %>">
               <td class="unit">&nbsp;
                  <span class="sr"><%- gettext('Unit') %>&nbsp;</span>
                  <%= subchild.display_name %>
               </td>
-              <td class="date start-date">
-                <button class="ccx-button-link">
+              <td class="date start-date no-link">
+                <% if (subchild.start) { %>
                   <%= subchild.start %>
-                  <span class="sr"><%- gettext('Click to change') %></span>
-                </button>
+                <% } else { %>
+                  <%
+                  // Translators: Unit's aka vertical start date is set to Unscheduled when user has not set start date on corresponding subsection aka sequential.
+                  %>
+                  <%- gettext('Unscheduled') %>
+                <% } %>
               </td>
-              <td class="date due-date">
-                <button class="ccx-button-link">
+              <td class="date due-date no-link">
+                <% if (subchild.due) { %>
                   <%= subchild.due %>
-                  <span class="sr"><%- gettext('Click to change') %></span>
+                <% } else { %>
+                  <%
+                  // Translators: Unit's aka vertical due date is set to Unscheduled when user has not set due date on corresponding subsection aka sequential.
+                  %>
+                  <%- gettext('Unscheduled') %>
+                <% } %>
+              </td>
+              <td>
+                <button class="remove-unit ccx-button-link" aria-label="<%- interpolate(
+                    gettext('Remove unit %(unitName)s'), {unitName: subchild.display_name}, true) %>">
+                  <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove') %>
                 </button>
               </td>
-              <td><button class="remove-unit ccx-button-link" aria-label="Remove unit <%= subchild.display_name %>">
-                <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove') %>
-              </button></td>
+          </tr>
           <% }); %>
         <% }); %>
       <% }); %>

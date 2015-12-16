@@ -350,6 +350,7 @@ def finish_auth(request):  # pylint: disable=unused-argument
     """
     return render_to_response('student_account/finish_auth.html', {
         'disable_courseware_js': True,
+        'disable_footer': True,
     })
 
 

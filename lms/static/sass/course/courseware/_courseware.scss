@@ -58,12 +58,14 @@ html.video-fullscreen {
 
 .content-wrapper {
 
-  .course-license, .xblock-license {
+  .course-license,
+  .xblock-license {
     @include text-align(right);
     @extend %t-title7;
     display: block;
     width: auto;
     padding: ($baseline/4) 0;
+    color: $gray-d1;
 
     span {
       color: inherit;
@@ -645,19 +647,5 @@ section.self-assessment {
   .error {
     font-size: 14px;
     font-weight: bold;
-  }
-}
-
-section.foldit {
-  table {
-    margin-top: ($baseline/2);
-  }
-  th {
-    text-align: center;
-  }
-  td {
-    padding-left: ($baseline/4);
-    padding-right: ($baseline/4);
-
   }
 }

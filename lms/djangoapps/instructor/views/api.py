@@ -2839,22 +2839,21 @@ def parse_request_data_and_get_user(request, course_key):
     try:
         certificate_exception = json.loads(request.body or '{}')
     except ValueError:
-        raise ValueError(_('Invalid Json data, Please refresh the page and then try again.'))
+        raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))
 
     user = certificate_exception.get('user_name', '') or certificate_exception.get('user_email', '')
     if not user:
         raise ValueError(_('Student username/email field is required and can not be empty. '
-                           'Kindly fill in username/email and then press "Add Exception" button.'))
+                           'Kindly fill in username/email and then press "Add to Exception List" button.'))
     try:
         db_user = get_user_by_username_or_email(user)
     except ObjectDoesNotExist:
-        raise ValueError(_("We can't find the user (username/email={user}) you've entered. "
-                           "Make sure the username or email address is correct, then try again.").format(user=user))
+        raise ValueError(_("{user} does not exist in the LMS. Please check your spelling and retry.").format(user=user))
 
     # Make Sure the given student is enrolled in the course
     if not CourseEnrollment.is_enrolled(db_user, course_key):
-        raise ValueError(_("The user (username/email={user}) you have entered is not enrolled in this course. "
-                           "Make sure the username or email address is correct, then try again.").format(user=user))
+        raise ValueError(_("{user} is not enrolled in this course. Please check your spelling and retry.")
+                         .format(user=user))
 
     return certificate_exception, db_user
 
@@ -2950,7 +2949,7 @@ def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable
         """
         inner method to build dict of csv data as row errors.
         """
-        row_errors[key].append(_('user "{user}" in row#    {row}').format(user=_user, row=row_count))
+        row_errors[key].append(_('user "{user}" in row# {row}').format(user=_user, row=row_count))
 
     if 'students_list' in request.FILES:
         try:

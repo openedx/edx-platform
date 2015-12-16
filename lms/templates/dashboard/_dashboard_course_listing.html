@@ -7,7 +7,6 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from markupsafe import escape
-from courseware.courses import get_course_university_about_section
 from course_modes.models import CourseMode
 from course_modes.helpers import enrollment_mode_display
 from student.helpers import (
@@ -99,7 +98,7 @@ from student.helpers import (
           % endif
         </h3>
         <div class="course-info">
-          <span class="info-university">${get_course_university_about_section(course_overview)} - </span>
+          <span class="info-university">${course_overview.display_org_with_default | h} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default | h}</span>
           <span class="info-date-block" data-tooltip="Hi">
           % if course_overview.has_ended():

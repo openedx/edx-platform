@@ -1810,45 +1810,6 @@ CREATE TABLE `external_auth_externalauthmap` (
   CONSTRAINT `external_auth_externala_user_id_644e7779f2d52b9a_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `foldit_puzzlecomplete`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `foldit_puzzlecomplete` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `unique_user_id` varchar(50) NOT NULL,
-  `puzzle_id` int(11) NOT NULL,
-  `puzzle_set` int(11) NOT NULL,
-  `puzzle_subset` int(11) NOT NULL,
-  `created` datetime(6) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `foldit_puzzlecomplete_user_id_4c63656af6674331_uniq` (`user_id`,`puzzle_id`,`puzzle_set`,`puzzle_subset`),
-  KEY `foldit_puzzlecomplete_ff2b2d15` (`unique_user_id`),
-  KEY `foldit_puzzlecomplete_56c088b4` (`puzzle_set`),
-  KEY `foldit_puzzlecomplete_2dc27ffb` (`puzzle_subset`),
-  CONSTRAINT `foldit_puzzlecomplete_user_id_cd0294fb3a392_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `foldit_score`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `foldit_score` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `unique_user_id` varchar(50) NOT NULL,
-  `puzzle_id` int(11) NOT NULL,
-  `best_score` double NOT NULL,
-  `current_score` double NOT NULL,
-  `score_version` int(11) NOT NULL,
-  `created` datetime(6) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `foldit_score_user_id_6ac502fe1f6861b2_fk_auth_user_id` (`user_id`),
-  KEY `foldit_score_ff2b2d15` (`unique_user_id`),
-  KEY `foldit_score_44726e86` (`best_score`),
-  KEY `foldit_score_32d6f808` (`current_score`),
-  CONSTRAINT `foldit_score_user_id_6ac502fe1f6861b2_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `instructor_task_instructortask`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1873,33 +1834,6 @@ CREATE TABLE `instructor_task_instructortask` (
   KEY `instructor_task_instructortask_57746cc8` (`task_id`),
   KEY `instructor_task_instructortask_76980a94` (`task_state`),
   CONSTRAINT `instructor_task_in_requester_id_3383acfe2fe42391_fk_auth_user_id` FOREIGN KEY (`requester_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `licenses_coursesoftware`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `licenses_coursesoftware` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `full_name` varchar(255) NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `course_id` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `licenses_userlicense`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `licenses_userlicense` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `serial` varchar(255) NOT NULL,
-  `software_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `licen_software_id_209fd400b7c7a3ca_fk_licenses_coursesoftware_id` (`software_id`),
-  KEY `licenses_userlicense_user_id_7d98c37aa4438a34_fk_auth_user_id` (`user_id`),
-  CONSTRAINT `licen_software_id_209fd400b7c7a3ca_fk_licenses_coursesoftware_id` FOREIGN KEY (`software_id`) REFERENCES `licenses_coursesoftware` (`id`),
-  CONSTRAINT `licenses_userlicense_user_id_7d98c37aa4438a34_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `lms_xblock_xblockasidesconfig`;
@@ -2526,20 +2460,6 @@ CREATE TABLE `programs_programsapiconfig` (
   PRIMARY KEY (`id`),
   KEY `programs_programsa_changed_by_id_b7c3b49d5c0dcd3_fk_auth_user_id` (`changed_by_id`),
   CONSTRAINT `programs_programsa_changed_by_id_b7c3b49d5c0dcd3_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `psychometrics_psychometricdata`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `psychometrics_psychometricdata` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `done` tinyint(1) NOT NULL,
-  `attempts` int(11) NOT NULL,
-  `checktimes` longtext,
-  `studentmodule_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `studentmodule_id` (`studentmodule_id`),
-  CONSTRAINT `D758b867e6fa9161734bd9cb58b9a485` FOREIGN KEY (`studentmodule_id`) REFERENCES `courseware_studentmodule` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `self_paced_selfpacedconfiguration`;

@@ -52,6 +52,7 @@ from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from lms.djangoapps.ccx.views import get_date
 
 
 def intercept_renderer(path, context):
@@ -286,6 +287,25 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         course_enrollments = get_override_for_ccx(ccx, self.course, 'max_student_enrollments_allowed')
         self.assertEqual(course_enrollments, settings.CCX_MAX_STUDENTS_ALLOWED)
 
+        # assert ccx creator has role=ccx_coach
+        role = CourseCcxCoachRole(course_key)
+        self.assertTrue(role.has_user(self.coach))
+
+    def test_get_date(self):
+        """
+        Assert that get_date returns valid date.
+        """
+        ccx = self.make_ccx()
+        for section in self.course.get_children():
+            self.assertEqual(get_date(ccx, section, 'start'), self.mooc_start)
+            self.assertEqual(get_date(ccx, section, 'due'), None)
+            for subsection in section.get_children():
+                self.assertEqual(get_date(ccx, subsection, 'start'), self.mooc_start)
+                self.assertEqual(get_date(ccx, subsection, 'due'), self.mooc_due)
+                for unit in subsection.get_children():
+                    self.assertEqual(get_date(ccx, unit, 'start', parent_node=subsection), self.mooc_start)
+                    self.assertEqual(get_date(ccx, unit, 'due', parent_node=subsection), self.mooc_due)
+
     @SharedModuleStoreTestCase.modifies_courseware
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('ccx.views.TODAY')
@@ -337,15 +357,24 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
         response = self.client.get(url)
         schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+
         self.assertEqual(len(schedule), 2)
         self.assertEqual(schedule[0]['hidden'], False)
-        self.assertEqual(schedule[0]['start'], None)
-        self.assertEqual(schedule[0]['children'][0]['start'], None)
-        self.assertEqual(schedule[0]['due'], None)
-        self.assertEqual(schedule[0]['children'][0]['due'], None)
+        # If a coach does not override dates, then dates will be imported from master course.
         self.assertEqual(
-            schedule[0]['children'][0]['children'][0]['due'], None
+            schedule[0]['start'],
+            self.chapters[0].start.strftime('%Y-%m-%d %H:%M')
         )
+        self.assertEqual(
+            schedule[0]['children'][0]['start'],
+            self.sequentials[0].start.strftime('%Y-%m-%d %H:%M')
+        )
+
+        if self.sequentials[0].due:
+            expected_due = self.sequentials[0].due.strftime('%Y-%m-%d %H:%M')
+        else:
+            expected_due = None
+        self.assertEqual(schedule[0]['children'][0]['due'], expected_due)
 
         url = reverse(
             'save_ccx',
@@ -388,7 +417,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # scheduled chapter
         ccx = CustomCourseForEdX.objects.get()
         course_start = get_override_for_ccx(ccx, self.course, 'start')
-        self.assertEqual(str(course_start)[:-9], u'2014-11-20 00:00')
+        self.assertEqual(str(course_start)[:-9], self.chapters[0].start.strftime('%Y-%m-%d %H:%M'))
 
         # Make sure grading policy adjusted
         policy = get_override_for_ccx(ccx, self.course, 'grading_policy',

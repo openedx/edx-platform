@@ -261,7 +261,34 @@ def _footer_logo_img(is_secure):
         Absolute url to logo
     """
     logo_name = microsite.get_value('FOOTER_ORGANIZATION_IMAGE', settings.FOOTER_ORGANIZATION_IMAGE)
-    return _absolute_url_staticfile(is_secure, logo_name)
+    # `logo_name` is looked up from the microsite configuration,
+    # which falls back on the Django settings, which loads it from
+    # `lms.env.json`, which is created and managed by Ansible. Because of
+    # this runaround, we lose a lot of the flexibility that Django's
+    # staticfiles system provides, and we end up having to hardcode the path
+    # to the footer logo rather than use the comprehensive theming system.
+    # EdX needs the FOOTER_ORGANIZATION_IMAGE value to point to edX's
+    # logo by default, so that it can display properly on edx.org -- both
+    # within the LMS, and on the Drupal marketing site, which uses this API.
+    try:
+        return _absolute_url_staticfile(is_secure, logo_name)
+    except ValueError:
+        # However, if the edx.org comprehensive theme is not activated,
+        # Django's staticfiles system will be unable to find this footer,
+        # and will throw a ValueError. Since the edx.org comprehensive theme
+        # is not activated by default, we will end up entering this block
+        # of code on new Open edX installations, and on sandbox installations.
+        # We can log when this happens:
+        default_logo = "images/logo.png"
+        log.info(
+            "Failed to find footer logo at '%s', using '%s' instead",
+            logo_name,
+            default_logo,
+        )
+        # And we'll use the default logo path of "images/logo.png" instead.
+        # There is a core asset that corresponds to this logo, so this should
+        # always succeed.
+        return staticfiles_storage.url(default_logo)
 
 
 def _absolute_url(is_secure, url_path):

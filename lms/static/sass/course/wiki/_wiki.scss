@@ -897,13 +897,14 @@ section.wiki {
   .alert {
     position: relative;
     width: auto;
-    margin: 24px 40px;
+    margin: 24px 0px;
     padding: 8px 12px;
     border: 1px solid #EBE8BF;
     border-radius: 3px;
     background: $yellow;
     color: $black;
     font-size: 0.9em;
+    min-width: inherit;
 
     .close {
       position: absolute;

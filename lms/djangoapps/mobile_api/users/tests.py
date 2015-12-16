@@ -21,6 +21,7 @@ from courseware.access_response import (
     VisibilityError,
 )
 from course_modes.models import CourseMode
+from openedx.core.lib.courses import course_image_url
 from student.models import CourseEnrollment
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -98,6 +99,11 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
 
+        expected_course_image_url = course_image_url(self.course)
+        self.assertIsNotNone(expected_course_image_url)
+        self.assertIn(expected_course_image_url, found_course['course_image'])
+        self.assertIn(expected_course_image_url, found_course['media']['course_image']['uri'])
+
     def verify_failure(self, response, error_type=None):
         self.assertEqual(response.status_code, 200)
         courses = response.data
@@ -162,8 +168,10 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     @ddt.data(
         (NEXT_WEEK, ADVERTISED_START, ADVERTISED_START, "string"),
         (NEXT_WEEK, None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
+        (NEXT_WEEK, '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
         (DEFAULT_START_DATE, ADVERTISED_START, ADVERTISED_START, "string"),
-        (DEFAULT_START_DATE, None, None, "empty")
+        (DEFAULT_START_DATE, '', None, "empty"),
+        (DEFAULT_START_DATE, None, None, "empty"),
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
@@ -187,7 +195,11 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         certificate_data = response.data[0]['certificate']
         self.assertDictEqual(certificate_data, {})
 
-    def test_pdf_certificate(self):
+    def verify_pdf_certificate(self):
+        """
+        Verifies the correct URL is returned in the response
+        for PDF certificates.
+        """
         self.login_and_enroll()
 
         certificate_url = "http://test_certificate_url"
@@ -202,6 +214,20 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
         self.assertEquals(certificate_data['url'], certificate_url)
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})
+    def test_pdf_certificate_with_html_cert_disabled(self):
+        """
+        Tests PDF certificates with CERTIFICATES_HTML_VIEW set to False.
+        """
+        self.verify_pdf_certificate()
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_pdf_certificate_with_html_cert_enabled(self):
+        """
+        Tests PDF certificates with CERTIFICATES_HTML_VIEW set to True.
+        """
+        self.verify_pdf_certificate()
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_web_certificate(self):

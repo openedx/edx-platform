@@ -71,7 +71,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@xblock-0.4.1#egg=XBlock==0.4.1
+git+https://github.com/edx/XBlock.git@xblock-0.4.4#egg=XBlock==0.4.4
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
@@ -93,7 +93,7 @@ git+https://github.com/edx/xblock-utils.git@v1.0.0#egg=xblock-utils==v1.0.0
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
-git+https://github.com/edx/edx-organizations.git@release-2015-11-25#egg=edx-organizations==0.1.9
+git+https://github.com/edx/edx-organizations.git@release-2015-12-08#egg=edx-organizations==0.2.0
 git+https://github.com/edx/edx-proctoring.git@0.11.6#egg=edx-proctoring==0.11.6
 git+https://github.com/edx/xblock-lti-consumer.git@v1.0.0#egg=xblock-lti-consumer==v1.0.0
 

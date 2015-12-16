@@ -32,7 +32,8 @@
                 el: DOM_SELECTORS.bulk_exception,
                 events: {
                     'change #browseBtn': 'chooseFile',
-                    'click .upload-csv-button': 'uploadCSV'
+                    'click .upload-csv-button': 'uploadCSV',
+                    'click a.arrow': 'toggleMessageDetails'
                 },
 
                 initialize: function(options){
@@ -72,19 +73,22 @@
                 },
 
                 display_response: function(data_from_server) {
-                    $(".results").empty();
+                    $(".bulk-exception-results").removeClass('hidden').empty();
 
                     // Display general error messages
                     if (data_from_server.general_errors.length) {
                         var errors = data_from_server.general_errors;
-                        generate_div('msg-error', MESSAGE_GROUP.general_errors, gettext('Errors!'), errors);
+                        generate_div(
+                            MESSAGE_GROUP.general_errors,
+                            gettext('Uploaded file issues. Click on "+" to view.'),
+                            errors
+                        );
                     }
 
                     // Display success message
                     if (data_from_server.success.length) {
                         var success_data = data_from_server.success;
                         generate_div(
-                            'msg-success',
                             MESSAGE_GROUP.successfully_added,
                             get_text(success_data.length, MESSAGE_GROUP.successfully_added),
                             success_data
@@ -98,7 +102,6 @@
                         if (row_errors.data_format_error.length) {
                             var format_errors = row_errors.data_format_error;
                             generate_div(
-                                'msg-error',
                                 MESSAGE_GROUP.data_format_error,
                                 get_text(format_errors.length, MESSAGE_GROUP.data_format_error),
                                 format_errors
@@ -107,7 +110,6 @@
                         if (row_errors.user_not_exist.length) {
                             var user_not_exist = row_errors.user_not_exist;
                             generate_div(
-                                'msg-error',
                                 MESSAGE_GROUP.user_not_exist,
                                 get_text(user_not_exist.length, MESSAGE_GROUP.user_not_exist),
                                 user_not_exist
@@ -116,7 +118,6 @@
                         if (row_errors.user_already_white_listed.length) {
                             var user_already_white_listed = row_errors.user_already_white_listed;
                             generate_div(
-                                'msg-error',
                                 MESSAGE_GROUP.user_already_white_listed,
                                 get_text(user_already_white_listed.length, MESSAGE_GROUP.user_already_white_listed),
                                 user_already_white_listed
@@ -125,7 +126,6 @@
                         if (row_errors.user_not_enrolled.length) {
                             var user_not_enrolled = row_errors.user_not_enrolled;
                             generate_div(
-                                'msg-error',
                                 MESSAGE_GROUP.user_not_enrolled,
                                 get_text(user_not_enrolled.length, MESSAGE_GROUP.user_not_enrolled),
                                 user_not_enrolled
@@ -133,17 +133,22 @@
                         }
                     }
 
-                    function generate_div(div_class, group, heading, display_data) {
+                    function generate_div(group, heading, display_data) {
                         // inner function generate div and display response messages.
                         $('<div/>', {
-                            class: 'message ' + div_class + ' ' + group
-                        }).appendTo('.results').prepend( "<b>" + heading + "</b>" );
+                            class: 'message ' + group
+                        }).appendTo('.bulk-exception-results').prepend(
+                                "<a  id= '" + group + "' href='javascript:void(0);' class='arrow'> + </a>" +  heading
+                        ).append($('<ul/>', {
+                                class: group
+                            }));
 
                         for(var i = 0; i < display_data.length; i++){
-                            $('<div/>', {
+                            $('<li/>', {
                                 text: display_data[i]
-                            }).appendTo('.results > .' + div_class + '.' + group);
+                            }).appendTo('div.message > .' + group);
                         }
+                        $("div.message > ." + group).hide();
                     }
 
                     function get_text(qty, group) {
@@ -156,33 +161,52 @@
                                 break;
 
                             case MESSAGE_GROUP.data_format_error:
-                                text = qty > 1 ? gettext(qty + ' records are not in correct format'):
-                                    gettext(qty + ' record is not in correct format');
+                                text = qty > 1 ? gettext(qty + ' records are not in correct format and not added to' +
+                                    ' the exception list'):
+                                    gettext(qty + ' record is not in correct format and not added to the exception' +
+                                        ' list');
                                 break;
 
                             case MESSAGE_GROUP.user_not_exist:
-                                text = qty > 1 ? gettext(qty + ' learners do not exist in LMS'):
-                                    gettext(qty + ' learner does not exist in LMS');
+                                text = qty > 1 ? gettext(qty + ' learners do not exist in LMS and not added to the' +
+                                    ' exception list'):
+                                    gettext(qty + ' learner does not exist in LMS and not added to the exception list');
                                 break;
 
                             case MESSAGE_GROUP.user_already_white_listed:
-                                text = qty > 1 ? gettext(qty + ' learners are already white listed'):
-                                    gettext(qty + ' learner is already white listed');
+                                text = qty > 1 ? gettext(qty + ' learners are already white listed and not added to' +
+                                    ' the exception list'):
+                                    gettext(qty + ' learner is already white listed and not added to the exception ' +
+                                        'list');
                                 break;
 
                             case MESSAGE_GROUP.user_not_enrolled:
-                                text = qty > 1 ? gettext(qty + ' learners are not enrolled in course'):
-                                    gettext(qty + ' learner is not enrolled in course');
+                                text = qty > 1 ? gettext(qty + ' learners are not enrolled in course and not added to' +
+                                    ' the exception list'):
+                                    gettext(qty + ' learner is not enrolled in course and not added to the exception' +
+                                        ' list');
                                 break;
                         }
                         return text;
                     }
                 },
 
+                toggleMessageDetails: function(event) {
+                    if (event && event.preventDefault) { event.preventDefault(); }
+                    var group = event.target.id;
+                    $("div.message > ." + group).slideToggle( "fast", function() {
+                        if ($(this).is(':visible')) {
+                            event.target.text = ' -- ';
+                        } else {
+                             event.target.text = ' + ';
+                        }
+                    });
+                },
+
                 chooseFile: function(event) {
                     if (event && event.preventDefault) { event.preventDefault(); }
                     if (event.currentTarget.files.length === 1) {
-                        this.$el.find(DOM_SELECTORS.upload_csv_button).removeClass('is-disabled');
+                        this.$el.find(DOM_SELECTORS.upload_csv_button).removeClass('disabled');
                         this.$el.find(DOM_SELECTORS.browse_file).val(
                             event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf("\\") + 1));
                     }

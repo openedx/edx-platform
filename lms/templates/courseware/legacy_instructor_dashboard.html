@@ -148,9 +148,6 @@ function goto( mode)
     %endif
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
-          %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
-            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
-          %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">${_("Forum Admin")}</a> |
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_("Enrollment")}</a> |
@@ -268,27 +265,6 @@ function goto( mode)
  %endif
 
 ##-----------------------------------------------------------------------------
-%if modeflag.get('Psychometrics'):
-
-    <p>${_("Select a problem and an action:")}
-    </p>
-
-    <p>
-    <select name="Problem">
-    %for problem, count in sorted(problems.items(), key=lambda x: x[0]):
-        <option value="${problem}">${problem} [${count}]</option>
-    %endfor
-    </select>
-    </p>
-    <p>
-    <input type="submit" name="action" value="Generate Histogram and IRT Plot">
-    </p>
-
-    <p></p>
-
-%endif
-
-##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
 
   %if instructor_access or admin_access:
@@ -398,7 +374,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 
-%if datatable and modeflag.get('Psychometrics') is None:
+%if datatable:
 
     <br/>
     <br/>
@@ -490,32 +466,6 @@ function goto( mode)
       ${_("View course statistics in the Admin section of this legacy instructor dashboard.")}
     </p>
 %endif
-
-##-----------------------------------------------------------------------------
-%if modeflag.get('Psychometrics'):
-
-    %for plot in plots:
-      <br/>
-      <h3>${plot['title']}</h3>
-      <br/>
-      <p>${plot['info']}</p>
-      <br/>
-      <div id="plot_${plot['id']}" style="width:600px;height:300px;"></div>
-      <script type="text/javascript">
-          $(function () {
-              ${plot['data']}
-              $.plot($("#plot_${plot['id']}"), ${plot['cmd']}  );
-          });
-      </script>
-      <br/>
-      <br/>
-    %endfor
-
-%endif
-
-##-----------------------------------------------------------------------------
-## always show msg
-
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):

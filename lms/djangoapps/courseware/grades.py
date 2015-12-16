@@ -378,8 +378,7 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
 
             with outer_atomic():
                 # some problems have state that is updated independently of interaction
-                # with the LMS, so they need to always be scored. (E.g. foldit.,
-                # combinedopenended)
+                # with the LMS, so they need to always be scored. (E.g. combinedopenended ORA1)
                 # TODO This block is causing extra savepoints to be fired that are empty because no queries are executed
                 # during the loop. When refactoring this code please keep this outer_atomic call in mind and ensure we
                 # are not making unnecessary database queries.
@@ -699,7 +698,7 @@ def get_score(user, problem_descriptor, module_creator, scores_client, submissio
         return submissions_scores_cache[location_url]
 
     # some problems have state that is updated independently of interaction
-    # with the LMS, so they need to always be scored. (E.g. foldit.)
+    # with the LMS, so they need to always be scored. (E.g. combinedopenended ORA1.)
     if problem_descriptor.always_recalculate_grades:
         problem = module_creator(problem_descriptor)
         if problem is None:

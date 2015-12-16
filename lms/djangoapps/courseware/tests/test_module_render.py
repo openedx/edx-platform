@@ -29,7 +29,7 @@ from xblock.fragment import Fragment
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
 from courseware import module_render as render
-from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
+from courseware.courses import get_course_with_access, get_course_info_section
 from courseware.field_overrides import OverrideFieldData
 from courseware.model_data import FieldDataCache
 from courseware.module_render import hash_resource, get_module_for_descriptor
@@ -39,6 +39,7 @@ from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.lib.courses import course_image_url
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE,
@@ -1350,7 +1351,7 @@ class XmlViewInStudioTest(ViewInStudioTest):
 
 @attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
-@patch('courseware.module_render.has_access', Mock(return_value=True))
+@patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(ModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
 
@@ -1482,7 +1483,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
 
-    @patch('courseware.module_render.has_access', Mock(return_value=True))
+    @patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
     def _get_anonymous_id(self, course_id, xblock_class):
         location = course_id.make_usage_key('dummy_category', 'dummy_name')
         descriptor = Mock(
@@ -1549,7 +1550,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr('shard_1')
-@patch('track.views.tracker')
+@patch('track.views.tracker', autospec=True)
 class TestModuleTrackingContext(ModuleStoreTestCase):
     """
     Ensure correct tracking information is included in events emitted during XBlock callback handling.
@@ -1637,8 +1638,8 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         super(TestXmoduleRuntimeEvent, self).setUp()
         self.homework = self.add_graded_section_to_course('homework')
         self.problem = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
-        self.grade_dict = {'value': 0.18, 'max_value': 32, 'user_id': self.student_user.id}
-        self.delete_dict = {'value': None, 'max_value': None, 'user_id': self.student_user.id}
+        self.grade_dict = {'value': 0.18, 'max_value': 32}
+        self.delete_dict = {'value': None, 'max_value': None}
 
     def get_module_for_user(self, user):
         """Helper function to get useful module at self.location in self.course_id for user"""
@@ -1765,17 +1766,6 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertEqual(module.system.anonymous_student_id, anonymous_id_for_user(user2, self.course.id))
         self.assertEqual(module.scope_ids.user_id, user2.id)
         self.assertEqual(module.descriptor.scope_ids.user_id, user2.id)
-
-    @patch('courseware.module_render.make_psychometrics_data_update_handler')
-    @patch.dict(settings.FEATURES, {'ENABLE_PSYCHOMETRICS': True})
-    def test_psychometrics_anonymous(self, psycho_handler):
-        """
-        Make sure that noauth modules with anonymous users don't have
-        the psychometrics callback bound.
-        """
-        module = self.get_module_for_user(self.anon_user)
-        module.system.rebind_noauth_module_to_user(module, self.anon_user)
-        self.assertFalse(psycho_handler.called)
 
 
 @attr('shard_1')
@@ -2065,13 +2055,13 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         super(TestDisabledXBlockTypes, self).setUp()
 
         for store in self.store.modulestores:
-            store.disabled_xblock_types = ('combinedopenended', 'peergrading', 'video')
+            store.disabled_xblock_types = ('video',)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_item(self, default_ms):
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            for block_type in ('peergrading', 'combinedopenended', 'video'):
+            for block_type in ('video',):
                 item = ItemFactory(category=block_type, parent=course)
                 item = self.store.get_item(item.scope_ids.usage_id)
                 self.assertEqual(item.__class__.__name__, 'RawDescriptorWithMixins')

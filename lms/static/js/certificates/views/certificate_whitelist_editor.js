@@ -19,11 +19,6 @@
                     'click #add-exception': 'addException'
                 },
 
-                initialize: function(){
-                    this.on('removeException', this.removeException);
-                },
-
-
                 render: function(){
                     var template = this.loadTemplate('certificate-white-list-editor');
                     this.$el.html(template());
@@ -59,8 +54,7 @@
 
                     if(this.collection.findWhere(model)){
                         this.showMessage(
-                            "User (username/email=" + (user_name || user_email) + ") already in exception list.",
-                            'msg-error'
+                                (user_name || user_email) + " already in exception list."
                         );
                     }
                     else if(certificate_exception.isValid()){
@@ -70,7 +64,8 @@
                                 success: this.showSuccess(
                                     this,
                                     true,
-                                    'Student added to Certificate white list successfully.'
+                                    (user_name || user_email) + ' has been successfully added to the exception list.' +
+                                        ' Click Generate Exception Certificate below to send the certificate.'
                                 ),
                                 error: this.showError(this)
                             }
@@ -78,34 +73,7 @@
 
                     }
                     else{
-                        this.showMessage(certificate_exception.validationError, 'msg-error');
-                    }
-                },
-
-                removeException: function(certificate){
-                    var model = this.collection.findWhere(certificate);
-                    if(model){
-                        model.destroy(
-                            {
-                                success: this.showSuccess(
-                                    this,
-                                    false,
-                                    'Student Removed from certificate white list successfully.'
-                                ),
-                                error: this.showError(this),
-                                wait: true,
-                                //emulateJSON: true,
-                                data: JSON.stringify(model.attributes)
-                            }
-                        );
-                        this.showMessage('Exception is being removed from server.', 'msg-success');
-                    }
-                    else{
-                        this.showMessage(
-                            'Could not find Certificate Exception in white list. ' +
-                            'Please refresh the page and try again',
-                            'msg-error'
-                        );
+                        this.showMessage(certificate_exception.validationError);
                     }
                 },
 
@@ -114,12 +82,9 @@
                     return re.test(email);
                 },
 
-                showMessage: function(message, messageClass){
-                    this.$(this.message_div).text(message).
-                        removeClass('msg-error msg-success').addClass(messageClass).focus();
-                    $('html, body').animate({
-                        scrollTop: this.$el.offset().top - 20
-                    }, 1000);
+                showMessage: function(message){
+                    $(this.message_div +  ">p" ).remove();
+                    this.$(this.message_div).removeClass('hidden').append("<p>"+ gettext(message) + "</p>");
                 },
 
                 showSuccess: function(caller, add_model, message){
@@ -127,7 +92,7 @@
                         if(add_model){
                             caller.collection.add(model);
                         }
-                        caller.showMessage(message, 'msg-success');
+                        caller.showMessage(message);
                     };
                 },
 
@@ -135,11 +100,11 @@
                     return function(model, response){
                         try{
                             var response_data = JSON.parse(response.responseText);
-                            caller.showMessage(response_data.message, 'msg-error');
+                            caller.showMessage(response_data.message);
                         }
                         catch(exception){
                             caller.showMessage("" +
-                                "Server Error, Please refresh the page and try again.", 'msg-error'
+                                "Server Error, Please refresh the page and try again."
                             );
                         }
                     };

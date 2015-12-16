@@ -10,10 +10,10 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.core.urlresolvers import resolve
 
-from contentstore.utils import course_image_url
 from contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
 from eventtracking import tracker
+from openedx.core.lib.courses import course_image_url
 from search.search_engine_base import SearchEngine
 from xmodule.annotator_mixin import html_to_text
 from xmodule.modulestore import ModuleStoreEnum
