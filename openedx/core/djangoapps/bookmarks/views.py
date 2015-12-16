@@ -247,7 +247,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
             log.error(error_message)
             return self.error_response(error_message, default_user_message)
         except BookmarksLimitReachedError:
-            max_bookmarks_per_course = settings.COURSE_BOOKMARKS['MAX_LIMIT_PER_COURSE']
+            max_bookmarks_per_course = settings.MAX_BOOKMARKS_PER_COURSE
             error_message = ugettext_noop(u'You can create up to {0} bookmarks.'
                                           u' You must remove some bookmarks before you can add new ones.')\
                 .format(max_bookmarks_per_course)

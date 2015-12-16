@@ -64,14 +64,14 @@ class Bookmark(TimeStampedModel):
     def can_create_more(cls, data):
         """
         Determine if a new Bookmark can be created for the course
-        based on limit defined in django.conf.settings.COURSE_BOOKMARKS["MAX_LIMIT_PER_COURSE"]
+        based on limit defined in django.conf.settings.MAX_BOOKMARKS_PER_COURSE
 
         Arguments:
             data (dict): The data to create the object with.
         Returns:
             Boolean
         """
-        max_bookmarks_per_course = settings.COURSE_BOOKMARKS['MAX_LIMIT_PER_COURSE']
+        max_bookmarks_per_course = settings.MAX_BOOKMARKS_PER_COURSE
         data = dict(data)
 
         user = data['user']
