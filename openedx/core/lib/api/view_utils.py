@@ -116,7 +116,7 @@ def view_course_access(depth=0, access_action='load', check_for_milestones=False
     return _decorator
 
 
-def view_auth_classes(is_user=False):
+def view_auth_classes(is_user=False, is_authenticated=True):
     """
     Function and class decorator that abstracts the authentication and permission checks for api views.
     """
@@ -129,7 +129,9 @@ def view_auth_classes(is_user=False):
             OAuth2AuthenticationAllowInactiveUser,
             SessionAuthenticationAllowInactiveUser
         )
-        func_or_class.permission_classes = (IsAuthenticated,)
+        func_or_class.permission_classes = ()
+        if is_authenticated:
+            func_or_class.permission_classes += (IsAuthenticated,)
         if is_user:
             func_or_class.permission_classes += (IsUserInUrl,)
         return func_or_class
