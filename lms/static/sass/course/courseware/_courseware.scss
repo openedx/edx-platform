@@ -100,6 +100,10 @@ html.video-fullscreen {
 div.course-wrapper {
   position: relative;
 
+  section.courseware-results-wrapper {
+    display: none;
+  }
+
   section.course-content,
   section.courseware-results-wrapper {
     @extend .content;
