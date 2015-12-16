@@ -818,9 +818,6 @@ INSTALLED_APPS = (
 
     # Credentials support
     'openedx.core.djangoapps.credentials',
-
-    # Credentials service
-    'openedx.core.djangoapps.credentials_service',
 )
 
 
