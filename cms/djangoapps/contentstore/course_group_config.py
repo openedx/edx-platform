@@ -190,7 +190,9 @@ class GroupConfiguration(object):
         """
         Get usage information for content groups.
         """
-        items = store.get_items(course.id, settings={'group_access': {'$exists': True}})
+        # Set `include_orphans` kwarg to False to get only items present in the course tree.
+        # This will not fetch orphans.
+        items = store.get_items(course.id, settings={'group_access': {'$exists': True}}, include_orphans=False)
 
         return GroupConfiguration._get_content_groups_usage_info(course, items)
 
