@@ -159,7 +159,9 @@ class CourseMode(models.Model):
     @expiration_datetime.setter
     def expiration_datetime(self, new_datetime):
         """ Saves datetime to _expiration_datetime and sets the explicit flag. """
-        self.expiration_datetime_is_explicit = True
+        # Only set explicit flag if we are setting an actual date.
+        if new_datetime is not None:
+            self.expiration_datetime_is_explicit = True
         self._expiration_datetime = new_datetime
 
     @classmethod
