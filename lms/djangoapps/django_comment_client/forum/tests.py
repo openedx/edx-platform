@@ -36,6 +36,7 @@ from mock import patch, Mock, ANY, call
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
 from teams.tests.factories import CourseTeamFactory
+from student.models import UserProfile
 
 log = logging.getLogger(__name__)
 
@@ -718,6 +719,9 @@ class InlineDiscussionContextTestCase(ModuleStoreTestCase):
             discussion_topic_id=self.discussion_topic_id
         )
         self.team.add_user(self.user)  # pylint: disable=no-member
+
+        # Create the user a UserProfile so it doesn't act as a direct access user
+        UserProfile(user=self.user).save()
 
     def test_context_can_be_standalone(self, mock_request):
         mock_request.side_effect = make_mock_request_impl(
