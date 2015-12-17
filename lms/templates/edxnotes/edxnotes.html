@@ -12,6 +12,10 @@ import json
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='edxnotes'" />
+<%
+  _notes = json.loads(notes)
+  has_notes = _notes and _notes.get('results')
+%>
 <section class="container">
   <div class="wrapper-student-notes">
     <div class="student-notes">
@@ -24,7 +28,7 @@ import json
           </h1>
         </div>
 
-        % if notes:
+        % if has_notes:
         <div class="wrapper-notes-search">
           <form role="search" action="${notes_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
             <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
@@ -51,7 +55,7 @@ import json
           <h2 id="tab-view" class="tabs-label">${_('View notes by:')}</h2>
         </div>
 
-        % if notes:
+        % if has_notes:
         <div class="ui-loading" tabindex="-1">
           <span class="spin">
             <i class="icon fa fa-refresh"></i>
@@ -103,11 +107,13 @@ import json
 % endfor
 </%block>
 
-% if notes:
+% if has_notes:
     <%block name="js_extra">
     <%static:require_module module_name="js/edxnotes/views/page_factory" class_name="NotesPageFactory">
         NotesPageFactory({
-            notesList: ${notes if notes is not None else []},
+            notes: ${notes},
+            notesEndpoint: '${notes_endpoint}',
+            pageSize: '${page_size}',
             debugMode: ${debug}
         });
     </%static:require_module>

@@ -1,14 +1,25 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'js/edxnotes/views/search_box',
-    'js/edxnotes/collections/notes', 'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
-], function($, _, AjaxHelpers, SearchBoxView, NotesCollection, customMatchers) {
+    'js/edxnotes/collections/notes', 'js/spec/edxnotes/custom_matchers', 'js/spec/edxnotes/helpers', 'jasmine-jquery'
+], function($, _, AjaxHelpers, SearchBoxView, NotesCollection, customMatchers, Helpers) {
     'use strict';
     describe('EdxNotes SearchBoxView', function() {
-        var getSearchBox, submitForm, assertBoxIsEnabled, assertBoxIsDisabled;
+        var getSearchBox, submitForm, assertBoxIsEnabled, assertBoxIsDisabled, searchReponse;
+
+        searchReponse = {
+            'count': 2,
+            'current_page': 1,
+            'num_pages': 1,
+            'start': 0,
+            'next': null,
+            'previous': null,
+            'results': [null, null]
+        };
 
         getSearchBox = function (options) {
             options = _.defaults(options || {}, {
                 el: $('#search-notes-form').get(0),
+                perPage: 10,
                 beforeSearchStart: jasmine.createSpy(),
                 search: jasmine.createSpy(),
                 error: jasmine.createSpy(),
@@ -50,7 +61,11 @@ define([
             submitForm(this.searchBox, 'test_text');
             request = requests[0];
             expect(request.method).toBe(form.method.toUpperCase());
-            expect(request.url).toBe(form.action + '?' + $.param({text: 'test_text'}));
+            Helpers.verifyUrl(
+                request.url,
+                form.action,
+                {text: 'test_text', page: '1', page_size: '10'}
+            );
         });
 
         it('returns success result', function () {
@@ -60,13 +75,10 @@ define([
                 'test_text'
             );
             assertBoxIsDisabled(this.searchBox);
-            AjaxHelpers.respondWithJson(requests, {
-                total: 2,
-                rows: [null, null]
-            });
+            AjaxHelpers.respondWithJson(requests, searchReponse);
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.search).toHaveBeenCalledWith(
-                jasmine.any(NotesCollection), 2, 'test_text'
+                jasmine.any(NotesCollection), 'test_text'
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
                 'test_text'
@@ -76,10 +88,7 @@ define([
         it('should log the edx.course.student_notes.searched event properly', function () {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
-            AjaxHelpers.respondWithJson(requests, {
-                total: 2,
-                rows: [null, null]
-            });
+            AjaxHelpers.respondWithJson(requests, searchReponse);
 
             expect(Logger.log).toHaveBeenCalledWith('edx.course.student_notes.searched', {
                 'number_of_results': 2,
@@ -140,10 +149,7 @@ define([
             submitForm(this.searchBox, 'test_text');
             assertBoxIsDisabled(this.searchBox);
             submitForm(this.searchBox, 'another_text');
-            AjaxHelpers.respondWithJson(requests, {
-                total: 2,
-                rows: [null, null]
-            });
+            AjaxHelpers.respondWithJson(requests, searchReponse);
             assertBoxIsEnabled(this.searchBox);
             expect(requests).toHaveLength(1);
         });

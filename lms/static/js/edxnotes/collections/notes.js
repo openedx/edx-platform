@@ -1,10 +1,28 @@
-;(function (define, undefined) {
+;(function (define) {
 'use strict';
 define([
-    'backbone', 'js/edxnotes/models/note'
-], function (Backbone, NoteModel) {
-    var NotesCollection = Backbone.Collection.extend({
+    'underscore', 'common/js/components/collections/paging_collection', 'js/edxnotes/models/note'
+], function (_, PagingCollection, NoteModel) {
+    return PagingCollection.extend({
         model: NoteModel,
+
+        initialize: function(models, options) {
+            PagingCollection.prototype.initialize.call(this);
+
+            this.perPage = options.perPage;
+            this.server_api = _.extend(
+                {'text': options.text ? options.text : null}, PagingCollection.prototype.server_api
+            );
+
+            // delete text query param if null
+            if (this.server_api.text === null) {
+                delete this.server_api.text;
+            }
+
+            // These are not specified for the Notes API
+            delete this.server_api.sort_order;
+            delete this.server_api.text_search;
+        },
 
         /**
          * Returns course structure from the list of notes.
@@ -40,7 +58,5 @@ define([
             };
         }())
     });
-
-    return NotesCollection;
 });
 }).call(this, define || RequireJS.define);
