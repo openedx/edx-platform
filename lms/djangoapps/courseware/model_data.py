@@ -980,7 +980,7 @@ class ScoresClient(object):
                 "Tried to fetch location {} from ScoresClient before fetch_scores() has run."
                 .format(location)
             )
-        return self._locations_to_scores.get(location)
+        return self._locations_to_scores.get(location.replace(version=None, branch=None))
 
     @classmethod
     def from_field_data_cache(cls, fd_cache):
