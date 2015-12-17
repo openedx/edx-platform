@@ -32,7 +32,6 @@ from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.discussion_module import DiscussionDescriptor
-from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.poll_module import PollDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
@@ -53,7 +52,6 @@ LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
     CapaDescriptor: [{}],
     DiscussionDescriptor: [{}],
-    GraphicalSliderToolDescriptor: [{}],
     HtmlDescriptor: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
@@ -75,10 +73,9 @@ CONTAINER_XMODULES = {
     WrapperBlock: [{}],
 }
 
-# These modules are editable in studio yet
+# These modules are not editable in studio yet
 NOT_STUDIO_EDITABLE = (
     CrowdsourceHinterDescriptor,
-    GraphicalSliderToolDescriptor,
     PollDescriptor
 )
 
