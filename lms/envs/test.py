@@ -516,6 +516,8 @@ MONGODB_LOG = {
     'db': 'xlog',
 }
 
+NOTES_DISABLED_TABS = []
+
 # Enable EdxNotes for tests.
 FEATURES['ENABLE_EDXNOTES'] = True
 

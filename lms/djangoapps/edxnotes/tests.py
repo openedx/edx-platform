@@ -33,6 +33,16 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 NOTES_API_EMPTY_RESPONSE = {
+    "total": 0,
+    "rows": [],
+    "current_page": 1,
+    "start": 0,
+    "next": None,
+    "previous": None,
+    "num_pages": 0,
+}
+
+NOTES_VIEW_EMPTY_RESPONSE = {
     "count": 0,
     "results": [],
     "current_page": 1,
@@ -297,13 +307,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         mock_get.return_value.content = json.dumps(
             {
-                "count": 2,
+                "total": 2,
                 "current_page": 1,
                 "start": 0,
                 "next": None,
                 "previous": None,
                 "num_pages": 1,
-                "results": [
+                "rows": [
                     {
                         u"quote": u"quote text",
                         u"text": u"text",
@@ -404,13 +414,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Tests the result if correct data is received.
         """
         mock_get.return_value.content = json.dumps({
-            "count": 2,
+            "total": 2,
             "current_page": 1,
             "start": 0,
             "next": None,
             "previous": None,
             "num_pages": 1,
-            "results": [
+            "rows": [
                 {
                     u"quote": u"quote text",
                     u"text": u"text",
@@ -511,7 +521,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE)
         self.assertItemsEqual(
-            NOTES_API_EMPTY_RESPONSE,
+            NOTES_VIEW_EMPTY_RESPONSE,
             json.loads(helpers.get_notes(self.request, self.course))
         )
 
@@ -1006,19 +1016,17 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         Tests that search notes successfully respond if EdxNotes feature is enabled.
         """
-        mock_search.return_value = json.dumps(NOTES_API_EMPTY_RESPONSE)
+        mock_search.return_value = json.dumps(NOTES_VIEW_EMPTY_RESPONSE)
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(json.loads(response.content), NOTES_API_EMPTY_RESPONSE)
+        self.assertEqual(json.loads(response.content), NOTES_VIEW_EMPTY_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
-    @patch("edxnotes.views.get_notes", autospec=True)
-    def test_search_notes_is_disabled(self, mock_search):
+    def test_search_notes_is_disabled(self):
         """
         Tests that 404 status code is received if EdxNotes feature is disabled.
         """
-        mock_search.return_value = json.dumps(NOTES_API_EMPTY_RESPONSE)
         response = self.client.get(self.notes_url, {"text": "test"})
         self.assertEqual(response.status_code, 404)
 

@@ -67,12 +67,12 @@ define([
             var view = getView({tags: ["First", "Second"]});
             expect(view.$('.reference-title').length).toBe(3);
             expect(view.$('.reference-title')[2]).toContainText('Tags:');
-            expect(view.$('a.reference-tags').length).toBe(2);
-            expect(view.$('a.reference-tags')[0]).toContainText('First');
-            expect(view.$('a.reference-tags')[1]).toContainText('Second');
+            expect(view.$('span.reference-tags').length).toBe(2);
+            expect(view.$('span.reference-tags')[0]).toContainText('First');
+            expect(view.$('span.reference-tags')[1]).toContainText('Second');
         });
 
-        it('should handle a click event on the tag', function() {
+        xit('should handle a click event on the tag', function() {
             var scrollToTagSpy = {
                 scrollToTag: function (tagName){}
             };
