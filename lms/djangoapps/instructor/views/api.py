@@ -10,14 +10,13 @@ import json
 import logging
 import re
 import time
-import requests
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -25,11 +24,9 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
 from django.shortcuts import redirect
-from util.db import outer_atomic
 import string
 import random
 import unicodecsv
-import urllib
 import decimal
 from student import auth
 from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
@@ -52,7 +49,7 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_string
 from courseware.models import StudentModule
 from shoppingcart.models import (
     Coupon,
@@ -92,7 +89,7 @@ from instructor.views import INVOICE_KEY
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
-from certificates.models import CertificateWhitelist, GeneratedCertificate
+from certificates.models import CertificateWhitelist, GeneratedCertificate, CertificateStatuses
 
 from bulk_email.models import CourseEmail
 from student.models import get_user_by_username_or_email
@@ -108,7 +105,6 @@ from .tools import (
     set_due_date_extension,
     strip_if_string,
     bulk_email_is_enabled_for_course,
-    add_block_ids,
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -2708,7 +2704,7 @@ def start_certificate_regeneration(request, course_id):
         )
 
     # Check if the selected statuses are allowed
-    allowed_statuses = GeneratedCertificate.get_unique_statuses(course_key=course_key, flat=True)
+    allowed_statuses = [CertificateStatuses.downloadable, CertificateStatuses.error, CertificateStatuses.notpassing]
     if not set(certificates_statuses).issubset(allowed_statuses):
         return JsonResponse(
             {'message': _('Please select certificate statuses from the list only.')},
@@ -2789,11 +2785,18 @@ def add_certificate_exception(course_key, student, certificate_exception):
         }
     )
 
+    generated_certificate = GeneratedCertificate.objects.filter(
+        user=student,
+        course_id=course_key,
+        status=CertificateStatuses.downloadable,
+    ).first()
+
     exception = dict({
         'id': certificate_white_list.id,
         'user_email': student.email,
         'user_name': student.username,
         'user_id': student.id,
+        'certificate_generated': generated_certificate and generated_certificate.created_date.strftime("%B %d, %Y"),
         'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
     })
 

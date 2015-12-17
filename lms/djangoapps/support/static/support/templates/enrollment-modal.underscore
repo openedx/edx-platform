@@ -1,0 +1,26 @@
+<form class="enrollment-modal">
+  <h1 class="enrollment-change-title">Change enrollment for <%- enrollment.get('course_id') %></h1>
+  <p class="enrollment-change-errors" style="display: none;"></p>
+  <div class="enrollment-change-field"><p><%- gettext("Current enrollment mode:") %> <%- enrollment.get('mode') %></p></div>
+  <div class="enrollment-change-field">
+    <label for="enrollment-new-mode"><%- gettext("New enrollment mode:") %></label>
+    <select class="enrollment-new-mode" id="enrollment-new-mode">
+      <% _.each(modes, function (mode) { %>
+      <option value="<%- mode %>"><%- mode %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="enrollment-change-field">
+    <label for="enrollment-reason"><%- gettext("Reason for change:") %></label>
+    <select class="enrollment-reason" id="enrollment-reason">
+      <option value=""><%- gettext("Choose One") %></option>
+      <% _.each(reasons, function (translated_reason, reason) { %>
+      <option value="<%- reason %>"><%- translated_reason %></option>
+      <% }) %>
+    </select>
+    <label class="sr" for="enrollment-reason-other"><%- gettext("Explain if other.") %></label>
+    <input class="enrollment-reason-other" id="enrollment-reason-other" type="text" placeholder="<%- gettext('Explain if other.') %>" />
+  </div>
+  <button class="enrollment-change-submit"><%- gettext("Submit enrollment change") %></button>
+  <button class="enrollment-change-cancel"><%- gettext("Cancel") %></button>
+</form>
