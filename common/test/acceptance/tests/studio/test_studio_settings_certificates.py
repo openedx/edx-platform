@@ -3,7 +3,9 @@ Acceptance tests for Studio's Setting pages
 """
 import re
 import uuid
+
 from .base_studio_test import StudioCourseTest
+from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.studio.settings_certificates import CertificatesPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
@@ -27,6 +29,12 @@ class CertificatesTest(StudioCourseTest):
             self.course_info['run']
         )
         self.course_advanced_settings = dict()
+
+        # Add a verified mode to the course
+        ModeCreationPage(
+            self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate',
+            min_price=10, suggested_prices='10,20'
+        ).visit()
 
     def make_signatory_data(self, prefix='First'):
         """
