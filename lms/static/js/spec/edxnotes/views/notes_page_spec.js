@@ -13,7 +13,7 @@ define([
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
-            this.view = new NotesFactory({notesList: notes});
+            this.view = new NotesFactory({notes: notes, pageSize: 10});
         });
 
 
@@ -35,8 +35,13 @@ define([
             this.view.$('.search-notes-input').val('test_query');
             this.view.$('.search-notes-submit').click();
             AjaxHelpers.respondWithJson(requests, {
-                total: 0,
-                rows: []
+                'count': 0,
+                'current_page': 1,
+                'num_pages': 1,
+                'start': 0,
+                'next': null,
+                'previous': null,
+                'results': []
             });
             expect(this.view.$('#view-search-results')).toHaveClass('is-active');
             expect(this.view.$('#view-recent-activity')).toExist();

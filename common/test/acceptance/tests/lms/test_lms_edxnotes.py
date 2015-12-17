@@ -1,6 +1,7 @@
 """
 Test LMS Notes
 """
+from unittest import skip
 from uuid import uuid4
 from datetime import datetime
 from nose.plugins.attrib import attr
@@ -850,6 +851,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assert_viewed_event('Search Results')
         self.assert_search_event('note', 4)
 
+    @skip("scroll to tag functionality is removed")
     def test_scroll_to_tag_recent_activity(self):
         """
         Scenario: Can scroll to a tag group from the Recent Activity view (default view)
@@ -861,6 +863,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.visit()
         self._scroll_to_tag_and_verify("pear", 3)
 
+    @skip("scroll to tag functionality is removed")
     def test_scroll_to_tag_course_structure(self):
         """
         Scenario: Can scroll to a tag group from the Course Structure view
@@ -872,6 +875,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.visit().switch_to_tab("structure")
         self._scroll_to_tag_and_verify("squash", 5)
 
+    @skip("scroll to tag functionality is removed")
     def test_scroll_to_tag_search(self):
         """
         Scenario: Can scroll to a tag group from the Search Results view
@@ -884,6 +888,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.visit().search("note")
         self._scroll_to_tag_and_verify("pumpkin", 4)
 
+    @skip("scroll to tag functionality is removed")
     def test_scroll_to_tag_from_tag_view(self):
         """
         Scenario: Can scroll to a tag group from the Tags view
