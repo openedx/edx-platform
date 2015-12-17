@@ -268,7 +268,8 @@ class CertificateGenerationHistory(TimeStampedModel):
         """
         Return "regenerated" if record corresponds to Certificate Regeneration task, otherwise returns 'generated'
         """
-        return "regenerated" if self.is_regeneration else "generated"
+        # Translators: This is a past-tense verb that is used for task action messages.
+        return _("regenerated") if self.is_regeneration else _("generated")
 
     def get_certificate_generation_candidates(self):
         """
@@ -285,7 +286,8 @@ class CertificateGenerationHistory(TimeStampedModel):
             task_input_json = json.loads(task_input)
         except ValueError:
             # if task input is empty, it means certificates were generated for all learners
-            return "All learners"
+            # Translators: This string represents task was executed for all learners.
+            return _("All learners")
 
         # get statuses_to_regenerate from task_input convert statuses to human readable strings and return
         statuses = task_input_json.get('statuses_to_regenerate', None)
@@ -294,9 +296,10 @@ class CertificateGenerationHistory(TimeStampedModel):
                 [CertificateStatuses.readable_statuses.get(status, "") for status in statuses]
             )
 
-        # If statuses_to_regenerate is not present in task_input then, certificate generation task was run to
-        # generate certificates for white listed students
-        return "for exceptions"
+        # If students is present in task_input then, certificate generation task was run to
+        # generate certificates for white listed students otherwise it is for all students.
+        # Translators: This string represents task was executed for students having exceptions.
+        return _("For exceptions") if 'students' in task_input_json else _("All learners")
 
     class Meta(object):
         app_label = "certificates"

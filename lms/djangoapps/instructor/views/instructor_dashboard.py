@@ -322,7 +322,8 @@ def _section_certificates(course):
         'active_certificate': certs_api.get_active_web_certificate(course),
         'certificate_statuses_with_count': certificate_statuses_with_count,
         'status': CertificateStatuses,
-        'certificate_generation_history': CertificateGenerationHistory.objects.filter(course_id=course.id),
+        'certificate_generation_history':
+            CertificateGenerationHistory.objects.filter(course_id=course.id).order_by("-created"),
         'urls': {
             'generate_example_certificates': reverse(
                 'generate_example_certificates',
