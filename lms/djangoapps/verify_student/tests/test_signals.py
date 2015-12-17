@@ -24,13 +24,13 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
         VerificationDeadline.objects.all().delete()
 
     def test_no_deadline(self):
-        """ Verify the signal does not raise error when no deadlines found. """
+        """ Verify the signal sets deadline to course end when no deadline exists."""
         _listen_for_course_publish('store', self.course.id)
 
-        self.assertIsNone(_listen_for_course_publish('store', self.course.id))
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), self.course.end)
 
     def test_deadline(self):
-        """ Verify deadline is set to course end date by signal. """
+        """ Verify deadline is set to course end date by signal when changed. """
         deadline = datetime.now(tz=UTC) - timedelta(days=7)
         VerificationDeadline.set_deadline(self.course.id, deadline)
 
