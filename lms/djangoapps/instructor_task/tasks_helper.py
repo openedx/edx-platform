@@ -1421,7 +1421,11 @@ def generate_students_certificates(
     task_progress.update_task_state(extra_meta=current_step)
 
     statuses_to_regenerate = task_input.get('statuses_to_regenerate', [])
-    students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
+    if students is not None and not statuses_to_regenerate:
+        # We want to skip 'filtering students' only when students are given and statuses to regenerate are not
+        students_require_certs = enrolled_students
+    else:
+        students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
 
     if statuses_to_regenerate:
         # Mark existing generated certificates as 'unavailable' before regenerating
