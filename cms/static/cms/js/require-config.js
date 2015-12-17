@@ -24,7 +24,7 @@ require.config({
         "jquery.ui": "js/vendor/jquery-ui.min",
         "jquery.form": "js/vendor/jquery.form",
         "jquery.markitup": "js/vendor/markitup/jquery.markitup",
-        "jquery.leanModal": "js/vendor/jquery.leanModal.min",
+        "jquery.leanModal": "js/vendor/jquery.leanModal",
         "jquery.ajaxQueue": "js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "js/vendor/jquery.smooth-scroll.min",
         "jquery.timepicker": "js/vendor/timepicker/jquery.timepicker",

@@ -47,7 +47,7 @@ lib_paths:
     - common_static/js/vendor/json2.js
     - common_static/js/vendor/underscore-min.js
     - common_static/js/vendor/backbone-min.js
-    - common_static/js/vendor/jquery.leanModal.min.js
+    - common_static/js/vendor/jquery.leanModal.js
     - common_static/js/vendor/CodeMirror/codemirror.js
     - common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js
     - common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js
