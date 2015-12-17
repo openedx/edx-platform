@@ -67,6 +67,10 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     edited_by: 'MockUser',
                     course_graders: ["Lab", "Howework"],
                     has_explicit_staff_lock: false,
+                    is_prereq: false,
+                    prereqs: [],
+                    prereq: '',
+                    prereq_min_score: '',
                     child_info: {
                         category: 'vertical',
                         display_name: 'Unit',
@@ -216,7 +220,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     'course-outline', 'xblock-string-field-editor', 'modal-button',
                     'basic-modal', 'course-outline-modal', 'release-date-editor',
                     'due-date-editor', 'grading-editor', 'publish-editor',
-                    'staff-lock-editor', 'settings-tab-section', 'timed-examination-preference-editor'
+                    'staff-lock-editor', 'settings-modal-tabs', 'timed-examination-preference-editor',
+                    'access-editor'
                 ]);
                 appendSetFixtures(mockOutlinePage);
                 mockCourseJSON = createMockCourseJSON({}, [
@@ -580,8 +585,9 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
             describe("Subsection", function() {
                 var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson,
-                    selectDisableSpecialExams, selectGeneralSettings, selectAdvancedSettings,
-                    selectTimedExam, selectProctoredExam, selectPracticeExam;
+                    selectDisableSpecialExams, selectBasicSettings, selectAdvancedSettings,
+                    selectAccessSettings, selectTimedExam, selectProctoredExam, selectPracticeExam,
+                    selectPrerequisite, selectLastPrerequisiteSubsection;
 
                 getDisplayNameWrapper = function() {
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
@@ -598,12 +604,16 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     this.$("#id_not_timed").prop('checked', true).trigger('change');
                 };
 
-                selectGeneralSettings = function() {
-                   this.$(".modal-section .general-settings-button").click();
+                selectBasicSettings = function() {
+                   this.$(".modal-section .settings-tab-button[data-tab='basic']").click();
                 };
 
                 selectAdvancedSettings = function() {
-                   this.$(".modal-section .advanced-settings-button").click();
+                   this.$(".modal-section .settings-tab-button[data-tab='advanced']").click();
+                };
+
+                selectAccessSettings = function() {
+                   this.$(".modal-section .settings-tab-button[data-tab='access']").click();
                 };
 
                 selectTimedExam = function(time_limit) {
@@ -624,6 +634,15 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     this.$("#id_time_limit").trigger('focusout');
                 };
 
+                selectPrerequisite = function() {
+                    this.$("#is_prereq").prop('checked', true).trigger('change');
+                };
+
+                selectLastPrerequisiteSubsection = function(minScore) {
+                    this.$("#prereq option:last").prop('selected', true).trigger('change');
+                    this.$("#prereq_min_score").val(minScore).trigger('keyup');
+                };
+
                 // Contains hard-coded dates because dates are presented in different formats.
                 mockServerValuesJson = createMockSectionJSON({
                         release_date: 'Jan 01, 2970 at 05:00 UTC'
@@ -637,6 +656,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                             due: "2014-07-10T00:00:00Z",
                             has_explicit_staff_lock: true,
                             staff_only_message: true,
+                            is_prereq: false,
                             "is_time_limited": true,
                             "is_practice_exam": false,
                             "is_proctored_exam": true,
@@ -710,21 +730,63 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     collapseItemsAndVerifyState('subsection');
                     expandItemsAndVerifyState('subsection');
                 });
-               
-                it('can show general settings', function() {
+
+                it('can show basic settings', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    selectGeneralSettings();
-                    expect($('.modal-section .general-settings-button')).toHaveClass('active');
-                    expect($('.modal-section .advanced-settings-button')).not.toHaveClass('active');
+                    selectBasicSettings();
+                    expect($('.modal-section .settings-tab-button[data-tab="basic"]')).toHaveClass('active');
+                    expect($('.modal-section .settings-tab-button[data-tab="advanced"]')).not.toHaveClass('active');
+                    expect($('.modal-section .settings-tab-button[data-tab="access"]')).not.toHaveClass('active');
                 });
 
                 it('can show advanced settings', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     selectAdvancedSettings();
-                    expect($('.modal-section .general-settings-button')).not.toHaveClass('active');
-                    expect($('.modal-section .advanced-settings-button')).toHaveClass('active');
+                    expect($('.modal-section .settings-tab-button[data-tab="basic"]')).not.toHaveClass('active');
+                    expect($('.modal-section .settings-tab-button[data-tab="advanced"]')).toHaveClass('active');
+                    expect($('.modal-section .settings-tab-button[data-tab="access"]')).not.toHaveClass('active');
+                });
+
+                it('can show access settings', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectAccessSettings();
+                    expect($('.modal-section .settings-tab-button[data-tab="basic"]')).not.toHaveClass('active');
+                    expect($('.modal-section .settings-tab-button[data-tab="advanced"]')).not.toHaveClass('active');
+                    expect($('.modal-section .settings-tab-button[data-tab="access"]')).toHaveClass('active');
+                });
+
+                it('does not show settings tab headers if there is only one tab to show', function() {
+                    var mockSubsectionJSON = createMockSubsectionJSON({}, []);
+                    delete mockSubsectionJSON.is_prereq;
+                    delete mockSubsectionJSON.prereqs;
+                    delete mockSubsectionJSON.prereq;
+                    delete mockSubsectionJSON.prereq_min_score;
+                    var mockCourseJSON = createMockCourseJSON({
+                        enable_proctored_exams: false,
+                        enable_timed_exams: false
+                    }, [
+                        createMockSectionJSON({}, [mockSubsectionJSON])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($(".settings-tabs-header").length).toBe(0);
+                });
+
+                it('can show correct editors for self_paced course', function() {
+                    var mockCourseJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({}, [])
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    /* global course */
+                    course.set('self_paced', true);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($(".edit-settings-release").length).toBe(0);
+                    expect($(".grading-due-date").length).toBe(0);
                 });
 
                 it('can select valid time', function() {
@@ -759,6 +821,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
                         "publish": "republish",
+                        "isPrereq": false,
                         "metadata":{
                             "visible_to_staff_only": true,
                             "start":"2014-07-09T00:00:00.000Z",
@@ -986,6 +1049,176 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     expect($("#id_timed_exam").is(":checked")).toBe(true);
                     expect($("#id_not_timed").is(":checked")).toBe(false);
                     expect($("#id_time_limit").val()).toBe("02:30");
+                });
+
+                it('can select prerequisite', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectPrerequisite();
+                    expect($('#is_prereq').is(':checked')).toBe(true);
+                    $('.wrapper-modal-window .action-save').click();
+                });
+
+                it('can be deleted when it is a prerequisite', function() {
+                    var promptSpy = EditHelpers.createPromptSpy();
+                    var mockCourseWithPrequisiteJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                is_prereq: true,
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPrequisiteJSON, false);
+                    getItemHeaders('subsection').find('.delete-button').click();
+                    EditHelpers.confirmPrompt(promptSpy);
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/mock-subsection');
+                    AjaxHelpers.respondWithJson(requests, {});
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
+                });
+
+                it('can show a saved prerequisite correctly', function() {
+                    var mockCourseWithPrequisiteJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                is_prereq: true,
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPrequisiteJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($('#is_prereq').is(':checked')).toBe(true);
+                });
+
+                it('does not display prerequisite subsections if none are available', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($('.gating-prereq').length).toBe(0);
+                });
+
+                it('can display available prerequisite subsections', function() {
+                    var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($('.gating-prereq').length).toBe(1);
+                });
+
+                it('can select prerequisite subsection', function() {
+                    var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectLastPrerequisiteSubsection('80');
+                    expect($('#prereq_min_score_input').css('display')).not.toBe('none');
+                    expect($('#prereq option:selected').val()).toBe('usage_key');
+                    expect($('#prereq_min_score').val()).toBe('80');
+                    $('.wrapper-modal-window .action-save').click();
+                });
+
+                it('can display gating correctly', function() {
+                    var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                visibility_state: 'gated',
+                                prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
+                                prereq: 'usage_key',
+                                prereq_min_score: '80'
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
+                    expect($(".outline-subsection .status-message-copy")).toContainText(
+                        "Prerequisite: Prereq Subsection 1"
+                    );
+                });
+
+                it('can show a saved prerequisite subsection correctly', function() {
+                    var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
+                                prereq: 'usage_key',
+                                prereq_min_score: '80'
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($('.gating-prereq').length).toBe(1);
+                    expect($('#prereq option:selected').val()).toBe('usage_key');
+                    expect($('#prereq_min_score_input').css('display')).not.toBe('none');
+                    expect($('#prereq_min_score').val()).toBe('80');
+                });
+
+                it('can display validation error on non-integer minimum score', function() {
+                    var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectLastPrerequisiteSubsection('abc');
+                    expect($('#prereq_min_score_error').css('display')).not.toBe('none');
+                    expect($(".wrapper-modal-window .action-save").prop('disabled')).toBe(true);
+                    expect($(".wrapper-modal-window .action-save").hasClass('is-disabled')).toBe(true);
+                    selectLastPrerequisiteSubsection('5.5');
+                    expect($('#prereq_min_score_error').css('display')).not.toBe('none');
+                    expect($(".wrapper-modal-window .action-save").prop('disabled')).toBe(true);
+                    expect($(".wrapper-modal-window .action-save").hasClass('is-disabled')).toBe(true);
+                });
+
+                it('can display validation error on out of bounds minimum score', function() {
+                    var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectLastPrerequisiteSubsection('-5');
+                    expect($('#prereq_min_score_error').css('display')).not.toBe('none');
+                    expect($(".wrapper-modal-window .action-save").prop('disabled')).toBe(true);
+                    expect($(".wrapper-modal-window .action-save").hasClass('is-disabled')).toBe(true);
+                    selectLastPrerequisiteSubsection('105');
+                    expect($('#prereq_min_score_error').css('display')).not.toBe('none');
+                    expect($(".wrapper-modal-window .action-save").prop('disabled')).toBe(true);
+                    expect($(".wrapper-modal-window .action-save").hasClass('is-disabled')).toBe(true);
+                });
+
+                it('does not display validation error on valid minimum score', function() {
+                    var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
+                            }, []),
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectAccessSettings();
+                    selectLastPrerequisiteSubsection('');
+                    expect($('#prereq_min_score_error').css('display')).toBe('none');
+                    selectLastPrerequisiteSubsection('80');
+                    expect($('#prereq_min_score_error').css('display')).toBe('none');
+                    selectLastPrerequisiteSubsection('0');
+                    expect($('#prereq_min_score_error').css('display')).toBe('none');
+                    selectLastPrerequisiteSubsection('100');
+                    expect($('#prereq_min_score_error').css('display')).toBe('none');
                 });
 
                 it('release date, due date, grading type, and staff lock can be cleared.', function() {

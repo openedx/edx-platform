@@ -842,6 +842,9 @@ INSTALLED_APPS = (
 
     # Credentials support
     'openedx.core.djangoapps.credentials',
+
+    # edx-milestones service
+    'milestones',
 )
 
 
@@ -947,9 +950,6 @@ OPTIONAL_APPS = (
 
     # edxval
     'edxval',
-
-    # milestones
-    'milestones',
 
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',

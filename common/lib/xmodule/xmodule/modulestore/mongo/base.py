@@ -1212,7 +1212,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         query['_id.revision'] = key_revision
         for field in ['category', 'name']:
             if field in qualifiers:
-                query['_id.' + field] = qualifiers.pop(field)
+                qualifier_value = qualifiers.pop(field)
+                if isinstance(qualifier_value, list):
+                    qualifier_value = {'$in': qualifier_value}
+                query['_id.' + field] = qualifier_value
 
         for key, value in (settings or {}).iteritems():
             query['metadata.' + key] = value

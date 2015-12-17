@@ -799,8 +799,13 @@ class XMLModuleStore(ModuleStoreReadBase):
         def _block_matches_all(mod_loc, module):
             if category and mod_loc.category != category:
                 return False
-            if name and mod_loc.name != name:
-                return False
+            if name:
+                if isinstance(name, list):
+                    # Support for passing a list as the name qualifier
+                    if mod_loc.name not in name:
+                        return False
+                elif mod_loc.name != name:
+                    return False
             return all(
                 self._block_matches(module, fields or {})
                 for fields in [settings, content, qualifiers]

@@ -23,10 +23,8 @@ from courseware.access_response import (
 from course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseEnrollment
-from util.milestones_helpers import (
-    set_prerequisite_courses,
-    seed_milestone_relationship_types,
-)
+from util.milestones_helpers import set_prerequisite_courses
+from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from util.testing import UrlResetMixin
@@ -66,7 +64,8 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 
 
 @ddt.ddt
-class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
+                            MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
     """
@@ -130,7 +129,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True, 'DISABLE_START_DATES': False}
     )
     def test_courseware_access(self):
-        seed_milestone_relationship_types()
         self.login()
 
         course_with_prereq = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
@@ -315,7 +313,8 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
+                          MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for GET of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
@@ -333,7 +332,8 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mobi
         )
 
 
-class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
+                            MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
