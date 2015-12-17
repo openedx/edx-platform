@@ -2,7 +2,7 @@
 Utilities related to API views
 """
 import functools
-from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError, ObjectDoesNotExist
 from django.http import Http404
 from django.utils.translation import ugettext as _
 
@@ -68,7 +68,7 @@ class DeveloperErrorViewMixin(object):
 
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
-        elif isinstance(exc, Http404):
+        elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):
             return self.make_error_response(404, exc.message or "Not found.")
         elif isinstance(exc, ValidationError):
             return self.make_validation_error_response(exc)

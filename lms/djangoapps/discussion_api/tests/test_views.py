@@ -360,7 +360,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
@@ -884,7 +884,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Thread not found."}
         )
 
     def test_basic(self):
@@ -976,7 +976,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
