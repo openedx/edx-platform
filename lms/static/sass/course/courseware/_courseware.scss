@@ -97,11 +97,11 @@ html.video-fullscreen {
 }
 
 // TO-DO should this be content wrapper?
-div.course-wrapper {
+.course-wrapper {
   position: relative;
 
-  section.course-content,
-  section.courseware-results-wrapper {
+  .course-content,
+  .courseware-results-wrapper {
     @extend .content;
     padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
     line-height: 1.6;
@@ -405,7 +405,10 @@ div.course-wrapper {
     }
 
     .sequence .path {
-      margin-bottom: ($baseline/2);
+      @extend %t-copy-sub1;
+      margin-top: -($baseline);
+      margin-bottom: $baseline;
+      color: $gray;
     }
 
     div#seq_content {
@@ -655,11 +658,4 @@ section.self-assessment {
   }
 }
 
-.courseware-results-wrapper {
-  display: none;
 
-  &.is-shown {
-    display: table-cell;
-  }
-
-}

@@ -15,36 +15,23 @@
   width: flex-grid(5);
   vertical-align: top;
 
-  button {
-    &.is-active {
-      background-color: $white;
-      &:before {
-        content: "\f02e";
-        font-family: FontAwesome;
-      }
-    }
-
-    &.is-inactive {
-      background: none;
-      &:before {
-          content: "\f097";
-          font-family: FontAwesome;
-      }
-    }
-  }
-
   .bookmarks-list-button {
-    background: none;
-    border-radius: ($baseline/4);
-    padding: ($baseline/2);
-    width: 100%;
+    @extend %ui-clear-button;
 
-    &:hover {
-      background: none;
+    // set styles
+    @extend %btn-pl-default-base;
+    @include font-size(13);
+    width: 100%;
+    padding: ($baseline/4) ($baseline/2);
+
+    &:before {
+      content: "\f02e";
+      font-family: FontAwesome;
     }
 
-    &:focus, &:active {
-      box-shadow: none;
+    &.is-active {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
     }
   }
 }
@@ -52,7 +39,10 @@
 
 // Rules for Bookmarks Results Header
 .bookmarks-results-header {
-  margin: 0;
+  @extend %t-title4;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-bottom: ($baseline/2);
 }
 
 // Rules for Bookmarks Results
@@ -60,15 +50,21 @@
   padding-top: ($baseline/2);
 
   .bookmarks-results-list-item {
-    @include padding(($baseline/4), $baseline, ($baseline/2), $baseline);
+    @include padding(0, $baseline, ($baseline/4), $baseline);
     display: block;
-    border: 1px solid $gray;
-    border-radius: ($baseline/4);
+    border: 1px solid $gray-l4;
     margin-bottom: $baseline;
 
     &:hover {
       border-color: $m-blue;
-      color: $m-blue;
+
+      .list-item-breadcrumbtrail {
+        color: $blue;
+      }
+    }
+
+    .icon {
+      @extend %t-icon6;
     }
   }
 
@@ -78,11 +74,12 @@
   }
 
   .list-item-date {
-    @extend %t-title7;
+    @extend %t-copy-sub2;
+    margin-top: ($baseline/4);
     color: $gray;
   }
 
-  a.bookmarks-results-list-item:before {
+  .bookmarks-results-list-item:before {
     content: "\f02e";
     position: relative;
     top: -7px;
@@ -95,17 +92,21 @@
   }
 
   .list-item-left-section {
-    @include float(left);
+    display: inline-block;
+    vertical-align: middle;
     width: 90%;
-
-    .list-item-breadcrumbtrail, .list-item-date {
-      @extend %t-ultralight;
-    }
   }
 
   .list-item-right-section {
-    @include float(right);
-    margin-top: 7px;
+    display: inline-block;
+    vertical-align: middle;
+
+    .fa-arrow-right {
+
+      @include rtl {
+        @include transform(rotate(180deg));
+      }
+    }
   }
 }
 
@@ -129,61 +130,45 @@
 
 
 // Rules for bookmark icon shown on each sequence nav item
-i.bookmarked {
-  top: -3px;
-  position: absolute;
-  left: ($baseline/4);
-}
+.course-content {
 
-
-// Rules for bookmark button's different styles
-.bookmark-button-wrapper {
-  text-align: right;
-  margin-bottom: 10px;
-}
-
-@mixin base-style($border-color, $content-color) {
-  background: none;
-  border: 1px solid $border-color;
-  border-radius: ($baseline/4);
-  color: $content-color;
-
-  &:focus, &:active {
-    box-shadow: none;
+   .bookmark-icon.bookmarked {
+    top: -3px;
+    position: absolute;
+    left: ($baseline/4);
   }
-}
 
-@mixin icon-style($content, $color) {
-  &:before {
-    content: $content;
-    font-family: FontAwesome;
-    color: $color;
+
+  // Rules for bookmark button's different styles
+  .bookmark-button-wrapper {
+    text-align: right;
+    margin-bottom: 10px;
   }
-}
 
-@mixin hover-style($border-color, $content-color, $icon-content) {
-  &:hover {
-    background: none;
-    border: 1px solid $border-color;
-    color: $content-color;
-    @include icon-style($icon-content, $content-color);
-  }
-}
+  .bookmark-button {
+    @extend %ui-clear-button;
+    @extend %btn-pl-default-base;
+    @include font-size(13);
+    padding: ($baseline/4) ($baseline/2);
 
-.bookmark-button.bookmarked {
-  @include base-style($m-blue, $m-blue);
-  @include icon-style("\f02e", $m-blue);
-  @include hover-style($light-gray, $black, "\f097");
-}
+    &:before {
+      content: "\f02e";
+      font-family: FontAwesome;
+    }
 
-.bookmark-button:not(.bookmarked) {
-  @include base-style($light-gray, $black);
-  @include icon-style("\f097", $black);
-  @include hover-style($m-blue, $m-blue, "\f02e");
-}
+    &.is-active {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
+    }
 
-.paging-header {
-  .search-tools {
-    margin: 0;
+    &.bookmarked {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
+
+      &:before {
+        content: "\f097";
+        font-family: FontAwesome;
+      }
+    }
   }
 }
