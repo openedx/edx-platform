@@ -293,6 +293,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
     staff_context = {
         'fields': field_contents,
         'xml_attributes': getattr(block, 'xml_attributes', {}),
+        'tags': block._class_tags,  # pylint: disable=protected-access
         'location': block.location,
         'xqa_key': block.xqa_key,
         'source_file': source_file,

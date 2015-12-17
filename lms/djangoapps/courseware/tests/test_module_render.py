@@ -1349,6 +1349,19 @@ class XmlViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
+@XBlock.tag("detached")
+class DetachedXBlock(XBlock):
+    """
+    XBlock marked with the 'detached' flag.
+    """
+    def student_view(self, context=None):  # pylint: disable=unused-argument
+        """
+        A simple view that returns just enough to test.
+        """
+        frag = Fragment(u"Hello there!")
+        return frag
+
+
 @attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
 @patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
@@ -1403,6 +1416,28 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Debug', result_fragment.content)
+
+    @XBlock.register_temp_plugin(DetachedXBlock, identifier='detached-block')
+    def test_staff_debug_info_disabled_for_detached_blocks(self):
+        """Staff markup should not be present on detached blocks."""
+
+        descriptor = ItemFactory.create(
+            category='detached-block',
+            display_name='Detached Block'
+        )
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            descriptor
+        )
+        module = render.get_module(
+            self.user,
+            self.request,
+            descriptor.location,
+            field_data_cache,
+        )
+        result_fragment = module.render(STUDENT_VIEW)
+        self.assertNotIn('Staff Debug', result_fragment.content)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_HISTOGRAMS_TO_STAFF': False})
     def test_histogram_disabled(self):
