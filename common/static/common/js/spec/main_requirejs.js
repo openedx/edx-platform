@@ -7,7 +7,7 @@
             'jquery.flot': 'js/vendor/flot/jquery.flot.min',
             'jquery.form': 'js/vendor/jquery.form',
             'jquery.markitup': 'js/vendor/markitup/jquery.markitup',
-            'jquery.leanModal': 'js/vendor/jquery.leanModal.min',
+            'jquery.leanModal': 'js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'js/vendor/jquery.smooth-scroll.min',
             'jquery.scrollTo': 'js/vendor/jquery.scrollTo-1.4.2-min',

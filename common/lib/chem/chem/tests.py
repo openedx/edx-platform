@@ -9,16 +9,17 @@ from .chemcalc import (
     chemical_equations_equal,
 )
 
-import miller
+import chem.miller
 
-local_debug = None
+LOCAL_DEBUG = None
 
 
-def log(s, output_type=None):
-    if local_debug:
-        print s
+def log(msg, output_type=None):
+    """Logging function for tests"""
+    if LOCAL_DEBUG:
+        print msg
         if output_type == 'html':
-            f.write(s + '\n<br>\n')
+            f.write(msg + '\n<br>\n')
 
 
 class Test_Compare_Equations(unittest.TestCase):
@@ -132,10 +133,6 @@ class Test_Compare_Expressions(unittest.TestCase):
         self.assertFalse(compare_chemical_expression(
             "H2O(s) + CO2", "H2O+CO2"))
 
-    def test_compare_phases_not_ignored_explicitly(self):
-        self.assertTrue(compare_chemical_expression(
-            "H2O(s) + CO2", "H2O(s)+CO2", ignore_state=False))
-
     # all in one cases
     def test_complex_additivity(self):
         self.assertTrue(compare_chemical_expression(
@@ -223,247 +220,250 @@ class Test_Divide_Expressions(unittest.TestCase):
 
 
 class Test_Render_Equations(unittest.TestCase):
-
+    """
+    Tests to validate the HTML rendering of plaintext (input) equations
+    """
+    # pylint: disable=line-too-long
     def test_render1(self):
-        s = "H2O + CO2"
-        out = render_to_html(s)
+        test_string = "H2O + CO2"
+        out = render_to_html(test_string)
         correct = u'<span class="math">H<sub>2</sub>O+CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_uncorrect_reaction(self):
-        s = "O2C + OH2"
-        out = render_to_html(s)
+        test_string = "O2C + OH2"
+        out = render_to_html(test_string)
         correct = u'<span class="math">O<sub>2</sub>C+OH<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render2(self):
-        s = "CO2 + H2O + Fe(OH)3"
-        out = render_to_html(s)
+        test_string = "CO2 + H2O + Fe(OH)3"
+        out = render_to_html(test_string)
         correct = u'<span class="math">CO<sub>2</sub>+H<sub>2</sub>O+Fe(OH)<sub>3</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render3(self):
-        s = "3H2O + 2CO2"
-        out = render_to_html(s)
+        test_string = "3H2O + 2CO2"
+        out = render_to_html(test_string)
         correct = u'<span class="math">3H<sub>2</sub>O+2CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render4(self):
-        s = "H^+ + OH^-"
-        out = render_to_html(s)
+        test_string = "H^+ + OH^-"
+        out = render_to_html(test_string)
         correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render5(self):
-        s = "Fe(OH)^2- + (OH)^-"
-        out = render_to_html(s)
+        test_string = "Fe(OH)^2- + (OH)^-"
+        out = render_to_html(test_string)
         correct = u'<span class="math">Fe(OH)<sup>2-</sup>+(OH)<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render6(self):
-        s = "7/2H^+ + 3/5OH^-"
-        out = render_to_html(s)
+        test_string = "7/2H^+ + 3/5OH^-"
+        out = render_to_html(test_string)
         correct = u'<span class="math"><sup>7</sup>&frasl;<sub>2</sub>H<sup>+</sup>+<sup>3</sup>&frasl;<sub>5</sub>OH<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render7(self):
-        s = "5(H1H212)^70010- + 2H2O + 7/2HCl + H2O"
-        out = render_to_html(s)
+        test_string = "5(H1H212)^70010- + 2H2O + 7/2HCl + H2O"
+        out = render_to_html(test_string)
         correct = u'<span class="math">5(H<sub>1</sub>H<sub>212</sub>)<sup>70010-</sup>+2H<sub>2</sub>O+<sup>7</sup>&frasl;<sub>2</sub>HCl+H<sub>2</sub>O</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render8(self):
-        s = "H2O(s) + CO2"
-        out = render_to_html(s)
+        test_string = "H2O(s) + CO2"
+        out = render_to_html(test_string)
         correct = u'<span class="math">H<sub>2</sub>O(s)+CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render9(self):
-        s = "5[Ni(NH3)4]^2+ + 5/2SO4^2-"
-        out = render_to_html(s)
+        test_string = "5[Ni(NH3)4]^2+ + 5/2SO4^2-"
+        out = render_to_html(test_string)
         correct = u'<span class="math">5[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>+<sup>5</sup>&frasl;<sub>2</sub>SO<sub>4</sub><sup>2-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_error(self):
-        s = "5.2H20"
-        out = render_to_html(s)
+        test_string = "5.2H20"
+        out = render_to_html(test_string)
         correct = u'<span class="math"><span class="inline-error inline">5.2H20</span></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_simple_brackets(self):
-        s = "(Ar)"
-        out = render_to_html(s)
+        test_string = "(Ar)"
+        out = render_to_html(test_string)
         correct = u'<span class="math">(Ar)</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_eq1(self):
-        s = "H^+ + OH^- -> H2O"
-        out = render_to_html(s)
+        test_string = "H^+ + OH^- -> H2O"
+        out = render_to_html(test_string)
         correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2192H<sub>2</sub>O</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_eq2(self):
-        s = "H^+ + OH^- <-> H2O"
-        out = render_to_html(s)
+        test_string = "H^+ + OH^- <-> H2O"
+        out = render_to_html(test_string)
         correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2194H<sub>2</sub>O</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_eq3(self):
-        s = "H^+ + OH^- <= H2O"   # unsupported arrow
-        out = render_to_html(s)
+        test_string = "H^+ + OH^- <= H2O"   # unsupported arrow
+        out = render_to_html(test_string)
         correct = u'<span class="math"><span class="inline-error inline">H^+ + OH^- <= H2O</span></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
 
 class Test_Crystallography_Miller(unittest.TestCase):
-    ''' Tests  for crystallography grade function.'''
-
+    """Tests  for crystallography grade function."""
+    # pylint: disable=line-too-long
     def test_empty_points(self):
         user_input = '{"lattice": "bcc", "points": []}'
-        self.assertFalse(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+        self.assertFalse(chem.miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_only_one_point(self):
         user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"]]}'
-        self.assertFalse(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+        self.assertFalse(chem.miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_only_two_points(self):
         user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.00", "0.50", "0.00"]]}'
-        self.assertFalse(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+        self.assertFalse(chem.miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_1(self):
         user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.00", "0.50", "0.00"], ["0.00", "0.00", "0.50"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_2(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,1,1)', 'lattice': 'bcc'}))
 
     def test_3(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.50", "1.00"], ["1.00", "1.00", "0.50"], ["0.50", "1.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_4(self):
         user_input = '{"lattice": "bcc", "points": [["0.33", "1.00", "0.00"], ["0.00", "0.664", "0.00"], ["0.00", "1.00", "0.33"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(-3, 3, -3)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(-3, 3, -3)', 'lattice': 'bcc'}))
 
     def test_5(self):
         """ return true only in case points coordinates are exact.
         But if they transform to closest 0.05 value it is not true"""
         user_input = '{"lattice": "bcc", "points": [["0.33", "1.00", "0.00"], ["0.00", "0.33", "0.00"], ["0.00", "1.00", "0.33"]]}'
-        self.assertFalse(miller.grade(user_input, {'miller': '(-6,3,-6)', 'lattice': 'bcc'}))
+        self.assertFalse(chem.miller.grade(user_input, {'miller': '(-6,3,-6)', 'lattice': 'bcc'}))
 
     def test_6(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.25", "0.00"], ["0.25", "0.00", "0.00"], ["0.00", "0.00", "0.25"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(4,4,4)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(4,4,4)', 'lattice': 'bcc'}))
 
     def test_7(self):  # goes throug origin
         user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.00"], ["1.00", "0.00", "0.00"], ["0.50", "1.00", "0.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(0,0,-1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,0,-1)', 'lattice': 'bcc'}))
 
     def test_8(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.50"], ["1.00", "0.00", "0.50"], ["0.50", "1.00", "0.50"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(0,0,2)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,0,2)', 'lattice': 'bcc'}))
 
     def test_9(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "1.00"], ["0.00", "1.00", "1.00"], ["1.00", "0.00", "0.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,0)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,1,0)', 'lattice': 'bcc'}))
 
     def test_10(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "1.00"], ["0.00", "0.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
 
     def test_11(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.50"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "0.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(0,1,2)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,1,2)', 'lattice': 'bcc'}))
 
     def test_12(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.50"], ["0.00", "0.00", "0.50"], ["1.00", "1.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(0,1,-2)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,1,-2)', 'lattice': 'bcc'}))
 
     def test_13(self):
         user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.50", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(2,0,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(2,0,1)', 'lattice': 'bcc'}))
 
     def test_14(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["0.00", "0.00", "1.00"], ["0.50", "1.00", "0.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(2,-1,0)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(2,-1,0)', 'lattice': 'bcc'}))
 
     def test_15(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
 
     def test_16(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
 
     def test_17(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "1.00"], ["1.00", "1.00", "0.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(-1,1,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(-1,1,1)', 'lattice': 'bcc'}))
 
     def test_18(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
 
     def test_19(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(-1,1,0)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(-1,1,0)', 'lattice': 'bcc'}))
 
     def test_20(self):
         user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,0,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,0,1)', 'lattice': 'bcc'}))
 
     def test_21(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["1.00", "0.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(-1,0,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(-1,0,1)', 'lattice': 'bcc'}))
 
     def test_22(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(0,1,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,1,1)', 'lattice': 'bcc'}))
 
     def test_23(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'bcc'}))
 
     def test_24(self):
         user_input = '{"lattice": "bcc", "points": [["0.66", "0.00", "0.00"], ["0.00", "0.66", "0.00"], ["0.00", "0.00", "0.66"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': 'bcc'}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': 'bcc'}))
 
     def test_25(self):
         user_input = u'{"lattice":"","points":[["0.00","0.00","0.01"],["1.00","1.00","0.01"],["0.00","1.00","1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': ''}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': ''}))
 
     def test_26(self):
         user_input = u'{"lattice":"","points":[["0.00","0.01","0.00"],["1.00","0.00","0.00"],["0.00","0.00","1.00"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(0,-1,0)', 'lattice': ''}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,-1,0)', 'lattice': ''}))
 
     def test_27(self):
         """ rounding to 0.35"""
         user_input = u'{"lattice":"","points":[["0.33","0.00","0.00"],["0.00","0.33","0.00"],["0.00","0.00","0.33"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': ''}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': ''}))
 
     def test_28(self):
         """ rounding to 0.30"""
         user_input = u'{"lattice":"","points":[["0.30","0.00","0.00"],["0.00","0.30","0.00"],["0.00","0.00","0.30"]]}'
-        self.assertTrue(miller.grade(user_input, {'miller': '(10,10,10)', 'lattice': ''}))
+        self.assertTrue(chem.miller.grade(user_input, {'miller': '(10,10,10)', 'lattice': ''}))
 
     def test_wrong_lattice(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
-        self.assertFalse(miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': 'fcc'}))
+        self.assertFalse(chem.miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': 'fcc'}))
 
 
 def suite():
@@ -478,7 +478,7 @@ def suite():
     return unittest.TestSuite(suites)
 
 if __name__ == "__main__":
-    local_debug = True
+    LOCAL_DEBUG = True
     with codecs.open('render.html', 'w', encoding='utf-8') as f:
         unittest.TextTestRunner(verbosity=2).run(suite())
     # open render.html to look at rendered equations

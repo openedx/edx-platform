@@ -1374,15 +1374,6 @@ class TestComponentTemplates(CourseTestCase):
         self.assertNotEqual(only_template.get('category'), 'video')
         self.assertNotEqual(only_template.get('category'), 'openassessment')
 
-    def test_advanced_components_without_display_name(self):
-        """
-        Test that advanced components without display names display their category instead.
-        """
-        self.course.advanced_modules.append('graphical_slider_tool')
-        self.templates = get_component_templates(self.course)
-        template = self.get_templates_of_type('advanced')[0]
-        self.assertEqual(template.get('display_name'), 'graphical_slider_tool')
-
     def test_advanced_problems(self):
         """
         Test the handling of advanced problem templates.
