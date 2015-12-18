@@ -53,7 +53,8 @@ def get_certificate_description(mode, certificate_type, platform_name):
     """
     certificate_type_description = None
     if mode == 'honor':
-        # Translators:  This text describes the 'Honor' course certificate type.
+        # Translators:  This text describes the 'Honor' course
+        # certificate type.
         certificate_type_description = _("An {cert_type} certificate signifies that a "
                                          "learner has agreed to abide by the honor code established by {platform_name} "
                                          "and has completed all of the required tasks for this course under its "
