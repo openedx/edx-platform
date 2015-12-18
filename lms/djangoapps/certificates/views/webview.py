@@ -53,7 +53,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
     """
     certificate_type_description = None
     if mode == 'honor':
-        # Translators:  This text describes the 'Honor' course 
+        # Translators:  This text describes the 'Honor' course
         # certificate type.
         certificate_type_description = _("An {cert_type} certificate signifies that a "
                                          "learner has agreed to abide by the honor code established by {platform_name} "
@@ -68,7 +68,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
                                          "completed all of the required tasks for this course under its "
                                          "guidelines, as well as having their photo ID checked to verify "
                                          "their identity.").format(cert_type=certificate_type,
-                                         platform_name=platform_name)
+                                                                   platform_name=platform_name)
     elif mode == 'xseries':
         # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
         # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
