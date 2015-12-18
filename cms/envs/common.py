@@ -123,9 +123,6 @@ FEATURES = {
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
 
-    # Modulestore to use for new courses
-    'DEFAULT_STORE_FOR_NEW_COURSE': None,
-
     # Display option to send email confirmation of course enrollment
     'ENABLE_ENROLLMENT_EMAIL': False,
 
