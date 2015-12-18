@@ -133,6 +133,9 @@ AUDIT_LOG = logging.getLogger("audit")
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
+# Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
+# pylint: disable=logging-format-interpolation
+
 
 def csrf_token(context):
     """A csrf token that can be included in a form."""
@@ -296,12 +299,13 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
 
     default_status = 'processing'
 
-    default_info = {'status': default_status,
-                    'show_disabled_download_button': False,
-                    'show_download_url': False,
-                    'show_survey_button': False,
-                    'can_unenroll': True
-                    }
+    default_info = {
+        'status': default_status,
+        'show_disabled_download_button': False,
+        'show_download_url': False,
+        'show_survey_button': False,
+        'can_unenroll': True,
+    }
 
     if cert_status is None:
         return default_info
@@ -500,9 +504,14 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
                     u"User %s (%s) opted out of receiving emails from course %s",
                     request.user.username,
                     request.user.email,
-                    course_key
+                    course_key,
                 )
-                track.views.server_track(request, "change-email1-settings", {"receive_emails": "no", "course": course_key.to_deprecated_string()}, page='dashboard')
+                track.views.server_track(
+                    request,
+                    "change-email1-settings",
+                    {"receive_emails": "no", "course": course_key.to_deprecated_string()},
+                    page='dashboard',
+                )
                 break
 
     return blocked
@@ -725,7 +734,7 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):  # pyli
     recently_enrolled_courses = _get_recently_enrolled_courses(course_enrollments)
 
     if recently_enrolled_courses:
-        messages = [
+        enroll_messages = [
             {
                 "course_id": enrollment.course_overview.id,
                 "course_name": enrollment.course_overview.display_name,
@@ -738,7 +747,7 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):  # pyli
 
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'course_enrollment_messages': messages, 'platform_name': platform_name}
+            {'course_enrollment_messages': enroll_messages, 'platform_name': platform_name}
         )
 
 
@@ -777,7 +786,11 @@ def _allow_donation(course_modes, course_id, enrollment):
 
     """
     donations_enabled = DonationConfiguration.current().enabled
-    return donations_enabled and enrollment.mode in course_modes[course_id] and course_modes[course_id][enrollment.mode].min_price == 0
+    return (
+        donations_enabled and
+        enrollment.mode in course_modes[course_id] and
+        course_modes[course_id][enrollment.mode].min_price == 0
+    )
 
 
 def _update_email_opt_in(request, org):
@@ -1011,7 +1024,7 @@ def change_enrollment(request, check_access=True):
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
                     CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 
         # If we have more than one course mode or professional ed is enabled,
@@ -1073,32 +1086,43 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
             third_party_auth_successful = True
         except User.DoesNotExist:
             AUDIT_LOG.warning(
-                u'Login failed - user with username {username} has no social auth with backend_name {backend_name}'.format(
-                    username=username, backend_name=backend_name))
-            return HttpResponse(
-                _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
-                    platform_name=platform_name, provider_name=requested_provider.name
-                )
-                + "<br/><br/>" +
-                _("Use your {platform_name} username and password to log into {platform_name} below, "
-                  "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
-                      platform_name=platform_name, provider_name=requested_provider.name
-                )
-                + "<br/><br/>" +
-                _("If you don't have an {platform_name} account yet, "
-                  "click <strong>Register</strong> at the top of the page.").format(
-                      platform_name=platform_name),
-                content_type="text/plain",
-                status=403
+                u"Login failed - user with username {username} has no social auth "
+                "with backend_name {backend_name}".format(
+                    username=username, backend_name=backend_name)
             )
+            message = _(
+                "You've successfully logged into your {provider_name} account, "
+                "but this account isn't linked with an {platform_name} account yet."
+            ).format(
+                platform_name=platform_name,
+                provider_name=requested_provider.name,
+            )
+            message += "<br/><br/>"
+            message += _(
+                "Use your {platform_name} username and password to log into {platform_name} below, "
+                "and then link your {platform_name} account with {provider_name} from your dashboard."
+            ).format(
+                platform_name=platform_name,
+                provider_name=requested_provider.name,
+            )
+            message += "<br/><br/>"
+            message += _(
+                "If you don't have an {platform_name} account yet, "
+                "click <strong>Register</strong> at the top of the page."
+            ).format(
+                platform_name=platform_name
+            )
+
+            return HttpResponse(message, content_type="text/plain", status=403)
 
     else:
 
         if 'email' not in request.POST or 'password' not in request.POST:
             return JsonResponse({
                 "success": False,
-                "value": _('There was an error receiving your login information. Please email us.'),  # TODO: User error message
-            })  # TODO: this should be status code 400  # pylint: disable=fixme
+                # TODO: User error message
+                "value": _('There was an error receiving your login information. Please email us.'),
+            })  # TODO: this should be status code 400
 
         email = request.POST['email']
         password = request.POST['password']
@@ -1129,9 +1153,11 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
+            lockout_message = _('This account has been temporarily locked due '
+                                'to excessive login failures. Try again later.')
             return JsonResponse({
                 "success": False,
-                "value": _('This account has been temporarily locked due to excessive login failures. Try again later.'),
+                "value": lockout_message,
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
     # see if the user must reset his/her password due to any policy settings
@@ -1239,7 +1265,8 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your email for the activation instructions.")
+    not_activated_msg = _("This account has not been activated. We have sent another activation "
+                          "message. Please check your email for the activation instructions.")
     return JsonResponse({
         "success": False,
         "value": not_activated_msg,
@@ -1608,7 +1635,7 @@ def create_account_with_params(request, params):
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
             enable_notifications(user)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
 
     dog_stats_api.increment("common.student.account_created")
@@ -2010,9 +2037,9 @@ def password_reset(request):
 
 
 def password_reset_confirm_wrapper(
-    request,
-    uidb36=None,
-    token=None,
+        request,
+        uidb36=None,
+        token=None,
 ):
     """ A wrapper around django.contrib.auth.views.password_reset_confirm.
         Needed because we want to set the user as active at this step.
@@ -2046,6 +2073,8 @@ def password_reset_confirm_wrapper(
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
             else:
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
+            # Because of how ngettext is, splitting the following into shorter lines would be ugly.
+            # pylint: disable=line-too-long
             err_msg = ungettext(
                 "You are re-using a password that you have used recently. You must have {num} distinct password before reusing a previous password.",
                 "You are re-using a password that you have used recently. You must have {num} distinct passwords before reusing a previous password.",
@@ -2055,6 +2084,8 @@ def password_reset_confirm_wrapper(
         # also, check to see if passwords are getting reset too frequent
         if PasswordHistory.is_password_reset_too_soon(user):
             num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
+            # Because of how ngettext is, splitting the following into shorter lines would be ugly.
+            # pylint: disable=line-too-long
             err_msg = ungettext(
                 "You are resetting passwords too frequently. Due to security policies, {num} day must elapse between password resets.",
                 "You are resetting passwords too frequently. Due to security policies, {num} days must elapse between password resets.",
@@ -2287,18 +2318,28 @@ def change_email_settings(request):
             u"User %s (%s) opted in to receive emails from course %s",
             user.username,
             user.email,
-            course_id
+            course_id,
         )
-        track.views.server_track(request, "change-email-settings", {"receive_emails": "yes", "course": course_id}, page='dashboard')
+        track.views.server_track(
+            request,
+            "change-email-settings",
+            {"receive_emails": "yes", "course": course_id},
+            page='dashboard',
+        )
     else:
         Optout.objects.get_or_create(user=user, course_id=course_key)
         log.info(
             u"User %s (%s) opted out of receiving emails from course %s",
             user.username,
             user.email,
-            course_id
+            course_id,
         )
-        track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
+        track.views.server_track(
+            request,
+            "change-email-settings",
+            {"receive_emails": "no", "course": course_id},
+            page='dashboard',
+        )
 
     return JsonResponse({"success": True})
 

@@ -1059,7 +1059,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 log.debug("Found more than one item for '{}'".format(usage_key))
             return items[0]
 
-    def get_items(self, course_locator, settings=None, content=None, qualifiers=None, **kwargs):
+    def get_items(self, course_locator, settings=None, content=None, qualifiers=None, include_orphans=True, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -1079,6 +1079,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 For substring matching pass a regex object.
                 For split,
                 you can search by ``edited_by``, ``edited_on`` providing a function testing limits.
+            include_orphans (boolean): Returns all items in a course, including orphans if present.
+                True - This would return all items irrespective of course in tree checking. It may fetch orphans
+                if present in the course.
+                False - if we want only those items which are in the course tree. This would ensure no orphans are
+                fetched.
         """
         if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
@@ -1118,12 +1123,18 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if 'category' in qualifiers:
             qualifiers['block_type'] = qualifiers.pop('category')
 
+        detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
+
         # don't expect caller to know that children are in fields
         if 'children' in qualifiers:
             settings['children'] = qualifiers.pop('children')
         for block_id, value in course.structure['blocks'].iteritems():
             if _block_matches_all(value):
-                items.append(block_id)
+                if not include_orphans:
+                    if self.has_path_to_root(block_id, course) or block_id.type in detached_categories:
+                        items.append(block_id)
+                else:
+                    items.append(block_id)
 
         if len(items) > 0:
             return self._load_items(course, items, depth=0, **kwargs)

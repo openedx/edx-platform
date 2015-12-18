@@ -30,7 +30,9 @@ CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
 
 <%block name="requirejs">
   require(["js/certificates/factories/certificates_page_factory"], function(CertificatesPageFactory) {
-      CertificatesPageFactory(${escape_json_dumps(certificates) | n}, "${certificate_url}", "${course_outline_url}", ${escape_json_dumps(course_modes) | n}, ${escape_json_dumps(certificate_web_view_url) | n}, ${escape_json_dumps(is_active) | n}, ${escape_json_dumps(certificate_activation_handler_url) | n} );
+      if(${escape_json_dumps(has_certificate_modes)}) {
+          CertificatesPageFactory(${escape_json_dumps(certificates) | n}, "${certificate_url}", "${course_outline_url}", ${escape_json_dumps(course_modes) | n}, ${escape_json_dumps(certificate_web_view_url) | n}, ${escape_json_dumps(is_active) | n}, ${escape_json_dumps(certificate_activation_handler_url) | n} );
+      }
   });
 </%block>
 
@@ -54,6 +56,12 @@ CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
             <div class="notice notice-incontext notice-moduledisabled">
                 <p class="copy">
                     ${_("This module is not enabled.")}
+                </p>
+            </div>
+          % elif not has_certificate_modes:
+            <div class="notice notice-incontext notice-moduledisabled">
+                <p class="copy">
+                    ${_("This course does not use a mode that offers certificates.")}
                 </p>
             </div>
           % else:
