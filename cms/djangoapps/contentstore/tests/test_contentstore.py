@@ -15,7 +15,8 @@ from path import path
 from textwrap import dedent
 from uuid import uuid4
 from functools import wraps
-from unittest import SkipTest, skipUnless
+from unittest import skipUnless
+from unittest import SkipTest
 
 from django.conf import settings
 from django.contrib.auth.models import User
