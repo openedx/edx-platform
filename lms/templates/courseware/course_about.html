@@ -173,14 +173,14 @@ from openedx.core.lib.courses import course_image_url
       % if get_course_about_section(request, course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
-          <img src="${course_image_url(course)}" alt="" />
+          <img src="${course_image_urls['large']}" alt="" />
           <div class="play-intro"></div>
         </div>
       </a>
       %else:
       <div class="media">
         <div class="hero">
-          <img src="${course_image_url(course)}" alt="" />
+          <img src="${course_image_urls['large']}" alt="" />
         </div>
       </div>
       % endif
