@@ -3,6 +3,7 @@ Tests for discussion pages
 """
 
 import datetime
+from flaky import flaky
 from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
@@ -546,6 +547,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_comment_editable("comment_other_author"))
         self.edit_comment(page, "comment_self_author")
 
+    @flaky  # TODO: See TNL-3943
     def test_edit_comment_as_moderator(self):
         self.setup_user(roles=["Moderator"])
         self.setup_view()
