@@ -3,11 +3,14 @@
 // ===================================================================
 
 .certificates-search, .enrollment-search {
-    margin: 40px 0;
-
-    input[name="query"] {
-        width: 476px;
-    }
+  margin: 40px 0;
+  input[name="query"] {
+    width: 350px;
+  }
+  .certificates-form {
+    max-width: 850px;
+    margin: 0 auto;
+  }
 }
 
 
@@ -28,6 +31,10 @@
 }
 
 .btn-cert-regenerate {
+    font-size: 12px;
+}
+
+.btn-cert-generate {
     font-size: 12px;
 }
 
