@@ -29,13 +29,13 @@ from openedx.core.djangoapps.bookmarks.signals import trigger_update_xblocks_cac
 
 class StoreConstructors(object):
     """Enumeration of store constructor types."""
-    draft, split, xml = range(3)
+    draft, split = range(2)
 
 
 def mixed_store_config(data_dir, mappings, include_xml=False, xml_source_dirs=None, store_order=None):
     """
     Return a `MixedModuleStore` configuration, which provides
-    access to both Mongo- and XML-backed courses.
+    access to both Mongo-backed courses.
 
     Args:
         data_dir (string): the directory from which to load XML-backed courses.
@@ -70,7 +70,6 @@ def mixed_store_config(data_dir, mappings, include_xml=False, xml_source_dirs=No
     store_constructors = {
         StoreConstructors.split: split_mongo_store_config(data_dir)['default'],
         StoreConstructors.draft: draft_mongo_store_config(data_dir)['default'],
-        StoreConstructors.xml: xml_store_config(data_dir, source_dirs=xml_source_dirs)['default'],
     }
 
     store = {
