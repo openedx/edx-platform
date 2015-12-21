@@ -9,7 +9,7 @@ from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
 from .api import course_detail, list_courses
 from .forms import CourseDetailGetForm, CourseListGetForm
-from .serializers import CourseSerializer
+from .serializers import CourseListSerializer, CourseDetailSerializer
 
 
 @view_auth_classes(is_authenticated=False)
@@ -88,7 +88,7 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
             }
     """
 
-    serializer_class = CourseSerializer
+    serializer_class = CourseDetailSerializer
 
     def get_object(self):
         """
@@ -174,7 +174,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
 
     pagination_class = NamespacedPageNumberPagination
-    serializer_class = CourseSerializer
+    serializer_class = CourseListSerializer
 
     def get_queryset(self):
         """
