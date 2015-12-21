@@ -65,9 +65,10 @@ def get_certificate_description(mode, certificate_type, platform_name):
         certificate_type_description = _("A {cert_type} certificate signifies that a "
                                          "learner has agreed to abide by the honor code established by {platform_name} "
                                          "and has completed all of the required tasks for this course under its "
-                                         "guidelines. A {cert_type} certificate also indicates that the identity of the "
-                                         "learner has been checked and is valid.").format(cert_type=certificate_type,
-                                                                                          platform_name=platform_name)
+                                         "guidelines. A {cert_type} certificate also indicates that the "
+                                         "identity of the learner has been checked and "
+                                         "is valid.").format(cert_type=certificate_type,
+                                                             platform_name=platform_name)
     elif mode == 'xseries':
         # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
         # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
@@ -129,8 +130,9 @@ def _update_certificate_context(context, user_certificate, platform_name):
         context['certificate_type_description'] = certificate_type_description
 
     # Translators: This text describes the purpose (and therefore, value) of a course certificate
-    context['certificate_info_description'] = _("{platform_name} acknowledges achievements through certificates, which "
-                                                "are awarded for course activities that {platform_name} students complete.").format(
+    context['certificate_info_description'] = _("{platform_name} acknowledges achievements through "
+                                                "certificates, which are awarded for course activities "
+                                                "that {platform_name} students complete.").format(
         platform_name=platform_name,
         tos_url=context.get('company_tos_url'),
         verified_cert_url=context.get('company_verified_certificate_url'))
@@ -229,13 +231,15 @@ def _update_course_context(request, context, course, platform_name):
     if context['organization_long_name']:
         # Translators:  This text represents the description of course
         context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
-                                                              'an online learning initiative of {partner_long_name}.').format(
+                                                              'an online learning initiative of '
+                                                              '{partner_long_name}.').format(
             partner_short_name=context['organization_short_name'],
             partner_long_name=context['organization_long_name'],
             platform_name=platform_name)
     else:
         # Translators:  This text represents the description of course
-        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}.').format(
+        context['accomplishment_copy_course_description'] = _('a course of study offered by '
+                                                              '{partner_short_name}.').format(
             partner_short_name=context['organization_short_name'],
             platform_name=platform_name)
 
