@@ -26,7 +26,8 @@ from certificates.models import (
     CertificateStatuses,
     CertificateSocialNetworks,
     CertificateTemplate,
-    CertificateHtmlViewConfiguration
+    CertificateHtmlViewConfiguration,
+    CertificateTemplateAsset,
 )
 
 from certificates.tests.factories import (
@@ -138,6 +139,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         Creates a custom certificate template entry in DB.
         """
         template_html = """
+            <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
                 lang: ${LANGUAGE_CODE}
@@ -145,6 +147,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 mode: ${course_mode}
                 ${accomplishment_copy_course_description}
                 ${twitter_url}
+                <img class="custom-logo" src="${static.certificate_asset_url('custom-logo')}" />
             </body>
             </html>
         """
@@ -824,3 +827,38 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                         else:
                             self.assertContains(response, "Tweet this Accomplishment")
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    def test_certificate_asset_by_slug(self):
+        """
+        Tests certificate template asset display by slug using static.certificate_asset_url method.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(mode='honor')
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        # render certificate without template asset
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.return_value = []
+            response = self.client.get(test_url)
+            self.assertContains(response, '<img class="custom-logo" src="" />')
+
+        template_asset = CertificateTemplateAsset(
+            description='custom logo',
+            asset='certificate_template_assets/32/test_logo.png',
+            asset_slug='custom-logo',
+        )
+        template_asset.save()
+
+        # render certificate with template asset
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.return_value = []
+            response = self.client.get(test_url)
+            self.assertContains(
+                response, '<img class="custom-logo" src="{}certificate_template_assets/32/test_logo.png" />'.format(
+                    settings.MEDIA_URL
+                )
+            )

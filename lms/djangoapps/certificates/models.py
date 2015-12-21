@@ -948,6 +948,12 @@ class CertificateTemplateAsset(TimeStampedModel):
         upload_to=template_assets_path,
         help_text=_(u'Asset file. It could be an image or css file.'),
     )
+    asset_slug = models.SlugField(
+        max_length=255,
+        unique=True,
+        null=True,
+        help_text=_(u'Asset\'s unique slug. We can reference the asset in templates using this value.'),
+    )
 
     def save(self, *args, **kwargs):
         """save the certificate template asset """

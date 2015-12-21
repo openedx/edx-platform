@@ -26,6 +26,7 @@ from certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate,
     CertificateTemplate,
+    CertificateTemplateAsset,
 )
 from certificates.queue import XQueueCertInterface
 
@@ -477,3 +478,16 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
 
     with tracker.get_tracker().context(event_name, context):
         tracker.emit(event_name, event_data)
+
+
+def get_asset_url_by_slug(asset_slug):
+    """
+    Returns certificate template asset url for given asset_slug.
+    """
+    asset_url = ''
+    try:
+        template_asset = CertificateTemplateAsset.objects.get(asset_slug=asset_slug)
+        asset_url = template_asset.asset.url
+    except CertificateTemplateAsset.DoesNotExist:
+        pass
+    return asset_url
