@@ -140,28 +140,6 @@ def split_mongo_store_config(data_dir):
     return store
 
 
-def xml_store_config(data_dir, source_dirs=None):
-    """
-    Defines default module store using XMLModuleStore.
-
-    Note: you should pass in a list of source_dirs that you care about,
-    otherwise all courses in the data_dir will be processed.
-    """
-    store = {
-        'default': {
-            'NAME': 'xml',
-            'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-            'OPTIONS': {
-                'data_dir': data_dir,
-                'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-                'source_dirs': source_dirs,
-            }
-        }
-    }
-
-    return store
-
-
 @patch('xmodule.modulestore.django.create_modulestore_instance', autospec=True)
 def drop_mongo_collections(mock_create):
     """
@@ -179,9 +157,6 @@ def drop_mongo_collections(mock_create):
 
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-
-# This is an XML only modulestore with only the toy course loaded
-TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, source_dirs=['toy'])
 
 # This modulestore will provide both a mixed mongo editable modulestore, and
 # an XML store with just the toy course loaded.
