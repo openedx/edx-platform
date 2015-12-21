@@ -53,24 +53,25 @@ def get_certificate_description(mode, certificate_type, platform_name):
     certificate_type_description = None
     if mode == 'honor':
         # Translators:  This text describes the 'Honor' course certificate type.
-        certificate_type_description = _("An {cert_type} Certificate signifies that an {platform_name} "
-                                         "learner has agreed to abide by {platform_name}'s honor code and "
-                                         "completed all of the required tasks for this course under its "
+        certificate_type_description = _("An {cert_type} certificate signifies that a "
+                                         "learner has agreed to abide by the honor code established by {platform_name} "
+                                         "and has completed all of the required tasks for this course under its "
                                          "guidelines.").format(cert_type=certificate_type,
                                                                platform_name=platform_name)
     elif mode == 'verified':
         # Translators:  This text describes the 'ID Verified' course certificate type, which is a higher level of
         # verification offered by edX.  This type of verification is useful for professional education/certifications
-        certificate_type_description = _("An {cert_type} Certificate signifies that an {platform_name} "
-                                         "learner has agreed to abide by {platform_name}'s honor code and "
-                                         "completed all of the required tasks for this course under its "
-                                         "guidelines, as well as having their photo ID checked to verify "
-                                         "their identity.").format(cert_type=certificate_type,
-                                                                   platform_name=platform_name)
+        certificate_type_description = _("A {cert_type} certificate signifies that a "
+                                         "learner has agreed to abide by the honor code established by {platform_name} "
+                                         "and has completed all of the required tasks for this course under its "
+                                         "guidelines. A {cert_type} certificate also indicates that the "
+                                         "identity of the learner has been checked and "
+                                         "is valid.").format(cert_type=certificate_type,
+                                                             platform_name=platform_name)
     elif mode == 'xseries':
         # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
         # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
-        certificate_type_description = _("An {cert_type} Certificate demonstrates a high level of "
+        certificate_type_description = _("An {cert_type} certificate demonstrates a high level of "
                                          "achievement in a program of study, and includes verification of "
                                          "the student's identity.").format(cert_type=certificate_type)
     return certificate_type_description
@@ -118,7 +119,7 @@ def _update_certificate_context(context, user_certificate, platform_name):
     # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
     # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
     context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
-                                                        "awarded a {platform_name} {certificate_type} "
+                                                        "awarded this {platform_name} {certificate_type} "
                                                         "Certificate of Completion in ").format(
         platform_name=platform_name,
         certificate_type=context.get("certificate_type"))
@@ -128,12 +129,9 @@ def _update_certificate_context(context, user_certificate, platform_name):
         context['certificate_type_description'] = certificate_type_description
 
     # Translators: This text describes the purpose (and therefore, value) of a course certificate
-    # 'verifying your identity' refers to the process for establishing the authenticity of the student
-    context['certificate_info_description'] = _("{platform_name} acknowledges achievements through certificates, which "
-                                                "are awarded for various activities {platform_name} students complete "
-                                                "under the <a href='{tos_url}'>{platform_name} Honor Code</a>.  Some "
-                                                "certificates require completing additional steps, such as "
-                                                "<a href='{verified_cert_url}'> verifying your identity</a>.").format(
+    context['certificate_info_description'] = _("{platform_name} acknowledges achievements through "
+                                                "certificates, which are awarded for course activities "
+                                                "that {platform_name} students complete.").format(
         platform_name=platform_name,
         tos_url=context.get('company_tos_url'),
         verified_cert_url=context.get('company_verified_certificate_url'))
@@ -200,10 +198,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     context['certificate_verify_urltext'] = _("Validate this certificate for yourself")
 
     # Translators:  This text describes (at a high level) the mission and charter the edX platform and organization
-    context['company_about_description'] = _("{platform_name} offers interactive online classes and MOOCs from the "
-                                             "world's best universities, including MIT, Harvard, Berkeley, University "
-                                             "of Texas, and many others.  {platform_name} is a non-profit online "
-                                             "initiative created by founding partners Harvard and MIT.").format(
+    context['company_about_description'] = _("{platform_name} offers interactive online classes and MOOCs.").format(
         platform_name=platform_name)
 
     context['company_about_title'] = _("About {platform_name}").format(platform_name=platform_name)
@@ -235,15 +230,15 @@ def _update_course_context(request, context, course, platform_name):
     if context['organization_long_name']:
         # Translators:  This text represents the description of course
         context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
-                                                              'an online learning initiative of {partner_long_name} '
-                                                              'through {platform_name}.').format(
+                                                              'an online learning initiative of '
+                                                              '{partner_long_name}.').format(
             partner_short_name=context['organization_short_name'],
             partner_long_name=context['organization_long_name'],
             platform_name=platform_name)
     else:
         # Translators:  This text represents the description of course
-        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
-                                                              'through {platform_name}.').format(
+        context['accomplishment_copy_course_description'] = _('a course of study offered by '
+                                                              '{partner_short_name}.').format(
             partner_short_name=context['organization_short_name'],
             platform_name=platform_name)
 
@@ -265,7 +260,7 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
     context['twitter_share_text'] = share_settings.get(
         'CERTIFICATE_TWITTER_TEXT',
-        _("I completed a course on {platform_name}. Take a look at my certificate.").format(
+        _("I completed a course at {platform_name}. Take a look at my certificate.").format(
             platform_name=platform_name
         )
     )
@@ -319,13 +314,13 @@ def _update_context_with_user_info(context, user, user_certificate):
         user_name=user_fullname
     )
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
-    context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
+    context['accomplishment_banner_opening'] = _("{fullname}, you earned a certificate!").format(
         fullname=user_fullname
     )
 
     # Translators: This line congratulates the user and instructs them to share their accomplishment on social networks
-    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes all of the details of what "
-                                                  "you've accomplished. Show it off to family, friends, and colleagues "
+    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes what "
+                                                  "you accomplished. Show it off to family, friends, and colleagues "
                                                   "in your social and professional networks.")
 
     # Translators: This line leads the reader to understand more about the certificate that a student has been awarded
@@ -428,7 +423,6 @@ def _update_microsite_context(context, configuration):
     _update_certificate_context() call above. For example the
     'company_about_description' talks about edX, which we most likely
     do not want to keep in a microsite
-
     So we need to re-apply any configuration/content that
     we are sourcing from the database. This is somewhat duplicative of
     the code at the beginning of this method, but we
