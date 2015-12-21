@@ -103,6 +103,11 @@
 
                 expect('qualitychange').not.toHaveBeenTriggeredOn('.video');
             });
+
+            it('always fails', function () {
+                expect(1).toBe(2);
+            });
+
         });
     });
 
