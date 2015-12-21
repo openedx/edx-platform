@@ -28,8 +28,6 @@ class FormTestMixin(object):
         Check that the form returns the expected data
         """
         form = self.get_form(expected_valid=True)
-        print 'form.cleaned_data: ' + unicode(form.cleaned_data)
-        print 'expected_cleaned_data: ' + unicode(expected_cleaned_data)
         self.assertDictEqual(form.cleaned_data, expected_cleaned_data)
 
     def assert_field_value(self, field, expected_value):

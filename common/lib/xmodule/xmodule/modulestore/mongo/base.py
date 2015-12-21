@@ -268,8 +268,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     )
                     if parent_url:
                         parent = self._convert_reference_to_key(parent_url)
-                if not parent and category != 'course':
-                    # try looking it up just-in-time (but not if we're working with a root node (course).
+                if not parent and category not in _DETACHED_CATEGORIES + ['course']:
+                    # try looking it up just-in-time (but not if we're working with a detached block).
                     parent = self.modulestore.get_parent_location(
                         as_published(location),
                         ModuleStoreEnum.RevisionOption.published_only if location.revision is None

@@ -9,7 +9,7 @@ from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
 from .api import course_detail, list_courses
 from .forms import CourseDetailGetForm, CourseListGetForm
-from .serializers import CourseSerializer
+from .serializers import CourseSerializer, CourseDetailSerializer
 
 
 @view_auth_classes(is_authenticated=False)
@@ -41,6 +41,9 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
         * name: Name of the course
         * number: Catalog number of the course
         * org: Name of the organization that owns the course
+        * overview: A possibly verbose HTML textual description of the course.
+            Note: this field is only included in the Course Detail view, not
+            the Course List view.
         * short_description: A textual description of the course
         * start: Date the course begins
         * start_display: Readably formatted start of the course
@@ -83,13 +86,14 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
                 "name": "Example Course",
                 "number": "example",
                 "org": "edX",
+                "overview: "<p>A verbose description of the course.</p>"
                 "start": "2015-07-17T12:00:00Z",
                 "start_display": "July 17, 2015",
                 "start_type": "timestamp"
             }
     """
 
-    serializer_class = CourseSerializer
+    serializer_class = CourseDetailSerializer
 
     def get_object(self):
         """
