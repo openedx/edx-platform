@@ -735,14 +735,6 @@ MODULESTORE = {
                         'fs_root': DATA_DIR,
                         'render_template': 'edxmako.shortcuts.render_to_string',
                     }
-                },
-                {
-                    'NAME': 'xml',
-                    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-                    'OPTIONS': {
-                        'data_dir': DATA_DIR,
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-                    }
                 }
             ]
         }

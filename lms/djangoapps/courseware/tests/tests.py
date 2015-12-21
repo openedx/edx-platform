@@ -10,7 +10,6 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE as XML_MODULESTORE
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE as TOY_MODULESTORE
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
@@ -120,24 +119,6 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         if check_content:
             self.assertNotContains(response, "this module is temporarily unavailable")
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
-
-
-@attr('shard_1')
-class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
-    """
-    Check that all pages in test courses load properly from XML.
-    """
-    MODULESTORE = XML_MODULESTORE
-
-    def setUp(self):
-        super(TestXmlCoursesLoad, self).setUp()
-        self.setup_user()
-
-    def test_toy_course_loads(self):
-        # Load one of the XML based courses
-        # Our test mapping rules allow the MixedModuleStore
-        # to load this course from XML, not Mongo.
-        self.check_all_pages_load(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
 
 @attr('shard_1')
