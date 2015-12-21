@@ -50,8 +50,10 @@
   display: none;
 
   .search-info {
+    margin-bottom: ($baseline);
     border-bottom: 4px solid $border-color-l4;
-    padding-bottom: $baseline;
+    padding-bottom: ($baseline/2);
+
     .search-count {
       @include float(right);
       color: $gray-l1;
