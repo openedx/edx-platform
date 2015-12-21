@@ -74,9 +74,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
     RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
     MONGO_COURSEID = 'MITx/999/2013_Spring'
-    XML_COURSEID1 = 'edX/toy/2012_Fall'
-    XML_COURSEID2 = 'edX/simple/2012_Fall'
-    BAD_COURSE_ID = 'edX/simple'
 
     modulestore_options = {
         'default_class': DEFAULT_CLASS,
@@ -91,11 +88,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         'collection': COLLECTION,
         'asset_collection': ASSET_COLLECTION,
     }
-    MAPPINGS = {
-        XML_COURSEID1: 'xml',
-        XML_COURSEID2: 'xml',
-        BAD_COURSE_ID: 'xml',
-    }
+    MAPPINGS = {}
     OPTIONS = {
         'stores': [
             {
@@ -148,7 +141,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         self.addTypeEqualityFunc(BlockUsageLocator, '_compare_ignore_version')
         self.addTypeEqualityFunc(CourseLocator, '_compare_ignore_version')
         # define attrs which get set in initdb to quell pylint
-        self.writable_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
+        self.writable_chapter_location = self.store = self.fake_location = None
         self.course_locations = {}
 
         self.user_id = ModuleStoreEnum.UserID.test
@@ -275,7 +268,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         # convert to CourseKeys
         self.course_locations = {
             course_id: CourseLocator.from_string(course_id)
-            for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
+            for course_id in [self.MONGO_COURSEID]
         }
         # and then to the root UsageKey
         self.course_locations = {
@@ -285,10 +278,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
 
         mongo_course_key = self.course_locations[self.MONGO_COURSEID].course_key
         self.fake_location = self.store.make_course_key(mongo_course_key.org, mongo_course_key.course, mongo_course_key.run).make_usage_key('vertical', 'fake')
-
-        self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
-            category='chapter', name='Overview'
-        )
 
         self._create_course(self.course_locations[self.MONGO_COURSEID].course_key)
 
@@ -338,12 +327,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         """
         self.initdb(default_ms)
         self.assertEqual(self.store.get_modulestore_type(
-            self._course_key_from_string(self.XML_COURSEID1)), ModuleStoreEnum.Type.xml
-        )
-        self.assertEqual(self.store.get_modulestore_type(
-            self._course_key_from_string(self.XML_COURSEID2)), ModuleStoreEnum.Type.xml
-        )
-        self.assertEqual(self.store.get_modulestore_type(
             self._course_key_from_string(self.MONGO_COURSEID)), default_ms
         )
         # try an unknown mapping, it should be the 'default' store
@@ -392,15 +375,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        self.assertTrue(self.store.has_item(self.course_locations[self.XML_COURSEID1]))
-
         with check_mongo_calls(max_find.pop(0), max_send):
             self.assertTrue(self.store.has_item(self.problem_x1a_1))
 
         # try negative cases
-        self.assertFalse(self.store.has_item(
-            self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
-        ))
         with check_mongo_calls(max_find.pop(0), max_send):
             self.assertFalse(self.store.has_item(self.fake_location))
 
@@ -420,16 +398,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        self.assertIsNotNone(self.store.get_item(self.course_locations[self.XML_COURSEID1]))
-
         with check_mongo_calls(max_find.pop(0), max_send):
             self.assertIsNotNone(self.store.get_item(self.problem_x1a_1))
 
         # try negative cases
-        with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(
-                self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
-            )
         with check_mongo_calls(max_find.pop(0), max_send):
             with self.assertRaises(ItemNotFoundError):
                 self.store.get_item(self.fake_location)
@@ -447,12 +419,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     def test_get_items(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
         self._create_block_hierarchy()
-
-        course_locn = self.course_locations[self.XML_COURSEID1]
-        # NOTE: use get_course if you just want the course. get_items is expensive
-        modules = self.store.get_items(course_locn.course_key, qualifiers={'category': 'course'})
-        self.assertEqual(len(modules), 1)
-        self.assertEqual(modules[0].location, course_locn)
 
         course_locn = self.course_locations[self.MONGO_COURSEID]
         with check_mongo_calls(max_find, max_send):
@@ -536,18 +502,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
         """
-        Update should fail for r/o dbs and succeed for r/w ones
+        Update should succeed for r/w dbs
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
-        course = self.store.get_course(self.course_locations[self.XML_COURSEID1].course_key)
-        # if following raised, then the test is really a noop, change it
-        self.assertFalse(course.show_calculator, "Default changed making test meaningless")
-        course.show_calculator = True
-        with self.assertRaises(NotImplementedError):  # ensure it doesn't allow writing
-            self.store.update_item(course, self.user_id)
-
-        # now do it for a r/w db
         problem = self.store.get_item(self.problem_x1a_1)
         # if following raised, then the test is really a noop, change it
         self.assertNotEqual(problem.max_attempts, 2, "Default changed making test meaningless")
@@ -944,10 +902,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         if default_ms == ModuleStoreEnum.Type.mongo and mongo_uses_error_check(self.store):
             max_find += 1
 
-        # r/o try deleting the chapter (is here to ensure it can't be deleted)
-        with self.assertRaises(NotImplementedError):
-            self.store.delete_item(self.xml_chapter_location, self.user_id)
-
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.writable_chapter_location.course_key):
             with check_mongo_calls(max_find, max_send):
                 self.store.delete_item(self.writable_chapter_location, self.user_id)
@@ -1066,14 +1020,12 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
-        # we should have 3 total courses across all stores
+        # we should have one course across all stores
         with check_mongo_calls(max_find, max_send):
             courses = self.store.get_courses()
             course_ids = [course.location for course in courses]
-            self.assertEqual(len(courses), 3, "Not 3 courses: {}".format(course_ids))
+            self.assertEqual(len(courses), 1, "Not one course: {}".format(course_ids))
             self.assertIn(self.course_locations[self.MONGO_COURSEID], course_ids)
-            self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
-            self.assertIn(self.course_locations[self.XML_COURSEID2], course_ids)
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             draft_courses = self.store.get_courses(remove_branch=True)
@@ -1102,30 +1054,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         mongo_course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(len(mongo_course.children), 1)
 
-    def test_xml_get_courses(self):
-        """
-        Test that the xml modulestore only loaded the courses from the maps.
-        """
-        self.initdb(ModuleStoreEnum.Type.mongo)
-        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)  # pylint: disable=protected-access
-        courses = xml_store.get_courses()
-        self.assertEqual(len(courses), 2)
-        course_ids = [course.id for course in courses]
-        self.assertIn(self.course_locations[self.XML_COURSEID1].course_key, course_ids)
-        self.assertIn(self.course_locations[self.XML_COURSEID2].course_key, course_ids)
-        # this course is in the directory from which we loaded courses but not in the map
-        self.assertNotIn("edX/toy/TT_2012_Fall", course_ids)
-
-    def test_xml_no_write(self):
-        """
-        Test that the xml modulestore doesn't allow write ops.
-        """
-        self.initdb(ModuleStoreEnum.Type.mongo)
-        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)  # pylint: disable=protected-access
-        # the important thing is not which exception it raises but that it raises an exception
-        with self.assertRaises(AttributeError):
-            xml_store.create_course("org", "course", "run", self.user_id)
-
     # draft is 2: find out which ms owns course, get item
     # split: active_versions, structure, definition (to load course wiki string)
     @ddt.data((ModuleStoreEnum.Type.mongo, 2, 0), (ModuleStoreEnum.Type.split, 3, 0))
@@ -1139,9 +1067,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         with check_mongo_calls(max_find, max_send):
             course = self.store.get_item(self.course_locations[self.MONGO_COURSEID])
             self.assertEqual(course.id, self.course_locations[self.MONGO_COURSEID].course_key)
-
-        course = self.store.get_item(self.course_locations[self.XML_COURSEID1])
-        self.assertEqual(course.id, self.course_locations[self.XML_COURSEID1].course_key)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_library(self, default_ms):
@@ -1180,9 +1105,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         with check_mongo_calls(max_find, max_send):
             parent = self.store.get_parent_location(self.problem_x1a_1)
             self.assertEqual(parent, self.vertical_x1a)
-
-        parent = self.store.get_parent_location(self.xml_chapter_location)
-        self.assertEqual(parent, self.course_locations[self.XML_COURSEID1])
 
     def verify_get_parent_locations_results(self, expected_results):
         """
@@ -1363,34 +1285,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         with self.assertRaises(NoPathToItem):
             path_to_location(self.store, orphan)
-
-    def test_xml_path_to_location(self):
-        """
-        Make sure that path_to_location works: should be passed a modulestore
-        with the toy and simple courses loaded.
-        """
-        # only needs course_locations set
-        self.initdb(ModuleStoreEnum.Type.mongo)
-        course_key = self.course_locations[self.XML_COURSEID1].course_key
-        video_key = course_key.make_usage_key('video', 'Welcome')
-        chapter_key = course_key.make_usage_key('chapter', 'Overview')
-        should_work = (
-            (video_key,
-             (course_key, "Overview", "Welcome", None, None, video_key)),
-            (chapter_key,
-             (course_key, "Overview", None, None, None, chapter_key)),
-        )
-
-        for location, expected in should_work:
-            self.assertEqual(path_to_location(self.store, location), expected)
-
-        not_found = (
-            course_key.make_usage_key('video', 'WelcomeX'),
-            course_key.make_usage_key('course', 'NotHome'),
-        )
-        for location in not_found:
-            with self.assertRaises(ItemNotFoundError):
-                path_to_location(self.store, location)
 
     def test_navigation_index(self):
         """
@@ -1643,15 +1537,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         Test the get_courses_for_wiki method
         """
         self.initdb(default_ms)
-        # Test XML wikis
-        wiki_courses = self.store.get_courses_for_wiki('toy')
-        self.assertEqual(len(wiki_courses), 1)
-        self.assertIn(self.course_locations[self.XML_COURSEID1].course_key, wiki_courses)
-
-        wiki_courses = self.store.get_courses_for_wiki('simple')
-        self.assertEqual(len(wiki_courses), 1)
-        self.assertIn(self.course_locations[self.XML_COURSEID2].course_key, wiki_courses)
-
         # Test Mongo wiki
         with check_mongo_calls(max_find, max_send):
             wiki_courses = self.store.get_courses_for_wiki('999')
@@ -1986,14 +1871,13 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         wiki_courses = self.store.get_courses_for_wiki('999')
         self.assertEqual(len(wiki_courses), 0)
 
-        # but there should be two courses with wiki_slug 'simple'
+        # but there should be one course with wiki_slug 'simple'
         wiki_courses = self.store.get_courses_for_wiki('simple')
-        self.assertEqual(len(wiki_courses), 2)
+        self.assertEqual(len(wiki_courses), 1)
         self.assertIn(
             self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
             wiki_courses
         )
-        self.assertIn(self.course_locations[self.XML_COURSEID2].course_key, wiki_courses)
 
         # configure mongo course to use unique wiki_slug.
         mongo_course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
@@ -2008,13 +1892,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         )
         # and NOT retriveable with its old wiki_slug
         wiki_courses = self.store.get_courses_for_wiki('simple')
-        self.assertEqual(len(wiki_courses), 1)
+        self.assertEqual(len(wiki_courses), 0)
         self.assertNotIn(
             self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
-            wiki_courses
-        )
-        self.assertIn(
-            self.course_locations[self.XML_COURSEID2].course_key,
             wiki_courses
         )
 
@@ -2117,7 +1997,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         except NotImplementedError:
             self.assertEquals(store_type, ModuleStoreEnum.Type.xml)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml)
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_default_store(self, default_ms):
         """
         Test the default store context manager
@@ -2138,9 +2018,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
             self.verify_default_store(ModuleStoreEnum.Type.mongo)
             with self.store.default_store(ModuleStoreEnum.Type.split):
-                self.verify_default_store(ModuleStoreEnum.Type.split)
-                with self.store.default_store(ModuleStoreEnum.Type.xml):
-                    self.verify_default_store(ModuleStoreEnum.Type.xml)
                 self.verify_default_store(ModuleStoreEnum.Type.split)
             self.verify_default_store(ModuleStoreEnum.Type.mongo)
 
@@ -2194,25 +2071,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 # pylint: disable=protected-access
             source_store = self.store._get_modulestore_by_type(source_modulestore)
             dest_store = self.store._get_modulestore_by_type(destination_modulestore)
-            self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
-
-    def test_clone_xml_split(self):
-        """
-        Can clone xml courses to split; so, test it.
-        """
-        with MongoContentstoreBuilder().build() as contentstore:
-            # initialize the mixed modulestore
-            self._initialize_mixed(contentstore=contentstore, mappings={self.XML_COURSEID2: 'xml', })
-            source_course_key = CourseKey.from_string(self.XML_COURSEID2)
-            with self.store.default_store(ModuleStoreEnum.Type.split):
-                dest_course_id = CourseLocator("org.other", "course.other", "run.other")
-                self.store.clone_course(
-                    source_course_key, dest_course_id, ModuleStoreEnum.UserID.test
-                )
-
-            # pylint: disable=protected-access
-            source_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
-            dest_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
             self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
