@@ -32,7 +32,7 @@ class StoreConstructors(object):
     draft, split = range(2)
 
 
-def mixed_store_config(data_dir, mappings, include_xml=False, xml_source_dirs=None, store_order=None):
+def mixed_store_config(data_dir, mappings, xml_source_dirs=None, store_order=None):
     """
     Return a `MixedModuleStore` configuration, which provides
     access to both Mongo-backed courses.
@@ -51,11 +51,9 @@ def mixed_store_config(data_dir, mappings, include_xml=False, xml_source_dirs=No
 
     Keyword Args:
 
-        include_xml (boolean): If True, include an XML modulestore in the configuration.
         xml_source_dirs (list): The directories containing XML courses to load from disk.
 
         note: For the courses to be loaded into the XML modulestore and accessible do the following:
-            * include_xml should be True
             * xml_source_dirs should be the list of directories (relative to data_dir)
                   containing the courses you want to load
             * mappings should be configured, pointing the xml courses to the xml modulestore
@@ -63,9 +61,6 @@ def mixed_store_config(data_dir, mappings, include_xml=False, xml_source_dirs=No
     """
     if store_order is None:
         store_order = [StoreConstructors.draft, StoreConstructors.split]
-
-    if include_xml and StoreConstructors.xml not in store_order:
-        store_order.append(StoreConstructors.xml)
 
     store_constructors = {
         StoreConstructors.split: split_mongo_store_config(data_dir)['default'],
@@ -160,25 +155,25 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 # This modulestore will provide both a mixed mongo editable modulestore, and
 # an XML store with just the toy course loaded.
 TEST_DATA_MIXED_TOY_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {'edX/toy/2012_Fall': 'xml', }, include_xml=True, xml_source_dirs=['toy']
+    TEST_DATA_DIR, {}, xml_source_dirs=['toy']
 )
 
 # This modulestore will provide both a mixed mongo editable modulestore, and
 # an XML store with common/test/data/2014 loaded, which is a course that is closed.
 TEST_DATA_MIXED_CLOSED_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {'edX/detached_pages/2014': 'xml', }, include_xml=True, xml_source_dirs=['2014']
+    TEST_DATA_DIR, {}, xml_source_dirs=['2014']
 )
 
 # This modulestore will provide both a mixed mongo editable modulestore, and
 # an XML store with common/test/data/graded loaded, which is a course that is graded.
 TEST_DATA_MIXED_GRADED_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {'edX/graded/2012_Fall': 'xml', }, include_xml=True, xml_source_dirs=['graded']
+    TEST_DATA_DIR, {}, xml_source_dirs=['graded']
 )
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test mongo and not a mocked modulestore.
 # This modulestore definition below will not load any xml courses.
-TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xml=False)
+TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test split-mongo and not a mocked modulestore.
@@ -186,7 +181,6 @@ TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xm
 TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
     mkdtemp_clean(),
     {},
-    include_xml=False,
     store_order=[StoreConstructors.split, StoreConstructors.draft]
 )
 
@@ -239,7 +233,7 @@ class SharedModuleStoreTestCase(TestCase):
     In Django 1.8, we will be able to use setUpTestData() to do class level init
     for Django ORM models that will get cleaned up properly.
     """
-    MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xml=False)
+    MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
     # Tell Django to clean out all databases, not just default
     multi_db = True
 
@@ -403,7 +397,7 @@ class ModuleStoreTestCase(TestCase):
           your `setUp()` method.
     """
 
-    MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xml=False)
+    MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
     # Tell Django to clean out all databases, not just default
     multi_db = True
 
