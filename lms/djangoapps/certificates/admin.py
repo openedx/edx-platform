@@ -45,7 +45,8 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateTemplateAsset model
     """
-    list_display = ('description', '__unicode__')
+    list_display = ('description', 'asset_slug',)
+    prepopulated_fields = {"asset_slug": ("description",)}
 
 
 class GeneratedCertificateAdmin(admin.ModelAdmin):
