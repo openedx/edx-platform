@@ -388,7 +388,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('input.time').timepicker({
                 'timeFormat' : 'H:i',
                 'minTime': '00:30',
-                'maxTime': '05:00',
+                'maxTime': '24:00',
                 'forceRoundTime': false
             });
 
@@ -429,7 +429,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('#id_exam_review_rules').val(value);
         },
         isValidTimeLimit: function(time_limit) {
-            var pattern = new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
+            var pattern = new RegExp('^\\d{1,2}:[0-5][0-9]$');
             return pattern.test(time_limit) && time_limit !== "00:00";
         },
         getExamTimeLimit: function () {
