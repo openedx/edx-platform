@@ -64,28 +64,3 @@ def get_university_for_request():
     if no university was specified
     """
     return microsite.get_value('university')
-
-
-def get_logo_url():
-    """
-    Return the url for the branded logo image to be used
-    """
-
-    # if the MicrositeConfiguration has a value for the logo_image_url
-    # let's use that
-    image_url = microsite.get_value('logo_image_url')
-    if image_url:
-        return '{static_url}{image_url}'.format(
-            static_url=settings.STATIC_URL,
-            image_url=image_url
-        )
-
-    # otherwise, use the legacy means to configure this
-    university = microsite.get_value('university')
-
-    if university is None and settings.FEATURES.get('IS_EDX_DOMAIN', False):
-        return staticfiles_storage.url('images/edx-theme/edx-logo-77x36.png')
-    elif university:
-        return staticfiles_storage.url('images/{uni}-on-edx-logo.png'.format(uni=university))
-    else:
-        return staticfiles_storage.url('images/logo.png')
