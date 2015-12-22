@@ -16,6 +16,7 @@ from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -40,7 +41,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         """
         super(TestCohortPartitionScheme, self).setUp()
 
-        self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
         config_course_cohorts(self.course, is_cohorted=True)
 
@@ -286,7 +287,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         and a student for each test.
         """
         super(TestGetCohortedUserPartition, self).setUp()
-        self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
         self.student = UserFactory.create()
 
