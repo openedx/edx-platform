@@ -344,6 +344,11 @@ def get_element_padding(page, selector):
     return page.browser.execute_script(js_script)
 
 
+def is_404_page(browser):
+    """ Check if page is 404 """
+    return 'Page not found (404)' in browser.find_element_by_tag_name('h1').text
+
+
 class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted

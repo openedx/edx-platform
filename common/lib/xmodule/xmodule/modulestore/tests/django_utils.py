@@ -18,9 +18,11 @@ from openedx.core.lib.tempdir import mkdtemp_clean
 
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores, SignalHandler
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
+
+from openedx.core.djangoapps.bookmarks.signals import trigger_update_xblocks_cache_task
 
 
 class StoreConstructors(object):
@@ -404,6 +406,8 @@ class ModuleStoreTestCase(TestCase):
         OverrideFieldData.provider_classes = None
 
         super(ModuleStoreTestCase, self).setUp()
+
+        SignalHandler.course_published.disconnect(trigger_update_xblocks_cache_task)
 
         self.store = modulestore()
 

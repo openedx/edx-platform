@@ -54,16 +54,7 @@
   }
 
   .nav-label {
-    /* This wasn't working for me, so I directly copied the rule
-    @extend %cont-text-sr; */
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
+    @extend %text-sr;
   }
 
   .pagination-form,
@@ -105,16 +96,7 @@
 
     .page-number-label,
     .submit-pagination-form {
-      /* This wasn't working for me, so I directly copied the rule
-      @extend %cont-text-sr; */
-      border: 0;
-      clip: rect(0 0 0 0);
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      padding: 0;
-      position: absolute;
-      width: 1px;
+      @extend %text-sr;
     }
 
     .page-number-input {
@@ -140,5 +122,23 @@
         border-radius: 3px;
       }
     }
+  }
+}
+
+// styles for search/pagination metadata and sorting
+.listing-tools {
+  @extend %t-copy-sub1;
+  color: $gray-d1;
+
+  label { // override
+    color: inherit;
+    font-size: inherit;
+    cursor: auto;
+  }
+
+  .listing-sort-select {
+    @extend %t-copy-sub1;
+    @extend %t-regular;
+    border: 0;
   }
 }
