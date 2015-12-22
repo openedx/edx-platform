@@ -34,13 +34,13 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
         super(CourseEnrollmentBadgeTest, self).setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
         ]
         nums = ['3', '5', '8']
@@ -102,13 +102,13 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
         super(CourseCompletionBadgeTest, self).setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
         ]
         nums = ['2', '6', '9']
@@ -179,13 +179,13 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
         super(CourseGroupBadgeTest, self).setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
             RandomBadgeClassFactory(
-                issuing_component='edx__course'
+                issuing_component='openedx__course'
             ),
         ]
         self.courses = []

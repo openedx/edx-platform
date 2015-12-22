@@ -77,7 +77,7 @@ class UserBadgeAssertions(generics.ListAPIView):
                 {
                     "badge_class": {
                         "slug": "special_award",
-                        "issuing_component": "edx__course",
+                        "issuing_component": "openedx__course",
                         "display_name": "Very Special Award",
                         "course_id": "course-v1:edX+DemoX+Demo_Course",
                         "description": "Awarded for people who did something incredibly special",

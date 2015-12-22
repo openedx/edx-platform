@@ -220,7 +220,7 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         blank=True, default='',
         help_text=_(
             u"On each line, put the number of completed courses to award a badge for, a comma, and the slug of a "
-            u"badge class you have created with the issuing component 'edx__course'. "
+            u"badge class you have created that has the issuing component 'openedx__course'. "
             u"For example: 3,enrolled_3_courses"
         )
     )
@@ -228,16 +228,16 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         blank=True, default='',
         help_text=_(
             u"On each line, put the number of enrolled courses to award a badge for, a comma, and the slug of a "
-            u"badge class you have created with the issuing component 'edx__course'. "
+            u"badge class you have created that has the issuing component 'openedx__course'. "
             u"For example: 3,enrolled_3_courses"
         )
     )
     course_groups = models.TextField(
         blank=True, default='',
         help_text=_(
-            u"Each line is a comma-separated list. The first item in each line is the slug of a badge class to award, "
-            u"with an issuing component of 'edx__course'. The remaining items in each line are the course keys the "
-            u"user will need to complete to be awarded the badge. For example: "
+            u"Each line is a comma-separated list. The first item in each line is the slug of a badge class you "
+            u"have created that has an issuing component of 'openedx__course'. The remaining items in each line are "
+            u"the course keys the learner needs to complete to be awarded the badge. For example: "
             u"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
         )
     )
