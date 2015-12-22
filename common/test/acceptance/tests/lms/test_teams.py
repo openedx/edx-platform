@@ -812,7 +812,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
-    @flaky  # TODO: fix flaky test. See TNL-3489
     def test_search(self):
         """
         Scenario: User should be able to search for a team
