@@ -20,7 +20,7 @@ def award_badge(config, count, user):
     if not slug:
         return
     badge_class = BadgeClass.get_badge_class(
-        slug=slug, issuing_component='edx__course', create=False,
+        slug=slug, issuing_component='openedx__course', create=False,
     )
     if not badge_class:
         return
@@ -72,7 +72,7 @@ def course_group_check(user, course_key):
 
     for slug in awards:
         badge_class = BadgeClass.get_badge_class(
-            slug=slug, issuing_component='edx__course', create=False,
+            slug=slug, issuing_component='openedx__course', create=False,
         )
         if badge_class and not badge_class.get_for_user(user):
             badge_class.award(user)
