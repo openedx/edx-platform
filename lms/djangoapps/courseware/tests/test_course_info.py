@@ -17,9 +17,11 @@ from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
+    TEST_DATA_SPLIT_MODULESTORE,
+    TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
@@ -214,14 +216,30 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
 
-    # The following XML test course (which lives at common/test/data/2014)
-    # is closed; we're testing that a course info page still appears when
-    # the course is already closed
-    xml_course_key = SlashSeparatedCourseKey('edX', 'detached_pages', '2014')
+    def setUp(self):
+        """
+        Set up the tests
+        """
+        super(CourseInfoTestCaseXML, self).setUp()
 
-    # this text appears in that course's course info page
-    # common/test/data/2014/info/updates.html
-    xml_data = "course info 463139"
+        # The following test course (which lives at common/test/data/2014)
+        # is closed; we're testing that a course info page still appears when
+        # the course is already closed
+        self.xml_course_key = self.store.make_course_key('edX', 'detached_pages', '2014')
+        import_course_from_xml(
+            self.store,
+            'test_user',
+            TEST_DATA_DIR,
+            source_dirs=['2014'],
+            static_content_store=None,
+            target_id=self.xml_course_key,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        # this text appears in that course's course info page
+        # common/test/data/2014/info/updates.html
+        self.xml_data = "course info 463139"
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
