@@ -29,7 +29,7 @@ from certificates.models import (
     CertificateTemplateAsset,
 )
 from certificates.queue import XQueueCertInterface
-from branding import api as branding_api, get_logo_url
+from branding import api as branding_api
 
 log = logging.getLogger("edx.certificate")
 
@@ -499,7 +499,7 @@ def get_certificate_header_context(is_secure=True):
     data returned should be customized according to the microsite settings
     """
     data = dict(
-        logo_src=get_logo_url(),
+        logo_src=branding_api.get_logo_url(),
         logo_url=branding_api.get_base_url(is_secure),
     )
 

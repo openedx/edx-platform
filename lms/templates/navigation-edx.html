@@ -9,7 +9,7 @@ from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
 
 # App that handles subdomain specific branding
-import branding
+from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
 %>
@@ -41,7 +41,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
       <a href="${marketing_link('ROOT')}" itemprop="url">
         <%block name="navigation_logo">
-            <img src="${static.url(branding.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}" itemprop="logo" />
+            <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}" itemprop="logo" />
         </%block>
       </a>
     </h1>
