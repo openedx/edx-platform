@@ -233,6 +233,7 @@ class ToyCourseFactory(SampleCourseFactory):
                     user_id, toy_course.id, "course_info", "handouts",
                     fields={"data": "<a href='/static/handouts/sample_handout.txt'>Sample</a>"}
                 )
+                ## TODO: Broken! These static tabs are never added to course.tabs?
                 store.create_item(
                     user_id, toy_course.id, "static_tab", "resources",
                     fields={"display_name": "Resources"},
