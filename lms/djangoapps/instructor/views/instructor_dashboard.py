@@ -43,6 +43,7 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
     CertificateGenerationHistory,
+    CertificateInvalidation,
 )
 from certificates import api as certs_api
 from util.date_utils import get_default_time_display
@@ -184,6 +185,13 @@ def instructor_dashboard_2(request, course_id):
         kwargs={'course_id': unicode(course_key)}
     )
 
+    certificate_invalidation_view_url = reverse(  # pylint: disable=invalid-name
+        'certificate_invalidation_view',
+        kwargs={'course_id': unicode(course_key)}
+    )
+
+    certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
+
     context = {
         'course': course,
         'studio_url': get_studio_url(course, 'course'),
@@ -191,9 +199,11 @@ def instructor_dashboard_2(request, course_id):
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message,
         'certificate_white_list': certificate_white_list,
+        'certificate_invalidations': certificate_invalidations,
         'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
-        'certificate_exception_view_url': certificate_exception_view_url
+        'certificate_exception_view_url': certificate_exception_view_url,
+        'certificate_invalidation_view_url': certificate_invalidation_view_url,
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)

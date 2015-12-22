@@ -2159,16 +2159,18 @@ input[name="subject"] {
     }
   }
 
+  .student-username-or-email {
+      width: 300px;
+      margin-bottom: 10px;
+    }
+    .notes-field {
+      width: 400px;
+    }
+
+
   #certificate-white-list-editor {
     padding-top: 5px;
     .certificate-exception-inputs {
-      .student-username-or-email {
-        width: 300px;
-        margin-bottom: 10px;
-      }
-      .notes-field {
-        width: 400px;
-      }
       p + p {
         margin-top: 5px;
       }
@@ -2178,7 +2180,7 @@ input[name="subject"] {
     }
   }
 
-  .white-listed-students {
+  .white-listed-students, .invalidation-history {
     margin-top: 10px;
     padding-top: 5px;
     table {
