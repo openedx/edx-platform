@@ -234,7 +234,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         """
         Test that posting a bookmark successfully returns newly created data with 201 code.
         """
-        with self.assertNumQueries(15):
+        with self.assertNumQueries(16):
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -265,7 +265,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
                 data={'usage_id': 'invalid'},
                 expected_status=400
             )
-        self.assertEqual(response.data['user_message'], u'Invalid usage_id: invalid.')
+        self.assertEqual(response.data['user_message'], u'An error has occurred. Please try again.')
 
         # Send data without usage_id.
         with self.assertNumQueries(7):  # No queries for bookmark table.
@@ -275,7 +275,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
                 data={'course_id': 'invalid'},
                 expected_status=400
             )
-        self.assertEqual(response.data['user_message'], u'Parameter usage_id not provided.')
+        self.assertEqual(response.data['user_message'], u'An error has occurred. Please try again.')
         self.assertEqual(response.data['developer_message'], u'Parameter usage_id not provided.')
 
         # Send empty data dictionary.
@@ -286,7 +286,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
                 data={},
                 expected_status=400
             )
-        self.assertEqual(response.data['user_message'], u'No data provided.')
+        self.assertEqual(response.data['user_message'], u'An error has occurred. Please try again.')
         self.assertEqual(response.data['developer_message'], u'No data provided.')
 
     def test_post_bookmark_for_non_existing_block(self):
@@ -302,11 +302,37 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             )
         self.assertEqual(
             response.data['user_message'],
-            u'Block with usage_id: i4x://arbi/100/html/340ef1771a094090ad260ec940d04a21 not found.'
+            u'An error has occurred. Please try again.'
         )
         self.assertEqual(
             response.data['developer_message'],
             u'Block with usage_id: i4x://arbi/100/html/340ef1771a094090ad260ec940d04a21 not found.'
+        )
+
+    @patch('django.conf.settings.MAX_BOOKMARKS_PER_COURSE', 5)
+    def test_post_bookmark_when_max_bookmarks_already_exist(self):
+        """
+        Test that posting a bookmark for a block that does not exist returns a 400.
+        """
+        max_bookmarks = settings.MAX_BOOKMARKS_PER_COURSE
+        __, blocks, __ = self.create_course_with_bookmarks_count(max_bookmarks)
+
+        with self.assertNumQueries(8):  # No queries for bookmark table.
+            response = self.send_post(
+                client=self.client,
+                url=reverse('bookmarks'),
+                data={'usage_id': unicode(blocks[-1].location)},
+                expected_status=400
+            )
+        self.assertEqual(
+            response.data['user_message'],
+            u'You can create up to {0} bookmarks.'
+            u' You must remove some bookmarks before you can add new ones.'.format(max_bookmarks)
+        )
+        self.assertEqual(
+            response.data['developer_message'],
+            u'You can create up to {0} bookmarks.'
+            u' You must remove some bookmarks before you can add new ones.'.format(max_bookmarks)
         )
 
     def test_unsupported_methods(self):

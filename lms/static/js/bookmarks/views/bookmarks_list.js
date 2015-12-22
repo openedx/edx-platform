@@ -55,14 +55,11 @@
 
                 this.hideErrorMessage();
                 this.showBookmarksContainer();
-                this.showLoadingMessage();
 
                 this.collection.goTo(this.defaultPage).done(function () {
-                    view.hideLoadingMessage();
                     view.render();
                     view.focusBookmarksElement();
                 }).fail(function () {
-                    view.hideLoadingMessage();
                     view.showErrorMessage();
                 });
             },
@@ -100,7 +97,7 @@
             hideBookmarks: function () {
                 this.$el.hide();
                 $(this.coursewareResultsWrapperEl).hide();
-                $(this.coursewareContentEl).css('display', 'table-cell');
+                $(this.coursewareContentEl).css( 'display', 'table-cell');
             },
 
             showBookmarksContainer: function () {

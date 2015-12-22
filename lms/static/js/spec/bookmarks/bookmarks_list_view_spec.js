@@ -162,8 +162,6 @@ define(['backbone',
                 var expectedData = createBookmarksData({numBookmarksToCreate: 3});
 
                 bookmarksButtonView.$('.bookmarks-list-button').click();
-                expect($('#loading-message').text().trim()).
-                    toBe(bookmarksButtonView.bookmarksListView.loadingMessage);
 
                 verifyRequestParams(
                     requests,

@@ -5,6 +5,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         'use strict';
 
         describe("bookmarks.button", function () {
+            var timerCallback;
 
             var API_URL = 'bookmarks/api/v1/bookmarks/';
 
@@ -15,6 +16,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         'templates/fields/message_banner'
                     ]
                 );
+
+                timerCallback = jasmine.createSpy('timerCallback');
+                jasmine.Clock.useMock();
             });
 
             var createBookmarkButtonView = function(isBookmarked) {
@@ -135,5 +139,18 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expect($messageBanner.text().trim()).toBe(bookmarkButtonView.errorMessage);
             });
 
+            it('removes error message after 5 seconds', function () {
+                var requests = AjaxHelpers.requests(this),
+                    $messageBanner = $('.message-banner'),
+                    bookmarkButtonView = createBookmarkButtonView(false);
+                bookmarkButtonView.$el.click();
+
+                AjaxHelpers.respondWithError(requests);
+
+                expect($messageBanner.text().trim()).toBe(bookmarkButtonView.errorMessage);
+
+                jasmine.Clock.tick(5001);
+                expect($messageBanner.text().trim()).toBe('');
+            });
         });
     });

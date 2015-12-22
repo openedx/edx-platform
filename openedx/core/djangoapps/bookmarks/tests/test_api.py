@@ -14,6 +14,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .. import api
 from ..models import Bookmark
+from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from .test_models import BookmarksTestsBase
 
 
@@ -120,7 +121,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(
@@ -141,7 +142,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(
@@ -157,7 +158,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
 
         mock_tracker.reset_mock()
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             bookmark_data_2 = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 3)
@@ -175,6 +176,32 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
                 api.create_bookmark(user=self.user, usage_key=UsageKey.from_string('i4x://brb/100/html/340ef1771a0940'))
 
         self.assert_no_events_were_emitted(mock_tracker)
+
+    @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
+    @patch('django.conf.settings.MAX_BOOKMARKS_PER_COURSE', 5)
+    def bookmark_more_than_limit_raise_error(self, mock_tracker):
+        """
+        Verifies that create_bookmark raises error when maximum number of units
+        allowed to bookmark per course are already bookmarked.
+        """
+
+        max_bookmarks = settings.MAX_BOOKMARKS_PER_COURSE
+        __, blocks, __ = self.create_course_with_bookmarks_count(max_bookmarks)
+        with self.assertNumQueries(1):
+            with self.assertRaises(BookmarksLimitReachedError):
+                api.create_bookmark(user=self.user, usage_key=blocks[-1].location)
+
+        self.assert_no_events_were_emitted(mock_tracker)
+
+        # if user tries to create bookmark in another course it should succeed
+        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.other_course.id)), 1)
+        api.create_bookmark(user=self.user, usage_key=self.other_chapter_1.location)
+        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.other_course.id)), 2)
+
+        # if another user tries to create bookmark it should succeed
+        self.assertEqual(len(api.get_bookmarks(user=self.other_user, course_key=blocks[-1].location.course_key)), 0)
+        api.create_bookmark(user=self.other_user, usage_key=blocks[-1].location)
+        self.assertEqual(len(api.get_bookmarks(user=self.other_user, course_key=blocks[-1].location.course_key)), 1)
 
     @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
     def test_delete_bookmark(self, mock_tracker):
