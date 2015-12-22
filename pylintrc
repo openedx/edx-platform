@@ -95,10 +95,10 @@ const-rgx = (([A-Z_][A-Z0-9_]*)|(__.*__)|log|urlpatterns)$
 class-rgx = [A-Z_][a-zA-Z0-9]+$
 function-rgx = ([a-z_][a-z0-9_]{2,40}|test_[a-z0-9_]+)$
 method-rgx = ([a-z_][a-z0-9_]{2,40}|setUp|set[Uu]pClass|tearDown|tear[Dd]ownClass|assert[A-Z]\w*|maxDiff|test_[a-z0-9_]+)$
-attr-rgx = [a-z_][a-z0-9_]{2,30}$
-argument-rgx = [a-z_][a-z0-9_]{2,30}$
-variable-rgx = [a-z_][a-z0-9_]{2,30}$
-class-attribute-rgx = ([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$
+attr-rgx = [a-z_][a-z0-9_]{2,40}$
+argument-rgx = [a-z_][a-z0-9_]{2,40}$
+variable-rgx = [a-z_][a-z0-9_]{2,40}$
+class-attribute-rgx = ([A-Za-z_][A-Za-z0-9_]{2,40}|(__.*__))$
 inlinevar-rgx = [A-Za-z_][A-Za-z0-9_]*$
 good-names = f,i,j,k,db,ex,Run,_,__
 bad-names = foo,bar,baz,toto,tutu,tata
@@ -180,4 +180,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 22900b2201bd1e9f0050ff51de25691939dc7901
+# b98d7d902efebf1f5eaafb847960e366a35fd51b

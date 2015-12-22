@@ -281,7 +281,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
 
     protocol = 'https' if secure else 'http'
     course_key = course_key or course.id.to_deprecated_string()
-    display_name = display_name or course.display_name_with_default
+    display_name = display_name or course.display_name_with_default_escaped
 
     stripped_site_name = microsite.get_value(
         'SITE_NAME',

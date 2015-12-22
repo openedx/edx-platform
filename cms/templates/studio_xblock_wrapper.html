@@ -9,7 +9,7 @@ xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 collapsible_class = "is-collapsible" if xblock.has_children else ""
-label = xblock.display_name_with_default or xblock.scope_ids.block_type
+label = xblock.display_name_with_default_escaped or xblock.scope_ids.block_type
 messages = xblock.validate().to_json()
 %>
 

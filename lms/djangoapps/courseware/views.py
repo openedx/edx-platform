@@ -427,7 +427,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
-            'COURSE_TITLE': course.display_name_with_default,
+            'COURSE_TITLE': course.display_name_with_default_escaped,
             'course': course,
             'init': '',
             'fragment': Fragment(),
@@ -539,7 +539,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             save_child_position(chapter_module, section)
             section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
             context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
-            context['section_title'] = section_descriptor.display_name_with_default
+            context['section_title'] = section_descriptor.display_name_with_default_escaped
         else:
             # section is none, so display a message
             studio_url = get_studio_url(course, 'course')

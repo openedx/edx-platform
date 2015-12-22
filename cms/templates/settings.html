@@ -89,10 +89,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <li class="action-item">
                 <%
                   email_subject = urllib.quote(_("Enroll in {course_display_name}").format(
-                      course_display_name = context_course.display_name_with_default
+                      course_display_name = context_course.display_name_with_default_escaped
                   ).encode("utf-8"))
                   email_body = urllib.quote(_('The course "{course_display_name}", provided by {platform_name}, is open for enrollment. Please navigate to this course at {link_for_about_page} to enroll.').format(
-                      course_display_name = context_course.display_name_with_default,
+                      course_display_name = context_course.display_name_with_default_escaped,
                       platform_name = settings.PLATFORM_NAME,
                       link_for_about_page = link_for_about_page
                   ).encode("utf-8"))

@@ -324,6 +324,20 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.display_name_with_default(self)
 
+    @property
+    def display_name_with_default_escaped(self):
+        """
+        DEPRECATED: use display_name_with_default
+
+        Return html escaped reasonable display name for the course.
+
+        Note: This newly introduced method should not be used.  It was only
+        introduced to enable a quick search/replace and the ability to slowly
+        migrate and test switching to display_name_with_default, which is no
+        longer escaped.
+        """
+        return course_metadata_utils.display_name_with_default_escaped(self)
+
     def has_started(self):
         """
         Returns whether the the course has started.

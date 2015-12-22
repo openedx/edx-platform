@@ -50,7 +50,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h2 class="course-header">
       <span class="provider">${course.display_org_with_default | h}:</span>
       <span class="course-number">${course.display_number_with_default | h}</span>
-      <span class="course-name">${course.display_name_with_default}</span>
+      <span class="course-name">${course.display_name_with_default_escaped}</span>
     </h2>
     % endif
 

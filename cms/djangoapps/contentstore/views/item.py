@@ -834,7 +834,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     xblock_info = {
         "id": unicode(xblock.location),
-        "display_name": xblock.display_name_with_default,
+        "display_name": xblock.display_name_with_default_escaped,
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
@@ -1098,4 +1098,4 @@ def _xblock_type_and_display_name(xblock):
     """
     return _('{section_or_subsection} "{display_name}"').format(
         section_or_subsection=xblock_type_display_name(xblock),
-        display_name=xblock.display_name_with_default)
+        display_name=xblock.display_name_with_default_escaped)
