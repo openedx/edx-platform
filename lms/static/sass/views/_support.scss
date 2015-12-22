@@ -3,10 +3,12 @@
 // ===================================================================
 
 .certificates-search, .enrollment-search {
+  
   margin: 40px 0;
   input[name="query"] {
     width: 350px;
   }
+
   .certificates-form {
     max-width: 850px;
     margin: 0 auto;

@@ -18,9 +18,8 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class SupportViewTestCase(ModuleStoreTestCase):
