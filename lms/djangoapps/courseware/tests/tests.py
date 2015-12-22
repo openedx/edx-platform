@@ -10,11 +10,13 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE as TOY_MODULESTORE
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+)
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
 @attr('shard_1')
@@ -126,11 +128,12 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
     """
-    MODULESTORE = TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(TestMongoCoursesLoad, self).setUp()
         self.setup_user()
+        self.toy_course_key = ToyCourseFactory.create().id
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_toy_textbooks_loads(self, mock_get):
@@ -139,8 +142,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
             <entry page="5" page_label="ii" name="Table of Contents"/>
             </table_of_contents>
         """).strip()
-
-        location = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall').make_usage_key('course', '2012_Fall')
+        location = self.toy_course_key.make_usage_key('course', '2012_Fall')
         course = self.store.get_item(location)
         self.assertGreater(len(course.textbooks), 0)
 
