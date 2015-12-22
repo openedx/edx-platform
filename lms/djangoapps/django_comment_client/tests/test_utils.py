@@ -25,7 +25,7 @@ from openedx.core.djangoapps.content.course_structures.models import CourseStruc
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locator import CourseLocator
@@ -1255,7 +1255,7 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
         Make sure that course is reloaded every time--clear out the modulestore.
         """
         super(IsCommentableCohortedTestCase, self).setUp()
-        self.toy_course_key = CourseLocator("edX", "toy", "2012_Fall", deprecated=True)
+        self.toy_course_key = ToyCourseFactory.create().id
 
     def test_is_commentable_cohorted(self):
         course = modulestore().get_course(self.toy_course_key)
