@@ -15,6 +15,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from course_modes.models import CourseMode
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
@@ -201,14 +203,30 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
 
-    # The following XML test course (which lives at common/test/data/2014)
-    # is closed; we're testing that an about page still appears when
-    # the course is already closed
-    xml_course_id = SlashSeparatedCourseKey('edX', 'detached_pages', '2014')
+    def setUp(self):
+        """
+        Set up the tests
+        """
+        super(AboutTestCaseXML, self).setUp()
 
-    # this text appears in that course's about page
-    # common/test/data/2014/about/overview.html
-    xml_data = "about page 463139"
+        # The following test course (which lives at common/test/data/2014)
+        # is closed; we're testing that an about page still appears when
+        # the course is already closed
+        self.xml_course_id = self.store.make_course_key('edX', 'detached_pages', '2014')
+        import_course_from_xml(
+            self.store,
+            'test_user',
+            TEST_DATA_DIR,
+            source_dirs=['2014'],
+            static_content_store=None,
+            target_id=self.xml_course_id,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        # this text appears in that course's about page
+        # common/test/data/2014/about/overview.html
+        self.xml_data = "about page 463139"
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):

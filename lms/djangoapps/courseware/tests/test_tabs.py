@@ -27,10 +27,12 @@ from util.milestones_helpers import (
 from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE,
-    SharedModuleStoreTestCase)
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 
 class TabTestCase(SharedModuleStoreTestCase):
@@ -289,15 +291,31 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
 
-    # The following XML test course (which lives at common/test/data/2014)
-    # is closed; we're testing that tabs still appear when
-    # the course is already closed
-    xml_course_key = SlashSeparatedCourseKey('edX', 'detached_pages', '2014')
+    def setUp(self):
+        """
+        Set up the tests
+        """
+        super(StaticTabDateTestCaseXML, self).setUp()
 
-    # this text appears in the test course's tab
-    # common/test/data/2014/tabs/8e4cce2b4aaf4ba28b1220804619e41f.html
-    xml_data = "static 463139"
-    xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
+        # The following XML test course (which lives at common/test/data/2014)
+        # is closed; we're testing that tabs still appear when
+        # the course is already closed
+        self.xml_course_key = self.store.make_course_key('edX', 'detached_pages', '2014')
+        import_course_from_xml(
+            self.store,
+            'test_user',
+            TEST_DATA_DIR,
+            source_dirs=['2014'],
+            static_content_store=None,
+            target_id=self.xml_course_key,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        # this text appears in the test course's tab
+        # common/test/data/2014/tabs/8e4cce2b4aaf4ba28b1220804619e41f.html
+        self.xml_data = "static 463139"
+        self.xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
