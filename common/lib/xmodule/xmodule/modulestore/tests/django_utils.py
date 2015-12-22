@@ -32,7 +32,7 @@ class StoreConstructors(object):
     draft, split = range(2)
 
 
-def mixed_store_config(data_dir, mappings, xml_source_dirs=None, store_order=None):
+def mixed_store_config(data_dir, mappings, store_order=None):
     """
     Return a `MixedModuleStore` configuration, which provides
     access to both Mongo-backed courses.
@@ -51,13 +51,8 @@ def mixed_store_config(data_dir, mappings, xml_source_dirs=None, store_order=Non
 
     Keyword Args:
 
-        xml_source_dirs (list): The directories containing XML courses to load from disk.
-
-        note: For the courses to be loaded into the XML modulestore and accessible do the following:
-            * xml_source_dirs should be the list of directories (relative to data_dir)
-                  containing the courses you want to load
-            * mappings should be configured, pointing the xml courses to the xml modulestore
-
+        store_order (list): List of StoreConstructors providing order of modulestores
+            to use in creating courses.
     """
     if store_order is None:
         store_order = [StoreConstructors.draft, StoreConstructors.split]
