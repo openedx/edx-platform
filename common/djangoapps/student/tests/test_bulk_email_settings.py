@@ -13,7 +13,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
 # This import is for an lms djangoapp.
@@ -90,7 +90,7 @@ class TestStudentDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     """
     Check for email view on student dashboard, with XML backed course.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         super(TestStudentDashboardEmailViewXMLBacked, self).setUp()

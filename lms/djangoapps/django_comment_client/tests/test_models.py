@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 
 import django_comment_common.models as models
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_TOY_MODULESTORE, ModuleStoreTestCase
+    TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
@@ -17,7 +17,7 @@ class RoleClassTestCase(ModuleStoreTestCase):
     """
     Tests for roles of the comment client service integration
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         super(RoleClassTestCase, self).setUp()

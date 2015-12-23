@@ -12,7 +12,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from bulk_email.models import CourseAuthorization
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_TOY_MODULESTORE, SharedModuleStoreTestCase
+    TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
 )
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -112,7 +112,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     Check for email view on the new instructor dashboard
     """
 
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     @classmethod
     def setUpClass(cls):

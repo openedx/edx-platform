@@ -29,7 +29,8 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase
+    SharedModuleStoreTestCase,
+    TEST_DATA_MIXED_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
@@ -228,7 +229,7 @@ class TextbooksTestCase(TabTestCase):
 class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -288,7 +289,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Tests for the static tab dates of an XML course
     """
 
-    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """
@@ -338,7 +339,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
     """
     Validate tab behavior when dealing with Entrance Exams
     """
-    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
     def setUp(self):
@@ -445,7 +446,7 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
     """
     Validate tab behavior when dealing with textbooks.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     @classmethod
     def setUpClass(cls):

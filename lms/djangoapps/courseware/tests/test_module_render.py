@@ -43,13 +43,13 @@ from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_TOY_MODULESTORE,
-    SharedModuleStoreTestCase
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+    TEST_DATA_MIXED_MODULESTORE
 )
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
@@ -1403,7 +1403,7 @@ class MongoViewInStudioTest(ViewInStudioTest):
 class MixedViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
 
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def test_view_in_studio_link_mongo_backed(self):
         """Mixed mongo courses that are mongo backed should see 'View in Studio' links."""

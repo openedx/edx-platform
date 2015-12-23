@@ -14,7 +14,7 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+    ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
@@ -128,7 +128,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         super(TestMongoCoursesLoad, self).setUp()

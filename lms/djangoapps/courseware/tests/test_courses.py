@@ -309,7 +309,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
 @attr('shard_1')
 class XmlCoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content for an XML course."""
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """

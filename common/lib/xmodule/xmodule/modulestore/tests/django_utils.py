@@ -147,22 +147,14 @@ def drop_mongo_collections(mock_create):
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
-# This modulestore will provide both a mixed mongo editable modulestore, and
-# an XML store with just the toy course loaded.
-TEST_DATA_MIXED_TOY_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {}, xml_source_dirs=['toy']
-)
-
-# This modulestore will provide both a mixed mongo editable modulestore, and
-# an XML store with common/test/data/2014 loaded, which is a course that is closed.
-TEST_DATA_MIXED_CLOSED_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {}, xml_source_dirs=['2014']
-)
-
-# This modulestore will provide both a mixed mongo editable modulestore, and
-# an XML store with common/test/data/graded loaded, which is a course that is graded.
-TEST_DATA_MIXED_GRADED_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {}, xml_source_dirs=['graded']
+# This modulestore will provide a mixed mongo editable modulestore.
+# If your test uses the 'toy' course, use the the ToyCourseFactory to construct it.
+# If your test needs a closed course to test against, import the common/test/data/2014
+#   test course into this modulestore.
+# If your test needs a graded course to test against, import the common/test/data/graded
+#   test course into this modulestore.
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
+    TEST_DATA_DIR, {}
 )
 
 # All store requests now go through mixed

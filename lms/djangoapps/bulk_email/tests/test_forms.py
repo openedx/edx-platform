@@ -8,7 +8,6 @@ from nose.plugins.attrib import attr
 
 from bulk_email.models import CourseAuthorization, CourseEmailTemplate
 from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
