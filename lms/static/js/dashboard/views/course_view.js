@@ -58,19 +58,19 @@
 
                 render: function () {
                     this.$el.html(this.template({model: this.model.attributes, settings: this.settings}));
-                    this.$("#certificate-info-section").replaceWith(
+                    this.$('#certificate-info-section').replaceWith(
                         this.certTemplate({model: this.model.attributes, settings: this.settings})
                     );
-                    this.$("#credit-info-section").replaceWith(
+                    this.$('#credit-info-section').replaceWith(
                         this.creditTemplate({model: this.model.attributes, settings: this.settings})
                     );
-                    this.$("#course-verification-info-section").replaceWith(
+                    this.$('#course-verification-info-section').replaceWith(
                         this.courseVerificationTemplate({model: this.model.attributes, settings: this.settings})
                     );
-                    this.$("#course-mode-info-section").replaceWith(
+                    this.$('#course-mode-info-section').replaceWith(
                         this.courseModeTemplate({model: this.model.attributes, settings: this.settings})
                     );
-                    this.$("#programs-info-section").replaceWith(
+                    this.$('#programs-info-section').replaceWith(
                         this.programsTemplate({model: this.model.attributes, settings: this.settings})
                     );
                     var $actionUnroll = this.$('.action-unenroll'),
@@ -109,13 +109,13 @@
                 },
 
                 toggleCourseActionsDropDown: function (e) {
-                    // Suppress the actual click event from the browser
-                    e.preventDefault();
-
                     var ariaExpandedState,
                         $currentTarget = this.$(e.currentTarget),
                     // Toggle the visibility control for the selected element and set the focus
                         $dropDown = this.$('div#actions-dropdown');
+
+                    // Suppress the actual click event from the browser
+                    e.preventDefault();
 
                     if ($dropDown.hasClass('is-visible')) {
                         $dropDown.attr('tabindex', -1);
@@ -195,12 +195,12 @@
                     if (xhr.status === 200) {
                         location.href = this.settings.dashboard;
                     } else if (xhr.status === 403) {
-                        location.href = this.settings.signin_user + "?course_id=" +
-                            encodeURIComponent(this.$("#unenroll_course_id").val()) + "&enrollment_action=unenroll";
+                        location.href = this.settings.signin_user + '?course_id=' +
+                            encodeURIComponent(this.$('#unenroll_course_id').val()) + '&enrollment_action=unenroll';
                     } else {
                         $('#unenroll_error').html(
-                            xhr.responseText ? xhr.responseText : gettext("An error occurred. Please try again later.")
-                        ).stop().css("display", "block");
+                            xhr.responseText ? xhr.responseText : gettext('An error occurred. Please try again later.')
+                        ).stop().show();
                     }
                 },
 
@@ -210,7 +210,7 @@
 
                     $.ajax({
                         context: this,
-                        type: "POST",
+                        type: 'POST',
                         url: this.settings.change_email_settings,
                         data: this.$(e.target).serializeArray(),
                         success: function (data) {
