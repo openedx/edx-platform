@@ -12,8 +12,8 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
         },
         render: function() {
             this.$el.html(this.template({
-                name: this.model.escape('name'),
-                asset_path: this.model.escape('asset_path'),
+                name: this.model.get('name'),
+                asset_path: this.model.get('asset_path'),
                 order: this.model.get('order'),
                 error: this.model.validationError
             }));
@@ -52,8 +52,10 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
                 asset_path: this.$("input.chapter-asset-path").val()
             });
             var msg = new FileUploadModel({
-                title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
-                    {name: course.escape('name')}),
+                title: _.template(
+                    gettext("Upload a new PDF to “<%= name %>”"),
+                    {name: window.course.escape('name')}
+                ),
                 message: gettext("Please select a PDF file to upload."),
                 mimeTypes: ['application/pdf']
             });
