@@ -75,7 +75,7 @@ class BaseMicrositeBackend(object):
         microsites_root = settings.MICROSITE_ROOT_DIR
 
         if os.path.isdir(microsites_root):
-            settings.TEMPLATE_DIRS.append(microsites_root)
+            settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].insert(0, microsites_root)
             edxmako.paths.add_lookup('main', microsites_root)
             settings.STATICFILES_DIRS.insert(0, microsites_root)
 
@@ -131,19 +131,24 @@ class BaseMicrositeTemplateBackend(object):
 
         from microsite_configuration.microsite import get_value as microsite_get_value
 
-        microsite_template_path = str(microsite_get_value('template_dir', None))
+        microsite_template_path = microsite_get_value('template_dir', None)
 
-        if microsite_template_path:
-            search_path = os.path.join(microsite_template_path, relative_path)
+        if not microsite_template_path:
+            microsite_template_path = '/'.join([
+                settings.MICROSITE_ROOT_DIR,
+                microsite_get_value('microsite_config_key', 'default'),
+                'templates',
+            ])
 
-            if os.path.isfile(search_path):
-                path = '/{0}/templates/{1}'.format(
-                    microsite_get_value('microsite_config_key'),
-                    relative_path
-                )
-                return path
-
-        return relative_path
+        search_path = os.path.join(microsite_template_path, relative_path)
+        if os.path.isfile(search_path):
+            path = '/{0}/templates/{1}'.format(
+                microsite_get_value('microsite_config_key'),
+                relative_path
+            )
+            return path
+        else:
+            return relative_path
 
     def get_template(self, uri):
         """

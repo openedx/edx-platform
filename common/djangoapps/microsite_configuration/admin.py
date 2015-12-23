@@ -2,6 +2,7 @@
 Django admin page for microsite models
 """
 from django.contrib import admin
+from django import forms
 
 from .models import (
     Microsite,
@@ -9,6 +10,7 @@ from .models import (
     MicrositeOrgMapping,
     MicrositeTemplate
 )
+from util.organizations_helpers import get_organizations
 
 
 class MicrositeAdmin(admin.ModelAdmin):
@@ -39,10 +41,29 @@ class MicrositeHistoryAdmin(admin.ModelAdmin):
         return False
 
 
+class MicrositeOrgMappingForm(forms.ModelForm):
+    """
+    Django admin form for CertificateTemplate model
+    """
+    def __init__(self, *args, **kwargs):
+        super(MicrositeOrgMappingForm, self).__init__(*args, **kwargs)
+        organizations = get_organizations()
+        org_choices = [(org["short_name"], org["name"]) for org in organizations]
+        org_choices.insert(0, ('', 'None'))
+        self.fields['org'] = forms.TypedChoiceField(
+            choices=org_choices, required=False, empty_value=None
+        )
+
+    class Meta(object):
+        model = MicrositeOrgMapping
+        fields = '__all__'
+
+
 class MicrositeOrgMappingAdmin(admin.ModelAdmin):
     """ Admin interface for the Microsite object. """
     list_display = ('org', 'microsite')
     search_fields = ('org', 'microsite')
+    form = MicrositeOrgMappingForm
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = MicrositeOrgMapping

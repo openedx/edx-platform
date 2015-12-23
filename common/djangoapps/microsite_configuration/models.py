@@ -5,28 +5,17 @@ The object is stored as a json representation of the python dict
 that would have been used in the settings.
 
 """
-
-import json
+import collections
 
 from django.db import models
 from django.dispatch import receiver
-from django.core.exceptions import ValidationError
 from model_utils.models import TimeStampedModel
 
 from simple_history.models import HistoricalRecords
 
 from django.db.models.signals import pre_save, pre_delete
 from django.db.models.base import ObjectDoesNotExist
-
-
-def validate_json(values):
-    """
-    Guarantees the value passed is a valid json
-    """
-    try:
-        json.loads(values)
-    except ValueError:
-        raise ValidationError("The values field must be a valid json.")
+from jsonfield.fields import JSONField
 
 
 class Microsite(models.Model):
@@ -45,7 +34,7 @@ class Microsite(models.Model):
     """
     key = models.CharField(max_length=63, db_index=True, unique=True)
     subdomain = models.CharField(max_length=127, db_index=True, unique=True)
-    values = models.TextField(null=False, blank=True, validators=[validate_json])
+    values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
     def __unicode__(self):
         return self.key
@@ -77,7 +66,7 @@ class MicrositeHistory(TimeStampedModel):
     """
     key = models.CharField(max_length=63, db_index=True)
     subdomain = models.CharField(max_length=127, db_index=True)
-    values = models.TextField(null=False, blank=True, validators=[validate_json])
+    values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
     def __unicode__(self):
         return self.key
@@ -160,7 +149,7 @@ class MicrositeOrgMapping(models.Model):
         """
 
         try:
-            item = cls.objects.get(org=org).select_related()
+            item = cls.objects.select_related('microsite').get(org=org)
             return item.microsite
         except ObjectDoesNotExist:
             return None

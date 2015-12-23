@@ -69,7 +69,7 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
 
         candidates = Microsite.objects.all()
         for microsite in candidates:
-            values = json.loads(microsite.values)
+            values = microsite.values
             config[microsite.key] = values
 
         return config
@@ -86,7 +86,7 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
 
         # cdodge: This approach will not leverage any caching, although I think only Studio calls
         # this
-        config = json.loads(microsite.values)
+        config = microsite.values
         return config.get(val_name, default)
 
     def get_all_orgs(self):
@@ -103,7 +103,7 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         """
         Helper internal method to actually find the microsite configuration
         """
-        config = json.loads(microsite_object.values)
+        config = microsite_object.values
         config['subdomain'] = subdomain
         config['site_domain'] = domain
         config['microsite_config_key'] = microsite_object.key
