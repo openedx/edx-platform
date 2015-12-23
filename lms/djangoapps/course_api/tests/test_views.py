@@ -16,12 +16,14 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
     Mixin class for test helpers for Course API views
     """
 
-    def setup_user(self, requesting_user):
+    def setup_user(self, requesting_user, make_inactive=False):
         """
-        log in the specified user, and remember it as `self.user`
+        log in the specified user and set its is_active field
         """
-        self.user = requesting_user  # pylint: disable=attribute-defined-outside-init
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.assertTrue(self.client.login(username=requesting_user.username, password=TEST_PASSWORD))
+        if make_inactive:
+            requesting_user.is_active = False
+            requesting_user.save()
 
     def verify_response(self, expected_status_code=200, params=None, url=None):
         """
@@ -59,7 +61,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     def test_as_staff(self):
         self.setup_user(self.staff_user)
-        self.verify_response()
+        self.verify_response(params={'username': self.staff_user.username})
 
     def test_as_staff_for_honor(self):
         self.setup_user(self.staff_user)
@@ -67,7 +69,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     def test_as_honor(self):
         self.setup_user(self.honor_user)
-        self.verify_response()
+        self.verify_response(params={'username': self.honor_user.username})
 
     def test_as_honor_for_explicit_self(self):
         self.setup_user(self.honor_user)
@@ -76,6 +78,15 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     def test_as_honor_for_staff(self):
         self.setup_user(self.honor_user)
         self.verify_response(expected_status_code=403, params={'username': self.staff_user.username})
+
+    def test_as_inactive_user(self):
+        inactive_user = self.create_user(username='inactive', is_staff=False)
+        self.setup_user(inactive_user, make_inactive=True)
+        self.verify_response(params={'username': inactive_user.username})
+
+    def test_missing_username(self):
+        self.setup_user(self.honor_user)
+        self.verify_response(expected_status_code=400)
 
     @SharedModuleStoreTestCase.modifies_courseware
     def test_filter_by_org(self):
@@ -90,17 +101,40 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
         self.assertNotEqual(alternate_course.org, self.course.org)
 
         # No filtering.
-        unfiltered_response = self.verify_response()
+        unfiltered_response = self.verify_response(params={'username': self.staff_user.username})
         for org in [self.course.org, alternate_course.org]:
             self.assertTrue(
                 any(course['org'] == org for course in unfiltered_response.data['results'])  # pylint: disable=no-member
             )
 
         # With filtering.
-        filtered_response = self.verify_response(params={'org': self.course.org})
+        filtered_response = self.verify_response(params={'org': self.course.org, 'username': self.staff_user.username})
         self.assertTrue(
             all(course['org'] == self.course.org for course in filtered_response.data['results'])  # pylint: disable=no-member
         )
+
+    @SharedModuleStoreTestCase.modifies_courseware
+    def test_filter(self):
+        self.setup_user(self.staff_user)
+
+        # Create a second course to be filtered out of queries.
+        alternate_course = self.create_course(course='mobile', mobile_available=True)
+
+        test_cases = [
+            (None, [alternate_course, self.course]),
+            (dict(mobile=True), [alternate_course]),
+            (dict(mobile=False), [self.course]),
+        ]
+        for filter_, expected_courses in test_cases:
+            params = {'username': self.staff_user.username}
+            if filter_:
+                params.update(filter_)
+            response = self.verify_response(params=params)
+            self.assertEquals(
+                {course['course_id'] for course in response.data['results']},  # pylint: disable=no-member
+                {unicode(course.id) for course in expected_courses},
+                "testing course_api.views.CourseListView with filter_={}".format(filter_),
+            )
 
     def test_not_logged_in(self):
         self.client.logout()
@@ -125,10 +159,6 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
 
     def test_as_honor(self):
         self.setup_user(self.honor_user)
-        self.verify_response()
-
-    def test_as_honor_for_explicit_self(self):
-        self.setup_user(self.honor_user)
         self.verify_response(params={'username': self.honor_user.username})
 
     def test_as_honor_for_staff(self):
@@ -137,7 +167,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
 
     def test_as_staff(self):
         self.setup_user(self.staff_user)
-        self.verify_response()
+        self.verify_response(params={'username': self.staff_user.username})
 
     def test_as_staff_for_honor(self):
         self.setup_user(self.staff_user)
@@ -146,17 +176,26 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
     def test_as_anonymous_user(self):
         self.verify_response(expected_status_code=200)
 
+    def test_as_inactive_user(self):
+        inactive_user = self.create_user(username='inactive', is_staff=False)
+        self.setup_user(inactive_user, make_inactive=True)
+        self.verify_response(params={'username': inactive_user.username})
+
     def test_hidden_course_as_honor(self):
         self.setup_user(self.honor_user)
-        self.verify_response(expected_status_code=404, url=self.hidden_url)
+        self.verify_response(
+            expected_status_code=404, url=self.hidden_url, params={'username': self.honor_user.username}
+        )
 
     def test_hidden_course_as_staff(self):
         self.setup_user(self.staff_user)
-        self.verify_response(url=self.hidden_url)
+        self.verify_response(url=self.hidden_url, params={'username': self.staff_user.username})
 
     def test_nonexistent_course(self):
         self.setup_user(self.staff_user)
-        self.verify_response(expected_status_code=404, url=self.nonexistent_url)
+        self.verify_response(
+            expected_status_code=404, url=self.nonexistent_url, params={'username': self.staff_user.username}
+        )
 
     def test_invalid_course_key(self):
         # Our URL patterns try to block invalid course keys.  If one got
@@ -166,4 +205,4 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         request.query_params = {}
         request.user = self.staff_user
         response = CourseDetailView().dispatch(request, course_key_string='a:b:c')
-        self.assertEqual(404, response.status_code)
+        self.assertEquals(response.status_code, 400)

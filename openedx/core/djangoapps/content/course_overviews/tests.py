@@ -826,3 +826,24 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 }
             )
             return course_overview
+
+    def test_get_all_courses_by_mobile_available(self):
+        non_mobile_course = CourseFactory.create(emit_signals=True)
+        mobile_course = CourseFactory.create(mobile_available=True, emit_signals=True)
+
+        test_cases = (
+            (None, {non_mobile_course.id, mobile_course.id}),
+            (dict(mobile_available=True), {mobile_course.id}),
+            (dict(mobile_available=False), {non_mobile_course.id}),
+        )
+
+        for filter_, expected_courses in test_cases:
+            self.assertEqual(
+                {
+                    course_overview.id
+                    for course_overview in
+                    CourseOverview.get_all_courses(filter_=filter_)
+                },
+                expected_courses,
+                "testing CourseOverview.get_all_courses with filter_={}".format(filter_),
+            )

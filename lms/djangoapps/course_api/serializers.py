@@ -38,24 +38,20 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     Serializer for Course objects
     """
 
+    blocks_url = serializers.SerializerMethodField()
     course_id = serializers.CharField(source='id', read_only=True)
+    effort = serializers.CharField()
+    end = serializers.DateTimeField()
+    enrollment_start = serializers.DateTimeField()
+    enrollment_end = serializers.DateTimeField()
+    media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
     org = serializers.CharField(source='display_org_with_default')
     short_description = serializers.CharField()
-    effort = serializers.CharField()
-
-    media = _CourseApiMediaCollectionSerializer(source='*')
-
     start = serializers.DateTimeField()
-    start_type = serializers.CharField()
     start_display = serializers.CharField()
-    end = serializers.DateTimeField()
-
-    enrollment_start = serializers.DateTimeField()
-    enrollment_end = serializers.DateTimeField()
-
-    blocks_url = serializers.SerializerMethodField()
+    start_type = serializers.CharField()
 
     def get_blocks_url(self, course_overview):
         """
