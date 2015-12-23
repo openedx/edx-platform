@@ -159,19 +159,15 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml)
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_parents(self, modulestore_type):
         with self.store.default_store(modulestore_type):
 
             # setting up our own local course tree here, since it needs to be
             # created with the correct modulestore type.
 
-            if modulestore_type == 'xml':
-                course_key = self.store.make_course_key('edX', 'toy', '2012_Fall')
-            else:
-                course_key = ToyCourseFactory.create(run='2012_Fall_copy').id
+            course_key = ToyCourseFactory.create().id
             course = self.store.get_course(course_key)
-
             self.assertIsNone(course.get_parent())
 
             def recurse(parent):

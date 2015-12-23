@@ -649,7 +649,6 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(enrollment.course_id) != ModuleStoreEnum.Type.xml and
             CourseAuthorization.instructor_email_enabled(enrollment.course_id)
         )
     )

@@ -1991,11 +1991,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.assertEquals(store.get_modulestore_type(), store_type)
 
         # verify store used for creating a course
-        try:
-            course = self.store.create_course("org", "course{}".format(uuid4().hex[:5]), "run", self.user_id)
-            self.assertEquals(course.system.modulestore.get_modulestore_type(), store_type)
-        except NotImplementedError:
-            self.assertEquals(store_type, ModuleStoreEnum.Type.xml)
+        course = self.store.create_course("org", "course{}".format(uuid4().hex[:5]), "run", self.user_id)
+        self.assertEquals(course.system.modulestore.get_modulestore_type(), store_type)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_default_store(self, default_ms):
