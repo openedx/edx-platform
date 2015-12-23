@@ -164,8 +164,7 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
             return original
         # if we're running with a MongoBacked store course_namespace is not None, then use studio style urls
         elif (not static_asset_path) \
-                and course_id \
-                and modulestore().get_modulestore_type(course_id) != ModuleStoreEnum.Type.xml:
+                and course_id:
             # first look in the static file pipeline and see if we are trying to reference
             # a piece of static content which is in the edx-platform repo (e.g. JS associated with an xmodule)
 

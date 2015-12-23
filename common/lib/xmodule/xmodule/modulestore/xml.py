@@ -875,7 +875,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Args:
             course_key: just for signature compatibility
         """
-        return ModuleStoreEnum.Type.xml
+        return None #ModuleStoreEnum.Type.xml
 
     def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
@@ -893,7 +893,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         Returns the course count
         """
-        return {ModuleStoreEnum.Type.xml: True}
+        return {'xml': True}
 
     @contextmanager
     def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument
