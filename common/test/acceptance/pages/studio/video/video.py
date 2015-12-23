@@ -183,12 +183,11 @@ class VideoComponentPage(VideoPage):
         asset_file_path = self.file_path(asset_filename)
         self.click_button('upload_asset', index)
         self.q(css=CLASS_SELECTORS['attach_asset']).results[0].send_keys(asset_file_path)
-        self.click_button('asset_submit')
         # Only srt format transcript files can be uploaded, If an error
         # occurs due to incorrect transcript file we will return from here
         if asset_type == 'transcript' and self.q(css='#upload_error').present:
             return
-
+        self.click_button('asset_submit')
         # confirm upload completion
         self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['upload_dialog']).present, 'Upload Completed')
 
