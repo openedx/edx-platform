@@ -15,4 +15,4 @@
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@bb6cbd668ed4a8069adfa775f5b626599eb94c1b#egg=xblock-group-project-v2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/edx-solutions/xblock.git@1d0deab761bb3bf82bfb0116b91b5444a1bdacda#egg=xblock
--e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@349a3d8386b3ae14252a31d380db35756545e13c#egg=xblock-diagnostic-feedback
+-e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@eece2d76ee3a16c56d8cfb0678fceee1c959b81e#egg=xblock-diagnostic-feedback
