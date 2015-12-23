@@ -7,8 +7,9 @@ import ddt
 import itertools
 import pytz
 
-from django.test import TestCase
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -504,15 +505,9 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         self.user_staff = UserFactory.create(is_staff=True)
         self.user_anonymous = AnonymousUserFactory.create()
 
-    ENROLL_TEST_DATA = list(itertools.product(
+    COURSE_TEST_DATA = list(itertools.product(
         ['user_normal', 'user_staff', 'user_anonymous'],
-        ['enroll'],
-        ['course_default', 'course_started', 'course_not_started', 'course_staff_only'],
-    ))
-
-    LOAD_TEST_DATA = list(itertools.product(
-        ['user_normal', 'user_beta_tester', 'user_staff'],
-        ['load'],
+        ['enroll', 'load', 'staff', 'instructor', 'see_exists', 'see_in_catalog', 'see_about_page'],
         ['course_default', 'course_started', 'course_not_started', 'course_staff_only'],
     ))
 
@@ -528,8 +523,9 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         ['course_default', 'course_with_pre_requisite', 'course_with_pre_requisites'],
     ))
 
-    @ddt.data(*(ENROLL_TEST_DATA + LOAD_TEST_DATA + LOAD_MOBILE_TEST_DATA + PREREQUISITES_TEST_DATA))
+    @ddt.data(*(COURSE_TEST_DATA + LOAD_MOBILE_TEST_DATA + PREREQUISITES_TEST_DATA))
     @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_overview_access(self, user_attr_name, action, course_attr_name):
         """
         Check that a user's access to a course is equal to the user's access to
@@ -562,3 +558,35 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         overview = CourseOverview.get_from_id(self.course_default.id)
         with self.assertRaises(ValueError):
             access.has_access(self.user, '_non_existent_action', overview)
+
+    @ddt.data(
+        *itertools.product(
+            ['user_normal', 'user_staff', 'user_anonymous'],
+            ['see_exists', 'see_in_catalog', 'see_about_page'],
+            ['course_default', 'course_started', 'course_not_started'],
+        )
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_course_catalog_access_num_queries(self, user_attr_name, action, course_attr_name):
+        course = getattr(self, course_attr_name)
+
+        # get a fresh user object that won't have any cached role information
+        if user_attr_name == 'user_anonymous':
+            user = AnonymousUserFactory()
+        else:
+            user = getattr(self, user_attr_name)
+            user = User.objects.get(id=user.id)
+
+        if user_attr_name == 'user_staff' and action == 'see_exists' and course_attr_name == 'course_not_started':
+            # checks staff role
+            num_queries = 1
+        elif user_attr_name == 'user_normal' and action == 'see_exists' and course_attr_name != 'course_started':
+            # checks staff role and enrollment data
+            num_queries = 2
+        else:
+            num_queries = 0
+
+        course_overview = CourseOverview.get_from_id(course.id)
+        with self.assertNumQueries(num_queries):
+            bool(access.has_access(user, action, course_overview, course_key=course.id))
