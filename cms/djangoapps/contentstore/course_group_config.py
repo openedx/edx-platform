@@ -190,7 +190,7 @@ class GroupConfiguration(object):
         """
         Get usage information for content groups.
         """
-        items = store.get_items(course.id, settings={'group_access': {'$exists': True}})
+        items = store.get_items(course.id, settings={'group_access': {'$exists': True}}, include_orphans=False)
 
         return GroupConfiguration._get_content_groups_usage_info(course, items)
 
