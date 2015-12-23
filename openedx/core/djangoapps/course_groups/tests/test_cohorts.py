@@ -16,7 +16,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from ..models import CourseUserGroup, CourseCohort, CourseUserGroupPartitionGroup
@@ -139,7 +139,7 @@ class TestCohorts(ModuleStoreTestCase):
     """
     Test the cohorts feature
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """
@@ -733,7 +733,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     """
     Test Cohorts and Partitions Groups.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """

@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE,
-    TEST_DATA_MIXED_CLOSED_MODULESTORE
+    TEST_DATA_MIXED_MODULESTORE
 )
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -214,7 +214,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course
     """
-    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """
