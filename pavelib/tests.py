@@ -27,9 +27,11 @@ __test__ = False  # do not collect
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
+    ("without_migrations", "m", "Run without migrations (overrides --settings)"),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
     ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+    ('settings=', "S", "Django settings file to use"),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
@@ -46,11 +48,13 @@ def test_system(options):
         'failed_only': getattr(options, 'failed', None),
         'fail_fast': getattr(options, 'fail_fast', None),
         'fasttest': getattr(options, 'fasttest', None),
+        'without_migrations': getattr(options, 'without_migrations', None),
         'verbosity': getattr(options, 'verbosity', 1),
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
         'skip_clean': getattr(options, 'skip_clean', False),
         'pdb': getattr(options, 'pdb', False),
+        'settings': getattr(options, 'settings', 'test'),
     }
 
     if test_id:
