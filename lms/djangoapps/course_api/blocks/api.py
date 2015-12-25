@@ -20,6 +20,7 @@ def get_blocks(
         block_counts=None,
         student_view_data=None,
         return_type='dict',
+        block_types=None
 ):
     """
     Return a serialized representation of the course blocks.
@@ -60,6 +61,18 @@ def get_blocks(
 
     # transform
     blocks = get_course_blocks(user, usage_key, transformers)
+
+    # filter blocks by types
+    if block_types and len(block_types) == 0:
+        block_types = None
+    if block_types:
+        block_keys_to_remove = []
+        for block_key in blocks:
+            block_type = blocks.get_xblock_field(block_key, 'category')
+            if not block_type in block_types:
+                block_keys_to_remove.append(block_key)
+        for block_key in block_keys_to_remove:
+            blocks.remove_block(block_key, True)
 
     # serialize
     serializer_context = {

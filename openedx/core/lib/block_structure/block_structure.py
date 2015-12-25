@@ -70,7 +70,7 @@ class BlockStructure(object):
         traversal since it's the more common case and we currently
         need to support DAGs.
         """
-        return self.topological_traversal()
+        return self.get_block_keys()
 
     #--- Block structure relation methods ---#
 

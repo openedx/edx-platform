@@ -30,9 +30,10 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
         GET /api/courses/v1/blocks/<usage_id>/?
             username=anjali
             &depth=all
-            &requested_fields=graded,format,student_view_multi_device
+            &requested_fields=graded,format,student_view_multi_device,lti_url
             &block_counts=video
             &student_view_data=video
+            &block_types=problem,html
 
     **Parameters**:
 
@@ -84,6 +85,11 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
           Default is dict. Supported values are: dict, list
 
           Example: return_type=dict
+
+        * block_types: (list) Requested types of blocks. Possible values include sequential,
+          vertical, html, problem, video, and discussion.
+
+          Example: block_types=vertical,html
 
     **Response Values**
 
@@ -147,6 +153,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             if the student_view_url and the student_view_data fields are not
             supported.
 
+          * lti_url: The block URL for an LTI consumer.
     """
 
     def list(self, request, usage_key_string):  # pylint: disable=arguments-differ
@@ -177,7 +184,8 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data['requested_fields'],
                     params.cleaned_data.get('block_counts', []),
                     params.cleaned_data.get('student_view_data', []),
-                    params.cleaned_data['return_type']
+                    params.cleaned_data['return_type'],
+                    params.cleaned_data.get('block_types', None),
                 )
             )
         except ItemNotFoundError as exception:
@@ -198,9 +206,10 @@ class BlocksInCourseView(BlocksView):
         GET /api/courses/v1/blocks/?course_id=<course_id>
             &username=anjali
             &depth=all
-            &requested_fields=graded,format,student_view_multi_device
+            &requested_fields=graded,format,student_view_multi_device,lti_url
             &block_counts=video
             &student_view_data=video
+            &block_types=problem,html
 
     **Parameters**:
 

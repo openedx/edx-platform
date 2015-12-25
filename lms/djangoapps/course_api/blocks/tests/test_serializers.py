@@ -70,6 +70,7 @@ class TestBlockSerializerBase(EnableTransformerRegistryMixin, SharedModuleStoreT
             'block_counts',
             'student_view_data',
             'student_view_multi_device',
+            'lti_url',
         ])
 
     def assert_extended_block(self, serialized_block):
@@ -81,6 +82,7 @@ class TestBlockSerializerBase(EnableTransformerRegistryMixin, SharedModuleStoreT
                 'id', 'type', 'lms_web_url', 'student_view_url',
                 'display_name', 'graded',
                 'block_counts', 'student_view_multi_device',
+                'lti_url',
             },
             set(serialized_block.iterkeys()),
         )
@@ -135,9 +137,6 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
 
     def test_basic(self):
         serializer = self.create_serializer()
-
-        # verify root
-        self.assertEquals(serializer.data['root'], unicode(self.block_structure.root_block_usage_key))
 
         # verify blocks
         for block_key_string, serialized_block in serializer.data['blocks'].iteritems():
