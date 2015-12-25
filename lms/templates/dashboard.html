@@ -181,6 +181,19 @@ import json
       </ul>
     </section>
   </section>
+  % if program_credentials:
+    <div class="wrapper-xseries-certificates">
+      <p class="title">${_("XSeries Program Certificates")}</p>
+      <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
+      <ul>
+      % for program_credential in program_credentials:
+        <li>
+          <a class="copy" href="${program_credential['credential_url']}">${program_credential['display_name']}</a>
+        </li>
+      % endfor
+      </ul>
+    </div>
+  % endif
 </section>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">
