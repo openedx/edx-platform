@@ -21,7 +21,7 @@ class ProgramsApiConfigMixin(object):
         'enable_studio_tab': True,
     }
 
-    def create_config(self, **kwargs):
+    def create_programs_config(self, **kwargs):
         """Creates a new ProgramsApiConfig with DEFAULTS, updated with any provided overrides."""
         fields = dict(self.DEFAULTS, **kwargs)
         ProgramsApiConfig(**fields).save()
@@ -183,6 +183,29 @@ class ProgramsDataMixin(object):
             }
         ]
     }
+
+    PROGRAMS_CREDENTIALS_DATA = [
+        {
+            "id": 1,
+            "username": "test",
+            "credential": {
+                "credential_id": 1,
+                "program_id": 1
+            },
+            "status": "awarded",
+            "uuid": "dummy-uuid-1"
+        },
+        {
+            "id": 2,
+            "username": "test",
+            "credential": {
+                "credential_id": 2,
+                "program_id": 2
+            },
+            "status": "awarded",
+            "uuid": "dummy-uuid-2"
+        }
+    ]
 
     def mock_programs_api(self, data=None, status_code=200):
         """Utility for mocking out Programs API URLs."""
