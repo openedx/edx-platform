@@ -242,7 +242,7 @@ def get_course_about_section(request, course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_course_info_section_module(request, course, section_key):
+def get_course_info_section_module(request, user, course, section_key):
     """
     This returns the course info module for a given section_key.
 
@@ -255,10 +255,10 @@ def get_course_info_section_module(request, course, section_key):
     usage_key = course.id.make_usage_key('course_info', section_key)
 
     # Use an empty cache
-    field_data_cache = FieldDataCache([], course.id, request.user)
+    field_data_cache = FieldDataCache([], course.id, user)
 
     return get_module(
-        request.user,
+        user,
         request,
         usage_key,
         field_data_cache,
@@ -269,7 +269,7 @@ def get_course_info_section_module(request, course, section_key):
     )
 
 
-def get_course_info_section(request, course, section_key):
+def get_course_info_section(request, user, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,
     given the key for the section.
@@ -280,7 +280,7 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-    info_module = get_course_info_section_module(request, course, section_key)
+    info_module = get_course_info_section_module(request, user, course, section_key)
 
     html = ''
     if info_module is not None:
