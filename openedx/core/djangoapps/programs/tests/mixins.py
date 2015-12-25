@@ -1,7 +1,4 @@
 """Mixins for use during testing."""
-import json
-
-import httpretty
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
@@ -21,7 +18,7 @@ class ProgramsApiConfigMixin(object):
         'enable_studio_tab': True,
     }
 
-    def create_config(self, **kwargs):
+    def create_program_config(self, **kwargs):
         """Creates a new ProgramsApiConfig with DEFAULTS, updated with any provided overrides."""
         fields = dict(self.DEFAULTS, **kwargs)
         ProgramsApiConfig(**fields).save()
@@ -184,16 +181,25 @@ class ProgramsDataMixin(object):
         ]
     }
 
-    def mock_programs_api(self, data=None, status_code=200):
-        """Utility for mocking out Programs API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
-
-        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
-
-        if data is None:
-            data = self.PROGRAMS_API_RESPONSE
-
-        body = json.dumps(data)
-
-        httpretty.reset()
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json', status=status_code)
+    PROGRAMS_CREDENTIALS_DATA = [
+        {
+            "id": 1,
+            "username": "test",
+            "credential": {
+                "credential_id": 1,
+                "program_id": 1
+            },
+            "status": "awarded",
+            "uuid": "dummy-uuid-1"
+        },
+        {
+            "id": 2,
+            "username": "test",
+            "credential": {
+                "credential_id": 2,
+                "program_id": 2
+            },
+            "status": "awarded",
+            "uuid": "dummy-uuid-2"
+        }
+    ]

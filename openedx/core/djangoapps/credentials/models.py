@@ -15,6 +15,8 @@ class CredentialsApiConfig(ConfigurationModel):
     Manages configuration for connecting to the Credential service and using its
     API.
     """
+    OAUTH2_CLIENT_NAME = 'credentials'
+
     internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
     public_service_url = models.URLField(verbose_name=_("Public Service URL"))
 
