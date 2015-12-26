@@ -1,0 +1,9 @@
+<problem display_name="Text Input" markdown="&gt;&gt;Is a society without orphans worth striving for or will there always be people in our society who are left behind and forgotten?&lt;&lt;&#10;&#10;= of course">
+<p>Is a society without orphans worth striving for or will there always be people in our society who are left behind and forgotten?</p>
+
+<stringresponse answer="of course" type="ci">
+  <textline label="Is a society without orphans worth striving for or will there always be people in our society who are left behind and forgotten?" size="20"/>
+</stringresponse>
+
+
+</problem>
