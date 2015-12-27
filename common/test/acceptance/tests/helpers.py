@@ -636,11 +636,15 @@ class UniqueCourseTest(WebAppTest):
     def setUp(self):
         super(UniqueCourseTest, self).setUp()
 
+        # the <PLAINTEXT> tag can sometimes be used to break a page that
+        # hasn't been properly escaped
+        test_improper_escaping = '"><PLAINTEXT>'
+
         self.course_info = {
             'org': 'test_org',
             'number': self.unique_id,
             'run': 'test_run',
-            'display_name': 'Test Course' + self.unique_id
+            'display_name': 'Test Course' + test_improper_escaping + self.unique_id
         }
 
     @property
