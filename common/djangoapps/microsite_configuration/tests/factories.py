@@ -11,7 +11,9 @@ from microsite_configuration.models import (
 
 
 class MicrositeFactory(DjangoModelFactory):
-
+    """
+    Factor for Microsite
+    """
     class Meta(object):
         model = Microsite
 
@@ -44,6 +46,8 @@ class MicrositeFactory(DjangoModelFactory):
 
 
 class MicrositeOrgMappingFactory(DjangoModelFactory):
-
+    """
+    Factory for MicrositeOrgMapping
+    """
     class Meta(object):
         model = MicrositeOrgMapping

@@ -2,8 +2,6 @@
 Microsite backend that reads the configuration from the database
 
 """
-import json
-
 from mako.template import Template
 from util.cache import cache
 

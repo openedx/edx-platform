@@ -23,6 +23,7 @@ from microsite_configuration.tests.tests import (
 
 # NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure
 # Sessions are always started on every request
+# pylint: disable=no-member, protected-access
 @ddt.ddt
 @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
 class MicroSiteSessionCookieTests(MicrositeTest):

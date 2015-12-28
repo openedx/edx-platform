@@ -16,7 +16,9 @@ MICROSITE_BACKENDS = (
 
 
 class MicrositeTest(TestCase):
-
+    """
+    Base class for microsite related tests.
+    """
     def setUp(self):
         super(MicrositeTest, self).setUp()
         microsite = MicrositeFactory.create()
@@ -27,7 +29,11 @@ def side_effect_for_get_value(value, return_value):
     """
     returns a side_effect with given return value for a given value
     """
-    def side_effect(*args, **kwargs):
+    def side_effect(*args, **kwargs):  # pylint: disable=unused-argument
+        """
+        A side effect for tests which returns a value based
+        on a given argument otherwise return actual function.
+        """
         if args[0] == value:
             return return_value
         else:
