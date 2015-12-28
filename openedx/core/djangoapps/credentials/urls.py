@@ -1,10 +1,9 @@
 """
 URLs for the credentials support in LMS and Studio.
 """
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^v1/', include('openedx.core.djangoapps.credentials.api.urls')),
-)
+]
