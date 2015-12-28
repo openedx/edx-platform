@@ -37,6 +37,12 @@ def validate_lowercase(string):
         raise ValidationError(_(u"This value must be all lowercase."))
 
 
+class CourseBadgesDisabledError(Exception):
+    """
+    Exception raised when Course Badges aren't enabled, but an attempt to fetch one is made anyway.
+    """
+
+
 class BadgeClass(models.Model):
     """
     Specifies a badge class to be registered with a backend.
@@ -67,6 +73,8 @@ class BadgeClass(models.Model):
         """
         slug = slug.lower()
         issuing_component = issuing_component.lower()
+        if course_id and not modulestore().get_course(course_id).issue_badges:
+            raise CourseBadgesDisabledError("This course does not have badges enabled.")
         if not course_id:
             course_id = CourseKeyField.Empty
         try:

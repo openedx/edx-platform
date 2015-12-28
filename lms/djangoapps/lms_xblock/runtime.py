@@ -210,11 +210,12 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             track_function=kwargs.get('track_function', None),
             cache=request_cache_dict
         )
-        services['library_tools'] = LibraryToolsService(modulestore())
+        store = modulestore()
+        services['library_tools'] = LibraryToolsService(store)
         services['fs'] = xblock.reference.plugins.FSService()
         services['settings'] = SettingsService()
         if settings.FEATURES["ENABLE_OPENBADGES"]:
-            services['badging'] = BadgingService()
+            services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
 

@@ -12,7 +12,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from badges.models import CourseCompleteImageConfiguration, validate_badge_image, BadgeClass, BadgeAssertion
+from badges.models import CourseCompleteImageConfiguration, validate_badge_image, BadgeClass, BadgeAssertion, \
+    CourseBadgesDisabledError
 from badges.tests.factories import BadgeClassFactory, BadgeAssertionFactory, RandomBadgeClassFactory
 from certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
@@ -104,6 +105,19 @@ class BadgeClassTest(ModuleStoreTestCase):
         )
         self.assertNotEqual(badge_class.id, course_badge_class.id)
         self.assertEqual(course_badge_class.id, premade_badge_class.id)
+
+    def test_get_badge_class_course_disabled(self):
+        """
+        Verify attempting to fetch a badge class for a course which does not issue badges raises an
+        exception.
+        """
+        course_key = CourseFactory.create(metadata={'issue_badges': False}).location.course_key
+        self.assertRaises(
+            CourseBadgesDisabledError, BadgeClass.get_badge_class,
+            slug='test_slug', issuing_component='test_component', description='Attempted override',
+            criteria='test', display_name='Testola', image_file_handle=get_image('good'),
+            course_id=course_key,
+        )
 
     def test_get_badge_class_create(self):
         """
