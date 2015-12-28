@@ -4,6 +4,8 @@ courseware.
 """
 from datetime import datetime
 from collections import defaultdict
+
+from django.core.exceptions import ObjectDoesNotExist
 from fs.errors import ResourceNotFoundError
 import logging
 
@@ -377,7 +379,10 @@ def get_courses(user, domain=None):
     '''
     Returns a list of courses available, sorted by course.number
     '''
-    courses = branding.get_visible_courses()
+    try:
+        courses = branding.get_visible_courses(user.profile.organization.key)
+    except (AttributeError, ObjectDoesNotExist):
+        courses = branding.get_visible_courses()
 
     permission_name = microsite.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
