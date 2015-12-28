@@ -33,7 +33,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.request_factory = APIRequestFactory()
 
         self.expected_data = {
-            'course_id': u'edX/toy/2012_Fall',
+            'id': u'edX/toy/2012_Fall',
             'name': u'Toy Course',
             'number': u'toy',
             'org': u'edX',
@@ -54,6 +54,9 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'enrollment_end': u'2015-07-15T00:00:00Z',
             'blocks_url': u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
             'effort': u'6 hours',
+
+            # 'course_id' is a deprecated field, please use 'id' instead.
+            'course_id': u'edX/toy/2012_Fall',
         }
 
     def _get_request(self, user=None):
