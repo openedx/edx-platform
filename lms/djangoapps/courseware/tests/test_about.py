@@ -4,6 +4,7 @@ Test the about xblock
 import datetime
 import pytz
 
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -16,10 +17,14 @@ from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
 
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
+from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from shoppingcart.models import Order, PaidCourseRegistration
 from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -27,6 +32,7 @@ from util.milestones_helpers import (
     get_prerequisite_courses_display,
 )
 
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 from .helpers import LoginEnrollmentTestCase
 
 # HTML for registration button
@@ -567,3 +573,39 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn("Add free to Cart (Free)", resp.content)
         self.assertNotIn('<p class="important-dates-item-title">Price</p>', resp.content)
+
+
+class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test for unenrolled student tries to access ccx.
+    Note: Only CCX coach can enroll a student in CCX. In sum self-registration not allowed.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @classmethod
+    def setUpClass(cls):
+        super(CourseAboutTestCaseCCX, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(CourseAboutTestCaseCCX, self).setUp()
+
+        # Create ccx coach account
+        self.coach = coach = AdminFactory.create(password="test")
+        self.client.login(username=coach.username, password="test")
+
+    def test_redirect_to_dashboard_unenrolled_ccx(self):
+        """
+        Assert that when unenrolled user tries to access CCX do not allow the user to self-register.
+        Redirect him to his student dashboard
+        """
+
+        # create ccx
+        ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+
+        self.setup_user()
+        url = reverse('info', args=[ccx_locator])
+        response = self.client.get(url)
+        expected = reverse('dashboard')
+        self.assertRedirects(response, expected, status_code=302, target_status_code=200)
