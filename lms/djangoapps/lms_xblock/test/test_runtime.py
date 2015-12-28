@@ -11,6 +11,7 @@ from urlparse import urlparse
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator, SlashSeparatedCourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from badges.tests.factories import BadgeClassFactory
 from badges.tests.test_models import get_image
@@ -21,6 +22,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xblock.exceptions import NoSuchServiceError
 
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 TEST_STRINGS = [
     '',
@@ -191,15 +193,12 @@ class TestUserServiceAPI(TestCase):
             self.runtime.service(self.mock_block, 'user_tags').get_tag('fake_scope', self.key)
 
 
-class TestBadgingService(TestCase):
+class TestBadgingService(ModuleStoreTestCase):
     """Test the badging service interface"""
 
     def setUp(self):
         super(TestBadgingService, self).setUp()
         self.course_id = CourseKey.from_string('course-v1:org+course+run')
-
-        self.user = User(username='test_robot', email='test_robot@edx.org', password='test', first_name='Test')
-        self.user.save()
 
         self.mock_block = Mock()
         self.mock_block.service_declaration.return_value = 'needs'
@@ -232,6 +231,18 @@ class TestBadgingService(TestCase):
     def test_no_service_rendered(self):
         runtime = self.create_runtime()
         self.assertFalse(runtime.service(self.mock_block, 'badging'))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
+    def test_course_badges_disabled(self):
+        self.course_id = CourseFactory.create(metadata={'issue_badges': False}).location.course_key
+        runtime = self.create_runtime()
+        self.assertFalse(runtime.service(self.mock_block, 'badging').course_badges_enabled)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
+    def test_course_badges_enabled(self):
+        self.course_id = CourseFactory.create(metadata={'issue_badges': True}).location.course_key
+        runtime = self.create_runtime()
+        self.assertTrue(runtime.service(self.mock_block, 'badging').course_badges_enabled)
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     def test_get_badge_class(self):
