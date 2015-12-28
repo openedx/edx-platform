@@ -875,7 +875,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         Args:
             course_key: just for signature compatibility
         """
-        return None #ModuleStoreEnum.Type.xml
+        # return ModuleStoreEnum.Type.xml
+        return None
 
     def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
