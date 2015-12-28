@@ -42,11 +42,11 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     blocks_url = serializers.SerializerMethodField()
-    course_id = serializers.CharField(source='id', read_only=True)
     effort = serializers.CharField()
     end = serializers.DateTimeField()
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
+    id = serializers.CharField()  # pylint: disable=invalid-name
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
@@ -55,6 +55,9 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     start = serializers.DateTimeField()
     start_display = serializers.CharField()
     start_type = serializers.CharField()
+
+    # 'course_id' is a deprecated field, please use 'id' instead.
+    course_id = serializers.CharField(source='id', read_only=True)
 
     def get_blocks_url(self, course_overview):
         """

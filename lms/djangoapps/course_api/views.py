@@ -27,13 +27,14 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
 
         Body consists of the following fields:
 
-        * blocks_url: used to fetch the course blocks
-        * course_id: Course key
+        * blocks_url: Used to fetch the course blocks
         * effort: A textual description of the weekly hours of effort expected
             in the course.
         * end: Date the course ends
         * enrollment_end: Date enrollment ends
         * enrollment_start: Date enrollment begins
+        * id: A unique identifier of the course; a serialized representation
+            of the opaque key identifying the course.
         * media: An object that contains named media items.  Included here:
             * course_image: An image to show for the course.  Represented
               as an object with the following fields:
@@ -51,6 +52,10 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
             * `"string"`: manually set
             * `"timestamp"`: generated form `start` timestamp
             * `"empty"`: the start date should not be shown
+
+        Deprecated fields:
+
+        * course_id: Course key (use 'id' instead)
 
     **Parameters:**
 
