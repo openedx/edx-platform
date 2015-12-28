@@ -193,6 +193,7 @@ class TestUserServiceAPI(TestCase):
             self.runtime.service(self.mock_block, 'user_tags').get_tag('fake_scope', self.key)
 
 
+@ddt
 class TestBadgingService(ModuleStoreTestCase):
     """Test the badging service interface"""
 
@@ -232,17 +233,12 @@ class TestBadgingService(ModuleStoreTestCase):
         runtime = self.create_runtime()
         self.assertFalse(runtime.service(self.mock_block, 'badging'))
 
+    @data(True, False)
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    def test_course_badges_disabled(self):
-        self.course_id = CourseFactory.create(metadata={'issue_badges': False}).location.course_key
+    def test_course_badges_toggle(self, toggle):
+        self.course_id = CourseFactory.create(metadata={'issue_badges': toggle}).location.course_key
         runtime = self.create_runtime()
-        self.assertFalse(runtime.service(self.mock_block, 'badging').course_badges_enabled)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    def test_course_badges_enabled(self):
-        self.course_id = CourseFactory.create(metadata={'issue_badges': True}).location.course_key
-        runtime = self.create_runtime()
-        self.assertTrue(runtime.service(self.mock_block, 'badging').course_badges_enabled)
+        self.assertIs(runtime.service(self.mock_block, 'badging').course_badges_enabled, toggle)
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     def test_get_badge_class(self):
