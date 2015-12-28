@@ -23,6 +23,7 @@ from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
+from ccx_keys.locator import CCXLocator
 from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -817,6 +818,9 @@ def course_about(request, course_id):
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    if isinstance(course_key, CCXLocator):
+        return redirect(reverse('dashboard'))
 
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
