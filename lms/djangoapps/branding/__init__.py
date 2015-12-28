@@ -16,14 +16,22 @@ from microsite_configuration import microsite
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 
-def get_visible_courses():
+def get_visible_courses(user_org=None):
     """
     Return the set of CourseDescriptors that should be visible in this branded instance
     """
 
     filtered_by_org = microsite.get_value('course_org_filter')
 
-    _courses = modulestore().get_courses(org=filtered_by_org)
+    if settings.FEATURES.get('SHOW_ONLY_APPSEMBLER_AND_OWNED_COURSES', False):
+        appsembler_courses = modulestore().get_courses(org='edX')
+        if user_org:
+            user_courses = modulestore().get_courses(org=user_org)
+        else:
+            user_courses = []
+        _courses = appsembler_courses + user_courses
+    else:
+        _courses = modulestore().get_courses(org=filtered_by_org)
 
     courses = [c for c in _courses
                if isinstance(c, CourseDescriptor)]
