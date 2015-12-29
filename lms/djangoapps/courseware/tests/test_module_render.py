@@ -2092,7 +2092,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         super(TestDisabledXBlockTypes, self).setUp()
 
         for store in self.store.modulestores:
-            store.disabled_xblock_types = ('video',)
+            store.disabled_xblock_types = lambda: ('video',)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_item(self, default_ms):

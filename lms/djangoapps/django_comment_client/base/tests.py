@@ -372,6 +372,7 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
             with modulestore().default_store(default_store):
                 self.set_up_course(module_count=module_count)
                 self.clear_caches()
+                self.store.disabled_xblock_types()  # Cache this.
                 with self.assertNumQueries(sql_queries):
                     with check_mongo_calls(mongo_calls):
                         func(self, *args, **kwargs)

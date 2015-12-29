@@ -171,9 +171,9 @@ def create_modulestore_instance(
         doc_store_config['read_preference'] = getattr(ReadPreference, doc_store_config['read_preference'])
 
     if XBlockDisableConfig and settings.FEATURES.get('ENABLE_DISABLING_XBLOCK_TYPES', False):
-        disabled_xblock_types = XBlockDisableConfig.disabled_block_types()
+        disabled_xblock_types = XBlockDisableConfig.disabled_block_types
     else:
-        disabled_xblock_types = ()
+        disabled_xblock_types = lambda: ()
 
     return class_(
         contentstore=content_store,
