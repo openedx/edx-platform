@@ -6,7 +6,7 @@
             type="text"
             name="query"
             value="<%- user %>"
-            placeholder="<%- gettext('Username') %>">
+            placeholder="<%- gettext('Username or email address') %>">
         </input>
         <input type="submit" value="<%- gettext('Search') %>" class="btn-disable-on-submit"></input>
     </form>

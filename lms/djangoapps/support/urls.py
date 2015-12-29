@@ -11,5 +11,9 @@ urlpatterns = patterns(
     url(r'^certificates/?$', views.CertificatesSupportView.as_view(), name="certificates"),
     url(r'^refund/?$', views.RefundSupportView.as_view(), name="refund"),
     url(r'^enrollment/?$', views.EnrollmentSupportView.as_view(), name="enrollment"),
-    url(r'^enrollment/(?P<username>[\w.@+-]+)?$', views.EnrollmentSupportListView.as_view(), name="enrollment_list"),
+    url(
+        r'^enrollment/(?P<username_or_email>[\w.@+-]+)?$',
+        views.EnrollmentSupportListView.as_view(),
+        name="enrollment_list"
+    ),
 )
