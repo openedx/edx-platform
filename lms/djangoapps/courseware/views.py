@@ -107,6 +107,9 @@ log = logging.getLogger("edx.courseware")
 template_imports = {'urllib': urllib}
 
 CONTENT_DEPTH = 2
+# Only display the requirements on learner dashboard for
+# credit and verified modes.
+REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
 
 
 def user_groups(user):
@@ -1019,13 +1022,21 @@ def _credit_course_requirements(course_key, student):
         course_key (CourseKey): Identifier for the course.
         student (User): Currently logged in user.
 
-    Returns: dict
+    Returns: dict if the credit eligibility enabled and it is a credit course
+    and the user is enrolled in either verified or credit mode, and None otherwise.
 
     """
     # If credit eligibility is not enabled or this is not a credit course,
     # short-circuit and return `None`.  This indicates that credit requirements
     # should NOT be displayed on the progress page.
     if not (settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)):
+        return None
+
+    # If student is enrolled not enrolled in verified or credit mode,
+    # short-circuit and return None. This indicates that
+    # credit requirements should NOT be displayed on the progress page.
+    enrollment = CourseEnrollment.get_enrollment(student, course_key)
+    if enrollment.mode not in REQUIREMENTS_DISPLAY_MODES:
         return None
 
     # Credit requirement statuses for which user does not remain eligible to get credit.
