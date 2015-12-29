@@ -29,6 +29,8 @@ from celery import task, current_task  # pylint: disable=no-name-in-module
 from celery.states import SUCCESS, FAILURE, RETRY  # pylint: disable=no-name-in-module, import-error
 from celery.exceptions import RetryTaskError  # pylint: disable=no-name-in-module, import-error
 
+from django.utils.translation import ugettext as _
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
@@ -405,8 +407,13 @@ def _get_source_address(course_id, course_title):
     # character appears.
     course_name = re.sub(r"[^\w.-]", '_', course_id.course)
 
+    # Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
+    course_staff_title = _('"{course_name}" Course Staff')
+
+    from_addr_format = course_staff_title + u' <{course_id}-{from_email}>'
+
     def format_address(course_title_no_quotes):
-        return u'"{0}" Course Staff <{1}-{2}>'.format(
+        return from_addr_format.format(
             course_title_no_quotes,
             course_name,
             settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
