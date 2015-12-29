@@ -81,15 +81,15 @@ define([
         });
 
         it("will not render header and footer if there are no notes", function () {
-            var notes = Helpers.createNotesData(
-                {
-                    numNotesToCreate: 0,
-                    count: 0,
-                    num_pages: 1,
-                    current_page: 1,
-                    start: 0
-                }
-            );
+            var notes = {
+                'count': 0,
+                'current_page': 1,
+                'num_pages': 1,
+                'start': 0,
+                'next': null,
+                'previous': null,
+                'results': []
+            };
             var collection = new NotesCollection(notes, {perPage: 10, parse: true});
             var view = getView(collection, this.tabsCollection);
             expect(view.$('.search-tools.listing-tools')).toHaveLength(0);

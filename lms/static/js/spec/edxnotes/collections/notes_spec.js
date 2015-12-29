@@ -26,7 +26,7 @@ define([
             var compareUnits = function (structureUnits, collectionUnits) {
                 expect(structureUnits.length === collectionUnits.length).toBeTruthy();
                 for(var i = 0; i < structureUnits.length; i++) {
-                    expect(structureUnits[i].attributes).toEqual(collectionUnits[i].attributes)
+                    expect(structureUnits[i].attributes).toEqual(collectionUnits[i].attributes);
                 }
             };
 
@@ -38,7 +38,7 @@ define([
             };
 
             _.each(units, function(value, key){
-                compareUnits(structure.units[key], value)
+                compareUnits(structure.units[key], value);
             });
         });
     });

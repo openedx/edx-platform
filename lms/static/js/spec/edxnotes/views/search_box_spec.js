@@ -4,9 +4,9 @@ define([
 ], function($, _, AjaxHelpers, SearchBoxView, NotesCollection, customMatchers, Helpers) {
     'use strict';
     describe('EdxNotes SearchBoxView', function() {
-        var getSearchBox, submitForm, assertBoxIsEnabled, assertBoxIsDisabled, searchReponse;
+        var getSearchBox, submitForm, assertBoxIsEnabled, assertBoxIsDisabled, searchResponse;
 
-        searchReponse = {
+        searchResponse = {
             'count': 2,
             'current_page': 1,
             'num_pages': 1,
@@ -75,7 +75,7 @@ define([
                 'test_text'
             );
             assertBoxIsDisabled(this.searchBox);
-            AjaxHelpers.respondWithJson(requests, searchReponse);
+            AjaxHelpers.respondWithJson(requests, searchResponse);
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.search).toHaveBeenCalledWith(
                 jasmine.any(NotesCollection), 'test_text'
@@ -88,7 +88,7 @@ define([
         it('should log the edx.course.student_notes.searched event properly', function () {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
-            AjaxHelpers.respondWithJson(requests, searchReponse);
+            AjaxHelpers.respondWithJson(requests, searchResponse);
 
             expect(Logger.log).toHaveBeenCalledWith('edx.course.student_notes.searched', {
                 'number_of_results': 2,
@@ -149,7 +149,7 @@ define([
             submitForm(this.searchBox, 'test_text');
             assertBoxIsDisabled(this.searchBox);
             submitForm(this.searchBox, 'another_text');
-            AjaxHelpers.respondWithJson(requests, searchReponse);
+            AjaxHelpers.respondWithJson(requests, searchResponse);
             assertBoxIsEnabled(this.searchBox);
             expect(requests).toHaveLength(1);
         });

@@ -3,7 +3,7 @@ define(['underscore', 'URI', 'common/js/spec_helpers/ajax_helpers'], function(_,
     var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
         LONG_TEXT, PRUNED_TEXT, TRUNCATED_TEXT, SHORT_TEXT,
         base64Encode, makeToken, getChapter, getSection, getUnit, getDefaultNotes,
-        stringStartsWith, verifyUrl, verifyRequestParams, createNotesData, respondToRequest,
+        verifyUrl, verifyRequestParams, createNotesData, respondToRequest,
         verifyPaginationInfo, verifyPageData;
 
     LONG_TEXT = [
@@ -169,12 +169,8 @@ define(['underscore', 'URI', 'common/js/spec_helpers/ajax_helpers'], function(_,
         };
     };
 
-    stringStartsWith = function (string, prefix) {
-        return string.slice(0, prefix.length) == prefix;
-    };
-
     verifyUrl = function (requestUrl, expectedUrl, expectedParams) {
-        expect(stringStartsWith(requestUrl, expectedUrl)).toBeTruthy();
+        expect(requestUrl.slice(0, expectedUrl.length) === expectedUrl).toBeTruthy();
         verifyRequestParams(requestUrl, expectedParams);
     };
 
@@ -250,7 +246,6 @@ define(['underscore', 'URI', 'common/js/spec_helpers/ajax_helpers'], function(_,
         getSection: getSection,
         getUnit: getUnit,
         getDefaultNotes: getDefaultNotes,
-        stringStartsWith: stringStartsWith,
         verifyUrl: verifyUrl,
         verifyRequestParams: verifyRequestParams,
         createNotesData: createNotesData,

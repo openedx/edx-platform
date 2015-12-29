@@ -212,15 +212,15 @@ define([
         it("will not render header and footer if there are no notes", function () {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
-                notes = Helpers.createNotesData(
-                    {
-                        numNotesToCreate: 0,
-                        count: 0,
-                        num_pages: 1,
-                        current_page: 1,
-                        start: 0
-                    }
-                );
+                notes = {
+                    'count': 0,
+                    'current_page': 1,
+                    'num_pages': 1,
+                    'start': 0,
+                    'next': null,
+                    'previous': null,
+                    'results': []
+                };
             submitForm(view.searchBox, 'awesome');
             Helpers.respondToRequest(requests, notes, true);
             expect(view.$('.search-tools.listing-tools')).toHaveLength(0);
