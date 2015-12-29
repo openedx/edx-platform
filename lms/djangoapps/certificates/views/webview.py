@@ -359,7 +359,11 @@ def _track_certificate_events(request, context, course, user, user_certificate):
 
     if 'evidence_visit' in request.GET:
         badge_class = get_completion_badge(course_key, user)
-        badges = badge_class.get_for_user(user)
+        if not badge_class:
+            log.warning('Visit to evidence URL for badge, but badges not configured for course "%s"', course_key)
+            badges = []
+        else:
+            badges = badge_class.get_for_user(user)
         if badges:
             # There should only ever be one of these.
             badge = badges[0]
@@ -441,7 +445,7 @@ def _update_badge_context(context, course, user):
     Updates context with badge info.
     """
     badge = None
-    if settings.FEATURES.get('ENABLE_OPENBADGES'):
+    if settings.FEATURES.get('ENABLE_OPENBADGES') and course.issue_badges:
         badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
         if badges:
             badge = badges[0]

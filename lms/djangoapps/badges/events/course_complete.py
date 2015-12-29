@@ -82,6 +82,8 @@ def get_completion_badge(course_id, user):
         return None
     mode = badge_classes[0].mode
     course = modulestore().get_course(course_id)
+    if not course.issue_badges:
+        return None
     return BadgeClass.get_badge_class(
         slug=course_slug(course_id, mode),
         issuing_component='',
