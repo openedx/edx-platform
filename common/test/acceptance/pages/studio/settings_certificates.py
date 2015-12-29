@@ -68,6 +68,12 @@ class CertificatesPage(CoursePage):
         """
         return self.q(css='.course-number-override .certificate-value').first.text[0]
 
+    def course_number_override(self):
+        """
+        Return Course Number Override selector
+        """
+        return self.q(css='.course-number-override')
+
     ################
     # Properties
     ################
