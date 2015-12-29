@@ -16,5 +16,9 @@ urlpatterns = patterns(
         r'^course/({})/?$'.format(settings.COURSE_KEY_PATTERN),
         'openedx.core.djangoapps.labster.course.views.course_handler',
         name='course_handler_detail'
+    ),
+    url(
+        r'^coaches/?$', 'openedx.core.djangoapps.labster.course.views.coach_list_handler',
+        name='coach_list_handler'
     )
 )

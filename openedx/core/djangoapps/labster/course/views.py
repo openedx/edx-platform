@@ -17,6 +17,7 @@ from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from openedx.core.djangoapps.labster.course.utils import set_staff
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 log = logging.getLogger(__name__)
@@ -128,3 +129,14 @@ def course_handler(request, course_key_string=None):
                 return Response(status=status.HTTP_204_NO_CONTENT)
     except InvalidKeyError:
         raise Http404
+
+
+@api_view(['GET'])
+@authentication_classes((SessionAuthentication, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def coach_list_handler(reuqest):
+    coach_list = ({
+        'full_name': ccx.coach.get_full_name(),
+        'email': ccx.coach.email,
+    } for ccx in CustomCourseForEdX.objects.all())
+    return Response(coach_list)
