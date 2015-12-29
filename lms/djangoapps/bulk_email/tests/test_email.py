@@ -14,6 +14,8 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
+from django.utils import translation
+
 from bulk_email.models import Optout
 from courseware.tests.factories import StaffFactory, InstructorFactory
 from instructor_task.subtasks import update_subtask_status
@@ -84,6 +86,90 @@ class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
             'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
+
+
+@attr('shard_1')
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+class TestLocalizedFromAddress(EmailSendFromDashboardTestCase):
+
+    original_ugettext = None
+    mocked_lang = 'ar'
+
+    def setUp(self):
+        super(TestLocalizedFromAddress, self).setUp()
+
+        translations = translation.trans_real._translations  # pylint: disable=protected-access
+
+        with translation.override(self.mocked_lang):
+            # In order to undo it later
+            self.original_ugettext = translations[self.mocked_lang].ugettext
+
+            mocked_ugettext = self.get_mocked_ugettext(self.mocked_lang)
+            translations[self.mocked_lang].ugettext = mocked_ugettext
+
+    def get_mocked_ugettext(self, lang_code):
+        """
+        Mocks ugettext to return the lang code with the original string.
+
+        e.g.
+
+        >>> ugettext = self.mock_ugettext('ar')
+        >>> ugettext('Hello') == '@AR Hello@'
+        """
+        def mocked_ugettext(msg):
+            """
+            A mock of ugettext to isolate it from the real `.mo` files.
+            """
+            return u'@{} {}@'.format(lang_code.upper(), msg)
+
+        return mocked_ugettext
+
+    def send_email(self):
+        """
+        Sends a dummy email to check the `from_addr` translation.
+        """
+        test_email = {
+            'action': 'send',
+            'send_to': 'myself',
+            'subject': 'test subject for myself',
+            'message': 'test message for myself'
+        }
+
+        self.client.post(self.send_mail_url, test_email)
+
+        return mail.outbox[0]
+
+    @override_settings(LANGUAGE_CODE='en')
+    def test_english_platform(self):
+        """
+        Test if the email `from` is localized to the platform's preference.
+        """
+
+        message = self.send_email()
+
+        self.assertNotRegexpMatches(
+            message.from_email,
+            '@.* Course Staff@'
+        )
+
+    @override_settings(LANGUAGE_CODE='ar')
+    def test_arabic_platform(self):
+        """
+        Test if the email `from` is localized to the platform's preference.
+        """
+
+        message = self.send_email()
+
+        self.assertRegexpMatches(
+            message.from_email,
+            '@AR .* Course Staff@'
+        )
+
+    def tearDown(self):
+        super(TestLocalizedFromAddress, self).tearDown()
+
+        translations = translation.trans_real._translations  # pylint: disable=protected-access
+        translations[self.mocked_lang].ugettext = self.original_ugettext
 
 
 @attr('shard_1')
