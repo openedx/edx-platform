@@ -14,12 +14,9 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 
-<<<<<<< HEAD
 from course_modes.models import CourseMode
-=======
 from badges.events.course_complete import get_completion_badge
->>>>>>> a248c5a... Add completion and enrollment badges.
-from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
+from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory, BadgeClassFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
@@ -337,6 +334,26 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             response.content
         )
         self.assertIn('logo_test1.png', response.content)
+
+    @ddt.data(True, False)
+    @patch('certificates.views.webview.get_completion_badge')
+    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
+    def test_fetch_badge_info(self, issue_badges, mock_get_completion_badge):
+        """
+        Test: Fetch badge class info if badges are enabled.
+        """
+        badge_class = BadgeClassFactory(course_id=self.course_id, mode=self.cert.mode)
+        mock_get_completion_badge.return_value = badge_class
+
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+
+        if issue_badges:
+            mock_get_completion_badge.assertCalled()
+        else:
+            mock_get_completion_badge.assertNotCalled()
 
     @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
