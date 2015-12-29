@@ -40,8 +40,7 @@ def get_programs(user):
             return cached
 
     try:
-        jwt = get_id_token(user, programs_config.OAUTH2_CLIENT_NAME)
-        api = EdxRestApiClient(programs_config.internal_api_url, jwt=jwt)
+        api = programs_api_client(user, programs_config=programs_config)
     except Exception:  # pylint: disable=broad-except
         log.exception('Failed to initialize the Programs API client.')
         return no_programs
@@ -105,3 +104,38 @@ def get_programs_for_dashboard(user, course_keys):
             log.exception('Unable to parse Programs API response: %r', program)
 
     return course_programs
+
+
+def programs_api_client(user, programs_config=None):
+    """
+    Returns an Programs API client setup for the specified user.
+    """
+    if not programs_config:
+        programs_config = ProgramsApiConfig.current()
+    jwt = get_id_token(user, programs_config.OAUTH2_CLIENT_NAME)
+    return EdxRestApiClient(programs_config.internal_api_url, jwt=jwt)
+
+
+def get_program_by_id(user, program_id):
+    """
+    Given a user and program id, get program from the Programs service.
+
+    Arguments:
+        user (User): The user to authenticate as when requesting program.
+        program_id (Integer): The program id when requesting a single program.
+
+    Returns:
+        dict, representing program returned by the Programs service.
+    """
+    programs_config = ProgramsApiConfig.current()
+    try:
+        api = programs_api_client(user, programs_config=programs_config)
+    except Exception:  # pylint: disable=broad-except
+        log.exception('Failed to initialize the Programs API client.')
+        return {}
+
+    try:
+        return api.programs(program_id).get()
+    except Exception:  # pylint: disable=broad-except
+        log.exception('Failed to retrieve program from the Programs API.')
+        return {}
