@@ -322,13 +322,21 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
         raise EdxNotesParseError(_("Invalid response received from notes api."))
 
     # Verify response dict structure
-    expected_keys = ['count', 'results', 'num_pages', 'start', 'next', 'previous', 'current_page']
+    expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
     keys = collection.keys()
     if not keys or not all(key in expected_keys for key in keys):
         raise EdxNotesParseError(_("Invalid response received from notes api."))
 
-    filtered_results = preprocess_collection(request.user, course, collection['results'])
+    filtered_results = preprocess_collection(request.user, course, collection['rows'])
+    # notes frontend uses notes api in two ways
+    # 1. uses through LMS
+    # 2. directly call the notes api
+    # In first case, notes frontend requires count and results attributes in json response and
+    # for second case frontend requires total and rows attributes in json response.
+    collection['count'] = collection['total']
+    del collection['total']
     collection['results'] = filtered_results
+    del collection['rows']
 
     collection['next'], collection['previous'] = construct_pagination_urls(
         request,
