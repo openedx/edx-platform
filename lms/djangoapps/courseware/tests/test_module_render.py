@@ -1152,7 +1152,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
 
     def test_get_course_info_section(self):
         self.course.static_asset_path = "toy_course_dir"
-        get_course_info_section(self.request, self.course, "handouts")
+        get_course_info_section(self.request, self.request.user, self.course, "handouts")
         # NOTE: check handouts output...right now test course seems to have no such content
         # at least this makes sure get_course_info_section returns without exception
 
