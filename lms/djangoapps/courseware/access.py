@@ -39,6 +39,7 @@ from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
     CourseBetaTesterRole,
+    CourseCcxCoachRole,
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
@@ -62,7 +63,39 @@ from courseware.access_response import (
 )
 from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
 
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+
 log = logging.getLogger(__name__)
+
+
+def has_ccx_coach_role(user, course_key):
+    """
+    Check if user is a coach on this ccx.
+
+    Arguments:
+        user (User): the user whose descriptor access we are checking.
+        course_key (CCXLocator): Key to CCX.
+
+    Returns:
+        bool: whether user is a coach on this ccx or not.
+    """
+    if hasattr(course_key, 'ccx'):
+        ccx_id = course_key.ccx
+        role = CourseCcxCoachRole(course_key)
+
+        if role.has_user(user):
+            list_ccx = CustomCourseForEdX.objects.filter(
+                course_id=course_key.to_course_locator(),
+                coach=user
+            )
+            if list_ccx.exists():
+                coach_ccx = list_ccx[0]
+                return str(coach_ccx.id) == ccx_id
+    else:
+        raise CCXLocatorValidationException("Invalid CCX key. To verify that "
+                                            "user is a coach on CCX, you must provide key to CCX")
+    return False
 
 
 def has_access(user, action, obj, course_key=None):
