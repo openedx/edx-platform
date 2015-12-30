@@ -1,5 +1,5 @@
 """ Commerce API v1 view tests. """
-from datetime import datetime
+from datetime import datetime, timedelta
 import itertools
 import json
 
@@ -225,6 +225,26 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(VerificationDeadline.deadline_for_course(self.course.id))
+
+    def test_remove_upgrade_deadline(self):
+        """
+        Verify that course mode upgrade deadlines can be removed through the API.
+        """
+        # First create a deadline
+        upgrade_deadline = datetime.now(pytz.utc) + timedelta(days=1)
+        response, __ = self._get_update_response_and_expected_data(upgrade_deadline, None)
+        self.assertEqual(response.status_code, 200)
+        verified_mode = CourseMode.verified_mode_for_course(self.course.id)
+        self.assertIsNotNone(verified_mode)
+        self.assertEqual(verified_mode.expiration_datetime.date(), upgrade_deadline.date())
+
+        # Now set the deadline to None
+        response, __ = self._get_update_response_and_expected_data(None, None)
+        self.assertEqual(response.status_code, 200)
+
+        updated_verified_mode = CourseMode.verified_mode_for_course(self.course.id)
+        self.assertIsNotNone(updated_verified_mode)
+        self.assertIsNone(updated_verified_mode.expiration_datetime)
 
     def test_update_overwrite(self):
         """ Verify that data submitted via PUT overwrites/deletes modes that are
