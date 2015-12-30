@@ -22,8 +22,6 @@ from pytz import UTC
 from shutil import rmtree
 from tempfile import mkdtemp
 
-from xblock.core import XBlock
-
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -44,6 +42,7 @@ from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DI
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location, navigation_index
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
     mongo_uses_error_check
 from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, mock_tab_from_json
@@ -463,16 +462,13 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
         course_key = test_course.id
 
-        # get detached category list
-        detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
-
         items = self.store.get_items(course_key)
         # Check items found are either course or about type
         self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items])))
         # Assert that about is a detached category found in get_items
         self.assertIn(
             [item.location.block_type for item in items if item.location.block_type == 'about'][0],
-            detached_categories
+            DETACHED_XBLOCK_TYPES
         )
         self.assertEqual(len(items), 2)
 
