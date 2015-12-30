@@ -98,6 +98,7 @@ class UsersPageMixin(PageObject):
         """ Deletes user from course/library """
         target_user = self.get_user(email)
         target_user.click_delete()
+        self.wait_for_page()
 
     def modal_dialog_visible(self, dialog_type):
         """ Checks if modal dialog of specified class is displayed """

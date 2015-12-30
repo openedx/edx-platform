@@ -92,7 +92,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-24 13:41+0000\n"
+"POT-Creation-Date: 2015-12-03 21:16+0000\n"
 "PO-Revision-Date: 2015-11-24 13:39+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -220,6 +220,46 @@ msgid ""
 "verification."
 msgstr ""
 
+#: common/djangoapps/course_modes/helpers.py
+msgid "Your verification is pending"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "Verified: Pending Verification"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "ID verification pending"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Verified"
+msgstr "인증"
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "ID Verified Ribbon/Badge"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "학습자 서약"
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as a professional education student"
+msgstr ""
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "Professional Ed"
+msgstr ""
+
 #: common/djangoapps/course_modes/models.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: lms/templates/courseware/courseware.html
@@ -252,62 +292,14 @@ msgid ""
 " to the ecommerce service."
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py
-msgid "Honor Code Certificate"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "청강"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
 "Professional education modes are not allowed to have expiration_datetime "
 "set."
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Your verification is pending"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Verified: Pending Verification"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "ID verification pending"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as a verified student"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Verified"
-msgstr "인증"
-
-#: common/djangoapps/course_modes/models.py
-msgid "ID Verified Ribbon/Badge"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as an honor code student"
-msgstr ""
-
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "학습자 서약"
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're auditing this course"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Auditing"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as a professional education student"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Professional Ed"
 msgstr ""
 
 #: common/djangoapps/course_modes/views.py
@@ -800,6 +792,10 @@ msgid ""
 "If this option is selected, users will not be required to confirm their "
 "email, and their account will be activated immediately upon registration."
 msgstr ""
+
+#: lms/templates/student_account/finish_auth.html
+msgid "Please wait"
+msgstr "잠시 기다려 주십시오."
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -2326,6 +2322,11 @@ msgstr ""
 msgid "Enable CCX"
 msgstr ""
 
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content. CCX Coach is
+#. a role created by a course Instructor to enable a person (the "Coach") to
+#. manage the custom course for
+#. his students.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
@@ -3330,6 +3331,8 @@ msgstr ""
 msgid "Request user's username"
 msgstr ""
 
+#. Translators: This is used to request the user's username for a third party
+#. service.
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Select True to request the user's username."
 msgstr ""
@@ -3338,6 +3341,8 @@ msgstr ""
 msgid "Request user's email"
 msgstr ""
 
+#. Translators: This is used to request the user's email for a third party
+#. service.
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Select True to request the user's email address."
 msgstr ""
@@ -4313,6 +4318,8 @@ msgstr ""
 msgid "Top num_top_words words for word cloud."
 msgstr ""
 
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
@@ -4340,7 +4347,7 @@ msgid "News"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "FAQs"
+msgid "Help Center"
 msgstr ""
 
 #: lms/templates/static_templates/contact.html
@@ -4348,10 +4355,9 @@ msgstr ""
 msgid "Contact"
 msgstr "연락처"
 
-#: lms/templates/static_templates/jobs.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Jobs"
-msgstr "직업"
+#: lms/djangoapps/branding/api.py
+msgid "Careers"
+msgstr ""
 
 #: lms/templates/static_templates/donate.html
 msgid "Donate"
@@ -5778,32 +5784,51 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invalid Json data"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Students added to Certificate white list successfully"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Student username/email is required."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Duplicate Student Username/password."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Student (username/email={user}) does not exist"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Multiple Students found with username/email={user}"
+msgid "Student (username/email={user}) already in certificate exception list."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Student (username/email={user_id} already in certificate exception  list)"
+"Certificate exception (user={user}) does not exist in certificate white "
+"list. Please refresh the page and try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid Json data, Please refresh the page and then try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Add Exception\" button."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"We can't find the user (username/email={user}) you've entered. Make sure the"
+" username or email address is correct, then try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The user (username/email={user}) you have entered is not enrolled in this "
+"course. Make sure the username or email address is correct, then try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid data, user_id must be present for all certificate exceptions."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate generation started for white listed students."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "user \"{user}\" in row#    {row}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "user \"{username}\" in row# {row}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -6655,16 +6680,27 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
+"You can unenroll in the course and receive a full refund for 14 days after "
+"the course start date. "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
 "If you haven't verified your identity yet, please start the verification "
 "process ({verification_url})."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"You have up to two weeks into the course to unenroll and receive a full "
-"refund.To receive your refund, contact {billing_email}. Please include your "
-"order number in your email. Please do NOT include your credit card "
-"information."
+"You can unenroll in the course and receive a full refund for 2 days after "
+"the course start date. "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
+"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
+" include your order number in your email. Please do NOT include your credit "
+"card information."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -8459,6 +8495,14 @@ msgstr ""
 msgid "Course Credit Eligibility"
 msgstr ""
 
+#: openedx/core/djangoapps/credit/exceptions.py
+msgid "[{username}] is not eligible for credit for [{course_key}]."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/exceptions.py
+msgid "[{course_key}] is not a valid course key."
+msgstr ""
+
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
 "Unique identifier for this credit provider. Only alphanumeric characters and"
@@ -8545,6 +8589,10 @@ msgid "No file provided for profile image"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
 msgid "Internal Service URL"
 msgstr ""
 
@@ -8553,11 +8601,16 @@ msgid "Public Service URL"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "API Version"
+msgid "Path to authoring app's JS"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "Enable Student Dashboard Displays"
+msgid ""
+"This value is required in order to enable the Studio authoring interface."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Path to authoring app's CSS"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
@@ -8568,6 +8621,14 @@ msgstr ""
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Studio Authoring Interface"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -8614,6 +8675,10 @@ msgstr ""
 msgid "username@domain.com"
 msgstr ""
 
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
@@ -8629,12 +8694,16 @@ msgstr "비밀번호"
 msgid "Remember me"
 msgstr "로그인 상태 유지"
 
+#. Translators: This message is shown to users who attempt to create a new
+#. account using an email address associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
 msgstr ""
 
+#. Translators: This message is shown to users who attempt to create a new
+#. account using a username associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
@@ -8647,9 +8716,13 @@ msgstr ""
 msgid "Jane Doe"
 msgstr ""
 
-#: lms/templates/register.html
-msgid "Needed for any certificates you may earn"
-msgstr "앞으로 받게 될 이수증에 필요합니다. 영문이름 병기를 원하시면 영문이름을 추가하세요."
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -8657,6 +8730,9 @@ msgstr "앞으로 받게 될 이수증에 필요합니다. 영문이름 병기�
 msgid "Public username"
 msgstr ""
 
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "The name that will identify you in your courses - {bold_start}(cannot be "
@@ -8683,6 +8759,8 @@ msgstr "출생연도"
 msgid "Mailing address"
 msgstr "우편주소"
 
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
 msgstr ""
@@ -8697,10 +8775,18 @@ msgstr ""
 msgid "Terms of Service and Honor Code"
 msgstr ""
 
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
 msgstr ""
 
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
 msgstr ""
@@ -9398,18 +9484,30 @@ msgid ""
 msgstr ""
 
 #: common/templates/course_modes/choose.html
+msgid "Earn an Honor Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Take this course for free and have complete access to all the course "
+"material, activities, tests, and forums. Please note that learners who earn "
+"a passing grade will earn a certificate in this course."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Pursue an Honor Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "이 강좌 청강"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
+"material, activities, tests, and forums.  Please note that this track does "
+"not offer a certificate for learners who earn a passing grade."
 msgstr ""
-"무료로 본 강좌를 청강하고 모든 강좌의 자료, 활동, 시험, 게시판을 이용하세요. 명예규범을 잘 따르고 학습활동이 만족스럽다면, 성취를 "
-"보여준 학습자에게 명예규범 인증서가 부여됩니다. "
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
@@ -10621,10 +10719,10 @@ msgstr "저장소 위치"
 msgid "Repo Branch (optional)"
 msgstr "분기 저장소 (선택)"
 
-#. Translators: Github is a popular website for hosting code
+#. Translators: GitHub is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
-msgid "Load new course from github"
-msgstr "github로부터 새 강좌 올림"
+msgid "Load new course from GitHub"
+msgstr ""
 
 #. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
@@ -12152,7 +12250,7 @@ msgstr ""
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
-msgstr "최종 강좌 세부 사항을 산출 중입니다. 최종 결과가 곧 발표될 될 것입니다."
+msgstr "성적을 산출 중입니다. 최종 성적을 곧 확인하실 수 있습니다."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -12161,6 +12259,10 @@ msgstr "최종 성적"
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
 msgstr "{cert_name_short} 에 필요한 성적:"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grade required to pass this course:"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -13651,10 +13753,6 @@ msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "유형별 (관리자, 운영팀, 학습자)  등록 인원"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "청강"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
 msgstr "전문"
 
@@ -13837,7 +13935,7 @@ msgstr "성적 보고서 생성"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Problem Grade Report"
-msgstr "성적 보고서 생성 오류"
+msgstr "문항 성적 보고서 생성"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
@@ -15746,6 +15844,11 @@ msgstr ""
 msgid "FAQ"
 msgstr "자주하는 질문"
 
+#: lms/templates/static_templates/jobs.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Jobs"
+msgstr "직업"
+
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "미디어 키트"
@@ -15789,10 +15892,6 @@ msgstr "계정 설정"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
-msgstr "잠시 기다려 주십시오."
-
-#: lms/templates/student_account/finish_auth.html
-msgid "Please wait"
 msgstr "잠시 기다려 주십시오."
 
 #: lms/templates/student_account/login_and_register.html
@@ -15921,8 +16020,8 @@ msgstr "{course_name}의 인증 마감일은 {date}까지였습니다. 인증을
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
 "The deadline to upgrade to a verified certificate for this course has "
-"passed. You can still earn an honor code certificate."
-msgstr "인증 이수증으로 업그레이드할 수 있는 날짜가 지났습니다. 명예 이수증은 지금 발급 가능합니다. "
+"passed."
+msgstr ""
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Upgrade Your Enrollment For {course_name}."
@@ -17648,6 +17747,10 @@ msgid "New Library"
 msgstr "새 콘텐츠 보관함"
 
 #: cms/templates/index.html
+msgid "New Program"
+msgstr ""
+
+#: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr "아래에 강조한 필드를 수정하세요."
 
@@ -17812,6 +17915,10 @@ msgstr ""
 msgid "Libraries"
 msgstr "콘텐츠 보관함"
 
+#: cms/templates/index.html cms/templates/widgets/header.html
+msgid "Programs"
+msgstr ""
+
 #: cms/templates/index.html
 msgid "Re-run Course"
 msgstr "강좌 다시 시작하기"
@@ -17927,6 +18034,18 @@ msgid ""
 "courses. Create your first library with the click of a button!"
 msgstr ""
 "콘텐츠 보관함은 다양한 강좌에서 다시 사용할 수 있는 구성요소를 가지고 있습니다. 버튼 클릭 한 번으로 첫 콘텐츠 보관함을 만들어보세요!"
+
+#: cms/templates/index.html
+msgid "You haven't created any programs yet."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Programs are groups of courses related to a common subject."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Create Your First Program"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -18206,6 +18325,10 @@ msgid ""
 msgstr ""
 "교수자는 콘텐츠 보관함의 전체 수정 권한을 가지며, 다른 강좌 운영팀 구성원을 추가하고 삭제할 수 있습니다. 이를 위해 보관함에 교수자가"
 " 최소 1명 이상 있어야 합니다.  "
+
+#: cms/templates/program_authoring.html cms/templates/widgets/header.html
+msgid "Program Administration"
+msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"

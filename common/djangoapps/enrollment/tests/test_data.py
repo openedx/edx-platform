@@ -11,9 +11,10 @@ from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from enrollment.errors import (
-    CourseNotFoundError, UserNotFoundError, CourseEnrollmentClosedError,
+    UserNotFoundError, CourseEnrollmentClosedError,
     CourseEnrollmentFullError, CourseEnrollmentExistsError,
 )
+from openedx.core.lib.exceptions import CourseNotFoundError
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, AlreadyEnrolledError
 from enrollment import data

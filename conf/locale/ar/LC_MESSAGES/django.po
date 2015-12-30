@@ -32,6 +32,7 @@
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
 # SiddigSami <siddigsami@live.com>, 2014-2015
+# Soha Assali <soha+transifex@qordoba.com>, 2015
 # soliman osman <solimanosman@windowslive.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -76,7 +77,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# may <may@qordoba.com>, 2014
+# may <may@qordoba.com>, 2014-2015
 # mustafasadiq <mustafasadiq0@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
@@ -100,7 +101,7 @@
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# may <may@qordoba.com>, 2014
+# may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # omarithawi <oithawi@qrf.org>, 2015
@@ -127,16 +128,16 @@
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # mabdelhaq <mabdelhaq@qou.edu>, 2014
-# may <may@qordoba.com>, 2014
+# may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # SalmaGhazal <salma-ghazal1@hotmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-24 13:41+0000\n"
-"PO-Revision-Date: 2015-11-24 13:39+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-12-03 21:16+0000\n"
+"PO-Revision-Date: 2015-12-07 09:55+0000\n"
+"Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -151,50 +152,62 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/django_comment_client/forum/views.py
 msgid "Discussion"
-msgstr ""
+msgstr "حوار"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Problem"
-msgstr ""
+msgstr "المسألة "
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
-msgstr ""
+msgstr "إعدادات متقدّمة"
 
-#: cms/templates/settings.html
+#: cms/djangoapps/contentstore/views/entrance_exam.py
+#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "امتحان الدخول"
 
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr "قسم"
 
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/ccx/schedule.html
 msgid "Subsection"
-msgstr "القسم الفرعي"
+msgstr "قسمٌ فرعيّ"
 
-#: lms/templates/seq_module.html lms/templates/ccx/schedule.html
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
 msgid "Unit"
-msgstr "الوحدة"
+msgstr "وحدة"
 
-#: lms/templates/help_modal.html
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Name"
-msgstr "الاسم "
+msgstr "الاسم"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video ID"
-msgstr ""
+msgstr "الرقم التعريفي للفيديو"
 
+#: cms/djangoapps/contentstore/views/videos.py
+#: common/djangoapps/config_models/admin.py
+#: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
@@ -202,58 +215,60 @@ msgstr "الحالة"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
-msgstr ""
+msgstr "العودة إلى الإعدادات المختارة"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Please select a single configuration to revert to."
-msgstr ""
+msgstr "يرجى اختيار إعداد واحد للعودة إليه."
 
 #: common/djangoapps/config_models/admin.py
 msgid "Reverted configuration."
-msgstr ""
+msgstr "إعدادات جرى العودة إليها"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Current Configuration"
-msgstr ""
+msgstr "الإعدادات الحالية"
 
 #: common/djangoapps/config_models/admin.py
 msgid "All (Show History)"
-msgstr ""
+msgstr "الكل (إظهار التاريخ)"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
-msgstr ""
+msgstr "تحديث"
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
-msgstr ""
+msgstr "تغيير التاريخ"
 
 #. Translators: this label indicates the name of the user who made this
 #. change:
 #: common/djangoapps/config_models/models.py
 msgid "Changed by"
-msgstr ""
+msgstr "جرى التغيير من قِبَل"
 
 #: common/djangoapps/config_models/models.py
 msgid "Enabled"
-msgstr ""
+msgstr "فعّال"
 
 #: common/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
 "  Please list each domain on its own line."
 msgstr ""
+"قائمة بالمجالات المختلفة التي يُسمح بتقديم طلبات حولها على هذا الموقع. يرجى "
+"ذكر كل مجال في سطر منفصل."
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Mode"
-msgstr ""
+msgstr "الوضعية"
 
 #: common/djangoapps/course_modes/admin.py
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Deadline"
-msgstr ""
+msgstr "الموعد النهائي للتحقّق"
 
 #: common/djangoapps/course_modes/admin.py
 msgid ""
@@ -261,22 +276,84 @@ msgid ""
 "photos for verification.  This appies ONLY to modes that require "
 "verification."
 msgstr ""
+"اختياري: لن يتمكّن الطلاب بعد هذا التاريخ/الوقت من تقديم صور للتحقّق منها. "
+"ويسري هذا حصرًا على أوضاع التي تقتضي التحقّق منها."
 
-#: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
+#: common/djangoapps/course_modes/helpers.py
+msgid "Your verification is pending"
+msgstr "عملية التحقّق من هويّتك معلَّقة "
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "Verified: Pending Verification"
+msgstr "شهادة موثَّقة: عملية التحقّق من هويّة الطالب معلَّقة "
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "ID verification pending"
+msgstr "عملية التحقّق من هويّة الطالب معلَّقة "
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as a verified student"
+msgstr "إنّك مسجَّل كطالب يحمل شهادة موثَّقة"
+
+#: common/djangoapps/course_modes/helpers.py lms/envs/devstack.py
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Verified"
+msgstr "موثَّقة"
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "ID Verified Ribbon/Badge"
+msgstr "شارة الطالب الذي جرى التحقّق من هويّته"
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as an honor code student"
+msgstr "إنّك مسجَّل كطالب يحمل شهادة ميثاق الشرف الأكاديمي"
+
+#: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: openedx/core/djangoapps/user_api/views.py
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "ميثاق الشرف الأكاديمي"
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "You're enrolled as a professional education student"
+msgstr "إنّك مسجَّل كطالب تعليم مهني."
+
+#: common/djangoapps/course_modes/helpers.py
+msgid "Professional Ed"
+msgstr "التعليم المهني"
+
+#: common/djangoapps/course_modes/models.py
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
+#: lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "المساق "
 
+#: common/djangoapps/course_modes/models.py
+#: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+#: common/lib/xmodule/xmodule/word_cloud_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "اسم العرض"
 
+#: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
 msgid "Price"
-msgstr "السعر "
+msgstr "السعر"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Upgrade Deadline"
-msgstr ""
+msgstr "الموعد النهائي للتحديث "
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -284,6 +361,9 @@ msgid ""
 "this mode. Leave this blank if users can enroll in this mode until "
 "enrollment closes for the course."
 msgstr ""
+"اختياري: لن يتمكّن المستخدمون بعد هذا التاريخ/الوقت من التسجيل في هذا الوضع."
+" يُرجى ترك هذا الحقل فارغًا في حال سيُسمح للمستخدمين التسجيل في هذا الوضع "
+"لحين إغلَاق باب التسجيل في المساق."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -293,91 +373,48 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
-msgid "Honor Code Certificate"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "مستمع"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
 "Professional education modes are not allowed to have expiration_datetime "
 "set."
 msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Your verification is pending"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Verified: Pending Verification"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "ID verification pending"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as a verified student"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Verified"
-msgstr "موثَّقة"
-
-#: common/djangoapps/course_modes/models.py
-msgid "ID Verified Ribbon/Badge"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as an honor code student"
-msgstr ""
-
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "ميثاق الشرف"
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're auditing this course"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Auditing"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "You're enrolled as a professional education student"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "Professional Ed"
-msgstr ""
+"لا يُسمح في أوضاع التعليم المهنية تحديد مجموعة تواريخ وأوقات انتهاء "
+"الاستحقاق."
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
-msgstr ""
+msgstr "عذرًا، باب التسجيل مغلق"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
-msgstr ""
+msgstr "عذرًا، وضع التسجيل غير مدعومة "
 
 #: common/djangoapps/course_modes/views.py
 msgid "Invalid amount selected."
-msgstr ""
+msgstr "عذرًا، لقد اخترتَ مبلغًا غير صحيح."
 
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
-msgstr ""
+msgstr "لم يجري اختيار سعر أو أن السعر المختار ضئيل جدًا."
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
-msgstr ""
+msgstr "المشرف"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Moderator"
-msgstr ""
+msgstr "مشرف المنتدى"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Community TA"
-msgstr ""
+msgstr "مساعد أستاذ لشؤون المتعلّمين"
 
+#: common/djangoapps/django_comment_common/models.py
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr "الطالب"
@@ -385,28 +422,32 @@ msgstr "الطالب"
 #: common/djangoapps/embargo/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
 msgstr ""
+"عذرًا، لم نتمكّن من إيجاد المساق. يُرجى التأكّد من صحّة الرقم التعريفي "
+"للمساق."
 
 #: common/djangoapps/embargo/models.py
 msgid "The course key for the restricted course."
-msgstr ""
+msgstr "رقم المساق للمساق المحجوز"
 
 #: common/djangoapps/embargo/models.py
 msgid "The message to show when a user is blocked from enrollment."
-msgstr ""
+msgstr "الرسالة الواجب عرضها عندما يُمنَع المستخدم من التسجيل."
 
 #: common/djangoapps/embargo/models.py
 msgid "The message to show when a user is blocked from accessing a course."
-msgstr ""
+msgstr "الرسالة الواجب عرضها عندما يُمنَع المستخدم من الوصول إلى المساق."
 
 #: common/djangoapps/embargo/models.py
 msgid ""
 "Allow users who enrolled in an allowed country to access restricted courses "
 "from excluded countries."
 msgstr ""
+"السماح للمستخدمين المسجّلين والمقيمين في بلد مسموح بالوصول إلى المساقات "
+"المقيَّدة من البلدان المحظورة."
 
 #: common/djangoapps/embargo/models.py
 msgid "Two character ISO country code."
-msgstr ""
+msgstr "رمز ’أيزو‘ للبلد مؤلّف من حرفين"
 
 #: common/djangoapps/embargo/models.py
 msgid ""
@@ -415,199 +456,215 @@ msgid ""
 " the course.  If blacklist countries are specified, then users from "
 "blacklisted countries will NOT be able to access the course."
 msgstr ""
+"سواء سيُدرج أو يٌستثنى مساق معيَّن. إذا جرى تحديد بلدان اللائحة البيضاء، "
+"ستقتصر سماحية الوصول إلى المساق على طلاب هذه البلدان فقط. ومن جهة أخرى، إذا "
+"جرى تحديد بلدان اللائحة السوداء، فلن يٌسمح للطلاب من هذه البلدان بالوصول إلى"
+" المساق. "
 
 #: common/djangoapps/embargo/models.py
 msgid "The course to which this rule applies."
-msgstr ""
+msgstr "المساق الذي تنطبق عليه هذه القاعدة"
 
 #: common/djangoapps/embargo/models.py
 msgid "The country to which this rule applies."
-msgstr ""
+msgstr "البلد الذي تنطبق عليه هذه القاعدة"
 
 #: common/djangoapps/embargo/models.py
 msgid "Whitelist {country} for {course}"
-msgstr ""
+msgstr "أدرج {country} على اللائحة البيضاء للمساق {course}"
 
 #: common/djangoapps/embargo/models.py
 msgid "Blacklist {country} for {course}"
-msgstr ""
+msgstr "أردج {country} على اللائحة السوداء للمساق {course}"
 
 #: common/djangoapps/external_auth/views.py
 msgid ""
 "You have already created an account using an external login like WebAuth or "
 "Shibboleth. Please contact {tech_support_email} for support."
 msgstr ""
+"لقد قمت بإنشاء حساب في وقت سابق باستخدام تسجيل دخول خارجي مثل WebAuth أو "
+"Shibboleth . يرجى الاتصال بـ {tech_support_email} للحصول على الدعم."
 
 #: common/djangoapps/student/forms.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
+"لا يرتبط عنوان البريد الإلكتروني ذاك بأي حساب لمستخدم لدينا. هل أنت متأكد "
+"بأنك قد سجّلت لدينا؟"
 
 #: common/djangoapps/student/forms.py
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr ""
+"لا يمكن لحساب المستخدم المرتبط بعنوان البريد الإلكتروني هذا إعادة تهيئة كلمة"
+" المرور."
 
 #: common/djangoapps/student/forms.py
 msgid "Username must be minimum of two characters long"
-msgstr ""
+msgstr "يجب أن يتألّف اسم المستخدم من حرفين على الأقلّ"
 
 #: common/djangoapps/student/forms.py
 msgid "A properly formatted e-mail is required"
-msgstr ""
+msgstr "يجب إدخال عنوان بريد إلكتروني بصيغة ملائمة"
 
 #: common/djangoapps/student/forms.py
 msgid "A valid password is required"
-msgstr ""
+msgstr "يجب إدخال كلمة سر صحيحة"
 
 #: common/djangoapps/student/forms.py
 msgid "Your legal name must be a minimum of two characters long"
-msgstr ""
+msgstr "يجب أن يتألّف اسمك القانوني من حرفين على الأقلّ"
 
 #: common/djangoapps/student/forms.py
 msgid ""
 "Usernames must contain only letters, numbers, underscores (_), and hyphens "
 "(-)."
 msgstr ""
+"يجب أن تحوي أسماء المستخدمين على حروف وأرقام وحرف الخط السفلي(_) "
+"والشرطة(-)فقط"
 
 #: common/djangoapps/student/forms.py
 #, python-format
 msgid "Username cannot be more than %(limit_value)s characters long"
-msgstr ""
+msgstr "لا يمكن أن يزيد عدد أحرف اسم المستخدم عن %(limit_value)s"
 
 #: common/djangoapps/student/forms.py
 #, python-format
 msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr ""
+msgstr "لا يمكن أن يزيد عدد أحرف البريد الإلكتروني عن %(limit_value)s"
 
 #: common/djangoapps/student/forms.py
 msgid "You must accept the terms of service."
-msgstr ""
+msgstr "يجب أن تقبل بشروط الخدمة."
 
 #: common/djangoapps/student/forms.py
 msgid "A level of education is required"
-msgstr ""
+msgstr "يجب إدخال المستوى التعليمي"
 
 #: common/djangoapps/student/forms.py
 msgid "Your gender is required"
-msgstr ""
+msgstr "يجب إدخال نوع جنسك"
 
 #: common/djangoapps/student/forms.py
 msgid "Your year of birth is required"
-msgstr ""
+msgstr "يجب إدخال سنة ميلادك"
 
 #: common/djangoapps/student/forms.py
 msgid "Your mailing address is required"
-msgstr ""
+msgstr "يجب إدخال عنوانك البريدي"
 
 #: common/djangoapps/student/forms.py
 msgid "A description of your goals is required"
-msgstr ""
+msgstr "يجب إدخال وصف لأهدافك"
 
 #: common/djangoapps/student/forms.py
 msgid "A city is required"
-msgstr ""
+msgstr "يجب إدخال المدينة"
 
 #: common/djangoapps/student/forms.py
 msgid "A country is required"
-msgstr ""
+msgstr "يجب إدخال الدولة"
 
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
-msgstr ""
+msgstr "للتسجيل، يجب عليك اتّباع ميثاق الشرف الأكاديمي."
 
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
-msgstr ""
+msgstr "لم تقم بتعبئة واحد أو أكثر من الحقول المطلوبة"
 
 #: common/djangoapps/student/forms.py
 msgid "Username and password fields cannot match"
-msgstr ""
+msgstr "ﻻ يسمحُ بتطابق حقليّ كلمة السرّ واسم المستخدم"
 
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
-msgstr ""
+msgstr "كلمة السر:"
 
 #: common/djangoapps/student/middleware.py
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {support_email}"
 msgstr ""
+"عذرًا، لقد جرى تعطيل حسابك. إذا كنت تعتقد حصول ذلك بفعل خطأ، يُرجى الاتصال "
+"بنا على العنوان {support_email}"
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
-msgstr ""
+msgstr "حساب معطَّل "
 
 #: common/djangoapps/student/models.py
 msgid "Male"
-msgstr ""
+msgstr "ذكر"
 
 #: common/djangoapps/student/models.py
 msgid "Female"
-msgstr ""
+msgstr "أنثى"
 
 #. Translators: 'Other' refers to the student's gender
 #: common/djangoapps/student/models.py
 msgid "Other/Prefer Not to Say"
-msgstr ""
+msgstr "أخرى/ أفضّل عدم الإفصاح"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
-msgstr ""
+msgstr "دكتوراه"
 
 #: common/djangoapps/student/models.py
 msgid "Master's or professional degree"
-msgstr ""
+msgstr "ماجستير أو شهادة مهنيّة"
 
 #: common/djangoapps/student/models.py
 msgid "Bachelor's degree"
-msgstr ""
+msgstr "درجة البكالوريوس"
 
 #: common/djangoapps/student/models.py
 msgid "Associate degree"
-msgstr ""
+msgstr "درجة زميل"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary/high school"
-msgstr ""
+msgstr "شهادة الثانوية العامة"
 
 #: common/djangoapps/student/models.py
 msgid "Junior secondary/junior high/middle school"
-msgstr ""
+msgstr "شهادة الثانوية الصغرى/الإعدادية/المرحلة المتوسّطة"
 
 #: common/djangoapps/student/models.py
 msgid "Elementary/primary school"
-msgstr ""
+msgstr "المدرسة الابتدائية"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "No Formal Education"
-msgstr ""
+msgstr "لا تعليم رسمي"
 
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "Other Education"
-msgstr ""
+msgstr "تعليم آخر"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr ""
+msgstr "شهادة ميثاق الشرف الأكاديمي من {platform_name} للمساق {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr ""
+msgstr "شهادة موثَّقة من {platform_name} للمساق {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr ""
+msgstr "شهادة مهنيّة من {platform_name} للمساق {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid ""
 "The company identifier for the LinkedIn Add-to-Profile button e.g "
 "0_0dPSPyS070e0HsE9HNz_13_d11_"
 msgstr ""
+"الرمز التعريفي للشركة، مطلوب لزرّ \"إضافة إلى الملف الشخصي\" على موقع لينكد "
+"إن، مثلًا 0_0dPSPyS070e0HsE9HNz_13_d11_"
 
 #: common/djangoapps/student/models.py
 msgid ""
@@ -615,70 +672,76 @@ msgid ""
 "(Example: 'edx')  If no value is provided, tracking codes will not be sent "
 "to LinkedIn."
 msgstr ""
+"رمز تعريفي قصير للشريك على موقع لينكد إن والمستخدَم كجزء من رمز التتبّع. "
+"(مثلًا: ’edx‘) لن تٌرسل رموز التتبّع إلى موقع لينكد إن مالم تزوّد القيم."
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Certificate for {course_name}"
-msgstr ""
+msgstr "شهادة من {platform_name} للمساق {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid "The ISO 639-1 language code for this language."
-msgstr ""
+msgstr "رمز اللغة أيزو-639-1 لهذه اللغة"
 
 #: common/djangoapps/student/models.py
 msgid "Namespace of enrollment attribute"
-msgstr ""
+msgstr "مساحة الاسم لخاصيّة التسجيل"
 
 #: common/djangoapps/student/models.py
 msgid "Name of the enrollment attribute"
-msgstr ""
+msgstr "اسم خاصيّة التسجيل"
 
 #: common/djangoapps/student/models.py
 msgid "Value of the enrollment attribute"
-msgstr ""
+msgstr "قيمة خاصيّة التسجيل"
 
 #: common/djangoapps/student/models.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
 msgstr ""
+"الإطار الزمني التالي للتسجيل والذي يُقبل خلاله إعادة المبلغ المدفوع "
+"للمستخدمين، ممثلًا بأجزاء الثواني. الفترة الافتراضية هي 14 يومًا."
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
-msgstr ""
+msgstr "عذرًا، المساق الذي تبحث عنه لن يبدأ حتى {date}. "
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
-msgstr ""
+msgstr "الرقم التعريفي المساق غير محدَّد "
 
 #: common/djangoapps/student/views.py lms/djangoapps/support/views/refund.py
 msgid "Invalid course id"
-msgstr ""
+msgstr "رقم تعريف المساق غير صحيح"
 
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
-msgstr ""
+msgstr "رقم المساق غير صحيح"
 
 #: common/djangoapps/student/views.py
 msgid "Could not enroll"
-msgstr ""
+msgstr "تعذّرت عمليّة التسجيل"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
-msgstr ""
+msgstr "عذرًا، أنت غير مسجَّل في هذا المساق "
 
 #: common/djangoapps/student/views.py
 msgid "Your certificate prevents you from unenrolling from this course"
-msgstr ""
+msgstr "تمنعك شهادتك من إلغاء تسجيلك في هذا المساق"
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
-msgstr ""
+msgstr "عملية التسجيل غير صحيحة"
 
 #: common/djangoapps/student/views.py
 msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
 msgstr ""
+"نجح تسجيل دخولك إلى حسابك لدى {provider_name}، غير أنّ هذا الحساب غير مرتبط "
+"بعد بأحد الحسابات لدى {platform_name}."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -686,22 +749,31 @@ msgid ""
 "below, and then link your {platform_name} account with {provider_name} from "
 "your dashboard."
 msgstr ""
+"يُرجى تحديد اسم المستخدم وكلمة السر الخاصَّين بحسابك لدى {platform_name} "
+"لتسجيل دخولك إلى {platform_name} أدناه، ثمّ اربط حسابك لدى {platform_name} "
+"مع {provider_name} باستخدام لوحة المعلومات الخاصة بك."
 
 #: common/djangoapps/student/views.py
 msgid ""
 "If you don't have an {platform_name} account yet, click "
 "<strong>Register</strong> at the top of the page."
 msgstr ""
+"إذا لم تكن قد أنشأت حسابًا لدى {platform_name} بعد، يُرجة النقر على "
+"<strong>سجّل الآن</strong> في أعلى الصفحة."
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
+"نعتذر لحدوث خطأ أثناء تلقّي بيانات تسجيل دخولك. يُرجى مراسلتنا على عنوان "
+"بريدنا الإلكتروني."
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
 msgstr ""
+"أُغلِقَ هذا الحساب مؤقّتًا نتيجة عدّة محاولات فاشلة لتسجيل الدخول. يُرجى "
+"إعادة المحاولة لاحقًا."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -709,68 +781,76 @@ msgid ""
 "reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
+"انتهت صلاحية كلمة المرور الخاصة بك حسب سياسة كلمة المرور المعتمدة لهذا "
+"الحساب. لذا يُرجى منك إعادة ضبط كلمة المرور لتتمكّن من تسجيل دخولك مرّة "
+"أخرى. يُرجى الضغط على رابط \"نسيت كلمة المرور\" الموجود على هذه الصفحة لتعيد"
+" ضبط كلمة المرور قبل إعادة محاولة تسجيل الدخول."
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
-msgstr ""
+msgstr "محاولات فاشلة كثيرة لتسجيل الدخول. يُرجى إعادة المحاولة لاحقًا. "
 
-#: lms/templates/provider_login.html
+#: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
-msgstr "يوجد خطأ إمّا في عنوان البريد الإلكتروني أو في كلمة السر."
+msgstr "عنوان البريد الإلكتروني أو كلمة المرور خاطئين."
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your email for the activation instructions."
 msgstr ""
+"لم يجرِ تفعيل هذا الحساب بعد. قد أرسلنا رسالة تفعيل أخرى. يُرجى التحقق من "
+"بريدك الإلكتروني للاطلاع على إرشادات التفعيل."
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
-msgstr ""
+msgstr "يُرجى إدخال اسم المستخدم"
 
 #: common/djangoapps/student/views.py
 msgid "Please choose an option"
-msgstr ""
+msgstr "يُرجى تحديد أحد الخيارات"
 
 #: common/djangoapps/student/views.py
 msgid "User with username {} does not exist"
-msgstr ""
+msgstr "المستخدم الذي يحمل اسم المستخدم {} غير موجود"
 
 #: common/djangoapps/student/views.py
 msgid "Successfully disabled {}'s account"
-msgstr ""
+msgstr "نجح تعطيل الحساب {}"
 
 #: common/djangoapps/student/views.py
 msgid "Successfully reenabled {}'s account"
-msgstr ""
+msgstr "لقد نجحت عملية إعادة تفعيل حساب {}"
 
 #: common/djangoapps/student/views.py
 msgid "Unexpected account status"
-msgstr ""
+msgstr "حالة حساب غير متوقّعة"
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
-msgstr ""
+msgstr "سبق أن سُجل حساب يحمل اسم المستخدم '{username}' ذاته."
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr ""
+msgstr "سبق أن سُجّل حساب بعنوان البريد الإلكتروني '{email}' ذاته."
 
 #: common/djangoapps/student/views.py
 msgid "An access_token is required when passing value ({}) for provider."
-msgstr ""
+msgstr "رمز الدخول ’access_token‘ مطلوب عند تمرير قيمة ({}) للمزوِّد."
 
 #: common/djangoapps/student/views.py
 msgid "The provided access_token is already associated with another user."
-msgstr ""
+msgstr "سبق أن رُبط رمز الدخول ’access_token‘ بمستخدِم آخر."
 
 #: common/djangoapps/student/views.py
 msgid "The provided access_token is not valid."
-msgstr ""
+msgstr "رمز الدخول ’access_token‘ غير صحيح. "
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
+"نعتذر لحدوث خطأ غير معروف. يُرجى التواصل معنا بإرسال رسالة إلى عنوان بريدنا "
+"الإلكتروني لإعلامنا بكيفية حدوث ذلك. "
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -780,11 +860,23 @@ msgid_plural ""
 "You are re-using a password that you have used recently. You must have {num}"
 " distinct passwords before reusing a previous password."
 msgstr[0] ""
+"إنّك تعيد استخدام كلمة سر كنت قد استخدمتها مؤخّرًا. يجب استخدام {num} كلمة "
+"سر مختلفة لتتمكّن من إعادة استخدام كلمة سر مستخدمة مسبقًا."
 msgstr[1] ""
+"إنّك تعيد استخدام كلمة سر كنت قد استخدمتها مؤخّرًا. يجب استخدام {num} كلمة "
+"سر مختلفة لتتمكّن من إعادة استخدام كلمة سر مستخدمة مسبقًا."
 msgstr[2] ""
+"إنّك تعيد استخدام كلمة سر كنت قد استخدمتها مؤخّرًا. يجب استخدام {num} كلمة "
+"سر مختلفة لتتمكّن من إعادة استخدام كلمة سر مستخدمة مسبقًا."
 msgstr[3] ""
+"إنّك تعيد استخدام كلمة سر كنت قد استخدمتها مؤخّرًا. يجب استخدام {num} كلمة "
+"سر مختلفة لتتمكّن من إعادة استخدام كلمة سر مستخدمة مسبقًا."
 msgstr[4] ""
+"إنّك تعيد استخدام كلمة سر كنت قد استخدمتها مؤخّرًا. يجب استخدام {num} كلمة "
+"سر مختلفة لتتمكّن من إعادة استخدام كلمة سر مستخدمة مسبقًا."
 msgstr[5] ""
+"أنت تحاول إعادة استخدام كلمة مرور كنت قد استعملتها مؤخّراً. يجب أن تستخدم "
+"{num} كلمات مرور مميّزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -794,43 +886,58 @@ msgid_plural ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
 "days must elapse between password resets."
 msgstr[0] ""
+"إنّت تعيد ضبط كلمة السر بشكل متكرّر أكثر من اللازم. ونظرًا لسياسات الأمن، "
+"يجب أن يمرّ {num} أيّام بين كلّ عمليّتي تغيير كلمة السرّ متتاليتين."
 msgstr[1] ""
+"إنّت تعيد ضبط كلمة السر بشكل متكرّر أكثر من اللازم. ونظرًا لسياسات الأمن، "
+"يجب أن يمرّ {num} أيّام بين كلّ عمليّتي تغيير كلمة السرّ متتاليتين."
 msgstr[2] ""
+"إنّت تعيد ضبط كلمة السر بشكل متكرّر أكثر من اللازم. ونظرًا لسياسات الأمن، "
+"يجب أن يمرّ {num} أيّام بين كلّ عمليّتي تغيير كلمة السرّ متتاليتين."
 msgstr[3] ""
+"إنّت تعيد ضبط كلمة السر بشكل متكرّر أكثر من اللازم. ونظرًا لسياسات الأمن، "
+"يجب أن يمرّ {num} أيّام بين كلّ عمليّتي تغيير كلمة السرّ متتاليتين."
 msgstr[4] ""
+"إنّت تعيد ضبط كلمة السر بشكل متكرّر أكثر من اللازم. ونظرًا لسياسات الأمن، "
+"يجب أن يمرّ {num} أيّام بين كلّ عمليّتي تغيير كلمة السرّ متتاليتين."
 msgstr[5] ""
+"أنت تقوم بإعادة ضبط كلمة المرور بشكلٍ متكرّر أكثر من اللازم. نظراً للسياسات "
+"الخاصة بأمن المعلومات، يتعيّن مرور  {num} أيام بين كل عملية تغيير لكلمة مرور"
+" والتي تليها."
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "عذرًا، لم تنجح عملية تغيير كلمة السر."
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
-msgstr ""
+msgstr "لا يوجد مستخدم غير فعّال مرتبط بعنوان البريد الإلكتروني هذا"
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send reactivation email"
-msgstr ""
+msgstr "نأسف لتعذّر إرسال رسالة إعادة التفعيل."
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
-msgstr ""
+msgstr "يجب إدخال عنوان بريد إلكتروني صحيح."
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
-msgstr ""
+msgstr "البريد الإلكتروني القديم مطابق للبريد الإلكتروني الجديد."
 
 #: common/djangoapps/student/views.py
 msgid "An account with this e-mail already exists."
-msgstr ""
+msgstr "سبق أن سُجّل حساب بعنوان البريد الإلكتروني ذاته."
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
+"نأسف لتعذّر إرسال رسالة بريد إلكتروني تحوي رابط التفعيل. يُرجى إعادة "
+"المحاولة لاحقًا. "
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
-msgstr ""
+msgstr "التصديق بـ {} غير متوفّر حاليًّا."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -844,12 +951,23 @@ msgid ""
 "(name, email, etc.) during the registration process. Only select this option"
 " for trusted providers that are known to provide accurate user information."
 msgstr ""
+"إذا جرى تفعيل هذا الخيار، لن يُطلَب من المستخدمين تأكيد بياناتهم (الاسم، "
+"البريد الإلكتروني، الخ.) أثناء عملية التسجيل. ويُرجى الاكتفاء بتحديد هذا "
+"الخيار بالنسبة للمزوِّدين الموثوقين والمعروفين بتزويد معلومات دقيقة "
+"للمستخدم."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is selected, users will not be required to confirm their "
 "email, and their account will be activated immediately upon registration."
 msgstr ""
+"إذا جرى تحديد هذا الخيار، لن يُطلب من المستخدمين تأكيد صحّة بريدهم "
+"الإلكتروني بل سيُفعّل حسابهم على الفور بمجرّد التسجيل."
+
+#: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
+#: lms/templates/student_account/finish_auth.html
+msgid "Please wait"
+msgstr "يرجى الانتظار"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -857,7 +975,7 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "LONG_DATE_FORMAT"
-msgstr ""
+msgstr "%d %b، %Y"
 
 #. Translators: the translation for "DATE_TIME_FORMAT" must be a format
 #. string for formatting dates with times.  For example, the American
@@ -865,7 +983,7 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "DATE_TIME_FORMAT"
-msgstr ""
+msgstr "\"%d %b، %Y عند الساعة %H:%M\""
 
 #. Translators: the translation for "SHORT_DATE_FORMAT" must be a
 #. format string for formatting dates in a brief form.  For example,
@@ -873,14 +991,14 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "SHORT_DATE_FORMAT"
-msgstr ""
+msgstr "\"%d %b %Y\""
 
 #. Translators: the translation for "TIME_FORMAT" must be a format
 #. string for formatting times.  For example, the American English
 #. form is "%H:%M:%S". See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "%H:%M:%S\""
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -888,7 +1006,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "AM"
-msgstr ""
+msgstr "صباحًا"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -896,7 +1014,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "PM"
-msgstr ""
+msgstr "مساءً"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Monday Februrary 10, 2014". It is used for the %A
@@ -904,7 +1022,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Monday"
-msgstr ""
+msgstr "الإثنين"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
@@ -912,7 +1030,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Tuesday"
-msgstr ""
+msgstr "الثلاثاء"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
@@ -920,7 +1038,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Wednesday"
-msgstr ""
+msgstr "الأربعاء"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
@@ -928,7 +1046,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Thursday"
-msgstr ""
+msgstr "الخميس"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Friday Februrary 14, 2014". It is used for the %A
@@ -936,7 +1054,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Friday"
-msgstr ""
+msgstr "الجمعة"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
@@ -944,7 +1062,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Saturday"
-msgstr ""
+msgstr "السبت"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
@@ -952,7 +1070,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Sunday"
-msgstr ""
+msgstr "الأحد"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
@@ -960,7 +1078,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Mon"
-msgstr ""
+msgstr "الإثنين"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
@@ -968,7 +1086,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Tue"
-msgstr ""
+msgstr "الثلاثاء"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
@@ -976,7 +1094,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Wed"
-msgstr ""
+msgstr "الأربعاء"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
@@ -984,7 +1102,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Thu"
-msgstr ""
+msgstr "الخميس"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
@@ -992,7 +1110,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Fri"
-msgstr ""
+msgstr "الجمعة"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
@@ -1000,7 +1118,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sat"
-msgstr ""
+msgstr "السبت"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
@@ -1008,7 +1126,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sun"
-msgstr ""
+msgstr "الأحد"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jan 10, 2014". It is used for the %b
@@ -1016,7 +1134,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jan"
-msgstr ""
+msgstr "يناير"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Feb 10, 2014". It is used for the %b
@@ -1024,7 +1142,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Feb"
-msgstr ""
+msgstr "فبراير"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Mar 10, 2014". It is used for the %b
@@ -1032,7 +1150,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Mar"
-msgstr ""
+msgstr "مارس"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Apr 10, 2014". It is used for the %b
@@ -1040,7 +1158,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Apr"
-msgstr ""
+msgstr "أبريل"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "May 10, 2014". It is used for the %b
@@ -1048,7 +1166,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr ""
+msgstr "مايو"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jun 10, 2014". It is used for the %b
@@ -1056,7 +1174,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jun"
-msgstr ""
+msgstr "يونيو"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jul 10, 2014". It is used for the %b
@@ -1064,7 +1182,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jul"
-msgstr ""
+msgstr "يوليو"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Aug 10, 2014". It is used for the %b
@@ -1072,7 +1190,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Aug"
-msgstr ""
+msgstr "أغسطس"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Sep 10, 2014". It is used for the %b
@@ -1080,7 +1198,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Sep"
-msgstr ""
+msgstr "سبتمبر"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Oct 10, 2014". It is used for the %b
@@ -1088,7 +1206,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Oct"
-msgstr ""
+msgstr "أكتوبر"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Nov 10, 2014". It is used for the %b
@@ -1096,7 +1214,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Nov"
-msgstr ""
+msgstr "نوفمبر"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Dec 10, 2014". It is used for the %b
@@ -1104,7 +1222,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Dec"
-msgstr ""
+msgstr "ديسمبر"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "January 10, 2014". It is used for the %B directive in
@@ -1112,7 +1230,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "January"
-msgstr ""
+msgstr "يناير"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -1120,7 +1238,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "February"
-msgstr ""
+msgstr "فبراير"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
@@ -1128,7 +1246,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "March"
-msgstr ""
+msgstr "مارس"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -1136,7 +1254,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "April"
-msgstr ""
+msgstr "أبريل"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
@@ -1144,7 +1262,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "May"
-msgstr ""
+msgstr "مايو"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -1152,7 +1270,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "June"
-msgstr ""
+msgstr "يونيو"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "July 10, 2014". It is used for the %B directive in
@@ -1160,7 +1278,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "July"
-msgstr ""
+msgstr "يوليو"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "August 10, 2014". It is used for the %B directive in
@@ -1168,7 +1286,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "August"
-msgstr ""
+msgstr "أغسطس"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
@@ -1176,7 +1294,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "September"
-msgstr ""
+msgstr "سبتمبر"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "October 10, 2014". It is used for the %B directive in
@@ -1184,7 +1302,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "October"
-msgstr ""
+msgstr "أكتوبر"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
@@ -1192,7 +1310,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "November"
-msgstr ""
+msgstr "نوفمبر"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
@@ -1200,204 +1318,219 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
-msgstr ""
+msgstr "ديسمبر"
 
 #: common/djangoapps/util/file.py
 msgid "The file must end with the extension '{file_types}'."
 msgid_plural ""
 "The file must end with one of the following extensions: '{file_types}'."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
+msgstr[1] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
+msgstr[2] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
+msgstr[3] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
+msgstr[4] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
+msgstr[5] "يجب أن ينتهي الملف بأحد الامتدادات التالية: '{file_types}'."
 
 #: common/djangoapps/util/file.py
 msgid "Maximum upload file size is {file_size} bytes."
-msgstr ""
+msgstr "الحدّ الأقصى لحجم الملفّ المسموح بتحميله هو {file_size} بايت."
 
 #: common/djangoapps/util/milestones_helpers.py
 msgid "Course {course_id} requires {prerequisite_course_id}"
-msgstr ""
+msgstr "يستوجب المساق {course_id} المتطلّب {prerequisite_course_id}"
 
 #: common/djangoapps/util/milestones_helpers.py
 msgid "System defined milestone"
-msgstr ""
+msgstr "إنجاز مهمّ يحدّده النظام"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid Length ({0})"
-msgstr ""
+msgstr "عدد الأحرف غير صحيح ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must be {0} characters or more"
-msgstr ""
+msgstr "يجب أن يتألّف من {0} حرفًا أو أكثر"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must be {0} characters or less"
-msgstr ""
+msgstr "يجب أن يتألّف من {0} حرفًا أو أقل"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Must be more complex ({0})"
-msgstr ""
+msgstr "يجب أن تكون الأحرف أكثر تعقيداً ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more uppercase characters"
-msgstr ""
+msgstr "يجب أن يتألّف من {0} حرف كبير أو أكثر "
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more lowercase characters"
-msgstr ""
+msgstr "يجب أن يتألّف من {0} حرف صغير أو أكثر"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more digits"
-msgstr ""
+msgstr "يجب أن يتألّف من {0} رقمًا أو أكثر"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more punctuation characters"
-msgstr ""
+msgstr "يجب أن يتألّف من {0} علامة ترقيم أو أكثر"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more non ascii characters"
 msgstr ""
+"يجب أن يتألّف من {0} رمز أو أكثر، لا تنتمي إلى مجموعة نظام الترميز أسكي "
+"ASCII"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more unique words"
-msgstr ""
+msgstr "يجب أن يتألّف من {0} كلمة مميّزة أو أكثر"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Too similar to a restricted dictionary word."
-msgstr ""
+msgstr "تُشبه إلى حدّ كبير إحدى كلمات القاموس المحظورة."
 
 #: common/djangoapps/xblock_django/models.py
 msgid "Space-separated list of XBlocks which should not render."
-msgstr ""
+msgstr "قائمة مفصولة بفراغات وتحدِّد XBlocks غير الواجب عرضها."
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
-msgstr ""
+msgstr "لا يمكن إعادة تقييم المسائل التي يُحتمل تقديم ملفّات فيها."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
-msgstr ""
+msgstr "صحيح"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incorrect"
-msgstr ""
+msgstr "خاطئ"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "partially correct"
-msgstr ""
+msgstr "صحيح جزئياً"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
-msgstr ""
+msgstr "غير مكتمل."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "unanswered"
-msgstr ""
+msgstr "لا توجد إجابة "
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "processing"
-msgstr ""
+msgstr "قيد المعالجة"
 
 #. Translators: these are tooltips that indicate the state of an assessment
 #. question
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is correct."
-msgstr ""
+msgstr "هذا صحيح."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
-msgstr ""
+msgstr "هذا خاطئ."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is partially correct."
-msgstr ""
+msgstr "هذا صحيح جزئياً."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
-msgstr ""
+msgstr "لم تجري الإجابة عنه."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is being processed."
-msgstr ""
+msgstr "هذا الأمر قيد المعالجة."
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
 msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr ""
+msgstr "ChoiceGroup: وسم {tag_name} غير متوقّع."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Answer received."
-msgstr ""
+msgstr "جرى تلقّي الإجابة."
 
 #. Translators: '<choice>' and '<compoundhint>' are tag names and should not
 #. be translated.
 #: common/lib/capa/capa/inputtypes.py
 msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
 msgstr ""
+"كان من المتوقَّع استلام أحد وسمي <choice> أو <compoundhint>؛ لكن جرى تلقّي "
+"وسم {given_tag} بدلًا منه."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Your files have been submitted. As soon as your submission is graded, this "
 "message will be replaced with the grader's feedback."
 msgstr ""
+"جرى  استلام الملفّات التي قدّمتها. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك"
+" المُقدّمة، برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Your answer has been submitted. As soon as your submission is graded, this "
 "message will be replaced with the grader's feedback."
 msgstr ""
+"جرى تقديم إجابتك. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك المُقدّمة، "
+"برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Submitted. As soon as a response is returned, this message will be replaced "
 "by that feedback."
 msgstr ""
+"تمّت عملية التقديم. ستُستبدل هذه الرسالةبرسالة آخرى تحوي تعليقات الأستاذ "
+"بمجرّد استلام الردّ."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
+"لا استجابة من ’Xqueue‘ في غضون {xqueue_timeout} ثوانٍ. أُوقِفت العملية."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Error running code."
-msgstr ""
+msgstr "حدث خطأ في تشغيل الكود."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Cannot connect to the queue"
-msgstr ""
+msgstr "لا يمكن الاتصال بقائمة الانتظار."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "No formula specified."
-msgstr ""
+msgstr "لم يجري تحديد صيغة."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Couldn't parse formula: {error_msg}"
-msgstr ""
+msgstr "تعذّر إعراب الصيغة: {error_msg}"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Error while rendering preview"
-msgstr ""
+msgstr "نعتذر لحدوث خطأ أثناء الإعداد لعرض المعاينة."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Sorry, couldn't parse formula"
-msgstr ""
+msgstr "عذراً، تعذّر إعراب الصيغة."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "{input_type}: unexpected tag {tag_name}"
-msgstr ""
+msgstr "{input_type}: وسم {tag_name} غير متوقَّع."
 
 #. Translators: a "tag" is an XML element, such as "<b>" in HTML
 #: common/lib/capa/capa/inputtypes.py
 msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
+"كان من المتوقَّع استلام وسم {expected_tag}؛ جرى تلقّي وسم {given_tag} بدلًا "
+"منه."
 
+#: common/lib/capa/capa/responsetypes.py
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Correct"
 msgstr "صحيح"
 
+#: common/lib/capa/capa/responsetypes.py
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Incorrect"
@@ -1405,28 +1538,30 @@ msgstr "خاطئ"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr ""
+msgstr "نعتذر لحدوث الخطأ {err} في تقييم وظيفة التلميح {hintfn}."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "(Source code line unavailable)"
-msgstr ""
+msgstr "(سطر الكود المصدري غير متوفّر) "
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
-msgstr ""
+msgstr "يُرجى الاطّلاع على السطر الأصلي بلغة XML {sourcenum}. "
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "JavaScript Input"
-msgstr ""
+msgstr "مُدخل بلغة جافاسكريبت"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Execution of unsafe Javascript code is not allowed."
-msgstr ""
+msgstr "لا يُسمح بتنفيذ كود غير آمن مكتوب بلغة جافاسكريبت."
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 msgid "Checkboxes"
-msgstr "مربّعات الاختيار"
+msgstr "مربّعات تأشير"
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 msgid "Multiple Choice"
 msgstr "اختيارات متعدّدة"
@@ -1440,54 +1575,58 @@ msgstr ""
 #. be translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "Do not use shuffle and answer-pool at the same time"
-msgstr ""
+msgstr "يُرجى عدم استخدام ’shuffle‘ و’answer-pool‘ في الوقت ذاته."
 
 #. Translators: 'answer-pool' is an attribute name and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "answer-pool value should be an integer"
-msgstr ""
+msgstr "يجب أن تكون قيمة ’answer-pool‘ عددًا صحيحًا."
 
 #. Translators: 'Choicegroup' is an input type and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
 msgstr ""
+"لا بدّ أن تتضمّن ’Choicegroup‘ خيارين،  1 صحيح وخيار 1 خاطئ، على الأقل."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "True/False Choice"
-msgstr ""
+msgstr "خيار صحيح/خاطئ"
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 msgid "Dropdown"
-msgstr "القائمة المنسدلة "
+msgstr "قائمة منسدلة"
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 msgid "Numerical Input"
-msgstr "مُدخَل رقمي"
+msgstr "قيم دخل عدديّة."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
-msgstr ""
+msgstr "حدثت مشكلة في إجابة طاقم المساق على هذه المسألة."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Could not interpret '{student_answer}' as a number."
-msgstr ""
+msgstr "تعذّر تفسير ’{student_answer}‘ كرقم."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr ""
+msgstr "لا يمكنك استخدام متغيّرات ({bad_variables}) في المسائل العددية."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
+"جرى تقييم وظيفة التحليل إلى العوامل خارج نطاق مجالها: ’{student_answer}‘"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid math syntax: '{student_answer}'"
-msgstr ""
+msgstr "تركيب رياضي غير صحيحة: ’{student_answer}‘"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use complex numbers in range tolerance problems"
-msgstr ""
+msgstr "لا يجوز استخدام الأعداد المركّبة في مسائل نطاق التحمّل"
 
 #. Translators: This is an error message for a math problem. If the instructor
 #. provided a boundary
@@ -1496,7 +1635,7 @@ msgstr ""
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: complex boundary."
-msgstr ""
+msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود مركّبة."
 
 #. Translators: This is an error message for a math problem. If the instructor
 #. did not provide
@@ -1504,19 +1643,25 @@ msgstr ""
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
-msgstr ""
+msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود خالية."
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 msgid "Text Input"
-msgstr "مُدخَل نصّي"
+msgstr "قيم دخَل نصّية"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error"
-msgstr ""
+msgstr "حدث خطأ"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
+#: common/lib/capa/capa/responsetypes.py
 #: common/templates/course_modes/choose.html lms/templates/login.html
 #: lms/templates/register.html
 msgid "or"
@@ -1524,47 +1669,49 @@ msgstr "أو"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Custom Evaluated Script"
-msgstr ""
+msgstr "نصّ مقيّم حسب الطلب"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error getting student answer from {student_answers}"
-msgstr ""
+msgstr "نعتذر لحدوث خطأ عند جلب إجابة الطالب من {student_answers}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer entered!"
-msgstr ""
+msgstr "لم تُدخَّل أي إجابة!"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr ""
+msgstr "CustomResponse: أرجعت وظيفة التحقّق قاموس غير صالح!"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Symbolic Math Input"
-msgstr ""
+msgstr "قيم دخل رياضيّة رمزيّة"
 
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr ""
+msgstr "حدث خطأ في ’SymbolicResponse‘. رسالة الخطأ: {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Code Input"
-msgstr ""
+msgstr "إدخال الكود"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer provided."
-msgstr ""
+msgstr "لم تُقدَّم أي إجابة."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error: No grader has been set up for this problem."
-msgstr ""
+msgstr "خطأ: لم يجري تحديد مقيّم هذه المسألة بعد."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
 msgstr ""
+"تعذّر إيصال تقديمك إلى المقيّم (السبب: {error_msg}). يُرجى إعادة المحاولة "
+"لاحقًا."
 
 #. Translators: 'grader' refers to the edX automatic code grader.
 #. Translators: the `grader` refers to the grading service open response
@@ -1574,83 +1721,85 @@ msgstr ""
 #: common/lib/capa/capa/responsetypes.py
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Invalid grader reply. Please contact the course staff."
-msgstr ""
+msgstr "إجابة مُقيّم غير صحيحة. يُرجى الاتصال بطاقم المساق."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "External Grader"
-msgstr ""
+msgstr "مُقيّم خارجي"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Math Expression Input"
-msgstr ""
+msgstr "إدخال تعبير رياضي"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: {bad_input} not permitted in answer."
-msgstr ""
+msgstr "مُدخلات غير صحيحة: {bad_input} غير مسموح بها في الإجابة."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
 msgstr ""
+"لا يُسمح باستخدام وظيفة التحليل إلى عوامل في الإجابة عن هذه المسألة. الإجابة"
+" المقدَّمة: {bad_input}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr ""
+msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr ""
+msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Circuit Schematic Builder"
-msgstr ""
+msgstr "باني مخطّطات الدارات"
 
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr ""
+msgstr "حدوث خطأ في تقييم ’SchematicResponse‘. رسالة الخطأ: {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Image Mapped Input"
-msgstr ""
+msgstr "دخل مربوط بصور"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error grading {image_input_id} (input={user_input})"
-msgstr ""
+msgstr "خطأ في تقييم {image_input_id} (input={user_input})"
 
 #. Translators: {sr_coords} are the coordinates of a rectangle
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr ""
+msgstr "حدث خطأ في توصيف المسألة! لا يمكن إعراب المستطيل في {sr_coords}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Annotation Input"
-msgstr ""
+msgstr "قيم دخل توضيحية"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Checkboxes With Text Input"
-msgstr ""
+msgstr "مربّعات تأشير ذات قيم دخل نصّية"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Answer not provided for {input_type}"
-msgstr ""
+msgstr "لم تُقدَّم إجابة لأجل {input_type}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
-msgstr ""
+msgstr "تعذّر تفسير إجابة طاقم المساق كعدد."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Could not interpret '{given_answer}' as a number."
-msgstr ""
+msgstr "تعذّر تفسير ’{given_answer}‘ كعدد."
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
-msgstr ""
+msgstr "بيانات ’XML‘ للملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
@@ -1662,32 +1811,32 @@ msgstr ""
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Display name for this module"
-msgstr ""
+msgstr "اسم العرض لهذه الوحدة"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
-msgstr ""
+msgstr "ملاحظة توضيحية"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr ""
+msgstr "يظهر هذا الإسم في شريط التصفّح الأفقي في أعلى الصفحة."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
-msgstr ""
+msgstr "مسألة متقدِّمة فارغة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Number of attempts taken by the student on this problem"
-msgstr ""
+msgstr "عدد gfمحاولات التي قام بها الطالب لحلّ هذه المسألة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
-msgstr ""
+msgstr "الحد الأقصى لعدد المحاولات"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -1698,54 +1847,58 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Date that this problem is due by"
-msgstr ""
+msgstr "تاريخ استحقاق تقديم هذه المسألة هو"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Amount of time after the due date that submissions will be accepted"
-msgstr ""
+msgstr "المدّة التي سيستمر خلالها قبول تقديم الواجبات بعد مضي تاريخ الاستحقاق"
 
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/templates/problem.html
 msgid "Show Answer"
-msgstr "إظهار الإجابة"
+msgstr "أظهر الإجابة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
 msgstr ""
+"حدّد متى يجري إظهار إجابة المسألة. يمكن تحديد القيمة الافتراضية من خلال قسم "
+"’الإعدادات المتقدّمة‘."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Always"
-msgstr ""
+msgstr "دائمًا"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answered"
-msgstr ""
+msgstr "أُجيب"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Attempted"
-msgstr ""
+msgstr "جرت محاولة الإجابة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
-msgstr ""
+msgstr "مُغلق"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Finished"
-msgstr ""
+msgstr "استُكمِلت"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
-msgstr ""
+msgstr "صحيح أو مضى استحقاقه"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Past Due"
-msgstr ""
+msgstr "مضى استحقاقه"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Never"
-msgstr ""
+msgstr "نهائيًا"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether to force the save button to appear on the page"
@@ -1753,78 +1906,85 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Reset Button"
-msgstr ""
+msgstr "آظهر زرّ إعادة الضبط"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
 msgstr ""
+"تحدّد فيما إذا سيُظهَر زرّ ’إعادة الضبط‘ مما يسمح للمستخدم من مسح إجابته. "
+"يمكن تعيين قيمة افتراضية من خلال قسم ’الإعدادات المتقدّمة‘."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
-msgstr ""
+msgstr "ترتيب عشوائي"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
 msgstr ""
+"تحديد متى يمكن إعادة ترتيب المتغيِّرات المحدَّدة في البرنامج النصي ذا الصلة،"
+" المكتوب باستخدام بايثون، بطريقة عشوائية. يجب تحديد القيمة ’نهائيًا‘ بالنسبة"
+" للمسائل التي لا تُرتِّب فيها القيم عشوائيًّا."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "On Reset"
-msgstr ""
+msgstr "جاري إعادة الضبط"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Per Student"
-msgstr ""
+msgstr "لكلّ طالب"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
-msgstr ""
+msgstr "بيانات XML للمسألة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary with the correctness of current student answers"
-msgstr ""
+msgstr "قاموس يحوي تصحيح أجابات الطالب الحالية"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary for maintaining the state of inputtypes"
-msgstr ""
+msgstr "قاموس لحفظ حالة أنواع المدخلات"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary with the current student responses"
-msgstr ""
+msgstr "قاموس بردود الطالب الحالية"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether the student has answered the problem"
-msgstr ""
+msgstr "فيما إذا أجاب الطالب عن المسألة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Random seed for this student"
-msgstr ""
+msgstr "البذرة وهي عدد عشوائي ممثّل لهذا الطالب"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Last submission time"
-msgstr ""
+msgstr "آخر توقيت للتقديم"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Timer Between Attempts"
-msgstr ""
+msgstr "المؤقّت بين المحاولات"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
 msgstr ""
+"عدد الثواني التي يجب على الطالب انتظارها بين عمليات التقديم لمسألة ذات "
+"محاولات إجابة متعدّدة."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Problem Weight"
-msgstr ""
+msgstr "ثقل المسألة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -1835,12 +1995,14 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Markdown source of this module"
-msgstr ""
+msgstr "مصدر تخفيض هذه الوحدة"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr ""
+"الكود المصدري للمسائل التي جرى تحرير نصوصها باستخدام  LaTeX وWord. وهذه "
+"الميزة غير مدعومة بشكل جيّد."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "String customization substitutions for particular locations"
@@ -1865,6 +2027,12 @@ msgid ""
 "compromised. To obtain a key for your course, or to report an issue, please "
 "contact moocsupport@mathworks.com"
 msgstr ""
+"يُرجى إدخال مفتاح واجهة برمجة التطبيقات، الذي تقدّمه شركة ماثووركس، لاستخدام"
+" الخدمة المستضافة بلغة MATLAB. ويُمنح هذا المفتاح للاستخدام الحصري في هذا "
+"المساق خلال مدّة محدّدة. يُرجى عدم استخدام مفتاح واجهة برمجة التطبيقات في "
+"مساقات أخرى، وإبلاغ ماثووركس فورًا إذا كنت تعتقد بأنّ المفتاح قد أصبح "
+"مكشوفًا. للحصول على مفتاح لمساقك، أو للإبلاغ عن مشكلة ما، يُرجى مراسلة "
+"الشركة على هذا العنوان moocsupport@mathworks.com."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
@@ -1994,6 +2162,8 @@ msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
 msgstr ""
+"نعتذر لحدوث خطأ أثناء معالجة طلبك. يُرجى إعادة تحميل صفحتك والمحاولة مرّة "
+"أخرى."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2145,6 +2315,8 @@ msgid ""
 "Enter the passports for course LTI tools in the following format: "
 "\"id:client_key:client_secret\"."
 msgstr ""
+"يُرجى إدخال تصاريح أدوات  LTI للمساق بالصيغة التالية: "
+"\"id:client_key:client_secret\""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "List of pairs of (title, url) for textbooks used in this course"
@@ -2191,6 +2363,9 @@ msgid ""
 "is different from the set start date. To advertise the set start date, enter"
 " null."
 msgstr ""
+"يُرجى إدخال التاريخ الذي تودّ الإعلان عنه كتاريخ بدء المساق أمّا إذا كان هذا"
+" التاريخ مختلفًا عن تاريخ البدء المحدَّد فيمكنك الإعلان عن تاريخ البدء "
+"بإدخال القيمة ,null‘. "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -2213,11 +2388,14 @@ msgid ""
 "Enter true or false. When true, students can see the calculator in the "
 "course."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. تشير القيمة ’true‘ إلى تمكين الطلّاب من رؤية "
+"عنصر الآلة الحاسبة ضمن المساق."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the name of the course as it should appear in the edX.org course list."
 msgstr ""
+"يُرجى إدخال اسم المساق كما يجب أن يظهر في قائمة المساقات على موقع edX.org."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Display Name"
@@ -2231,7 +2409,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
-msgstr ""
+msgstr "يُرجى إدخال طريقة تعديل هذا المساق (\"XML\" أو \"ستوديو\")."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Survey URL"
@@ -2242,6 +2420,8 @@ msgid ""
 "Enter the URL for the end-of-course survey. If your course does not have a "
 "survey, enter null."
 msgstr ""
+"يُرجى إدخال الرابط الخاص باستبيان نهاية المساق. في حال لم يستوجب مساقك "
+"الإدلاء باستبيان، يُرجى إدخال القيمة ’null‘. "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Blackout Dates"
@@ -2259,6 +2439,15 @@ msgid ""
 "brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
 "\"2015-10-08\"]] "
 msgstr ""
+"يُرجى إدخال أزواج التواريخ التي لا يُسمح للطلّاب خلالها بالمشاركة أو نشر "
+"تعليق في منتديات النقاش. يُرجى إحاطة كل زوج من أزواج التواريخ المُضافة بزوج "
+"إضافي من الأقواس المربّعة، وذلك ما بين القوسين المتوفّرين. يجب تحديد زوج "
+"التواريخ وفق الصيغة: [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. أمّا بالنسبة لتحديد "
+"الأوقات إلى جانب التواريخ، فيجب صياغة كل زوج وفق الصيغة: [\"YYYY-MM-"
+"DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. يُرجى التأكّد من فصل التاريخ عن التوقيت "
+"بالحرف ’T‘.  على سبيل المثال، تُحدّد صيغة الإدخال لأكثر من زوج تواريخ حجب "
+"المشاركة بالشكل، بما فيها زوج الأقواس المربّعة الخارجي: [[\"2015-09-15\", "
+"\"2015-09-21\"]، [\"2015-10-01\", \"2015-10-08\"]]"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Topic Mapping"
@@ -2273,6 +2462,12 @@ msgid ""
 "must be unique. In \"id\" values, the only special characters that are "
 "supported are underscore, hyphen, and period."
 msgstr ""
+"يُرجى إدخال فئات النقاشات وفقًا للصيغة التالية: \"CategoryName\": {\"id\": "
+"\"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. على سبيل المثال، "
+"يمكن أن تكون إحدى فئات النقاشات ’Lydian Mode‘: {\"id\": \"i4x-UniversityX-"
+"MUS101-course-2015_T1\"}. يجب أن تكون قيمة ’الرقم التعريفي‘ لكل فئة فريدة من"
+" نوعها. أما بالنسبة لقيّم ’الرقم التعريفي‘، فتقتضر قيم الأحرف أو الأشكال "
+"الخاصة المدعومة على حرف التسطير السفليّ، والشرطة والنقطة."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -2283,6 +2478,9 @@ msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
 "sorted alphabetically. If false, they are sorted chronologically."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘ .تشير القيمة ’true‘ إلى ترتيب فئات النقاشات "
+"وكل من فئاتها الفرعية بحسب الأحرف الأبجدية، بينما يسمح اختيار ’false‘ "
+"بترتيبها زمنيًّا."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Announcement Date"
@@ -2312,6 +2510,9 @@ msgid ""
 "Enter true or false. If true, the course appears in the list of new courses "
 "on edx.org, and a New! badge temporarily appears next to the course image."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. تسمح القيمة ’true‘ بظهور المساق ضمن قائمة "
+"المساقات الجديدة المتاحة على موقع edx.org، بالإضافة إلى ظهور الوسم ’جديد!‘ "
+"مؤقّتًا إلى جانب صورة المساق."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Mobile Course Available"
@@ -2322,6 +2523,8 @@ msgid ""
 "Enter true or false. If true, the course will be available to mobile "
 "devices."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘ .تسمح القيمة ’true‘ بإتاحة استعراض المساق على "
+"الأجهزة المحمولة. "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Video Upload Credentials"
@@ -2348,7 +2551,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enter true or false. If true, the course will not be graded."
-msgstr ""
+msgstr "يُرجى إدخال ’true‘ أو ’false‘. ستعفي القيمة ’true‘ من تقييم المساق. "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Disable Progress Graph"
@@ -2357,6 +2560,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enter true or false. If true, students cannot view the progress graph."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘ .سيمنع إدخالك للقيمة ’true‘ الطلّاب من عرض "
+"المخطّط البياني لتطوّرهم."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "PDF Textbooks"
@@ -2376,6 +2581,9 @@ msgid ""
 " name of the tab (usually the name of the book) as well as the URLs and "
 "titles of all the chapters in the book."
 msgstr ""
+"بالنسبة للكتب ذات صيغة HTML والتي تظهر بشكل علامات تبويب منفصلة في محتويات "
+"المساق، يُرجى إدخال اسم علامة التبويب (يكون عادةً اسم الكتاب) بالإضافة إلى "
+"الروابط والعناوين الخاصة بكل فصول الكتاب."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Remote Gradebook"
@@ -2396,6 +2604,11 @@ msgstr ""
 msgid "Enable CCX"
 msgstr ""
 
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content. CCX Coach is
+#. a role created by a course Instructor to enable a person (the "Coach") to
+#. manage the custom course for
+#. his students.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
@@ -2412,6 +2625,8 @@ msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to all users."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. سيسمح اختيارك للقيمة ’true‘ للطلاب بإنشاء "
+"مشاركات في قسم ’النقاشات‘، مجهولة المصدر بالنسبة لجميع المستخدمين."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts to Peers"
@@ -2423,6 +2638,9 @@ msgid ""
 "anonymous to other students. This setting does not make posts anonymous to "
 "course staff."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. سيسمح اختيارك للقيمة ’true‘ للطلّاب بإنشاء "
+"مشاركات في قسم ’النقاشات، تكون مجهولة المصدر بالنسبة للطلّاب الآخرين دون "
+"إخفاء هويّة الطالب الناشر عن طاقم المساق."
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
@@ -2614,7 +2832,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Draft a Course Description"
-msgstr ""
+msgstr "كتابة مسوّدة لوصف المساق"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2671,6 +2889,8 @@ msgid ""
 "True if timezones should be shown on dates in the courseware. Deprecated in "
 "favor of due_date_display_format."
 msgstr ""
+"’true‘ في حال توجّب إظهار المناطق الزمنية لتواريخ محتويات المساق. وإهمالها "
+"لصالح ’due_date_display_format‘."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2700,6 +2920,8 @@ msgid ""
 "Enter true or false. If true, students can download certificates before the "
 "course ends, if they've met certificate requirements."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘ .تسمح القيمة ’true‘ للطلّاب تنزيل الشهادات قبل"
+" انتهاء المساق في حال استوفوا متطلّبات الشهادة."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificates Display Behavior"
@@ -2767,6 +2989,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "If true, certificate Web/HTML views are enabled for the course."
 msgstr ""
+"في حال ’true‘ـ يجري تفعيل خاصيّة استعراض شهادة هذا المساق على شكل صفحة ويب "
+"أو بصيغة HTML."
 
 #. Translators: This field is the container for course-specific certifcate
 #. configuration values
@@ -2863,10 +3087,12 @@ msgid ""
 "Enter true or false. If true, edX users can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘ .تسمح القيمة ’true‘ لمستخدمي منصّة edX بعرض "
+"صفحة ويكي المخصّصة للمساق حتى لو لم يكونوا مسجّلين فيه."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Invitation Only"
-msgstr ""
+msgstr "المدعوّون فقط"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Whether to restrict enrollment to invitation by the course staff."
@@ -2890,6 +3116,9 @@ msgid ""
 "course content. If you set this value to true, you must add a name for the "
 "survey to the Course Survey Name setting above."
 msgstr ""
+"حدّد فيما إذا كان الطلاب مُلزمين بتعبئة استبيان قبل عرض محتويات مساقك. في "
+"حال ضبطت هذه القيمة على ’true‘، فسيتوجّب عليك إضافة اسم للاستبيان إلى إعداد "
+"\"اسم استبيان المساق\" الموجودة أعلاه."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Visibility In Catalog"
@@ -2986,6 +3215,9 @@ msgid ""
 "your course. Note that enabling proctored exams will also enable timed "
 "exams."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. تشير القيمة ’true‘ إلى تفعيل الامتحانات "
+"المراقبة لهذا المساق. وانتبه إلى أن تفعيلك للامتحانات المراقبة سيفعّل بدوره "
+"الامتحانات محدَّدة التوقيت أيضًا."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Timed Exams"
@@ -2996,6 +3228,8 @@ msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
 "course."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. يسمح اختيارك للخيار ’true‘ بتفعيل الامتحانات "
+"محدَّدة التوقيت في مساقك."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -3017,6 +3251,9 @@ msgid ""
 "do not have due dates for assignments, and students can progress through the"
 " course at any rate before the course ends."
 msgstr ""
+"يُرجى ضبط هذه على القيمة ’true‘ لجعل هذا المساق كمساق تعلّم ذاتي. لا يُحدّد،"
+" في مساقات التعلّم الذاتي، تاريخ لتسليم الفروض كما ويُسمح للمتعلّمين التقدّم"
+" في مواد  المساق بأي سرعة وفي أي وقت يسبق نهاية المساق."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -3062,6 +3299,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
 msgstr ""
+"الكود المصدري للمستندات المنسّقة باستخدام LaTeX . هذه الميزة غير مدعومة "
+"جيّدًا."
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid ""
@@ -3092,7 +3331,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 msgid "Image Annotation"
-msgstr ""
+msgstr "ملاحظات توضيحية بشكل صورة"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3110,32 +3349,32 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Location of Annotation backend"
-msgstr ""
+msgstr "مكان خلفية الملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Url for Annotation Storage"
-msgstr ""
+msgstr "رابط تخزين الملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Secret string for annotation storage"
-msgstr ""
+msgstr "النص السرّي لتخزين الملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Secret Token String for Annotation"
-msgstr ""
+msgstr "النص الرمزي السرّي للملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Default Annotations Tab"
-msgstr ""
+msgstr "التبويب الافتراضي للملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3144,12 +3383,14 @@ msgid ""
 "Select which tab will be the default in the annotations table: myNotes, "
 "Instructor, or Public."
 msgstr ""
+"اختر التبويبة التي ستُعتمد كتبويبة افتراضية لجدول الملاحظات التوضيحية: "
+"ملاحظاتي، الأستاذ، أو الجميع."
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Email for 'Instructor' Annotations"
-msgstr ""
+msgstr "البريد الإلكتروني للملاحظات التوضيحية الخاصّة بـ ’الأستاذ‘ "
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3158,19 +3399,21 @@ msgid ""
 "Email of the user that will be attached to all annotations that will be "
 "found in 'Instructor' tab."
 msgstr ""
+"بريد المستخدم الإلكتروني الذي سيُرفَق بجميع الملاحظات التوضيحية الموجودة ضمن"
+" تبويبة ’الأستاذ‘."
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Mode for Annotation Tool"
-msgstr ""
+msgstr "الوضع الخاص بأداة الملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid ""
 "Type in number corresponding to following modes:  'instructor' or 'everyone'"
-msgstr ""
+msgstr "كتابة الرقم المرتبط بالأوضاع التالية: ’الأستاذ‘ أو ’الجميع‘"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3230,6 +3473,8 @@ msgid ""
 "Set this value to True if this module is either a graded assignment or a "
 "practice problem."
 msgstr ""
+"يُرجى ضبط هذه القيمة على القيمة ’true‘ إذا كانت هذه الوحدة إمّا واجبًا "
+"مقيَّمًا أو تمرينًا.   "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -3297,7 +3542,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Invalid Library"
-msgstr ""
+msgstr "مكتبة غير صالحة"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "No Library Selected"
@@ -3368,22 +3613,31 @@ msgid ""
 "in the current page. This setting is only used when Hide External Tool is "
 "set to False.  "
 msgstr ""
+"يُرجى اختيار ’true‘ إذا أردت أن يضغط الطلّاب على رابط، يفتح أداة ’LTI‘ في "
+"نافذة جديدة أو يمكنك اختيار ’false‘ لفتح محتوى ’LTI‘ داخل إطار ’IFrame‘ ضمن "
+"الصفحة الحاليّة. يقتصر استخدام هذا الإعداد على حالة ضبط خاصية \"إخفاء الأداة"
+" الخارجية\" على القيمة ’false‘. "
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Select True if this component will receive a numerical score from the "
 "external LTI system."
 msgstr ""
+"يُرجى اختيار  ’true‘ إذا كان هذا المكوِّن سيستقبل قيمة عدديّة للنتيجة من "
+"نظام ’LTI‘ الخارجي."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Weight"
-msgstr ""
+msgstr "الثقل"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the number of points possible for this component.  The default value "
 "is 1.0.  This setting is only used when Scored is set to True."
 msgstr ""
+"يُرجى إدخال عدد النقاط المحتملة لهذا المكوِّن. تبُحدّد القيمة الافتراضية "
+"بالعدد 1.0. يقتصر استخدام هذا الإعداد على حالة ضبط خاصية ’Scored‘ على القيمة"
+" ’true‘."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -3393,7 +3647,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Comment as returned from grader, LTI2.0 spec"
-msgstr ""
+msgstr "التعليق العائد من المقيّيم، LTI2.0 spec"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Hide External Tool"
@@ -3405,22 +3659,29 @@ msgid ""
 "with an external grading  system rather than launch an external tool.  This "
 "setting hides the Launch button and any IFrames for this component."
 msgstr ""
+"يُرجى اختيار ’true‘ إذا أردت استخدام هذا المكوِّن كعنصر نائب مسؤول عن "
+"المزامنة مع نظام تقييم خارجي بدلًا من إطلاق أداة خارجية. يخفي هذا الإعداد زر"
+" \"إطلاق\" وأي إطارات iFrames ضمنيّة خاصّة بهذا المكوِّن."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Request user's username"
 msgstr ""
 
+#. Translators: This is used to request the user's username for a third party
+#. service.
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Select True to request the user's username."
-msgstr ""
+msgstr "يرجى اختيار ’true‘ لطلب اسم المستخدم الخاص بالمستخدم."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Request user's email"
 msgstr ""
 
+#. Translators: This is used to request the user's email for a third party
+#. service.
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Select True to request the user's email address."
-msgstr ""
+msgstr "يرجى اختيار ’true‘ لطلب البريد الإلكتروني الخاص بالمستخدم."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI Application Information"
@@ -3450,6 +3711,7 @@ msgstr ""
 msgid ""
 "Select True to allow third party systems to post grades past the deadline."
 msgstr ""
+"يُرجى اختيار ’true‘ للسماح لأنظمة خارجية بنشر الدرجات بعد تاريخ الاستحقاق."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -3484,6 +3746,8 @@ msgstr ""
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "If true, can be seen only by course staff, regardless of start date."
 msgstr ""
+"عند اختيارك للقيمة ’true‘، سيُتاح المحتوى لطاقم المساق فقط، بغض النظر عن "
+"تاريخ بدء المساق."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "GIT URL"
@@ -3506,16 +3770,21 @@ msgid ""
 "Enter the location of the annotation storage server. The textannotation, "
 "videoannotation, and imageannotation advanced modules require this setting."
 msgstr ""
+"يُرجى إدخال موقع خادم تخزين الملاحظات التوضيحية. هذا الإعداد مطلوب في "
+"الوحدات المتقدّمة لملاحظات النصوص، وملاحظات الفيديو، وملاحظات الصور."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "URL for Annotation Storage"
-msgstr ""
+msgstr "رابط مخزن الملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the secret string for annotation storage. The textannotation, "
 "videoannotation, and imageannotation advanced modules require this string."
 msgstr ""
+"يُرجى إدخال السلسلة النصيّة السرّية لمخزن الملاحظات التوضيحية. تتطلّب كل من "
+"الوحدات المتطوّرة لنصوص الملاحظات ومقاطع الفيديو الخاصّة بالملاحظات والصور "
+"التوضيحيّة للملاحظات هذه السلسلة النصيّة."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the ids for the content groups this problem belongs to."
@@ -3527,6 +3796,9 @@ msgid ""
 "are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
 "\"past_due\", \"correct_or_past_due\", and \"never\"."
 msgstr ""
+"يُرجى تحديد حالات ظهور زر ’عرض الإجابة‘ بالنسبة لكل مسألة. والقيم الصالحة هي"
+" \"دومًا\"، و’أُجيبت‘، و’جرت محاولة الإجابة‘، و’أغُلِقت‘، و’استُكمِلت‘، "
+"و’مضى استحقاقها‘ و \"صحيح أو مضى استحقاقها\"، و’مُطلقًا‘."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3574,6 +3846,9 @@ msgid ""
 "Enter true or false. If true, you can use the LaTeX templates for HTML "
 "components and advanced Problem components."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. باختيارك للقيمة ’true‘، ستتمكّن من استخدام "
+"نماذج ’LaTeX‘ للمكوِّنات المُصاغة بلغة HTML والمكوِّنات الأخرى المتقدِّمة "
+"الخاصة بالمسائل."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3614,6 +3889,8 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, video caching will be used for HTML5 videos."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. عند اختيارك للقيمة ’true‘، ستُستخدم خاصية "
+"التخزين المؤقّت لفيديوهات HTML5."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Video Pre-Roll"
@@ -3641,6 +3918,10 @@ msgid ""
 "settings. All existing problems are affected when this course-wide setting "
 "is changed."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. باختيارك للقيمة ’true‘، ستعرض مسائل المساق زر"
+" ’إعادة الضبط‘ بشكل افتراضي. يمكنك تجاوز هذا الإعداد بتعديل إعدادات كل مسألة"
+" على حدى. ستتأثّر جميع المسائل الموجودة بتغيير هذا الإعداد الذي يؤثّر على "
+"جميع أقسام المساق."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable Student Notes"
@@ -3650,6 +3931,8 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, students can use the Student Notes feature."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. يسمح اختيارك للقيمة ’true‘ للطلاب باستخدام "
+"ميّزة ’ملاحظات الطلّاب‘. "
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3666,6 +3949,8 @@ msgid ""
 "Enter true or false. If true, answer submissions for problem modules will be"
 " considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. باختيارك للقيمة ’true‘، ستُحتسب إجابات وحدات "
+"المسائل كجزء من خوارزمية تقييم/تحكيم امتحان الدخول أو القبول في المساق."
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -3710,7 +3995,7 @@ msgstr ""
 #. openended response has been fully scored
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Complete."
-msgstr ""
+msgstr "استُكمل التقييم. "
 
 #. Translators: "Scored rubric" appears to a user as part of a longer
 #. string that looks something like: "Scored rubric from grader 1".
@@ -3767,11 +4052,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "There was an error saving your feedback. Please contact course staff."
-msgstr ""
+msgstr "حدث خطأ أثناء حفظ ملاحظاتك. يُرجى الاتصال بطاقم المساق."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Couldn't submit feedback."
-msgstr ""
+msgstr "تعذّرت عملية تقديم الملاحظات."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Successfully saved your feedback."
@@ -3779,7 +4064,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Unable to save your feedback. Please try again later."
-msgstr ""
+msgstr "تعذّر حفظ ملاحظاتك. يُرجى إعادة المحاولة لاحقًا."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Successfully saved your submission."
@@ -3793,6 +4078,7 @@ msgstr ""
 msgid ""
 "Unable to submit your submission to the grader. Please try again later."
 msgstr ""
+"تعذّر تقديم المواد التي قدّمتها إلى المقيّيم. يُرجى إعادة المحاولة لاحقًا. "
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -3800,7 +4086,7 @@ msgstr ""
 #. graded.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error getting feedback from grader."
-msgstr ""
+msgstr "حدث خطأ أثناء محاولة الحصول على إفادة راجعة من المقيّم."
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -3812,7 +4098,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error handling action. Please try again."
-msgstr ""
+msgstr "حدث خطأ في معالجة العملية المطلوبة. يُرجى إعادة المحاولة مرّة أخرى."
 
 #. Translators: this string appears once an openended response
 #. is submitted but before it has been graded
@@ -3853,7 +4139,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py
 msgid "Error saving your score.  Please notify course staff."
-msgstr ""
+msgstr "حدث خطأ أثناء حفظ درجاتك. يُرجى إعلام طاقم المساق."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Show Single Problem"
@@ -3865,6 +4151,9 @@ msgid ""
 " is shown. When False, a panel is displayed with all problems available for "
 "peer grading."
 msgstr ""
+"عند اختيارك للقيمة ’true‘، ستَظهر المسألة الوحيدة المحدّدة من خلال ’رابط "
+"لموقع المسألة‘ فقط، أمّا في حال اخترت القيمة ’false‘، فستُعرَض لوحة تتضمّن "
+"كافة المسائل المُتاحة لتقييم الزملاء."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Link to Problem Location"
@@ -3875,12 +4164,16 @@ msgid ""
 "The location of the problem being graded. Only used when \"Show Single "
 "Problem\" is True."
 msgstr ""
+"موقع المسألة قيد التقييم. يقتصر استخدامها عند ضبط إعداد ’إظهار مسألة واحدة‘ "
+"على القيمة ’true‘."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid ""
 "Defines whether the student gets credit for grading this problem. Only used "
 "when \"Show Single Problem\" is True."
 msgstr ""
+"تحدّد فيما إذا كان سيُحتسب للطالب تقييمه لهذه المسألة. يقتصر استخدام هذا "
+"الإعداد فقط عند ضبط إعداد \"إظهار مسألة واحدة\" على القيمة ’true‘."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Due date that should be displayed."
@@ -4039,7 +4332,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
-msgstr ""
+msgstr "ملاحظات توضيحية نصّيّة"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Source/Citation"
@@ -4066,6 +4359,8 @@ msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
 msgstr ""
+"تعذّر استلام نصوص مقطع الفيديو  {youtube_id} من موقع يوتيوب. رمز الحالة: "
+"{status_code}."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
@@ -4076,18 +4371,20 @@ msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
 msgstr ""
+"حدث خطأ في ملف نصوص ’SubRip‘ أثناء عملية الإعراب. الرسالة الخطأ الداخلية هي "
+"{error_message}"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
-msgstr ""
+msgstr "حدث خطأ في ملف نصوص ’SubRip‘ أثناء عملية الإعراب."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
-msgstr ""
+msgstr "{exception_message}: تعذّر إيجاد النصوص المحمَّلة: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr ""
+msgstr "نوع ترميز غير صالح. يجب ترميز النصوص باستخدام التنسيق UTF-8.  "
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -4201,6 +4498,13 @@ msgid ""
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
 msgstr ""
+"رابط أو روابط إصدارات مقاطع الفيديو التي قٌمتَ بنشرتها على مواقع مغايرة "
+"لموقع يوتيوب. يجب أن ينتهي كل رابط  بإحدى الامتدادات .mpeg أو .mp4 أو .ogg "
+"أو .webm دون أن يقود الرابط إلى موقع يوتيوب. (كما ونوصي بشدّة اعتماد إحدى "
+"صيغتيّ .mp4 أو .webm للتوافق مع المتصفّح). سيتمكّن الطلّاب من استعراض أوّل "
+"فيديو مُدرج على القائمة، متوافق مع جهاز الكمبيوتر خاصّتهم. كما ويجب ضبط "
+"إعداد ’السماح بتنزيل الفيديو‘ على القيمة ’true‘ ليُسمح للطلاب تنزيل مقاطع "
+"الفيديو هذه."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video File URLs"
@@ -4216,6 +4520,12 @@ msgid ""
 " the URL for the transcript here. Students see a link to download that "
 "transcript below the video."
 msgstr ""
+"يمكن للطلّاب، وبشكل افتراضي، تنزيل نصّ وفق أحد امتداديّ .srt أو .txt عند ضبط"
+" خاصية ’السماح بتنزيل النص‘ على القيمة ’true‘. في حال رغبت بتقديم نص قابل "
+"للتنزيل بصيغة مختلفة، نوصيكم بتحميل نشرة باستخدام حقل ’تحميل نشرة‘. وفي حال "
+"لم يكن ذلك ممكنًا، يمكنك نشر ملف للنص على صفحة ’الملفّات والتحميلات‘ أو على "
+"الإنترنت، ثمّ إضافة الرابط للنص هنا. وسيجد الطلّاب رابطًا لتنزيل ذلك النص "
+"أسفل مقطع الفيديو."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Downloadable Transcript URL"
@@ -4335,7 +4645,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Video Annotation"
-msgstr ""
+msgstr "ملاحظات توضيحية من خلال فيديو"
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "The external source URL for the video."
@@ -4393,6 +4703,8 @@ msgstr ""
 msgid "Top num_top_words words for word cloud."
 msgstr ""
 
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
@@ -4416,7 +4728,7 @@ msgid "News"
 msgstr "الأخبار"
 
 #: lms/djangoapps/branding/api.py
-msgid "FAQs"
+msgid "Help Center"
 msgstr ""
 
 #: lms/templates/static_templates/contact.html
@@ -4424,10 +4736,9 @@ msgstr ""
 msgid "Contact"
 msgstr "معلومات الاتّصال"
 
-#: lms/templates/static_templates/jobs.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Jobs"
-msgstr "الوظائف"
+#: lms/djangoapps/branding/api.py
+msgid "Careers"
+msgstr ""
 
 #: lms/templates/static_templates/donate.html
 msgid "Donate"
@@ -4439,7 +4750,7 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
-msgstr ""
+msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
@@ -4487,10 +4798,11 @@ msgid ""
 "Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
 "{end_date})"
 msgstr ""
+"استُكمِل المساق \"{course_name}\" ({course_mode}, {start_date} - {end_date})"
 
 #: lms/djangoapps/certificates/badge_handler.py
 msgid "Completed the course \"{course_name}\" ({course_mode})"
-msgstr ""
+msgstr "لقد أتممت المساق \"{course_name}\" ({course_mode})"
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"
@@ -4559,6 +4871,9 @@ msgid ""
 "any course modes that do not have a specified badge image. You can have only"
 " one default image."
 msgstr ""
+"اضبط هذه القيمة على \"صحيح\" إذا أردت اعتماد هذه الصورة كصورة افتراضية لجميع"
+" أوضاع المساق غير الموسومة بصورة محدَّدة. يمكن أن يكون لديك صورة افتراضية "
+"واحدة."
 
 #: lms/djangoapps/certificates/models.py
 msgid "There can be only one default image."
@@ -4614,7 +4929,7 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "An unexpected error occurred while regenerating certificates."
-msgstr ""
+msgstr "حدث خطأ غير متوقّع أثناء إعادة إنشاء الشهادات."
 
 #. Translators:  This text describes the 'Honor' course certificate type.
 #: lms/djangoapps/certificates/views/webview.py
@@ -4623,6 +4938,9 @@ msgid ""
 "agreed to abide by {platform_name}'s honor code and completed all of the "
 "required tasks for this course under its guidelines."
 msgstr ""
+"تُفيد شهادة {cert_type} أنّ المتعلِّم لدى {platform_name} قد وافق على "
+"الالتزام بميثاق الشرف المتعمَد في {platform_name} واستكمَل كافة المهام "
+"المطلوبة في هذا المساق حسب الإرشادات."
 
 #. Translators:  This text describes the 'ID Verified' course certificate
 #. type, which is a higher level of
@@ -4635,6 +4953,10 @@ msgid ""
 "required tasks for this course under its guidelines, as well as having their"
 " photo ID checked to verify their identity."
 msgstr ""
+"تُفيد شهادة {cert_type} معنى أنّ المتعلِّم لدى {platform_name} قد وافق على "
+"الالتزام بميثاق الشرف المتعمَد في {platform_name} واستكمَل كافة المهام "
+"المطلوبة في هذا المساق حسب الإرشادات، إلى جانب خضوعه لعملية تحقّق من هويّته "
+"بهدف تأكيد صحّتها."
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
 #. An XSeries is a collection of
@@ -4673,6 +4995,8 @@ msgid ""
 "successfully completed, received a passing grade, and was awarded a "
 "{platform_name} {certificate_type} Certificate of Completion in "
 msgstr ""
+"استُكمِل المساق بنجاح بعد أن حُزت على درجة النجاح، ومُنِحت شهادة "
+"{certificate_type} من {platform_name} في مجال  "
 
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
@@ -4686,6 +5010,11 @@ msgid ""
 "require completing additional steps, such as <a href='{verified_cert_url}'> "
 "verifying your identity</a>."
 msgstr ""
+"تُقِرّ {platform_name} بالإنجازات من خلال شهادات، تُمنَح تقديرًا لجهود طلّاب"
+" {platform_name} بعد استكمال أنشطة مختلفة في إطار <a href='{tos_url}'>ميثاق "
+"الشرف الأكاديمي الخاص بمنصّة {platform_name}</a>. كما وتتطلّب بعض الشهادات "
+"استكمال خطوات إضافية، مثل <a href='{verified_cert_url}'>التحقّق من "
+"هويّتك</a>."
 
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
@@ -4699,13 +5028,13 @@ msgstr ""
 #. recognized
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Invalid Certificate"
-msgstr ""
+msgstr "شهادة غير صالحة"
 
 #. Translators: The &amp; characters represent an ampersand character and can
 #. be ignored
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Terms of Service &amp; Honor Code"
-msgstr ""
+msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 
 #. Translators: This line appears as a byline to a header image and describes
 #. the purpose of the page
@@ -4804,12 +5133,12 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "I completed the {course_title} course on {platform_name}."
-msgstr ""
+msgstr "لقد أتممت مساق {course_title} على {platform_name}."
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "I completed a course on {platform_name}. Take a look at my certificate."
-msgstr ""
+msgstr "لقد أتمّمت مساقًا على {platform_name}. للقي نظرة على شهادتي."
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "More Information About {user_name}'s Certificate:"
@@ -4908,12 +5237,14 @@ msgid ""
 "Make sure your information is correct, or try again with a different card or"
 " another form of payment."
 msgstr ""
+"يُرجى التأكّد من صحّة معلوماتك، أو إعادة المحاولة باستخدام بطاقة مختلفة أو "
+"وسيلة دفع أخرى."
 
 #: lms/djangoapps/commerce/views.py
 msgid ""
 "A system error occurred while processing your payment. You have not been "
 "charged."
-msgstr ""
+msgstr "حدث خطأ في النظام أثناء معالجة دفعتك. لم يجري خصم أيّة دفعات."
 
 #: lms/djangoapps/commerce/views.py
 msgid "Please wait a few minutes and then try again."
@@ -4925,7 +5256,7 @@ msgstr ""
 
 #: lms/djangoapps/commerce/views.py
 msgid "An error occurred while creating your receipt."
-msgstr ""
+msgstr "حدث خطأ أثناء إعداد إيصالك."
 
 #: lms/djangoapps/commerce/views.py
 msgid ""
@@ -4950,23 +5281,23 @@ msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Welcome to the {platform_name} Wiki"
-msgstr ""
+msgstr "مرحبًا بك في صفحة ويكي لمنصّة  {platform_name} "
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
-msgstr ""
+msgstr "تفضّل بزيارة إحدى صفحات الويكي الخاصة بالمساق لإضافة مقال. "
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "Course has not started"
-msgstr ""
+msgstr "لم يبدأ المساق بعد"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "Course does not start until {}"
-msgstr ""
+msgstr "لن يبدأ المساق حتى {}"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You have unfulfilled milestones"
-msgstr ""
+msgstr "لديك مراحل رئيسية غير منجَزة."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You do not have access to this course"
@@ -5029,7 +5360,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verify My Identity"
-msgstr ""
+msgstr "تحقّق من هويتي"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Missed Verification Deadline"
@@ -5096,7 +5427,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
-msgstr ""
+msgstr "موقع غير صحيح."
 
 #: lms/djangoapps/courseware/views.py
 msgid "User {username} has never accessed problem {location}"
@@ -5144,7 +5475,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to run import command."
-msgstr ""
+msgstr "تعذّر تشغيل أمر الاستيراد."
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The underlying module store does not support import."
@@ -5163,6 +5494,7 @@ msgstr ""
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr ""
+"تعذّر التبديل إلى الفرع المحدّد. يُرجى التحقق من اسم الفرع الذي طلبته."
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
 msgid ""
@@ -5184,7 +5516,7 @@ msgstr ""
 #. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {username}\n"
-msgstr ""
+msgstr "فشلت عملية التحقّق من هوية المستخدم {username}\n"
 
 #. Translators: this means that the password has been corrected (sometimes the
 #. database needs to be resynchronized)
@@ -5411,7 +5743,7 @@ msgstr ""
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
 "Error uploading file. Please contact the site administrator. Thank you."
-msgstr ""
+msgstr "حدث خطأ أثناء محاولة تحميل الملف. يُرجى الاتصال بمشرف الموقع وشكرًا."
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
@@ -5423,7 +5755,7 @@ msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Server error. Please try again in a few minutes."
-msgstr ""
+msgstr "خطأ في الخادم. يُرجى إعادة المحاولة بعد بضع دقائق."
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "No endpoint was provided for EdxNotes."
@@ -5441,6 +5773,7 @@ msgstr ""
 msgid "Course Staff"
 msgstr ""
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
@@ -5448,7 +5781,7 @@ msgstr "طاقم المساق"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Used Registration Code"
-msgstr ""
+msgstr "رمز تسجيل المُستَخدَم "
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Credit Card - Individual"
@@ -5482,7 +5815,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not read uploaded file."
-msgstr ""
+msgstr "تعذّرت قراءة الملف المحمَّل. "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5492,7 +5825,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invalid email {email_address}."
-msgstr ""
+msgstr "عنوان بريد إلكتروني {email_address} غير صحيح."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5524,18 +5857,21 @@ msgid ""
 " 'Pending Tasks' table for the status of the task. When completed, the "
 "report will be available for download in the table below."
 msgstr ""
+"مهمّة إعداد تقرير إجابات المسائل قيد المعالجة. يُرجى تفقّد قسم ’المهام "
+"المعلَّقة‘ لمتابعة حالة تلك المهمّة. سيتوفّر التقرير  للتنزيل في الجدول "
+"أدناه ما أن تكتمل المهمّة."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{num}' does not exist."
-msgstr ""
+msgstr " الفاتورة رقم '{num}' غير موجودة."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The sale associated with this invoice has already been invalidated."
-msgstr ""
+msgstr "سبق أن أُلغِيَت عملية البيع المرتبطة بهذه الفاتورة."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number {0} has been invalidated."
-msgstr ""
+msgstr "أُلغِيَت الفاتورة رقم {0}."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "This invoice is already active."
@@ -5543,7 +5879,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The registration codes for invoice {0} have been re-activated."
-msgstr ""
+msgstr "أُعيد تفعيل رموز التسجيل الخاصة بالفاتورة رقم {0}."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "CourseID"
@@ -5638,6 +5974,7 @@ msgstr ""
 msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr ""
 
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -5670,7 +6007,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Code Redeemed Count"
-msgstr ""
+msgstr "عدد الرموز المسترَدّة"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Total Discounted Seats"
@@ -5738,7 +6075,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Unable to generate redeem codes because of course misconfiguration."
-msgstr ""
+msgstr "تعذّر توليد رموز الاسترداد نتيجة خطأ في ضبط إعدادات المساق. "
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/models.py
@@ -5751,7 +6088,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "An error occurred while deleting the score."
-msgstr ""
+msgstr "حدث خطأ أثناء حذف الدرجة."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Course has no entrance exam section."
@@ -5854,32 +6191,57 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invalid Json data"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Students added to Certificate white list successfully"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Student username/email is required."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Duplicate Student Username/password."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Student (username/email={user}) does not exist"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Multiple Students found with username/email={user}"
+msgid "Student (username/email={user}) already in certificate exception list."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Student (username/email={user_id} already in certificate exception  list)"
+"Certificate exception (user={user}) does not exist in certificate white "
+"list. Please refresh the page and try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid Json data, Please refresh the page and then try again."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Add Exception\" button."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"We can't find the user (username/email={user}) you've entered. Make sure the"
+" username or email address is correct, then try again."
+msgstr ""
+"لم نتمكّن من إيجاد المستخدم (username/email={user}) الذي أدخلته. يُرجى "
+"التأكّد من صحّة اسم المستخدّم أو البريد الإلكتروني ثم إعادة المحاولة من "
+"جديد."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The user (username/email={user}) you have entered is not enrolled in this "
+"course. Make sure the username or email address is correct, then try again."
+msgstr ""
+"المستخدم (username/email={user}) الذي أدخلته غير مسجّل في هذا المساق. يُرجى "
+"التأكّد من صحّة اسم المستخدم أو عنوان البريد الإلكتروني ثم إعادة المحاولة من"
+" جديد."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid data, user_id must be present for all certificate exceptions."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Certificate generation started for white listed students."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "user \"{user}\" in row#    {row}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "user \"{username}\" in row# {row}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -5902,7 +6264,7 @@ msgstr ""
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
-msgstr ""
+msgstr "سبق أن استُخدم الرمز ({code}) الذي حاولت تعيّينه كرمز تسجيل."
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "Please Enter the Integer Value for Coupon Discount"
@@ -5918,15 +6280,15 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) added successfully"
-msgstr ""
+msgstr "نجحت إضافة القسيمة التي تحمل رمز ({code}) "
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) already exists for this course"
-msgstr ""
+msgstr "سبق استخدام قسيمة تحمل الرمز ({code}) في هذا المساق. "
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id not found"
-msgstr ""
+msgstr "تعذّر إيجاد رقم القسيمة"
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
@@ -6062,7 +6424,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Invalid assignment name '{name}'"
-msgstr ""
+msgstr "اسم الواجب '{name}' غير صحيح."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "External email"
@@ -6090,7 +6452,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to communicate with gradebook server at {url}"
-msgstr ""
+msgstr "تعذّر الاتّصال بخادم دفتر الدرجات باستخدام الرابط {url}"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Error: {err}"
@@ -6113,26 +6475,28 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "ID"
-msgstr ""
+msgstr "الرقم التعريفي"
 
-#: cms/templates/register.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Full Name"
 msgstr "الاسم الكامل"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
-msgstr ""
+msgstr "عنوان البريد الإلكتروني لـ edX "
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Enrollment of students"
-msgstr ""
+msgstr "تسجيل الطلّاب"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Un-enrollment of students"
-msgstr ""
+msgstr "إلغاء تسجيل الطلّاب"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
@@ -6145,31 +6509,33 @@ msgid ""
 "Failed to find any background tasks for course \"{course}\" and module "
 "\"{problem}\"."
 msgstr ""
+"تعذّر إيجاد أي مهام تُنفّذ في الخلفية للمساق \"{course}\"، والوحدة "
+"\"{problem}\"."
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid ""
 "The enrollment code ({code}) was not found for the {course_name} course."
-msgstr ""
+msgstr "تعذّر إيجاد رمز التسجيل ({code}) للمساق {course_name}."
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid "This enrollment code has been canceled. It can no longer be used."
-msgstr ""
+msgstr "أُلغيَ رمز التسجيل هذا. لم يعد بالإمكان استخدامه."
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid "This enrollment code has been marked as unused."
-msgstr ""
+msgstr "وُسِم رمز التسجيل كرمز غير مستخدم."
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid "The enrollment code has been restored."
-msgstr ""
+msgstr "تمّ استعادة رمز التسجيل."
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid "The redemption does not exist against enrollment code ({code})."
-msgstr ""
+msgstr " لا تتوفّر ميزة الاسترداد لرمز التسجيل ({code})."
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Could not find student matching identifier: {student_identifier}"
-msgstr ""
+msgstr "تعذّر إيجاد الرقم التعريفي للطالب: {student_identifier} "
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unable to parse date: "
@@ -6177,7 +6543,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Couldn't find module for url: {0}"
-msgstr ""
+msgstr "تعذّر إيجاد الوحدة ذات الصلة بالرابط: {0}"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit {0} has no due date to extend."
@@ -6283,7 +6649,7 @@ msgstr ""
 msgid "Company Name"
 msgstr "اسم الشركة"
 
-#: wiki/forms.py
+#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
 msgid "Title"
 msgstr "العنوان"
 
@@ -6333,11 +6699,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Coupon Codes Used"
-msgstr ""
+msgstr "رموز القسائم المستخدمة"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Registration Code Used"
-msgstr ""
+msgstr "رمز التسجيل المستخدَم"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Payment Status"
@@ -6389,7 +6755,7 @@ msgstr ""
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find submission to be {action} for student '{student}'"
-msgstr ""
+msgstr "تعذّر إيجاد التقديم الذي يحتاج إلى {action} للطالب '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
@@ -6410,6 +6776,8 @@ msgid ""
 "Unable to find entrance exam submission to be {action} for student "
 "'{student}'"
 msgstr ""
+"تعذّر إيجاد التقديم الخاص بامتحان الدخول الذي كان قد {action} للطالب "
+"'{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
@@ -6532,6 +6900,8 @@ msgid ""
 "Enter true or false. If true, the course is open to the public. If false, "
 "the course is open only to admins."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. باختيارك للقيمة ’true‘، يُصبح المساق مُتاحًا "
+"لعامة الناس، أما باختيار ’false‘ فسيُتاح المساق للمشرفين فقط. "
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -6560,6 +6930,8 @@ msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
 msgstr ""
+"تعذّر الاتّصال بالخادم الخارجي المسؤول عن التقييم. يُرجى مراسلة فريق التطوير"
+" على البريد الإلكتروني {email}."
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -6567,6 +6939,9 @@ msgid ""
 "answers to any open response assessment questions? If not, please do so and "
 "return to this page."
 msgstr ""
+"تعذّر العثور على أي مسائل مفتوحة الردود في هذا المساق. هل قدّمت إجابات لأي "
+"أسئلة تقييم مفتوحة الردود؟ إذا لم تكن قد فعلت ذلك حتى الآن، يُرجى منك تقديم "
+"إجابة ثمّ العودة إلى هذه الصفحة. "
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
@@ -6592,13 +6967,13 @@ msgstr ""
 msgid ""
 "Error occurred while contacting the grading service.  Please notify course "
 "staff."
-msgstr ""
+msgstr "حدث خطأ أثناء الاتصال بخدمة التقييم. يُرجى إعلام طاقم المساق. "
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
 "Error occurred while contacting the grading service.  Please notify your edX"
 " point of contact."
-msgstr ""
+msgstr "حدث خطأ أثناء الاتصال بخدمة التقييم. يُرجى إعلام جهة اتصالك بـ edX. "
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "for course {0} and student {1}."
@@ -6630,7 +7005,7 @@ msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "New grades have been returned"
-msgstr ""
+msgstr "أُرجِعَت درجات جديدة"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "Submissions have been flagged for review"
@@ -6662,6 +7037,10 @@ msgid ""
 "        Please check back later for this.\n"
 "        "
 msgstr ""
+"\n"
+"حدث خطأ أثناء إنشاء عملية تقييم الزملاء.\n"
+"لم يجرِ إنشاء وحدة خاصة بتقييم الزملاء في محتويات المساق وهو ما سيتيح لك تقييم الآخرين.\n"
+"يُرجى إعادة التحقّق من ذلك لاحقًا."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -6671,7 +7050,7 @@ msgstr ""
 msgid ""
 "Confirmation and Registration Codes for the following courses: "
 "{course_name_list}"
-msgstr ""
+msgstr "رموز التأكيد والتسجيل الخاصة بالمساقات التالية: {course_name_list}"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
@@ -6679,11 +7058,11 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Internal reference code for this invoice."
-msgstr ""
+msgstr "الرقم المرجعي الداخلي الخاص بهذه الفاتورة."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Customer's reference code for this invoice."
-msgstr ""
+msgstr "الرقم المرجعي للعميل الخاص بهذه الفاتورة."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -6693,7 +7072,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Lower-case ISO currency codes"
-msgstr ""
+msgstr "رموز العملة بأحرف صغيرة، حسب معيار ’أيزو‘"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Optional: provide additional information for this transaction"
@@ -6706,6 +7085,10 @@ msgid ""
 " payment or refund was received. 'cancelled' means that payment or refund "
 "was expected, but was cancelled before money was transferred. "
 msgstr ""
+"حالة عملية الدفع أو استرداد المبلغ. يدل خيار ’بدأت‘ أنّ الدفعة متوقَّعة، إلا"
+" أن المبلغ المالي لم يُحوَّل بعد بينما يدل الخيار ’تمّت‘ على استلام الدفعة "
+"أو مبلغ المال المسترَدّ. يشير الخيار ’أُلغيَت‘ على توقّع الدفعة أو مبلغ "
+"المال المُسترَدّ إلّا أنّ العمليّة قد أُلغِيت قبل تحويل المبلغ المالي. "
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "The number of items sold."
@@ -6726,7 +7109,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Enrollment codes for Course: {course_name}"
-msgstr ""
+msgstr "رموز التسجيل للمساق: {course_name}"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Mode {mode} does not exist for {course_id}"
@@ -6741,16 +7124,27 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
+"You can unenroll in the course and receive a full refund for 14 days after "
+"the course start date. "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
 "If you haven't verified your identity yet, please start the verification "
 "process ({verification_url})."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"You have up to two weeks into the course to unenroll and receive a full "
-"refund.To receive your refund, contact {billing_email}. Please include your "
-"order number in your email. Please do NOT include your credit card "
-"information."
+"You can unenroll in the course and receive a full refund for 2 days after "
+"the course start date. "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
+"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
+" include your order number in your email. Please do NOT include your credit "
+"card information."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -6763,7 +7157,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Could not find a course with the ID '{course_id}'"
-msgstr ""
+msgstr "تعذّر إيجاد مساق يحمل الرقم التعريفي '{course_id}'"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Donation for {course}"
@@ -6777,9 +7171,9 @@ msgstr ""
 msgid "Page {page_number} of {page_count}"
 msgstr ""
 
-#: lms/templates/shoppingcart/receipt.html
+#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
 msgid "Invoice"
-msgstr "الفاتورة"
+msgstr "فاتورة"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Order"
@@ -6842,17 +7236,17 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
-msgstr ""
+msgstr "لم يَرجِع معالِج الدفع بمُعامل معيّن مطلوب: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
-msgstr ""
+msgstr "أرجع معالِج الدفعات قيمةً مطبوعة بشكل سيّئ {0} للمُعامل {1}. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
-msgstr ""
+msgstr "قَبِل معالِج الدفعات طلبًا ذا رقم غير موجود في نظامنا. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -6867,6 +7261,10 @@ msgid ""
 " charged. Please try a different form of payment. Contact us with payment-"
 "related questions at {email}."
 msgstr ""
+"عذرًا! لم يقبل قسمنا المختصّ بمعالجة الدفعات دفعتك. أما القرار الذي أرجعه "
+"القسم فقد كان  {decision_text}، والسبب هو {reason_text}. لم يجري خصم المبلغ "
+"من حسابك. يُرجى مراسلتنا على العنوان {email} لنجيب عن أي استفسار يخصّ سداد "
+"الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -6876,6 +7274,12 @@ msgid ""
 "is: {error_message}. Your credit card may possibly have been charged. "
 "Contact us with payment-specific questions at {email}."
 msgstr ""
+"عذرًا! أَرجَع لنا قسمنا المختصّ بمعالجة الدفعات تأكيدًا، يحوي بياناتِ "
+"متضاربة تخصّ سداد الدفعة. نعتذر لعدم قدرتنا على التثبّت فيما إذا جرى خصم "
+"الرسوم فعلًا لاتّخاذ إجراء إضافي حيال طلبك. رسالة الخطأ المحدّدة هي:  "
+"{error_message}. يُحتمل أن يكون المبلغ قد اقتُطِع من حساب بطاقتك "
+"الائتمانية.يُرجى مراسلتنا على العنوان {email} لنجيب عن أي استفسار يخصّ سداد "
+"الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -6894,6 +7298,12 @@ msgid ""
 "further action on your order. Your credit card may possibly have been "
 "charged. Contact us with payment-specific questions at {email}."
 msgstr ""
+"عذرًا! أَرجَع لنا قسمنا المختصّ بمعالجة الدفعات رسالةً تالفة تخصّ خصم رسومك،"
+" الأمر الذي جعلنا غير قادرين على التثبّت فيما إذا كان مصدر الرسالة هو معالج "
+"الدفعات فعلًا. رسالة الخطأ المحدّدة هي: {msg}. نعتذر لعدم قدرتنا على التثبّت"
+" فيما إذا جرى خصم الرسوم فعلًا لاتّخاذ إجراء إضافي حيال طلبك. يُحتمل أن يكون"
+" المبلغ قد اقتُطِع من حساب بطاقتك الائتمانية. يُرجى مراسلتنا على العنوان "
+"{email} لنجيب عن أي استفسار يخصّ سداد الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -6908,7 +7318,7 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "One or more fields in the request contains invalid data."
-msgstr ""
+msgstr "يحتوي حقل واحد أو أكثر من الحقول المطلوبة في طلبك بياناتٍ غير صحيحة."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -6918,6 +7328,10 @@ msgid ""
 "            Possible fix: retry the payment after 15 minutes.\n"
 "            "
 msgstr ""
+"\n"
+"إنّ الرمز المرجعي للبائع ’merchantReferenceCode‘ المُستخدم في طلب التفويض هذا يتطابق مع\n"
+"رمز مرجعي لبائع، مُستخدم في طلب تفويض آخر أرسلته أنت خلال آخر 15 دقيقة.\n"
+"الحلّ المحتمل: إعادة محاولة الدفع بعد 15 دقيقة."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -6999,11 +7413,14 @@ msgid ""
 "Invalid card verification number. Possible fix: retry with another form of "
 "payment"
 msgstr ""
+"رقم التحقق الخاص بالبطاقة غير صحيح. الحلّ المحتمل: إعادة المحاولة باستخدام "
+"وسيلة دفع أخرى"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
+"رقم الحساب غير صحيح. الحلّ المحتمل: إعادة المحاولة باستخدام وسيلة دفع أخرى"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7012,12 +7429,17 @@ msgid ""
 "            Possible fix: retry with another form of payment\n"
 "            "
 msgstr ""
+"\n"
+"لم يقبل معالِج الدفعات نوع بطاقتك الائتمانية.\n"
+"الحلّ المحتمل: إعادة المحاولة باستخدام وسيلة دفع أخرى"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
 msgstr ""
+"رفض عام من قبل المعالج. الحلّ المحتمل: إعادة المحاولة باستخدام وسيلة دفع "
+"أخرى"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7031,7 +7453,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr ""
+msgstr "حدث خلل في المعالِج. الحلّ المحتمل: إعادة محاولة الدفع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The authorization has already been captured"
@@ -7054,7 +7476,7 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The request ID is invalid."
-msgstr ""
+msgstr "الرقم التعريفي للطلب غير صحيح."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7087,6 +7509,9 @@ msgid ""
 "            Possible fix: retry the payment.\n"
 "            "
 msgstr ""
+"\n"
+"خطأ: جرى استلام الطلب إلا أن مهلة العملية المسموح بها لمعالج الدفعات قد انتهت.\n"
+"الحلّ المحتمل: إعادة محاولة الدفع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7105,13 +7530,14 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {parameter}"
-msgstr ""
+msgstr "لم يَرجِع معالِج الدفع بمُعامل معيّن مطلوب: {parameter}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The payment processor returned a badly-typed value {value} for parameter "
 "{parameter}."
 msgstr ""
+"أرجع معالِج الدفعات قيمةً مطبوعة بشكل سيّئ {value} للمُعامل {parameter}. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7127,6 +7553,10 @@ msgid ""
 "charged. Please try a different form of payment.  Contact us with payment-"
 "related questions at {email}."
 msgstr ""
+"عذرًا! لم يقبل قسمنا المختصّ بمعالجة الدفعات دفعتك. أما القرار الذي أرجعه "
+"القسم فقد كان  {decision}، والسبب هو {reason}. لم يجري خصم المبلغ من حسابك. "
+"يُرجى محاولة الدفع باستخدام وسيلة دفع أخرى. يُرجى مراسلتنا على العنوان "
+"{email} لنجيب عن أي استفسار يخصّ سداد الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7136,6 +7566,11 @@ msgid ""
 "message is: {msg} Your credit card may possibly have been charged.  Contact "
 "us with payment-specific questions at {email}."
 msgstr ""
+"عذرًا! أَرجَع لنا قسمنا المختصّ بمعالجة الدفعات تأكيدًا، يحوي بياناتِ "
+"متضاربة تخصّ سداد الدفعة. نعتذر لعدم قدرتنا على التثبّت فيما إذا جرى خصم "
+"الرسوم فعلًا لاتّخاذ إجراء إضافي حيال طلبك. رسالة الخطأ المحدّدة هي:  {msg}."
+" يُحتمل أن يكون المبلغ قد اقتُطِع من حساب بطاقتك الائتمانية.يُرجى مراسلتنا "
+"على العنوان {email} لنجيب عن أي استفسار يخصّ سداد الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7154,6 +7589,12 @@ msgid ""
 "action on your order. Your credit card may possibly have been charged. "
 "Contact us with payment-specific questions at {email}."
 msgstr ""
+"عذرًا! أَرجَع لنا قسمنا المختصّ بمعالجة الدفعات رسالةً تالفة تخصّ خصم رسومك،"
+" الأمر الذي جعلنا غير قادرين على التثبّت فيما إذا كان مصدر الرسالة هو معالج "
+"الدفعات فعلًا. رسالة الخطأ المحدّدة هي: {msg}. نعتذر لعدم قدرتنا على التثبّت"
+" فيما إذا جرى خصم الرسوم فعلًا لاتّخاذ إجراء إضافي حيال طلبك. يُحتمل أن يكون"
+" المبلغ قد اقتُطِع من حساب بطاقتك الائتمانية.يُرجى مراسلتنا على العنوان "
+"{email} لنجيب عن أي استفسار يخصّ سداد الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7162,6 +7603,10 @@ msgid ""
 "future purchase. If you feel that this is in error, please contact us with "
 "payment-specific questions at {email}."
 msgstr ""
+"عذرًا! أرجَع لنا قسمنا المختصّ بمعالجة الدفعات رسالةً مفادها أنّك قد ألغيتَ "
+"هذه العملية. سنحتفظ بالعناصر الموجودة في سلّة تسوّقك لعمليّات شراء "
+"مستقبليّة. إذا كنت تعتقد بأنّ هذا حصل عن طريق الخطأ، فيُرجى مراسلتنا على "
+"العنوان {email} لنجسي عن أي استفسار يخصّ سداد الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7175,6 +7620,8 @@ msgid ""
 "Sorry! Your payment could not be processed because an unexpected exception "
 "occurred. Please contact us at {email} for assistance."
 msgstr ""
+"تعذّرت معالجة دفعتك نظرًا لحصول استثناء غير متوقَّع. يُرجى مراسلتنا على "
+"{email} للحصول على المساعدة."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7184,6 +7631,11 @@ msgid ""
 "            Possible action: Resend the request with a unique merchant reference code.\n"
 "            "
 msgstr ""
+"\n"
+"إنّ الرمز المرجعي للبائع المُستخدم في طلب التفويض هذا يتطابق مع\n"
+"الرمز المرجعي \n"
+"لطلب تفويض آخر، كنت قد أرسلته خلال آخر 15 دقيقة.\n"
+"الإجراء التصحيحي المحتمل: إعادة إرسال الطلب واستخدام رمز مرجعي فريد للبائع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Only a partial amount was approved."
@@ -7222,6 +7674,10 @@ msgid ""
 "            Possible action: retry with another form of payment.\n"
 "            "
 msgstr ""
+"\n"
+"لدى البنك المُصدِر تساؤلات حول الطلب. لا تحصل على \n"
+"رمز تفويض مُرسل آليًا، بل قد تحصل عليه شفهيًا بااتصالك بالمعالج.\n"
+"يمكنك اتخاذ الإجراء: إعادة المحاولة باستخدام وسيلة دفع أخرى."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7278,6 +7734,8 @@ msgid ""
 "Invalid card verification number (CVN). Possible action: retry with another "
 "form of payment."
 msgstr ""
+"رقم التحقق الخاص بالبطاقة (CVN) غير صحيح. الحلّ المحتمل: إعادة المحاولة "
+"باستخدام وسيلة دفع أخرى."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The customer matched an entry on the processors negative file."
@@ -7308,12 +7766,17 @@ msgid ""
 "            Possible action: retry with another form of payment.\n"
 "            "
 msgstr ""
+"\n"
+"لم يَقبَل معالِج الدفعات نوع بطاقتك.\n"
+"الحلّ المحتمل: إعادة المحاولة باستخدام وسيلة دفع أخرى."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "General decline by the processor.  Possible action: retry with another form "
 "of payment."
 msgstr ""
+"حدث رفض عام من قبل المعالج. الحلّ المحتمل: إعادة المحاولة باستخدام وسيلة دفع"
+" أخرى."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7327,7 +7790,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Processor Failure.  Possible action: retry the payment"
-msgstr ""
+msgstr "حدث خلل في المعالِج. الحلّ المحتمل: إعادة محاولة الدفع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The authorization has already been reversed."
@@ -7370,6 +7833,7 @@ msgstr ""
 msgid ""
 "The request was received, but there was a timeout at the payment processor."
 msgstr ""
+"جرى استلام الطلب إلا أن مهلة العملية المسموح بها لمعالج الدفعات قد انتهت."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Stand-alone credits are not allowed."
@@ -7471,7 +7935,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Honor Code Enrollment"
-msgstr ""
+msgstr "التسجيل في ميثاق الشرف الأكاديمي"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Verified Enrollment"
@@ -7535,26 +7999,27 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Discount does not exist against code '{code}'."
-msgstr ""
+msgstr " لا يتوفّر خصم للرمز '{code}'."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "This enrollment code ({enrollment_code}) is no longer valid."
-msgstr ""
+msgstr "لم يعد رمز التسجيل ({enrollment_code}) صالحًا."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "This enrollment code ({enrollment_code}) is not valid."
-msgstr ""
+msgstr "رمز التسجيل ({enrollment_code}) غير صحيح."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid ""
 "Code '{registration_code}' is not valid for any course in the shopping cart."
-msgstr ""
+msgstr "رمز '{registration_code}' غير صالح بالنسبة لأي مساق في سلّة التسوّق."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid ""
 "Cart item quantity should not be greater than 1 when applying activation "
 "code"
 msgstr ""
+"لا يجب أن تزيد كمّية المشتريات في السلّة عن بند  1 عند تطبيق رمز التفعيل."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Only one coupon redemption is allowed against an order"
@@ -7620,7 +8085,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
-msgstr ""
+msgstr "لغة اختيارية التي يستخدمها الفريق كرمز ISO 639-1."
 
 #: lms/djangoapps/teams/plugins.py
 #: lms/djangoapps/teams/templates/teams/teams.html
@@ -7715,7 +8180,7 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
-msgstr ""
+msgstr "نأسف لحدوث خطأ أثناء التحقّق من صحّة صور بطاقتك الشخصية."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -7779,11 +8244,11 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Invalid course key"
-msgstr ""
+msgstr "مفتاح المساق غير صحيح."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Invalid checkpoint location"
-msgstr ""
+msgstr "موقع نقطة التحقّق غير صحيح."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
@@ -7977,7 +8442,7 @@ msgstr ""
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "يُرجى إدخال كلمة السر الجديدة مرّتين لنتمكّن من تأكيد صحّة إدخالها."
+msgstr "يُرجى إدخال كلمة المرور الجديدة مرّتين لنتحقّق من صحّة إدخالها."
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8565,6 +9030,14 @@ msgstr ""
 msgid "Course Credit Eligibility"
 msgstr ""
 
+#: openedx/core/djangoapps/credit/exceptions.py
+msgid "[{username}] is not eligible for credit for [{course_key}]."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/exceptions.py
+msgid "[{course_key}] is not a valid course key."
+msgstr ""
+
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
 "Unique identifier for this credit provider. Only alphanumeric characters and"
@@ -8585,6 +9058,9 @@ msgid ""
 "credit. In order for this to work, a shared secret key MUST be configured "
 "for the credit provider in secure auth settings."
 msgstr ""
+"باختيارك للقيمة ’true‘، يُعلم مزوِّد الوحدات الدراسية تلقائيًّا بمجرّد طلب "
+"المستخدم لوحدات دراسية. لتنجح هذه العملية، \"يجب\" ضبط مفتاح سرّي مشترك "
+"ك4لمزوِّد الوحدات الدراسية من خلال قسم إعدادات التفويض الآمن. "
 
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
@@ -8651,6 +9127,10 @@ msgid "No file provided for profile image"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
+msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
 msgid "Internal Service URL"
 msgstr ""
 
@@ -8659,11 +9139,16 @@ msgid "Public Service URL"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "API Version"
+msgid "Path to authoring app's JS"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "Enable Student Dashboard Displays"
+msgid ""
+"This value is required in order to enable the Studio authoring interface."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Path to authoring app's CSS"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
@@ -8674,6 +9159,14 @@ msgstr ""
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Student Dashboard Displays"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Studio Authoring Interface"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -8694,7 +9187,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Invalid user preference key '{preference_key}'."
-msgstr ""
+msgstr "مفتاح التفضيل '{preference_key}' للمستخدم غير صحيح. "
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 msgid ""
@@ -8720,6 +9213,10 @@ msgstr ""
 msgid "username@domain.com"
 msgstr ""
 
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
@@ -8735,12 +9232,16 @@ msgstr "كلمة السر"
 msgid "Remember me"
 msgstr "تذكُّر بياناتي"
 
+#. Translators: This message is shown to users who attempt to create a new
+#. account using an email address associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
 msgstr ""
 
+#. Translators: This message is shown to users who attempt to create a new
+#. account using a username associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
@@ -8753,9 +9254,13 @@ msgstr ""
 msgid "Jane Doe"
 msgstr ""
 
-#: lms/templates/register.html
-msgid "Needed for any certificates you may earn"
-msgstr "مطلوب لأي شهادة قد تنالها - يفضل باللغة العربية"
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -8763,6 +9268,9 @@ msgstr "مطلوب لأي شهادة قد تنالها - يفضل باللغة �
 msgid "Public username"
 msgstr ""
 
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "The name that will identify you in your courses - {bold_start}(cannot be "
@@ -8779,7 +9287,7 @@ msgstr ""
 #. form used to select the user's highest completed level of education.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Highest level of education completed"
-msgstr ""
+msgstr "أعلى مستوى تعليمي وصلت إليه "
 
 #: lms/templates/signup_modal.html
 msgid "Year of birth"
@@ -8789,6 +9297,8 @@ msgstr "سنة الميلاد"
 msgid "Mailing address"
 msgstr "العنوان البريدي"
 
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
 msgstr ""
@@ -8801,23 +9311,31 @@ msgstr ""
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
-msgstr ""
+msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
 msgstr ""
 
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
-msgstr ""
+msgstr "هذة القيمة غير صحيحة"
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This field is not editable"
-msgstr ""
+msgstr "هذا الحقل غير قابل للتعديل"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -9552,19 +10070,30 @@ msgid ""
 msgstr ""
 
 #: common/templates/course_modes/choose.html
+msgid "Earn an Honor Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Take this course for free and have complete access to all the course "
+"material, activities, tests, and forums. Please note that learners who earn "
+"a passing grade will earn a certificate in this course."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Pursue an Honor Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "سجِّل في هذا المساق كمستمع "
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
+"material, activities, tests, and forums.  Please note that this track does "
+"not offer a certificate for learners who earn a passing grade."
 msgstr ""
-"استمع إلى دروس هذا المساق مجّانًا واستمتع بإمكانية استخدام كافة مواد المساق "
-"وأنشطته واختباراته ومنتدياته. وإذا جاءت نتيجة عملك مُرضية، والتزمتَ بميثاق "
-"الشرف، فإنّك ستحصل على شهادة في ميثاق الشرف تحمِل اسمك لإثبات إنجازك."
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
@@ -10831,10 +11360,10 @@ msgstr "موقع المستودع"
 msgid "Repo Branch (optional)"
 msgstr "فرع المستودع (اختياري)"
 
-#. Translators: Github is a popular website for hosting code
+#. Translators: GitHub is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
-msgid "Load new course from github"
-msgstr "تحميل مساق جديد من github"
+msgid "Load new course from GitHub"
+msgstr ""
 
 #. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
@@ -12436,6 +12965,10 @@ msgstr "درجتك النهائية:"
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
 msgstr "مجموع الدرجات المطلوب لشهادة {cert_name_short}:"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grade required to pass this course:"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -14043,10 +14576,6 @@ msgstr "معلومات التسجيل"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "عدد المسجلين (المشرفون والطاقم والطلاب) بحسب المسار."
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "مستمع"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
@@ -16273,6 +16802,11 @@ msgstr ""
 msgid "FAQ"
 msgstr "الأسئلة الشائعة"
 
+#: lms/templates/static_templates/jobs.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Jobs"
+msgstr "الوظائف"
+
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
@@ -16319,10 +16853,6 @@ msgstr "إعدادات الحساب"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
-msgstr "يرجى الانتظار"
-
-#: lms/templates/student_account/finish_auth.html
-msgid "Please wait"
 msgstr "يرجى الانتظار"
 
 #: lms/templates/student_account/login_and_register.html
@@ -16454,10 +16984,8 @@ msgstr ""
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
 "The deadline to upgrade to a verified certificate for this course has "
-"passed. You can still earn an honor code certificate."
+"passed."
 msgstr ""
-"لقد انقضى الموعد النهائي للتحقق من أجل هذا المساق. ما زال يمكنك الحصول على "
-"شهادة رمز الشرف."
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Upgrade Your Enrollment For {course_name}."
@@ -18346,6 +18874,10 @@ msgid "New Library"
 msgstr "مكتبة جديدة"
 
 #: cms/templates/index.html
+msgid "New Program"
+msgstr ""
+
+#: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr "يُرجى تصحيح الحقول المركَّز عليها أدناه."
 
@@ -18516,6 +19048,10 @@ msgstr ""
 msgid "Libraries"
 msgstr "المكتبات"
 
+#: cms/templates/index.html cms/templates/widgets/header.html
+msgid "Programs"
+msgstr ""
+
 #: cms/templates/index.html
 msgid "Re-run Course"
 msgstr "مساق مشغَّل مرّة أخرى"
@@ -18644,6 +19180,18 @@ msgid ""
 msgstr ""
 "تنطوي المكتبات على مجموعة من المكوِّنات التي يمكن إعادة استخدامها في عدّة "
 "مساقات. تفضَّل بإنشاء مكتبتك الأولى بمجرّد كبسة زرّ!"
+
+#: cms/templates/index.html
+msgid "You haven't created any programs yet."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Programs are groups of courses related to a common subject."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Create Your First Program"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -18950,6 +19498,10 @@ msgstr ""
 "يملك المشرفون على المكتبات كامل صلاحيات التحرير، كما يمكنهم إضافة أعضاء "
 "الفريق الآخرين وحذفهم. ويجب أن يكون لدى مستخدم واحد على الأقلّ صلاحيات "
 "المشرِف في أي مكتبة."
+
+#: cms/templates/program_authoring.html cms/templates/widgets/header.html
+msgid "Program Administration"
+msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -20662,7 +21214,7 @@ msgstr "استُعيد الآن المقال \"%s\" وكافة مقالاته ا
 #, python-format
 msgid ""
 "The article %(title)s is now set to display revision #%(revision_number)d"
-msgstr ""
+msgstr "جرى الآن إعداد المقال %(title)s لعرض المراجعة #%(revision_number)d"
 
 #: wiki/views/article.py
 msgid "New title"

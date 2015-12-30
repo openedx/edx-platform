@@ -16,6 +16,7 @@ log = logging.getLogger('VideoPage')
 VIDEO_BUTTONS = {
     'transcript': '.lang',
     'transcript_button': '.toggle-transcript',
+    'cc_button': '.toggle-captions',
     'volume': '.volume',
     'play': '.video_control.play',
     'pause': '.video_control.pause',
@@ -28,10 +29,12 @@ VIDEO_BUTTONS = {
 }
 
 CSS_CLASS_NAMES = {
-    'closed_captions': '.video.closed',
+    'captions_closed': '.video.closed',
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
-    'captions_text': '.subtitles > li',
+    'captions_text': '.subtitles li',
+    'captions_text_getter': '.subtitles li[role="link"][data-index="1"]',
+    'closed_captions': '.closed-captions',
     'error_message': '.video .video-player h3',
     'video_container': '.video',
     'video_sources': '.video-player video source',
@@ -293,6 +296,18 @@ class VideoPage(PageObject):
         """
         self._captions_visibility(False)
 
+    def show_closed_captions(self):
+        """
+        Make closed captions visible.
+        """
+        self._closed_captions_visibility(True)
+
+    def hide_closed_captions(self):
+        """
+        Make closed captions invisible.
+        """
+        self._closed_captions_visibility(False)
+
     def is_captions_visible(self):
         """
         Get current visibility sate of captions.
@@ -302,8 +317,20 @@ class VideoPage(PageObject):
 
         """
         self.wait_for_ajax()
-        caption_state_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
-        return not self.q(css=caption_state_selector).present
+        caption_state_selector = self.get_element_selector(CSS_CLASS_NAMES['captions'])
+        return self.q(css=caption_state_selector).visible
+
+    def is_closed_captions_visible(self):
+        """
+        Get current visibility sate of closed captions.
+
+        Returns:
+            bool: True means captions are visible, False means captions are not visible
+
+        """
+        self.wait_for_ajax()
+        closed_caption_state_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
+        return self.q(css=closed_caption_state_selector).visible
 
     @wait_for_js
     def _captions_visibility(self, captions_new_state):
@@ -327,7 +354,24 @@ class VideoPage(PageObject):
 
             # Verify that captions state is toggled/changed
             EmptyPromise(lambda: self.is_captions_visible() == captions_new_state,
-                         "Captions are {state}".format(state=state)).fulfill()
+                         "Transcripts are {state}".format(state=state)).fulfill()
+
+    @wait_for_js
+    def _closed_captions_visibility(self, closed_captions_new_state):
+        """
+        Set the video closed captioning visibility state.
+
+        Arguments:
+            closed_captions_new_state (bool): True means show closed captioning
+        """
+        states = {True: 'shown', False: 'hidden'}
+        state = states[closed_captions_new_state]
+
+        self.click_player_button('cc_button')
+
+        # Make sure that the captions are visible
+        EmptyPromise(lambda: self.is_closed_captions_visible() == closed_captions_new_state,
+                     "Closed captions are {state}".format(state=state)).fulfill()
 
     @property
     def captions_text(self):
@@ -344,6 +388,31 @@ class VideoPage(PageObject):
         subs = self.q(css=captions_selector).html
 
         return ' '.join(subs)
+
+    @property
+    def closed_captions_text(self):
+        """
+        Extract closed captioning text.
+
+        Returns:
+            str: closed captions Text.
+
+        """
+        self.wait_for_closed_captions()
+
+        closed_captions_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
+        subs = self.q(css=closed_captions_selector).html
+
+        return ' '.join(subs)
+
+    def click_first_line_in_transcript(self):
+        """
+        Clicks a line in the transcript updating the current caption.
+        """
+
+        self.wait_for_captions()
+        captions_selector = self.q(css=CSS_CLASS_NAMES['captions_text_getter'])
+        captions_selector.click()
 
     @property
     def speed(self):
@@ -493,6 +562,12 @@ class VideoPage(PageObject):
 
         response = requests.get(url, **kwargs)
         return response.status_code < 400, response.headers, response.content
+
+    def get_cookie(self, cookie_name):
+        """
+        Searches for and returns `cookie_name`
+        """
+        return self.browser.get_cookie(cookie_name)
 
     def downloaded_transcript_contains_text(self, transcript_format, text_to_search):
         """
@@ -836,6 +911,20 @@ class VideoPage(PageObject):
         """
         captions_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['captions_rendered'])
         self.wait_for_element_presence(captions_rendered_selector, 'Captions Rendered')
+
+    def wait_for_closed_captions(self):
+        """
+        Wait until closed captions are rendered completely.
+        """
+        cc_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
+        self.wait_for_element_visibility(cc_rendered_selector, 'Closed captions rendered')
+
+    def wait_for_closed_captions_to_be_hidden(self):
+        """
+        Waits for the closed captions to be turned off completely.
+        """
+        cc_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
+        self.wait_for_element_invisibility(cc_rendered_selector, 'Closed captions hidden')
 
 
 def _parse_time_str(time_str):

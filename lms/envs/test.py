@@ -62,8 +62,6 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
-FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = True
-
 FEATURES['ENABLE_SHOPPING_CART'] = True
 
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
@@ -448,6 +446,11 @@ MICROSITE_CONFIGURATION = {
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
         "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "urls": {
+            'ABOUT': 'testmicrosite/about',
+            'PRIVACY': 'testmicrosite/privacy',
+            'TOS_AND_HONOR': 'testmicrosite/tos-and-honor',
+        },
     },
     "microsite_with_logistration": {
         "domain_prefix": "logistration",
@@ -516,9 +519,6 @@ FEATURES['ENABLE_EDXNOTES'] = True
 # Enable teams feature for tests.
 FEATURES['ENABLE_TEAMS'] = True
 
-# Add apps to Installed apps for testing
-INSTALLED_APPS += ('openedx.core.djangoapps.call_stack_manager',)
-
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 
@@ -557,3 +557,6 @@ AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
+
+# Financial assistance page
+FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True

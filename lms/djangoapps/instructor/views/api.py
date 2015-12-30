@@ -10,14 +10,13 @@ import json
 import logging
 import re
 import time
-import requests
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -25,11 +24,9 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
 from django.shortcuts import redirect
-from util.db import outer_atomic
 import string
 import random
 import unicodecsv
-import urllib
 import decimal
 from student import auth
 from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
@@ -52,7 +49,7 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_string
 from courseware.models import StudentModule
 from shoppingcart.models import (
     Coupon,
@@ -92,7 +89,7 @@ from instructor.views import INVOICE_KEY
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
-from certificates.models import CertificateWhitelist, GeneratedCertificate
+from certificates.models import CertificateWhitelist, GeneratedCertificate, CertificateStatuses
 
 from bulk_email.models import CourseEmail
 from student.models import get_user_by_username_or_email
@@ -108,7 +105,6 @@ from .tools import (
     set_due_date_extension,
     strip_if_string,
     bulk_email_is_enabled_for_course,
-    add_block_ids,
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -2679,7 +2675,7 @@ def start_certificate_generation(request, course_id):
     Start generating certificates for all students enrolled in given course.
     """
     course_key = CourseKey.from_string(course_id)
-    task = instructor_task.api.generate_certificates_for_all_students(request, course_key)
+    task = instructor_task.api.generate_certificates_for_students(request, course_key)
     message = _('Certificate generation task for all students of this course has been started. '
                 'You can view the status of the generation task in the "Pending Tasks" section.')
     response_payload = {
@@ -2708,7 +2704,7 @@ def start_certificate_regeneration(request, course_id):
         )
 
     # Check if the selected statuses are allowed
-    allowed_statuses = GeneratedCertificate.get_unique_statuses(course_key=course_key, flat=True)
+    allowed_statuses = [CertificateStatuses.downloadable, CertificateStatuses.error, CertificateStatuses.notpassing]
     if not set(certificates_statuses).issubset(allowed_statuses):
         return JsonResponse(
             {'message': _('Please select certificate statuses from the list only.')},
@@ -2789,11 +2785,18 @@ def add_certificate_exception(course_key, student, certificate_exception):
         }
     )
 
+    generated_certificate = GeneratedCertificate.objects.filter(
+        user=student,
+        course_id=course_key,
+        status=CertificateStatuses.downloadable,
+    ).first()
+
     exception = dict({
         'id': certificate_white_list.id,
         'user_email': student.email,
         'user_name': student.username,
         'user_id': student.id,
+        'certificate_generated': generated_certificate and generated_certificate.created_date.strftime("%B %d, %Y"),
         'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
     })
 
@@ -2839,22 +2842,21 @@ def parse_request_data_and_get_user(request, course_key):
     try:
         certificate_exception = json.loads(request.body or '{}')
     except ValueError:
-        raise ValueError(_('Invalid Json data, Please refresh the page and then try again.'))
+        raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))
 
     user = certificate_exception.get('user_name', '') or certificate_exception.get('user_email', '')
     if not user:
         raise ValueError(_('Student username/email field is required and can not be empty. '
-                           'Kindly fill in username/email and then press "Add Exception" button.'))
+                           'Kindly fill in username/email and then press "Add to Exception List" button.'))
     try:
         db_user = get_user_by_username_or_email(user)
     except ObjectDoesNotExist:
-        raise ValueError(_("We can't find the user (username/email={user}) you've entered. "
-                           "Make sure the username or email address is correct, then try again.").format(user=user))
+        raise ValueError(_("{user} does not exist in the LMS. Please check your spelling and retry.").format(user=user))
 
     # Make Sure the given student is enrolled in the course
     if not CourseEnrollment.is_enrolled(db_user, course_key):
-        raise ValueError(_("The user (username/email={user}) you have entered is not enrolled in this course. "
-                           "Make sure the username or email address is correct, then try again.").format(user=user))
+        raise ValueError(_("{user} is not enrolled in this course. Please check your spelling and retry.")
+                         .format(user=user))
 
     return certificate_exception, db_user
 
@@ -2950,7 +2952,7 @@ def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable
         """
         inner method to build dict of csv data as row errors.
         """
-        row_errors[key].append(_('user "{user}" in row#    {row}').format(user=_user, row=row_count))
+        row_errors[key].append(_('user "{user}" in row# {row}').format(user=_user, row=row_count))
 
     if 'students_list' in request.FILES:
         try:

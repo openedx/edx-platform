@@ -54,7 +54,6 @@ COPYRIGHT_YEAR = "2015"
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
-COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
 DISCUSSION_SETTINGS = {
@@ -74,31 +73,6 @@ FEATURES = {
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
-    # When True, will only publicly list courses by the subdomain.
-    'SUBDOMAIN_COURSE_LISTINGS': False,
-    # Expects you to define COURSE_LISTINGS, a dictionary mapping
-    # subdomains to lists of course_ids
-    # COURSE_LISTINGS = {
-    #     'default': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #         'HarvardX/CS50x/2012',
-    #         'MITx/3.091x/2012_Fall',
-    #     ],
-    #     'openedx': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #     ],
-    # }
-    # To see it in action, add the following to your /etc/hosts file:
-    #     127.0.0.1 openedx.dev
-
-    # When True, will override certain branding with university specific values
-    # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
-    # university to use for branding purposes
-    'SUBDOMAIN_BRANDING': False,
-
-    'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
-                                       # set to None to do no university selection
-
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
@@ -116,8 +90,6 @@ FEATURES = {
     # in their emails, and they will have no way to resubscribe.
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
 
-    'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
-
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
@@ -130,7 +102,6 @@ FEATURES = {
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
     # extrernal access methods
-    'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
@@ -208,9 +179,6 @@ FEATURES = {
 
     # Enable Custom Courses for EdX
     'CUSTOM_COURSES_EDX': False,
-
-    # Enable legacy instructor dashboard
-    'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
 
     # Is this an edX-owned domain? (used for edX specific messaging and images)
     'IS_EDX_DOMAIN': False,
@@ -426,7 +394,7 @@ COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
 # comprehensive theming system
-COMP_THEME_DIR = ""
+COMPREHENSIVE_THEME_DIR = ""
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -606,6 +574,7 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
+USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
@@ -701,7 +670,6 @@ OPTIMIZELY_PROJECT_ID = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
-SUBDOMAIN_BRANDING = {}
 VIRTUAL_UNIVERSITIES = []
 
 ############# XBlock Configuration ##########
@@ -1033,26 +1001,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 # Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 
-################################# open ended grading config  #####################
-
-#By setting up the default settings with an incorrect user name and password,
-# will get an error when attempting to connect
-OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://example.com/peer_grading',
-    'username': 'incorrect_user',
-    'password': 'incorrect_pass',
-    'staff_grading': 'staff_grading',
-    'peer_grading': 'peer_grading',
-    'grading_controller': 'grading_controller'
-}
-
-# Used for testing, debugging peer grading
-MOCK_PEER_GRADING = False
-
-# Used for testing, debugging staff grading
-MOCK_STAFF_GRADING = False
-
-
 ################################# EdxNotes config  #########################
 
 # Configure the LMS to use our stub EdxNotes implementation
@@ -1087,7 +1035,7 @@ FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/edx-openedx-log
 
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
-FOOTER_ORGANIZATION_IMAGE = "images/default-theme/logo.png"
+FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
 
 # These are referred to both by the Django asset pipeline
 # AND by the branding footer API, which needs to decide which
@@ -1197,12 +1145,12 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 PIPELINE_ENABLED = True
 
-# Process static files using RequireJS Optimizer
-STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -1281,7 +1229,7 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
     'js/vendor/afontgarde/afontgarde.js',
-    'js/vendor/afontgarde/edx-icons.js',
+    'js/vendor/afontgarde/edx-icons.js'
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
@@ -1317,8 +1265,6 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
-staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
-open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
 instructor_dash_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js')) +
@@ -1503,8 +1449,8 @@ PIPELINE_CSS = {
 }
 
 
-common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)    # pylint: disable=line-too-long
-project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)  # pylint: disable=line-too-long
+common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)    # pylint: disable=line-too-long
+project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)  # pylint: disable=line-too-long
 
 
 PIPELINE_JS = {
@@ -1555,14 +1501,6 @@ PIPELINE_JS = {
         'source_filenames': discussion_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
     },
-    'staff_grading': {
-        'source_filenames': staff_grading_js,
-        'output_filename': 'js/staff_grading.js',
-    },
-    'open_ended': {
-        'source_filenames': open_ended_js,
-        'output_filename': 'js/open_ended.js',
-    },
     'notes': {
         'source_filenames': notes_js,
         'output_filename': 'js/notes.js',
@@ -1604,25 +1542,6 @@ PIPELINE_JS = {
         'output_filename': 'js/credit/web_view.js'
     }
 }
-
-# Compile all coffee files in course data directories if they are out of date.
-# TODO: Remove this once we move data into Mongo. This is only temporary while
-# course data directories are still in use.
-if os.path.isdir(DATA_DIR):
-    for course_dir in os.listdir(DATA_DIR):
-        js_dir = DATA_DIR / course_dir / "js"
-        if not os.path.isdir(js_dir):
-            continue
-        for filename in os.listdir(js_dir):
-            if filename.endswith('coffee'):
-                new_filename = os.path.splitext(filename)[0] + ".js"
-                if os.path.exists(js_dir / new_filename):
-                    coffee_timestamp = os.stat(js_dir / filename).st_mtime
-                    js_timestamp = os.stat(js_dir / new_filename).st_mtime
-                    if coffee_timestamp <= js_timestamp:
-                        continue
-                os.system("rm %s" % (js_dir / new_filename))
-                os.system("coffee -c %s" % (js_dir / filename))
 
 
 STATICFILES_IGNORE_PATTERNS = (
@@ -1851,9 +1770,6 @@ INSTALLED_APPS = (
     'dashboard',
     'instructor',
     'instructor_task',
-    'open_ended_grading',
-    'psychometrics',
-    'licenses',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
@@ -1893,9 +1809,6 @@ INSTALLED_APPS = (
     # See TNL-3783 for details.
     #'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
-
-    # Foldit integration
-    'foldit',
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
@@ -1993,6 +1906,9 @@ INSTALLED_APPS = (
     'lms.djangoapps.teams',
 
     'xblock_django',
+
+    # Bookmarks
+    'openedx.core.djangoapps.bookmarks',
 
     # programs support
     'openedx.core.djangoapps.programs',
@@ -2553,7 +2469,7 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 PDF_RECEIPT_LOGO_PATH = PROJECT_ROOT + '/static/images/openedx-logo-tag.png'
 # Height of the Logo in mm
 PDF_RECEIPT_LOGO_HEIGHT_MM = 12
-PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/logo.png'
+PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/logo.png'
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
@@ -2650,7 +2566,7 @@ PROFILE_IMAGE_BACKEND = {
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
-PROFILE_IMAGE_DEFAULT_FILENAME = 'images/default-theme/default-profile'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 # This secret key is used in generating unguessable URLs to users'
 # profile images.  Once it has been set, changing it will make the
@@ -2735,3 +2651,13 @@ PROCTORING_SETTINGS = {}
 # The reason we introcuced this number is because we do not want the CCX
 # to compete with the MOOC.
 CCX_MAX_STUDENTS_ALLOWED = 200
+
+# Financial assistance settings
+
+# Maximum and minimum length of answers, in characters, for the
+# financial assistance form
+FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
+FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
+
+# Course Content Bookmarks Settings
+MAX_BOOKMARKS_PER_COURSE = 100

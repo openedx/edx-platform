@@ -39,13 +39,23 @@ class StaticContent(object):
         return self.location.category == 'thumbnail'
 
     @staticmethod
-    def generate_thumbnail_name(original_name):
+    def generate_thumbnail_name(original_name, dimensions=None):
+        """
+        - original_name: Name of the asset (typically its location.name)
+        - dimensions: `None` or a tuple of (width, height) in pixels
+        """
         name_root, ext = os.path.splitext(original_name)
         if not ext == XASSET_THUMBNAIL_TAIL_NAME:
             name_root = name_root + ext.replace(u'.', u'-')
+
+        if dimensions:
+            width, height = dimensions  # pylint: disable=unpacking-non-sequence
+            name_root += "-{}x{}".format(width, height)
+
         return u"{name_root}{extension}".format(
             name_root=name_root,
-            extension=XASSET_THUMBNAIL_TAIL_NAME,)
+            extension=XASSET_THUMBNAIL_TAIL_NAME,
+        )
 
     @staticmethod
     def compute_location(course_key, path, revision=None, is_thumbnail=False):
@@ -248,11 +258,25 @@ class ContentStore(object):
         """
         raise NotImplementedError
 
-    def generate_thumbnail(self, content, tempfile_path=None):
+    def generate_thumbnail(self, content, tempfile_path=None, dimensions=None):
+        """Create a thumbnail for a given image.
+
+        Returns a tuple of (StaticContent, AssetKey)
+
+        `content` is the StaticContent representing the image you want to make a
+        thumbnail out of.
+
+        `tempfile_path` is a string path to the location of a file to read from
+        in order to grab the image data, instead of relying on `content.data`
+
+        `dimensions` is an optional param that represents (width, height) in
+        pixels. It defaults to None.
+        """
         thumbnail_content = None
         # use a naming convention to associate originals with the thumbnail
-        thumbnail_name = StaticContent.generate_thumbnail_name(content.location.name)
-
+        thumbnail_name = StaticContent.generate_thumbnail_name(
+            content.location.name, dimensions=dimensions
+        )
         thumbnail_file_location = StaticContent.compute_location(
             content.location.course_key, thumbnail_name, is_thumbnail=True
         )
@@ -273,8 +297,11 @@ class ContentStore(object):
                 # I've seen some exceptions from the PIL library when trying to save palletted
                 # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
                 im = im.convert('RGB')
-                size = 128, 128
-                im.thumbnail(size, Image.ANTIALIAS)
+
+                if not dimensions:
+                    dimensions = (128, 128)
+
+                im.thumbnail(dimensions, Image.ANTIALIAS)
                 thumbnail_file = StringIO.StringIO()
                 im.save(thumbnail_file, 'JPEG')
                 thumbnail_file.seek(0)

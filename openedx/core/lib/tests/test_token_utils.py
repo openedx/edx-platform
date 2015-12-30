@@ -12,6 +12,7 @@ from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.lib.token_utils import get_id_token
+from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory, UserProfileFactory
 
 
@@ -53,7 +54,7 @@ class TestIdTokenGeneration(TestCase):
             'exp': calendar.timegm(expiration.utctimetuple()),
             'iat': calendar.timegm(now.utctimetuple()),
             'aud': self.oauth2_client.client_id,
-            'sub': self.user.id,  # pylint: disable=no-member
+            'sub': anonymous_id_for_user(self.user, None),
         }
 
         self.assertEqual(payload, expected_payload)

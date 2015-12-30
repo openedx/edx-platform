@@ -127,7 +127,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
     def student_view(self, context):
         """ Renders parameters to template. """
         context = {
-            'display_name': self.display_name_with_default,
+            'display_name': self.display_name_with_default_escaped,
             'instructions_html': self.instructions,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
             'tag': self.instructor_tags,

@@ -37,7 +37,13 @@ from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from certificates.models import CertificateGenerationConfiguration, CertificateWhitelist, GeneratedCertificate
+from certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateWhitelist,
+    GeneratedCertificate,
+    CertificateStatuses,
+    CertificateGenerationHistory,
+)
 from certificates import api as certs_api
 from util.date_utils import get_default_time_display
 
@@ -180,7 +186,6 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)}),
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
@@ -190,6 +195,7 @@ def instructor_dashboard_2(request, course_id):
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
         'certificate_exception_view_url': certificate_exception_view_url
     }
+
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
@@ -300,6 +306,10 @@ def _section_certificates(course):
             )
         )
     instructor_generation_enabled = settings.FEATURES.get('CERTIFICATES_INSTRUCTOR_GENERATION', False)
+    certificate_statuses_with_count = {
+        certificate['status']: certificate['count']
+        for certificate in GeneratedCertificate.get_unique_statuses(course_key=course.id)
+    }
 
     return {
         'section_key': 'certificates',
@@ -310,7 +320,10 @@ def _section_certificates(course):
         'instructor_generation_enabled': instructor_generation_enabled,
         'html_cert_enabled': html_cert_enabled,
         'active_certificate': certs_api.get_active_web_certificate(course),
-        'certificate_statuses': GeneratedCertificate.get_unique_statuses(course_key=course.id),
+        'certificate_statuses_with_count': certificate_statuses_with_count,
+        'status': CertificateStatuses,
+        'certificate_generation_history':
+            CertificateGenerationHistory.objects.filter(course_id=course.id).order_by("-created"),
         'urls': {
             'generate_example_certificates': reverse(
                 'generate_example_certificates',

@@ -247,7 +247,7 @@ def answer_distributions(course_key):
         problem_store = modulestore()
         if usage_key not in state_keys_to_problem_info:
             problem = problem_store.get_item(usage_key)
-            problem_info = (problem.url_name, problem.display_name_with_default)
+            problem_info = (problem.url_name, problem.display_name_with_default_escaped)
             state_keys_to_problem_info[usage_key] = problem_info
 
         return state_keys_to_problem_info[usage_key]
@@ -374,12 +374,11 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
         format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
-            section_name = section_descriptor.display_name_with_default
+            section_name = section_descriptor.display_name_with_default_escaped
 
             with outer_atomic():
                 # some problems have state that is updated independently of interaction
-                # with the LMS, so they need to always be scored. (E.g. foldit.,
-                # combinedopenended)
+                # with the LMS, so they need to always be scored. (E.g. combinedopenended ORA1)
                 # TODO This block is causing extra savepoints to be fired that are empty because no queries are executed
                 # during the loop. When refactoring this code please keep this outer_atomic call in mind and ensure we
                 # are not making unnecessary database queries.
@@ -450,7 +449,7 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
                                 correct,
                                 total,
                                 graded,
-                                module_descriptor.display_name_with_default,
+                                module_descriptor.display_name_with_default_escaped,
                                 module_descriptor.location
                             )
                         )
@@ -630,7 +629,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                         correct,
                         total,
                         graded,
-                        module_descriptor.display_name_with_default,
+                        module_descriptor.display_name_with_default_escaped,
                         module_descriptor.location
                     )
 
@@ -639,11 +638,11 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
 
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(
-                    scores, section_module.display_name_with_default)
+                    scores, section_module.display_name_with_default_escaped)
 
                 module_format = section_module.format if section_module.format is not None else ''
                 sections.append({
-                    'display_name': section_module.display_name_with_default,
+                    'display_name': section_module.display_name_with_default_escaped,
                     'url_name': section_module.url_name,
                     'scores': scores,
                     'section_total': section_total,
@@ -653,8 +652,8 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                 })
 
         chapters.append({
-            'course': course.display_name_with_default,
-            'display_name': chapter_module.display_name_with_default,
+            'course': course.display_name_with_default_escaped,
+            'display_name': chapter_module.display_name_with_default_escaped,
             'url_name': chapter_module.url_name,
             'sections': sections
         })
@@ -699,7 +698,7 @@ def get_score(user, problem_descriptor, module_creator, scores_client, submissio
         return submissions_scores_cache[location_url]
 
     # some problems have state that is updated independently of interaction
-    # with the LMS, so they need to always be scored. (E.g. foldit.)
+    # with the LMS, so they need to always be scored. (E.g. combinedopenended ORA1.)
     if problem_descriptor.always_recalculate_grades:
         problem = module_creator(problem_descriptor)
         if problem is None:

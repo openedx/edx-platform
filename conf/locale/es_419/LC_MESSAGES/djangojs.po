@@ -99,8 +99,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-24 13:40+0000\n"
-"PO-Revision-Date: 2015-11-24 13:50+0000\n"
+"POT-Creation-Date: 2015-12-03 21:15+0000\n"
+"PO-Revision-Date: 2015-12-01 21:00+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -1823,15 +1823,15 @@ msgstr "Intente usar otro navegador. Por ejemplo Google Chrome."
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr ""
+msgstr "Alta Definición"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr ""
+msgstr "Apagar"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
-msgstr ""
+msgstr "Encender"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
@@ -1863,6 +1863,8 @@ msgstr[1] "%(value)s segundos"
 msgid ""
 "Volume: Click on this button to mute or unmute this video or press UP or "
 msgstr ""
+"Clic en este botón para silenciar o anular silenciar para este video o "
+"presiona ARRIBA o"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1870,6 +1872,9 @@ msgid ""
 "to navigate the different speeds, then press ENTER to change to the selected"
 " speed."
 msgstr ""
+"Velocidad: Presione ARRIBA para acceder al menú luego use las teclas de "
+"ARRIBA y ABAJO para cambiar a diferentes velocidades, entonces presionas "
+"ENTER para cambiar a la velocidad seleccionada."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -1885,7 +1890,7 @@ msgstr "No mostrar nuevamente"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcript"
-msgstr ""
+msgstr "Desactivar transcripción"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1896,7 +1901,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "Abrir menú de lenguaje"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1912,11 +1917,11 @@ msgstr "El texto se mostrará cuando"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr ""
+msgstr "Activar transcripción"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr ""
+msgstr "Desactivar transcripción"
 
 #: common/lib/xmodule/xmodule/public/js/library_content_edit.js
 msgid "Updating with latest library content"
@@ -2219,6 +2224,7 @@ msgstr "Mostrando %(first_index)s-%(last_index)s de un total de %(num_items)s"
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
 msgstr ""
+"La dirección de correo que ha ingresado no está en el formato correcto."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
@@ -2230,7 +2236,7 @@ msgstr ""
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
-msgstr ""
+msgstr "Por favor ingrese su %(field)s."
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -2852,6 +2858,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating survey results. Please try again."
 msgstr ""
+"Error generando los resultados de encuesta. Por favor intente nuevamente."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
@@ -3681,11 +3688,11 @@ msgstr "Guardar cambios"
 
 #: lms/static/js/ccx/schedule.js
 msgid "Please enter valid start date and time."
-msgstr ""
+msgstr "Por favor ingrese fecha y hora de inicio válida."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Due date cannot be before start date."
-msgstr ""
+msgstr "Fecha límite no puede ser menor al a fecha de inicio."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Due Date and Time"
@@ -3696,8 +3703,54 @@ msgid "Enter Start Date and Time"
 msgstr "Ingrese fecha y hora"
 
 #: lms/static/js/certificates/models/certificate_exception.js
-msgid "Student username/email is required."
+msgid "Student username/email field is required and can not be empty. "
 msgstr ""
+"Campos nombre de usuario / email del estudiante son requeridos y no pueden "
+"estar vacíos."
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Errors!"
+msgstr "Errores !"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are successfully added to exception list"
+msgstr "alumnos fueron agregados a la lista de excepciones"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is successfully added to the exception list"
+msgstr "alumno fue agregado a la lista de excepción"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " records are not in correct format"
+msgstr "registros no están en el formato correcto"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " record is not in correct format"
+msgstr "registro no está en el formato correcto"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners do not exist in LMS"
+msgstr "estudiante no existe en LMS"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner does not exist in LMS"
+msgstr "estudiante no existe en LMS"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are already white listed"
+msgstr "estudiantes fueron puestos en lista blanca"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is already white listed"
+msgstr "estudiante ya está en lista blanca"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are not enrolled in course"
+msgstr "estudiantes no están inscritos en el curso"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is not enrolled in course"
+msgstr "estudiante no esta inscrito en el curso"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -4056,7 +4109,13 @@ msgid "Loading your courses"
 msgstr "Cargando sus cursos"
 
 #: lms/static/js/student_account/views/LoginView.js
-msgid "Please check your internet connection and try again."
+msgid "An error has occurred. Check your Internet connection and try again."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"An error has occurred. Try refreshing the page, or check your Internet "
+"connection."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -6217,11 +6276,9 @@ msgstr ""
 #: lms/templates/commerce/provider.underscore
 #, python-format
 msgid ""
-"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"To finalize course credit, %(display_name)s requires %(platform_name)s "
 "learners to submit a credit request."
 msgstr ""
-"Para terminar el proceso, %(provider_id)s requiere que los estudiantes de "
-"%(platform_name)s envíen una solicitud de crédito."
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -6382,30 +6439,32 @@ msgstr "Haga clic para editar"
 msgid "title"
 msgstr "Título"
 
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Bulk Exceptions"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid ""
+"You can upload a CSV file of usernames or email addresses to be added to the"
+" certificate exceptions white list."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Upload CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Individual Exceptions"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
-"Specify either Student's username or email for whom to create certificate "
-"exception"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Enter Notes associated with this certificate exception"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User ID"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User Email"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Date Exception Granted"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Notes"
+"You can add a username or email address to be added to the certificate "
+"exceptions white list."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -6426,6 +6485,30 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User ID"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User Email"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Date Exception Granted"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Remove from List"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore

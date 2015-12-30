@@ -7,7 +7,10 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models, transaction, IntegrityError
+from util.db import outer_atomic
 from django.core.exceptions import ValidationError
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -85,55 +88,63 @@ class CohortMembership(models.Model):
             raise ValidationError("Non-matching course_ids provided")
 
     def save(self, *args, **kwargs):
-        # Avoid infinite recursion if creating from get_or_create() call below.
-        if 'force_insert' in kwargs and kwargs['force_insert'] is True:
-            super(CohortMembership, self).save(*args, **kwargs)
-            return
-
         self.full_clean(validate_unique=False)
 
-        # This loop has been created to allow for optimistic locking, and retrial in case of losing a race condition.
-        # The limit is 2, since select_for_update ensures atomic updates. Creation is the only possible race condition.
-        max_retries = 2
-        success = False
-        for __ in range(max_retries):
-
+        # Avoid infinite recursion if creating from get_or_create() call below.
+        # This block also allows middleware to use CohortMembership.get_or_create without worrying about outer_atomic
+        if 'force_insert' in kwargs and kwargs['force_insert'] is True:
             with transaction.atomic():
-
-                try:
-                    with transaction.atomic():
-                        saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
-                            user__id=self.user.id,
-                            course_id=self.course_id,
-                            defaults={
-                                'course_user_group': self.course_user_group,
-                                'user': self.user
-                            }
-                        )
-                except IntegrityError:  # This can happen if simultaneous requests try to create a membership
-                    continue
-
-                if not created:
-                    if saved_membership.course_user_group == self.course_user_group:
-                        raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                            user_name=self.user.username,
-                            cohort_name=self.course_user_group.name
-                        ))
-                    self.previous_cohort = saved_membership.course_user_group
-                    self.previous_cohort_name = saved_membership.course_user_group.name
-                    self.previous_cohort_id = saved_membership.course_user_group.id
-                    self.previous_cohort.users.remove(self.user)
-
-                saved_membership.course_user_group = self.course_user_group
                 self.course_user_group.users.add(self.user)
+                self.course_user_group.save()
+                super(CohortMembership, self).save(*args, **kwargs)
+            return
 
-                super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
+        # This block will transactionally commit updates to CohortMembership and underlying course_user_groups.
+        # Note the use of outer_atomic, which guarantees that operations are committed to the database on block exit.
+        # If called from a view method, that method must be marked with @transaction.non_atomic_requests.
+        with outer_atomic(read_committed=True):
 
-            success = True
-            break
+            saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
+                user__id=self.user.id,
+                course_id=self.course_id,
+                defaults={
+                    'course_user_group': self.course_user_group,
+                    'user': self.user
+                }
+            )
 
-        if not success:
-            raise IntegrityError("Unable to save membership after {} tries, aborting.".format(max_retries))
+            # If the membership was newly created, all the validation and course_user_group logic was settled
+            # with a call to self.save(force_insert=True), which gets handled above.
+            if created:
+                return
+
+            if saved_membership.course_user_group == self.course_user_group:
+                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                    user_name=self.user.username,
+                    cohort_name=self.course_user_group.name
+                ))
+            self.previous_cohort = saved_membership.course_user_group
+            self.previous_cohort_name = saved_membership.course_user_group.name
+            self.previous_cohort_id = saved_membership.course_user_group.id
+            self.previous_cohort.users.remove(self.user)
+            self.previous_cohort.save()
+
+            saved_membership.course_user_group = self.course_user_group
+            self.course_user_group.users.add(self.user)
+            self.course_user_group.save()
+
+            super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
+
+
+# Needs to exist outside class definition in order to use 'sender=CohortMembership'
+@receiver(pre_delete, sender=CohortMembership)
+def remove_user_from_cohort(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Ensures that when a CohortMemebrship is deleted, the underlying CourseUserGroup
+    has its users list updated to reflect the change as well.
+    """
+    instance.course_user_group.users.remove(instance.user)
+    instance.course_user_group.save()
 
 
 class CourseUserGroupPartitionGroup(models.Model):

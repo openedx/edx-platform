@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-24 15:20+0000\n"
-"PO-Revision-Date: 2015-11-24 15:21:35.052367\n"
+"POT-Creation-Date: 2015-12-11 17:48+0000\n"
+"PO-Revision-Date: 2015-12-11 17:49:33.083624\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3922,9 +3922,65 @@ msgid "Enter Start Date and Time"
 msgstr "Éntér Stärt Däté änd Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/certificates/models/certificate_exception.js
-msgid "Student username/email is required."
+msgid "Student username/email field is required and can not be empty. "
 msgstr ""
-"Stüdént üsérnämé/émäïl ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Stüdént üsérnämé/émäïl fïéld ïs réqüïréd änd çän nöt ßé émptý.  Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Errors!"
+msgstr "Érrörs! Ⱡ'σяєм ιρѕυм #"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are successfully added to exception list"
+msgstr ""
+" léärnérs äré süççéssfüllý äddéd tö éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is successfully added to the exception list"
+msgstr ""
+" léärnér ïs süççéssfüllý äddéd tö thé éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " records are not in correct format"
+msgstr ""
+" réçörds äré nöt ïn çörréçt förmät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " record is not in correct format"
+msgstr ""
+" réçörd ïs nöt ïn çörréçt förmät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners do not exist in LMS"
+msgstr " léärnérs dö nöt éxïst ïn LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner does not exist in LMS"
+msgstr " léärnér döés nöt éxïst ïn LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are already white listed"
+msgstr ""
+" léärnérs äré älréädý whïté lïstéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is already white listed"
+msgstr ""
+" léärnér ïs älréädý whïté lïstéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are not enrolled in course"
+msgstr ""
+" léärnérs äré nöt énrölléd ïn çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is not enrolled in course"
+msgstr ""
+" léärnér ïs nöt énrölléd ïn çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -4348,10 +4404,18 @@ msgid "Loading your courses"
 msgstr "Löädïng ýöür çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/static/js/student_account/views/LoginView.js
-msgid "Please check your internet connection and try again."
+msgid "An error has occurred. Check your Internet connection and try again."
 msgstr ""
-"Pléäsé çhéçk ýöür ïntérnét çönnéçtïön änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Àn érrör häs öççürréd. Çhéçk ýöür Ìntérnét çönnéçtïön änd trý ägäïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"An error has occurred. Try refreshing the page, or check your Internet "
+"connection."
+msgstr ""
+"Àn érrör häs öççürréd. Trý réfréshïng thé pägé, ör çhéçk ýöür Ìntérnét "
+"çönnéçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information (required)"
@@ -5296,6 +5360,12 @@ msgstr ""
 "Thïs çömpönént häs välïdätïön ïssüés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Your video uploads are not complete."
+msgstr ""
+"Ýöür vïdéö üplöäds äré nöt çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "Délété Fïlé Çönfïrmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
@@ -5348,6 +5418,7 @@ msgstr "Mäx fïlé sïzé éxçéédéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Choose File"
 msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -6743,10 +6814,10 @@ msgstr ""
 #: lms/templates/commerce/provider.underscore
 #, python-format
 msgid ""
-"To finalize course credit, %(provider_id)s requires %(platform_name)s "
+"To finalize course credit, %(display_name)s requires %(platform_name)s "
 "learners to submit a credit request."
 msgstr ""
-"Tö fïnälïzé çöürsé çrédït, %(provider_id)s réqüïrés %(platform_name)s "
+"Tö fïnälïzé çöürsé çrédït, %(display_name)s réqüïrés %(platform_name)s "
 "léärnérs tö süßmït ä çrédït réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/commerce/provider.underscore
@@ -6800,6 +6871,7 @@ msgid "Amount"
 msgstr "Àmöünt Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
@@ -6921,35 +6993,37 @@ msgstr "Çlïçk tö édït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "title"
 msgstr "tïtlé Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Bulk Exceptions"
+msgstr "Bülk Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid ""
+"You can upload a CSV file of usernames or email addresses to be added to the"
+" certificate exceptions white list."
+msgstr ""
+"Ýöü çän üplöäd ä ÇSV fïlé öf üsérnämés ör émäïl äddréssés tö ßé äddéd tö thé"
+" çértïfïçäté éxçéptïöns whïté lïst. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "Bröwsé Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Upload CSV"
+msgstr "Ûplöäd ÇSV Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Individual Exceptions"
+msgstr "Ìndïvïdüäl Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
-"Specify either Student's username or email for whom to create certificate "
-"exception"
+"You can add a username or email address to be added to the certificate "
+"exceptions white list."
 msgstr ""
-"Spéçïfý éïthér Stüdént's üsérnämé ör émäïl för whöm tö çréäté çértïfïçäté "
-"éxçéptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Enter Notes associated with this certificate exception"
-msgstr ""
-"Éntér Nötés ässöçïätéd wïth thïs çértïfïçäté éxçéptïön Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User ID"
-msgstr "Ûsér ÌD Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User Email"
-msgstr "Ûsér Émäïl Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Date Exception Granted"
-msgstr "Däté Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Notes"
-msgstr "Nötés Ⱡ'σяєм ιρѕ#"
+"Ýöü çän ädd ä üsérnämé ör émäïl äddréss tö ßé äddéd tö thé çértïfïçäté "
+"éxçéptïöns whïté lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all "
@@ -6972,6 +7046,30 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
 msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User ID"
+msgstr "Ûsér ÌD Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "User Email"
+msgstr "Ûsér Émäïl Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Date Exception Granted"
+msgstr "Däté Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr "Nötés Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "Àçtïön Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Remove from List"
+msgstr "Rémövé fröm Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
@@ -7577,6 +7675,7 @@ msgstr "Whät Ýöü Nééd för Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Wéßçäm Ⱡ'σяєм ιρѕυ#"
@@ -7839,6 +7938,7 @@ msgid "Check Your Email"
 msgstr "Çhéçk Ýöür Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "Phötö ÌD Ⱡ'σяєм ιρѕυм ∂#"
@@ -7935,6 +8035,85 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
 msgstr "prïçé Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Account Not Activated"
+msgstr "Àççöünt Nöt Àçtïvätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "You are enrolling in %(courseName)s"
+msgstr "Ýöü äré énröllïng ïn %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Upgrade to a Verified Certificate for %(courseName)s"
+msgstr ""
+"Ûpgrädé tö ä Vérïfïéd Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Before you upgrade to a certificate track, you must activate your account."
+msgstr ""
+"Béföré ýöü üpgrädé tö ä çértïfïçäté träçk, ýöü müst äçtïväté ýöür äççöünt. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Check your email for an activation message."
+msgstr ""
+"Çhéçk ýöür émäïl för än äçtïvätïön méssägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Professional Certificate for %(courseName)s"
+msgstr ""
+"Pröféssïönäl Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Verified Certificate for %(courseName)s"
+msgstr ""
+"Vérïfïéd Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid ""
+"To receive a certificate, you must also verify your identity before "
+"%(date)s."
+msgstr ""
+"Tö réçéïvé ä çértïfïçäté, ýöü müst älsö vérïfý ýöür ïdéntïtý ßéföré "
+"%(date)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "To receive a certificate, you must also verify your identity."
+msgstr ""
+"Tö réçéïvé ä çértïfïçäté, ýöü müst älsö vérïfý ýöür ïdéntïtý. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"To verify your identity, you need a webcam and a government-issued photo ID."
+msgstr ""
+"Tö vérïfý ýöür ïdéntïtý, ýöü nééd ä wéßçäm änd ä gövérnmént-ïssüéd phötö ÌD."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Your ID must be a government-issued photo ID that clearly shows your face."
+msgstr ""
+"Ýöür ÌD müst ßé ä gövérnmént-ïssüéd phötö ÌD thät çléärlý shöws ýöür fäçé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"You will use your webcam to take a picture of your face and of your "
+"government-issued photo ID."
+msgstr ""
+"Ýöü wïll üsé ýöür wéßçäm tö täké ä pïçtüré öf ýöür fäçé änd öf ýöür "
+"gövérnmént-ïssüéd phötö ÌD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8184,6 +8363,7 @@ msgid "ID"
 msgstr "ÌD Ⱡ'σя#"
 
 #: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Details"
 msgstr "Çértïfïçäté Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 

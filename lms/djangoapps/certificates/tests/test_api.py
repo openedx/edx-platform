@@ -1,6 +1,7 @@
 """Tests for the certificates Python API. """
 from contextlib import contextmanager
 import ddt
+from functools import wraps
 
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from config_models.models import cache
 from util.testing import EventTestMixin
@@ -22,10 +24,13 @@ from certificates.models import (
     CertificateStatuses,
     CertificateGenerationConfiguration,
     ExampleCertificate,
-    GeneratedCertificate
+    GeneratedCertificate,
+    certificate_status_for_student,
 )
 from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
 from certificates.tests.factories import GeneratedCertificateFactory
+
+from microsite_configuration import microsite
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -104,13 +109,13 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             status=CertificateStatuses.generating,
             mode='verified'
         )
-
         self.assertEqual(
             certs_api.certificate_downloadable_status(self.student, self.course.id),
             {
                 'is_downloadable': False,
                 'is_generating': True,
-                'download_url': None
+                'download_url': None,
+                'uuid': None,
             }
         )
 
@@ -127,7 +132,8 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             {
                 'is_downloadable': False,
                 'is_generating': True,
-                'download_url': None
+                'download_url': None,
+                'uuid': None
             }
         )
 
@@ -137,17 +143,22 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             {
                 'is_downloadable': False,
                 'is_generating': False,
-                'download_url': None
+                'download_url': None,
+                'uuid': None,
             }
         )
 
-    def test_with_downloadable_pdf_cert(self):
-        GeneratedCertificateFactory.create(
+    def verify_downloadable_pdf_cert(self):
+        """
+        Verifies certificate_downloadable_status returns the
+        correct response for PDF certificates.
+        """
+        cert = GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
             mode='verified',
-            download_url='www.google.com'
+            download_url='www.google.com',
         )
 
         self.assertEqual(
@@ -155,9 +166,17 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             {
                 'is_downloadable': True,
                 'is_generating': False,
-                'download_url': 'www.google.com'
+                'download_url': 'www.google.com',
+                'uuid': cert.verify_uuid
             }
         )
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_pdf_cert_with_html_enabled(self):
+        self.verify_downloadable_pdf_cert()
+
+    def test_pdf_cert_with_html_disabled(self):
+        self.verify_downloadable_pdf_cert()
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_with_downloadable_web_cert(self):
@@ -166,6 +185,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         with self._mock_passing_grade():
             certs_api.generate_user_certificates(self.student, self.course.id)
 
+        cert_status = certificate_status_for_student(self.student, self.course.id)
         self.assertEqual(
             certs_api.certificate_downloadable_status(self.student, self.course.id),
             {
@@ -175,6 +195,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                     user_id=self.student.id,  # pylint: disable=no-member
                     course_id=self.course.id,
                 ),
+                'uuid': cert_status['uuid']
             }
         )
 
@@ -333,6 +354,7 @@ class GenerateExampleCertificatesTest(TestCase):
 
     def test_generate_example_certs(self):
         # Generate certificates for the course
+        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
         with self._mock_xqueue() as mock_queue:
             certs_api.generate_example_certificates(self.COURSE_KEY)
 
@@ -386,3 +408,94 @@ class GenerateExampleCertificatesTest(TestCase):
         """Check the example certificate status. """
         actual_status = certs_api.example_certificates_status(self.COURSE_KEY)
         self.assertEqual(list(expected_statuses), actual_status)
+
+
+def set_microsite(domain):
+    """
+    returns a decorator that can be used on a test_case to set a specific microsite for the current test case.
+    :param domain: Domain of the new microsite
+    """
+    def decorator(func):
+        """
+        Decorator to set current microsite according to domain
+        """
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            """
+            Execute the function after setting up the microsite.
+            """
+            microsite.set_by_domain(domain)
+            return func(request, *args, **kwargs)
+        return inner
+    return decorator
+
+
+@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+@attr('shard_1')
+class CertificatesBrandingTest(TestCase):
+    """Test certificates branding. """
+
+    COURSE_KEY = CourseLocator(org='test', course='test', run='test')
+
+    def setUp(self):
+        super(CertificatesBrandingTest, self).setUp()
+
+    @set_microsite(settings.MICROSITE_CONFIGURATION['test_microsite']['domain_prefix'])
+    def test_certificate_header_data(self):
+        """
+        Test that get_certificate_header_context from certificates api
+        returns data customized according to site branding.
+        """
+        # Generate certificates for the course
+        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
+        data = certs_api.get_certificate_header_context(is_secure=True)
+
+        # Make sure there are not unexpected keys in dict returned by 'get_certificate_header_context'
+        self.assertItemsEqual(
+            data.keys(),
+            ['logo_src', 'logo_url']
+        )
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']['logo_image_url'],
+            data['logo_src']
+        )
+
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']['SITE_NAME'],
+            data['logo_url']
+        )
+
+    @set_microsite(settings.MICROSITE_CONFIGURATION['test_microsite']['domain_prefix'])
+    def test_certificate_footer_data(self):
+        """
+        Test that get_certificate_footer_context from certificates api returns
+        data customized according to site branding.
+        """
+        # Generate certificates for the course
+        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
+        data = certs_api.get_certificate_footer_context()
+
+        # Make sure there are not unexpected keys in dict returned by 'get_certificate_footer_context'
+        self.assertItemsEqual(
+            data.keys(),
+            ['company_about_url', 'company_privacy_url', 'company_tos_url']
+        )
+
+        # ABOUT is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['ABOUT'],
+            data['company_about_url']
+        )
+
+        # PRIVACY is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['PRIVACY'],
+            data['company_privacy_url']
+        )
+
+        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_microsite']["urls"],
+        # so web certificate will use that url
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['TOS_AND_HONOR'],
+            data['company_tos_url']
+        )

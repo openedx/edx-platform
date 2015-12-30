@@ -150,14 +150,14 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         # Needed for test_is_newish
         datetime_patcher = patch.object(
-            xmodule.course_module, 'datetime',
+            xmodule.course_metadata_utils, 'datetime',
             Mock(wraps=datetime)
         )
         mocked_datetime = datetime_patcher.start()
         mocked_datetime.now.return_value = NOW
         self.addCleanup(datetime_patcher.stop)
 
-    @patch('xmodule.course_module.datetime.now')
+    @patch('xmodule.course_metadata_utils.datetime.now')
     def test_sorting_score(self, gmtime_mock):
         gmtime_mock.return_value = NOW
 
@@ -208,7 +208,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False, 'January 2014'),
     ]
 
-    @patch('xmodule.course_module.datetime.now')
+    @patch('xmodule.course_metadata_utils.datetime.now')
     def test_start_date_text(self, gmtime_mock):
         gmtime_mock.return_value = NOW
         for s in self.start_advertised_settings:
@@ -216,7 +216,7 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Checking start=%s advertised=%s" % (s[0], s[1])
             self.assertEqual(d.start_datetime_text(), s[2])
 
-    @patch('xmodule.course_module.datetime.now')
+    @patch('xmodule.course_metadata_utils.datetime.now')
     def test_start_date_time_text(self, gmtime_mock):
         gmtime_mock.return_value = NOW
         for setting in self.start_advertised_settings:

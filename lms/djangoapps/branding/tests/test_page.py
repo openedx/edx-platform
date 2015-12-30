@@ -140,6 +140,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
             org='edX',
             course='900',
             display_name='pre requisite course',
+            emit_signals=True,
         )
 
         pre_requisite_courses = [unicode(pre_requisite_course.id)]
@@ -155,6 +156,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
             start=datetime.datetime(2013, 1, 1),
             end=datetime.datetime(2030, 1, 1),
             pre_requisite_courses=pre_requisite_courses,
+            emit_signals=True,
         )
         set_prerequisite_courses(course.id, pre_requisite_courses)
 
@@ -180,7 +182,8 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             metadata={
                 'start': datetime.datetime.now(UTC) + datetime.timedelta(days=4),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=3),
-            }
+            },
+            emit_signals=True,
         )
         self.starting_earlier = CourseFactory.create(
             org='MITx',
@@ -189,12 +192,14 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             metadata={
                 'start': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=1),
-            }
+            },
+            emit_signals=True,
         )
         self.course_with_default_start_date = CourseFactory.create(
             org='MITx',
             number='1002',
             display_name='Tech Beta Course',
+            emit_signals=True,
         )
         self.factory = RequestFactory()
 

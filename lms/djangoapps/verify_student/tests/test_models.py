@@ -472,6 +472,7 @@ class TestPhotoVerification(ModuleStoreTestCase):
     @ddt.unpack
     @ddt.data(
         {'enrollment_mode': 'honor', 'status': None, 'output': 'N/A'},
+        {'enrollment_mode': 'audit', 'status': None, 'output': 'N/A'},
         {'enrollment_mode': 'verified', 'status': False, 'output': 'Not ID Verified'},
         {'enrollment_mode': 'verified', 'status': True, 'output': 'ID Verified'},
     )

@@ -35,9 +35,8 @@
           % endif
 
           % if is_programs_enabled:
-            <!-- TODO: Link to the program creation view in the authoring app. -->
-            <button class="button new-button new-program-button"><i class="icon fa fa-plus icon-inline"></i>
-            ${_("New Program")}</button>
+            <a href=${program_authoring_url + 'new'} class="button new-button new-program-button"><i class="icon fa fa-plus icon-inline"></i>
+            ${_("New Program")}</a>
           % endif
         </li>
       </ul>
@@ -80,7 +79,7 @@
                   ## Translators: This is an example for the name of the organization sponsoring a course, seen when filling out the form to create a new course. The organization name cannot contain spaces.
                   ## Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed when user put no data into this field.
                   <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-course-org tip-error-new-course-org" />
-                  <span class="tip" id="tip-new-course-org">${_("The name of the organization sponsoring the course.")}  <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
+                  <span class="tip" id="tip-new-course-org">${_("The name of the organization sponsoring the course.")}  <strong>${_("Note: The organization name is part of the course URL")}</strong> ${_("This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-course-org"></span>
                 </li>
 
@@ -508,8 +507,7 @@
               % for program in programs:
               <li class="course-item">
 
-                <!-- TODO: Use the program ID contained in the dict to link to the appropriate view in the authoring app. -->
-                <a class="program-link" href="#">
+                <a class="program-link" href=${program_authoring_url + str(program['id'])}>
                   <h3 class="course-title">${program['name'] | h}</h3>
 
                   <div class="course-metadata">
@@ -538,8 +536,7 @@
 
               <ul class="list-actions">
                 <li class="action-item">
-                  <!-- TODO: Link to the program creation view in the authoring app. -->
-                  <button class="action-primary action-create new-button action-create-program new-program-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Create Your First Program')}</button>
+                  <a href=${program_authoring_url + 'new'} class="action-primary action-create new-button action-create-program new-program-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Create Your First Program')}</a>
                 </li>
               </ul>
 

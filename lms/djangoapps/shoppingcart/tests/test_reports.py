@@ -184,7 +184,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         self.course_reg_code_annotation = CourseRegCodeItemAnnotation(course_id=self.course_key, annotation=self.TEST_ANNOTATION)
         self.course_reg_code_annotation.save()
         self.cart = Order.get_cart_for_user(self.user)
-        self.reg = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        self.reg = PaidCourseRegistration.add_to_order(self.cart, self.course_key, mode_slug=course_mode.mode_slug)
         self.cert_item = CertificateItem.add_to_order(self.cart, self.course_key, self.cost, 'verified')
         self.cart.purchase()
         self.now = datetime.datetime.now(pytz.UTC)

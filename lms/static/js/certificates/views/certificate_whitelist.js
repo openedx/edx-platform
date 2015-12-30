@@ -14,7 +14,7 @@
         function($, _, gettext, Backbone){
             return Backbone.View.extend({
                 el: "#white-listed-students",
-                message_div: '#certificate-white-list-editor .message',
+                message_div: 'div.white-listed-students > div.message',
                 generate_exception_certificates_radio:
                     'input:radio[name=generate-exception-certificates-radio]:checked',
 
@@ -32,7 +32,12 @@
                 render: function(){
                     var template = this.loadTemplate('certificate-white-list');
                     this.$el.html(template({certificates: this.collection.models}));
-
+                    if (this.collection.isEmpty()) {
+                        this.$("#generate-exception-certificates").addClass("is-disabled");
+                    }
+                    else {
+                        this.$("#generate-exception-certificates").removeClass("is-disabled");
+                    }
                 },
 
                 loadTemplate: function(name) {
@@ -42,11 +47,27 @@
                 },
 
                 removeException: function(event){
-                    // Delegate remove exception event to certificate white-list editor view
-                    this.certificateWhiteListEditorView.trigger('removeException', $(event.target).data());
-
-                    // avoid default click behavior of link by returning false.
-                    return false;
+                    var certificate = $(event.target).data();
+                    var model = this.collection.findWhere(certificate);
+                    var self = this;
+                    if(model){
+                        model.destroy(
+                            {
+                                success: function() {
+                                    self.showMessage('Student Removed from certificate white list successfully.');
+                                },
+                                error: this.showError(this),
+                                wait: true,
+                                data: JSON.stringify(model.attributes)
+                            }
+                        );
+                    }
+                    else{
+                        this.showMessage(
+                            'Could not find Certificate Exception in white list. ' +
+                            'Please refresh the page and try again'
+                        );
+                    }
                 },
 
                 generateExceptionCertificates: function(){
@@ -56,17 +77,15 @@
                     );
                 },
 
-                showMessage: function(message, messageClass){
-                    $(this.message_div).text(message).
-                        removeClass('msg-error msg-success').addClass(messageClass).focus();
-                    $('html, body').animate({
-                        scrollTop: $(this.message_div).offset().top - 20
-                    }, 1000);
+                showMessage: function(message){
+                    $(this.message_div +  ">p" ).remove();
+                    $(this.message_div).removeClass('hidden').append("<p>"+ gettext(message) + "</p>").focus();
+                    $(this.message_div).fadeOut(6000, "linear");
                 },
 
                 showSuccess: function(caller_object){
                     return function(xhr){
-                        caller_object.showMessage(xhr.message, 'msg-success');
+                        caller_object.showMessage(xhr.message);
                     };
                 },
 
@@ -74,12 +93,11 @@
                     return function(xhr){
                         try{
                             var response = JSON.parse(xhr.responseText);
-                            caller_object.showMessage(response.message, 'msg-error');
+                            caller_object.showMessage(response.message);
                         }
                         catch(exception){
                             caller_object.showMessage(
-                                "Server Error, Please refresh the page and try again.", 'msg-error'
-                            );
+                                "Server Error, Please refresh the page and try again.");
                         }
                     };
                 }

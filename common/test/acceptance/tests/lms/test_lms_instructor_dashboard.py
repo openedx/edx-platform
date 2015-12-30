@@ -211,6 +211,10 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # open the exam settings to make it a proctored exam.
         self.course_outline.open_exam_settings_dialog()
+
+        # select advanced settings tab
+        self.course_outline.select_advanced_settings_tab()
+
         self.course_outline.make_exam_proctored()
 
         # login as a verified student and visit the courseware.
@@ -233,6 +237,10 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # open the exam settings to make it a proctored exam.
         self.course_outline.open_exam_settings_dialog()
+
+        # select advanced settings tab
+        self.course_outline.select_advanced_settings_tab()
+
         self.course_outline.make_exam_timed()
 
         # login as a verified student and visit the courseware.
@@ -673,7 +681,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, notes)
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
         # Verify that added exceptions are also synced with backend
         # Revisit Page
@@ -685,7 +692,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # validate certificate exception synced with server is visible in certificate exceptions list
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
     def test_instructor_can_remove_certificate_exception(self):
         """
@@ -701,13 +707,11 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, notes)
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
         # Remove Certificate Exception
         self.certificates_section.remove_first_certificate_exception()
         self.assertNotIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertNotIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertNotIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
         # Verify that added exceptions are also synced with backend
         # Revisit Page
@@ -719,7 +723,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # validate certificate exception synced with server is visible in certificate exceptions list
         self.assertNotIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertNotIn(notes, self.certificates_section.last_certificate_exception.text)
-        self.assertNotIn(str(self.user_id), self.certificates_section.last_certificate_exception.text)
 
     def test_error_on_duplicate_certificate_exception(self):
         """
@@ -737,7 +740,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            'User (username/email={user}) already in exception list.'.format(user=self.user_name),
+            '{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -759,7 +762,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
 
         self.assertIn(
             'Student username/email field is required and can not be empty. '
-            'Kindly fill in username/email and then press "Add Exception" button.',
+            'Kindly fill in username/email and then press "Add to Exception List" button.',
             self.certificates_section.message.text
         )
 
@@ -784,8 +787,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "We can't find the user (username/email={user}) you've entered. "
-            "Make sure the username or email address is correct, then try again.".format(user=invalid_user),
+            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -818,8 +820,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "The user (username/email={user}) you have entered is not enrolled in this course. "
-            "Make sure the username or email address is correct, then try again.".format(user=new_user),
+            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -840,6 +841,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            'Certificate generation started for white listed students.',
+            self.user_name + ' has been successfully added to the exception list. Click Generate Exception Certificate'
+                             ' below to send the certificate.',
             self.certificates_section.message.text
         )

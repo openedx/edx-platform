@@ -1,0 +1,10 @@
+<ul class="settings-tab">
+    <li class="settings-section">
+        <button class="general-settings-button" href="#"><%- gettext('General Settings') %></button>
+    </li>
+    <li class="settings-section">
+        <button class="advanced-settings-button" href="#"><%- gettext('Advanced') %></button>
+    </li>
+</ul>
+<div class='general-settings'></div>
+<div class='advanced-settings'></div>

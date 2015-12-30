@@ -414,7 +414,7 @@ define([
 
             function returnsToContent () {
                 this.resultsView.clear();
-                expect(this.resultsView.$contentElement).toBeVisible();
+                expect(this.resultsView.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
                 expect(this.resultsView.$el).toBeHidden();
                 expect(this.resultsView.$el).toBeEmpty();
             }
@@ -487,7 +487,7 @@ define([
 
             function beforeEachHelper(SearchResultsView) {
                 appendSetFixtures(
-                    '<section id="courseware-search-results"></section>' +
+                    '<div class="courseware-results"></div>' +
                     '<section id="course-content"></section>' +
                     '<section id="dashboard-search-results"></section>' +
                     '<section id="my-courses"></section>'
@@ -518,6 +518,7 @@ define([
             describe('CourseSearchResultsView', function () {
                 beforeEach(function() {
                     beforeEachHelper.call(this, CourseSearchResultsView);
+                    this.contentElementDisplayValue = 'table-cell';
                 });
                 it('shows loading message', showsLoadingMessage);
                 it('shows error message', showsErrorMessage);
@@ -532,6 +533,7 @@ define([
             describe('DashSearchResultsView', function () {
                 beforeEach(function() {
                     beforeEachHelper.call(this, DashSearchResultsView);
+                    this.contentElementDisplayValue = 'block';
                 });
                 it('shows loading message', showsLoadingMessage);
                 it('shows error message', showsErrorMessage);
@@ -613,13 +615,13 @@ define([
                 $('.cancel-button').trigger('click');
                 AjaxHelpers.skipResetRequest(requests);
                 // there should be no results
-                expect(this.$contentElement).toBeVisible();
+                expect(this.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
             function clearsResults () {
                 $('.cancel-button').trigger('click');
-                expect(this.$contentElement).toBeVisible();
+                expect(this.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
@@ -673,7 +675,7 @@ define([
                 beforeEach(function () {
                     loadFixtures('js/fixtures/search/course_search_form.html');
                     appendSetFixtures(
-                        '<section id="courseware-search-results"></section>' +
+                        '<div class="courseware-results"></div>' +
                         '<section id="course-content"></section>'
                     );
                     loadTemplates.call(this);
@@ -682,7 +684,8 @@ define([
                     CourseSearchFactory(courseId);
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#course-content');
-                    this.$searchResults = $('#courseware-search-results');
+                    this.contentElementDisplayValue = 'table-cell';
+                    this.$searchResults = $('.courseware-results');
                 });
 
                 it('shows loading message on search', showsLoadingMessage);
@@ -709,6 +712,7 @@ define([
 
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#my-courses');
+                    this.contentElementDisplayValue = 'block';
                     this.$searchResults = $('#dashboard-search-results');
                 });
 

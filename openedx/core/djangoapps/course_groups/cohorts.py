@@ -181,13 +181,12 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
 
     # If course is cohorted, check if the user already has a cohort.
     try:
-        cohort = CourseUserGroup.objects.get(
+        membership = CohortMembership.objects.get(
             course_id=course_key,
-            group_type=CourseUserGroup.COHORT,
-            users__id=user.id,
+            user_id=user.id,
         )
-        return request_cache.data.setdefault(cache_key, cohort)
-    except CourseUserGroup.DoesNotExist:
+        return request_cache.data.setdefault(cache_key, membership.course_user_group)
+    except CohortMembership.DoesNotExist:
         # Didn't find the group. If we do not want to assign, return here.
         if not assign:
             # Do not cache the cohort here, because in the next call assign
@@ -195,6 +194,17 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             return None
 
     # Otherwise assign the user a cohort.
+    membership = CohortMembership.objects.create(
+        user=user,
+        course_user_group=_get_default_cohort(course_key)
+    )
+    return request_cache.data.setdefault(cache_key, membership.course_user_group)
+
+
+def _get_default_cohort(course_key):
+    """
+    Helper method to get a default cohort for assignment in get_cohort
+    """
     course = courses.get_course(course_key)
     cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
     if cohorts:
@@ -205,11 +215,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             course_id=course_key,
             assignment_type=CourseCohort.RANDOM
         ).course_user_group
-
-    membership = CohortMembership(course_user_group=cohort, user=user)
-    membership.save()
-
-    return request_cache.data.setdefault(cache_key, cohort)
+    return cohort
 
 
 def migrate_cohort_settings(course):
@@ -332,6 +338,27 @@ def is_cohort_exists(course_key, name):
     return CourseUserGroup.objects.filter(course_id=course_key, group_type=CourseUserGroup.COHORT, name=name).exists()
 
 
+def remove_user_from_cohort(cohort, username_or_email):
+    """
+    Look up the given user, and if successful, remove them from the specified cohort.
+
+    Arguments:
+        cohort: CourseUserGroup
+        username_or_email: string.  Treated as email if has '@'
+
+    Raises:
+        User.DoesNotExist if can't find user.
+        ValueError if user not already present in this cohort.
+    """
+    user = get_user_by_username_or_email(username_or_email)
+
+    try:
+        membership = CohortMembership.objects.get(course_user_group=cohort, user=user)
+        membership.delete()
+    except CohortMembership.DoesNotExist:
+        raise ValueError("User {} was not present in cohort {}".format(username_or_email, cohort))
+
+
 def add_user_to_cohort(cohort, username_or_email):
     """
     Look up the given user, and if successful, add them to the specified cohort.
@@ -350,7 +377,7 @@ def add_user_to_cohort(cohort, username_or_email):
     user = get_user_by_username_or_email(username_or_email)
 
     membership = CohortMembership(course_user_group=cohort, user=user)
-    membership.save()
+    membership.save()  # This will handle both cases, creation and updating, of a CohortMembership for this user.
 
     tracker.emit(
         "edx.cohort.user_add_requested",
