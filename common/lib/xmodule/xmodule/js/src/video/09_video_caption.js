@@ -217,7 +217,7 @@
                     case KEY.SPACE:
                     case KEY.ENTER:
                         event.preventDefault();
-                        this.toggle();
+                        this.toggle(event);
                 }
             },
 
