@@ -423,13 +423,13 @@ class CourseFields(object):
         scope=Scope.settings
     )
     has_children = True
-    info_section_name = String(
+    info_sidebar_name = String(
         display_name=_("Course Home Sidebar Name"),
         help=_(
             "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
-        scope=Scope.settings, default=_('Course Resources and Tools'))
+        scope=Scope.settings, default='Course Handouts')
     show_timezone = Boolean(
         help=_(
             "True if timezones should be shown on dates in the courseware. "
