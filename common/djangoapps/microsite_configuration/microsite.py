@@ -16,7 +16,7 @@ from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicr
 __all__ = [
     'is_request_in_microsite', 'get_value', 'has_override_value',
     'get_template_path', 'get_value_for_org', 'get_all_orgs',
-    'clear', 'set_by_domain', 'enable_microsites',
+    'clear', 'set_by_domain', 'enable_microsites', 'get_all_config',
 ]
 
 BACKEND = None
@@ -69,6 +69,14 @@ def get_all_orgs():
     for example, to do filtering
     """
     return BACKEND.get_all_orgs()
+
+
+def get_all_config():
+    """
+    This returns a dict have all microsite configs. Each key in the dict represent a
+    microsite config.
+    """
+    return BACKEND.get_all_config()
 
 
 def clear():

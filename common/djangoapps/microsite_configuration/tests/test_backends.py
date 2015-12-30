@@ -2,9 +2,28 @@
 """
 Test Microsite backends.
 """
+import logging
+from mock import patch
+
+from django.conf import settings
 from django.test import TestCase
 
-from microsite_configuration.backends.base import BaseMicrositeBackend
+from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
+from microsite_configuration import microsite
+from microsite_configuration.models import (
+    Microsite,
+    MicrositeTemplate,
+    MicrositeHistory,
+)
+from microsite_configuration.tests.tests import (
+    DatabaseMicrositeTest,
+)
+from microsite_configuration.tests.factories import (
+    MicrositeFactory,
+    MicrositeTemplateFactory,
+)
+
+log = logging.getLogger(__name__)
 
 
 class NullBackend(BaseMicrositeBackend):
@@ -52,13 +71,6 @@ class NullBackend(BaseMicrositeBackend):
         specified named value
         """
         return super(NullBackend, self).has_override_value(val_name)
-
-    def enable_microsites(self, log):
-        """
-        Enable the use of microsites.
-        Used during the startup.py script
-        """
-        return super(NullBackend, self).enable_microsites(log)
 
     def get_all_config(self):
         """
@@ -134,3 +146,277 @@ class BaseBackendTests(TestCase):
 
         with self.assertRaises(NotImplementedError):
             backend.get_all_orgs()
+
+
+@patch(
+    'microsite_configuration.microsite.BACKEND',
+    microsite.get_backend('microsite_configuration.backends.database.DatabaseMicrositeBackend', BaseMicrositeBackend)
+)
+class DatabaseMicrositeBackendTests(DatabaseMicrositeTest):
+    """
+    Go through and test the DatabaseMicrositeBackend  class
+    """
+    def setUp(self):
+        super(DatabaseMicrositeBackendTests, self).setUp()
+
+    def tearDown(self):
+        super(DatabaseMicrositeBackendTests, self).tearDown()
+        microsite.clear()
+
+    def test_get_value(self):
+        """
+        Tests microsite.get_value works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        self.assertEqual(microsite.get_value('email_from_address'), self.microsite.values['email_from_address'])
+
+    def test_is_request_in_microsite(self):
+        """
+        Tests microsite.is_request_in_microsite works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        self.assertTrue(microsite.is_request_in_microsite())
+
+    def test_get_dict(self):
+        """
+        Tests microsite.get_dict works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        self.assertEqual(microsite.get_dict('nested_dict'), self.microsite.values['nested_dict'])
+
+    def test_has_override_value(self):
+        """
+        Tests microsite.has_override_value works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        self.assertTrue(microsite.has_override_value('platform_name'))
+
+    def test_get_value_for_org(self):
+        """
+        Tests microsite.get_value_for_org works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        self.assertEqual(
+            microsite.get_value_for_org(self.microsite.get_orgs()[0], 'platform_name'),
+            self.microsite.values['platform_name']
+        )
+
+    def test_get_all_orgs(self):
+        """
+        Tests microsite.get_all_orgs works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        self.assertEqual(
+            microsite.get_all_orgs(),
+            set(self.microsite.get_orgs())
+        )
+
+    def test_clear(self):
+        """
+        Tests microsite.clear works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        self.assertEqual(
+            microsite.get_value('platform_name'),
+            self.microsite.values['platform_name']
+        )
+        microsite.clear()
+        self.assertIsNone(microsite.get_value('platform_name'))
+
+    def test_enable_microsites(self):
+        """
+        Tests microsite.enable_microsites works as expected.
+        """
+        if settings.DEFAULT_TEMPLATE_ENGINE['DIRS']:
+            settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].remove(settings.MICROSITE_ROOT_DIR)
+        with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': False}):
+            microsite.enable_microsites(log)
+            self.assertNotIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+        with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': True}):
+            microsite.enable_microsites(log)
+            self.assertIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+
+    def test_get_all_configs(self):
+        """
+        Tests microsite.get_all_config works as expected.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        configs = microsite.get_all_config()
+        self.assertEqual(len(configs.keys()), 1)
+        self.assertEqual(configs[self.microsite.key], self.microsite.values)
+
+    def test_set_config_by_domain(self):
+        """
+        Tests microsite.set_config_by_domain works as expected.
+        """
+        microsite.clear()
+        # if microsite config does not exist
+        microsite.set_by_domain('unknown')
+        self.assertIsNone(microsite.get_value('platform_name'))
+
+        # if no microsite exists
+        Microsite.objects.all().delete()
+        microsite.clear()
+        microsite.set_by_domain('unknown')
+        self.assertIsNone(microsite.get_value('platform_name'))
+
+        # if microsite site has no organization it should raise exception
+        new_microsite = MicrositeFactory.create()
+        new_microsite.key = 'test_microsite'
+        new_microsite.subdomain = 'microsite.test'
+        # This would update microsite so we test MicrositeHistory has old microsite
+        new_microsite.save()
+        self.assertEqual(MicrositeHistory.objects.all().count(), 2)
+        with self.assertRaises(Exception):
+            microsite.set_by_domain('microsite.test')
+
+
+@patch(
+    'microsite_configuration.microsite.BACKEND',
+    microsite.get_backend(
+        'microsite_configuration.backends.filebased.SettingsFileMicrositeBackend', BaseMicrositeBackend
+    )
+)
+class FilebasedMicrositeBackendTests(TestCase):
+    """
+    Go through and test the SettingsFileMicrositeBackend  class
+    """
+    def setUp(self):
+        super(FilebasedMicrositeBackendTests, self).setUp()
+        self.microsite_subdomain = 'testmicrosite'
+
+    def tearDown(self):
+        super(FilebasedMicrositeBackendTests, self).tearDown()
+        microsite.clear()
+
+    def test_get_value(self):
+        """
+        Tests microsite.get_value works as expected.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        self.assertEqual(microsite.get_value('platform_name'), 'Test Microsite')
+
+    def test_is_request_in_microsite(self):
+        """
+        Tests microsite.is_request_in_microsite works as expected.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        self.assertTrue(microsite.is_request_in_microsite())
+
+    def test_has_override_value(self):
+        """
+        Tests microsite.has_override_value works as expected.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        self.assertTrue(microsite.has_override_value('platform_name'))
+
+    def test_get_value_for_org(self):
+        """
+        Tests microsite.get_value_for_org works as expected.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        self.assertEqual(
+            microsite.get_value_for_org('TestMicrositeX', 'platform_name'),
+            'Test Microsite'
+        )
+
+        # if no config is set
+        microsite.clear()
+        with patch('django.conf.settings.MICROSITE_CONFIGURATION', False):
+            self.assertEqual(
+                microsite.get_value_for_org('TestMicrositeX', 'platform_name', 'Default Value'),
+                'Default Value'
+            )
+
+    def test_get_all_orgs(self):
+        """
+        Tests microsite.get_all_orgs works as expected.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        self.assertEqual(
+            microsite.get_all_orgs(),
+            set(['TestMicrositeX', 'LogistrationX'])
+        )
+
+        # if no config is set
+        microsite.clear()
+        with patch('django.conf.settings.MICROSITE_CONFIGURATION', False):
+            self.assertEqual(
+                microsite.get_all_orgs(),
+                set()
+            )
+
+    def test_clear(self):
+        """
+        Tests microsite.clear works as expected.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        self.assertEqual(
+            microsite.get_value('platform_name'),
+            'Test Microsite'
+        )
+        microsite.clear()
+        self.assertIsNone(microsite.get_value('platform_name'))
+
+    def test_get_all_configs(self):
+        """
+        Tests microsite.get_all_config works as expected.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        configs = microsite.get_all_config()
+        self.assertEqual(len(configs.keys()), 3)
+
+    def test_set_config_by_domain(self):
+        """
+        Tests microsite.set_config_by_domain works as expected.
+        """
+        microsite.clear()
+        # if microsite config does not exist default config should be used
+        microsite.set_by_domain('unknown')
+        self.assertEqual(microsite.get_value('university'), 'default_university')
+
+
+@patch(
+    'microsite_configuration.microsite.TEMPLATES_BACKEND',
+    microsite.get_backend(
+        'microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend', BaseMicrositeTemplateBackend
+    )
+)
+class DatabaseMicrositeTemplateBackendTests(DatabaseMicrositeTest):
+    """
+    Go through and test the DatabaseMicrositeTemplateBackend class
+    """
+    def setUp(self):
+        super(DatabaseMicrositeTemplateBackendTests, self).setUp()
+        MicrositeTemplateFactory.create(
+            microsite=self.microsite,
+            template_uri='about.html',
+            template="""
+            <html>
+                <body>
+                About this microsite.
+                </body>
+            </html>
+            """,
+        )
+
+    def tearDown(self):
+        super(DatabaseMicrositeTemplateBackendTests, self).tearDown()
+        microsite.clear()
+
+    def test_microsite_get_template_when_no_template_exists(self):
+        """
+        Test microsite.get_template return None if there is not template in DB.
+        """
+        MicrositeTemplate.objects.all().delete()
+        microsite.set_by_domain(self.microsite.subdomain)
+        template = microsite.get_template('about.html')
+        self.assertIsNone(template)
+
+    def test_microsite_get_template(self):
+        """
+        Test microsite.get_template return appropriate template.
+        """
+        microsite.set_by_domain(self.microsite.subdomain)
+        template = microsite.get_template('about.html')
+        self.assertIn('About this microsite', template.render())

@@ -15,7 +15,7 @@ from microsite_configuration.microsite import (
 )
 from microsite_configuration.backends.base import BaseMicrositeBackend
 from microsite_configuration.tests.tests import (
-    MicrositeTest,
+    DatabaseMicrositeTest,
     side_effect_for_get_value,
     MICROSITE_BACKENDS,
 )
@@ -26,7 +26,7 @@ from microsite_configuration.tests.tests import (
 # pylint: disable=no-member, protected-access
 @ddt.ddt
 @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
-class MicroSiteSessionCookieTests(MicrositeTest):
+class MicroSiteSessionCookieTests(DatabaseMicrositeTest):
     """
     Tests regarding the session cookie management in the middlware for MicroSites
     """

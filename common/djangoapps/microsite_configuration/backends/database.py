@@ -39,7 +39,7 @@ class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
         to the complete Django request processing
         """
 
-        if not self.has_configuration_set or not domain:
+        if not self.has_configuration_set() or not domain:
             return
 
         # look up based on the HTTP request domain name

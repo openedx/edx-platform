@@ -7,6 +7,7 @@ from factory.django import DjangoModelFactory
 from microsite_configuration.models import (
     Microsite,
     MicrositeOrgMapping,
+    MicrositeTemplate,
 )
 
 
@@ -22,10 +23,10 @@ class MicrositeFactory(DjangoModelFactory):
     values = {
         "domain_prefix": "testmicrosite",
         "university": "test_microsite",
-        "platform_name": "Test Microsite",
+        "platform_name": "Test Microsite DB",
         "logo_image_url": "test_microsite/images/header-logo.png",
-        "email_from_address": "test_microsite@edx.org",
-        "payment_support_email": "test_microsite@edx.org",
+        "email_from_address": "test_microsite_db@edx.org",
+        "payment_support_email": "test_microsit_dbe@edx.org",
         "ENABLE_MKTG_SITE": False,
         "SITE_NAME": "test_microsite.localhost",
         "course_org_filter": "TestMicrositeX",
@@ -42,6 +43,10 @@ class MicrositeFactory(DjangoModelFactory):
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
         "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "nested_dict": {
+            "key 1": "value 1",
+            "key 2": "value 2",
+        }
     }
 
 
@@ -51,3 +56,11 @@ class MicrositeOrgMappingFactory(DjangoModelFactory):
     """
     class Meta(object):
         model = MicrositeOrgMapping
+
+
+class MicrositeTemplateFactory(DjangoModelFactory):
+    """
+    Factory for MicrositeTemplate
+    """
+    class Meta(object):
+        model = MicrositeTemplate

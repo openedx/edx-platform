@@ -15,14 +15,14 @@ MICROSITE_BACKENDS = (
 )
 
 
-class MicrositeTest(TestCase):
+class DatabaseMicrositeTest(TestCase):
     """
     Base class for microsite related tests.
     """
     def setUp(self):
-        super(MicrositeTest, self).setUp()
-        microsite = MicrositeFactory.create()
-        MicrositeOrgMappingFactory.create(microsite=microsite, org='TestMicrositeX')
+        super(DatabaseMicrositeTest, self).setUp()
+        self.microsite = MicrositeFactory.create()
+        MicrositeOrgMappingFactory.create(microsite=self.microsite, org='TestMicrositeX')
 
 
 def side_effect_for_get_value(value, return_value):

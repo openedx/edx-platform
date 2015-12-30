@@ -128,13 +128,6 @@ class MicrositeOrgMapping(models.Model):
         )
 
     @classmethod
-    def get_orgs_for_microsite(cls, microsite_key):
-        """
-        Returns a list of ORGs associated with the microsite key, returned as a set
-        """
-        return cls.objects.filter(microsite__key=microsite_key).values_list('org', flat=True)
-
-    @classmethod
     def get_orgs_for_microsite_by_pk(cls, microsite_pk):
         """
         Returns a list of ORGs associated with the microsite key, returned as a set

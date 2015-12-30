@@ -11,13 +11,13 @@ from microsite_configuration.microsite import (
 )
 from microsite_configuration.backends.base import BaseMicrositeBackend
 from microsite_configuration.tests.tests import (
-    MicrositeTest,
+    DatabaseMicrositeTest,
     MICROSITE_BACKENDS,
 )
 
 
 @ddt.ddt
-class TestMicrosites(MicrositeTest):
+class TestMicrosites(DatabaseMicrositeTest):
     """
     Run through some Microsite logic
     """
