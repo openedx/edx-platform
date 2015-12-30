@@ -835,6 +835,12 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return self.courses.values()
 
+    def get_course_summaries(self, **kwargs):
+        """
+        Returns `self.get_courses()`. Use to list courses to the global staff user.
+        """
+        return self.get_courses(**kwargs)
+
     def get_errored_courses(self):
         """
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
