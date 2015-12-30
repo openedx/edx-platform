@@ -19,11 +19,16 @@ ${_("After you activate your account, you can sign up for "
     "and take any of the hundreds of courses {platform_name} offers."
   ).format(platform_name=settings.PLATFORM_NAME)}
 
+${_("Once you have activated your account, edX will send you email "
+    "from time to time about new courses or other information.")}
+
 ${_("If you need help, please use our web form at "
-    "{contact_us_url} or email {info_email_address}."
+    "{contact_us_url}, email {info_email_address}, "
+    "or write to {info_postal_address}."
   ).format(
     contact_us_url="https://www.edx.org/contact-us",
-    info_email_address=settings.CONTACT_EMAIL
+    info_email_address=settings.CONTACT_EMAIL,
+    info_postal_address=settings.CONTACT_MAILING_ADDRESS
   )}
 
 ${_("We hope you enjoy learning with {platform_name}!").format(
