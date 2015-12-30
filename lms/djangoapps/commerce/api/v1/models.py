@@ -59,8 +59,7 @@ class Course(object):
         """ Save the CourseMode objects to the database. """
 
         # Override the verification deadline for the course (not the individual modes)
-        if self.verification_deadline is not None:
-            VerificationDeadline.set_deadline(self.id, self.verification_deadline, is_explicit=True)
+        VerificationDeadline.set_deadline(self.id, self.verification_deadline, is_explicit=True)
 
         for mode in self.modes:
             mode.course_id = self.id
