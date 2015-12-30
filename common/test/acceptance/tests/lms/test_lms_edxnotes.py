@@ -1,6 +1,7 @@
 """
 Test LMS Notes
 """
+import random
 from uuid import uuid4
 from datetime import datetime
 from nose.plugins.attrib import attr
@@ -345,9 +346,10 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.edxnotes_fixture.create_notes(notes_list)
         self.edxnotes_fixture.install()
 
-    def _add_default_notes(self, tags=None):
+    def _add_default_notes(self, tags=None, extra_notes=0):
         """
-        Creates 5 test notes. If tags are not specified, will populate the notes with some test tag data.
+        Creates 5 test notes by default & number of extra_notes will be created if specified.
+        If tags are not specified, will populate the notes with some test tag data.
         If tags are specified, they will be used for each of the 3 notes that have tags.
         """
         xblocks = self.course_fixture.get_nested_xblocks(category="html")
@@ -398,6 +400,19 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat()
             ),
         ]
+        if extra_notes and isinstance(extra_notes, int):
+            for __ in range(extra_notes):
+                self.raw_note_list.append(
+                    Note(
+                        usage_id=xblocks[random.choice([0, 1, 2, 3, 4, 5])].locator,
+                        user=self.username,
+                        course_id=self.course_fixture._course_key,  # pylint: disable=protected-access
+                        text="Fourth note",
+                        quote="",
+                        updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
+                        tags=["review"] if tags is None else tags
+                    )
+                )
         self._add_notes(self.raw_note_list)
 
     def assertNoteContent(self, item, text=None, quote=None, unit_name=None, time_updated=None, tags=None):
@@ -468,6 +483,39 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
             {'event': {'search_string': search_string, 'number_of_results': number_of_results}}
         ]
         self.assert_events_match(expected_events, actual_events)
+
+    def _verify_pagination_info(
+            self,
+            notes_count_on_current_page,
+            header_text,
+            previous_button_enabled,
+            next_button_enabled,
+            current_page_number,
+            total_pages
+    ):
+        """
+        Verify pagination info
+        """
+        self.assertEqual(self.notes_page.count(), notes_count_on_current_page)
+        self.assertEqual(self.notes_page.get_pagination_header_text(), header_text)
+        self.assertEqual(self.notes_page.is_previous_page_button_enabled(), previous_button_enabled)
+        self.assertEqual(self.notes_page.is_next_page_button_enabled(), next_button_enabled)
+        self.assertEqual(self.notes_page.get_current_page_number(), current_page_number)
+        self.assertEqual(self.notes_page.get_total_pages, total_pages)
+
+    def search_and_verify(self):
+        """
+        Add, search and verify notes.
+        """
+        self._add_default_notes(extra_notes=7)
+        self.notes_page.visit()
+        # Run the search
+        self.notes_page.search("note")
+        # No error message appears
+        self.assertFalse(self.notes_page.is_error_visible)
+        self.assertIn(u"Search Results", self.notes_page.tabs)
+
+        self.assertEqual(self.notes_page.get_total_pages, 2)
 
     def test_no_content(self):
         """
@@ -1004,6 +1052,290 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.course_nav.go_to_sequential_position(1)
         note = self.note_unit_page.notes[0]
         self.assertFalse(note.is_visible)
+
+    def test_page_size_limit(self):
+        """
+        Scenario: Verify that we can't get notes more than default page size.
+
+        Given that I am a registered user
+        And I have a course with 11 notes
+        When I open Notes page
+        Then I can see notes list contains 10 items
+        And I should see paging header and footer with correct data
+        And I should see disabled previous button
+        And I should also see enabled next button
+        """
+        self._add_default_notes(extra_notes=6)
+        self.notes_page.visit()
+
+        self._verify_pagination_info(
+            notes_count_on_current_page=10,
+            header_text='Showing 1-10 out of 11 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+    def test_pagination_with_single_page(self):
+        """
+        Scenario: Notes list pagination works as expected for single page
+        Given that I am a registered user
+        And I have a course with 5 notes
+        When I open Notes page
+        Then I can see notes list contains 5 items
+        And I should see paging header and footer with correct data
+        And I should see disabled previous and next buttons
+        """
+        self._add_default_notes()
+        self.notes_page.visit()
+
+        self._verify_pagination_info(
+            notes_count_on_current_page=5,
+            header_text='Showing 1-5 out of 5 total',
+            previous_button_enabled=False,
+            next_button_enabled=False,
+            current_page_number=1,
+            total_pages=1
+        )
+
+    def test_next_and_previous_page_button(self):
+        """
+        Scenario: Next & Previous buttons are working as expected for notes list pagination
+
+        Given that I am a registered user
+        And I have a course with 12 notes
+        When I open Notes page
+        Then I can see notes list contains 10 items
+        And I should see paging header and footer with correct data
+        And I should see disabled previous button
+        And I should see enabled next button
+
+        When I click on next page button in footer
+        Then I should be navigated to second page
+        And I should see a list with 2 items
+        And I should see paging header and footer with correct info
+        And I should see enabled previous button
+        And I should also see disabled next button
+
+        When I click on previous page button in footer
+        Then I should be navigated to first page
+        And I should see a list with 10 items
+        And I should see paging header and footer with correct info
+        And I should see disabled previous button
+        And I should also see enabled next button
+        """
+        self._add_default_notes(extra_notes=7)
+        self.notes_page.visit()
+
+        self._verify_pagination_info(
+            notes_count_on_current_page=10,
+            header_text='Showing 1-10 out of 12 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+        self.notes_page.press_next_page_button()
+        self._verify_pagination_info(
+            notes_count_on_current_page=2,
+            header_text='Showing 11-12 out of 12 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+        self.notes_page.press_previous_page_button()
+        self._verify_pagination_info(
+            notes_count_on_current_page=10,
+            header_text='Showing 1-10 out of 12 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+    def test_pagination_with_valid_and_invalid_page_number(self):
+        """
+        Scenario: Notes list pagination works as expected for valid & invalid page number
+
+        Given that I am a registered user
+        And I have a course with 11 notes
+        When I open Notes page
+        Then I can see notes list contains 10 items
+        And I should see paging header and footer with correct data
+        And I should see total page value is 2
+        When I enter 2 in the page number input
+        Then I should be navigated to page 2
+
+        When I enter 3 in the page number input
+        Then I should not be navigated away from page 2
+        """
+        self._add_default_notes(extra_notes=6)
+        self.notes_page.visit()
+
+        self.assertEqual(self.notes_page.get_total_pages, 2)
+
+        # test pagination with valid page number
+        self.notes_page.go_to_page(2)
+        self._verify_pagination_info(
+            notes_count_on_current_page=1,
+            header_text='Showing 11-11 out of 11 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+
+        # test pagination with invalid page number
+        self.notes_page.go_to_page(3)
+        self._verify_pagination_info(
+            notes_count_on_current_page=1,
+            header_text='Showing 11-11 out of 11 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+
+    def test_search_behaves_correctly_with_pagination(self):
+        """
+        Scenario: Searching behaves correctly with pagination.
+
+        Given that I am a registered user
+        And I have a course with 12 notes
+        When I open Notes page
+        Then I can see notes list contains 10 items
+        When I run the search with "note" query
+        Then I see no error message
+        And I see that "Search Results" tab appears with 11 notes found
+        And an event has fired indicating that the Search Results view was selected
+        And an event has fired recording the search that was performed
+        """
+        self.search_and_verify()
+
+        self._verify_pagination_info(
+            notes_count_on_current_page=10,
+            header_text='Showing 1-10 out of 11 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+        self.assert_viewed_event('Search Results')
+        self.assert_search_event('note', 11)
+
+    def test_search_with_next_and_prev_page_button(self):
+        """
+        Scenario: Next & Previous buttons are working as expected for search
+
+        Given that I am a registered user
+        And I have a course with 12 notes
+        When I open Notes page
+        Then I can see notes list with 10 items
+        And I should see paging header and footer with correct data
+        And previous button is disabled
+        And next button is enabled
+
+        When I run the search with "note" query
+        Then I see that "Search Results" tab appears with 11 notes found
+        And an event has fired indicating that the Search Results view was selected
+        And an event has fired recording the search that was performed
+
+        When I click on next page button in footer
+        Then I should be navigated to second page
+        And I should see a list with 1 item
+        And I should see paging header and footer with correct info
+        And I should see enabled previous button
+        And I should also see disabled next button
+
+        When I click on previous page button in footer
+        Then I should be navigated to first page
+        And I should see a list with 10 items
+        And I should see paging header and footer with correct info
+        And I should see disabled previous button
+        And I should also see enabled next button
+        """
+        self.search_and_verify()
+
+        self._verify_pagination_info(
+            notes_count_on_current_page=10,
+            header_text='Showing 1-10 out of 11 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+        self.assert_viewed_event('Search Results')
+        self.assert_search_event('note', 11)
+
+        self.notes_page.press_next_page_button()
+        self._verify_pagination_info(
+            notes_count_on_current_page=1,
+            header_text='Showing 11-11 out of 11 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+        self.notes_page.press_previous_page_button()
+        self._verify_pagination_info(
+            notes_count_on_current_page=10,
+            header_text='Showing 1-10 out of 11 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+    def test_search_with_valid_and_invalid_page_number(self):
+        """
+        Scenario: Notes list pagination works as expected for valid & invalid page number
+
+        Given that I am a registered user
+        And I have a course with 12 notes
+        When I open Notes page
+        Then I can see notes list contains 10 items
+        And I should see paging header and footer with correct data
+        And I should see total page value is 2
+
+        When I run the search with "note" query
+        Then I see that "Search Results" tab appears with 11 notes found
+        And an event has fired indicating that the Search Results view was selected
+        And an event has fired recording the search that was performed
+
+        When I enter 2 in the page number input
+        Then I should be navigated to page 2
+
+        When I enter 3 in the page number input
+        Then I should not be navigated away from page 2
+        """
+        self.search_and_verify()
+
+        # test pagination with valid page number
+        self.notes_page.go_to_page(2)
+        self._verify_pagination_info(
+            notes_count_on_current_page=1,
+            header_text='Showing 11-11 out of 11 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+
+        # test pagination with invalid page number
+        self.notes_page.go_to_page(3)
+        self._verify_pagination_info(
+            notes_count_on_current_page=1,
+            header_text='Showing 11-11 out of 11 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
 
 
 @attr('shard_4')
