@@ -87,8 +87,7 @@ class Course(object):
             merged_mode.min_price = posted_mode.min_price
             merged_mode.currency = posted_mode.currency
             merged_mode.sku = posted_mode.sku
-            if posted_mode.expiration_datetime is not None:
-                merged_mode.expiration_datetime = posted_mode.expiration_datetime
+            merged_mode.expiration_datetime = posted_mode.expiration_datetime
             merged_mode.save()
 
             merged_modes.add(merged_mode)
