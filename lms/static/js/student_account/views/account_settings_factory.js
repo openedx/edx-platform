@@ -39,7 +39,9 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
-                                helpMessage: gettext('The name that appears on your certificates. Other learners never see your full name.'),
+                                helpMessage: gettext(
+                                    'The name that is used for ID verification and appears on your certificates. Other learners never see your full name. Make sure to enter your name exactly as it appears on your government-issued photo ID, including any non-Roman characters.' /* jshint ignore:line */
+                                ),
                                 persistChanges: true
                             })
                         },
