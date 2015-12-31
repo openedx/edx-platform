@@ -42,6 +42,7 @@ glob2==0.3
 gunicorn==0.17.4
 httpretty==0.8.3
 lazy==1.1
+libsass==0.10.0
 mako==1.0.2
 Markdown==2.2.1
 --allow-external meliae

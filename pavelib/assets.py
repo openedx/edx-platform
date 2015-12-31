@@ -180,6 +180,8 @@ def compile_coffeescript(*files):
         "node_modules/.bin/coffee", "--compile", *files
     ))
 
+import sassutils.builder
+import sass
 
 @task
 @no_help
@@ -192,28 +194,17 @@ def compile_sass(options):
     Compile Sass to CSS.
     """
     debug = options.get('debug')
-    parts = ["sass"]
-    parts.append("--update")
-    parts.append("--cache-location {cache}".format(cache=SASS_CACHE_PATH))
-    parts.append("--default-encoding utf-8")
+
     if debug:
-        parts.append("--sourcemap")
+        source_comments = True
+        output_style = 'nested'
     else:
-        parts.append("--style compressed --quiet")
-    if options.get('force'):
-        parts.append("--force")
-    parts.append("--load-path .")
-    for load_path in SASS_LOAD_PATHS + SASS_DIRS:
-        parts.append("--load-path {path}".format(path=load_path))
+        source_comments = False
+        output_style = 'compressed'
 
     for sass_dir in SASS_DIRS:
         css_dir = sass_dir.parent / "css"
-        if css_dir:
-            parts.append("{sass}:{css}".format(sass=sass_dir, css=css_dir))
-        else:
-            parts.append(sass_dir)
-
-    sh(cmd(*parts))
+        sass.compile(dirname=(sass_dir, css_dir), include_paths=SASS_LOAD_PATHS + SASS_DIRS)
 
     print("\t\tFinished compiling sass.")
 
