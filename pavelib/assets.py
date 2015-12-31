@@ -12,6 +12,7 @@ from paver import tasks
 from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
+import sass
 
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
@@ -179,9 +180,6 @@ def compile_coffeescript(*files):
     sh(cmd(
         "node_modules/.bin/coffee", "--compile", *files
     ))
-
-import sassutils.builder
-import sass
 
 @task
 @no_help
