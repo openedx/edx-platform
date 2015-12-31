@@ -3,7 +3,7 @@ Asset compilation and collection.
 """
 
 from __future__ import print_function
-
+from datetime import datetime
 import argparse
 import glob
 import traceback
@@ -12,6 +12,7 @@ from paver import tasks
 from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
+import sass
 
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
@@ -192,30 +193,31 @@ def compile_sass(options):
     Compile Sass to CSS.
     """
     debug = options.get('debug')
-    parts = ["sass"]
-    parts.append("--update")
-    parts.append("--cache-location {cache}".format(cache=SASS_CACHE_PATH))
-    parts.append("--default-encoding utf-8")
+
     if debug:
-        parts.append("--sourcemap")
+        source_comments = True
+        output_style = 'nested'
     else:
-        parts.append("--style compressed --quiet")
-    if options.get('force'):
-        parts.append("--force")
-    parts.append("--load-path .")
-    for load_path in SASS_LOAD_PATHS + SASS_DIRS:
-        parts.append("--load-path {path}".format(path=load_path))
+        source_comments = False
+        output_style = 'compressed'
+
+    timing_info = []
 
     for sass_dir in SASS_DIRS:
+        start = datetime.now()
         css_dir = sass_dir.parent / "css"
-        if css_dir:
-            parts.append("{sass}:{css}".format(sass=sass_dir, css=css_dir))
-        else:
-            parts.append(sass_dir)
+        sass.compile(
+            dirname=(sass_dir, css_dir),
+            include_paths=SASS_LOAD_PATHS + SASS_DIRS,
+            source_comments=source_comments,
+            output_style=output_style,
+        )
+        duration = datetime.now() - start
+        timing_info.append((sass_dir, css_dir, duration))
 
-    sh(cmd(*parts))
-
-    print("\t\tFinished compiling sass.")
+    print("\t\tFinished compiling Sass:")
+    for sass_dir, css_dir, duration in timing_info:
+        print(">> {} -> {} in {}s".format(sass_dir, css_dir, duration))
 
 
 def compile_templated_sass(systems, settings):
