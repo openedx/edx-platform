@@ -227,7 +227,8 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTest):
         """
         Tests microsite.enable_microsites works as expected.
         """
-        if settings.DEFAULT_TEMPLATE_ENGINE['DIRS']:
+        if settings.DEFAULT_TEMPLATE_ENGINE['DIRS'] \
+                and settings.MICROSITE_ROOT_DIR in settings.DEFAULT_TEMPLATE_ENGINE['DIRS']:
             settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].remove(settings.MICROSITE_ROOT_DIR)
         with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': False}):
             microsite.enable_microsites(log)
