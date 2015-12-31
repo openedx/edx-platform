@@ -35,5 +35,10 @@ fi
 # Activate the Python virtualenv
 source $HOME/edx-venv/bin/activate
 
+echo "Installing paver requirements"
+pip install -q -r requirements/edx/paver.txt
+
 # add the node_js packages dir to PATH
 PATH=$PATH:node_modules/.bin
+
+echo "done sourcing jenkins-common"
