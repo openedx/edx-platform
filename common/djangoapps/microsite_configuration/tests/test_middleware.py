@@ -26,7 +26,7 @@ from microsite_configuration.tests.tests import (
 # Sessions are always started on every request
 # pylint: disable=no-member, protected-access
 @ddt.ddt
-@override_settings(SESSION_SAVE_EVERY_REQUEST=True)\
+@override_settings(SESSION_SAVE_EVERY_REQUEST=True)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class MicroSiteSessionCookieTests(DatabaseMicrositeTest):
     """
