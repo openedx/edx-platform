@@ -21,8 +21,6 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
 
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
-        self.create_programs_config()
-
         self.staff = UserFactory(is_staff=True)
         self.client.login(username=self.staff.username, password='test')
 
@@ -50,6 +48,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
         student = UserFactory(is_staff=False)
         self.client.login(username=student.username, password='test')
 
+        self.create_programs_config()
         self.mock_programs_api()
 
         response = self.client.get(self.studio_home)
@@ -60,6 +59,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
         """Verify that the programs tab and creation button can be rendered when config is enabled."""
 
         # When no data is provided, expect creation prompt.
+        self.create_programs_config()
         self.mock_programs_api(data={'results': []})
 
         response = self.client.get(self.studio_home)
