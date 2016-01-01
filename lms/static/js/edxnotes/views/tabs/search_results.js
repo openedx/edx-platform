@@ -58,6 +58,7 @@ define([
             this.searchBox = new SearchBoxView({
                 el: document.getElementById('search-notes-form'),
                 debug: this.options.debug,
+                perPage: this.options.perPage,
                 beforeSearchStart: this.onBeforeSearchStart,
                 search: this.onSearch,
                 error: this.onSearchError
@@ -81,7 +82,8 @@ define([
                     return new this.PanelConstructor({
                         collection: collection,
                         searchQuery: this.searchResults.searchQuery,
-                        scrollToTag: this.options.scrollToTag
+                        scrollToTag: this.options.scrollToTag,
+                        createHeaderFooter: this.options.createHeaderFooter
                     });
                 } else {
                     return new this.NoResultsViewConstructor({
@@ -122,10 +124,9 @@ define([
             }
         },
 
-        onSearch: function (collection, total, searchQuery) {
+        onSearch: function (collection, searchQuery) {
             this.searchResults = {
                 collection: collection,
-                total: total,
                 searchQuery: searchQuery
             };
 

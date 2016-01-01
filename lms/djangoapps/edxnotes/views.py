@@ -55,6 +55,7 @@ def edxnotes(request, course_id):
         "course": course,
         "notes_endpoint": reverse("notes", kwargs={"course_id": course_id}),
         "notes": notes_info,
+        "page_size": DEFAULT_PAGE_SIZE,
         "debug": json.dumps(settings.DEBUG),
         'position': None,
     }

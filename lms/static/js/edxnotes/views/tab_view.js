@@ -14,7 +14,8 @@ define([
         initialize: function (options) {
             _.bindAll(this, 'showLoadingIndicator', 'hideLoadingIndicator');
             this.options = _.defaults(options || {}, {
-                createTabOnInitialization: true
+                createTabOnInitialization: true,
+                createHeaderFooter: false
             });
 
             if (this.options.createTabOnInitialization) {
@@ -64,7 +65,13 @@ define([
 
         getSubView: function () {
             var collection = this.getCollection();
-            return new this.PanelConstructor({collection: collection, scrollToTag: this.options.scrollToTag});
+            return new this.PanelConstructor(
+                {
+                    collection: collection,
+                    scrollToTag: this.options.scrollToTag,
+                    createHeaderFooter: this.options.createHeaderFooter
+                }
+            );
         },
 
         destroySubView: function () {

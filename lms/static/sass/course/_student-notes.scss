@@ -107,6 +107,10 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     margin: 0;
     padding-top: ($baseline*1.5);
 
+    .listing-tools {
+      @include margin($baseline $baseline (-$baseline/2) 0);
+    }
+
     // course structure labels
     .course-title, .tags-title {
       @extend %t-title6;
