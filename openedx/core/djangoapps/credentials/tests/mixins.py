@@ -15,6 +15,7 @@ class CredentialsApiConfigMixin(object):
         'public_service_url': 'http://public.credentials.org/',
         'enable_learner_issuance': True,
         'enable_studio_authoring': True,
+        'cache_ttl': 0,
     }
 
     def create_credentials_config(self, **kwargs):

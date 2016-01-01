@@ -11,7 +11,7 @@ from openedx.core.lib.token_utils import get_id_token
 log = logging.getLogger(__name__)
 
 
-def get_api_data(api_config, user, api_name, resource, querystring=None, use_cache=False):
+def get_api_data(api_config, user, api_name, resource, querystring=None, use_cache=False, cache_key=None):
     """Fetch the data from the API using provided API Configuration and
     resource.
 
@@ -24,6 +24,7 @@ def get_api_data(api_config, user, api_name, resource, querystring=None, use_cac
             data.
         use_cache: Will be used to decide whether to cache the response data
             or not.
+        cache_key: cache key to be used to save response data.
 
     Returns:
         list of dict, representing data returned by the API.
@@ -35,12 +36,12 @@ def get_api_data(api_config, user, api_name, resource, querystring=None, use_cac
         return no_data
 
     if use_cache:
-        if api_config.CACHE_KEY:
+        if cache_key:
             cached = cache.get(api_config.CACHE_KEY)
             if cached is not None:
                 return cached
         else:
-            log.warning('No cache key available for %s configuration.', api_name)
+            log.warning('Cache key does not provided to cache data.')
             return no_data
 
     try:

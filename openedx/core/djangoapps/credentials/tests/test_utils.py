@@ -1,4 +1,5 @@
 """Tests covering Credentials utilities."""
+from django.core.cache import cache
 from django.test import TestCase
 import httpretty
 from oauth2_provider.tests.factories import ClientFactory
@@ -26,6 +27,8 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.user = UserFactory()
 
+        cache.clear()
+
     @httpretty.activate
     def test_get_user_credentials(self):
         """Verify user credentials data can be retrieve."""
@@ -34,6 +37,30 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
 
         actual = get_user_credentials(self.user)
         self.assertEqual(actual, self.CREDENTIALS_API_RESPONSE['results'])
+
+    @httpretty.activate
+    def test_get_user_credentials_caching(self):
+        """Verify that when enabled, the cache is used for non-staff users."""
+        self.create_credentials_config(cache_ttl=1)
+        self.mock_credentials_api(self.user)
+
+        # Warm up the cache.
+        get_user_credentials(self.user)
+
+        # Hit the cache.
+        get_user_credentials(self.user)
+
+        # Verify only one request was made.
+        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
+
+        staff_user = UserFactory(is_staff=True)
+
+        # Hit the Credentials API twice.
+        for _ in range(2):
+            get_user_credentials(staff_user)
+
+        # Verify that three requests have been made (one for student, two for staff).
+        self.assertEqual(len(httpretty.httpretty.latest_requests), 3)
 
     def test_get_user_program_credentials_issuance_disable(self):
         """Verify that user program credentials cannot be retrieved if issuance is disabled."""
