@@ -15,6 +15,7 @@ class CredentialsApiConfigMixin(object):
         'public_service_url': 'http://public.credentials.org/',
         'enable_learner_issuance': True,
         'enable_studio_authoring': True,
+        'cache_ttl': 0,
     }
 
     def create_credentials_config(self, **kwargs):
@@ -99,7 +100,7 @@ class CredentialsDataMixin(object):
     }
 
     CREDENTIALS_NEXT_API_RESPONSE = {
-        "next": 'next_page_url',
+        "next": None,
         "results": [
             {
                 "id": 7,
@@ -140,9 +141,9 @@ class CredentialsDataMixin(object):
         body = json.dumps(data)
 
         if is_next_page:
-            next_page_data = self.CREDENTIALS_NEXT_API_RESPONSE
-            next_page_body = json.dumps(next_page_data)
             next_page_url = internal_api_url + '/user_credentials/?page=2&username=' + user.username
+            self.CREDENTIALS_NEXT_API_RESPONSE['next'] = next_page_url
+            next_page_body = json.dumps(self.CREDENTIALS_NEXT_API_RESPONSE)
             httpretty.register_uri(
                 httpretty.GET, next_page_url, body=body, content_type='application/json', status=status_code
             )

@@ -11,19 +11,20 @@ from openedx.core.lib.token_utils import get_id_token
 log = logging.getLogger(__name__)
 
 
-def get_api_data(api_config, user, api_name, resource, querystring=None, use_cache=False):
-    """Fetch the data from the API using provided API Configuration and
-    resource.
+def get_edx_api_data(api_config, user, resource, querystring=None, cache_key=None):
+    """Fetch data from an API using provided API configuration and resource
+        name.
 
     Arguments:
-        api_config: The configuration which will be user for requesting data.
+        api_config (ConfigurationModel): The configuration model governing
+            interaction with the API.
         user (User): The user to authenticate as when requesting data.
-        api_name: Name fo the api to be use for logging.
-        resource: API resource to from where data will be requested.
-        querystring: Querystring parameters that might be required to request
-            data.
-        use_cache: Will be used to decide whether to cache the response data
-            or not.
+        resource(str): Name of the API resource for which data is being
+            requested.
+        querystring(dict): Querystring parameters that might be required to
+            request data.
+        cache_key(str): Where to cache retrieved data. Omitting this will cause the
+            cache to be bypassed.
 
     Returns:
         list of dict, representing data returned by the API.
@@ -31,23 +32,19 @@ def get_api_data(api_config, user, api_name, resource, querystring=None, use_cac
     no_data = []
 
     if not api_config.enabled:
-        log.warning('%s configuration is disabled.', api_name)
+        log.warning('%s configuration is disabled.', api_config.API_NAME)
         return no_data
 
-    if use_cache:
-        if api_config.CACHE_KEY:
-            cached = cache.get(api_config.CACHE_KEY)
-            if cached is not None:
-                return cached
-        else:
-            log.warning('No cache key available for %s configuration.', api_name)
-            return no_data
+    if cache_key:
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
 
     try:
         jwt = get_id_token(user, api_config.OAUTH2_CLIENT_NAME)
         api = EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
     except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to initialize the %s API client.', api_name)
+        log.exception('Failed to initialize the %s API client.', api_config.API_NAME)
         return no_data
 
     try:
@@ -63,10 +60,10 @@ def get_api_data(api_config, user, api_name, resource, querystring=None, use_cac
             results += response.get('results', no_data)
             next_page = response.get('next', None)
     except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to retrieve data from the %s API.', api_name)
+        log.exception('Failed to retrieve data from the %s API.', api_config.API_NAME)
         return no_data
 
-    if use_cache:
-        cache.set(api_config.CACHE_KEY, results, api_config.cache_ttl)
+    if cache_key:
+        cache.set(cache_key, results, api_config.cache_ttl)
 
     return results
