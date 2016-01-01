@@ -946,6 +946,14 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         hint = correct_map.get_hint('1_2_1')
         self.assertEqual(hint, self._get_random_number_result(problem.seed))
 
+    def test_empty_answer(self):
+        """
+        This Method checks if question is graded for empty answers if correct answer
+        is also not given. Fails if empty answer is scored.
+        """
+        problem = self.build_problem(answer=" ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u" ", "incorrect")
+
 
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = CodeResponseXMLFactory
