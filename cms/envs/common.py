@@ -1041,11 +1041,6 @@ ADVANCED_COMPONENT_TYPES = [
     'ubcpi',
 ]
 
-# Adding components in this list will disable the creation of new problem for
-# those components in Studio. Existing problems will work fine and one can edit
-# them in Studio.
-DEPRECATED_ADVANCED_COMPONENT_TYPES = []
-
 # Specify XBlocks that should be treated as advanced problems. Each entry is a
 # dict:
 #       'component': the entry-point name of the XBlock. See the comment for
@@ -1099,6 +1094,29 @@ XBLOCK_SETTINGS = {
     }
 }
 
+################################ XBlock Deprecation ################################
+
+# The following settings are used for deprecating XBlocks.
+
+# Adding an XBlock to this list does the following:
+# 1. Shows a warning on the course outline if the XBlock is listed in
+#    "Advanced Module List" in "Advanced Settings" page.
+# 2. List all instances of that XBlock on the top of the course outline page asking
+#    course authors to delete or replace the instances.
+DEPRECATED_BLOCK_TYPES = [
+    'peergrading',
+    'combinedopenended',
+    'graphical_slider_tool',
+]
+
+# Adding components in this list will disable the creation of new problems for
+# those advanced components in Studio. Existing problems will work fine
+# and one can edit them in Studio.
+DEPRECATED_ADVANCED_COMPONENT_TYPES = []
+
+# XBlocks can be disabled from rendering in LMS Courseware by adding them to
+# /admin/xblock_django/xblockdisableconfig/.
+
 ################################ Settings for Credit Course Requirements ################################
 # Initial delay used for retrying tasks.
 # Additional retries use longer delays.
@@ -1114,16 +1132,7 @@ CREDIT_TASK_MAX_RETRIES = 5
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
-
-################################ Deprecated Blocks Info ################################
-
-DEPRECATED_BLOCK_TYPES = [
-    'peergrading',
-    'combinedopenended',
-    'graphical_slider_tool',
-]
-
-#### PROCTORING CONFIGURATION DEFAULTS
+############################### PROCTORING CONFIGURATION DEFAULTS ##############
 
 PROCTORING_BACKEND_PROVIDER = {
     'class': 'edx_proctoring.backends.null.NullBackendProvider',
