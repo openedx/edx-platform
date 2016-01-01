@@ -2658,3 +2658,6 @@ FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 # Course Content Bookmarks Settings
 MAX_BOOKMARKS_PER_COURSE = 100
+
+# URL which is used to convert math formula to Content MathML in Symbolic Response problem.
+SYMMATH_URL = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
