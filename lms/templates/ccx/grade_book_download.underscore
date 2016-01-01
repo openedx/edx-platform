@@ -1,0 +1,26 @@
+<p>
+  <a href="#" id="ccx-calculate-grades-csv"><%- gettext('Generate Grade Report') %></a>
+</p>
+<br/>
+
+<% if (showSuccessMessage) { %>
+<div class="request-response msg msg-confirm copy" id="ccx-gradebook-request-response"></div>
+<% }  %>
+
+<% if (showErrorMessage) { %>
+<div class="request-response-error msg msg-error copy" id="ccx-gradebook-request-response-error"></div>
+<% }  %>
+<br/>
+
+<p><b> <%- gettext('Grade Book Available for Download') %></b></p>
+<%
+  // Translators: a table of URL links to report files appears after this sentence.
+%>
+<p>
+  <%- gettext("To keep student data secure, " +
+  "you cannot save or email these links for direct access. " +
+  "Copies of links expire within 5 minutes.") %>
+</p>
+<br/>
+<br/>
+<div class="report-downloads-table" id="ccx_report-downloads-table"></div>

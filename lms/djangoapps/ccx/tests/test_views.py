@@ -875,31 +875,56 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             len(student_info['grade_summary']['section_breakdown']), 4)
 
-    def test_grades_csv(self):
+    def test_prepare_grade_book_csv(self):
+        """
+        Test prepares grade book for download.
+        """
         self.course.enable_ccx = True
-        RequestCache.clear_request_cache()
 
         url = reverse(
             'ccx_grades_csv',
             kwargs={'course_id': self.ccx_key}
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        # Are the grades downloaded as an attachment?
-        self.assertEqual(
-            response['content-disposition'],
-            'attachment'
-        )
-        rows = response.content.strip().split('\r')
-        headers = rows[0]
+        response_json = json.loads(response.content)
 
-        # picking first student records
-        data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
-        self.assertNotIn('HW 04', data)
-        self.assertEqual(data['HW 01'], '0.75')
-        self.assertEqual(data['HW 02'], '0.5')
-        self.assertEqual(data['HW 03'], '0.25')
-        self.assertEqual(data['HW Avg'], '0.5')
+        self.assertEqual(
+            response_json['status'],
+            "The grade book is being created."
+            " Grade book will shortly appear under 'Available for Download' section."
+        )
+
+    def test_list_ready_downloads(self):
+        """
+        Test list of grade books available for download
+        """
+        self.course.enable_ccx = True
+        url = reverse('list_ready_downloads', kwargs={'course_id': self.ccx_key})
+        with patch('instructor_task.models.LocalFSReportStore.links_for') as mock_links_for:
+            mock_links_for.return_value = [
+                ('mock_file_name_1', 'https://1.mock.url'),
+                ('mock_file_name_2', 'https://2.mock.url'),
+            ]
+            response = self.client.get(url, {})
+
+        expected_response = {
+            "downloads": [
+                {
+                    "url": "https://1.mock.url",
+                    "link": "<a href=\"https://1.mock.url\">mock_file_name_1</a>",
+                    "name": "mock_file_name_1"
+                },
+                {
+                    "url": "https://2.mock.url",
+                    "link": "<a href=\"https://2.mock.url\">mock_file_name_2</a>",
+                    "name": "mock_file_name_2"
+                }
+            ]
+        }
+        self.assertJSONEqual(
+            str(response.content),
+            expected_response
+        )
 
     @patch('courseware.views.render_to_response', intercept_renderer)
     def test_student_progress(self):

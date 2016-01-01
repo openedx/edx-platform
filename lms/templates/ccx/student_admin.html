@@ -1,11 +1,29 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="jsextra">
+  <%static:js group='ccx'/>
+</%block>
 
 <section>
   <h2>${_('Student Grades')}</h2>
   <p>
     <a href="${gradebook_url}">${_('View gradebook')}</a>
   </p>
-  <p>
-    <a href="${grades_csv_url}">${_('Download student grades')}</a>
-  </p>
+  <br/>
+  <div id="ccx_grade_book_download">
+  </div>
 </section>
+<script>
+$(function() {
+  var require = window.require || RequireJS.require;
+  require(["async_grade_book_download", "jquery"], function(asyncGradeBookDownload, $) {
+    var view = new asyncGradeBookDownload.GradeBookDownloadView({
+      el: $('#ccx_grade_book_download'),
+      gradeBookPrepareUrl: "${grades_csv_url}",
+      listPreparedGradeBookUrl: "${list_ready_downloads}"
+    });
+    view.render();
+  });
+});
+</script>

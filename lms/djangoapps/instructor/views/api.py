@@ -85,7 +85,6 @@ import instructor_analytics.csvs
 import csv
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from instructor.views import INVOICE_KEY
-
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
@@ -2205,16 +2204,10 @@ def list_report_downloads(_request, course_id):
     """
     List grade CSV files that are available for download for this course.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-
-    response_payload = {
-        'downloads': [
-            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
-            for name, url in report_store.links_for(course_id)
-        ]
-    }
-    return JsonResponse(response_payload)
+    # to avoid circular imports
+    from instructor.views.gradebook_api import list_report_downloads_by_course_key
+    course_key = CourseKey.from_string(course_id)
+    return list_report_downloads_by_course_key(course_key)
 
 
 @ensure_csrf_cookie

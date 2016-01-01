@@ -4,6 +4,8 @@ which is currently use by ccx and instructor apps.
 """
 import math
 
+from util.json_request import JsonResponse
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -15,10 +17,31 @@ from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from instructor.offline_gradecalc import student_grades
 from instructor.views.api import require_level
-
+from instructor_task.models import ReportStore
 
 # Grade book: max students per page
 MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 20
+
+
+def list_report_downloads_by_course_key(course_key):
+    """
+    Return json list of reports like grade book, ready for download
+
+    Arguments:
+        course_key (CourseKey): Course key
+
+    Returns:
+      string: Json list of reports ready for download.
+    """
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+
+    response_payload = {
+        'downloads': [
+            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
+            for name, url in report_store.links_for(course_key)
+        ]
+    }
+    return JsonResponse(response_payload)
 
 
 def calculate_page_info(offset, total_students):
