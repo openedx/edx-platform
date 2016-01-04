@@ -61,14 +61,15 @@ class TestDashboard(SharedModuleStoreTestCase):
         super(TestDashboard, self).setUp()
         # will be assigned to self.client by default
         self.user = UserFactory.create(password=self.test_password)
-        self.teams_url = reverse('teams_dashboard', args=[self.course.id])
+        self.teams_url = reverse('teams_dashboard', args=[unicode(self.course.id)])
 
     def test_anonymous(self):
         """Verifies that an anonymous client cannot access the team
         dashboard, and is redirected to the login page."""
         anonymous_client = APIClient()
         response = anonymous_client.get(self.teams_url)
-        redirect_url = '{0}?next={1}'.format(settings.LOGIN_URL, self.teams_url)
+        redirect_url = u'{0}?next={1}'.format(settings.LOGIN_URL, self.teams_url)
+        from nose.tools import set_trace; set_trace()
         self.assertRedirects(response, redirect_url)
 
     def test_not_enrolled_not_staff(self):

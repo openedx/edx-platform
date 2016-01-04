@@ -177,7 +177,7 @@ class TeamsDashboardView(GenericAPIView):
                 "teams": user_teams_data
             },
             "topic_url": reverse(
-                'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
+                'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': unicode(course_id)}, request=request
             ),
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
