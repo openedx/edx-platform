@@ -99,7 +99,7 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("You are enrolled in this course", resp.content)
-        self.assertIn("View Courseware", resp.content)
+        self.assertIn("View Course", resp.content)
 
     @override_settings(COURSE_ABOUT_VISIBILITY_PERMISSION="see_about_page")
     def test_visible_about_page_settings(self):
@@ -474,7 +474,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("You are enrolled in this course", resp.content)
-        self.assertIn("View Courseware", resp.content)
+        self.assertIn("View Course", resp.content)
         self.assertNotIn("Add buyme to Cart <span>($10 USD)</span>", resp.content)
 
     def test_closed_enrollment(self):

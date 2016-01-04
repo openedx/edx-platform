@@ -465,6 +465,7 @@ $courseware-navigation-color: $blue !default;
 $homepage__header--gradient__color--alpha: lighten($gray, 15%) !default;
 $homepage__header--gradient__color--bravo: saturate($gray, 30%) !default;
 $homepage__header--background: lighten($gray, 15%) !default;
+$homepage-background: rgb(252, 252, 252);
 $course-card-height: ($baseline*18) !default;
 $course-image-height: ($baseline*8) !default;
 $course-info-height: ($baseline*10) !default;
@@ -514,7 +515,7 @@ $light-gray: rgb(221, 221, 221) !default;
 $dark-gray: rgb(51, 51, 51) !default;
 $border-color: rgb(200, 200, 200) !default;
 $sidebar-color: rgb(246, 246, 246) !default;
-$outer-border-color: rgb(170, 170, 170);
+$outer-border-color: $gray-l3;
 $light-gray: rgb(221,221,221) !default;
 
 // used by descriptor css

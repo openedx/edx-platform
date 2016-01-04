@@ -247,14 +247,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         mock_xmodule_2.get_display_items.return_value = []
         self.assertIsNone(views.get_current_child(mock_xmodule_2))
 
-    def test_redirect_to_course_position(self):
-        mock_module = MagicMock()
-        mock_module.descriptor.id = 'Underwater Basketweaving'
-        mock_module.position = 3
-        mock_module.get_display_items.return_value = []
-        self.assertRaises(Http404, views.redirect_to_course_position,
-                          mock_module, views.CONTENT_DEPTH)
-
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
         self.assertEqual(response.status_code, 404)

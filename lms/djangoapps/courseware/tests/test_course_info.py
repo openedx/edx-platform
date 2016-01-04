@@ -3,6 +3,7 @@ Test the course_info xblock
 """
 import mock
 from nose.plugins.attrib import attr
+from pyquery import PyQuery as pq
 from urllib import urlencode
 
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
@@ -84,6 +86,35 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_last_accessed_courseware_not_shown(self):
+        SelfPacedConfiguration(enable_course_home_improvements=True).save()
+        url = reverse('info', args=(unicode(self.course.id),))
+        response = self.client.get(url)
+        content = pq(response.content)
+        self.assertEqual(content('.page-header-secondary a').length, 0)
+
+    def test_last_accessed_shown(self):
+        SelfPacedConfiguration(enable_course_home_improvements=True).save()
+        chapter = ItemFactory.create(
+            category="chapter", parent_location=self.course.location
+        )
+        section = ItemFactory.create(
+            category='section', parent_location=chapter.location
+        )
+        section_url = reverse(
+            'courseware_section',
+            kwargs={
+                'section': section.url_name,
+                'chapter': chapter.url_name,
+                'course_id': self.course.id
+            }
+        )
+        self.client.get(section_url)
+        info_url = reverse('info', args=(unicode(self.course.id),))
+        info_page_response = self.client.get(info_url)
+        content = pq(info_page_response.content)
+        self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
+
 
 @attr('shard_1')
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
@@ -125,6 +156,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
     """
 
     def setUp(self):
+        SelfPacedConfiguration(enabled=True).save()
         super(SelfPacedCourseInfoTestCase, self).setUp()
         self.instructor_paced_course = CourseFactory.create(self_paced=False)
         self.self_paced_course = CourseFactory.create(self_paced=True)
@@ -142,7 +174,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 17, 4)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 19, 4)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 17, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 19, 4)

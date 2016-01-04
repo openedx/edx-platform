@@ -55,6 +55,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from courseware.models import StudentModuleHistory
 from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
@@ -225,38 +226,6 @@ def get_current_child(xmodule, min_depth=None):
     else:
         child = None
     return child
-
-
-def redirect_to_course_position(course_module, content_depth):
-    """
-    Return a redirect to the user's current place in the course.
-
-    If this is the user's first time, redirects to COURSE/CHAPTER/SECTION.
-    If this isn't the users's first time, redirects to COURSE/CHAPTER,
-    and the view will find the current section and display a message
-    about reusing the stored position.
-
-    If there is no current position in the course or chapter, then selects
-    the first child.
-
-    """
-    urlargs = {'course_id': course_module.id.to_deprecated_string()}
-    chapter = get_current_child(course_module, min_depth=content_depth)
-    if chapter is None:
-        # oops.  Something bad has happened.
-        raise Http404("No chapter found when loading current position in course")
-
-    urlargs['chapter'] = chapter.url_name
-    if course_module.position is not None:
-        return redirect(reverse('courseware_chapter', kwargs=urlargs))
-
-    # Relying on default of returning first child
-    section = get_current_child(chapter, min_depth=content_depth - 1)
-    if section is None:
-        raise Http404("No section found when loading current position in course")
-
-    urlargs['section'] = section.url_name
-    return redirect(reverse('courseware_section', kwargs=urlargs))
 
 
 def save_child_position(seq_module, child_name):
@@ -467,9 +436,12 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                                             chapter=exam_chapter.url_name,
                                             section=exam_section.url_name)
 
-            # passing CONTENT_DEPTH avoids returning 404 for a course with an
-            # empty first section and a second section with content
-            return redirect_to_course_position(course_module, CONTENT_DEPTH)
+            # Otherwise, try to redirect to the user's last position in the courseware
+            __, section_url = get_last_accessed_courseware(course, request)
+            if section_url is not None:
+                return redirect(section_url)
+            else:
+                raise Http404("No chapter found when loading current position in course")
 
         chapter_descriptor = course.get_child_by(lambda m: m.location.name == chapter)
         if chapter_descriptor is not None:
@@ -544,8 +516,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
             context['section_title'] = section_descriptor.display_name_with_default_escaped
         else:
-            # section is none, so display a message
-            studio_url = get_studio_url(course, 'course')
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user.
@@ -554,22 +524,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 course_module.position = None
                 course_module.save()
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
-            prev_section_url = reverse('courseware_section', kwargs={
-                'course_id': course_key.to_deprecated_string(),
-                'chapter': chapter_descriptor.url_name,
-                'section': prev_section.url_name
-            })
-            context['fragment'] = Fragment(content=render_to_string(
-                'courseware/welcome-back.html',
-                {
-                    'course': course,
-                    'studio_url': studio_url,
-                    'chapter_module': chapter_module,
-                    'prev_section': prev_section,
-                    'prev_section_url': prev_section_url
-                }
-            ))
-
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
 
@@ -717,6 +671,14 @@ def course_info(request, course_id):
             'url_to_enroll': url_to_enroll,
         }
 
+        # Get the URL of the user's last position in order to display the 'where you were last' message
+        context['last_accessed_courseware'] = None
+        if SelfPacedConfiguration.current().enable_course_home_improvements:
+            (section_module, section_url) = get_last_accessed_courseware(course, request)
+            if section_module is not None and section_url is not None:
+                context['last_accessed_courseware'] = section_module
+                context['last_accessed_url'] = section_url
+
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
         if not in_preview_mode() and staff_access and now < effective_start:
@@ -725,6 +687,30 @@ def course_info(request, course_id):
             context['disable_student_access'] = True
 
         return render_to_response('courseware/info.html', context)
+
+
+def get_last_accessed_courseware(course, request):
+    """
+    Return a pair of the last-accessed courseware for this request's
+    user, and a URL for that module.
+    """
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2
+    )
+    course_module = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
+    chapter_module = get_current_child(course_module)
+    if chapter_module is not None:
+        section_module = get_current_child(chapter_module)
+        if section_module is not None:
+            url = reverse('courseware_section', kwargs={
+                'course_id': unicode(course.id),
+                'chapter': chapter_module.url_name,
+                'section': section_module.url_name
+            })
+            return (section_module, url)
+    return (None, None)
 
 
 @ensure_csrf_cookie
