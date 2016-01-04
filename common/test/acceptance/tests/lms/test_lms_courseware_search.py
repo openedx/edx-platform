@@ -2,6 +2,7 @@
 Test courseware search
 """
 import json
+from unittest import skip
 
 from nose.plugins.attrib import attr
 
@@ -16,6 +17,7 @@ from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@skip("for test purpose")
 @attr('shard_5')
 class CoursewareSearchTest(UniqueCourseTest):
     """

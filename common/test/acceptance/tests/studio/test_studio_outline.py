@@ -4,6 +4,7 @@ Acceptance tests for studio related to the outline page.
 import json
 from datetime import datetime, timedelta
 import itertools
+from unittest import skip
 from pytz import UTC
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
@@ -27,6 +28,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
+@skip("for test purpose")
 class CourseOutlineTest(StudioCourseTest):
     """
     Base class for all course outline tests
@@ -74,6 +76,7 @@ class CourseOutlineTest(StudioCourseTest):
         verify_ordering(self, outline_page, expected_ordering)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class CourseOutlineDragAndDropTest(CourseOutlineTest):
     """
@@ -129,6 +132,7 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
         self.drag_and_verify(self.seq_1_vert_2_handle, self.chap_1_seq_2_handle, expected_ordering, course_outline_page)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class WarningMessagesTest(CourseOutlineTest):
     """
@@ -337,6 +341,7 @@ class WarningMessagesTest(CourseOutlineTest):
             unit.toggle_staff_lock()
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class EditingSectionsTest(CourseOutlineTest):
     """
@@ -493,6 +498,7 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertIn(release_text, self.course_outline_page.section_at(0).subsection_at(0).release_date)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class StaffLockTest(CourseOutlineTest):
     """
@@ -875,6 +881,7 @@ class StaffLockTest(CourseOutlineTest):
         self._remove_staff_lock_and_verify_warning(subsection, False)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class EditNamesTest(CourseOutlineTest):
     """
@@ -991,6 +998,7 @@ class EditNamesTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class CreateSectionsTest(CourseOutlineTest):
     """
@@ -1078,6 +1086,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class DeleteContentTest(CourseOutlineTest):
     """
@@ -1190,6 +1199,7 @@ class DeleteContentTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
     """
@@ -1322,6 +1332,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.verify_all_sections(collapsed=False)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class ExpandCollapseSingleSectionTest(CourseOutlineTest):
     """
@@ -1362,6 +1373,7 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).subsection_at(1).is_collapsed)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class ExpandCollapseEmptyTest(CourseOutlineTest):
     """
@@ -1400,6 +1412,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class DefaultStatesEmptyTest(CourseOutlineTest):
     """
@@ -1425,6 +1438,7 @@ class DefaultStatesEmptyTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.bottom_add_section_button.is_present())
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class DefaultStatesContentTest(CourseOutlineTest):
     """
@@ -1450,6 +1464,7 @@ class DefaultStatesContentTest(CourseOutlineTest):
         self.assertEqual(courseware.xblock_component_type(2), 'discussion')
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class UnitNavigationTest(CourseOutlineTest):
     """
@@ -1471,6 +1486,7 @@ class UnitNavigationTest(CourseOutlineTest):
         self.assertTrue(unit.is_browser_on_page)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class PublishSectionTest(CourseOutlineTest):
     """
@@ -1597,6 +1613,7 @@ class PublishSectionTest(CourseOutlineTest):
         return (section, subsection, unit)
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class DeprecationWarningMessageTest(CourseOutlineTest):
     """
@@ -1763,6 +1780,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
         )
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class SelfPacedOutlineTest(CourseOutlineTest):
     """Test the course outline for a self-paced course."""

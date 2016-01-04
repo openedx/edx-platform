@@ -3,10 +3,12 @@
 """
 Acceptance tests for CMS Video Handout.
 """
+from unittest import skip
 from nose.plugins.attrib import attr
 from .test_studio_video_module import CMSVideoBaseTest
 
 
+@skip("for test purpose")
 @attr('shard_5')
 class VideoHandoutTest(CMSVideoBaseTest):
     """

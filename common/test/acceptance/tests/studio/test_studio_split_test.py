@@ -66,6 +66,7 @@ class SplitTestMixin(object):
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class SplitTest(ContainerBase, SplitTestMixin):
     """
@@ -199,6 +200,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class GroupConfigurationsNoSplitTest(StudioCourseTest):
     """
@@ -224,6 +226,7 @@ class GroupConfigurationsNoSplitTest(StudioCourseTest):
         self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """

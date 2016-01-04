@@ -6,6 +6,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 import time
 
 from flaky import flaky
+from unittest import skip
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
@@ -46,6 +47,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         return instructor_dashboard_page
 
 
+@skip("for test purpose")
 @attr('shard_1')
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
@@ -254,7 +256,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
 
-    @flaky  # TODO fix this SOL-1182
+    @flaky(max_runs=50, min_passes=50)  # TODO fix this SOL-1182
     def test_can_add_remove_allowance(self):
         """
         Make sure that allowances can be added and removed.
@@ -272,7 +274,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then I can add Allowance to that exam for a student
         self.assertTrue(allowance_section.is_add_allowance_button_visible)
 
-    @flaky  # TODO fix this SOL-1182
+    @flaky(max_runs=50, min_passes=50)  # TODO fix this SOL-1182
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -298,6 +300,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
+@skip("for test purpose")
 @attr('shard_1')
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
@@ -497,6 +500,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
         self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
 
 
+@skip("for test purpose")
 class DataDownloadsTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab.
@@ -590,6 +594,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.verify_report_download(report_name)
 
 
+@skip("for test purpose")
 @attr('shard_1')
 class CertificatesTest(BaseInstructorDashboardTest):
     """

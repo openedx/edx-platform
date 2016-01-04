@@ -3,7 +3,7 @@
 End-to-end tests for the LMS.
 """
 
-from unittest import expectedFailure
+from unittest import expectedFailure, skip
 
 from ..helpers import UniqueCourseTest
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -13,6 +13,7 @@ from ...pages.xblock.acid import AcidView
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@skip("for test purpose")
 class XBlockAcidBase(UniqueCourseTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
@@ -45,6 +46,7 @@ class XBlockAcidBase(UniqueCourseTest):
         self.assertTrue(acid_block.scope_passed('user_info'))
 
 
+@skip("for test purpose")
 class XBlockAcidNoChildTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with no children
@@ -81,6 +83,7 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
         self.validate_acid_block_view(acid_block)
 
 
+@skip("for test purpose")
 class XBlockAcidChildTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with children
@@ -128,6 +131,7 @@ class XBlockAcidChildTest(XBlockAcidBase):
         self.validate_acid_block_view(acid_block)
 
 
+@skip("for test purpose")
 class XBlockAcidAsideTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with children

@@ -3,6 +3,7 @@
 End-to-end tests for the courseware unit bookmarks.
 """
 import json
+from unittest import skip
 import requests
 from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from ...pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
@@ -17,6 +18,7 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import EventsTestMixin, UniqueCourseTest, is_404_page
 
 
+@skip("for test purpose")
 class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
     """
     Mixin with helper methods for testing Bookmarks.
@@ -59,6 +61,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         self.assert_events_match(event_data, actual_events)
 
 
+@skip("for test purpose")
 class BookmarksTest(BookmarksTestMixin):
     """
     Tests to verify bookmarks functionality.

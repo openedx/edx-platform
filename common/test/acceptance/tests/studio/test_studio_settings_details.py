@@ -19,6 +19,7 @@ from ..helpers import (
 )
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class StudioSettingsDetailsTest(StudioCourseTest):
     """Base class for settings and details page tests."""
@@ -37,6 +38,7 @@ class StudioSettingsDetailsTest(StudioCourseTest):
         self.assertTrue(self.settings_detail.is_browser_on_page())
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class SettingsMilestonesTest(StudioSettingsDetailsTest):
     """
@@ -204,6 +206,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         ))
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class CoursePacingTest(StudioSettingsDetailsTest):
     """Tests for setting a course to self-paced."""

@@ -1,6 +1,7 @@
 """
 Acceptance tests for Content Libraries in Studio
 """
+from unittest import skip
 from ddt import ddt, data
 from nose.plugins.attrib import attr
 from flaky import flaky
@@ -13,6 +14,7 @@ from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.users import LibraryUsersPage
 
 
+@skip("for test purpose")
 @attr('shard_2')
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
@@ -186,6 +188,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
+@skip("for test purpose")
 @attr('shard_2')
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
@@ -502,6 +505,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         self.assertFalse(target_block.is_placeholder())
 
 
+@skip("for test purpose")
 class LibraryUsersPageTest(StudioLibraryTest):
     """
     Test the functionality of the library "Instructor Access" page.
@@ -638,6 +642,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         self.assertTrue(user.is_current_user)
 
 
+@skip("for test purpose")
 @attr('a11y')
 class StudioLibraryA11yTest(StudioLibraryTest):
     """

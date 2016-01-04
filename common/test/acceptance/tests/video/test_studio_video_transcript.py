@@ -18,10 +18,12 @@ front-end validation will not pass.
                   one stored on YouTube
     t_not_exist - this file does not exist on YouTube; it exists locally
 """
+from unittest import skip
 from nose.plugins.attrib import attr
 from .test_studio_video_module import CMSVideoBaseTest
 
 
+@skip("for test purpose")
 @attr('shard_6')
 class VideoTranscriptTest(CMSVideoBaseTest):
     """

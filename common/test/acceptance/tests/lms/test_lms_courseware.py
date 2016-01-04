@@ -3,6 +3,7 @@
 End-to-end tests for the LMS.
 """
 import time
+from unittest import skip
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -18,6 +19,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@skip("for test purpose")
 class CoursewareTest(UniqueCourseTest):
     """
     Test courseware.
@@ -124,6 +126,7 @@ class CoursewareTest(UniqueCourseTest):
             self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
 
+@skip("for test purpose")
 class ProctoredExamTest(UniqueCourseTest):
     """
     Test courseware.
@@ -393,6 +396,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertTrue(self.course_outline.time_allotted_field_visible())
 
 
+@skip("for test purpose")
 class CoursewareMultipleVerticalsTest(UniqueCourseTest):
     """
     Test courseware with multiple verticals

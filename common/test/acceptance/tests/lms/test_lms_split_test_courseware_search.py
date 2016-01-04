@@ -3,6 +3,7 @@ Test courseware search
 """
 import os
 import json
+from unittest import skip
 
 from ..helpers import remove_file
 from ...pages.common.logout import LogoutPage
@@ -21,6 +22,7 @@ from ..studio.base_studio_test import ContainerBase
 from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 
 
+@skip("for test purpose")
 @attr('shard_1')
 class SplitTestCoursewareSearchTest(ContainerBase):
     """

@@ -98,6 +98,7 @@ THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscin
                                """
 
 
+@skip("for test purpose")
 class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
     """
     A mixin containing tests for response pagination for use by both inline
@@ -177,6 +178,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionHomePageTest(UniqueCourseTest):
     """
@@ -204,6 +206,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.assertIsNotNone(self.page.new_post_form)
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
@@ -277,6 +280,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
     """
@@ -332,6 +336,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
@@ -381,6 +386,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     """
@@ -421,6 +427,7 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         page.delete_comment("comment_other_author")
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
@@ -515,6 +522,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.endorse_response('response_other_author')
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
@@ -599,6 +607,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertTrue(page.is_add_comment_visible("response1"))
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
@@ -758,6 +767,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionUserProfileTest(UniqueCourseTest):
     """
@@ -887,6 +897,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
@@ -961,6 +972,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         ).wait_for_page()
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class DiscussionSortPreferenceTest(UniqueCourseTest):
     """

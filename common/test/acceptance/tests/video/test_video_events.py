@@ -3,6 +3,7 @@
 import datetime
 import json
 import ddt
+from unittest import skip
 import unittest
 
 from ..helpers import EventsTestMixin
@@ -13,6 +14,7 @@ from openedx.core.lib.tests.assertions.events import assert_event_matches, asser
 from opaque_keys.edx.keys import UsageKey, CourseKey
 
 
+@skip("for test purpose")
 class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
     """
     Useful helper methods to test video player event emission.
@@ -58,6 +60,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
         )
 
 
+@skip("for test purpose")
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
@@ -150,6 +153,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
+@skip("for test purpose")
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """

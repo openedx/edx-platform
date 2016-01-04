@@ -1,6 +1,7 @@
 """
 Test LMS Notes
 """
+from unittest import skip
 from uuid import uuid4
 from datetime import datetime
 from nose.plugins.attrib import attr
@@ -14,6 +15,7 @@ from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 from ..helpers import EventsTestMixin
 
 
+@skip("for test purpose")
 class EdxNotesTestMixin(UniqueCourseTest):
     """
     Creates a course with initial data and contains useful helper methods.
@@ -120,6 +122,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
@@ -336,6 +339,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
             self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
     """
@@ -1006,6 +1010,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assertFalse(note.is_visible)
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     """
@@ -1075,6 +1080,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         self.assertTrue(note_2.is_visible)
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class EdxNotesToggleNotesTest(EdxNotesTestMixin):
     """

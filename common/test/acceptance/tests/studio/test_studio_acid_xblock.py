@@ -1,6 +1,7 @@
 """
 Acceptance tests for Studio related to the acid xblock.
 """
+from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -9,6 +10,7 @@ from ...pages.xblock.acid import AcidView
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@skip("for test purpose")
 class XBlockAcidBase(WebAppTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
@@ -87,6 +89,7 @@ class XBlockAcidBase(WebAppTest):
         self.assertTrue(acid_block.resource_url_passed)
 
 
+@skip("for test purpose")
 class XBlockAcidNoChildTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with no children
@@ -115,6 +118,7 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
         self.user = course_fix.user
 
 
+@skip("for test purpose")
 class XBlockAcidParentBase(XBlockAcidBase):
     """
     Base class for tests that verify that parent XBlock integration is working correctly
@@ -139,6 +143,7 @@ class XBlockAcidParentBase(XBlockAcidBase):
         self.validate_acid_block_preview(acid_block)
 
 
+@skip("for test purpose")
 class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
     """
     Tests of an AcidBlock with children
@@ -168,6 +173,7 @@ class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
         self.user = course_fix.user
 
 
+@skip("for test purpose")
 class XBlockAcidChildTest(XBlockAcidParentBase):
     """
     Tests of an AcidBlock with children
