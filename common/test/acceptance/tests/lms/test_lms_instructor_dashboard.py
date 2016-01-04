@@ -269,9 +269,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # And visit the Allowance Section of Instructor Dashboard's Special Exams tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
-        import pudb;pu.db
         allowance_section = instructor_dashboard_page.select_special_exams().select_allowance_section()
-        import pudb;pu.db
 
         # Then I can add Allowance to that exam for a student
         self.assertTrue(allowance_section.is_add_allowance_button_visible)
