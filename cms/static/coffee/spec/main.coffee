@@ -253,6 +253,7 @@ define([
     "js/spec/views/xblock_validation_spec",
     "js/spec/views/license_spec",
     "js/spec/views/paging_spec",
+    "js/spec/views/login_studio_spec",
 
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
