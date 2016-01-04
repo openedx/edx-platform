@@ -181,6 +181,17 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         for val in total_student_count.values():
             self.assertEquals(USER_COUNT, val)
 
+    @override_settings(ANALYTICS_DATA_URL='', MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
+    def test_get_problem_grade_distribution_api_not_set(self):
+        prob_grade_distrib, total_student_count = get_problem_grade_distribution(self.course.id, USER_COUNT)
+
+        for problem in prob_grade_distrib:
+            max_grade = prob_grade_distrib[problem]['max_grade']
+            self.assertEquals(1, max_grade)
+
+        for value in total_student_count.values():
+            self.assertEquals(USER_COUNT, value)
+
     @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT + 1))
     def test_get_sequential_open_distibution_from_db(self):
         sequential_open_distrib = get_sequential_open_distrib(self.course.id, USER_COUNT)
@@ -193,6 +204,14 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
     def test_get_sequential_open_distibution_from_client(self, mock_client):
         mock_client.return_value.modules.return_value.sequential_open_distribution.return_value = [{'count': USER_COUNT}]
+        sequential_open_distrib = get_sequential_open_distrib(self.course.id, USER_COUNT)
+
+        for problem in sequential_open_distrib:
+            num_students = sequential_open_distrib[problem]
+            self.assertEquals(USER_COUNT, num_students)
+
+    @override_settings(ANALYTICS_DATA_URL='', MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
+    def test_get_sequential_open_distibution_api_not_set(self):
         sequential_open_distrib = get_sequential_open_distrib(self.course.id, USER_COUNT)
 
         for problem in sequential_open_distrib:
@@ -225,6 +244,21 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
             },
         ]
 
+        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id, USER_COUNT)
+        probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib, USER_COUNT)
+
+        for problem in probset_grade_distrib:
+            max_grade = probset_grade_distrib[problem]['max_grade']
+            self.assertEquals(1, max_grade)
+
+            grade_distrib = probset_grade_distrib[problem]['grade_distrib']
+            sum_attempts = 0
+            for item in grade_distrib:
+                sum_attempts += item[1]
+            self.assertEquals(USER_COUNT, sum_attempts)
+
+    @override_settings(ANALYTICS_DATA_URL='', MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
+    def test_get_problem_set_grade_distrib_api_not_set(self):
         prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id, USER_COUNT)
         probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib, USER_COUNT)
 
