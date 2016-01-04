@@ -3,6 +3,7 @@ Test the course_info xblock
 """
 import mock
 from nose.plugins.attrib import attr
+from pyquery import PyQuery as pq
 from urllib import urlencode
 
 from django.conf import settings
@@ -89,7 +90,8 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
         url = reverse('info', args=(unicode(self.course.id),))
         response = self.client.get(url)
-        self.assertNotIn('Jump back to where you were last:', response.content)
+        content = pq(response.content)
+        self.assertEqual(content('.page-header-secondary a').length, 0)
 
     def test_last_accessed_shown(self):
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
@@ -110,7 +112,8 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.client.get(section_url)
         info_url = reverse('info', args=(unicode(self.course.id),))
         info_page_response = self.client.get(info_url)
-        self.assertIn('Jump back to where you were last:', info_page_response.content)
+        content = pq(info_page_response.content)
+        self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
 
 
 @attr('shard_1')
