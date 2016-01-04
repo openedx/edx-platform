@@ -106,6 +106,9 @@ def get_template(uri):
     Returns a template for the specified URI, None if none exists or if caller should
     use default templates/search paths
     """
+    if not is_request_in_microsite():
+        return
+
     return TEMPLATES_BACKEND.get_template(uri)
 
 
