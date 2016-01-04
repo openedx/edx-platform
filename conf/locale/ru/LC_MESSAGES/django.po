@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Andrey Bochkarev <abocha@ya.ru>, 2015
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
@@ -24,6 +25,7 @@
 # mchalyk <mchalyk@gmail.com>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015
 # Natalia Vavilina <nfgenius@gmail.com>, 2015
+# Ned Batchelder <ned@edx.org>, 2015
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Nikita V. Ignatchenko <n.v.ignatchenko@urfu.ru>, 2014
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014-2015
@@ -99,6 +101,7 @@
 # Michael Savin <m.savin.ru@gmail.com>, 2015
 # Natalia Vavilina <nfgenius@gmail.com>, 2015
 # Natalie Murashkina <murnatty@gmail.com>, 2015
+# Ned Batchelder <ned@edx.org>, 2015
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
@@ -184,7 +187,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-03 21:16+0000\n"
+"POT-Creation-Date: 2015-12-14 21:32+0000\n"
 "PO-Revision-Date: 2015-12-02 23:55+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -243,7 +246,6 @@ msgstr "Блок"
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Name"
@@ -257,7 +259,6 @@ msgstr "Идентификатор видео"
 #: cms/djangoapps/contentstore/views/videos.py
 #: common/djangoapps/config_models/admin.py
 #: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
 msgstr "Состояние"
@@ -372,7 +373,7 @@ msgstr "Вы зачислены на курс профессиональной �
 msgid "Professional Ed"
 msgstr "Профессиональная подготовка"
 
-#: common/djangoapps/course_modes/models.py
+#: common/djangoapps/course_modes/models.py lms/djangoapps/courseware/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: lms/templates/courseware/courseware.html
 msgid "Course"
@@ -381,13 +382,11 @@ msgstr "Курс"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
 #: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -429,6 +428,11 @@ msgstr ""
 msgid "Audit"
 msgstr "Слушатели"
 
+#: common/djangoapps/course_modes/models.py lms/envs/devstack.py
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr "Сертификат Кодекса чести"
+
 #: common/djangoapps/course_modes/models.py
 msgid ""
 "Professional education modes are not allowed to have expiration_datetime "
@@ -436,6 +440,11 @@ msgid ""
 msgstr ""
 "В режимах профессионального образования не разрешается иметь установленным "
 "expiration_datetime."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"The time period before a course ends in which a course mode will expire"
+msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
@@ -1564,14 +1573,10 @@ msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr "Требуется тег {expected_tag}. Вместо него введён тег {given_tag}."
 
 #: common/lib/capa/capa/responsetypes.py
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Correct"
 msgstr "Верных"
 
 #: common/lib/capa/capa/responsetypes.py
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Incorrect"
 msgstr "Неверных"
 
@@ -1762,12 +1767,7 @@ msgstr ""
 "попробуйте повторить позже."
 
 #. Translators: 'grader' refers to the edX automatic code grader.
-#. Translators: the `grader` refers to the grading service open response
-#. problems
-#. are sent to, either to be machine-graded, peer-graded, or instructor-
-#. graded.
 #: common/lib/capa/capa/responsetypes.py
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Invalid grader reply. Please contact the course staff."
 msgstr ""
 "Ответ не может быть получен. Пожалуйста, свяжитесь с ответственными за курс."
@@ -1860,7 +1860,6 @@ msgstr "Содержание пояснения в формате XML"
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -1872,7 +1871,6 @@ msgid "Annotation"
 msgstr "Пояснение"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr ""
@@ -1884,12 +1882,10 @@ msgid "Blank Advanced Problem"
 msgstr "Пустая задача — расширенный XML-редактор"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Количество попыток, использованных студентом при выполнении задания"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Максимальное количество попыток"
@@ -1903,12 +1899,10 @@ msgstr ""
 "значение не установлено, предоставляется неограниченное количество попыток."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Date that this problem is due by"
 msgstr "Срок сдачи данного задания"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr ""
 "Время, на протяжении которого будут приниматься ответы по истечении срока "
@@ -2000,7 +1994,6 @@ msgid "Per Student"
 msgstr "Для каждого студента"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
 msgstr "Данные, связанные с заданием, в формате XML"
@@ -2042,8 +2035,6 @@ msgstr ""
 "которых предусмотрено несколько попыток."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Problem Weight"
 msgstr "Вес задания"
 
@@ -2056,7 +2047,6 @@ msgstr ""
 "каждое поле ответа в задании будет оцениваться в один балл."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Markdown source of this module"
 msgstr "Мarkdown код этого модуля"
 
@@ -2240,165 +2230,6 @@ msgstr ""
 "Статус этого задания изменился после того, как Вы загрузили страницу.  "
 "Пожалуйста, перезагрузите страницу."
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Open Response Assessment"
-msgstr "Оценивание ответов в свободной форме"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Current task that the student is on."
-msgstr "Текущая задача, над которой работает студент."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid ""
-"A list of lists of state dictionaries for student states that are saved. "
-"This field is only populated if the instructor changes tasks after the "
-"module is created and students have attempted it (for example, if a self "
-"assessed problem is changed to self and peer assessed)."
-msgstr ""
-"Список списков словарей состояния, содержащих состояние сохранённой работы "
-"студентов.  Это поле заполняется только в том случае, если преподаватель "
-"вносит изменения в задание после создания модуля, а студенты уже выполняли "
-"задание (например, изменяет задание, требующее самопроверки, включив в него "
-"взаимную проверку)."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "List of state dictionaries of each task within this module."
-msgstr ""
-"Список словарей, отражающих состояние каждого задания в данном модуле."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Which step within the current task that the student is on."
-msgstr "Этап текущего задания, который выполняет студент."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-#: lms/templates/peer_grading/peer_grading.html
-msgid "Graded"
-msgstr "Оценено"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid ""
-"Defines whether the student gets credit for this problem. Credit is based on"
-" peer grades of this problem."
-msgstr ""
-"Определяет, будет ли задание зачтено студенту.  Это зависит от оценок "
-"задания, поставленных однокурсниками."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "If the problem is ready to be reset or not."
-msgstr "Готово ли задание к сбросу значений."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "The number of times the student can try to answer this problem."
-msgstr "Сколько раз студент может дать ответ на задание."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Allow File Uploads"
-msgstr "Разрешить загрузку файлов"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Whether or not the student can submit files as a response."
-msgstr "Может ли студент отправлять файлы в качестве ответа."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Disable Quality Filter"
-msgstr "Отключить фильтр качества"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid ""
-"If False, the Quality Filter is enabled and submissions with poor spelling, "
-"short length, or poor grammar will not be peer reviewed."
-msgstr ""
-"Если установлено значение \"Ложно\", включается фильтр качества, и работы с "
-"орфографическими и грамматическими ошибками, или слишком короткие тексты не "
-"будут оценены однокурсниками."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Current version number"
-msgstr "Номер текущей версии"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"Defines the number of points each problem is worth. If the value is not set,"
-" each problem is worth one point."
-msgstr ""
-"Определяет количество баллов за каждое задание.  Если значение не "
-"установлено, каждое задание оценивается в один балл."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Minimum Peer Grading Calibrations"
-msgstr "Минимум тренировочных заданий для взаимной проверки"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid ""
-"The minimum number of calibration essays each student will need to complete "
-"for peer grading."
-msgstr ""
-"Минимальное количество тренировочных заданий, которые должен выполнить "
-"каждый студент, чтобы приступить к взаимной проверке."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Maximum Peer Grading Calibrations"
-msgstr "Максимум тренировочных заданий для взаимной проверки"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid ""
-"The maximum number of calibration essays each student will need to complete "
-"for peer grading."
-msgstr ""
-"Максимальное количество тренировочных заданий, которые должен выполнить "
-"каждый студент, чтобы приступить к взаимной проверке."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Peer Graders per Response"
-msgstr "Количество оценивающих каждый ответ"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "The number of peers who will grade each submission."
-msgstr ""
-"Количество студентов, которые будут участвовать во взаимной проверке каждой "
-"работы."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Required Peer Grading"
-msgstr "Необходимо взаимооценивание"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid ""
-"The number of other students each student making a submission will have to "
-"grade."
-msgstr ""
-"Количество студентов, работы которых должен будет оценить сдающий задание."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid "Allow \"overgrading\" of peer submissions"
-msgstr ""
-"Разрешить повторное оценивание работ, предоставленных для взаимооценки. "
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-msgid ""
-"EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already"
-" have the requisite number of graders, but ONLY WHEN all submissions they "
-"are eligible to grade already have enough graders.  This is intended for use"
-" when settings for `Required Peer Grading` > `Peer Graders per Response`"
-msgstr ""
-"ЭКСПЕРИМЕНТАЛЬНАЯ ФУНКЦИЯ.  Позволяет студентам проверять работы, которые "
-"уже были оценены требуемым количеством проверяющих, но ТОЛЬКО КОГДА все "
-"работы, доступные им для проверки, уже были оценены достаточным количеством "
-"проверяющих.  Эту функцию можно использовать когда значение  настройки "
-"\"Обязательное Количество Заданий для Взаимной Проверки\" > значения "
-"настройки \"Количество Проверяющих Каждую Работу\""
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"ORA1 is no longer supported. To use this assessment, replace this ORA1 "
-"component with an ORA2 component."
-msgstr ""
-"Пакет ORA1 больше не поддерживается. Замените его на ORA2, если хотите "
-"использовать систему оценивания в свободной форме."
-
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_metadata_utils.py
@@ -2566,11 +2397,11 @@ msgid ""
 "supported are underscore, hyphen, and period."
 msgstr ""
 "Введите категории обсуждений в следующем формате: \"НазваниеКатегории\": "
-"{\"id\": \"i4x-НаименованиеОУ-НомерКурса-course-ПериодПроведенияКурса\"}. "
-"Например, одна из категорий обсуждения может выглядеть так: \"Лидийский "
-"лад\": {\"id\": \"i4x-UnivercityX-MUS101-course-2015_T1\"}.  Значение \"id\""
-" должно быть уникальным для каждой категории. Значения \"id\" могут "
-"содержать следующие специальные символы: знак подчёркивания, дефис и точка."
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. Например, "
+"одна из категорий обсуждения может выглядеть так: \"Лидийский лад\": "
+"{\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\"}.  Значение \"id\" должно"
+" быть уникальным для каждой категории. Значения \"id\" могут содержать "
+"следующие специальные символы: знак подчёркивания, дефис и точка."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -2770,260 +2601,6 @@ msgstr "Список дополнительных модулей"
 msgid "Enter the names of the advanced components to use in your course."
 msgstr ""
 "Введите названия дополнительных компонентов, используемых в Вашем курсе."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Checklist to Follow When Developing a Course"
-msgstr "Контрольный список для использования при разработке курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Getting Started With Studio"
-msgstr "Как начать работу в Studio"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Add Course Team Members"
-msgstr "Добавить членов команды курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Grant your collaborators permission to edit your course so you can work "
-"together."
-msgstr ""
-"Предоставьте соавторам права на редактирование Вашего курса, чтобы вы могли "
-"работать над ним вместе."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Edit Course Team"
-msgstr "Редактировать состав команды курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Set Important Dates for Your Course"
-msgstr "Установить важные даты курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Establish your course's student enrollment and launch dates on the Schedule "
-"and Details page."
-msgstr ""
-"Установите дату начала записи на курс и дату запуска курса на странице "
-"«Расписание и обзор курса»."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Edit Course Details &amp; Schedule"
-msgstr "Редактировать обзор курса и расписание"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Draft Your Course's Grading Policy"
-msgstr "Задать правила оценивания курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Set up your assignment types and grading policy even if you haven't created "
-"all your assignments."
-msgstr ""
-"Определите типы заданий и правила оценивания, даже если Вы ещё не составили "
-"все задания."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Edit Grading Settings"
-msgstr "Редактировать настройки оценивания"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Explore the Other Studio Checklists"
-msgstr "Просмотреть другие контрольные списки в Studio"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Discover other available course authoring tools, and find help when you need"
-" it."
-msgstr ""
-"Ознакомьтесь с доступными инструментами создания курсов и, при "
-"необходимости, обратитесь за помощью."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Draft a Rough Course Outline"
-msgstr "Создание примерной структуры курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Create Your First Section and Subsection"
-msgstr "Создайть свой первый раздел и подраздел"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Use your course outline to build your first Section and Subsection."
-msgstr ""
-"Используйте страницу «Структура курса», чтобы создать свой первый раздел и "
-"подраздел."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Edit Course Outline"
-msgstr "Редактировать структуру курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Set Section Release Dates"
-msgstr "Установить даты выпуска разделов"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Specify the release dates for each Section in your course. Sections become "
-"visible to students on their release dates."
-msgstr ""
-"Укажите дату выпуска каждого раздела своего курса.  Разделы становятся "
-"видимыми для студентов по наступлении соответствующих дат выпуска."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Designate a Subsection as Graded"
-msgstr "Указать, что подраздел выполняется на оценку"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Set a Subsection to be graded as a specific assignment type. Assignments "
-"within graded Subsections count toward a student's final grade."
-msgstr ""
-"Укажите тип задания, к которому относится оцениваемый подраздел. Задания, "
-"входящие в оцениваемые подразделы, влияют на итоговую оценку студента."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Reordering Course Content"
-msgstr "Упорядочить содержимое курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Use drag and drop to reorder the content in your course."
-msgstr ""
-"Используйте функцию перетаскивания, чтобы упорядочить содержимое курса."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Renaming Sections"
-msgstr "Переименовать разделы"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Rename Sections by clicking the Section name from the Course Outline."
-msgstr "Переименовывайте разделы, нажимая на их названия в структуре курса."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Deleting Course Content"
-msgstr "Удалить содержимое курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Delete Sections, Subsections, or Units you don't need anymore. Be careful, "
-"as there is no Undo function."
-msgstr ""
-"Удаляйте разделы, подразделы или блоки, в которых больше нет необходимости. "
-"Будьте осторожны: отменить удаление невозможно."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Add an Instructor-Only Section to Your Outline"
-msgstr "Добавить в структуру курса раздел, доступный только преподавателям"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Some course authors find using a section for unsorted, in-progress work "
-"useful. To do this, create a section and set the release date to the distant"
-" future."
-msgstr ""
-"Некоторые авторы курсов используют для текущих разработок вспомогательный "
-"раздел. Для создания такого раздела измените дату выпуска на отдалённое "
-"будущее."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Explore edX's Support Tools"
-msgstr "Изучение средств поддержки edX"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Explore the Studio Help Forum"
-msgstr "Посетить справочный форум Studio"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Access the Studio Help forum from the menu that appears when you click your "
-"user name in the top right corner of Studio."
-msgstr ""
-"Зайдите на форум поддержки Studio через выпадающее меню, вызываемое щелчком "
-"по своему имени пользователя в правом верхнем углу Studio."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Visit Studio Help"
-msgstr "Посетить сайт поддержки для пользователей Studio"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enroll in edX 101"
-msgstr "Записаться на курс edX 101"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Register for edX 101, edX's primer for course creation."
-msgstr "Зарегистрируйтесь на курс «edX 101: Основы создания курсов в edX»."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Register for edX 101"
-msgstr "Зарегистрироваться на курс edX 101"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Download the Studio Documentation"
-msgstr "Скачать документацию по работе в Studio"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Download the searchable Studio reference documentation in PDF form."
-msgstr ""
-"Скачайте справочную документацию по использованию Studio в формате PDF с "
-"возможностью поиска."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Download Documentation"
-msgstr "Скачать документацию"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Draft Your Course About Page"
-msgstr "Создание страницы «О курсе»"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Draft a Course Description"
-msgstr "Составить описание курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Courses on edX have an About page that includes a course video, description,"
-" and more. Draft the text students will read before deciding to enroll in "
-"your course."
-msgstr ""
-"У каждого курса edX есть информационная страница «О курсе», на которой "
-"представлены вводное видео, описание курса, и многое другое. Составьте "
-"текст, который студенты прочитают перед тем, как принять решение записаться "
-"на курс."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Edit Course Schedule &amp; Details"
-msgstr "Редактировать расписание и обзор курса"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Add Staff Bios"
-msgstr "Добавить биографии сотрудников"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Showing prospective students who their instructor will be is helpful. "
-"Include staff bios on the course About page."
-msgstr ""
-"Потенциальным студентам полезно будет узнать, кто будет их преподавателем. "
-"Поместите биографии сотрудников на информационной странице «О курсе»."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Add Course FAQs"
-msgstr "Добавить раздел «Вопросы и ответы» о курсе"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Include a short list of frequently asked questions about your course."
-msgstr "Добавьте короткий список часто задаваемых вопросов о Вашем курсе."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Add Course Prerequisites"
-msgstr "Добавить требования к поступающим"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Let students know what knowledge and/or skills they should have before they "
-"enroll in your course."
-msgstr ""
-"Дайте студентам знать, какие знания и/или навыки им потребуются прежде, чем "
-"записаться на курс."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Info Sidebar Name"
@@ -3373,9 +2950,9 @@ msgid ""
 "course setting to take effect."
 msgstr ""
 "Укажите минимальный процент баллов за вступительное испытание, необходимых "
-"для того, чтобы студенты смогли посмотреть содержание курса.  Заметьте, что "
-"вы должны активировать вступительные испытания на этом курсе для того, чтобы"
-" эта настройка действовала."
+"для того, чтобы студенты смогли посмотреть содержание курса.  Обратите "
+"внимание, что вы должны активировать вступительные испытания на этом курсе "
+"для того, чтобы эта настройка действовала."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam ID"
@@ -3422,7 +2999,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
-msgstr "Разрешить проведение испытаний в наблюдаемой форме"
+msgstr "Разрешить проведение наблюдаемых испытаний"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3431,9 +3008,9 @@ msgid ""
 "exams."
 msgstr ""
 "Введите \"true\" или \"false\".  Если введено значение \"true\", на вашем "
-"курсе будет разрешено проведение испытаний в наблюдаемой форме. Обратите "
-"внимание, что при использовании этой возможности также можно будет добавлять"
-" испытания, ограниченные по времени."
+"курсе будет разрешено проведение наблюдаемых испытаний. Обратите внимание, "
+"что при использовании этой возможности также можно будет добавлять "
+"испытания, ограниченные по времени."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Timed Exams"
@@ -3517,7 +3094,6 @@ msgid "Text"
 msgstr "Текст"
 
 #: common/lib/xmodule/xmodule/html_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Html contents to display for this module"
 msgstr "HTML содержимое, отображаемое в этом модуле"
 
@@ -3703,7 +3279,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Scored"
-msgstr "Оценено"
+msgstr "Оценивается"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid ""
@@ -4062,6 +3638,8 @@ msgstr ""
 "Введите идентификаторы групп по изучаемым материалам, для которых "
 "предоставляется данное задание."
 
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Specify when the Show Answer button appears for each problem. Valid values "
@@ -4076,6 +3654,8 @@ msgstr ""
 "\"correct_or_past_due\" — когда ответ верен или после срока сдачи и "
 "\"never\" — никогда."
 
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Specify the default for how often variable values in a problem are "
@@ -4262,264 +3842,6 @@ msgstr ""
 "Введите true или false. При установке значения true, отправленные ответы к "
 "модулям заданий будут учитываться в оценочном/отборочном алгоритме "
 "вступительного испытания."
-
-#. Translators: "Self" is used to denote an openended response that is self-
-#. graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Self"
-msgstr "Самооценка"
-
-#. Translators: "AI" is used to denote an openended response that is machine-
-#. graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "AI"
-msgstr "ИИ"
-
-#. Translators: "Peer" is used to denote an openended response that is peer-
-#. graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Peer"
-msgstr "Взаимооценка"
-
-#. Translators: "Not started" is used to communicate to a student that their
-#. response
-#. has not yet been graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Not started."
-msgstr "Ещё не оценено."
-
-#. Translators: "Being scored." is used to communicate to a student that their
-#. response
-#. are in the process of being scored
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Being scored."
-msgstr "В процессе оценки."
-
-#. Translators: "Scoring finished" is used to communicate to a student that
-#. their response
-#. have been scored, but the full scoring process is not yet complete
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Scoring finished."
-msgstr "Оценка завершена."
-
-#. Translators: "Complete" is used to communicate to a student that their
-#. openended response has been fully scored
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Complete."
-msgstr "Выполнено."
-
-#. Translators: "Scored rubric" appears to a user as part of a longer
-#. string that looks something like: "Scored rubric from grader 1".
-#. "Scored" is an adjective that modifies the noun "rubric".
-#. That longer string appears when a user is viewing a graded rubric
-#. returned from one of the graders of their openended response problem.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Scored rubric"
-msgstr "Оцененные рубрики"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid ""
-"You have attempted this question {number_of_student_attempts} times. You are"
-" only allowed to attempt it {max_number_of_attempts} times."
-msgstr ""
-"Вы сделали {number_of_student_attempts} попыток ответить на этот вопрос. Вам"
-" разрешено всего {max_number_of_attempts} попыток."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "The problem state got out-of-sync. Please try reloading the page."
-msgstr ""
-"Нарушена синхронизация статуса задания.  Пожалуйста, попробуйте "
-"перезагрузить страницу."
-
-#. Translators: "Self-Assessment" refers to the self-assessed mode of
-#. openended evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "Self-Assessment"
-msgstr "Самооценка"
-
-#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
-#. openended evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "Peer-Assessment"
-msgstr "Взаимное оценивание"
-
-#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
-#. of openended evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "Instructor-Assessment"
-msgstr "Оценка инструктором"
-
-#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
-#. evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "AI-Assessment"
-msgstr "Оценка ИИ"
-
-#. Translators: 'tag' is one of 'feedback', 'submission_id',
-#. 'grader_id', or 'score'. They are categories that a student
-#. responds to when filling out a post-assessment survey
-#. of his or her grade from an openended problem.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid ""
-"Could not find needed tag {tag_name} in the survey responses. Please try "
-"submitting again."
-msgstr ""
-"Не удалось найти необходимый тег {tag_name} в ответах на вопросы анкеты.  "
-"Пожалуйста, попробуйте еще раз."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "There was an error saving your feedback. Please contact course staff."
-msgstr ""
-"При сохранении вашего отзыва произошла ошибка.  Пожалуйста, свяжитесь с "
-"сотрудниками курса."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Couldn't submit feedback."
-msgstr "Не удалось отправить отзыв."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Successfully saved your feedback."
-msgstr "Ваш отзыв был успешно сохранён."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Unable to save your feedback. Please try again later."
-msgstr ""
-"Не удалось сохранить ваш отзыв.  Пожалуйста, попробуйте повторить позже."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Successfully saved your submission."
-msgstr "Ваш ответ был успешно сохранен."
-
-#. Translators: the `grader` refers to the grading service open response
-#. problems
-#. are sent to, either to be machine-graded, peer-graded, or instructor-
-#. graded.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid ""
-"Unable to submit your submission to the grader. Please try again later."
-msgstr ""
-"Не удалось сдать ваш ответ на оценку.  Пожалуйста, попробуйте повторить "
-"позже."
-
-#. Translators: the `grader` refers to the grading service open response
-#. problems
-#. are sent to, either to be machine-graded, peer-graded, or instructor-
-#. graded.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Error getting feedback from grader."
-msgstr "Ошибка получения ответа от оценщика"
-
-#. Translators: the `grader` refers to the grading service open response
-#. problems
-#. are sent to, either to be machine-graded, peer-graded, or instructor-
-#. graded.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "No feedback available from grader."
-msgstr "Нет доступных ответов от оценщика"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Error handling action. Please try again."
-msgstr "Ошибка при выполнении команды.  Пожалуйста, попробуйте ещё раз."
-
-#. Translators: this string appears once an openended response
-#. is submitted but before it has been graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid ""
-"Your response has been submitted. Please check back later for your grade."
-msgstr ""
-"Ваш ответ принят.  Пожалуйста, вернитесь на эту страницу позже, чтобы узнать"
-" свою оценку."
-
-#. Translators: "Not started" communicates to a student that their response
-#. has not yet been graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid "Not started"
-msgstr "Ещё не оценено"
-
-#. Translators: "In progress" communicates to a student that their response
-#. is currently in the grading process
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid "In progress"
-msgstr "В процессе"
-
-#. Translators: "Done" communicates to a student that their response
-#. has been fully graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid "Done"
-msgstr "Завершено"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid ""
-"We could not find a file in your submission. Please try choosing a file or "
-"pasting a URL to your file into the answer box."
-msgstr ""
-"В вашей заявке нет прикрепленного файла. Пожалуйста, выберите файл на своем "
-"компьютере или вставьте ссылку в поле для ответа."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid ""
-"We are having trouble saving your file. Please try another file or paste a "
-"URL to your file into the answer box."
-msgstr ""
-"Мы не можем сохранить ваш файл. Пожалуйста, укажите другой файл или вставьте"
-" ссылку в поле для ответа."
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py
-msgid "Error saving your score.  Please notify course staff."
-msgstr ""
-"Ошибка при сохранении Вашей оценки.  Пожалуйста, сообщите сотрудникам курса."
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Show Single Problem"
-msgstr "Показать одно задание"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"When True, only the single problem specified by \"Link to Problem Location\""
-" is shown. When False, a panel is displayed with all problems available for "
-"peer grading."
-msgstr ""
-"Если значение этого параметра «True», будет отображаться только одно "
-"задание, указанное в поле «Ссылка на местонахождение задания».  Если "
-"значение параметра - «False», отображается перечень всех заданий, доступных "
-"для оценки однокурсниками."
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Link to Problem Location"
-msgstr "Ссылка на задание"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"The location of the problem being graded. Only used when \"Show Single "
-"Problem\" is True."
-msgstr ""
-"Местонахождение оцениваемого задания.  Используется только если настройке "
-"«Показать одно задание» присвоено значение «True»."
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"Defines whether the student gets credit for grading this problem. Only used "
-"when \"Show Single Problem\" is True."
-msgstr ""
-"Определяет, должен ли студент получить  кредит для решения этой проблемы. "
-"Используется только когда \"Показывают одно задание\" присвоено значение "
-"«True»."
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Due date that should be displayed."
-msgstr "Отображаемый срок сдачи."
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Amount of grace to give on the due date."
-msgstr "Льготный период, предоставляемый по истечении срока сдачи."
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Student data for a given peer grading problem."
-msgstr "Данные студента для этого задания, подлежащего взаимному оцениваю. "
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Peer Grading Interface"
-msgstr "Интерфейс взаимной проверки"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
@@ -5630,7 +4952,6 @@ msgstr "Дальнейшая информация о достижениях {ful
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/staff_problem_info.html
@@ -5665,7 +4986,6 @@ msgid "Percent of Students"
 msgstr "Процент студентов"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/folditchallenge.html
 msgid "Score"
 msgstr "Балл"
 
@@ -5958,6 +5278,61 @@ msgstr "Сертификат уже создан"
 #: lms/djangoapps/courseware/views.py
 msgid "Certificate is being created."
 msgstr "Создание сертификата"
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
+"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
+" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "Annual Household Income"
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your current financial situation. Why do you need assistance?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your learning or professional goals. How will a Verified "
+"Certificate in this course help you achieve these goals?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Tell us about your plans for this course. What steps will you take to help "
+"you complete the course work and receive a certificate?"
+msgstr ""
+"Расскажите нам о ваших планах. Какие шаги вы предпримете, чтобы завершить "
+"курсовую работу и получить сертификат?"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Use between 250 and 500 words or so in your response."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"Select the course for which you want to earn a verified certificate. If the "
+"course does not appear in the list, make sure that you have enrolled in the "
+"audit track for the course."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "income in US Dollars ($)"
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "Specify your annual household income in US Dollars."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid ""
+"I allow edX to use the information provided in this application (except for "
+"financial information) for edX marketing purposes."
+msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
@@ -6301,7 +5676,7 @@ msgstr "Администраторы {platform_name}"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
-msgstr "Сотрудники Курса"
+msgstr "Сотрудники курса"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
@@ -6451,7 +5826,6 @@ msgstr "Идентификатор пользователя"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: openedx/core/djangoapps/user_api/views.py
-#: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "Электронная почта"
@@ -6817,32 +6191,30 @@ msgstr ""
 "Пожалуйста обновите страницу и попробуйте ещё раз."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invalid Json data, Please refresh the page and then try again."
-msgstr "Получены неверные JSON-данные. Пожалуйста обновите страницу."
+msgid ""
+"The record is not in the correct format. Please add a valid username or "
+"email address."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Student username/email field is required and can not be empty. Kindly fill "
-"in username/email and then press \"Add Exception\" button."
+"in username/email and then press \"Add to Exception List\" button."
 msgstr ""
-"Имя пользователя/адрес электронной почты не могут быть пустыми. Заполните "
-"это поле и нажмите кнопку \"Добавить в исключения\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"We can't find the user (username/email={user}) you've entered. Make sure the"
-" username or email address is correct, then try again."
+"{user} does not exist in the LMS. Please check your spelling and retry."
 msgstr ""
-"Мы не нашли пользователя (username/email={user}). Проверьте, что вы "
-"правильно ввели имя пользователя или адрес электронной почты. "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"The user (username/email={user}) you have entered is not enrolled in this "
-"course. Make sure the username or email address is correct, then try again."
+"{user} is not enrolled in this course. Please check your spelling and retry."
 msgstr ""
-"Пользователь (username/email={user}) не зачислен на этот курс. Проверьте, "
-"что вы правильно ввели имя пользователя или адрес электронной почты."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid Json data, Please refresh the page and then try again."
+msgstr "Получены неверные JSON-данные. Пожалуйста обновите страницу."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invalid data, user_id must be present for all certificate exceptions."
@@ -6854,8 +6226,8 @@ msgstr ""
 "Начата процедура выпуска сертификатов для студентов из списка исключений."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "user \"{user}\" in row#    {row}"
-msgstr "пользователь \"{user}\" в строке#    {row}"
+msgid "user \"{user}\" in row# {row}"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "user \"{username}\" in row# {row}"
@@ -6995,7 +6367,6 @@ msgid "Analytics"
 msgstr "Аналитика"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Metrics"
 msgstr "Показатели"
 
@@ -7027,119 +6398,6 @@ msgstr "Завершено"
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "Не завершено"
-
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Course Statistics At A Glance"
-msgstr "Краткие Статистические Данные Курса"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "List of students enrolled in {course_key}"
-msgstr "Список студентов, зарегистрированных на курс {course_key}"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Raw Grades of students enrolled in {course_key}"
-msgstr "Предварительные оценки студентов, зачисленных на курс {course_key}"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Assignment Name"
-msgstr "Наименование Задания"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Please enter an assignment name"
-msgstr "Пожалуйста, введите наименование задания"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Invalid assignment name '{name}'"
-msgstr "Неверное назначение имени '{name}'"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "External email"
-msgstr "Внешний электронный адрес"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Grades for assignment \"{name}\""
-msgstr "Оценки за задание «{name}»"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Grades from {course_id}"
-msgstr "Оценки курса {course_id}"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "No remote gradebook defined in course metadata"
-msgstr "В метаданных курса не задан удалённый журнал оценок"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "No remote gradebook url defined in settings.FEATURES"
-msgstr ""
-"В настройках settings.FEATURES не определён адрес удалённого журнала оценок."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "No gradebook name defined in course remote_gradebook metadata"
-msgstr "В курсе не определено имя книги оценок remote_gradebook metadata"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Failed to communicate with gradebook server at {url}"
-msgstr "Не удалось связаться с сервером книги оценок {url}"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: {err}"
-msgstr "Ошибка: {err}"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Remote gradebook response for {action}"
-msgstr "Ответ удалённого журнала оценок на {action}"
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's full name.
-#: lms/djangoapps/instructor/views/legacy.py
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Full name"
-msgstr "Полное имя"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "{title} in course {course_key}"
-msgstr "{title} в курсе {course_key}"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "ID"
-msgstr "Идентификатор"
-
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Full Name"
-msgstr "Полное имя"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "edX email"
-msgstr "электронный адрес edX"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Enrollment of students"
-msgstr "Регистрация студентов"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Un-enrollment of students"
-msgstr "Отмена регистрации студентов"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid ""
-"Failed to find any background tasks for course \"{course}\", module "
-"\"{problem}\" and student \"{student}\"."
-msgstr ""
-"Невозможно найти фоновые задачи для курса «{course}», модуля «{problem}» и "
-"студента «{student}»."
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid ""
-"Failed to find any background tasks for course \"{course}\" and module "
-"\"{problem}\"."
-msgstr ""
-"Невозможно найти фоновые задачи для курса «{course}» и модуля «{problem}»."
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid ""
@@ -7187,6 +6445,14 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 msgid "No due date extension is set for that student and unit."
 msgstr "Срок сдачи задания в этом блоке не был продлён для этого студента."
+
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Full Name"
+msgstr "Полное имя"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Extended Due Date"
@@ -7508,6 +6774,8 @@ msgstr ""
 msgid "Courseware Chrome"
 msgstr "Навигация по содержанию курса"
 
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
 "Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
@@ -7543,18 +6811,6 @@ msgid "Enter the source file name for LaTeX."
 msgstr "Введите имя исходного файла для LaTeX"
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Course Is Public"
-msgstr "Курс доступен"
-
-#: lms/djangoapps/lms_xblock/mixin.py
-msgid ""
-"Enter true or false. If true, the course is open to the public. If false, "
-"the course is open only to admins."
-msgstr ""
-"Введите true или false. Если введено true, курс будет открыт для общего "
-"доступа. Если введено false, курс будет доступен только администраторам."
-
-#: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
 "A dictionary that maps which groups can be shown this block. The keys are "
 "group configuration ids and the values are a list of group IDs. If there is "
@@ -7585,131 +6841,6 @@ msgstr ""
 #: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Мои заметки"
-
-#: lms/djangoapps/open_ended_grading/staff_grading_service.py
-msgid ""
-"Could not contact the external grading server. Please contact the "
-"development team at {email}."
-msgstr ""
-"Не удалось связаться с внешним сервером для получения оценки. Пожалуйста, "
-"свяжитесь с командой разработчиков по адресу {email}."
-
-#: lms/djangoapps/open_ended_grading/staff_grading_service.py
-msgid ""
-"Cannot find any open response problems in this course. Have you submitted "
-"answers to any open response assessment questions? If not, please do so and "
-"return to this page."
-msgstr ""
-"В этом курсе не найдены задания с ответом в свободной форме.  Отправили ли "
-"вы на проверку работу на одно из заданий с ответом в свободной форме? Если "
-"нет, пожалуйста, сделайте это и вернитесь к данной странице."
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid "AI Assessment"
-msgstr "Автоматическое оценивание"
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid "Peer Assessment"
-msgstr "Взаимное оценивание"
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid "Not yet available"
-msgstr "Пока не доступно"
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid "Automatic Checker"
-msgstr "Автоматическая проверка"
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid "Instructor Assessment"
-msgstr "Оценивание преподавателями"
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid ""
-"Error occurred while contacting the grading service.  Please notify course "
-"staff."
-msgstr ""
-"При связи с сервисом оценок произошла ошибка. Пожалуйста, сообщите "
-"сотрудникам курса."
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid ""
-"Error occurred while contacting the grading service.  Please notify your edX"
-" point of contact."
-msgstr ""
-"При связи с сервисом оценок произошла ошибка. Пожалуйста, сообщите вашему "
-"контактному лицу в edX."
-
-#: lms/djangoapps/open_ended_grading/utils.py
-msgid "for course {0} and student {1}."
-msgstr "для курса {0} и студента {1}"
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid ""
-"View all problems that require peer assessment in this particular course."
-msgstr "Посмотреть все задания, требующие взаимной оценки в этом курсе."
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid ""
-"View ungraded submissions submitted by students for the open ended problems "
-"in the course."
-msgstr ""
-"Посмотреть ещё не оцененные задания с открытым ответом, полученные от "
-"студентов в этом курсе."
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid ""
-"View open ended problems that you have previously submitted for grading."
-msgstr "Посмотреть задания с открытым ответом, отправленные Вами на проверку."
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid "View submissions that have been flagged by students as inappropriate."
-msgstr "Посмотреть материалы, помеченные студентами как неуместные. "
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid "New submissions to grade"
-msgstr "Новые материалы для проверки"
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid "New grades have been returned"
-msgstr "Появились новые оценки"
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid "Submissions have been flagged for review"
-msgstr "Присланные материалы были помечены как рассматриваемые"
-
-#: lms/djangoapps/open_ended_grading/views.py
-#: lms/templates/instructor/staff_grading.html
-msgid "Staff grading"
-msgstr "Оценивание персонала"
-
-#. Translators: "Peer grading" appears on a tab that allows
-#. students to view open-ended problems that require grading
-#: lms/djangoapps/open_ended_grading/views.py
-msgid "Peer grading"
-msgstr "Просмотр взаимооценок"
-
-#. Translators: "Open Ended Panel" appears on a tab that, when clicked, opens
-#. up a panel that
-#. displays information about open-ended problems that a user has submitted or
-#. needs to grade
-#: lms/djangoapps/open_ended_grading/views.py
-msgid "Open Ended Panel"
-msgstr "Ответы в свободной форме"
-
-#: lms/djangoapps/open_ended_grading/views.py
-msgid ""
-"\n"
-"        Error with initializing peer grading.\n"
-"        There has not been a peer grading module created in the courseware that would allow you to grade others.\n"
-"        Please check back later for this.\n"
-"        "
-msgstr ""
-"\n"
-"        Ошибка при попытке начать оценивание заданий другого участника.\n"
-"        В содержании этого курса пока нет модуля, который позволял бы участникам оценивать друг друга.\n"
-"        Пожалуйста, попробуйте позже.\n"
-"        "
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -8324,9 +7455,9 @@ msgstr ""
 "К сожалению, наша система платежей прислала подтверждение оплаты с "
 "противоречивыми данными.  Примите наши извинения: мы не можем проверить, "
 "прошёл ли платёж, и предпринять дальнейшие действия в отношении Вашего "
-"заказа.  Содержание сообщения об ошибке: {error_message}.  Возможно, "
-"денежные средства были сняты с Вашей кредитной карты.  По вопросам оплаты "
-"свяжитесь с нами по адресу {email}."
+"заказа.  Содержание сообщения об ошибке: {msg}.  Возможно, денежные средства"
+" были сняты с Вашей кредитной карты.  По вопросам оплаты свяжитесь с нами по"
+" адресу {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -9188,11 +8319,6 @@ msgstr "Организация"
 msgid "Course Type"
 msgstr "Вид курса"
 
-#: lms/envs/devstack.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Honor"
-msgstr "Сертификат Кодекса чести"
-
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
@@ -9943,8 +9069,8 @@ msgid ""
 "*after* paying for the credit to get credit for a credit course against a "
 "credit provider."
 msgstr ""
-"Текст или HTML-код с дальнейшими инструкциями по оформлению кредита на "
-"обучение. Они появятся на странице с квитанцией только после оплаты кредита."
+"Текст или HTML-код с дальнейшими инструкциями по оформлению зачётных единиц."
+" Он появится на странице с квитанцией только после оплаты."
 
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
@@ -9985,6 +9111,30 @@ msgstr "КБ"
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "MB"
 msgstr "МБ"
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "The file must be smaller than {image_max_size} in size."
+msgstr ""
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "The file must be at least {image_min_size} in size."
+msgstr ""
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "The file must be one of the following types: {valid_file_types}."
+msgstr ""
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid ""
+"The Content-Type header for this file does not match the file data. The file"
+" may be corrupted."
+msgstr ""
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid ""
+"The file name extension for this file does not match the file data. The file"
+" may be corrupted."
+msgstr ""
 
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
@@ -10129,6 +9279,12 @@ msgid ""
 msgstr ""
 "Кажется {username} уже используется. Попробуйте ещё раз с другим именем "
 "пользователя."
+
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Full name"
+msgstr "Полное имя"
 
 #. Translators: This example name is used as a placeholder in
 #. a field on the registration form meant to hold the user's name.
@@ -10415,6 +9571,16 @@ msgstr ""
 "Невозможно создать курс с именем'{name}'\n"
 "\n"
 "{err}"
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
+"You must link this course to an organization in order to continue. "
+"Organization you selected does not exist in the system, you will need to add"
+" it to the system"
+msgstr ""
+"Вы должны привязать этот курс к организации, прежде чем продолжить. "
+"Организация, которую вы выбрали, не существует в системе, вам нужно будет "
+"добавить её"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
@@ -10829,7 +9995,7 @@ msgstr ""
 "курсы."
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Account"
 msgstr "Учётная запись"
 
@@ -10839,7 +10005,8 @@ msgid "Help"
 msgstr "Помощь"
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Выйти"
 
@@ -10895,12 +10062,9 @@ msgstr "Получайте зачётные баллы с помощью под�
 msgid ""
 "Become eligible for academic credit and highlight your new skills and "
 "knowledge with a verified certificate. Use this valuable credential to "
-"qualify for academic credit from {org}, advance your career, or strengthen "
-"your school applications."
+"qualify for academic credit, advance your career, or strengthen your school "
+"applications."
 msgstr ""
-"Получите зачётные баллы и подтвердите знания и навыки с помощью специального"
-" сертификата. Используйте его, чтобы получить баллы в ВУЗах {org}, "
-"устроиться на работу и построить карьеру."
 
 #: common/templates/course_modes/choose.html
 msgid "Benefits of a Verified Certificate"
@@ -10979,49 +10143,31 @@ msgstr ""
 "финансировать свободное образование для всех, глобально"
 
 #: common/templates/course_modes/choose.html
-msgid "Earn an Honor Certificate"
-msgstr "Заработайте сертификат Кодекса Чести"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Take this course for free and have complete access to all the course "
-"material, activities, tests, and forums. Please note that learners who earn "
-"a passing grade will earn a certificate in this course."
-msgstr ""
-"Пройдите этот курс бесплатно и получите полный доступ ко всем учебным "
-"материалам, деятельности, тестам, и форумам. Пожалуйста, обратите внимание, "
-"что учащиеся, которые зарабатывают на проходной балл, получат сертификат "
-"этого курса."
-
-#: common/templates/course_modes/choose.html
-msgid "Pursue an Honor Certificate"
-msgstr "Заниматься получением  Сертификата Кодекса Чести"
-
-#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "Просмотреть этот курс"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums.  Please note that this track does "
-"not offer a certificate for learners who earn a passing grade."
+"material, activities, tests, and forums."
 msgstr ""
-"Пройдите этот курс бесплатно и получите полный доступ ко всем учебным "
-"материалам, деятельности, тестам, и форумам. Пожалуйста, обратите внимание, "
-"что этот трек не предлагает сертификат для тех учащихся, которые "
-"зарабатывают на проходной балл."
 
-#: lms/templates/admin_dashboard.html
-msgid "{platform_name}-wide Summary"
-msgstr "Сводка по {platform_name}"
+#: common/templates/course_modes/choose.html
+msgid "Audit This Course (No Certificate)"
+msgstr ""
+
+#. Translators: b_start notes the beginning of a section of text bolded for
+#. emphasis, and b_end marks the end of the bolded text.
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums.  {b_start}Please note that this "
+"track does not offer a certificate for learners who earn a passing "
+"grade.{b_end}"
+msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
-#: lms/templates/instructor/staff_grading.html
-#: lms/templates/open_ended_problems/combined_notifications.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-#: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
 msgstr "Инструкции"
@@ -11048,7 +10194,7 @@ msgid "Starts"
 msgstr "Начало"
 
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
 msgstr "Панель управления"
 
@@ -11179,53 +10325,16 @@ msgstr "Отладка:"
 msgid "External Authentication failed"
 msgstr "Ошибка внешней аутентификации"
 
-#: lms/templates/folditbasic.html
-msgid "Due:"
-msgstr "Срок:"
-
-#: lms/templates/folditbasic.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-msgid "Status:"
-msgstr "Статус:"
-
-#: lms/templates/folditbasic.html
-msgid "You have successfully gotten to level {goal_level}."
-msgstr "Вы успешно достигли уровня {goal_level}."
-
-#: lms/templates/folditbasic.html
-msgid "You have not yet gotten to level {goal_level}."
-msgstr "Вы ещё не достигли уровня {goal_level}."
-
-#: lms/templates/folditbasic.html
-msgid "Completed puzzles"
-msgstr "Решенные головоломки"
-
-#: lms/templates/folditbasic.html
-msgid "Level"
-msgstr "Уровень"
-
-#: lms/templates/folditbasic.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Submitted"
-msgstr "Отправлено"
-
-#: lms/templates/folditchallenge.html
-msgid "Puzzle Leaderboard"
-msgstr "Рейтинговая таблица головоломок"
-
-#: lms/templates/folditchallenge.html
-msgid "User"
-msgstr "Пользователь"
-
-#: lms/templates/footer-edx-v3.html
+#: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"
 msgstr "Нижний колонтитул страницы"
 
-#: lms/templates/footer-edx-v3.html
+#: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
 msgid "About edX"
 msgstr "Об edX"
 
 #: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "Юридическая информация"
@@ -11327,9 +10436,6 @@ msgstr ""
 
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 msgid "Submit"
@@ -11503,7 +10609,7 @@ msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
-"Теперь вы можете начать изучать курсы {platform name}, используя свой "
+"Теперь вы можете начать изучать курсы {platform_name}, используя свой "
 "внешний <a rel=\"external\" href=\"http://openid.net/\">аккаунт OpenID "
 "account</a>."
 
@@ -11517,7 +10623,7 @@ msgstr "Зарегистрируйтесь для доступа к {platform_na
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
-msgstr "Нужна помощь при входе или с вашим   {platform name} аккаунтом?"
+msgstr "Нужна помощь при входе или с вашим   {platform_name} аккаунтом?"
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -11698,55 +10804,64 @@ msgid "Raw data:"
 msgstr "Необработанные данные:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} Главная страница"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "How it Works"
 msgstr "Как это работает"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
 msgstr "Найти курсы"
 
-#: lms/templates/navigation-edx.html
+#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
 msgid "Schools & Partners"
 msgstr "Учебные заведения и партнеры"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Dashboard for:"
 msgstr "Панель управления для:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "More options dropdown"
 msgstr "Меню с дополнительными опциями"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Profile"
 msgstr "Профиль"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/shoppingcart/shopping_cart.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Shopping Cart"
 msgstr "Корзина"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "Вход"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/register.html
+#: lms/templates/register.html themes/edx.org/lms/templates/header.html
 msgid "Register"
 msgstr "Регистрация"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
@@ -11786,8 +10901,6 @@ msgid "Reset"
 msgstr "Сбросить"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "Сохранить"
@@ -12096,7 +11209,7 @@ msgid ""
 "'{group_configuration_name}'."
 msgstr ""
 "Для этого экспериментального материала используется конфигурация группы "
-"'{experiment_name}'."
+"'{group_configuration_name}'."
 
 #: lms/templates/split_test_author_view.html
 msgid "Active Groups"
@@ -12327,6 +11440,7 @@ msgid "Error"
 msgstr "Ошибка"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/ccx/schedule.html
 msgid "Date"
 msgstr "Дата"
 
@@ -12637,7 +11751,6 @@ msgid "Name your CCX"
 msgstr "Дайте название своему CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Enrollment"
 msgstr "Запись на курс"
 
@@ -12790,6 +11903,10 @@ msgstr ""
 "минут"
 
 #: lms/templates/ccx/schedule.html
+msgid "Time"
+msgstr ""
+
+#: lms/templates/ccx/schedule.html
 msgid "Set date"
 msgstr "Выбрать дату"
 
@@ -12817,6 +11934,10 @@ msgstr ""
 "формат четырёхзначное числовое обозначение года тире двузначное числовое "
 "обозначение месяца тире двузначное числовое обозначение дня"
 
+#: lms/templates/ccx/schedule.html
+msgid "yyyy-mm-dd"
+msgstr ""
+
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of HH:MM
 #: lms/templates/ccx/schedule.html
@@ -12824,6 +11945,10 @@ msgid "Start time format two digit hours colon two digit minutes"
 msgstr ""
 "Формат времени двузначное количество часов двоеточие двузначное количество "
 "минут"
+
+#: lms/templates/ccx/schedule.html
+msgid "time"
+msgstr ""
 
 #: lms/templates/ccx/schedule.html
 msgid "(Optional)"
@@ -12956,172 +12081,6 @@ msgid ""
 msgstr ""
 "Если все данные введены верно и ошибка повторяется, свяжитесь с технической "
 "поддержкой."
-
-#: lms/templates/combinedopenended/combined_open_ended.html
-msgid "Open Response"
-msgstr "Ответ в свободной форме"
-
-#: lms/templates/combinedopenended/combined_open_ended.html
-msgid "Assessments:"
-msgstr "Оценка"
-
-#: lms/templates/combinedopenended/combined_open_ended.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Hide Question"
-msgstr "Скрыть вопрос"
-
-#: lms/templates/combinedopenended/combined_open_ended.html
-msgid "New Submission"
-msgstr "Новое задание"
-
-#: lms/templates/combinedopenended/combined_open_ended.html
-msgid "Next Step"
-msgstr "Следующий шаг"
-
-#: lms/templates/combinedopenended/combined_open_ended.html
-msgid ""
-"Staff Warning: Please note that if you submit a duplicate of text that has "
-"already been submitted for grading, it will not show up in the staff grading"
-" view.  It will be given the same grade that the original received "
-"automatically, and will be returned within 30 minutes if the original is "
-"already graded, or when the original is graded if not."
-msgstr ""
-"Предупреждение. Если вы отправляете копию текста, уже поданного на оценку, "
-"он не появится в списке оцениваемых. Если исходный вариант уже был оценен, "
-"копия будет возвращена в течение 30 минут с той же оценкой. Если работа ещё "
-"не проверена, это произойдет при проставлении оценки."
-
-#: lms/templates/combinedopenended/combined_open_ended_legend.html
-msgid "Legend"
-msgstr "Легенда"
-
-#: lms/templates/combinedopenended/combined_open_ended_results.html
-msgid "Submitted Rubric"
-msgstr "Присланные рубрики"
-
-#: lms/templates/combinedopenended/combined_open_ended_results.html
-msgid "Toggle Full Rubric"
-msgstr "Переключить на полную рубрику"
-
-#. Translators: an example of what this string will look
-#. like is: "Scored rubric from grader 1", where
-#. "Scored rubric" replaces {result_of_task} and
-#. "1" replaces {number}.
-#. This string appears when a user is viewing one of
-#. their graded rubrics for an openended response problem.
-#. the number distinguishes between the different
-#. graded rubrics the user might have received
-#: lms/templates/combinedopenended/combined_open_ended_results.html
-msgid "{result_of_task} from grader {number}"
-msgstr "{result_of_task} от оценивающего номер {number}"
-
-#. Translators: "See full feedback" is the text of
-#. a link that allows a user to see more detailed
-#. feedback from a self, peer, or instructor
-#. graded openended problem
-#: lms/templates/combinedopenended/open_ended_result_table.html
-msgid "See full feedback"
-msgstr "Просмотреть все отзывы"
-
-#. Translators: this text forms a link that, when
-#. clicked, allows a user to respond to the feedback
-#. the user received on his or her openended problem
-#. Translators: when "Respond to Feedback" is clicked, a survey
-#. appears on which a user can respond to the feedback the user
-#. received on an openended problem
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Respond to Feedback"
-msgstr "Ответить на отзывы"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "How accurate do you find this feedback?"
-msgstr "Насколько точным вы находите этот отзыв?"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Partially Correct"
-msgstr "Частично верно"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "No Opinion"
-msgstr "Нет определённого мнения"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Partially Incorrect"
-msgstr "Частично неверно"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Additional comments:"
-msgstr "Дополнительные комментарии:"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Submit Feedback"
-msgstr "Отправить отзыв"
-
-#. Translators: "Response" labels an area that contains the user's
-#. Response to an openended problem. It is a noun.
-#. Translators: "Response" labels a text area into which a user enters
-#. his or her response to a prompt from an openended problem.
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Response"
-msgstr "Ответ"
-
-#. Translators: This is a menu option for showing only unanswered forum
-#. question threads
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Unanswered"
-msgstr "Без ответа"
-
-#: lms/templates/combinedopenended/openended/open_ended.html
-msgid "Skip Post-Assessment"
-msgstr "Пропустить шаг, следующий за оцениванием"
-
-#: lms/templates/combinedopenended/openended/open_ended_combined_rubric.html
-msgid "{num} point: {explanatory_text}"
-msgid_plural "{num} points: {explanatory_text}"
-msgstr[0] "{num} балл: {explanatory_text}"
-msgstr[1] "{num} балла: {explanatory_text}"
-msgstr[2] "{num} баллов: {explanatory_text}"
-msgstr[3] "{num} баллов. {explanatory_text}"
-
-#: lms/templates/combinedopenended/openended/open_ended_error.html
-msgid "There was an error with your submission.  Please contact course staff."
-msgstr ""
-"При сохранении вашего отзыва произошла ошибка.  Пожалуйста, свяжитесь с "
-"сотрудниками курса."
-
-#: lms/templates/combinedopenended/openended/open_ended_rubric.html
-msgid "Rubric"
-msgstr "Оценивание"
-
-#: lms/templates/combinedopenended/openended/open_ended_rubric.html
-msgid ""
-"Select the criteria you feel best represents this submission in each "
-"category."
-msgstr ""
-"Выберите критерий, которому эта работа больше всего соответствует в каждой "
-"категории."
-
-#: lms/templates/combinedopenended/openended/open_ended_rubric.html
-msgid "{num} point: {text}"
-msgid_plural "{num} points: {text}"
-msgstr[0] "{num} балл: {text}"
-msgstr[1] "{num} балла: {text}"
-msgstr[2] "{num} баллов: {text}"
-msgstr[3] "{num} баллов. {text}"
-
-#: lms/templates/combinedopenended/selfassessment/self_assessment_hint.html
-msgid "Please enter a hint below:"
-msgstr "Введите подсказку ниже:"
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
@@ -13449,268 +12408,6 @@ msgstr "Важные даты курса"
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
 msgstr "Дополнительные материалы по курсу"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Legacy Instructor Dashboard"
-msgstr "Панель управления преподавателя: предыдущая версия"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "View Course in Studio"
-msgstr "Просмотр курса в Studio"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Back To Instructor Dashboard"
-msgstr " Вернуться к Панели Управления Преподавателя"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"You are using the legacy instructor dashboard, which we will retire in the "
-"near future."
-msgstr ""
-"Вы используете предыдущую версию панели управления преподавателя, которая "
-"вскоре будет выведена из эксплуатации."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Return to the Instructor Dashboard"
-msgstr "Вернуться к панели управления преподавателя"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"If the Instructor Dashboard is missing functionality, please contact your PM"
-" to let us know."
-msgstr ""
-"Если какие-либо свойства Панели управления преподавателя не функционируют, "
-"пожалуйста, дайте нам знать, связавшись со своим менеджером продукта."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Psychometrics"
-msgstr "Психометрика"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Admin"
-msgstr "Администратор"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Forum Admin"
-msgstr "Администратор форума"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "DataDump"
-msgstr "Хранилище данных"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Manage Groups"
-msgstr "Руководить группами"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Grade Downloads"
-msgstr "Скачивание оценок"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"Note: some of these buttons are known to time out for larger courses. We "
-"have disabled those features for courses with more than {max_enrollment} "
-"students."
-msgstr ""
-"Заметьте: некоторые из этих кнопок известны для ограничения времени для "
-"больших курсов. Мы отключили те свойства для курсов с более чем "
-"{max_enrollment} студентов. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To download student grades and view the grading configuration for your "
-"course, visit the Data Download section of the Instructor Dashboard."
-msgstr ""
-"Чтобы скачать студенческие оценки и посмотреть оценочную конфигурацию для "
-"Вашего курса, посетите раздел загрузки данных преподавательской панели "
-"управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To view the Gradebook (only available for courses with a small number of "
-"enrolled students), visit the Student Admin section of the Instructor "
-"Dashboard."
-msgstr ""
-"Чтобы посмотреть зачетную книжку (доступно только для курсов с малым "
-"количеством зачисленных студентов), посетите студенческий админ-раздел "
-"преподавательской панели управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Export grades to remote gradebook"
-msgstr "Экспортировать оценки в удалённый журнал"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"The assignments defined for this course should match the ones stored in the "
-"gradebook, for this to work properly!"
-msgstr ""
-"Задания, определенные для этого курса, должны совпадать с теми, которые "
-"хранятся в журнале, чтобы он работал правильно!"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Gradebook name:"
-msgstr "Имя журнала:"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Assignment name:"
-msgstr "Название задания:"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Course-specific grade adjustment"
-msgstr "Коррекция оценок для конкретных курсов"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To perform these actions, visit the Student Admin section of the Instructor "
-"Dashboard."
-msgstr ""
-"Чтобы выполнить эти действия, посетите студенческий админ-раздел "
-"преподавательской панели управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Student-specific grade inspection and adjustment"
-msgstr "Просмотр и коррекция оценок конкретных студентов"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Select a problem and an action:"
-msgstr "Выбрать задачу и действие:"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To add or remove course staff or instructors, visit the Membership section "
-"of the Instructor Dashboard."
-msgstr ""
-"Чтобы добавить или удалить сотрудников курса или преподавателей, посетите "
-"раздел членства преподавательской панели управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To manage forum roles, visit the Membership section of the Instructor "
-"Dashboard."
-msgstr ""
-"Чтобы управлять ролями на форуме, посетите раздел членства преподавательской"
-" панели управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Enrollment Data"
-msgstr "Данные внесения в список"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To download a CSV file containing profile information for students who are "
-"enrolled in this course, visit the Data Download section of the Instructor "
-"Dashboard."
-msgstr ""
-"Чтобы скачать файл в формате CSV с личными данными студентов, "
-"зарегистрированных на этот курс, перейдите к разделу Скачивание данных на "
-"Панели управления преподавателя."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To download a list of students who may enroll in this course but have not "
-"yet signed up for it, visit the Data Download section of the Instructor "
-"Dashboard."
-msgstr ""
-"Чтобы скачать список студентов, которые имеют возможность зарегистрироваться"
-" на курс, но еще не записались на него, перейдите к разделу Скачивание "
-"Данных на Панели Управления Преподавателя."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Pull enrollment from remote gradebook"
-msgstr "Откройте список из удалённого журнала"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Section:"
-msgstr "Раздел:"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To download a CSV listing student responses to a given problem, visit the "
-"Data Download section of the Instructor Dashboard."
-msgstr ""
-"Чтобы скачать файл CSV со списком ответов студентов для данного задания, "
-"перейдите в раздел «Скачивание данных» в Панели управления преподавателя."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To download student profile data and anonymized IDs, visit the Data Download"
-" section of the Instructor Dashboard."
-msgstr ""
-"Чтобы скачать студенческие личные данные и анонимные идентификаторы, "
-"посетите раздел загрузки данных преподавательской панели управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To manage beta tester roles and cohorts, visit the Membership section of the"
-" Instructor Dashboard."
-msgstr ""
-"Для управления ролями бета тестеров и студенческими группами перейдите к "
-"разделу \"Участники\" на панели управления преподавателя."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"To manage beta tester roles, visit the Membership section of the Instructor "
-"Dashboard."
-msgstr ""
-"Чтобы управлять ролями в бета тестере, посетите раздел членства "
-"преподавательской панели управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "To send email, visit the Email section of the Instructor Dashboard."
-msgstr ""
-"Чтобы отправить email, посетите раздел Email преподавательской панели "
-"управления. "
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Pending Instructor Tasks"
-msgstr "Текущие задания преподавателя"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Task Type"
-msgstr "Тип задания"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Task inputs"
-msgstr "Ввод задания"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Task Id"
-msgstr "Идентификатор задания"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Requester"
-msgstr "Запрашивающий"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Task State"
-msgstr "Состояние задания"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Duration (sec)"
-msgstr "Продолжительность (сек)"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Task Progress"
-msgstr "Прогресс задания"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "unknown"
-msgstr "неизвестно"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"View course statistics in the Admin section of this legacy instructor "
-"dashboard."
-msgstr ""
-"Просмотр статистики курса в админ-разделе этой открывшейся преподавательской"
-" панели управления."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Course errors"
-msgstr "Ошибки курса"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -14237,16 +12934,9 @@ msgid ""
 "{unenroll_link_start}unenroll{unenroll_link_end} from this course"
 msgstr ""
 "Вы не можете получить доступ к этому курсу, так как оплата еще не "
-"произведена. Вы можете {link_start} связаться с владельцем счета{link_end} ,"
-" чтобы запросить оплату или Вы можете {unenroll_link_start}  отменить "
-"доступ{unenroll_link_end} для этого курса"
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"An error occurred with this transaction. For help, contact {support_email}."
-msgstr ""
-"При выполнении операции возникла ошибка. Обращайтесь за помощью по адресу "
-"{support_email}."
+"произведена. Вы можете {contact_link_start}связаться с владельцем "
+"счета{contact_link_end} , чтобы запросить оплату или Вы можете "
+"{unenroll_link_start}отменить доступ{unenroll_link_end} для этого курса"
 
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)
@@ -14262,8 +12952,20 @@ msgstr ""
 msgid "Get Credit"
 msgstr "Получить зачёт"
 
-#. Translators: provider_name is the name of a credit provider or university
-#. (e.g. State University)
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a  credit provider, such as 'State
+#. University' or 'Happy Fun Company'.
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"Thank you for your payment. To receive course credit, you must now request "
+"credit at the {link_to_provider_site} website. Select <b>Request Credit</b> "
+"to get started."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Request Credit"
+msgstr ""
+
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "{provider_name} has received your course credit request. We will update you "
@@ -14272,27 +12974,14 @@ msgstr ""
 "{provider_name} получил ваш запрос на зачётные единицы. Мы обновим ваши "
 "баллы, после того как проверка будет завершена."
 
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'.
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Thank you for your payment. To receive course credit, you must now request "
-"credit at the {link_to_provider_site}  website. Select <b>Request Credit</b>"
-" to get started."
-msgstr ""
-"Благодарим Вас за оплату. Теперь для получения зачёта Вам необходимо "
-"отправить соответствующий запрос на веб-сайте {link_to_provider_site}. "
-"Нажмите <b>Запросить зачёт</b> для начала."
-
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Details"
 msgstr "Подробнее"
 
 #. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'.
-#. provider_name is the name of credit provider.
+#. text of the link will be the name of a credit provider, such as 'State
+#. University' or 'Happy Fun Company'. provider_name is the name of credit
+#. provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "<b>Congratulations!</b> {provider_name} has approved your request for course"
@@ -14306,10 +12995,6 @@ msgstr ""
 msgid "View Credit"
 msgstr "Посмотреть баллы"
 
-#. Translators: link_to_provider_site is a link to an external webpage. The
-#. text of the link will be the name of a
-#. credit provider, such as 'State University' or 'Happy Fun Company'.
-#. provider_name is the name of credit provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "{provider_name} did not approve your request for course credit. For more "
@@ -14317,6 +13002,13 @@ msgid ""
 msgstr ""
 "{provider_name} не утвердил ваш запрос о зачётных единицах. Для получения "
 "дополнительной информации, свяжитесь с {link_to_provider_site} напрямую."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"An error occurred with this transaction. For help, contact {support_email}."
+msgstr ""
+"При выполнении операции возникла ошибка. Обращайтесь за помощью по адресу "
+"{support_email}."
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -14480,6 +13172,12 @@ msgstr "Показать всё"
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread"
 msgstr "Непрочитанные"
+
+#. Translators: This is a menu option for showing only unanswered forum
+#. question threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Unanswered"
+msgstr "Без ответа"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
@@ -15426,75 +14124,65 @@ msgstr ""
 msgid "Donation Actions"
 msgstr "Пожертвования"
 
-#: lms/templates/instructor/staff_grading.html
-msgid "{course_number} Staff Grading"
-msgstr "{course_number} оценивание персонала"
-
-#: lms/templates/instructor/staff_grading.html
-msgid ""
-"This is the list of problems that currently need to be graded in order to "
-"train AI grading and create calibration essays for peer grading. Each "
-"problem needs to be treated separately, and we have indicated the number of "
-"student submissions that need to be graded.  You can grade more than the "
-"minimum required number of submissions--this will improve the accuracy of AI"
-" grading, though with diminishing returns. You can see the current accuracy "
-"of AI grading in the problem view."
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Financial Assistance Application"
 msgstr ""
-"Это список задач, которые в настоящее время необходимо оценить, чтобы "
-"научить ИИ оценивать и создавать калибровку эссе для оценивания "
-"пользователей. Каждая задача должна оценивать отдельно, мы указали число "
-"присланных студентами работ, которые необходимо оценить. Вы можете оценить "
-"больше, чем требуемый минимум присланных заданий - это улучшит точность "
-"оценки ИИ, хотя и не очень значительно. Вы можете просмотреть текущую "
-"точность оценки ИИ в режиме просмотра задачи."
 
-#: lms/templates/instructor/staff_grading.html
-msgid "Problem List"
-msgstr "Список задач"
-
-#: lms/templates/instructor/staff_grading.html
-msgid ""
-"Please note that when you see a submission here, it has been temporarily "
-"removed from the grading pool.  The submission will return to the grading "
-"pool after 30 minutes without any grade being submitted.  Hitting the back "
-"button will result in a 30 minute wait to be able to grade this submission "
-"again."
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "A Note to Learners"
 msgstr ""
-"Пожалуйста, имейте в виду, что доступные здесь работы студентов были "
-"временно удалены из множества работ, готовых к оцениванию. Оно вернётся "
-"назад без присвоения какой-либо оценки через 30 минут. Нажатие кнопки "
-"«Назад» приведёт к необходимости 30-минутного ожидания прежде чем вы сможете"
-" поставить оценку."
 
-#: lms/templates/instructor/staff_grading.html
-msgid "Prompt"
-msgstr "Подсказка"
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Dear edX Learner,"
+msgstr ""
 
-#: lms/templates/instructor/staff_grading.html
-msgid "(Hide)"
-msgstr "(Скрыть)"
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"EdX Financial Assistance is a program we created to give learners in all "
+"financial circumstances a chance to earn a Verified Certificate upon "
+"successful completion of an edX course."
+msgstr ""
 
-#: lms/templates/instructor/staff_grading.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Student Response"
-msgstr "Ответ студента"
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"If you are interested in working toward a Verified Certificate, but cannot "
+"afford to pay the fee, please apply now. Please note that financial "
+"assistance is limited and may not be awarded to all eligible candidates."
+msgstr ""
 
-#: lms/templates/instructor/staff_grading.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Written Feedback"
-msgstr "Письменный отзыв"
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"In order to be eligible for edX Financial Assistance, you must demonstrate "
+"that paying the Verified Certificate fee would cause you economic hardship. "
+"To apply, you will be asked to answer a few questions about why you are "
+"applying and how the Verified Certificate will benefit you."
+msgstr ""
 
-#: lms/templates/instructor/staff_grading.html
-msgid "Feedback for student (optional)"
-msgstr "Отзыв для студента (необязательно)"
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"If your application is approved, we'll give you instructions for verifying "
+"your identity on edx.org so you can start working toward completing your edX"
+" course."
+msgstr ""
 
-#: lms/templates/instructor/staff_grading.html
-msgid "Flag as inappropriate content for later review"
-msgstr "Отметить как неприемлемый контент для более позднего рассмотрения"
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid ""
+"EdX is committed to making it possible for you to take high quality courses "
+"from leading institutions regardless of your financial situation, earn a "
+"Verified Certificate, and share your success with others."
+msgstr ""
 
-#: lms/templates/instructor/staff_grading.html
-msgid "Skip"
-msgstr "Пропустить"
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Sincerely, Anant"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Back to Student FAQs"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial-assistance.html
+msgid "Apply for Financial Assistance"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -15524,6 +14212,10 @@ msgstr "Создать образец Сертификата курса."
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generate Example Certificates"
 msgstr "Создать образец Сертификата"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Status:"
+msgstr "Статус:"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generating example {name} certificate"
@@ -15574,6 +14266,13 @@ msgstr ""
 "настройки сертификатов."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"When you are ready to generate certificates for your course, click Generate "
+"Certificates. You do not need to do this<br/>if you have set the certificate"
+" mode to on-demand generation."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -15597,32 +14296,38 @@ msgstr "Повторно создать сертификаты"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
-"Select one or more certificate statuses below using your mouse and ctrl or "
-"command key."
+"To regenerate certificates for your course, chose the learners who will "
+"receive regenerated certificates and click <br/> Regenerate Certificates."
 msgstr ""
-"Пожалуйста, выберите один или более указанный ниже статус сертификатов с "
-"помощью мыши и клавиши Ctrl или Command."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
-"Select certificate statuses that need regeneration and click Regenerate "
-"Certificates button."
+"Regenerate for learners who have already received certificates. ({count})"
 msgstr ""
-"Выберите статусы сертификатов, которые требуется создать заново, и нажмите "
-"кнопку «Повторно создать сертификаты»."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
-msgid "Certificate Exceptions"
-msgstr "Исключения для получения сертификатов"
+msgid "Regenerate for learners who have not received certificates. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners in an error state. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Certificate Generation History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "SET CERTIFICATE EXCEPTIONS"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
-"Use this to generate certificates for users who did not pass the course but "
-"have been given an exception by the Course Team to earn a certificate."
+"Set exceptions to generate certificates for learners who did not qualify for"
+" a certificate but have been given an exception by the course team. After "
+"you add learners to the exception list, click Generate Exception "
+"Certificates below."
 msgstr ""
-"Раздел используется для выдачи сертификатов слушателям, не получивших "
-"проходной балл, но заслуживших сертификат в виде исключения по запросу "
-"команды курса."
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -15646,7 +14351,7 @@ msgstr "Основная Информация о Курсе"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
-msgstr "Название Курса:"
+msgstr "Название курса:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Display Name:"
@@ -16475,8 +15180,8 @@ msgid "Instructor Dashboard"
 msgstr "Панель управления преподавателя"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Revert to Legacy Dashboard"
-msgstr "Вернуться к предыдущей версии Панели управления"
+msgid "View Course in Studio"
+msgstr "Просмотр курса в Studio"
 
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 msgid "Enrollment Code Status"
@@ -16620,6 +15325,10 @@ msgid "Add Staff"
 msgstr "Добавить сотрудников"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Admin"
+msgstr "Администратор"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Course team members with the Admin role help you manage your course. They "
 "can do all of the tasks that Staff can do, and can also add and remove the "
@@ -16656,7 +15365,7 @@ msgstr "Добавить бета-тестера"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Admins"
-msgstr "Администраторы Обсуждений"
+msgstr "Администраторы форума"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -16678,7 +15387,7 @@ msgstr "Добавить Администратора Обсуждений"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
-msgstr "Модераторы Обсуждений"
+msgstr "Модераторы форума"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -16944,7 +15653,7 @@ msgstr "Установить цену"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Allowance Section"
-msgstr "Раздел пособий"
+msgstr "Раздел послаблений"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Student Special Exam Attempts"
@@ -17058,7 +15767,7 @@ msgstr "Заново оценить все задания"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Let Student Skip Entrance Exam"
-msgstr "Разрешить обучающимся пропускать испытание"
+msgstr "Разрешить пропустить вступительное испытание"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -17075,6 +15784,10 @@ msgstr "Удалить ответы и оценки студентов"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Student's Exam Adjustment History"
 msgstr "Показать историю настроек вступительного теста"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Course-specific grade adjustment"
+msgstr "Коррекция оценок для конкретных курсов"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Then select an action"
@@ -17101,10 +15814,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
 msgstr "Показать историю фоновых заданий для задачи"
-
-#: lms/templates/licenses/serial_numbers.html
-msgid "None Available"
-msgstr "Ничего не доступно"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
@@ -17144,76 +15853,6 @@ msgstr "ОК"
 msgid "open"
 msgstr "открыть"
 
-#: lms/templates/open_ended_problems/combined_notifications.html
-msgid "{course_number} Combined Notifications"
-msgstr "{course_number} Объединенные уведомления"
-
-#: lms/templates/open_ended_problems/combined_notifications.html
-msgid "Open Ended Console"
-msgstr "Консоль ответов в свободной форме"
-
-#: lms/templates/open_ended_problems/combined_notifications.html
-msgid "Here are items that could potentially need your attention."
-msgstr "Вот события, которым, возможно, требуется Ваше внимание."
-
-#: lms/templates/open_ended_problems/combined_notifications.html
-msgid "No items require attention at the moment."
-msgstr "нет событий, нуждающихся во внимании в настоящий момент."
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "{course_number} Flagged Open Ended Problems"
-msgstr "{course_number} Отмеченные задания с ответом в свободной форме"
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Flagged Open Ended Problems"
-msgstr "Отмеченные задания с ответом в свободной форме"
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid ""
-"Here is a list of open ended problems for this course that have been flagged"
-" by students as potentially inappropriate."
-msgstr ""
-"Список неструктурированных заданий этого курса, помеченных студентами как "
-"возможно неприемлемые."
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "No flagged problems exist."
-msgstr "Нет помеченных задач"
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Unflag"
-msgstr "Снять отметку"
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Ban"
-msgstr "Запретить Доступ"
-
-#: lms/templates/open_ended_problems/open_ended_problems.html
-msgid "{course_number} Open Ended Problems"
-msgstr "{course_number} задания с ответами в свободной форме"
-
-#: lms/templates/open_ended_problems/open_ended_problems.html
-msgid "Open Ended Problems"
-msgstr "Задания с ответами в свободной форме"
-
-#: lms/templates/open_ended_problems/open_ended_problems.html
-msgid "Here is a list of open ended problems for this course."
-msgstr "Список заданий этого курса, требующих ответа в свободной форме."
-
-#: lms/templates/open_ended_problems/open_ended_problems.html
-msgid "You have not attempted any open ended problems yet."
-msgstr ""
-"Вы еще не выполнили ни одного задания, требующего ответа в свободной форме."
-
-#: lms/templates/open_ended_problems/open_ended_problems.html
-#: lms/templates/peer_grading/peer_grading.html
-msgid "Problem Name"
-msgstr "Наименование задачи"
-
-#: lms/templates/open_ended_problems/open_ended_problems.html
-msgid "Grader Type"
-msgstr "Тип оценивающего"
-
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "\n"
@@ -17247,8 +15886,16 @@ msgid ""
 msgstr "Список заданий этого курса, подлежащих взаимной проверке."
 
 #: lms/templates/peer_grading/peer_grading.html
+msgid "Problem Name"
+msgstr "Наименование задачи"
+
+#: lms/templates/peer_grading/peer_grading.html
 msgid "Due date"
 msgstr "Срок выполнения"
+
+#: lms/templates/peer_grading/peer_grading.html
+msgid "Graded"
+msgstr "Оценено"
 
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/shoppingcart/receipt.html
@@ -17278,6 +15925,18 @@ msgstr "Срок вышел, и оценивание пользователям�
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Learning to Grade"
 msgstr "Обучение оцениванию"
+
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Hide Question"
+msgstr "Скрыть вопрос"
+
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Student Response"
+msgstr "Ответ студента"
+
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Written Feedback"
+msgstr "Письменный отзыв"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Please include some written feedback as well."
@@ -18457,7 +17116,7 @@ msgid ""
 "upload the associated images."
 msgstr ""
 "Для подтверждённых сертификатов, укажите от одной до четырёх подписей и "
-"загрузите соответствующие картинки."
+"загрузите соответствующие изображения."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -18534,44 +17193,6 @@ msgstr "Команда курса"
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Advanced Settings"
 msgstr "Расширенные настройки"
-
-#: cms/templates/checklists.html
-msgid "Course Checklists"
-msgstr "Контрольные списки курса"
-
-#: cms/templates/checklists.html cms/templates/export.html
-#: cms/templates/export_git.html cms/templates/import.html
-#: cms/templates/widgets/header.html
-msgid "Tools"
-msgstr "Инструменты"
-
-#: cms/templates/checklists.html
-msgid "Current Checklists"
-msgstr "Текущий курс"
-
-#: cms/templates/checklists.html
-msgid "What are course checklists?"
-msgstr "Что такое контрольные списки курса?"
-
-#: cms/templates/checklists.html
-msgid ""
-"Course checklists are tools to help you understand and keep track of all the"
-" steps necessary to get your course ready for students."
-msgstr ""
-"Контрольные списки учебного курса помогают Вам понять и отследить все шаги, "
-"необходимые для подготовки Вашего учебного курса для студентов."
-
-#: cms/templates/checklists.html
-msgid ""
-"Any changes you make to these checklists are saved automatically and are "
-"immediately visible to other course team members."
-msgstr ""
-"Любые изменения, которые Вы вносите в эти контрольные списки, сохраняются "
-"автоматически и тотчас становятся видимыми другим членам команды курса."
-
-#: cms/templates/checklists.html
-msgid "{studio_name} checklists"
-msgstr "Контрольные списки {studio_name}"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
@@ -19189,6 +17810,11 @@ msgstr "Экспорт библиотеки"
 msgid "Course Export"
 msgstr "Экспорт курса"
 
+#: cms/templates/export.html cms/templates/export_git.html
+#: cms/templates/import.html cms/templates/widgets/header.html
+msgid "Tools"
+msgstr "Инструменты"
+
 #: cms/templates/export.html
 msgid "About Exporting Libraries"
 msgstr "Об экспорте библиотек"
@@ -19653,7 +18279,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Simple, Fast, and Incremental Publishing. With Friends."
-msgstr "Публикуйте свои материалы просто, быстро и постепенно. С друзьями."
+msgstr "Публикуйте свои материалы просто, быстро и постепенно. С коллегами."
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -20078,12 +18704,8 @@ msgid "The name of the organization sponsoring the course."
 msgstr "Название организации, спонсирующей курс."
 
 #: cms/templates/index.html
-msgid ""
-"Note: This is part of your course URL, so no spaces or special characters "
-"are allowed."
+msgid "Note: The organization name is part of the course URL"
 msgstr ""
-"Примечание: это часть URL Вашего курса, здесь не разрешается использовать "
-"пробелы и специальные символы."
 
 #: cms/templates/index.html
 msgid ""
@@ -20875,11 +19497,11 @@ msgstr "Минимальная оценка"
 
 #: cms/templates/settings.html
 msgid "Successful Proctored Exam"
-msgstr "Очный экзамен сдан"
+msgstr "Наблюдаемое испытание успешно сдано"
 
 #: cms/templates/settings.html
 msgid "Proctored Exam {number}"
-msgstr "Очный экзамен {number}"
+msgstr "Наблюдаемое испытание {number}"
 
 #: cms/templates/settings.html
 msgid "ID Verification"
@@ -21680,10 +20302,6 @@ msgstr "Обновления"
 #: cms/templates/widgets/header.html
 msgid "Schedule &amp; Details"
 msgstr "Расписание и обзор курса"
-
-#: cms/templates/widgets/header.html
-msgid "Checklists"
-msgstr "Контрольные списки"
 
 #: cms/templates/widgets/header.html
 msgid "Import"
