@@ -21,6 +21,12 @@
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
+           % if temp_user_creator_status == 'granted':
+          <a href="${register_temp_user_link}" class="button new-button new-temp-user-button"><i class="icon fa fa-plus icon-inline"></i>
+              ${_("New Temp User")}</a>
+          <a href="${temp_users_home_link}" class="button new-button temp-users-list-button"><i class="icon fa fa-plus icon-inline"></i>
+              ${_("Temp Users list")}</a>
+          % endif
           % if course_creator_status=='granted':
           <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               ${_("New Course")}</a>

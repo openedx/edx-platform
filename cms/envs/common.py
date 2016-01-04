@@ -58,6 +58,8 @@ import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 
+from datetime import timedelta
+
 ############################ FEATURE CONFIGURATION #############################
 
 
@@ -184,6 +186,12 @@ FEATURES = {
 
     # Special Exams, aka Timed and Proctored Exams
     'ENABLE_SPECIAL_EXAMS': False,
+
+    # Expiry Date default value of 7 days
+    'EXPIRY_DATE_DEFAULT': 7,
+
+    # Enable temporary user
+    'ENABLE_TEMP_USER': True,
 }
 
 ENABLE_JASMINE = False
@@ -679,6 +687,13 @@ CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {}
+}
+
+CELERYBEAT_SCHEDULE = {
+    'write-every-10-seconds': {
+        'task': 'tasks.celery_task',
+        'schedule': timedelta(seconds=10),
+    },
 }
 
 

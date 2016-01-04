@@ -58,6 +58,7 @@ urlpatterns += patterns(
 
     url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
+    url(r'^register_temp_user$', 'student.views.register_temp_user_handler', name='register_temp_user_handler'),
 
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
@@ -81,6 +82,13 @@ urlpatterns += patterns(
         'course_info_update_handler'
     ),
     url(r'^home/?$', 'course_listing', name='home'),
+    url(r'^temp_users_home', 'temp_users_home_handler', name='temp_users_home_handler'),
+    url(r'^delete_course/(?P<user_id>\d+)/{}$'.format(COURSELIKE_KEY_PATTERN), 'delete_course_handler',
+        name='delete_course_handler'),
+    url(r'^delete_library/(?P<user_id>\d+)/{}$'.format(LIBRARY_KEY_PATTERN),
+        'delete_library_handler', name='delete_library_handler'),
+    url(r'^delete_temp_user/(?P<user_id>\d+)?$',
+        'delete_temp_user_handler', name='delete_temp_user_handler'),
     url(
         r'^course/{}/search_reindex?$'.format(settings.COURSE_KEY_PATTERN),
         'course_search_index_handler',

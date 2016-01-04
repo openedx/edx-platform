@@ -48,3 +48,24 @@ def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable
         from .tasks import update_library_index
 
         update_library_index.delay(unicode(library_key), datetime.now(UTC).isoformat())
+
+
+@receiver(SignalHandler.deleted_course)
+def listen_for_course_deleted(sender, user_id, course_key_string, **kwargs):
+
+    from .tasks import delete_course_task
+    delete_course_task.delay(unicode(user_id), unicode(course_key_string))
+
+
+@receiver(SignalHandler.deleted_library)
+def listen_for_library_deleted(sender, user_id, library_key_string, **kwargs):
+
+    from .tasks import delete_library_task
+    delete_library_task.delay(unicode(user_id), unicode(library_key_string))
+
+
+@receiver(SignalHandler.deleted_temp_user)
+def listen_for_temp_user_deleted(sender, request, user_id, **kwargs):
+
+    from .tasks import delete_temp_user_task
+    delete_temp_user_task.delay(unicode(request), unicode(user_id))

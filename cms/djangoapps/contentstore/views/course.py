@@ -9,12 +9,12 @@ import logging
 import string  # pylint: disable=deprecated-module
 from django.utils.translation import ugettext as _
 import django.utils
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
 from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404, HttpResponseRedirect
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
 from edxmako.shortcuts import render_to_response
@@ -44,7 +44,7 @@ from contentstore.course_group_config import (
     RANDOM_SCHEME,
     COHORT_SCHEME
 )
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError, CourseAboutSearchIndexer
 from contentstore.utils import (
     add_instructor,
     initialize_permissions,
@@ -94,6 +94,17 @@ from util.milestones_helpers import (
     is_entrance_exams_enabled
 )
 
+from contentstore.utils import delete_course_and_groups
+from django.contrib.auth.models import User
+from student.models import UserProfile
+from search.search_engine_base import SearchEngine
+from student.views import get_temp_user_enable_status
+from xmodule.modulestore.django import SignalHandler
+from contentstore.helpers import (accessible_libraries_list,
+                                  get_courses_accessible_to_user,
+                                  format_course_for_view,
+                                  format_library_for_view)
+
 log = logging.getLogger(__name__)
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
@@ -104,15 +115,17 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'advanced_settings_handler',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
-           'group_configurations_list_handler', 'group_configurations_detail_handler']
+           'group_configurations_list_handler', 'group_configurations_detail_handler',
+           'delete_course_handler', 'delete_library_handler',
+           'delete_temp_user_handler', 'temp_users_home_handler']
 
 
-class AccessListFallback(Exception):
-    """
-    An exception that is raised whenever we need to `fall back` to fetching *all* courses
-    available to a user, rather than using a shorter method (i.e. fetching by group)
-    """
-    pass
+# class AccessListFallback(Exception):
+#     """
+#     An exception that is raised whenever we need to `fall back` to fetching *all* courses
+#     available to a user, rather than using a shorter method (i.e. fetching by group)
+#     """
+#     pass
 
 
 def get_course_and_check_access(course_key, user, depth=0):
@@ -339,79 +352,89 @@ def _course_outline_json(request, course_module):
     )
 
 
-def _accessible_courses_list(request):
-    """
-    List all courses available to the logged in user by iterating through all the courses
-    """
-    def course_filter(course):
-        """
-        Filter out unusable and inaccessible courses
-        """
-        if isinstance(course, ErrorDescriptor):
-            return False
-
-        # pylint: disable=fixme
-        # TODO remove this condition when templates purged from db
-        if course.location.course == 'templates':
-            return False
-
-        return has_studio_read_access(request.user, course.id)
-
-    courses = filter(course_filter, modulestore().get_courses())
-    in_process_course_actions = [
-        course for course in
-        CourseRerunState.objects.find_all(
-            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
-        )
-        if has_studio_read_access(request.user, course.course_key)
-    ]
-    return courses, in_process_course_actions
-
-
-def _accessible_courses_list_from_groups(request):
-    """
-    List all courses available to the logged in user by reversing access group names
-    """
-    courses_list = {}
-    in_process_course_actions = []
-
-    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
-    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
-    all_courses = instructor_courses | staff_courses
-
-    for course_access in all_courses:
-        course_key = course_access.course_id
-        if course_key is None:
-            # If the course_access does not have a course_id, it's an org-based role, so we fall back
-            raise AccessListFallback
-        if course_key not in courses_list:
-            # check for any course action state for this course
-            in_process_course_actions.extend(
-                CourseRerunState.objects.find_all(
-                    exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED},
-                    should_display=True,
-                    course_key=course_key,
-                )
-            )
-            # check for the course itself
-            try:
-                course = modulestore().get_course(course_key)
-            except ItemNotFoundError:
-                # If a user has access to a course that doesn't exist, don't do anything with that course
-                pass
-            if course is not None and not isinstance(course, ErrorDescriptor):
-                # ignore deleted or errored courses
-                courses_list[course_key] = course
-
-    return courses_list.values(), in_process_course_actions
+# def _accessible_courses_list(request, this_user=None):
+#     """
+#     List all courses available to the logged in user by iterating through all the courses
+#     """
+#     if this_user:
+#         user = this_user
+#     else:
+#         user = request.user
+#
+#     def course_filter(course):
+#         """
+#         Filter out unusable and inaccessible courses
+#         """
+#         if isinstance(course, ErrorDescriptor):
+#             return False
+#
+#         # pylint: disable=fixme
+#         # TODO remove this condition when templates purged from db
+#         if course.location.course == 'templates':
+#             return False
+#
+#         return has_studio_read_access(user, course.id)
+#
+#     courses = filter(course_filter, modulestore().get_courses())
+#     in_process_course_actions = [
+#         course for course in
+#         CourseRerunState.objects.find_all(
+#             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
+#         )
+#         if has_studio_read_access(user, course.course_key)
+#     ]
+#     return courses, in_process_course_actions
 
 
-def _accessible_libraries_list(user):
-    """
-    List all libraries available to the logged in user by iterating through all libraries
-    """
-    # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
-    return [lib for lib in modulestore().get_libraries() if has_studio_read_access(user, lib.location.library_key)]
+# def _accessible_courses_list_from_groups(request, this_user=None):
+#     """
+#     List all courses available to the logged in user by reversing access group names
+#     """
+#     if this_user:
+#         user = this_user
+#     else:
+#         user = request.user
+#
+#     courses_list = {}
+#     in_process_course_actions = []
+#
+#     instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
+#     staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
+#     all_courses = instructor_courses | staff_courses
+#
+#     for course_access in all_courses:
+#         course_key = course_access.course_id
+#         if course_key is None:
+#             # If the course_access does not have a course_id, it's an org-based role, so we fall back
+#             raise AccessListFallback
+#         if course_key not in courses_list:
+#             # check for any course action state for this course
+#             in_process_course_actions.extend(
+#                 CourseRerunState.objects.find_all(
+#                     exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED},
+#                     should_display=True,
+#                     course_key=course_key,
+#                 )
+#             )
+#             # check for the course itself
+#             try:
+#                 course = modulestore().get_course(course_key)
+#             except ItemNotFoundError:
+#                 # If a user has access to a course that doesn't exist, don't do anything with that course
+#                 pass
+#             if course is not None and not isinstance(course, ErrorDescriptor):
+#                 # ignore deleted or errored courses
+#                 courses_list[course_key] = course
+#
+#     return courses_list.values(), in_process_course_actions
+
+
+# def accessible_libraries_list(user):
+#     """
+#     List all libraries available to the logged in user by iterating through all libraries
+#     """
+#     # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
+#     return [lib for lib in modulestore().get_libraries() if has_studio_read_access(user, lib.location.library_key)]
 
 
 @login_required
@@ -421,7 +444,7 @@ def course_listing(request):
     List all courses available to the logged in user
     """
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
-    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
+    libraries = accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
 
     def format_in_process_course_view(uca):
         """
@@ -444,19 +467,6 @@ def course_listing(request):
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
-    def format_library_for_view(library):
-        """
-        Return a dict of the data which the view requires for each library
-        """
-        return {
-            'display_name': library.display_name,
-            'library_key': unicode(library.location.library_key),
-            'url': reverse_library_url('library_handler', unicode(library.location.library_key)),
-            'org': library.display_org_with_default,
-            'number': library.display_number_with_default,
-            'can_edit': has_studio_write_access(request.user, library.location.library_key),
-        }
-
     courses = _remove_in_process_courses(courses, in_process_course_actions)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
@@ -464,20 +474,23 @@ def course_listing(request):
         'courses': courses,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
-        'libraries': [format_library_for_view(lib) for lib in libraries],
+        'libraries': [format_library_for_view(lib, request.user) for lib in libraries],
         'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
+        'temp_user_creator_status': _get_temp_user_creator_status(request.user),
         'rerun_creator_status': GlobalStaff().has_user(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True)
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'register_temp_user_link': reverse('register_temp_user_handler', ),
+        'temp_users_home_link': reverse('temp_users_home_handler', ),
     })
 
 
-def _get_rerun_link_for_item(course_key):
-    """ Returns the rerun link for the given course key. """
-    return reverse_course_url('course_rerun_handler', course_key)
+# def _get_rerun_link_for_item(course_key):
+#     """ Returns the rerun link for the given course key. """
+#     return reverse_course_url('course_rerun_handler', course_key)
 
 
 def _deprecated_blocks_info(course_module, deprecated_block_types):
@@ -570,22 +583,27 @@ def course_index(request, course_key):
         })
 
 
-def get_courses_accessible_to_user(request):
-    """
-    Try to get all courses by first reversing django groups and fallback to old method if it fails
-    Note: overhead of pymongo reads will increase if getting courses from django groups fails
-    """
-    if GlobalStaff().has_user(request.user):
-        # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_list(request)
-    else:
-        try:
-            courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
-        except AccessListFallback:
-            # user have some old groups or there was some error getting courses from django groups
-            # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_list(request)
-    return courses, in_process_course_actions
+# def get_courses_accessible_to_user(request, this_user=None):
+#     """
+#     Try to get all courses by first reversing django groups and fallback to old method if it fails
+#     Note: overhead of pymongo reads will increase if getting courses from django groups fails
+#     """
+#     if this_user:
+#         user = this_user
+#     else:
+#         user = request.user
+#
+#     if GlobalStaff().has_user(user):
+#         # user has global access so no need to get courses from django groups
+#         courses, in_process_course_actions = _accessible_courses_list_from_groups(request, user)
+#     else:
+#         try:
+#             courses, in_process_course_actions = _accessible_courses_list_from_groups(request, user)
+#         except AccessListFallback:
+#             # user have some old groups or there was some error getting courses from django groups
+#             # so fallback to iterating through all courses
+#             courses, in_process_course_actions = _accessible_courses_list(request, user)
+#     return courses, in_process_course_actions
 
 
 def _remove_in_process_courses(courses, in_process_course_actions):
@@ -593,20 +611,6 @@ def _remove_in_process_courses(courses, in_process_course_actions):
     removes any in-process courses in courses list. in-process actually refers to courses
     that are in the process of being generated for re-run
     """
-    def format_course_for_view(course):
-        """
-        Return a dict of the data which the view requires for each course
-        """
-        return {
-            'display_name': course.display_name,
-            'course_key': unicode(course.location.course_key),
-            'url': reverse_course_url('course_handler', course.id),
-            'lms_link': get_lms_link_for_item(course.location),
-            'rerun_link': _get_rerun_link_for_item(course.id),
-            'org': course.display_org_with_default,
-            'number': course.display_number_with_default,
-            'run': course.location.run
-        }
 
     in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
     courses = [
@@ -1569,3 +1573,153 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
+
+
+def _get_temp_user_creator_status(user):
+    """
+    Helper method for returning the temp user creator status for a particular user
+    """
+
+    profile = UserProfile.objects.get(user_id=user.id)
+    enable_temp_user = get_temp_user_enable_status(user)
+
+    if not enable_temp_user:
+        temp_user_creator_status = "disallowed_for_this_user"
+    elif profile.temp_user:
+        temp_user_creator_status = "disallowed_for_this_user"
+    elif not user.is_staff:
+        temp_user_creator_status = "disallowed_for_this_user"
+    elif enable_temp_user and user.is_staff:
+        temp_user_creator_status = "granted"
+    else:
+        temp_user_creator_status = "disallowed_for_this_user"
+
+    return temp_user_creator_status
+
+
+@login_required
+@ensure_csrf_cookie
+def delete_course_handler(request, user_id, course_key_string):
+    """
+    Method for deleting course
+    """
+    SignalHandler.deleted_course.send(sender=None, user_id=user_id, course_key_string=course_key_string)
+    # delete_item_handler(request, user_id, course_key_string)
+    #
+    # searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
+    # CoursewareSearchIndexer.remove_deleted_items(searcher, CourseKey.from_string(course_key_string), [])
+    # searcher.remove(CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE, [course_key_string])
+
+    return HttpResponseRedirect(reverse('temp_users_home_handler', ))
+
+
+@login_required
+@ensure_csrf_cookie
+def delete_library_handler(request, user_id, library_key_string):
+    """
+    Method for deleting library
+    """
+    SignalHandler.deleted_library.send(sender=None, user_id=user_id, library_key_string=library_key_string)
+    #delete_item_handler(request, user_id, library_key_string)
+
+    return HttpResponseRedirect(reverse('temp_users_home_handler', ))
+
+
+def delete_item_handler(request, user_id, item_key_string):
+    """
+    Helper method for deleting item, course or library
+    """
+
+    profile = UserProfile.objects.get(pk=user_id)
+    user = User.objects.get(pk=profile.user_id)
+
+    item_key = CourseKey.from_string(item_key_string)
+    delete_course_and_groups(item_key, user.id)
+
+
+@login_required
+@ensure_csrf_cookie
+def delete_temp_user_handler(request, user_id):
+    """
+    Method for deleting temp user
+    """
+    SignalHandler.deleted_temp_user.send(sender=None, request=request, user_id=user_id)
+    # profile = UserProfile.objects.get(pk=user_id)
+    # user = User.objects.get(pk=profile.user_id)
+    #
+    # courses = [format_course_for_view(c) for c in get_courses_accessible_to_user(request, user)[0]]
+    # libraries = [format_library_for_view(lib, user) for lib in accessible_libraries_list(user)]
+    #
+    # for course in courses:
+    #     delete_course_handler(request, user_id, course['course_key'])
+    #
+    # for library in libraries:
+    #     delete_library_handler(request, user_id, library['library_key'])
+
+    return HttpResponseRedirect(reverse('temp_users_home_handler', ))
+
+
+# def format_course_for_view(course):
+#     """
+#     Return a dict of the data which the view requires for each course
+#     """
+#     return {
+#         'display_name': course.display_name,
+#         'course_key': unicode(course.location.course_key),
+#         'url': reverse_course_url('course_handler', course.id),
+#         'lms_link': get_lms_link_for_item(course.location),
+#         'rerun_link': _get_rerun_link_for_item(course.id),
+#         'org': course.display_org_with_default,
+#         'number': course.display_number_with_default,
+#         'run': course.location.run
+#     }
+#
+#
+# def format_library_for_view(library, user):
+#     """
+#     Return a dict of the data which the view requires for each library
+#     """
+#
+#     return {
+#         'display_name': library.display_name,
+#         'library_key': unicode(library.location.library_key),
+#         'url': reverse_library_url('library_handler', unicode(library.location.library_key)),
+#         'org': library.display_org_with_default,
+#         'number': library.display_number_with_default,
+#         'can_edit': has_studio_write_access(user, library.location.library_key),
+#     }
+
+
+@login_required
+@ensure_csrf_cookie
+@user_passes_test(get_temp_user_enable_status, login_url='/', redirect_field_name=None)
+def temp_users_home_handler(request):
+    """
+    Temporary user home view
+    """
+
+    temp_users = UserProfile.objects.filter(temp_user=1)
+    courses_dict = {}
+    delete_courses_links = {}
+    libraries = {}
+
+    for temp_user in temp_users:
+        user = User.objects.get(pk=temp_user.user_id)
+        delete_courses_links[temp_user.id] = reverse('delete_temp_user_handler', args=(temp_user.id, ))
+        courses = [format_course_for_view(c) for c in get_courses_accessible_to_user(request, user)[0]]
+        for course in courses:
+            course['delete_course_link'] = reverse('delete_course_handler', args=(temp_user.id, course['course_key']))
+        courses_dict[temp_user.id] = courses
+        libraries[temp_user.id] = [format_library_for_view(lib, user) for lib in accessible_libraries_list(user)]
+        for library in libraries[temp_user.id]:
+            library['delete_library_link'] = reverse('delete_library_handler',
+                                                     args=(temp_user.id, library['library_key']))
+
+    context = {
+        'temp_users': temp_users,
+        'courses_dict': courses_dict,
+        'delete_courses_links': delete_courses_links,
+        'libraries': libraries
+    }
+
+    return render_to_response('temp_users_home.html', context)

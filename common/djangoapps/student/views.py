@@ -16,7 +16,7 @@ from ipware.ip import get_ip
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
 from django.core.context_processors import csrf
@@ -127,6 +127,9 @@ from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.views import get_course_programs_for_dashboard
 from openedx.core.djangoapps.programs.utils import is_student_dashboard_programs_enabled
+
+
+from django.utils import timezone
 
 
 log = logging.getLogger("edx.student")
@@ -1479,6 +1482,17 @@ def _do_create_account(form):
     if extended_profile:
         profile.meta = json.dumps(extended_profile)
     try:
+        if 'temp_user' in form.data:
+            if form.data["temp_user"] == "true":   # if user is temp user set its is_active,
+            # temp_user and expiry_date fields
+                user.is_active = True
+                user.save()
+                profile.temp_user = True
+                if form.data["expiry_date"]:
+                    profile.expiry_date = timezone.now() + datetime.timedelta(days=int(form.data["expiry_date"]))
+                else:
+                    profile.expiry_date = timezone.now() + datetime.timedelta(days=settings.FEATURES.get(
+                        'EXPIRY_DATE_DEFAULT'))
         profile.save()
     except Exception:  # pylint: disable=broad-except
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
@@ -1722,6 +1736,10 @@ def create_account_with_params(request, params):
     else:
         registration.activate()
 
+    if request.method == 'POST':
+        if request.POST.get("temp_user") == "true":  # if user is temp_user skip authentication and login
+            return user
+
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
@@ -1784,6 +1802,11 @@ def create_account(request, post_override=None):
         'success': True,
         'redirect_url': redirect_url,
     })
+
+    if request.method == 'POST':
+        if request.POST.get("temp_user") == "true":  # if user is temp_user skip authentication and login
+            return response
+
     set_logged_in_cookies(request, response, user)
     return response
 
@@ -2319,3 +2342,62 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                 log.warning('Program structure is invalid, skipping display: %r', program)
 
     return programs_data
+
+
+def get_temp_user_enable_status(user):
+    """
+    Helper method for returning the temp user enable flag
+    """
+
+    if not settings.FEATURES.get('ENABLE_TEMP_USER'):
+        return False
+    else:
+        return True
+
+
+@ensure_csrf_cookie
+@user_passes_test(get_temp_user_enable_status, login_url='/', redirect_field_name=None)
+def register_temp_user_handler(request, extra_context=None):
+    """
+    Registering temp user
+    """
+
+    # Determine the URL to redirect to following login:
+    redirect_to = get_next_url_for_login_page(request)
+
+    external_auth_response = external_auth_register(request)
+    if external_auth_response is not None:
+        return external_auth_response
+
+    context = {
+        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
+        'email': '',
+        'name': '',
+        'running_pipeline': None,
+        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, redirect_url=redirect_to),
+        'platform_name': microsite.get_value(
+            'platform_name',
+            settings.PLATFORM_NAME
+        ),
+        'selected_provider': '',
+        'username': '',
+    }
+
+    if extra_context is not None:
+        context.update(extra_context)
+
+    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+        return render_to_response('register-shib.html', context)
+
+    # If third-party auth is enabled, prepopulate the form with data from the
+    # selected provider.
+    if third_party_auth.is_enabled() and pipeline.running(request):
+        running_pipeline = pipeline.get(request)
+        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        if current_provider is not None:
+            overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+            overrides['running_pipeline'] = running_pipeline
+            overrides['selected_provider'] = current_provider.name
+            context.update(overrides)
+
+    return render_to_response('register_temp_user.html', context)

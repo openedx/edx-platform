@@ -1,0 +1,104 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "home" %></%def>
+<%block name="title">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</%block>
+<%block name="bodyclass">is-signedin index view-dashboard</%block>
+
+
+<%block name="requirejs">
+  require(["js/factories/index"], function (IndexFactory) {
+      IndexFactory();
+  });
+</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions">
+        <h1 class="page-header">${_("Temp Users Home")}</h1>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <article class="content-primary" role="main">
+            <ul>
+            %for user in temp_users:
+                <li>
+                <h1><b>${_("Temp user:")} ${user.name}</b>
+                <a href="${delete_courses_links[user.id]}" class="button new-button delete-temp-user-courses-button">${_("Delete All Courses")}</a>
+                </h1>
+                </li>
+
+                <ul>
+                    <li><a>${_("Courses")}</a></li>
+                </ul>
+                %if len(courses_dict[user.id]) > 0:
+                <div class="courses">
+                <ul class="list-courses">
+                %for course_info in sorted(courses_dict[user.id], key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+                <li class="course-item">
+                <a class="course-link" href="${course_info['url']}">
+                <h3 class="course-title">${course_info['display_name'] | h}</h3>
+
+                <div class="course-metadata">
+                    <span class="course-org metadata-item">
+                        <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
+                    </span>
+                    <span class="course-num metadata-item">
+                        <span class="label">${_("Course Number:")}</span>
+                        <span class="value">${course_info['number']}</span>
+                    </span>
+                    <span class="course-run metadata-item">
+                        <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
+                    </span>
+                </div>
+                </a>
+
+                <ul  class="item-actions course-actions">
+                    <li class="action action-view">
+                        <a href="${course_info['delete_course_link']}" class="button view-button">${_("Delete course")}</a>
+                    </li>
+                </ul>
+                </li>
+                %endfor
+                </ul>
+                </div>
+                %endif
+                <ul>
+                    <li><a>${_("Libraries")}</a></li>
+                </ul>
+                <div class="libraries">
+                    <ul class="list-courses">
+                        %for library_info in sorted(libraries[user.id], key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+                            <li class="course-item">
+                                <a class="library-link" href="${library_info['url']}">
+                                <h3 class="course-title">${library_info['display_name'] | h}</h3>
+
+                                <div class="course-metadata">
+                                    <span class="course-org metadata-item">
+                                        <span class="label">${_("Organization:")}</span> <span class="value">${library_info['org']}</span>
+                                    </span>
+                                    <span class="course-num metadata-item">
+                                        <span class="label">${_("Course Number:")}</span>
+                                        <span class="value">${library_info['number']}</span>
+                                    </span>
+                                </div>
+                                </a>
+                                <ul  class="item-actions course-actions">
+                                <li class="action action-view">
+                                    <a href="${library_info['delete_library_link']}" class="button view-button">${_("Delete library")}</a>
+                                </li>
+                                </ul>
+                    </li>
+                        %endfor
+                    </ul>
+                </div>
+            %endfor
+
+            </ul>
+        </article>
+    </section>
+
+</div>
+</%block>
