@@ -274,7 +274,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then I can add Allowance to that exam for a student
         self.assertTrue(allowance_section.is_add_allowance_button_visible)
 
-    @flaky  # TODO fix this SOL-1182
+    @flaky(max_runs=50, min_passes=50)  # TODO fix this SOL-1182
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
