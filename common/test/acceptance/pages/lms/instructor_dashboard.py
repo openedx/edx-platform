@@ -1006,6 +1006,16 @@ class CertificatesPage(PageObject):
         )
         self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
 
+    def wait_for_certificate_invalidations_section(self):  # pylint: disable=invalid-name
+        """
+        Wait for certificate invalidations section to be rendered on page
+        """
+        self.wait_for_element_visibility(
+            'div.certificate-invalidation-container',
+            'Certificate invalidations section is visible.'
+        )
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+
     def refresh(self):
         """
         Refresh Certificates Page and wait for the page to load completely.
@@ -1064,6 +1074,42 @@ class CertificatesPage(PageObject):
         """
         self.get_selector('#add-exception').click()
 
+    def add_certificate_invalidation(self, student, notes):
+        """
+        Add certificate invalidation for 'student'.
+        """
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+
+        self.get_selector('#certificate-invalidation-user').fill(student)
+        self.get_selector('#certificate-invalidation-notes').fill(notes)
+        self.get_selector('#invalidate-certificate').click()
+
+        self.wait_for_ajax()
+        self.wait_for(
+            lambda: student in self.get_selector('div.invalidation-history table tr:last-child td').text,
+            description='Certificate invalidation added to list.'
+        )
+
+    def remove_first_certificate_invalidation(self):
+        """
+        Remove certificate invalidation from the invalidation list.
+        """
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+        self.get_selector('div.invalidation-history table tr td .re-validate-certificate').first.click()
+        self.wait_for_ajax()
+
+    def fill_certificate_invalidation_user_name_field(self, student):  # pylint: disable=invalid-name
+        """
+        Fill username/email field with given text
+        """
+        self.get_selector('#certificate-invalidation-user').fill(student)
+
+    def click_invalidate_certificate_button(self):
+        """
+        Click 'Invalidate Certificate' button in 'certificates invalidations' section
+        """
+        self.get_selector('#invalidate-certificate').click()
+
     @property
     def generate_certificates_button(self):
         """
@@ -1111,4 +1157,18 @@ class CertificatesPage(PageObject):
         """
         Returns the Message (error/success) in "Certificate Exceptions" section.
         """
-        return self.get_selector('div.message')
+        return self.get_selector('.certificate-exception-container div.message')
+
+    @property
+    def last_certificate_invalidation(self):
+        """
+        Returns last certificate invalidation from "Certificate Invalidations" section.
+        """
+        return self.get_selector('div.certificate-invalidation-container table tr:last-child td')
+
+    @property
+    def certificate_invalidation_message(self):  # pylint: disable=invalid-name
+        """
+        Returns the message (error/success) in "Certificate Invalidation" section.
+        """
+        return self.get_selector('.certificate-invalidation-container div.message')

@@ -655,6 +655,7 @@
         'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
         'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
         'lms/include/js/spec/instructor_dashboard/certificates_exception_spec.js',
+        'lms/include/js/spec/instructor_dashboard/certificates_invalidation_spec.js',
         'lms/include/js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
         'lms/include/js/spec/instructor_dashboard/certificates_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',

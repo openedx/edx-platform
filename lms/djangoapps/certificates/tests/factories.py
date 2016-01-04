@@ -9,7 +9,7 @@ from student.models import LinkedInAddToProfileConfiguration
 
 from certificates.models import (
     GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion,
-    BadgeImageConfiguration,
+    BadgeImageConfiguration, CertificateInvalidation,
 )
 
 
@@ -33,6 +33,15 @@ class CertificateWhitelistFactory(DjangoModelFactory):
     course_id = None
     whitelist = True
     notes = 'Test Notes'
+
+
+class CertificateInvalidationFactory(DjangoModelFactory):
+
+    class Meta(object):
+        model = CertificateInvalidation
+
+    notes = 'Test Notes'
+    active = True
 
 
 class BadgeAssertionFactory(DjangoModelFactory):

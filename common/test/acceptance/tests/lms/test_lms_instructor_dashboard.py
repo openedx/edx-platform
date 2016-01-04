@@ -845,3 +845,202 @@ class CertificatesTest(BaseInstructorDashboardTest):
                              ' below to send the certificate.',
             self.certificates_section.message.text
         )
+
+
+@attr('shard_1')
+class CertificateInvalidationTest(BaseInstructorDashboardTest):
+    """
+    Tests for Certificates functionality on instructor dashboard.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(CertificateInvalidationTest, cls).setUpClass()
+
+        # Create course fixture once each test run
+        CourseFixture(
+            org='test_org',
+            number='335535897951379478207964576572017930000',
+            run='test_run',
+            display_name='Test Course 335535897951379478207964576572017930000',
+        ).install()
+
+    def setUp(self):
+        super(CertificateInvalidationTest, self).setUp()
+        # set same course number as we have in fixture json
+        self.course_info['number'] = "335535897951379478207964576572017930000"
+
+        # we have created a user with this id in fixture, and created a generated certificate for it.
+        self.student_id = "99"
+        self.student_name = "testcert"
+        self.student_email = "cert@example.com"
+
+        # Enroll above test user in the course
+        AutoAuthPage(
+            self.browser,
+            username=self.student_name,
+            email=self.student_email,
+            course_id=self.course_id,
+        ).visit()
+
+        self.test_certificate_config = {
+            'id': 1,
+            'name': 'Certificate name',
+            'description': 'Certificate description',
+            'course_title': 'Course title override',
+            'signatories': [],
+            'version': 1,
+            'is_active': True
+        }
+
+        self.cert_fixture = CertificateConfigFixture(self.course_id, self.test_certificate_config)
+        self.cert_fixture.install()
+        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.certificates_section = self.instructor_dashboard_page.select_certificates()
+
+        disable_animations(self.certificates_section)
+
+    def test_instructor_can_invalidate_certificate(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor can add a certificate
+        invalidation to invalidation list.
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I fill in student username and notes fields and click 'Add Exception' button
+            Then new certificate exception should be visible in certificate exceptions list
+        """
+        notes = 'Test Notes'
+        # Add a student to certificate invalidation list
+        self.certificates_section.add_certificate_invalidation(self.student_name, notes)
+        self.assertIn(self.student_name, self.certificates_section.last_certificate_invalidation.text)
+        self.assertIn(notes, self.certificates_section.last_certificate_invalidation.text)
+
+        # Validate success message
+        self.assertIn(
+            "Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
+            self.certificates_section.certificate_invalidation_message.text
+        )
+
+        # Verify that added invalidations are also synced with backend
+        # Revisit Page
+        self.certificates_section.refresh()
+
+        # wait for the certificate invalidations section to render
+        self.certificates_section.wait_for_certificate_invalidations_section()
+
+        # validate certificate invalidation is visible in certificate invalidation list
+        self.assertIn(self.student_name, self.certificates_section.last_certificate_invalidation.text)
+        self.assertIn(notes, self.certificates_section.last_certificate_invalidation.text)
+
+    def test_instructor_can_re_validate_certificate(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor can re-validate certificate.
+
+            Given that I am on the certificates tab on the Instructor Dashboard
+            AND there is a certificate invalidation in certificate invalidation table
+            When I click "Remove from Invalidation Table" button
+            Then certificate is re-validated and removed from certificate invalidation table.
+        """
+        notes = 'Test Notes'
+        # Add a student to certificate invalidation list
+        self.certificates_section.add_certificate_invalidation(self.student_name, notes)
+        self.assertIn(self.student_name, self.certificates_section.last_certificate_invalidation.text)
+        self.assertIn(notes, self.certificates_section.last_certificate_invalidation.text)
+
+        # Verify that added invalidations are also synced with backend
+        # Revisit Page
+        self.certificates_section.refresh()
+
+        # wait for the certificate invalidations section to render
+        self.certificates_section.wait_for_certificate_invalidations_section()
+
+        # click "Remove from Invalidation Table" button next to certificate invalidation
+        self.certificates_section.remove_first_certificate_invalidation()
+
+        # validate certificate invalidation is removed from the list
+        self.assertNotIn(self.student_name, self.certificates_section.last_certificate_invalidation.text)
+        self.assertNotIn(notes, self.certificates_section.last_certificate_invalidation.text)
+
+        self.assertIn(
+            "The certificate for this learner has been re-validated and the system is "
+            "re-running the grade for this learner.",
+            self.certificates_section.certificate_invalidation_message.text
+        )
+
+    def test_error_on_empty_user_name_or_email(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor should see error message if he clicks
+            "Invalidate Certificate" button without entering student username or email.
+
+            Given that I am on the certificates tab on the Instructor Dashboard
+            When I click "Invalidate Certificate" button without entering student username/email.
+            Then I see following error message
+                "Student username/email field is required and can not be empty."
+                "Kindly fill in username/email and then press "Invalidate Certificate" button."
+        """
+        # Click "Invalidate Certificate" with empty student username/email field
+        self.certificates_section.fill_certificate_invalidation_user_name_field("")
+        self.certificates_section.click_invalidate_certificate_button()
+        self.certificates_section.wait_for_ajax()
+
+        self.assertIn(
+            u'Student username/email field is required and can not be empty. '
+            u'Kindly fill in username/email and then press "Invalidate Certificate" button.',
+            self.certificates_section.certificate_invalidation_message.text
+        )
+
+    def test_error_on_invalid_user(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor should see error message if
+            the student entered for certificate invalidation does not exist.
+
+            Given that I am on the certificates tab on the Instructor Dashboard
+            When I click "Invalidate Certificate"
+            AND the username entered does not exist in the system
+            Then I see following error message
+                "Student username/email field is required and can not be empty."
+                "Kindly fill in username/email and then press "Invalidate Certificate" button."
+        """
+        invalid_user = "invalid_test_user"
+        # Click "Invalidate Certificate" with invalid student username/email
+        self.certificates_section.fill_certificate_invalidation_user_name_field(invalid_user)
+        self.certificates_section.click_invalidate_certificate_button()
+        self.certificates_section.wait_for_ajax()
+
+        self.assertIn(
+            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            self.certificates_section.certificate_invalidation_message.text
+        )
+
+    def test_user_not_enrolled_error(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor should see error message if
+            the student entered for certificate invalidation is not enrolled in the course.
+
+            Given that I am on the certificates tab on the Instructor Dashboard
+            When I click "Invalidate Certificate"
+            AND the username entered is not enrolled in the current course
+            Then I see following error message
+                "{user} is not enrolled in this course. Please check your spelling and retry."
+        """
+        new_user = 'test_user_{uuid}'.format(uuid=self.unique_id[6:12])
+        new_email = 'test_user_{uuid}@example.com'.format(uuid=self.unique_id[6:12])
+        # Create a new user who is not enrolled in the course
+        AutoAuthPage(self.browser, username=new_user, email=new_email).visit()
+        # Login as instructor and visit Certificate Section of Instructor Dashboard
+        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.instructor_dashboard_page.visit()
+        self.certificates_section = self.instructor_dashboard_page.select_certificates()
+
+        # Click 'Invalidate Certificate' button with not enrolled student
+        self.certificates_section.wait_for_certificate_invalidations_section()
+
+        self.certificates_section.fill_certificate_invalidation_user_name_field(new_user)
+        self.certificates_section.click_invalidate_certificate_button()
+        self.certificates_section.wait_for_ajax()
+
+        self.assertIn(
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            self.certificates_section.certificate_invalidation_message.text
+        )
