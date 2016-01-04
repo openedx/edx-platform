@@ -28,7 +28,7 @@ DB_CACHE_DIR="common/test/db_cache"
 echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
 
 # Clear out the test database
-./manage.py lms --settings bok_choy reset_db --traceback --noinput
+./manage.py lms --settings bok_choy flush --traceback --noinput
 
 # If there are cached database schemas/data, load them
 if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_migrations_data.sql && -f $DB_CACHE_DIR/bok_choy_data.json ]]; then

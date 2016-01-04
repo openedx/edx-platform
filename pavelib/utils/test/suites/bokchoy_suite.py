@@ -77,6 +77,9 @@ class BokChoyTestSuite(TestSuite):
 
         if not self.testsonly:
             self.prepare_bokchoy_run()
+        else:
+            # load data in db_fixtures
+            self.load_data()
 
         msg = colorize('green', "Confirming servers have started...")
         print msg
@@ -147,13 +150,8 @@ class BokChoyTestSuite(TestSuite):
         bokchoy_utils.clear_mongo()
         self.cache.flush_all()
 
-        sh(
-            "DEFAULT_STORE={default_store}"
-            " ./manage.py lms --settings bok_choy loaddata --traceback"
-            " common/test/db_fixtures/*.json".format(
-                default_store=self.default_store,
-            )
-        )
+        # load data in db_fixtures
+        self.load_data()
 
         if self.imports_dir:
             sh(
@@ -168,6 +166,19 @@ class BokChoyTestSuite(TestSuite):
         msg = colorize('green', "Confirming servers are running...")
         print msg
         bokchoy_utils.start_servers(self.default_store, self.coveragerc)
+
+    def load_data(self):
+        """
+        Loads data into database from db_fixtures
+        """
+        print 'Loading data from json fixtures in db_fixtures directory'
+        sh(
+            "DEFAULT_STORE={default_store}"
+            " ./manage.py lms --settings bok_choy loaddata --traceback"
+            " common/test/db_fixtures/*.json".format(
+                default_store=self.default_store,
+            )
+        )
 
     def run_servers_continuously(self):
         """
