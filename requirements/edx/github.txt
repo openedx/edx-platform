@@ -79,7 +79,7 @@ git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@0.2.4#egg=ora2==0.2.4
 -e git+https://github.com/edx/edx-submissions.git@0.1.3#egg=edx-submissions==0.1.3
--e git+https://github.com/edx/opaque-keys.git@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
+-e git+https://github.com/edx/opaque-keys.git@9f07da1abf699d10bc3252d3081017e8aa37c302#egg=opaque-keys
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 git+https://github.com/edx/i18n-tools.git@v0.1.4#egg=i18n-tools==v0.1.4
 git+https://github.com/edx/edx-oauth2-provider.git@0.5.8#egg=edx-oauth2-provider==0.5.8
