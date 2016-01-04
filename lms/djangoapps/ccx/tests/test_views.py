@@ -408,7 +408,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         course_key = CourseKey.from_string(ccx_key)
 
         self.assertTrue(CourseEnrollment.is_enrolled(self.coach, course_key))
-        self.assertTrue(re.search('id="ccx-schedule"', response.content))
+        self.assertTrue(re.search('id="ccx-schedule-container"', response.content))
 
         # check if the max amount of student that can be enrolled has been overridden
         ccx = CustomCourseForEdX.objects.get()

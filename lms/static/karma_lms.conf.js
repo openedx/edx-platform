@@ -16,7 +16,8 @@ var options = {
         {pattern: '../../common/static/common/js/vendor/jquery-migrate.js', included: true},
         {pattern: '../../common/static/js/vendor/jquery.event.drag-2.2.js', included: true},
         {pattern: '../../common/static/js/vendor/slick.core.js', included: true},
-        {pattern: '../../common/static/js/vendor/slick.grid.js', included: true}
+        {pattern: '../../common/static/js/vendor/slick.grid.js', included: true},
+        {pattern: 'xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker.js', included: false}
     ],
 
     libraryFiles: [

@@ -10,16 +10,16 @@ from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.ccx_dashboard_page import CoachDashboardPage
 
 
-@attr(shard=7)
-class CreateCCXCoachTest(EventsTestMixin, UniqueCourseTest):
+@attr('shard_7')
+class BaseCCXCoachTest(EventsTestMixin, UniqueCourseTest):
     """
-    Test ccx end to end process.
+    Base methods for CCX dashboard testing.
     """
     USERNAME = "coach_tester"
     EMAIL = "coach_tester@example.com"
 
     def setUp(self):
-        super(CreateCCXCoachTest, self).setUp()
+        super(BaseCCXCoachTest, self).setUp()
         self.course_info.update({"settings": {"enable_ccx": "true"}})
         self.course_fixture = CourseFixture(**self.course_info)
         self.course_fixture.add_advanced_settings({
@@ -45,14 +45,46 @@ class CreateCCXCoachTest(EventsTestMixin, UniqueCourseTest):
         coach_dashboard_page.visit()
         return coach_dashboard_page
 
-    def test_create_ccx(self):
+    def create_ccx(self):
         """
-        Assert that ccx created.
+        create ccx
         """
         ccx_name = "Test ccx"
 
         self.coach_dashboard_page.fill_ccx_name_text_box(ccx_name)
         self.coach_dashboard_page.wait_for_page()
 
+
+@attr('shard_7')
+class CreateCCXCoachTest(BaseCCXCoachTest):
+    """
+    Test ccx end to end process.
+    """
+    def test_create_ccx(self):
+        """
+        Assert that ccx created.
+        """
+        self.create_ccx()
         # Assert that new ccx is created and we are on ccx dashboard/enrollment tab.
         self.assertTrue(self.coach_dashboard_page.is_browser_on_enrollment_page())
+
+
+@attr('a11y')
+class ScheduleTabA11yTest(BaseCCXCoachTest):
+    """
+    Class to test schedule tab accessibility.
+    """
+
+    def test_schedule_tab_a11y(self):
+        """
+        Test schedule tab accessibility.
+        """
+        self.create_ccx()
+        schedule_section = self.coach_dashboard_page.select_schedule()
+
+        schedule_section.a11y_audit.config.set_rules({
+            'ignore': [
+                'link-href', 'skip-link'  # TODO: AC-233
+            ],
+        })
+        schedule_section.a11y_audit.check_for_accessibility_errors()

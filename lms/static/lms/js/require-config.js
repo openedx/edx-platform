@@ -82,6 +82,7 @@
             'string_utils': 'js/src/string_utils',
             'utility': 'js/src/utility',
             'draggabilly': 'js/vendor/draggabilly',
+            "jquery.timepicker": 'xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker',
 
             // Files needed by OVA
             'annotator': 'js/vendor/ova/annotator-full',

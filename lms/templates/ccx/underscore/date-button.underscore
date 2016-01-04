@@ -1,0 +1,8 @@
+<button class="ccx-button-link" data-toggle="modal" data-target="#enter-date-modal">
+    <% if (date) { %>
+        <%= HtmlUtils.ensureHtml(date) %>
+    <% } else { %>
+        <%- gettext('Set date') %>
+    <% } %>
+    <span class="sr"><%- gettext('Click to change') %></span>
+</button>

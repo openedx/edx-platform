@@ -1,0 +1,71 @@
+<td class="unit">
+  <% if (unit.category !== "vertical") { %>
+    <button class="toggle-collapse ccx-button-link" aria-expanded="false">
+      <i class="fa fa-caret-right" aria-hidden="true"></i>
+      <span class="sr">
+        <%= HtmlUtils.interpolateHtml(
+          gettext('toggle chapter {displayName}'),
+          {displayName: HtmlUtils.ensureHtml(unit.display_name)}
+        ) %>
+      </span>
+    </button>
+  <% } %>
+  <span class="sr">
+     <% if (unit.category === "chapter") { %>
+       <%- gettext('section') %>
+     <% } else if (unit.category === "sequential") { %>
+       <%- gettext('subsection') %>
+      <% } else { %>
+        <%- gettext('unit') %>
+      <% } %>
+  </span> <%= HtmlUtils.ensureHtml(unit.display_name) %>
+</td>
+
+<% if (unit.category !== "vertical") { %>
+    <td class="date start-date" tabindex="-1"
+         data-date="<%= HtmlUtils.ensureHtml(unit.start) %>"
+         data-location="<%= HtmlUtils.ensureHtml(location) %>">
+    </td>
+<% } else { %>
+<td class="no-link">
+  <% if (unit.start) { %>
+    <%= HtmlUtils.ensureHtml(unit.start) %>
+  <% } else { %>
+    <%
+    // Translators: Unit's start date is set to Unscheduled when user has not set start date on corresponding subsection aka sequential.
+    %>
+    <%- gettext('Unscheduled') %>
+  <% } %>
+ </td>
+<% } %>
+
+  <% if (unit.category === "chapter") { %>
+    <td class="no-link">
+      <%
+          // Translators: not applicable
+      %>
+      <%- gettext('N/A') %>
+    </td>
+  <% } else if (unit.category === "sequential") { %>
+  <td class="date due-date" tabindex="-1"
+      data-date="<%= HtmlUtils.ensureHtml(unit.due) %>"
+      data-location="<%= HtmlUtils.ensureHtml(location) %>">
+  </td>
+  <% } else { %>
+    <td class="no-link">
+    <% if (unit.due) { %>
+      <%= HtmlUtils.ensureHtml(unit.due) %>
+    <% } else { %>
+      <%
+      // Translators: Unit's aka vertical due date is set to Unscheduled when user has not set due date on corresponding subsection aka sequential.
+      %>
+      <%- gettext('Unscheduled') %>
+    <% } %>
+  <% } %>
+
+<td><button data-location="<%= location %>" class="remove-unit ccx-button-link" aria-label="<%= HtmlUtils.interpolateHtml(
+        gettext('Remove chapter {chapterDisplayName}'),
+        {chapterDisplayName: HtmlUtils.ensureHtml(unit.display_name)}) %>">
+    <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove') %>
+  </button>
+</td>

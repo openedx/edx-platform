@@ -1,0 +1,15 @@
+<div class="ccx-schedule-container">
+  <div id="ccx-schedule"></div>
+  <div id="new-ccx-schedule"></div>
+</div>
+
+<div class="ccx-schedule-sidebar">
+  <div class="ccx-sidebar-panel" id="ajax-error" tabindex="-1" role="region" aria-labelledby="ccx_schedule_error_message">
+    <h2><%- gettext('Error') %></h2>
+    <p id="ccx_schedule_error_message" class="text-helper">
+      <%- gettext('There was an error saving changes.') %>
+    </p>
+  </div>
+  <div id="ccx-schedule-form">
+  </div>
+</div>
