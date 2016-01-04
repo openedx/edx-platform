@@ -170,7 +170,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         CourseEnrollmentFactory.create(mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id)  # pylint: disable=no-member
 
-        self.url = reverse('support:enrollment_list', kwargs={'username': self.student.username})
+        self.url = reverse('support:enrollment_list', kwargs={'username_or_email': self.student.username})
 
     def assert_enrollment(self, mode):
         """
@@ -179,8 +179,13 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         enrollment = CourseEnrollment.get_enrollment(self.student, self.course.id)  # pylint: disable=no-member
         self.assertEqual(enrollment.mode, mode)
 
-    def test_get_enrollments(self):
-        response = self.client.get(self.url)
+    @ddt.data('username', 'email')
+    def test_get_enrollments(self, search_string_type):
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(len(data), 1)
@@ -212,9 +217,14 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'reason': 'Financial Assistance',
         }, json.loads(response.content)[0]['manual_enrollment'])
 
-    def test_change_enrollment(self):
+    @ddt.data('username', 'email')
+    def test_change_enrollment(self, search_string_type):
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
-        response = self.client.post(self.url, data={
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.post(url, data={
             'course_id': unicode(self.course.id),  # pylint: disable=no-member
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
