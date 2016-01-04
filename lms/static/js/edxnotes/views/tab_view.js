@@ -15,7 +15,7 @@ define([
             _.bindAll(this, 'showLoadingIndicator', 'hideLoadingIndicator');
             this.options = _.defaults(options || {}, {
                 createTabOnInitialization: true,
-                createHeaderFooter: false
+                createHeaderFooter: true
             });
 
             if (this.options.createTabOnInitialization) {

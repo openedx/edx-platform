@@ -106,6 +106,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
             params=params
         )
     except RequestException:
+        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
@@ -319,6 +320,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     try:
         collection = json.loads(response.content)
     except ValueError:
+        log.error("Invalid response received from notes api: response_content=%s", response.content)
         raise EdxNotesParseError(_("Invalid response received from notes api."))
 
     # Verify response dict structure
@@ -328,11 +330,9 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
         raise EdxNotesParseError(_("Invalid response received from notes api."))
 
     filtered_results = preprocess_collection(request.user, course, collection['rows'])
-    # notes frontend uses notes api in two ways
-    # 1. uses through LMS
-    # 2. directly call the notes api
-    # In first case, notes frontend requires count and results attributes in json response and
-    # for second case frontend requires total and rows attributes in json response.
+    # Notes API is called from:
+    # 1. The annotatorjs in courseware. It expects these attributes to be named "total" and "rows".
+    # 2. The Notes tab Javascript proxied through LMS. It expects these attributes to be called "count" and "results".
     collection['count'] = collection['total']
     del collection['total']
     collection['results'] = filtered_results

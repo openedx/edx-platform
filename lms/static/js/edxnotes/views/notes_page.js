@@ -31,8 +31,7 @@ define([
                 el: this.el,
                 collection: this.collection,
                 tabsCollection: this.tabsCollection,
-                scrollToTag: scrollToTag,
-                createHeaderFooter: true
+                scrollToTag: scrollToTag
             });
 
             this.courseStructureView = new CourseStructureView({
@@ -51,8 +50,7 @@ define([
                 debug: this.options.debug,
                 perPage: this.options.perPage,
                 createTabOnInitialization: false,
-                scrollToTag: scrollToTag,
-                createHeaderFooter: true
+                scrollToTag: scrollToTag
             });
 
             this.tabsView = new TabsListView({collection: this.tabsCollection});

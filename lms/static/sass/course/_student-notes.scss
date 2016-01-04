@@ -107,10 +107,6 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     margin: 0;
     padding-top: ($baseline*1.5);
 
-    .listing-tools {
-      @include margin($baseline $baseline (-$baseline/2) 0);
-    }
-
     // course structure labels
     .course-title, .tags-title {
       @extend %t-title6;
@@ -289,6 +285,15 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
     .tab-panel, .inline-error, .ui-loading {
       @extend %no-outline;
+      border-top: $divider-visual-primary;
+
+      .listing-tools {
+        @include margin($baseline $baseline (-$baseline/2) 0);
+      }
+
+      .note-group:first-of-type {
+        border-top: none;
+      }
     }
 
     .tab-panel.note-group {

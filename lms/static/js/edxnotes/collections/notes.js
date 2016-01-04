@@ -10,18 +10,8 @@ define([
             PagingCollection.prototype.initialize.call(this);
 
             this.perPage = options.perPage;
-            this.server_api = _.extend(
-                {'text': options.text ? options.text : null}, PagingCollection.prototype.server_api
-            );
-
-            // delete text query param if null
-            if (this.server_api.text === null) {
-                delete this.server_api.text;
-            }
-
-            // These are not specified for the Notes API
-            delete this.server_api.sort_order;
-            delete this.server_api.text_search;
+            this.server_api = _.pick(PagingCollection.prototype.server_api, "page", "page_size");
+            if (options.text) { this.server_api['text'] = options.text }
         },
 
         /**
