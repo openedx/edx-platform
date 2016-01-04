@@ -240,8 +240,9 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                     )
                 );
                 assignmentType = assignmentType || MOCK_MANUAL_ASSIGNMENT;
-                var manualMessage = "Students are added to this cohort only when you provide their email addresses or usernames on this page.";
-                var randomMessage = "Students are added to this cohort automatically.";
+                var manualMessage = "Learners are added to this cohort only when you provide their email addresses " +
+                    "or usernames on this page.";
+                var randomMessage = "Learners are added to this cohort automatically.";
                 var message = (assignmentType == MOCK_MANUAL_ASSIGNMENT) ? manualMessage : randomMessage;
                 expect(header.find('.cohort-management-group-setup .setup-value').text().trim().split('\n')[0]).toBe(message);
             };
