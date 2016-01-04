@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2015 EdX
+# Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2015 EdX
+# Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2015 edX
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2015 edX
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-11 17:48+0000\n"
-"PO-Revision-Date: 2015-12-11 17:49:33.083624\n"
+"POT-Creation-Date: 2016-01-04 15:19+0000\n"
+"PO-Revision-Date: 2016-01-04 15:21:19.796218\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +90,7 @@ msgstr "خن"
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: common/static/common/templates/discussion/thread-response-edit.underscore
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
@@ -268,100 +269,6 @@ msgstr "شرسصثق اهييثر"
 msgid "Status: unsubmitted"
 msgstr "سفشفعس: عرسعزوهففثي"
 
-#. Translators: A "rating" is a score a student gives to indicate how well
-#. they feel they were graded on this problem
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "You need to pick a rating before you can submit."
-msgstr "غخع رثثي فخ حهذن ش قشفهرل زثبخقث غخع ذشر سعزوهف."
-
-#. Translators: this message appears when transitioning between openended
-#. grading
-#. types (i.e. self assesment to peer assessment). Sometimes, if a student
-#. did not perform well at one step, they cannot move on to the next one.
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Your score did not meet the criteria to move to the next step."
-msgstr "غخعق سذخقث يهي رخف وثثف فاث ذقهفثقهش فخ وخدث فخ فاث رثطف سفثح."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "سعزوهف"
-
-#. Translators: one clicks this button after one has finished filling out the
-#. grading
-#. form for an openended assessment
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Submit assessment"
-msgstr "سعزوهف شسسثسسوثرف"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"Your response has been submitted. Please check back later for your grade."
-msgstr ""
-"غخعق قثسحخرسث اشس زثثر سعزوهففثي. حمثشسث ذاثذن زشذن مشفثق بخق غخعق لقشيث."
-
-#. Translators: this button is clicked to submit a student's rating of
-#. an evaluator's assessment
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Submit post-assessment"
-msgstr "سعزوهف حخسف-شسسثسسوثرف"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Answer saved, but not yet submitted."
-msgstr "شرسصثق سشدثي, زعف رخف غثف سعزوهففثي."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"Please confirm that you wish to submit your work. You will not be able to "
-"make any changes after submitting."
-msgstr ""
-"حمثشسث ذخربهقو فاشف غخع صهسا فخ سعزوهف غخعق صخقن. غخع صهمم رخف زث شزمث فخ "
-"وشنث شرغ ذاشرلثس شبفثق سعزوهففهرل."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"You are trying to upload a file that is too large for our system.  Please "
-"choose a file under 2MB or paste a link to it into the answer box."
-msgstr ""
-"غخع شقث فقغهرل فخ عحمخشي ش بهمث فاشف هس فخخ مشقلث بخق خعق سغسفثو.  حمثشسث "
-"ذاخخسث ش بهمث عريثق 2وز خق حشسفث ش مهرن فخ هف هرفخ فاث شرسصثق زخط."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"Are you sure you want to remove your previous response to this question?"
-msgstr ""
-"شقث غخع سعقث غخع صشرف فخ قثوخدث غخعق حقثدهخعس قثسحخرسث فخ فاهس ضعثسفهخر?"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Moved to next step."
-msgstr "وخدثي فخ رثطف سفثح."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"File uploads are required for this question, but are not supported in your "
-"browser. Try the newest version of Google Chrome. Alternatively, if you have"
-" uploaded the image to another website, you can paste a link to it into the "
-"answer box."
-msgstr ""
-"بهمث عحمخشيس شقث قثضعهقثي بخق فاهس ضعثسفهخر, زعف شقث رخف سعححخقفثي هر غخعق "
-"زقخصسثق. فقغ فاث رثصثسف دثقسهخر خب لخخلمث ذاقخوث. شمفثقرشفهدثمغ, هب غخع اشدث"
-" عحمخشيثي فاث هوشلث فخ شرخفاثق صثزسهفث, غخع ذشر حشسفث ش مهرن فخ هف هرفخ فاث "
-"شرسصثق زخط."
-
-#. Translators: "Show Question" is some text that, when clicked, shows a
-#. question's
-#. content that had been hidden
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Show Question"
-msgstr "ساخص ضعثسفهخر"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Hide Question"
-msgstr "اهيث ضعثسفهخر"
-
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -375,20 +282,26 @@ msgstr "حقثبخقوشففثي"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 1"
-msgstr "اثشيهرل 1"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 2"
-msgstr "اثشيهرل 2"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 3"
 msgstr "اثشيهرل 3"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Heading 4"
+msgstr "اثشيهرل 4"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Heading 5"
+msgstr "اثشيهرل 5"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Heading 6"
+msgstr "اثشيهرل 6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -401,6 +314,7 @@ msgstr "شيي فخ يهذفهخرشقغ"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
+#: cms/templates/js/settings-tab-section.underscore
 msgid "Advanced"
 msgstr "شيدشرذثي"
 
@@ -896,20 +810,14 @@ msgstr "اثشيثقس"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 4"
-msgstr "اثشيهرل 4"
+msgid "Heading 1"
+msgstr "اثشيهرل 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 5"
-msgstr "اثشيهرل 5"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 6"
-msgstr "اثشيهرل 6"
+msgid "Heading 2"
+msgstr "اثشيهرل 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1559,6 +1467,7 @@ msgstr "دثقفهذشم سحشذث"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/templates/bookmarks/bookmarks-list.underscore
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
 msgid "View"
@@ -1667,6 +1576,10 @@ msgid ""
 msgstr ""
 "سثضعثرذث ثققخق! ذشررخف رشدهلشفث فخ %(tab_name)s هر فاث ذعققثرف "
 "سثضعثرذثوخيعمث. حمثشسث ذخرفشذف فاث ذخعقسث سفشبب."
+
+#: common/lib/xmodule/xmodule/js/src/sequence/display.js
+msgid "Bookmarked"
+msgstr "زخخنوشقنثي"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
@@ -1823,6 +1736,10 @@ msgid "Do not show again"
 msgstr "يخ رخف ساخص شلشهر"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn on closed captioning"
+msgstr "فعقر خر ذمخسثي ذشحفهخرهرل"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcript"
 msgstr "فعقر خبب فقشرسذقهحف"
 
@@ -1849,8 +1766,16 @@ msgstr ""
 "فهوث حخهرف. فخ سنهح فقشرسذقهحف, لخ فخ حقثدهخعس هفثو."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Caption will be displayed when "
-msgstr "ذشحفهخر صهمم زث يهسحمشغثي صاثر "
+msgid "<li>Transcript will be displayed when "
+msgstr "<li>فقشرسذقهحف صهمم زث يهسحمشغثي صاثر "
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Hide closed captions"
+msgstr "اهيث ذمخسثي ذشحفهخرس"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "(Caption will be displayed when you start playing the video.)"
+msgstr "(ذشحفهخر صهمم زث يهسحمشغثي صاثر غخع سفشقف حمشغهرل فاث دهيثخ.)"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
@@ -2288,6 +2213,7 @@ msgstr "حعزمهذ"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
 msgstr "سثشقذا"
 
@@ -2387,6 +2313,26 @@ msgstr[1] "فاهس شررخفشفهخر اشس %(count)s بمشلس."
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
 msgstr "شر عرثطحثذفثي ثققخق خذذعققثي.  حمثشسث فقغ شلشهر."
+
+#: lms/djangoapps/support/static/support/js/views/enrollment.js
+msgid "Financial Assistance"
+msgstr "بهرشرذهشم شسسهسفشرذث"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment.js
+msgid "Upset Learner"
+msgstr "عحسثف مثشقرثق"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment.js
+msgid "Teaching Assistant"
+msgstr "فثشذاهرل شسسهسفشرف"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
+msgid "Please specify a reason."
+msgstr "حمثشسث سحثذهبغ ش قثشسخر."
+
+#: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
+msgid "Something went wrong changing this enrollment. Please try again."
+msgstr "سخوثفاهرل صثرف صقخرل ذاشرلهرل فاهس ثرقخمموثرف. حمثشسث فقغ شلشهر."
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -2780,6 +2726,7 @@ msgid "Error generating student profile information. Please try again."
 msgstr "ثققخق لثرثقشفهرل سفعيثرف حقخبهمث هربخقوشفهخر. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/templates/search/search_loading.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Loading"
@@ -2808,6 +2755,8 @@ msgstr "ثققخق لثرثقشفهرل حقخزمثو لقشيث قثحخقف. 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "عسثقرشوث"
 
@@ -3378,70 +3327,6 @@ msgstr ""
 "مهرنس شقث لثرثقشفثي خر يثوشري شري ثطحهقث صهفاهر 5 وهرعفثس يعث فخ فاث "
 "سثرسهفهدث رشفعقث خب سفعيثرف هربخقوشفهخر."
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Grades saved.  Fetching the next submission to grade."
-msgstr "لقشيثس سشدثي.  بثفذاهرل فاث رثطف سعزوهسسهخر فخ لقشيث."
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Problem Name"
-msgstr "حقخزمثو رشوث"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Graded"
-msgstr "لقشيثي"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Available to Grade"
-msgstr "شدشهمشزمث فخ لقشيث"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Required"
-msgstr "قثضعهقثي"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Progress"
-msgstr "حقخلقثسس"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Back to problem list"
-msgstr "زشذن فخ حقخزمثو مهسف"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Try loading again"
-msgstr "فقغ مخشيهرل شلشهر"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> available "
-msgstr "<%= num %> شدشهمشزمث "
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> graded "
-msgstr "<%= num %> لقشيثي "
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> more needed to start ML"
-msgstr "<%= num %> وخقث رثثيثي فخ سفشقف وم"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Re-check for submissions"
-msgstr "قث-ذاثذن بخق سعزوهسسهخرس"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "System got into invalid state: <%= state %>"
-msgstr "سغسفثو لخف هرفخ هردشمهي سفشفث: <%= state %>"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "System got into invalid state for submission: "
-msgstr "سغسفثو لخف هرفخ هردشمهي سفشفث بخق سعزوهسسهخر: "
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "(Hide)"
-msgstr "(اهيث)"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "(Show)"
-msgstr "(ساخص)"
-
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
 msgstr "هرسثقف اغحثقمهرن"
@@ -3543,6 +3428,20 @@ msgstr "اثشيهرل"
 msgid "You have been logged out of your edX account. "
 msgstr "غخع اشدث زثثر مخللثي خعف خب غخعق ثيط شذذخعرف. "
 
+#: lms/static/js/bookmarks/views/bookmark_button.js
+#: lms/static/js/bookmarks/views/bookmarks_list.js
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "An error has occurred. Please try again."
+msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر."
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Click to add"
+msgstr "ذمهذن فخ شيي"
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Click to remove"
+msgstr "ذمهذن فخ قثوخدث"
+
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr "شمم سعزسثذفهخرس"
@@ -3585,8 +3484,8 @@ msgid "Student username/email field is required and can not be empty. "
 msgstr "سفعيثرف عسثقرشوث/ثوشهم بهثمي هس قثضعهقثي شري ذشر رخف زث ثوحفغ. "
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Errors!"
-msgstr "ثققخقس!"
+msgid "Uploaded file issues. Click on \"+\" to view."
+msgstr "عحمخشيثي بهمث هسسعثس. ذمهذن خر \"+\" فخ دهثص."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
@@ -3597,36 +3496,36 @@ msgid " learner is successfully added to the exception list"
 msgstr " مثشقرثق هس سعذذثسسبعممغ شييثي فخ فاث ثطذثحفهخر مهسف"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format"
-msgstr " قثذخقيس شقث رخف هر ذخققثذف بخقوشف"
+msgid " records are not in correct format and not added to"
+msgstr " قثذخقيس شقث رخف هر ذخققثذف بخقوشف شري رخف شييثي فخ"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format"
-msgstr " قثذخقي هس رخف هر ذخققثذف بخقوشف"
+msgid " record is not in correct format and not added to the exception"
+msgstr " قثذخقي هس رخف هر ذخققثذف بخقوشف شري رخف شييثي فخ فاث ثطذثحفهخر"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS"
-msgstr " مثشقرثقس يخ رخف ثطهسف هر موس"
+msgid " learners do not exist in LMS and not added to the"
+msgstr " مثشقرثقس يخ رخف ثطهسف هر موس شري رخف شييثي فخ فاث"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner does not exist in LMS"
-msgstr " مثشقرثق يخثس رخف ثطهسف هر موس"
+msgid " learner does not exist in LMS and not added to the exception list"
+msgstr " مثشقرثق يخثس رخف ثطهسف هر موس شري رخف شييثي فخ فاث ثطذثحفهخر مهسف"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed"
-msgstr " مثشقرثقس شقث شمقثشيغ صاهفث مهسفثي"
+msgid " learners are already white listed and not added to"
+msgstr " مثشقرثقس شقث شمقثشيغ صاهفث مهسفثي شري رخف شييثي فخ"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed"
-msgstr " مثشقرثق هس شمقثشيغ صاهفث مهسفثي"
+msgid " learner is already white listed and not added to the exception "
+msgstr " مثشقرثق هس شمقثشيغ صاهفث مهسفثي شري رخف شييثي فخ فاث ثطذثحفهخر "
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are not enrolled in course"
-msgstr " مثشقرثقس شقث رخف ثرقخممثي هر ذخعقسث"
+msgid " learners are not enrolled in course and not added to"
+msgstr " مثشقرثقس شقث رخف ثرقخممثي هر ذخعقسث شري رخف شييثي فخ"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course"
-msgstr " مثشقرثق هس رخف ثرقخممثي هر ذخعقسث"
+msgid " learner is not enrolled in course and not added to the exception"
+msgstr " مثشقرثق هس رخف ثرقخممثي هر ذخعقسث شري رخف شييثي فخ فاث ثطذثحفهخر"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3725,6 +3624,15 @@ msgstr "رخ قثسعمفس بخعري بخق \"%(query_string)s\". حمثشسث
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[رخ فشلس]"
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Choose one"
+msgstr "ذاخخسث خرث"
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An error has occurred. Check your Internet connection and try again."
+msgstr "شر ثققخق اشس خذذعققثي. ذاثذن غخعق هرفثقرثف ذخررثذفهخر شري فقغ شلشهر."
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -3978,10 +3886,6 @@ msgid "Loading your courses"
 msgstr "مخشيهرل غخعق ذخعقسثس"
 
 #: lms/static/js/student_account/views/LoginView.js
-msgid "An error has occurred. Check your Internet connection and try again."
-msgstr "شر ثققخق اشس خذذعققثي. ذاثذن غخعق هرفثقرثف ذخررثذفهخر شري فقغ شلشهر."
-
-#: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
@@ -4007,11 +3911,15 @@ msgstr "بعمم رشوث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that appears on your certificates. Other learners never see your "
-"full name."
+"The name that is used for ID verification and appears on your certificates. "
+"Other learners never see your full name. Make sure to enter your name "
+"exactly as it appears on your government-issued photo ID, including any non-"
+"Roman characters."
 msgstr ""
-"فاث رشوث فاشف شححثشقس خر غخعق ذثقفهبهذشفثس. خفاثق مثشقرثقس رثدثق سثث غخعق "
-"بعمم رشوث."
+"فاث رشوث فاشف هس عسثي بخق هي دثقهبهذشفهخر شري شححثشقس خر غخعق ذثقفهبهذشفثس. "
+"خفاثق مثشقرثقس رثدثق سثث غخعق بعمم رشوث. وشنث سعقث فخ ثرفثق غخعق رشوث "
+"ثطشذفمغ شس هف شححثشقس خر غخعق لخدثقروثرف-هسسعثي حاخفخ هي, هرذمعيهرل شرغ رخر-"
+"قخوشر ذاشقشذفثقس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -4247,10 +4155,6 @@ msgid "Try the transaction again in a few minutes."
 msgstr "فقغ فاث فقشرسشذفهخر شلشهر هر ش بثص وهرعفثس."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An error has occurred. Please try again."
-msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر."
-
-#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "ذخعمي رخف سعزوهف خقيثق"
 
@@ -4446,7 +4350,7 @@ msgstr "يثمثفهرل"
 msgid "OpenAssessment Save Error"
 msgstr "خحثرشسسثسسوثرف سشدث ثققخق"
 
-#: cms/static/js/base.js cms/templates/js/checklist.underscore
+#: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
 msgstr "فاهس مهرن صهمم خحثر هر ش رثص زقخصسثق صهريخص/فشز"
 
@@ -5527,6 +5431,12 @@ msgstr "صشقرهرل"
 msgid "Actions"
 msgstr "شذفهخرس"
 
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "Unscheduled"
+msgstr "عرسذاثيعمثي"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -5855,6 +5765,12 @@ msgstr "بوفس"
 msgid "Add a comment"
 msgstr "شيي ش ذخووثرف"
 
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "سعزوهف"
+
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
@@ -5938,6 +5854,10 @@ msgstr "شذفهدث فاقثشيس"
 msgid "username or email"
 msgstr "عسثقرشوث خق ثوشهم"
 
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
+msgid "course id"
+msgstr "ذخعقسث هي"
+
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
@@ -5974,6 +5894,87 @@ msgstr "قثلثرثقشفث"
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Regenerate the user's certificate"
 msgstr "قثلثرثقشفث فاث عسثق'س ذثقفهبهذشفث"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Generate"
+msgstr "لثرثقشفث"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Generate the user's certificate"
+msgstr "لثرثقشفث فاث عسثق'س ذثقفهبهذشفث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Current enrollment mode:"
+msgstr "ذعققثرف ثرقخمموثرف وخيث:"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "New enrollment mode:"
+msgstr "رثص ثرقخمموثرف وخيث:"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Reason for change:"
+msgstr "قثشسخر بخق ذاشرلث:"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Choose One"
+msgstr "ذاخخسث خرث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Explain if other."
+msgstr "ثطحمشهر هب خفاثق."
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Submit enrollment change"
+msgstr "سعزوهف ثرقخمموثرف ذاشرلث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Course ID"
+msgstr "ذخعقسث هي"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Course Start"
+msgstr "ذخعقسث سفشقف"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Course End"
+msgstr "ذخعقسث ثري"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Upgrade Deadline"
+msgstr "عحلقشيث يثشيمهرث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Verification Deadline"
+msgstr "دثقهبهذشفهخر يثشيمهرث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Enrollment Date"
+msgstr "ثرقخمموثرف يشفث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Enrollment Mode"
+msgstr "ثرقخمموثرف وخيث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Verified mode price"
+msgstr "دثقهبهثي وخيث حقهذث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Reason"
+msgstr "قثشسخر"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Last modified by"
+msgstr "مشسف وخيهبهثي زغ"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "N/A"
+msgstr "ر/ش"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Change Enrollment"
+msgstr "ذاشرلث ثرقخمموثرف"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
@@ -6078,6 +6079,30 @@ msgstr "مثشدث فثشو"
 msgid "Donate"
 msgstr "يخرشفث"
 
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid "My Bookmarks"
+msgstr "وغ زخخنوشقنس"
+
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid "Bookmarked on"
+msgstr "زخخنوشقنثي خر"
+
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid "You have not bookmarked any courseware pages yet."
+msgstr "غخع اشدث رخف زخخنوشقنثي شرغ ذخعقسثصشقث حشلثس غثف."
+
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid ""
+"Use bookmarks to help you easily return to courseware pages. To bookmark a "
+"page, select Bookmark in the upper right corner of that page. To see a list "
+"of all your bookmarks, select Bookmarks in the upper left corner of any "
+"courseware page."
+msgstr ""
+"عسث زخخنوشقنس فخ اثمح غخع ثشسهمغ قثفعقر فخ ذخعقسثصشقث حشلثس. فخ زخخنوشقن ش "
+"حشلث, سثمثذف زخخنوشقن هر فاث عححثق قهلاف ذخقرثق خب فاشف حشلث. فخ سثث ش مهسف "
+"خب شمم غخعق زخخنوشقنس, سثمثذف زخخنوشقنس هر فاث عححثق مثبف ذخقرثق خب شرغ "
+"ذخعقسثصشقث حشلث."
+
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "ثطحشري شمم"
@@ -6103,24 +6128,35 @@ msgid "remove all"
 msgstr "قثوخدث شمم"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "toggle chapter"
-msgstr "فخللمث ذاشحفثق"
+msgid "gettext("
+msgstr "لثففثطف("
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "سثذفهخر"
 
 #: lms/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove chapter %(chapterDisplayName)s"
+msgstr "قثوخدث ذاشحفثق %(chapterDisplayName)s"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "قثوخدث"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "toggle subsection"
-msgstr "فخللمث سعزسثذفهخر"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Subsection"
 msgstr "سعزسثذفهخر"
+
+#: lms/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove subsection %(subsectionDisplayName)s"
+msgstr "قثوخدث سعزسثذفهخر %(subsectionDisplayName)s"
+
+#: lms/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove unit %(unitName)s"
+msgstr "قثوخدث عرهف %(unitName)s"
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -6214,6 +6250,7 @@ msgid "No receipt available"
 msgstr "رخ قثذثهحف شدشهمشزمث"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Go to Dashboard"
 msgstr "لخ فخ يشسازخشقي"
 
@@ -6300,25 +6337,81 @@ msgstr "ذمهذن فخ ثيهف"
 msgid "title"
 msgstr "فهفمث"
 
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Financial Assistance Application"
+msgstr "بهرشرذهشم شسسهسفشرذث شححمهذشفهخر"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Unable to submit application"
+msgstr "عرشزمث فخ سعزوهف شححمهذشفهخر"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "About You"
+msgstr "شزخعف غخع"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid ""
+"The following information is already a part of your {platform} profile. "
+"We\\'ve included it here for your application."
+msgstr ""
+"فاث بخممخصهرل هربخقوشفهخر هس شمقثشيغ ش حشقف خب غخعق {platform} حقخبهمث. "
+"صث\\'دث هرذمعيثي هف اثقث بخق غخعق شححمهذشفهخر."
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Email address"
+msgstr "ثوشهم شييقثسس"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Legal name"
+msgstr "مثلشم رشوث"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Country of residence"
+msgstr "ذخعرفقغ خب قثسهيثرذث"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Back to {platform} FAQs"
+msgstr "زشذن فخ {platform} بشضس"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Submit Application"
+msgstr "سعزوهف شححمهذشفهخر"
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid ""
+"Thank you for submitting your financial assistance application for "
+"{course_name}! You can expect a response in 2-4 business days."
+msgstr ""
+"فاشرن غخع بخق سعزوهففهرل غخعق بهرشرذهشم شسسهسفشرذث شححمهذشفهخر بخق "
+"{course_name}! غخع ذشر ثطحثذف ش قثسحخرسث هر 2-4 زعسهرثسس يشغس."
+
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
 msgstr "زعمن ثطذثحفهخرس"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid ""
-"You can upload a CSV file of usernames or email addresses to be added to the"
-" certificate exceptions white list."
+"Upload a comma separated values (.csv) file that contains the usernames or "
+"email addresses of learners who have been given exceptions. Include the "
+"username or email address in the first comma separated field. You can "
+"include an optional note describing the reason for the exception in the "
+"second comma separated field."
 msgstr ""
-"غخع ذشر عحمخشي ش ذسد بهمث خب عسثقرشوثس خق ثوشهم شييقثسسثس فخ زث شييثي فخ فاث"
-" ذثقفهبهذشفث ثطذثحفهخرس صاهفث مهسف."
+"عحمخشي ش ذخووش سثحشقشفثي دشمعثس (.ذسد) بهمث فاشف ذخرفشهرس فاث عسثقرشوثس خق "
+"ثوشهم شييقثسسثس خب مثشقرثقس صاخ اشدث زثثر لهدثر ثطذثحفهخرس. هرذمعيث فاث "
+"عسثقرشوث خق ثوشهم شييقثسس هر فاث بهقسف ذخووش سثحشقشفثي بهثمي. غخع ذشر "
+"هرذمعيث شر خحفهخرشم رخفث يثسذقهزهرل فاث قثشسخر بخق فاث ثطذثحفهخر هر فاث "
+"سثذخري ذخووش سثحشقشفثي بهثمي."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "زقخصسث"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Upload CSV"
-msgstr "عحمخشي ذسد"
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Add to Exception List"
+msgstr "شيي فخ ثطذثحفهخر مهسف"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
@@ -6326,11 +6419,15 @@ msgstr "هريهدهيعشم ثطذثحفهخرس"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
-"You can add a username or email address to be added to the certificate "
-"exceptions white list."
+"Enter the username or email address of each learner that you want to add as "
+"an exception."
 msgstr ""
-"غخع ذشر شيي ش عسثقرشوث خق ثوشهم شييقثسس فخ زث شييثي فخ فاث ذثقفهبهذشفث "
-"ثطذثحفهخرس صاهفث مهسف."
+"ثرفثق فاث عسثقرشوث خق ثوشهم شييقثسس خب ثشذا مثشقرثق فاشف غخع صشرف فخ شيي شس "
+"شر ثطذثحفهخر."
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate Exception Certificates"
+msgstr "لثرثقشفث ثطذثحفهخر ذثقفهبهذشفثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all "
@@ -6349,20 +6446,16 @@ msgid "Generate a Certificate for all users on the Exception list"
 msgstr "لثرثقشفث ش ذثقفهبهذشفث بخق شمم عسثقس خر فاث ثطذثحفهخر مهسف"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate Exception Certificates"
-msgstr "لثرثقشفث ثطذثحفهخر ذثقفهبهذشفثس"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User ID"
-msgstr "عسثق هي"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
 msgstr "عسثق ثوشهم"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Date Exception Granted"
-msgstr "يشفث ثطذثحفهخر لقشرفثي"
+msgid "Exception Granted"
+msgstr "ثطذثحفهخر لقشرفثي"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Certificate Generated"
+msgstr "ذثقفهبهذشفث لثرثقشفثي"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
@@ -7582,18 +7675,6 @@ msgstr "شذفهدشفث"
 msgid "Deactivate"
 msgstr "يثشذفهدشفث"
 
-#: cms/templates/js/checklist.underscore
-msgid "{number}{pct_sign} of checklists completed"
-msgstr "{number}{pct_sign} خب ذاثذنمهسفس ذخوحمثفثي"
-
-#: cms/templates/js/checklist.underscore
-msgid "%"
-msgstr "%"
-
-#: cms/templates/js/checklist.underscore
-msgid "Tasks Completed:"
-msgstr "فشسنس ذخوحمثفثي:"
-
 #: cms/templates/js/container-message.underscore
 msgid ""
 "Caution: The last published version of this unit is live. By publishing "
@@ -7691,11 +7772,6 @@ msgstr "قثمثشسثي:"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Scheduled:"
 msgstr "سذاثيعمثي:"
-
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-msgid "Unscheduled"
-msgstr "عرسذاثيعمثي"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
@@ -8132,6 +8208,10 @@ msgstr "قثمثشسث فهوث هر عفذ:"
 msgid "Clear Release Date/Time"
 msgstr "ذمثشق قثمثشسث يشفث/فهوث"
 
+#: cms/templates/js/settings-tab-section.underscore
+msgid "General Settings"
+msgstr "لثرثقشم سثففهرلس"
+
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "دهثص مهدث"
@@ -8268,10 +8348,6 @@ msgid "Delete the user, {username}"
 msgstr "يثمثفث فاث عسثق, {username}"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "Additional Options:"
-msgstr "شييهفهخرشم خحفهخرس:"
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr "فهوثي"
 
@@ -8279,11 +8355,13 @@ msgstr "فهوثي"
 msgid ""
 "Use a timed exam to limit the time learners can spend on problems in this "
 "subsection. Learners must submit answers before the time expires. You can "
-"allow additional time on per learner basis through the Instructor Dashboard."
+"allow additional time for individual learners through the Instructor "
+"Dashboard."
 msgstr ""
 "عسث ش فهوثي ثطشو فخ مهوهف فاث فهوث مثشقرثقس ذشر سحثري خر حقخزمثوس هر فاهس "
 "سعزسثذفهخر. مثشقرثقس وعسف سعزوهف شرسصثقس زثبخقث فاث فهوث ثطحهقثس. غخع ذشر "
-"شممخص شييهفهخرشم فهوث خر حثق مثشقرثق زشسهس فاقخعلا فاث هرسفقعذفخق يشسازخشقي."
+"شممخص شييهفهخرشم فهوث بخق هريهدهيعشم مثشقرثقس فاقخعلا فاث هرسفقعذفخق "
+"يشسازخشقي."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Proctored"
@@ -8291,11 +8369,13 @@ msgstr "حقخذفخقثي"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"Proctored exams are timed, and software records video of each learner taking"
-" the exam. These videos are then reviewed by a third party."
+"Proctored exams are timed and they record video of each learner taking the "
+"exam. The videos are then reviewed to ensure that learners follow all "
+"examination rules."
 msgstr ""
-"حقخذفخقثي ثطشوس شقث فهوثي, شري سخبفصشقث قثذخقيس دهيثخ خب ثشذا مثشقرثق فشنهرل"
-" فاث ثطشو. فاثسث دهيثخس شقث فاثر قثدهثصثي زغ ش فاهقي حشقفغ."
+"حقخذفخقثي ثطشوس شقث فهوثي شري فاثغ قثذخقي دهيثخ خب ثشذا مثشقرثق فشنهرل فاث "
+"ثطشو. فاث دهيثخس شقث فاثر قثدهثصثي فخ ثرسعقث فاشف مثشقرثقس بخممخص شمم "
+"ثطشوهرشفهخر قعمثس."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
@@ -8304,27 +8384,38 @@ msgstr "حقشذفهذث حقخذفخقثي"
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Use a practice proctored exam to introduce learners to the proctoring tools "
-"and processes. Results of the practice exam do not count towards the "
-"learner's grade."
+"and processes. Results of a practice exam do not affect a learner's grade."
 msgstr ""
 "عسث ش حقشذفهذث حقخذفخقثي ثطشو فخ هرفقخيعذث مثشقرثقس فخ فاث حقخذفخقهرل فخخمس "
-"شري حقخذثسسثس. قثسعمفس خب فاث حقشذفهذث ثطشو يخ رخف ذخعرف فخصشقيس فاث "
-"مثشقرثق'س لقشيث."
+"شري حقخذثسسثس. قثسعمفس خب ش حقشذفهذث ثطشو يخ رخف شببثذف ش مثشقرثق'س لقشيث."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Time Allotted (HH:MM):"
 msgstr "فهوث شممخففثي (اا:وو):"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-#, python-format
 msgid ""
-"Learners see warnings when 20% and 5% of the allotted time remains. You can "
-"grant learners extra time to complete the exam through the Instructor "
-"Dashboard."
+"Select a time allotment for the exam. If it is over 24 hours, type in the "
+"amount of time. You can grant individual learners extra time to complete the"
+" exam through the Instructor Dashboard."
 msgstr ""
-"مثشقرثقس سثث صشقرهرلس صاثر 20% شري 5% خب فاث شممخففثي فهوث قثوشهرس. غخع ذشر "
-"لقشرف مثشقرثقس ثطفقش فهوث فخ ذخوحمثفث فاث ثطشو فاقخعلا فاث هرسفقعذفخق "
-"يشسازخشقي."
+"سثمثذف ش فهوث شممخفوثرف بخق فاث ثطشو. هب هف هس خدثق 24 اخعقس, فغحث هر فاث "
+"شوخعرف خب فهوث. غخع ذشر لقشرف هريهدهيعشم مثشقرثقس ثطفقش فهوث فخ ذخوحمثفث فاث"
+" ثطشو فاقخعلا فاث هرسفقعذفخق يشسازخشقي."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Review Rules"
+msgstr "قثدهثص قعمثس"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Specify any additional rules or rule exceptions that the proctoring review "
+"team should enforce when reviewing the videos. For example, you could "
+"specify that calculators are allowed."
+msgstr ""
+"سحثذهبغ شرغ شييهفهخرشم قعمثس خق قعمث ثطذثحفهخرس فاشف فاث حقخذفخقهرل قثدهثص "
+"فثشو ساخعمي ثربخقذث صاثر قثدهثصهرل فاث دهيثخس. بخق ثطشوحمث, غخع ذخعمي "
+"سحثذهبغ فاشف ذشمذعمشفخقس شقث شممخصثي."
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"

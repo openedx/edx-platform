@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2015 EdX
+# Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2015 EdX
+# Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2015 edX
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2015 edX
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2015.
+# EdX Team <info@edx.org>, 2016.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-11 17:48+0000\n"
-"PO-Revision-Date: 2015-12-11 17:49:33.083624\n"
+"POT-Creation-Date: 2016-01-04 15:19+0000\n"
+"PO-Revision-Date: 2016-01-04 15:21:19.796218\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +90,7 @@ msgstr "ÖK Ⱡ'σя#"
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: common/static/common/templates/discussion/thread-response-edit.underscore
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
@@ -269,118 +270,6 @@ msgstr "Ànswér hïddén Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "Status: unsubmitted"
 msgstr "Stätüs: ünsüßmïttéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#. Translators: A "rating" is a score a student gives to indicate how well
-#. they feel they were graded on this problem
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "You need to pick a rating before you can submit."
-msgstr ""
-"Ýöü nééd tö pïçk ä rätïng ßéföré ýöü çän süßmït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: this message appears when transitioning between openended
-#. grading
-#. types (i.e. self assesment to peer assessment). Sometimes, if a student
-#. did not perform well at one step, they cannot move on to the next one.
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Your score did not meet the criteria to move to the next step."
-msgstr ""
-"Ýöür sçöré dïd nöt méét thé çrïtérïä tö mövé tö thé néxt stép. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
-
-#. Translators: one clicks this button after one has finished filling out the
-#. grading
-#. form for an openended assessment
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Submit assessment"
-msgstr "Süßmït ässéssmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"Your response has been submitted. Please check back later for your grade."
-msgstr ""
-"Ýöür réspönsé häs ßéén süßmïttéd. Pléäsé çhéçk ßäçk lätér för ýöür grädé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#. Translators: this button is clicked to submit a student's rating of
-#. an evaluator's assessment
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Submit post-assessment"
-msgstr "Süßmït pöst-ässéssmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Answer saved, but not yet submitted."
-msgstr ""
-"Ànswér sävéd, ßüt nöt ýét süßmïttéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"Please confirm that you wish to submit your work. You will not be able to "
-"make any changes after submitting."
-msgstr ""
-"Pléäsé çönfïrm thät ýöü wïsh tö süßmït ýöür wörk. Ýöü wïll nöt ßé äßlé tö "
-"mäké äný çhängés äftér süßmïttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"You are trying to upload a file that is too large for our system.  Please "
-"choose a file under 2MB or paste a link to it into the answer box."
-msgstr ""
-"Ýöü äré trýïng tö üplöäd ä fïlé thät ïs töö lärgé för öür sýstém.  Pléäsé "
-"çhöösé ä fïlé ündér 2MB ör pästé ä lïnk tö ït ïntö thé änswér ßöx. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт ł#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"Are you sure you want to remove your previous response to this question?"
-msgstr ""
-"Àré ýöü süré ýöü wänt tö rémövé ýöür prévïöüs réspönsé tö thïs qüéstïön? "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Moved to next step."
-msgstr "Mövéd tö néxt stép. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid ""
-"File uploads are required for this question, but are not supported in your "
-"browser. Try the newest version of Google Chrome. Alternatively, if you have"
-" uploaded the image to another website, you can paste a link to it into the "
-"answer box."
-msgstr ""
-"Fïlé üplöäds äré réqüïréd för thïs qüéstïön, ßüt äré nöt süppörtéd ïn ýöür "
-"ßröwsér. Trý thé néwést vérsïön öf Gööglé Çhrömé. Àltérnätïvélý, ïf ýöü hävé"
-" üplöädéd thé ïmägé tö änöthér wéßsïté, ýöü çän pästé ä lïnk tö ït ïntö thé "
-"änswér ßöx. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє#"
-
-#. Translators: "Show Question" is some text that, when clicked, shows a
-#. question's
-#. content that had been hidden
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Show Question"
-msgstr "Shöw Qüéstïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-msgid "Hide Question"
-msgstr "Hïdé Qüéstïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -394,20 +283,26 @@ msgstr "Préförmättéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 1"
-msgstr "Héädïng 1 Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 2"
-msgstr "Héädïng 2 Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 3"
 msgstr "Héädïng 3 Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Heading 4"
+msgstr "Héädïng 4 Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Heading 5"
+msgstr "Héädïng 5 Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Heading 6"
+msgstr "Héädïng 6 Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -420,6 +315,7 @@ msgstr "Àdd tö Dïçtïönärý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
+#: cms/templates/js/settings-tab-section.underscore
 msgid "Advanced"
 msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -917,20 +813,14 @@ msgstr "Héädérs Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 4"
-msgstr "Héädïng 4 Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "Heading 1"
+msgstr "Héädïng 1 Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 5"
-msgstr "Héädïng 5 Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 6"
-msgstr "Héädïng 6 Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "Heading 2"
+msgstr "Héädïng 2 Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1580,6 +1470,7 @@ msgstr "Vértïçäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/templates/bookmarks/bookmarks-list.underscore
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
 msgid "View"
@@ -1690,6 +1581,10 @@ msgid ""
 msgstr ""
 "Séqüénçé érrör! Çännöt nävïgäté tö %(tab_name)s ïn thé çürrént "
 "SéqüénçéMödülé. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/js/src/sequence/display.js
+msgid "Bookmarked"
+msgstr "Böökmärkéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
@@ -1857,6 +1752,10 @@ msgid "Do not show again"
 msgstr "Dö nöt shöw ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn on closed captioning"
+msgstr "Türn ön çlöséd çäptïönïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcript"
 msgstr "Türn öff tränsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -1888,8 +1787,20 @@ msgstr ""
 "tïmé pöïnt. Tö skïp tränsçrïpt, gö tö prévïöüs ïtém. Ⱡ'σяє#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Caption will be displayed when "
-msgstr "Çäptïön wïll ßé dïspläýéd whén  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "<li>Transcript will be displayed when "
+msgstr ""
+"<li>Tränsçrïpt wïll ßé dïspläýéd whén  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Hide closed captions"
+msgstr "Hïdé çlöséd çäptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "(Caption will be displayed when you start playing the video.)"
+msgstr ""
+"(Çäptïön wïll ßé dïspläýéd whén ýöü stärt pläýïng thé vïdéö.) Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
@@ -2389,6 +2300,7 @@ msgstr "Püßlïç Ⱡ'σяєм ιρѕυ#"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
 msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
 
@@ -2507,6 +2419,28 @@ msgid "An unexpected error occurred.  Please try again."
 msgstr ""
 "Àn ünéxpéçtéd érrör öççürréd.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment.js
+msgid "Financial Assistance"
+msgstr "Fïnänçïäl Àssïstänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment.js
+msgid "Upset Learner"
+msgstr "Ûpsét Léärnér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment.js
+msgid "Teaching Assistant"
+msgstr "Téäçhïng Àssïstänt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
+msgid "Please specify a reason."
+msgstr "Pléäsé spéçïfý ä réäsön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
+msgid "Something went wrong changing this enrollment. Please try again."
+msgstr ""
+"Söméthïng wént wröng çhängïng thïs énröllmént. Pléäsé trý ägäïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -2965,6 +2899,7 @@ msgstr ""
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/templates/search/search_loading.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Loading"
@@ -3001,6 +2936,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "Ûsérnämé Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -3704,77 +3641,6 @@ msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Grades saved.  Fetching the next submission to grade."
-msgstr ""
-"Grädés sävéd.  Fétçhïng thé néxt süßmïssïön tö grädé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Problem Name"
-msgstr "Prößlém Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Graded"
-msgstr "Grädéd Ⱡ'σяєм ιρѕυ#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Available to Grade"
-msgstr "Àväïläßlé tö Grädé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Required"
-msgstr "Réqüïréd Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Progress"
-msgstr "Prögréss Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Back to problem list"
-msgstr "Bäçk tö prößlém lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Try loading again"
-msgstr "Trý löädïng ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> available "
-msgstr "<%= num %> äväïläßlé  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> graded "
-msgstr "<%= num %> grädéd  Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> more needed to start ML"
-msgstr ""
-"<%= num %> möré néédéd tö stärt ML Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Re-check for submissions"
-msgstr "Ré-çhéçk för süßmïssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "System got into invalid state: <%= state %>"
-msgstr ""
-"Sýstém göt ïntö ïnvälïd stäté: <%= state %> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "System got into invalid state for submission: "
-msgstr ""
-"Sýstém göt ïntö ïnvälïd stäté för süßmïssïön:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "(Hide)"
-msgstr "(Hïdé) Ⱡ'σяєм ιρѕυ#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "(Show)"
-msgstr "(Shöw) Ⱡ'σяєм ιρѕυ#"
-
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
 msgstr "Ìnsért Hýpérlïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -3880,6 +3746,22 @@ msgstr ""
 "Ýöü hävé ßéén löggéd öüt öf ýöür édX äççöünt.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
+#: lms/static/js/bookmarks/views/bookmark_button.js
+#: lms/static/js/bookmarks/views/bookmarks_list.js
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "An error has occurred. Please try again."
+msgstr ""
+"Àn érrör häs öççürréd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Click to add"
+msgstr "Çlïçk tö ädd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Click to remove"
+msgstr "Çlïçk tö rémövé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr "Àll süßséçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -3928,8 +3810,10 @@ msgstr ""
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Errors!"
-msgstr "Érrörs! Ⱡ'σяєм ιρѕυм #"
+msgid "Uploaded file issues. Click on \"+\" to view."
+msgstr ""
+"Ûplöädéd fïlé ïssüés. Çlïçk ön \"+\" tö vïéw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
@@ -3944,43 +3828,52 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format"
+msgid " records are not in correct format and not added to"
 msgstr ""
-" réçörds äré nöt ïn çörréçt förmät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+" réçörds äré nöt ïn çörréçt förmät änd nöt äddéd tö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format"
+msgid " record is not in correct format and not added to the exception"
 msgstr ""
-" réçörd ïs nöt ïn çörréçt förmät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+" réçörd ïs nöt ïn çörréçt förmät änd nöt äddéd tö thé éxçéptïön Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS"
-msgstr " léärnérs dö nöt éxïst ïn LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner does not exist in LMS"
-msgstr " léärnér döés nöt éxïst ïn LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed"
+msgid " learners do not exist in LMS and not added to the"
 msgstr ""
-" léärnérs äré älréädý whïté lïstéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+" léärnérs dö nöt éxïst ïn LMS änd nöt äddéd tö thé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed"
+msgid " learner does not exist in LMS and not added to the exception list"
 msgstr ""
-" léärnér ïs älréädý whïté lïstéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+" léärnér döés nöt éxïst ïn LMS änd nöt äddéd tö thé éxçéptïön lïst Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are not enrolled in course"
+msgid " learners are already white listed and not added to"
 msgstr ""
-" léärnérs äré nöt énrölléd ïn çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+" léärnérs äré älréädý whïté lïstéd änd nöt äddéd tö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course"
+msgid " learner is already white listed and not added to the exception "
 msgstr ""
-" léärnér ïs nöt énrölléd ïn çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+" léärnér ïs älréädý whïté lïstéd änd nöt äddéd tö thé éxçéptïön  Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners are not enrolled in course and not added to"
+msgstr ""
+" léärnérs äré nöt énrölléd ïn çöürsé änd nöt äddéd tö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is not enrolled in course and not added to the exception"
+msgstr ""
+" léärnér ïs nöt énrölléd ïn çöürsé änd nöt äddéd tö thé éxçéptïön Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -4094,6 +3987,17 @@ msgstr ""
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[nö tägs] Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Choose one"
+msgstr "Çhöösé öné Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An error has occurred. Check your Internet connection and try again."
+msgstr ""
+"Àn érrör häs öççürréd. Çhéçk ýöür Ìntérnét çönnéçtïön änd trý ägäïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -4404,12 +4308,6 @@ msgid "Loading your courses"
 msgstr "Löädïng ýöür çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/static/js/student_account/views/LoginView.js
-msgid "An error has occurred. Check your Internet connection and try again."
-msgstr ""
-"Àn érrör häs öççürréd. Çhéçk ýöür Ìntérnét çönnéçtïön änd trý ägäïn. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
@@ -4437,11 +4335,19 @@ msgstr "Füll Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that appears on your certificates. Other learners never see your "
-"full name."
+"The name that is used for ID verification and appears on your certificates. "
+"Other learners never see your full name. Make sure to enter your name "
+"exactly as it appears on your government-issued photo ID, including any non-"
+"Roman characters."
 msgstr ""
-"Thé nämé thät äppéärs ön ýöür çértïfïçätés. Öthér léärnérs névér séé ýöür "
-"füll nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+"Thé nämé thät ïs üséd för ÌD vérïfïçätïön änd äppéärs ön ýöür çértïfïçätés. "
+"Öthér léärnérs névér séé ýöür füll nämé. Mäké süré tö éntér ýöür nämé "
+"éxäçtlý äs ït äppéärs ön ýöür gövérnmént-ïssüéd phötö ÌD, ïnçlüdïng äný nön-"
+"Römän çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,"
+" ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕ#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -4698,12 +4604,6 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An error has occurred. Please try again."
-msgstr ""
-"Àn érrör häs öççürréd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "Çöüld nöt süßmït ördér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -4929,7 +4829,7 @@ msgstr "Délétïng Ⱡ'σяєм ιρѕυм ∂#"
 msgid "OpenAssessment Save Error"
 msgstr "ÖpénÀsséssmént Sävé Érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: cms/static/js/base.js cms/templates/js/checklist.underscore
+#: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
 msgstr ""
 "Thïs lïnk wïll öpén ïn ä néw ßröwsér wïndöw/täß Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
@@ -6181,6 +6081,12 @@ msgstr "Wärnïng Ⱡ'σяєм ιρѕυм #"
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
 
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "Unscheduled"
+msgstr "Ûnsçhédüléd Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -6518,6 +6424,12 @@ msgstr "fmts Ⱡ'σяєм ι#"
 msgid "Add a comment"
 msgstr "Àdd ä çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
+
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
@@ -6610,6 +6522,10 @@ msgstr "Àçtïvé Thréäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "username or email"
 msgstr "üsérnämé ör émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
+msgid "course id"
+msgstr "çöürsé ïd Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
@@ -6647,6 +6563,87 @@ msgstr "Régénéräté Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Regenerate the user's certificate"
 msgstr ""
 "Régénéräté thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Generate"
+msgstr "Généräté Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Generate the user's certificate"
+msgstr "Généräté thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Current enrollment mode:"
+msgstr "Çürrént énröllmént mödé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "New enrollment mode:"
+msgstr "Néw énröllmént mödé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Reason for change:"
+msgstr "Réäsön för çhängé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Choose One"
+msgstr "Çhöösé Öné Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Explain if other."
+msgstr "Éxpläïn ïf öthér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
+msgid "Submit enrollment change"
+msgstr "Süßmït énröllmént çhängé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Course ID"
+msgstr "Çöürsé ÌD Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Course Start"
+msgstr "Çöürsé Stärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Course End"
+msgstr "Çöürsé Énd Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Upgrade Deadline"
+msgstr "Ûpgrädé Déädlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Verification Deadline"
+msgstr "Vérïfïçätïön Déädlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Enrollment Date"
+msgstr "Énröllmént Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Enrollment Mode"
+msgstr "Énröllmént Mödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Verified mode price"
+msgstr "Vérïfïéd mödé prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Reason"
+msgstr "Réäsön Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Last modified by"
+msgstr "Läst mödïfïéd ßý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "N/A"
+msgstr "N/À Ⱡ'σяєм#"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+msgid "Change Enrollment"
+msgstr "Çhängé Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
@@ -6758,6 +6755,36 @@ msgstr "Léävé Téäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Donate"
 msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid "My Bookmarks"
+msgstr "Mý Böökmärks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid "Bookmarked on"
+msgstr "Böökmärkéd ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid "You have not bookmarked any courseware pages yet."
+msgstr ""
+"Ýöü hävé nöt ßöökmärkéd äný çöürséwäré pägés ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/bookmarks/bookmarks-list.underscore
+msgid ""
+"Use bookmarks to help you easily return to courseware pages. To bookmark a "
+"page, select Bookmark in the upper right corner of that page. To see a list "
+"of all your bookmarks, select Bookmarks in the upper left corner of any "
+"courseware page."
+msgstr ""
+"Ûsé ßöökmärks tö hélp ýöü éäsïlý rétürn tö çöürséwäré pägés. Tö ßöökmärk ä "
+"pägé, séléçt Böökmärk ïn thé üppér rïght çörnér öf thät pägé. Tö séé ä lïst "
+"öf äll ýöür ßöökmärks, séléçt Böökmärks ïn thé üppér léft çörnér öf äný "
+"çöürséwäré pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕ#"
+
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -6783,24 +6810,36 @@ msgid "remove all"
 msgstr "rémövé äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "toggle chapter"
-msgstr "tögglé çhäptér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+msgid "gettext("
+msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "Séçtïön Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove chapter %(chapterDisplayName)s"
+msgstr "Rémövé çhäptér %(chapterDisplayName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "rémövé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "toggle subsection"
-msgstr "tögglé süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Subsection"
 msgstr "Süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove subsection %(subsectionDisplayName)s"
+msgstr ""
+"Rémövé süßséçtïön %(subsectionDisplayName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove unit %(unitName)s"
+msgstr "Rémövé ünït %(unitName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -6899,6 +6938,7 @@ msgid "No receipt available"
 msgstr "Nö réçéïpt äväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Go to Dashboard"
 msgstr "Gö tö Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -6993,25 +7033,84 @@ msgstr "Çlïçk tö édït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "title"
 msgstr "tïtlé Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Financial Assistance Application"
+msgstr ""
+"Fïnänçïäl Àssïstänçé Àpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Unable to submit application"
+msgstr "Ûnäßlé tö süßmït äpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "About You"
+msgstr "Àßöüt Ýöü Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid ""
+"The following information is already a part of your {platform} profile. "
+"We\\'ve included it here for your application."
+msgstr ""
+"Thé föllöwïng ïnförmätïön ïs älréädý ä pärt öf ýöür {platform} pröfïlé. "
+"Wé\\'vé ïnçlüdéd ït héré för ýöür äpplïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Email address"
+msgstr "Émäïl äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Legal name"
+msgstr "Légäl nämé Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Country of residence"
+msgstr "Çöüntrý öf résïdénçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Back to {platform} FAQs"
+msgstr "Bäçk tö {platform} FÀQs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Submit Application"
+msgstr "Süßmït Àpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid ""
+"Thank you for submitting your financial assistance application for "
+"{course_name}! You can expect a response in 2-4 business days."
+msgstr ""
+"Thänk ýöü för süßmïttïng ýöür fïnänçïäl ässïstänçé äpplïçätïön för "
+"{course_name}! Ýöü çän éxpéçt ä réspönsé ïn 2-4 ßüsïnéss däýs. Ⱡ'σяєм ιρѕυм#"
+
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
 msgstr "Bülk Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid ""
-"You can upload a CSV file of usernames or email addresses to be added to the"
-" certificate exceptions white list."
+"Upload a comma separated values (.csv) file that contains the usernames or "
+"email addresses of learners who have been given exceptions. Include the "
+"username or email address in the first comma separated field. You can "
+"include an optional note describing the reason for the exception in the "
+"second comma separated field."
 msgstr ""
-"Ýöü çän üplöäd ä ÇSV fïlé öf üsérnämés ör émäïl äddréssés tö ßé äddéd tö thé"
-" çértïfïçäté éxçéptïöns whïté lïst. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+"Ûplöäd ä çömmä sépärätéd välüés (.çsv) fïlé thät çöntäïns thé üsérnämés ör "
+"émäïl äddréssés öf léärnérs whö hävé ßéén gïvén éxçéptïöns. Ìnçlüdé thé "
+"üsérnämé ör émäïl äddréss ïn thé fïrst çömmä sépärätéd fïéld. Ýöü çän "
+"ïnçlüdé än öptïönäl nöté désçrïßïng thé réäsön för thé éxçéptïön ïn thé "
+"séçönd çömmä sépärätéd fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Bröwsé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Upload CSV"
-msgstr "Ûplöäd ÇSV Ⱡ'σяєм ιρѕυм ∂σłσ#"
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Add to Exception List"
+msgstr "Àdd tö Éxçéptïön Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
@@ -7019,11 +7118,15 @@ msgstr "Ìndïvïdüäl Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
-"You can add a username or email address to be added to the certificate "
-"exceptions white list."
+"Enter the username or email address of each learner that you want to add as "
+"an exception."
 msgstr ""
-"Ýöü çän ädd ä üsérnämé ör émäïl äddréss tö ßé äddéd tö thé çértïfïçäté "
-"éxçéptïöns whïté lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+"Éntér thé üsérnämé ör émäïl äddréss öf éäçh léärnér thät ýöü wänt tö ädd äs "
+"än éxçéptïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate Exception Certificates"
+msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all "
@@ -7044,20 +7147,16 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate Exception Certificates"
-msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User ID"
-msgstr "Ûsér ÌD Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
 msgstr "Ûsér Émäïl Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Date Exception Granted"
-msgstr "Däté Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgid "Exception Granted"
+msgstr "Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Certificate Generated"
+msgstr "Çértïfïçäté Générätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
@@ -8450,20 +8549,6 @@ msgstr "Àçtïväté Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Deactivate"
 msgstr "Déäçtïväté Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: cms/templates/js/checklist.underscore
-msgid "{number}{pct_sign} of checklists completed"
-msgstr ""
-"{number}{pct_sign} öf çhéçklïsts çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
-
-#: cms/templates/js/checklist.underscore
-msgid "%"
-msgstr "% Ⱡ#"
-
-#: cms/templates/js/checklist.underscore
-msgid "Tasks Completed:"
-msgstr "Täsks Çömplétéd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
 #: cms/templates/js/container-message.underscore
 msgid ""
 "Caution: The last published version of this unit is live. By publishing "
@@ -8570,11 +8655,6 @@ msgstr "Réléäséd: Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Scheduled:"
 msgstr "Sçhédüléd: Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-msgid "Unscheduled"
-msgstr "Ûnsçhédüléd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
@@ -9052,6 +9132,10 @@ msgstr "Réléäsé Tïmé ïn ÛTÇ: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 msgid "Clear Release Date/Time"
 msgstr "Çléär Réléäsé Däté/Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
+#: cms/templates/js/settings-tab-section.underscore
+msgid "General Settings"
+msgstr "Généräl Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Vïéw Lïvé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -9204,10 +9288,6 @@ msgid "Delete the user, {username}"
 msgstr "Délété thé üsér, {username} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "Additional Options:"
-msgstr "Àddïtïönäl Öptïöns: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr "Tïméd Ⱡ'σяєм ιρѕ#"
 
@@ -9215,16 +9295,17 @@ msgstr "Tïméd Ⱡ'σяєм ιρѕ#"
 msgid ""
 "Use a timed exam to limit the time learners can spend on problems in this "
 "subsection. Learners must submit answers before the time expires. You can "
-"allow additional time on per learner basis through the Instructor Dashboard."
+"allow additional time for individual learners through the Instructor "
+"Dashboard."
 msgstr ""
 "Ûsé ä tïméd éxäm tö lïmït thé tïmé léärnérs çän spénd ön prößléms ïn thïs "
 "süßséçtïön. Léärnérs müst süßmït änswérs ßéföré thé tïmé éxpïrés. Ýöü çän "
-"ällöw äddïtïönäl tïmé ön pér léärnér ßäsïs thröügh thé Ìnstrüçtör Däshßöärd."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
+"ällöw äddïtïönäl tïmé för ïndïvïdüäl léärnérs thröügh thé Ìnstrüçtör "
+"Däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
+" єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυ#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Proctored"
@@ -9232,17 +9313,18 @@ msgstr "Pröçtöréd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"Proctored exams are timed, and software records video of each learner taking"
-" the exam. These videos are then reviewed by a third party."
+"Proctored exams are timed and they record video of each learner taking the "
+"exam. The videos are then reviewed to ensure that learners follow all "
+"examination rules."
 msgstr ""
-"Pröçtöréd éxäms äré tïméd, änd söftwäré réçörds vïdéö öf éäçh léärnér täkïng"
-" thé éxäm. Thésé vïdéös äré thén révïéwéd ßý ä thïrd pärtý. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
+"Pröçtöréd éxäms äré tïméd änd théý réçörd vïdéö öf éäçh léärnér täkïng thé "
+"éxäm. Thé vïdéös äré thén révïéwéd tö énsüré thät léärnérs föllöw äll "
+"éxämïnätïön rülés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂є#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
@@ -9251,37 +9333,54 @@ msgstr "Präçtïçé Pröçtöréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Use a practice proctored exam to introduce learners to the proctoring tools "
-"and processes. Results of the practice exam do not count towards the "
-"learner's grade."
+"and processes. Results of a practice exam do not affect a learner's grade."
 msgstr ""
 "Ûsé ä präçtïçé pröçtöréd éxäm tö ïntrödüçé léärnérs tö thé pröçtörïng tööls "
-"änd pröçéssés. Résülts öf thé präçtïçé éxäm dö nöt çöünt töwärds thé "
-"léärnér's grädé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
-"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
-" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕє#"
+"änd pröçéssés. Résülts öf ä präçtïçé éxäm dö nöt äfféçt ä léärnér's grädé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Time Allotted (HH:MM):"
 msgstr "Tïmé Àllöttéd (HH:MM): Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-#, python-format
 msgid ""
-"Learners see warnings when 20% and 5% of the allotted time remains. You can "
-"grant learners extra time to complete the exam through the Instructor "
-"Dashboard."
+"Select a time allotment for the exam. If it is over 24 hours, type in the "
+"amount of time. You can grant individual learners extra time to complete the"
+" exam through the Instructor Dashboard."
 msgstr ""
-"Léärnérs séé wärnïngs whén 20% änd 5% öf thé ällöttéd tïmé rémäïns. Ýöü çän "
-"gränt léärnérs éxträ tïmé tö çömplété thé éxäm thröügh thé Ìnstrüçtör "
-"Däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
-" єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
+"Séléçt ä tïmé ällötmént för thé éxäm. Ìf ït ïs övér 24 höürs, týpé ïn thé "
+"ämöünt öf tïmé. Ýöü çän gränt ïndïvïdüäl léärnérs éxträ tïmé tö çömplété thé"
+" éxäm thröügh thé Ìnstrüçtör Däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρя#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Review Rules"
+msgstr "Révïéw Rülés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Specify any additional rules or rule exceptions that the proctoring review "
+"team should enforce when reviewing the videos. For example, you could "
+"specify that calculators are allowed."
+msgstr ""
+"Spéçïfý äný äddïtïönäl rülés ör rülé éxçéptïöns thät thé pröçtörïng révïéw "
+"téäm shöüld énförçé whén révïéwïng thé vïdéös. För éxämplé, ýöü çöüld "
+"spéçïfý thät çälçülätörs äré ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
