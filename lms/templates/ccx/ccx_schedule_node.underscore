@@ -1,0 +1,25 @@
+<td class="unit">
+  <button class="toggle-collapse ccx-button-link" aria-expanded="false">
+    <i class="fa fa-caret-right"></i>
+    <span class="sr">
+      <%- interpolate(gettext('toggle chapter %(displayName)s'),
+       {displayName: display_name}, true) %>
+    </span>
+  </button>
+  <span class="sr">
+      <%- gettext('Section') %>&nbsp;</span><%= display_name %>
+  </td>
+  <td class="date start-date">
+    <button class="ccx-button-link">
+      <%= start %>
+      <span class="sr"><%- gettext('Click to change') %></span>
+    </button>
+  </td>
+  <td class="date due-date no-link">
+    <%- gettext('N/A') %>
+  </td>
+  <td><button class="remove-unit ccx-button-link" aria-label="<%- interpolate(
+        gettext('Remove chapter %(chapterDisplayName)s'), {chapterDisplayName: display_name}, true) %>">
+    <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove') %>
+  </button>
+</td>

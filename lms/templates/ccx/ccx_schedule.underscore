@@ -1,0 +1,26 @@
+<div>
+  <div align="right">
+    <button id="ccx_expand_all_btn" class="ccx-button-link">
+      <i class="fa fa-expand" aria-hidden="true"></i> <%- gettext('Expand All') %>
+    </button>
+    <button id="ccx_collapse_all_btn" class="ccx-button-link">
+      <i class="fa fa-compress" aria-hidden="true"></i> <%- gettext('Collapse All') %>
+    </button>
+  </div>
+  <br/>
+  <table class="ccx-schedule">
+    <thead>
+      <tr>
+        <th><%- gettext('Unit') %></th>
+        <th><%- gettext('Start Date') %></th>
+        <th><%- gettext('Due Date') %></th>
+        <td><button id="remove-all" class="ccx-button-link">
+          <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove all') %>
+        </button></td>
+      </tr>
+    </thead>
+    <tbody id="ccx-schedule_tbody">
+
+    <tbody>
+  </table>
+</div>

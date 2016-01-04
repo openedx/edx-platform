@@ -82,6 +82,11 @@
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
             'js/ccx/schedule': 'js/ccx/schedule',
+            'js/ccx/collection/schedule_collection': 'js/ccx/collection/schedule_collection',
+            'js/ccx/model/schedule_model': 'js/ccx/model/schedule_model',
+            'js/ccx/view/ccx_schedule': 'js/ccx/view/ccx_schedule',
+            'js/ccx/view/schedule_tree': 'js/ccx/view/schedule_tree',
+            'js/ccx/view/schedule_tree_node': 'js/ccx/view/schedule_tree_node',
 
             // Discussion classes loaded explicitly until they are converted to use RequireJS
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
@@ -324,6 +329,21 @@
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
+            },
+            'js/ccx/collection/schedule_collection': {
+                exports: 'js/ccx/collection/schedule_collection'
+            },
+            'js/ccx/model/schedule_model': {
+                exports: 'js/ccx/model/schedule_model'
+            },
+            'js/ccx/view/ccx_schedule': {
+                exports: 'js/ccx/view/ccx_schedule'
+            },
+            'js/ccx/view/schedule_tree': {
+                exports: 'js/ccx/view/schedule_tree'
+            },
+            'js/ccx/view/schedule_tree_node': {
+                exports: 'js/ccx/view/schedule_tree_node'
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
