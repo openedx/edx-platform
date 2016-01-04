@@ -11,7 +11,9 @@ define([
 
             this.perPage = options.perPage;
             this.server_api = _.pick(PagingCollection.prototype.server_api, "page", "page_size");
-            if (options.text) { this.server_api['text'] = options.text }
+            if (options.text) {
+                this.server_api.text = options.text;
+            }
         },
 
         /**
@@ -25,24 +27,22 @@ define([
                     sections = {},
                     units = {};
 
-                if (!courseStructure) {
-                    this.each(function (note) {
-                        var chapter = note.get('chapter'),
-                            section = note.get('section'),
-                            unit = note.get('unit');
+                this.each(function (note) {
+                    var chapter = note.get('chapter'),
+                        section = note.get('section'),
+                        unit = note.get('unit');
 
-                        chapters[chapter.location] = chapter;
-                        sections[section.location] = section;
-                        units[unit.location] = units[unit.location] || [];
-                        units[unit.location].push(note);
-                    });
+                    chapters[chapter.location] = chapter;
+                    sections[section.location] = section;
+                    units[unit.location] = units[unit.location] || [];
+                    units[unit.location].push(note);
+                });
 
-                    courseStructure = {
-                        chapters: _.sortBy(_.toArray(chapters), function (c) {return c.index;}),
-                        sections: sections,
-                        units: units
-                    };
-                }
+                courseStructure = {
+                    chapters: _.sortBy(_.toArray(chapters), function (c) {return c.index;}),
+                    sections: sections,
+                    units: units
+                };
 
                 return courseStructure;
             };
