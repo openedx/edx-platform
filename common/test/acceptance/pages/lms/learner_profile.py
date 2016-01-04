@@ -253,10 +253,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_ajax()
 
         self.wait_for_element_visibility('.image-wrapper', "remove button is visible")
-        self.browser.execute_script('$(".u-field-remove-button").css("opacity",1);')
-        self.mouse_hover(self.browser.find_element_by_css_selector('.image-wrapper'))
-
-        self.wait_for_element_visibility('.u-field-remove-button', "remove button is visible")
         self.q(css='.u-field-remove-button').first.click()
 
         self.wait_for_ajax()
