@@ -7,7 +7,8 @@
     var save_url = '${save_url}';
     var schedule = ${schedule};
   </script>
-    <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+
+  <script src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
   <style>
@@ -15,14 +16,8 @@
     .ui-datepicker { z-index: 100000 !important; }
     input.date, input.time { width: auto !important; display: inline !important; }
   </style>
-  <%static:js group='ccx'/>
 </%block>
 
-%for template_name in ["schedule"]:
-  <script type="text/template" id="ccx-${template_name}-template">
-    <%static:include path="ccx/${template_name}.underscore" />
-  </script>
-%endfor
 
 <div class="ccx-schedule-container">
   <div id="ccx-schedule"></div>
@@ -132,13 +127,37 @@
   </div>
 </div>
 
+<br/>
+
 <script>
 $(function() {
+
+    var require = window.require || RequireJS.require;
+    require([
+      "js/ccx/view/ccx_schedule",
+      "js/ccx/collection/schedule_collection",
+      "jquery"
+    ], function(scheduleView, scheduleCollection, $) {
+      var scheduleCollection = new scheduleCollection.ccxScheduleCollection();
+      var handler = scheduleCollection.fetch();
+
+      handler.done(function () {
+        var view = new scheduleView.ccxScheduleView({
+          el: $("#new-ccx-schedule"),
+          saveCCXScheduleUrl: "${save_url}",
+          scheduleJson: schedule,
+          collection: scheduleCollection
+        });
+        view.render();
+      });
+    });
+
+    /*
     schedule_template = _.template($('#ccx-schedule-template').html());
     var view = new edx.ccx.schedule.ScheduleView({
         el: $('#new-ccx-schedule')
     });
-    view.render();
+    view.render();*/
     //ccx_schedule.render();
     $('.datepair .time').timepicker({
         'showDuration': true,
