@@ -2,6 +2,7 @@
 """
 End-to-end tests for LibraryContent block in LMS
 """
+from unittest import skip
 import ddt
 import textwrap
 
@@ -21,6 +22,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
+@skip("for test purpose")
 @attr('shard_3')
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
@@ -143,6 +145,7 @@ class LibraryContentTestBase(UniqueCourseTest):
                      course_id=self.course_id, staff=staff).visit()
 
 
+@skip("for test purpose")
 @ddt.ddt
 @attr('shard_3')
 class LibraryContentTest(LibraryContentTestBase):
@@ -196,6 +199,7 @@ class LibraryContentTest(LibraryContentTestBase):
         self.assertEqual(children_contents, self.library_xblocks_texts)
 
 
+@skip("for test purpose")
 @ddt.ddt
 @attr('shard_3')
 class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):

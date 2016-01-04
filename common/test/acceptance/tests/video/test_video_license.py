@@ -3,6 +3,7 @@
 Acceptance tests for licensing of the Video module
 """
 from __future__ import unicode_literals
+from unittest import skip
 from nose.plugins.attrib import attr
 from ..studio.base_studio_test import StudioCourseTest
 
@@ -12,6 +13,7 @@ from ...pages.lms.courseware import CoursewarePage
 from ...fixtures.course import XBlockFixtureDesc
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class VideoLicenseTest(StudioCourseTest):
     """

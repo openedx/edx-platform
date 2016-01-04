@@ -7,6 +7,7 @@ import random
 import textwrap
 
 from abc import ABCMeta, abstractmethod
+from unittest import skip
 from nose.plugins.attrib import attr
 from selenium.webdriver import ActionChains
 
@@ -32,6 +33,7 @@ from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 from common.test.acceptance.tests.helpers import EventsTestMixin
 
 
+@skip("for test purpose")
 class ProblemTypeTestBaseMeta(ABCMeta):
     """
     MetaClass for ProblemTypeTestBase to ensure that the required attributes
@@ -62,6 +64,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         return obj
 
 
+@skip("for test purpose")
 class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
     """
     Base class for testing assesment problem types in bok choy.
@@ -131,6 +134,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         raise NotImplementedError()
 
 
+@skip("for test purpose")
 class ProblemTypeTestMixin(object):
     """
     Test cases shared amongst problem types.
@@ -227,6 +231,7 @@ class ProblemTypeTestMixin(object):
         self.problem_page.a11y_audit.check_for_accessibility_errors()
 
 
+@skip("for test purpose")
 class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Annotation Problem Type
@@ -280,6 +285,7 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         ).nth(choice).click()
 
 
+@skip("for test purpose")
 class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Checkbox Problem Type
@@ -321,6 +327,7 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_1")
 
 
+@skip("for test purpose")
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Multiple Choice Problem Type
@@ -363,6 +370,7 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_choice_1")
 
 
+@skip("for test purpose")
 class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Radio Problem Type
@@ -406,6 +414,7 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_1")
 
 
+@skip("for test purpose")
 class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Drop Down Problem Type
@@ -442,6 +451,7 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         select_option_by_text(selector_element, answer)
 
 
+@skip("for test purpose")
 class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for String Problem Type
@@ -482,6 +492,7 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(textvalue)
 
 
+@skip("for test purpose")
 class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Numerical Problem Type
@@ -523,6 +534,7 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(textvalue)
 
 
+@skip("for test purpose")
 class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Formula Problem Type
@@ -566,6 +578,7 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(textvalue)
 
 
+@skip("for test purpose")
 class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Script Problem Type
@@ -625,6 +638,7 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(second_addend, input_num=1)
 
 
+@skip("for test purpose")
 class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Code Problem Type
@@ -687,6 +701,7 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         pass
 
 
+@skip("for test purpose")
 class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
     """
     Base class for "Choice + Text" Problem Types.
@@ -722,6 +737,7 @@ class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
         self._fill_input_text(input_value, choice)
 
 
+@skip("for test purpose")
 class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Radio Text Problem Type
@@ -760,6 +776,7 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         })
 
 
+@skip("for test purpose")
 class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Checkbox Text Problem Type
@@ -792,6 +809,7 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
         })
 
 
+@skip("for test purpose")
 class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Image Problem Type
@@ -821,6 +839,7 @@ class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         chain.perform()
 
 
+@skip("for test purpose")
 class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     TestCase Class for Symbolic Problem Type

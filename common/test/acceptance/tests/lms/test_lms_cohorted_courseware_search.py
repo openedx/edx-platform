@@ -3,6 +3,7 @@ Test courseware search
 """
 import os
 import json
+from unittest import skip
 import uuid
 
 from ..helpers import remove_file
@@ -25,6 +26,7 @@ from ...pages.lms.instructor_dashboard import InstructorDashboardPage
 from bok_choy.promise import EmptyPromise
 
 
+@skip("for test purpose")
 @attr('shard_1')
 class CoursewareSearchCohortTest(ContainerBase):
     """

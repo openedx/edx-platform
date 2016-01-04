@@ -14,6 +14,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ..helpers import EventsTestMixin
 
 
+@skip("for test purpose")
 class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     """
     Mixin with helper methods to test the account settings page.
@@ -87,6 +88,7 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
         self.assert_no_matching_events_were_emitted({'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME})
 
 
+@skip("for test purpose")
 @attr('shard_5')
 class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
     """
@@ -110,6 +112,7 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
         dashboard_page.click_account_settings_link()
 
 
+@skip("for test purpose")
 @attr('shard_5')
 class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
     """
@@ -447,6 +450,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
 
 
+@skip("for test purpose")
 @attr('a11y')
 class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
     """

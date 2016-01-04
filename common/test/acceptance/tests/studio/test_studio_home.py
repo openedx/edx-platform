@@ -1,6 +1,7 @@
 """
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
+from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import LibraryLocator
 
@@ -12,6 +13,7 @@ from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.index import DashboardPage, DashboardPageWithPrograms
 
 
+@skip("for test purpose")
 class CreateLibraryTest(WebAppTest):
     """
     Test that we can create a new content library on the studio home page.
@@ -60,6 +62,7 @@ class CreateLibraryTest(WebAppTest):
         self.assertTrue(self.dashboard_page.has_library(name=name, org=org, number=number))
 
 
+@skip("for test purpose")
 class DashboardProgramsTabTest(WebAppTest):
     """
     Test the programs tab on the studio home page.

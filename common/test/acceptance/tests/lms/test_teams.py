@@ -4,6 +4,7 @@ Acceptance tests for the teams feature.
 import json
 import random
 import time
+from unittest import skip
 
 from dateutil.parser import parse
 import ddt
@@ -157,6 +158,7 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
         return event['event_type'].startswith('edx.team.')
 
 
+@skip("for test purpose")
 @ddt.ddt
 @attr('shard_5')
 class TeamsTabTest(TeamsTabBase):
@@ -303,6 +305,7 @@ class TeamsTabTest(TeamsTabBase):
         self.assertTrue(self.teams_page.q(css=selector).visible)
 
 
+@skip("for test purpose")
 @attr('shard_5')
 class MyTeamsTest(TeamsTabBase):
     """
@@ -367,6 +370,7 @@ class MyTeamsTest(TeamsTabBase):
         self.assertEqual(self.my_teams_page.team_memberships[0], '4 / 10 Members')
 
 
+@skip("for test purpose")
 @attr('shard_5')
 @ddt.ddt
 class BrowseTopicsTest(TeamsTabBase):
@@ -585,6 +589,7 @@ class BrowseTopicsTest(TeamsTabBase):
             self.topics_page.visit()
 
 
+@skip("for test purpose")
 @attr('shard_5')
 @ddt.ddt
 class BrowseTeamsWithinTopicTest(TeamsTabBase):
@@ -889,6 +894,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             alert.accept()
 
 
+@skip("for test purpose")
 @attr('shard_5')
 class TeamFormActions(TeamsTabBase):
     """
@@ -988,6 +994,7 @@ class TeamFormActions(TeamsTabBase):
         )
 
 
+@skip("for test purpose")
 @ddt.ddt
 class CreateTeamTest(TeamFormActions):
     """
@@ -1162,6 +1169,7 @@ class CreateTeamTest(TeamFormActions):
             self.verify_and_navigate_to_create_team_page()
 
 
+@skip("for test purpose")
 @ddt.ddt
 class DeleteTeamTest(TeamFormActions):
     """
@@ -1285,6 +1293,7 @@ class DeleteTeamTest(TeamFormActions):
         self.teams_page.verify_topic_team_count(0)
 
 
+@skip("for test purpose")
 @ddt.ddt
 class EditTeamTest(TeamFormActions):
     """
@@ -1501,6 +1510,7 @@ class EditTeamTest(TeamFormActions):
             self.verify_and_navigate_to_edit_team_page()
 
 
+@skip("for test purpose")
 @ddt.ddt
 class EditMembershipTest(TeamFormActions):
     """
@@ -1602,6 +1612,7 @@ class EditMembershipTest(TeamFormActions):
         self.edit_membership_helper(role, cancel=True)
 
 
+@skip("for test purpose")
 @attr('shard_5')
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):

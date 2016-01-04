@@ -1,6 +1,7 @@
 """
 Base classes used by studio tests.
 """
+from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...fixtures.course import CourseFixture
@@ -10,6 +11,7 @@ from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.utils import verify_ordering
 
 
+@skip("for test purpose")
 class StudioCourseTest(UniqueCourseTest):
     """
     Base class for all Studio course tests.
@@ -63,6 +65,7 @@ class StudioCourseTest(UniqueCourseTest):
         self.auth_page.visit()
 
 
+@skip("for test purpose")
 class ContainerBase(StudioCourseTest):
     """
     Base class for tests that do operations on the container page.
@@ -115,6 +118,7 @@ class ContainerBase(StudioCourseTest):
         verify_ordering(self, container, expected_ordering)
 
 
+@skip("for test purpose")
 class StudioLibraryTest(WebAppTest):
     """
     Base class for all Studio library tests.

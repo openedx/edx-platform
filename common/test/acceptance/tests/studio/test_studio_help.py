@@ -1,12 +1,14 @@
 """
 Test the Studio help links.
 """
+from unittest import skip
 
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.index import DashboardPage
 from ...pages.studio.utils import click_studio_help, studio_help_links
 
 
+@skip("for test purpose")
 class StudioHelpTest(StudioCourseTest):
     """Tests for Studio help."""
 

@@ -1,6 +1,7 @@
 """
 Acceptance tests for the Import and Export pages
 """
+from unittest import skip
 from nose.plugins.attrib import attr
 from datetime import datetime
 
@@ -34,6 +35,7 @@ class ExportTestMixin(object):
         self.assertTrue(is_tarball_mimetype)
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class TestCourseExport(ExportTestMixin, StudioCourseTest):
     """
@@ -57,6 +59,7 @@ class TestCourseExport(ExportTestMixin, StudioCourseTest):
         self.assertEqual(self.export_page.header_text, 'Course Export')
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
     """
@@ -106,6 +109,7 @@ class BadExportMixin(object):
         )
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class TestLibraryBadExport(BadExportMixin, StudioLibraryTest):
     """
@@ -130,6 +134,7 @@ class TestLibraryBadExport(BadExportMixin, StudioLibraryTest):
         )
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class TestCourseBadExport(BadExportMixin, StudioCourseTest):
     """
@@ -162,6 +167,7 @@ class TestCourseBadExport(BadExportMixin, StudioCourseTest):
         )
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class ImportTestMixin(object):
     """
@@ -277,6 +283,7 @@ class ImportTestMixin(object):
         self.import_page.wait_for_tasks(fail_on='Updating')
 
 
+@skip("for test purpose")
 @attr('shard_4')
 class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
     """

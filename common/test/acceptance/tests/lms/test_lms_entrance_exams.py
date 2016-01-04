@@ -3,6 +3,7 @@
 Bok choy acceptance tests for Entrance exams in the LMS
 """
 from textwrap import dedent
+from unittest import skip
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -11,6 +12,7 @@ from ...pages.lms.problem import ProblemPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@skip("for test purpose")
 class EntranceExamTest(UniqueCourseTest):
     """
     Base class for tests of Entrance Exams in the LMS.
@@ -60,6 +62,7 @@ class EntranceExamTest(UniqueCourseTest):
         raise NotImplementedError()
 
 
+@skip("for test purpose")
 class EntranceExamPassTest(EntranceExamTest):
     """
     Tests the scenario when a student passes entrance exam.

@@ -1,12 +1,14 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
+from unittest import skip
 from ...pages.studio.asset_index import AssetIndexPage
 
 from .base_studio_test import StudioCourseTest
 from ...fixtures.base import StudioApiLoginError
 
 
+@skip("for test purpose")
 class AssetIndexTest(StudioCourseTest):
 
     """

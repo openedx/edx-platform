@@ -2,11 +2,13 @@
 Acceptance tests for Studio related to the textbooks.
 """
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from unittest import skip
 from ...pages.studio.textbooks import TextbooksPage
 from ...tests.helpers import disable_animations
 from nose.plugins.attrib import attr
 
 
+@skip("for test purpose")
 @attr('shard_2')
 class TextbooksTest(StudioCourseTest):
     """
