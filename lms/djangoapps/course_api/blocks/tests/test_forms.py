@@ -44,7 +44,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data = QueryDict(
             urlencode({
                 'username': self.student.username,
-                'usage_key': unicode(usage_key),
+                'usage_key': unicode(usage_key).encode('utf-8'),
             }),
             mutable=True,
         )

@@ -267,7 +267,7 @@ def generate_milestone_namespace(namespace, course_key=None):
     """
     if namespace in NAMESPACE_CHOICES.values():
         if namespace == 'entrance_exams':
-            return '{}.{}'.format(unicode(course_key), NAMESPACE_CHOICES['ENTRANCE_EXAM'])
+            return u'{}.{}'.format(unicode(course_key), NAMESPACE_CHOICES['ENTRANCE_EXAM'])
 
 
 def serialize_user(user):

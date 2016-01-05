@@ -273,7 +273,7 @@ def create_mode(request, course_id):
     CourseMode.objects.get_or_create(course_id=course_key, **PARAMETERS)
 
     # Return a success message and a 200 response
-    return HttpResponse("Mode '{mode_slug}' created for '{course}'.".format(
+    return HttpResponse(u"Mode '{mode_slug}' created for '{course}'.".format(
         mode_slug=PARAMETERS['mode_slug'],
         course=course_id
     ))
