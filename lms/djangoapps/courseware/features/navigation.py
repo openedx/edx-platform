@@ -183,6 +183,6 @@ def wait_for_problem(display_name):
     world.wait_for_ajax_complete()
 
     wait_func = lambda _: world.css_has_text(
-        'h2.problem-header', display_name, strip=True
+        'h3.problem-header', display_name, strip=True
     )
     world.wait_for(wait_func)
