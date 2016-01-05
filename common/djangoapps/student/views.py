@@ -589,7 +589,7 @@ def dashboard(request):
     # This is passed along in the template context to allow rendering of
     # program-related information on the dashboard.
     course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
-    program_credentials = _get_programs_credentials(user)
+    xseries_credentials = _get_xseries_credentials(user)
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -712,7 +712,7 @@ def dashboard(request):
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
         'course_programs': course_programs,
-        'program_credentials': program_credentials,
+        'xseries_credentials': xseries_credentials,
     }
 
     return render_to_response('dashboard.html', context)
@@ -2382,7 +2382,7 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
     return programs_data
 
 
-def _get_programs_credentials(user):
+def _get_xseries_credentials(user):
     """Return program credentials data required for display on
     the learner dashboard.
 
@@ -2399,7 +2399,7 @@ def _get_programs_credentials(user):
     programs_credentials = get_user_program_credentials(user)
     credentials_data = []
     for program in programs_credentials:
-        if program.get('status') == 'active' and program.get('category') == 'xseries':
+        if program.get('status') == 'active':
             try:
                 program_data = {
                     'display_name': program['name'],

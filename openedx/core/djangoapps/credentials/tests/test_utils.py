@@ -26,12 +26,12 @@ class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, Credentials
 
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-        self.create_credential_config()
         self.user = UserFactory()
 
     @httpretty.activate
     def test_get_user_credentials(self):
         """Verify user credentials data can be retrieve."""
+        self.create_credentials_config()
         self.mock_credentials_api(self.user)
 
         actual = get_user_credentials(self.user)
@@ -39,13 +39,14 @@ class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, Credentials
 
     def test_get_user_program_credentials_issuance_disable(self):
         """Verify that user program credentials cannot be retrieved if issuance is disabled."""
-        self.create_credential_config(enable_learner_issuance=False)
+        self.create_credentials_config(enable_learner_issuance=False)
         actual = get_user_program_credentials(self.user)
         self.assertEqual(actual, [])
 
     @httpretty.activate
     def test_get_user_program_credentials_no_credential(self):
         """Verify behavior if no credential exist."""
+        self.create_credentials_config()
         self.mock_credentials_api(self.user, data={'results': []})
         actual = get_user_program_credentials(self.user)
         self.assertEqual(actual, [])
@@ -53,6 +54,7 @@ class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, Credentials
     @httpretty.activate
     def test_get_user_program_credentials_revoked(self):
         """Verify behavior if credential revoked."""
+        self.create_credentials_config()
         credential_data = {"results": [
             {
                 "id": 1,
@@ -72,8 +74,8 @@ class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, Credentials
     @httpretty.activate
     def test_get_user_programs_credentials(self):
         """Verify program credentials data can be retrieved and parsed correctly."""
-        credentials_config = self.create_credential_config()
-        program_config = self.create_program_config()
+        credentials_config = self.create_credentials_config()
+        self.create_programs_config()
         self.mock_programs_api()
         self.mock_credentials_api(self.user, reset_url=False)
         actual = get_user_program_credentials(self.user)

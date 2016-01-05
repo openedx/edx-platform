@@ -28,7 +28,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
     @httpretty.activate
     def test_get_api_data_programs(self):
         """Verify programs data can be retrieve using get_api_data."""
-        program_config = self.create_program_config()
+        program_config = self.create_programs_config()
         self.mock_programs_api()
 
         actual = get_api_data(program_config, self.user, 'programs', 'programs')
@@ -43,7 +43,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
     @httpretty.activate
     def test_get_api_data_credentials(self):
         """Verify credentials data can be retrieve using get_api_data."""
-        credentials_config = self.create_credential_config()
+        credentials_config = self.create_credentials_config()
         self.mock_credentials_api(self.user)
         querystring = {'username': self.user.username}
 
@@ -55,7 +55,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
 
     def test_get_api_data_disable_config(self):
         """Verify no data is retrieve if configuration is disabled."""
-        program_config = self.create_program_config(enabled=False)
+        program_config = self.create_programs_config(enabled=False)
 
         actual = get_api_data(program_config, self.user, 'programs', 'programs')
         self.assertEqual(actual, [])
@@ -63,7 +63,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
     @httpretty.activate
     def test_get_api_data_cache(self):
         """Verify that when enabled, the cache is used."""
-        program_config = self.create_program_config(cache_ttl=1)
+        program_config = self.create_programs_config(cache_ttl=1)
         self.mock_programs_api()
 
         # Warm up the cache.
@@ -78,7 +78,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
     def test_get_api_data_without_cache_key(self):
         """Verify that when cache enabled without cache key then no data is retrieved."""
         ProgramsApiConfig.CACHE_KEY = None
-        program_config = self.create_program_config(cache_ttl=1)
+        program_config = self.create_programs_config(cache_ttl=1)
 
         actual = get_api_data(program_config, self.user, 'programs', 'programs', use_cache=True)
         self.assertEqual(actual, [])
@@ -86,7 +86,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
     @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
     def test_get_api_data_client_initialization_failure(self, mock_init):
         """Verify behavior when API client fails to initialize."""
-        program_config = self.create_program_config()
+        program_config = self.create_programs_config()
         mock_init.side_effect = Exception
 
         actual = get_api_data(program_config, self.user, 'programs', 'programs')
@@ -96,7 +96,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
     @httpretty.activate
     def test_get_api_data_retrieval_failure(self):
         """Verify behavior when data can't be retrieved from API."""
-        program_config = self.create_program_config()
+        program_config = self.create_programs_config()
         self.mock_programs_api(status_code=500)
 
         actual = get_api_data(program_config, self.user, 'programs', 'programs')
@@ -105,7 +105,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
     @httpretty.activate
     def test_get_api_data_multiple_page(self):
         """Verify that all data is retrieve for multiple page response."""
-        credentials_config = self.create_credential_config()
+        credentials_config = self.create_credentials_config()
         self.mock_credentials_api(self.user, is_next_page=True)
         querystring = {'username': self.user.username}
 
