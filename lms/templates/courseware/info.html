@@ -54,11 +54,9 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
         <h1 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.id.org, course_name=course.id.course) | h}</h1>
         <h2 class="page-subtitle">${course.display_name | h}</h2>
     </div>
-    % if last_accessed_courseware:
+    % if last_accessed_courseware_url:
       <div class="page-header-secondary">
-          <i class="fa fa-clock-o"></i>
-          <p class="last-accessed-message">${_("Jump back to where you were last:")}</p>
-          <a href="${last_accessed_url}">${last_accessed_courseware.display_name | h}</a>
+          <a href="${last_accessed_courseware_url}" class="last-accessed-link">${_("Resume Course")}</a>
       </div>
     % endif
   </div>
