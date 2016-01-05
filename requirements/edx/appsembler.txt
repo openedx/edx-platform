@@ -1,1 +1,2 @@
 python-intercom==0.2.13
+requests==2.8.1

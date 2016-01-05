@@ -32,7 +32,7 @@ class CreateCourseAPIView(GenericAPIView):
 
             try:
                 store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
-                org = "AppsemblerX"
+                org = user.profile.organization.key
                 number = "{}101".format(user.username)
                 run = "CurrentTerm"
                 fields = {
