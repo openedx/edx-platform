@@ -710,6 +710,7 @@ def dashboard(request):
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
         'course_programs': course_programs,
+        'disable_courseware_js': True,
     }
 
     return render_to_response('dashboard.html', context)
