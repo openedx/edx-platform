@@ -701,12 +701,9 @@ def course_info(request, course_id):
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
-        context['last_accessed_courseware'] = None
+        context['last_accessed_courseware_url'] = None
         if SelfPacedConfiguration.current().enable_course_home_improvements:
-            (section_module, section_url) = get_last_accessed_courseware(course, request)
-            if section_module is not None and section_url is not None:
-                context['last_accessed_courseware'] = section_module
-                context['last_accessed_url'] = section_url
+            context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request)
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
@@ -720,8 +717,8 @@ def course_info(request, course_id):
 
 def get_last_accessed_courseware(course, request):
     """
-    Return a pair of the last-accessed courseware for this request's
-    user, and a URL for that module.
+    Return the URL the courseware module that this request's user last
+    accessed, or None if it cannot be found.
     """
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id, request.user, course, depth=2
@@ -738,8 +735,8 @@ def get_last_accessed_courseware(course, request):
                 'chapter': chapter_module.url_name,
                 'section': section_module.url_name
             })
-            return (section_module, url)
-    return (None, None)
+            return url
+    return None
 
 
 @ensure_csrf_cookie
