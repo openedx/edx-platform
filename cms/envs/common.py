@@ -1136,3 +1136,6 @@ PROCTORING_SETTINGS = {}
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
 OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
+
+# URL which is used to convert math formula to Content MathML in Symbolic Response problem.
+SYMMATH_URL = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'

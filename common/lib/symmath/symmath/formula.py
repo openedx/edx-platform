@@ -17,6 +17,8 @@ import re
 import logging
 import operator
 import requests
+
+from django.conf import settings
 import sympy
 from sympy.printing.latex import LatexPrinter
 from sympy.printing.str import StrPrinter
@@ -591,7 +593,6 @@ class formula(object):
         """
         Handle requests to snuggletex API to convert the Ascii math to MathML
         """
-        url = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
 
         payload = {
             'asciiMathInput': asciimath,
@@ -600,7 +601,7 @@ class formula(object):
         headers = {
             'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"
         }
-        request = requests.post(url, data=payload, headers=headers, verify=False)
+        request = requests.post(settings.SYMMATH_URL, data=payload, headers=headers, verify=False)
         request.encoding = 'utf-8'
         ret = request.text
 
