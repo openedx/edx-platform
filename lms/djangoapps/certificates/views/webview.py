@@ -9,13 +9,12 @@ import urllib
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 from django.core.urlresolvers import reverse
 
-from courseware.courses import course_image_url
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
@@ -23,6 +22,7 @@ from eventtracking import tracker
 from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.lib.courses import course_image_url
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.views import handle_500
@@ -34,10 +34,13 @@ from certificates.api import (
     get_certificate_url,
     emit_certificate_event,
     has_html_certificates_enabled,
-    get_certificate_template
+    get_certificate_template,
+    get_certificate_header_context,
+    get_certificate_footer_context,
 )
 from certificates.models import (
     GeneratedCertificate,
+    CertificateStatuses,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
     BadgeAssertion
@@ -53,24 +56,25 @@ def get_certificate_description(mode, certificate_type, platform_name):
     certificate_type_description = None
     if mode == 'honor':
         # Translators:  This text describes the 'Honor' course certificate type.
-        certificate_type_description = _("An {cert_type} Certificate signifies that an {platform_name} "
-                                         "learner has agreed to abide by {platform_name}'s honor code and "
-                                         "completed all of the required tasks for this course under its "
+        certificate_type_description = _("An {cert_type} certificate signifies that a "
+                                         "learner has agreed to abide by the honor code established by {platform_name} "
+                                         "and has completed all of the required tasks for this course under its "
                                          "guidelines.").format(cert_type=certificate_type,
                                                                platform_name=platform_name)
     elif mode == 'verified':
         # Translators:  This text describes the 'ID Verified' course certificate type, which is a higher level of
         # verification offered by edX.  This type of verification is useful for professional education/certifications
-        certificate_type_description = _("An {cert_type} Certificate signifies that an {platform_name} "
-                                         "learner has agreed to abide by {platform_name}'s honor code and "
-                                         "completed all of the required tasks for this course under its "
-                                         "guidelines, as well as having their photo ID checked to verify "
-                                         "their identity.").format(cert_type=certificate_type,
-                                                                   platform_name=platform_name)
+        certificate_type_description = _("A {cert_type} certificate signifies that a "
+                                         "learner has agreed to abide by the honor code established by {platform_name} "
+                                         "and has completed all of the required tasks for this course under its "
+                                         "guidelines. A {cert_type} certificate also indicates that the "
+                                         "identity of the learner has been checked and "
+                                         "is valid.").format(cert_type=certificate_type,
+                                                             platform_name=platform_name)
     elif mode == 'xseries':
         # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
         # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
-        certificate_type_description = _("An {cert_type} Certificate demonstrates a high level of "
+        certificate_type_description = _("An {cert_type} certificate demonstrates a high level of "
                                          "achievement in a program of study, and includes verification of "
                                          "the student's identity.").format(cert_type=certificate_type)
     return certificate_type_description
@@ -118,7 +122,7 @@ def _update_certificate_context(context, user_certificate, platform_name):
     # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
     # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
     context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
-                                                        "awarded a {platform_name} {certificate_type} "
+                                                        "awarded this {platform_name} {certificate_type} "
                                                         "Certificate of Completion in ").format(
         platform_name=platform_name,
         certificate_type=context.get("certificate_type"))
@@ -128,12 +132,9 @@ def _update_certificate_context(context, user_certificate, platform_name):
         context['certificate_type_description'] = certificate_type_description
 
     # Translators: This text describes the purpose (and therefore, value) of a course certificate
-    # 'verifying your identity' refers to the process for establishing the authenticity of the student
-    context['certificate_info_description'] = _("{platform_name} acknowledges achievements through certificates, which "
-                                                "are awarded for various activities {platform_name} students complete "
-                                                "under the <a href='{tos_url}'>{platform_name} Honor Code</a>.  Some "
-                                                "certificates require completing additional steps, such as "
-                                                "<a href='{verified_cert_url}'> verifying your identity</a>.").format(
+    context['certificate_info_description'] = _("{platform_name} acknowledges achievements through "
+                                                "certificates, which are awarded for course activities "
+                                                "that {platform_name} students complete.").format(
         platform_name=platform_name,
         tos_url=context.get('company_tos_url'),
         verified_cert_url=context.get('company_verified_certificate_url'))
@@ -152,7 +153,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
 
     # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
     reserved = _("All rights reserved")
-    context['copyright_text'] = '&copy; {year} {platform_name}. {reserved}.'.format(
+    context['copyright_text'] = u'&copy; {year} {platform_name}. {reserved}.'.format(
         year=settings.COPYRIGHT_YEAR,
         platform_name=platform_name,
         reserved=reserved
@@ -200,10 +201,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     context['certificate_verify_urltext'] = _("Validate this certificate for yourself")
 
     # Translators:  This text describes (at a high level) the mission and charter the edX platform and organization
-    context['company_about_description'] = _("{platform_name} offers interactive online classes and MOOCs from the "
-                                             "world's best universities, including MIT, Harvard, Berkeley, University "
-                                             "of Texas, and many others.  {platform_name} is a non-profit online "
-                                             "initiative created by founding partners Harvard and MIT.").format(
+    context['company_about_description'] = _("{platform_name} offers interactive online classes and MOOCs.").format(
         platform_name=platform_name)
 
     context['company_about_title'] = _("About {platform_name}").format(platform_name=platform_name)
@@ -235,15 +233,15 @@ def _update_course_context(request, context, course, platform_name):
     if context['organization_long_name']:
         # Translators:  This text represents the description of course
         context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
-                                                              'an online learning initiative of {partner_long_name} '
-                                                              'through {platform_name}.').format(
+                                                              'an online learning initiative of '
+                                                              '{partner_long_name}.').format(
             partner_short_name=context['organization_short_name'],
             partner_long_name=context['organization_long_name'],
             platform_name=platform_name)
     else:
         # Translators:  This text represents the description of course
-        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
-                                                              'through {platform_name}.').format(
+        context['accomplishment_copy_course_description'] = _('a course of study offered by '
+                                                              '{partner_short_name}.').format(
             partner_short_name=context['organization_short_name'],
             platform_name=platform_name)
 
@@ -265,17 +263,12 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
     context['twitter_share_text'] = share_settings.get(
         'CERTIFICATE_TWITTER_TEXT',
-        _("I completed a course on {platform_name}. Take a look at my certificate.").format(
+        _("I completed a course at {platform_name}. Take a look at my certificate.").format(
             platform_name=platform_name
         )
     )
 
-    share_url = request.build_absolute_uri(
-        reverse(
-            'certificates:html_view',
-            kwargs=dict(user_id=str(user.id), course_id=unicode(course.id))
-        )
-    )
+    share_url = request.build_absolute_uri(get_certificate_url(course_id=course.id, uuid=user_certificate.verify_uuid))
     context['share_url'] = share_url
     twitter_url = ''
     if context.get('twitter_share_enabled', False):
@@ -297,10 +290,7 @@ def _update_social_context(request, context, course, user, user_certificate, pla
             course.id,
             course.display_name,
             user_certificate.mode,
-            smart_str(request.build_absolute_uri(get_certificate_url(
-                user_id=user.id,
-                course_id=unicode(course.id)
-            )))
+            smart_str(share_url)
         )
 
 
@@ -319,13 +309,13 @@ def _update_context_with_user_info(context, user, user_certificate):
         user_name=user_fullname
     )
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
-    context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
+    context['accomplishment_banner_opening'] = _("{fullname}, you earned a certificate!").format(
         fullname=user_fullname
     )
 
     # Translators: This line congratulates the user and instructs them to share their accomplishment on social networks
-    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes all of the details of what "
-                                                  "you've accomplished. Show it off to family, friends, and colleagues "
+    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes what "
+                                                  "you accomplished. Show it off to family, friends, and colleagues "
                                                   "in your social and professional networks.")
 
     # Translators: This line leads the reader to understand more about the certificate that a student has been awarded
@@ -340,33 +330,25 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     Returns None if there is no certificate generated for given user
     otherwise returns `GeneratedCertificate` instance.
     """
-    try:
-        # Attempt to load the user's generated certificate data
-        if preview_mode:
-            user_certificate = GeneratedCertificate.objects.get(
-                user=user,
-                course_id=course_key,
-                mode=preview_mode
-            )
-        else:
-            user_certificate = GeneratedCertificate.objects.get(
-                user=user,
-                course_id=course_key
-            )
-
-    # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...
-    # If we are, we'll need to create a mock version of the user_certificate container for previewing
-    except GeneratedCertificate.DoesNotExist:
-        if preview_mode and (
-                has_access(request.user, 'instructor', course) or
-                has_access(request.user, 'staff', course)):
+    user_certificate = None
+    if preview_mode:
+        # certificate is being previewed from studio
+        if has_access(request.user, 'instructor', course) or has_access(request.user, 'staff', course):
             user_certificate = GeneratedCertificate(
                 mode=preview_mode,
                 verify_uuid=unicode(uuid4().hex),
                 modified_date=datetime.now().date()
             )
-        else:
-            return None
+    else:
+        # certificate is being viewed by learner or public
+        try:
+            user_certificate = GeneratedCertificate.objects.get(
+                user=user,
+                course_id=course_key,
+                status=CertificateStatuses.downloadable
+            )
+        except GeneratedCertificate.DoesNotExist:
+            pass
 
     return user_certificate
 
@@ -428,7 +410,6 @@ def _update_microsite_context(context, configuration):
     _update_certificate_context() call above. For example the
     'company_about_description' talks about edX, which we most likely
     do not want to keep in a microsite
-
     So we need to re-apply any configuration/content that
     we are sourcing from the database. This is somewhat duplicative of
     the code at the beginning of this method, but we
@@ -473,13 +454,27 @@ def _update_organization_context(context, course):
     context['organization_logo'] = organization_logo
 
 
+def render_cert_by_uuid(request, certificate_uuid):
+    """
+    This public view generates an HTML representation of the specified certificate
+    """
+    try:
+        certificate = GeneratedCertificate.objects.get(
+            verify_uuid=certificate_uuid,
+            status=CertificateStatuses.downloadable
+        )
+        return render_html_view(request, certificate.user.id, unicode(certificate.course_id))
+    except GeneratedCertificate.DoesNotExist:
+        raise Http404
+
+
 @handle_500(
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
 def render_html_view(request, user_id, course_id):
     """
-    This public view generates an HTML representation of the specified student's certificate
+    This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
     """
     preview_mode = request.GET.get('preview', None)
@@ -540,6 +535,10 @@ def render_html_view(request, user_id, course_id):
 
     # Append microsite overrides
     _update_microsite_context(context, configuration)
+
+    # Add certificate header/footer data to current context
+    context.update(get_certificate_header_context(is_secure=request.is_secure()))
+    context.update(get_certificate_footer_context())
 
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
     context.update(course.cert_html_view_overrides)

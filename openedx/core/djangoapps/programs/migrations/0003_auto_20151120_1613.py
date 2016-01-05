@@ -14,12 +14,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='programsapiconfig',
             name='authoring_app_css_path',
-            field=models.CharField(max_length=255, verbose_name="Path to authoring app's CSS", blank=True),
+            field=models.CharField(
+                max_length=255,
+                help_text='This value is required in order to enable the Studio authoring interface.',
+                verbose_name="Path to authoring app's CSS",
+                blank=True
+            ),
         ),
         migrations.AddField(
             model_name='programsapiconfig',
             name='authoring_app_js_path',
-            field=models.CharField(max_length=255, verbose_name="Path to authoring app's JS", blank=True),
+            field=models.CharField(
+                max_length=255,
+                help_text='This value is required in order to enable the Studio authoring interface.',
+                verbose_name="Path to authoring app's JS",
+                blank=True
+            ),
         ),
         migrations.AddField(
             model_name='programsapiconfig',

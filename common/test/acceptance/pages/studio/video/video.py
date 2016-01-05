@@ -13,11 +13,11 @@ from selenium.webdriver.common.keys import Keys
 
 
 CLASS_SELECTORS = {
-    'video_container': 'div.video',
+    'video_container': '.video',
     'video_init': '.is-initialized',
     'video_xmodule': '.xmodule_VideoModule',
     'video_spinner': '.video-wrapper .spinner',
-    'video_controls': 'section.video-controls',
+    'video_controls': '.video-controls',
     'attach_asset': '.upload-dialog > input[type="file"]',
     'upload_dialog': '.wrapper-modal-window-assetupload',
     'xblock': '.add-xblock-component',
@@ -183,12 +183,11 @@ class VideoComponentPage(VideoPage):
         asset_file_path = self.file_path(asset_filename)
         self.click_button('upload_asset', index)
         self.q(css=CLASS_SELECTORS['attach_asset']).results[0].send_keys(asset_file_path)
-        self.click_button('asset_submit')
         # Only srt format transcript files can be uploaded, If an error
         # occurs due to incorrect transcript file we will return from here
         if asset_type == 'transcript' and self.q(css='#upload_error').present:
             return
-
+        self.click_button('asset_submit')
         # confirm upload completion
         self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['upload_dialog']).present, 'Upload Completed')
 
@@ -264,7 +263,7 @@ class VideoComponentPage(VideoPage):
             line_number (int): caption line number
 
         """
-        caption_line_selector = ".subtitles > li[data-index='{index}']".format(index=line_number - 1)
+        caption_line_selector = ".subtitles li[data-index='{index}']".format(index=line_number - 1)
         self.q(css=caption_line_selector).results[0].send_keys(Keys.ENTER)
 
     def is_caption_line_focused(self, line_number):
@@ -275,7 +274,7 @@ class VideoComponentPage(VideoPage):
             line_number (int): caption line number
 
         """
-        caption_line_selector = ".subtitles > li[data-index='{index}']".format(index=line_number - 1)
+        caption_line_selector = ".subtitles li[data-index='{index}']".format(index=line_number - 1)
         attributes = self.q(css=caption_line_selector).attrs('class')
 
         return 'focused' in attributes
@@ -504,7 +503,7 @@ class VideoComponentPage(VideoPage):
         As all the captions lines are exactly same so only getting partial lines will work.
         """
         self.wait_for_captions()
-        selector = '.subtitles > li:nth-child({})'
+        selector = '.subtitles li:nth-child({})'
         return ' '.join([self.q(css=selector.format(i)).text[0] for i in range(1, 6)])
 
     def set_url_field(self, url, field_number):

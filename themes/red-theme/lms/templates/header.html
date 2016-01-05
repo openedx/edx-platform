@@ -52,7 +52,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h2><span class="provider">${course.display_org_with_default | h}:</span>
       ${course.display_number_with_default | h}
       <%
-        display_name = course.display_name_with_default
+        display_name = course.display_name_with_default_escaped
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
           ccx = get_current_ccx()
           if ccx:

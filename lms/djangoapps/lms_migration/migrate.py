@@ -132,7 +132,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
 
     for cdir, course in def_ms.courses.items():
         html += '<hr width="100%"/>'
-        html += '<h2>Course: %s (%s)</h2>' % (course.display_name_with_default, cdir)
+        html += '<h2>Course: %s (%s)</h2>' % (course.display_name_with_default_escaped, cdir)
 
         html += '<p>commit_id=%s</p>' % get_commit_id(course)
 

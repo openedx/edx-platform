@@ -74,6 +74,22 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             source_course_id, dest_course_id, user_id, fields=fields, **kwargs
         )
 
+    def get_course_summaries(self, **kwargs):
+        """
+        Returns course summaries on the Draft or Published branch depending on the branch setting.
+        """
+        branch_setting = self.get_branch_setting()
+        if branch_setting == ModuleStoreEnum.Branch.draft_preferred:
+            return super(DraftVersioningModuleStore, self).get_course_summaries(
+                ModuleStoreEnum.BranchName.draft, **kwargs
+            )
+        elif branch_setting == ModuleStoreEnum.Branch.published_only:
+            return super(DraftVersioningModuleStore, self).get_course_summaries(
+                ModuleStoreEnum.BranchName.published, **kwargs
+            )
+        else:
+            raise InsufficientSpecificationError()
+
     def get_courses(self, **kwargs):
         """
         Returns all the courses on the Draft or Published branch depending on the branch setting.

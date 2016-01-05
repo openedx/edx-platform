@@ -47,6 +47,7 @@ from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
+from enrollment.api import _default_course_mode
 import lms.lib.comment_client as cc
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -503,7 +504,28 @@ class Registration(models.Model):
 
     def activate(self):
         self.user.is_active = True
+        self._track_activation()
         self.user.save()
+
+    def _track_activation(self):
+        """ Update the isActive flag in mailchimp for activated users."""
+        has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
+        has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
+        if has_segment_key and has_mailchimp_id:
+            identity_args = [
+                self.user.id,  # pylint: disable=no-member
+                {
+                    'email': self.user.email,
+                    'username': self.user.username,
+                    'activated': 1,
+                },
+                {
+                    "MailChimp": {
+                        "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
+                    }
+                }
+            ]
+            analytics.identify(*identity_args)
 
 
 class PendingNameChange(models.Model):
@@ -895,7 +917,7 @@ class CourseEnrollment(models.Model):
 
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
-    mode = models.CharField(default="honor", max_length=100)
+    mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
 
     objects = CourseEnrollmentManager()
 
@@ -957,7 +979,7 @@ class CourseEnrollment(models.Model):
 
         # If we *did* just create a new enrollment, set some defaults
         if created:
-            enrollment.mode = "honor"
+            enrollment.mode = CourseMode.DEFAULT_MODE_SLUG
             enrollment.is_active = False
             enrollment.save()
 
@@ -1043,8 +1065,8 @@ class CourseEnrollment(models.Model):
                           u"mode:{}".format(self.mode)]
                 )
         if mode_changed:
-            # the user's default mode is "honor" and disabled for a course
-            # mode change events will only be emitted when the user's mode changes from this
+            # Only emit mode change events when the user's enrollment
+            # mode has changed from its previous setting
             self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
 
     def emit_event(self, event_name):
@@ -1090,7 +1112,7 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode="honor", check_access=False):
+    def enroll(cls, user, course_key, mode=None, check_access=False):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1103,8 +1125,8 @@ class CourseEnrollment(models.Model):
         `course_key` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
 
         `mode` is a string specifying what kind of enrollment this is. The
-               default is 'honor', meaning honor certificate. Other options
-               include 'professional', 'verified', 'audit',
+               default is the default course mode, 'audit'. Other options
+               include 'professional', 'verified', 'honor',
                'no-id-professional' and 'credit'.
                See CourseMode in common/djangoapps/course_modes/models.py.
 
@@ -1124,6 +1146,8 @@ class CourseEnrollment(models.Model):
 
         Also emits relevant events for analytics purposes.
         """
+        if mode is None:
+            mode = _default_course_mode(unicode(course_key))
         # All the server-side checks for whether a user is allowed to enroll.
         try:
             course = CourseOverview.get_from_id(course_key)
@@ -1165,7 +1189,7 @@ class CourseEnrollment(models.Model):
         return enrollment
 
     @classmethod
-    def enroll_by_email(cls, email, course_id, mode="honor", ignore_errors=True):
+    def enroll_by_email(cls, email, course_id, mode=None, ignore_errors=True):
         """
         Enroll a user in a course given their email. This saves immediately.
 
@@ -1181,9 +1205,10 @@ class CourseEnrollment(models.Model):
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
 
         `mode` is a string specifying what kind of enrollment this is. The
-               default is "honor", meaning honor certificate. Future options
-               may include "audit", "verified_id", etc. Please don't use it
-               until we have these mapped out.
+               default is the default course mode, 'audit'. Other options
+               include 'professional', 'verified', 'honor',
+               'no-id-professional' and 'credit'.
+               See CourseMode in common/djangoapps/course_modes/models.py.
 
         `ignore_errors` is a boolean indicating whether we should suppress
                         `User.DoesNotExist` errors (returning None) or let it
@@ -1485,7 +1510,7 @@ class ManualEnrollmentAudit(models.Model):
         """
         saves the student manual enrollment information
         """
-        cls.objects.create(
+        return cls.objects.create(
             enrolled_by=user,
             enrolled_email=email,
             state_transition=state_transition,

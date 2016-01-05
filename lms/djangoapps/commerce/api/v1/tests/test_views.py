@@ -1,5 +1,5 @@
 """ Commerce API v1 view tests. """
-from datetime import datetime
+from datetime import datetime, timedelta
 import itertools
 import json
 
@@ -203,6 +203,49 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), verification_deadline)
 
+    def test_update_remove_verification_deadline(self):
+        """
+        Verify that verification deadlines can be removed through the API.
+        """
+        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=pytz.utc)
+        response, __ = self._get_update_response_and_expected_data(None, verification_deadline)
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), verification_deadline)
+
+        verified_mode = CourseMode(
+            mode_slug=u'verified',
+            min_price=200,
+            currency=u'USD',
+            sku=u'ABC123',
+            expiration_datetime=None
+        )
+        updated_data = self._serialize_course(self.course, [verified_mode], None)
+        updated_data['verification_deadline'] = None
+
+        response = self.client.put(self.path, json.dumps(updated_data), content_type=JSON_CONTENT_TYPE)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(VerificationDeadline.deadline_for_course(self.course.id))
+
+    def test_remove_upgrade_deadline(self):
+        """
+        Verify that course mode upgrade deadlines can be removed through the API.
+        """
+        # First create a deadline
+        upgrade_deadline = datetime.now(pytz.utc) + timedelta(days=1)
+        response, __ = self._get_update_response_and_expected_data(upgrade_deadline, None)
+        self.assertEqual(response.status_code, 200)
+        verified_mode = CourseMode.verified_mode_for_course(self.course.id)
+        self.assertIsNotNone(verified_mode)
+        self.assertEqual(verified_mode.expiration_datetime.date(), upgrade_deadline.date())
+
+        # Now set the deadline to None
+        response, __ = self._get_update_response_and_expected_data(None, None)
+        self.assertEqual(response.status_code, 200)
+
+        updated_verified_mode = CourseMode.verified_mode_for_course(self.course.id)
+        self.assertIsNotNone(updated_verified_mode)
+        self.assertIsNone(updated_verified_mode.expiration_datetime)
+
     def test_update_overwrite(self):
         """ Verify that data submitted via PUT overwrites/deletes modes that are
         not included in the body of the request. """
@@ -285,7 +328,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         expected_modes = [
             CourseMode(
-                mode_slug=u'honor',
+                mode_slug=CourseMode.DEFAULT_MODE_SLUG,
                 min_price=150, currency=u'USD',
                 sku=u'ABC123'
             )

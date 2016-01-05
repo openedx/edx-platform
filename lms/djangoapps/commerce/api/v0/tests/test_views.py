@@ -197,7 +197,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         with mock_create_basket(response=return_value):
             self._test_successful_ecommerce_api_call(False)
 
-    def _test_course_without_sku(self):
+    def _test_course_without_sku(self, enrollment_mode=CourseMode.DEFAULT_MODE_SLUG):
         """
         Validates the view bypasses the E-Commerce API when the course has no CourseModes with SKUs.
         """
@@ -207,13 +207,16 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         # Validate the response content
         self.assertEqual(response.status_code, 200)
-        msg = Messages.NO_SKU_ENROLLED.format(enrollment_mode='honor', course_id=self.course.id,
-                                              username=self.user.username)
+        msg = Messages.NO_SKU_ENROLLED.format(
+            enrollment_mode=enrollment_mode,
+            course_id=self.course.id,
+            username=self.user.username
+        )
         self.assertResponseMessage(response, msg)
 
-    def test_course_without_sku(self):
+    def test_course_without_sku_default(self):
         """
-        If the course does NOT have a SKU, the user should be enrolled in the course (under the honor mode) and
+        If the course does NOT have a SKU, the user should be enrolled in the course (under the default mode) and
         redirected to the user dashboard.
         """
         # Remove SKU from all course modes
@@ -222,6 +225,24 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             course_mode.save()
 
         self._test_course_without_sku()
+
+    def test_course_without_sku_honor(self):
+        """
+        If the course does not have an SKU and has an honor mode, the user
+        should be enrolled as honor. This ensures backwards
+        compatibility with courses existing before the removal of
+        honor certificates.
+        """
+        # Remove all existing course modes
+        CourseMode.objects.filter(course_id=self.course.id).delete()
+        # Ensure that honor mode exists
+        CourseMode(
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="Honor Cert",
+            course_id=self.course.id
+        ).save()
+        # We should be enrolled in honor mode
+        self._test_course_without_sku(enrollment_mode=CourseMode.HONOR)
 
     @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
     def test_ecommerce_service_not_configured(self):
@@ -240,7 +261,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
     def assertProfessionalModeBypassed(self):
-        """ Verifies that the view returns HTTP 406 when a course with no honor mode is encountered. """
+        """ Verifies that the view returns HTTP 406 when a course with no honor or audit mode is encountered. """
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
@@ -252,7 +273,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         # The view should return an error status code
         self.assertEqual(response.status_code, 406)
-        msg = Messages.NO_HONOR_MODE.format(course_id=self.course.id)
+        msg = Messages.NO_DEFAULT_ENROLLMENT_MODE.format(course_id=self.course.id)
         self.assertResponseMessage(response, msg)
 
     def test_course_with_professional_mode_only(self):

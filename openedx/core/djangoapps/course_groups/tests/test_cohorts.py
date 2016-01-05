@@ -25,7 +25,7 @@ from ..tests.helpers import (
 )
 
 
-@patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
+@patch("openedx.core.djangoapps.course_groups.cohorts.tracker", autospec=True)
 class TestCohortSignals(TestCase):
     """
     Test cases to validate event emissions for various cohort-related workflows
@@ -179,8 +179,7 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertIsNone(cohorts.get_cohort_id(user, course.id))
 
         config_course_cohorts(course, is_cohorted=True)
-        cohort = CohortFactory(course_id=course.id, name="TestCohort")
-        cohort.users.add(user)
+        cohort = CohortFactory(course_id=course.id, name="TestCohort", users=[user])
         self.assertEqual(cohorts.get_cohort_id(user, course.id), cohort.id)
 
         self.assertRaises(
@@ -237,8 +236,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertIsNone(cohorts.get_cohort(user, course.id), "No cohort created yet")
 
-        cohort = CohortFactory(course_id=course.id, name="TestCohort")
-        cohort.users.add(user)
+        cohort = CohortFactory(course_id=course.id, name="TestCohort", users=[user])
 
         self.assertIsNone(
             cohorts.get_cohort(user, course.id),
@@ -261,8 +259,8 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (True, 2),
-        (False, 6),
+        (True, 3),
+        (False, 9),
     )
     @ddt.unpack
     def test_get_cohort_sql_queries(self, use_cached, num_sql_queries):
@@ -271,10 +269,8 @@ class TestCohorts(ModuleStoreTestCase):
         """
         course = modulestore().get_course(self.toy_course_key)
         config_course_cohorts(course, is_cohorted=True)
-        cohort = CohortFactory(course_id=course.id, name="TestCohort")
-
         user = UserFactory(username="test", email="a@b.com")
-        cohort.users.add(user)
+        CohortFactory.create(course_id=course.id, name="TestCohort", users=[user])
 
         with self.assertNumQueries(num_sql_queries):
             for __ in range(3):
@@ -314,10 +310,7 @@ class TestCohorts(ModuleStoreTestCase):
         user1 = UserFactory(username="test", email="a@b.com")
         user2 = UserFactory(username="test2", email="a2@b.com")
 
-        cohort = CohortFactory(course_id=course.id, name="TestCohort")
-
-        # user1 manually added to a cohort
-        cohort.users.add(user1)
+        cohort = CohortFactory(course_id=course.id, name="TestCohort", users=[user1])
 
         # Add an auto_cohort_group to the course...
         config_course_cohorts(

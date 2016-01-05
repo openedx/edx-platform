@@ -81,23 +81,20 @@ var onCertificatesReady = null;
                 success: function (data) {
                     $btn_regenerating_certs.attr('disabled','disabled');
                     if(data.success){
-                        $certificate_regeneration_status.text(data.message).
-                            removeClass('msg-error').addClass('msg-success');
+                        $certificate_regeneration_status.text(data.message).addClass("message");
                     }
                     else{
-                        $certificate_regeneration_status.text(data.message).
-                            removeClass('msg-success').addClass("msg-error");
+                        $certificate_regeneration_status.text(data.message).addClass("message");
                     }
                 },
                 error: function(jqXHR) {
                     try{
                         var response = JSON.parse(jqXHR.responseText);
-                        $certificate_regeneration_status.text(gettext(response.message)).
-                            removeClass('msg-success').addClass("msg-error");
+                        $certificate_regeneration_status.text(gettext(response.message)).addClass("message");
                     }catch(error){
                         $certificate_regeneration_status.
                             text(gettext('Error while regenerating certificates. Please try again.')).
-                            removeClass('msg-success').addClass("msg-error");
+                            addClass("message");
                     }
                 }
             });

@@ -108,6 +108,7 @@ define([
                     buttonEl.removeAttr('disabled');
                     expect( buttonEl.length ).toEqual( 1 );
                     expect( buttonEl[0] ).toHaveClass( 'payment-button' );
+                    expect( buttonEl[0] ).toHaveClass( 'action-primary' );
                     expect( buttonEl[0] ).toHaveText( expectedText );
 
                     buttonEl[0].click();
@@ -216,6 +217,12 @@ define([
                     'Try the transaction again in a few minutes.'
                 );
             });
+            it( 'check Initialize method without AB testing ', function() {
+                var view = createView();
+                expect( view.templateName ).toEqual('make_payment_step');
+                expect( view.btnClass ).toEqual('action-primary');
+            });
+
         });
     }
 );

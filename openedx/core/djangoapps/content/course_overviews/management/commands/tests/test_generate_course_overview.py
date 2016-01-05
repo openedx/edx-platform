@@ -56,15 +56,14 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self._assert_courses_in_overview(self.course_key_1)
         self._assert_courses_not_in_overview(self.course_key_2)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.management.commands.generate_course_overview.log')
-    def test_invalid_key(self, mock_log):
+    def test_invalid_key(self):
         """
-        Test that invalid key errors are logged.
+        Test that CommandError is raised for invalid key.
         """
-        self.command.handle('not/found', all=False)
-        self.assertTrue(mock_log.fatal.called)
+        with self.assertRaises(CommandError):
+            self.command.handle('not/found', all=False)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.management.commands.generate_course_overview.log')
+    @patch('openedx.core.djangoapps.content.course_overviews.models.log')
     def test_not_found_key(self, mock_log):
         """
         Test keys not found are logged.

@@ -23,10 +23,11 @@ except ImportError:
 import dogstats_wrapper as dog_stats_api
 
 from contracts import check, new_contract
-from mongodb_proxy import autoretry_read, MongoProxy
+from mongodb_proxy import autoretry_read
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.mongo_connection import connect_to_mongodb
 
 
 new_contract('BlockData', BlockData)
@@ -287,36 +288,19 @@ class MongoConnection(object):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
         """
-        if kwargs.get('replicaSet') is None:
-            kwargs.pop('replicaSet', None)
-            mongo_class = pymongo.MongoClient
-        else:
-            mongo_class = pymongo.MongoReplicaSetClient
-        _client = mongo_class(
-            host=host,
-            port=port,
-            tz_aware=tz_aware,
-            **kwargs
-        )
-        self.database = MongoProxy(
-            pymongo.database.Database(_client, db),
-            wait_time=retry_wait_time
-        )
+        # Set a write concern of 1, which makes writes complete successfully to the primary
+        # only before returning. Also makes pymongo report write errors.
+        kwargs['w'] = 1
 
-        if user is not None and password is not None:
-            self.database.authenticate(user, password)
+        self.database = connect_to_mongodb(
+            db, host,
+            port=port, tz_aware=tz_aware, user=user, password=password,
+            retry_wait_time=retry_wait_time, **kwargs
+        )
 
         self.course_index = self.database[collection + '.active_versions']
         self.structures = self.database[collection + '.structures']
         self.definitions = self.database[collection + '.definitions']
-
-        # every app has write access to the db (v having a flag to indicate r/o v write)
-        # Force mongo to report errors, at the expense of performance
-        # pymongo docs suck but explanation:
-        # http://api.mongodb.org/java/2.10.1/com/mongodb/WriteConcern.html
-        self.course_index.write_concern = {'w': 1}
-        self.structures.write_concern = {'w': 1}
-        self.definitions.write_concern = {'w': 1}
 
     def heartbeat(self):
         """
@@ -365,6 +349,26 @@ class MongoConnection(object):
             docs = [
                 structure_from_mongo(structure, course_context)
                 for structure in self.structures.find({'_id': {'$in': ids}})
+            ]
+            tagger.measure("structures", len(docs))
+            return docs
+
+    @autoretry_read()
+    def find_course_blocks_by_id(self, ids, course_context=None):
+        """
+        Find all structures that specified in `ids`. Among the blocks only return block whose type is `course`.
+
+        Arguments:
+            ids (list): A list of structure ids
+        """
+        with TIMER.timer("find_course_blocks_by_id", course_context) as tagger:
+            tagger.measure("requested_ids", len(ids))
+            docs = [
+                structure_from_mongo(structure, course_context)
+                for structure in self.structures.find(
+                    {'_id': {'$in': ids}},
+                    {'blocks': {'$elemMatch': {'block_type': 'course'}}, 'root': 1}
+                )
             ]
             tagger.measure("structures", len(docs))
             return docs

@@ -693,12 +693,13 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
     items = store.get_orphans(course_usage_key)
     branch = course_usage_key.branch
     if commit:
-        for itemloc in items:
-            revision = ModuleStoreEnum.RevisionOption.all
-            # specify branches when deleting orphans
-            if branch == ModuleStoreEnum.BranchName.published:
-                revision = ModuleStoreEnum.RevisionOption.published_only
-            store.delete_item(itemloc, user_id, revision=revision)
+        with store.bulk_operations(course_usage_key):
+            for itemloc in items:
+                revision = ModuleStoreEnum.RevisionOption.all
+                # specify branches when deleting orphans
+                if branch == ModuleStoreEnum.BranchName.published:
+                    revision = ModuleStoreEnum.RevisionOption.published_only
+                store.delete_item(itemloc, user_id, revision=revision)
     return [unicode(item) for item in items]
 
 
@@ -833,7 +834,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     xblock_info = {
         "id": unicode(xblock.location),
-        "display_name": xblock.display_name_with_default,
+        "display_name": xblock.display_name_with_default_escaped,
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
@@ -868,6 +869,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 "is_proctored_exam": xblock.is_proctored_exam,
                 "is_practice_exam": xblock.is_practice_exam,
                 "is_time_limited": xblock.is_time_limited,
+                "exam_review_rules": xblock.exam_review_rules,
                 "default_time_limit_minutes": xblock.default_time_limit_minutes
             })
 
@@ -1096,4 +1098,4 @@ def _xblock_type_and_display_name(xblock):
     """
     return _('{section_or_subsection} "{display_name}"').format(
         section_or_subsection=xblock_type_display_name(xblock),
-        display_name=xblock.display_name_with_default)
+        display_name=xblock.display_name_with_default_escaped)

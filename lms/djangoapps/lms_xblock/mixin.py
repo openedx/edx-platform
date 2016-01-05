@@ -43,6 +43,8 @@ class LmsBlockMixin(XBlockMixin):
     )
     chrome = String(
         display_name=_("Courseware Chrome"),
+        # Translators: DO NOT translate the words in quotes here, they are
+        # specific words for the acceptable values.
         help=_("Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
                "\"chromeless\" -- to not use tabs or the accordion; \n"
                "\"tabs\" -- to use tabs only; \n"
@@ -62,11 +64,6 @@ class LmsBlockMixin(XBlockMixin):
         help=_("Enter the source file name for LaTeX."),
         scope=Scope.settings,
         deprecated=True
-    )
-    ispublic = Boolean(
-        display_name=_("Course Is Public"),
-        help=_("Enter true or false. If true, the course is open to the public. If false, the course is open only to admins."),
-        scope=Scope.settings
     )
     visible_to_staff_only = Boolean(
         help=_("If true, can be seen only by course staff, regardless of start date."),

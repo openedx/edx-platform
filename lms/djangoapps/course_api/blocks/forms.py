@@ -111,7 +111,7 @@ class BlockListGetForm(Form):
 
     def clean(self):
         """
-        Return cleanded data, including additional requested fields.
+        Return cleaned data, including additional requested fields.
         """
         cleaned_data = super(BlockListGetForm, self).clean()
 

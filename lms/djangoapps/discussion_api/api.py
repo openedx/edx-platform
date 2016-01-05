@@ -16,6 +16,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from courseware.courses import get_course_with_access
 
+from discussion_api.exceptions import ThreadNotFoundError, CommentNotFoundError, DiscussionDisabledError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
@@ -41,17 +42,21 @@ from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
+from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
 
 
-def _get_course_or_404(course_key, user):
+def _get_course(course_key, user):
     """
-    Get the course descriptor, raising Http404 if the course is not found,
-    the user cannot access forums for the course, or the discussion tab is
-    disabled for the course.
+    Get the course descriptor, raising CourseNotFoundError if the course is not found or
+    the user cannot access forums for the course, and DiscussionDisabledError if the
+    discussion tab is disabled for the course.
     """
-    course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
+    try:
+        course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
+    except Http404:
+        raise CourseNotFoundError("Course not found.")
     if not any([tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs]):
-        raise Http404
+        raise DiscussionDisabledError("Discussion is disabled for the course.")
     return course
 
 
@@ -60,8 +65,8 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
     Retrieve the given thread and build a serializer context for it, returning
     both. This function also enforces access control for the thread (checking
     both the user's access to the course and to the thread's cohort if
-    applicable). Raises Http404 if the thread does not exist or the user cannot
-    access it.
+    applicable). Raises ThreadNotFoundError if the thread does not exist or the
+    user cannot access it.
     """
     retrieve_kwargs = retrieve_kwargs or {}
     try:
@@ -69,7 +74,7 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
             retrieve_kwargs["mark_as_read"] = False
         cc_thread = Thread(id=thread_id).retrieve(**retrieve_kwargs)
         course_key = CourseKey.from_string(cc_thread["course_id"])
-        course = _get_course_or_404(course_key, request.user)
+        course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
         if (
                 not context["is_requester_privileged"] and
@@ -78,12 +83,12 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         ):
             requester_cohort = get_cohort_id(request.user, course.id)
             if requester_cohort is not None and cc_thread["group_id"] != requester_cohort:
-                raise Http404
+                raise ThreadNotFoundError("Thread not found.")
         return cc_thread, context
     except CommentClientRequestError:
         # params are validated at a higher level, so the only possible request
         # error is if the thread doesn't exist
-        raise Http404
+        raise ThreadNotFoundError("Thread not found.")
 
 
 def _get_comment_and_context(request, comment_id):
@@ -91,15 +96,15 @@ def _get_comment_and_context(request, comment_id):
     Retrieve the given comment and build a serializer context for it, returning
     both. This function also enforces access control for the comment (checking
     both the user's access to the course and to the comment's thread's cohort if
-    applicable). Raises Http404 if the comment does not exist or the user cannot
-    access it.
+    applicable). Raises CommentNotFoundError if the comment does not exist or the
+    user cannot access it.
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
         _, context = _get_thread_and_context(request, cc_comment["thread_id"])
         return cc_comment, context
     except CommentClientRequestError:
-        raise Http404
+        raise CommentNotFoundError("Comment not found.")
 
 
 def _is_user_author_or_privileged(cc_content, context):
@@ -146,10 +151,10 @@ def get_course(request, course_key):
 
     Raises:
 
-        Http404: if the course does not exist or is not accessible to the
-          requesting user
+        CourseNotFoundError: if the course does not exist or is not accessible
+        to the requesting user
     """
-    course = _get_course_or_404(course_key, request.user)
+    course = _get_course(course_key, request.user)
     return {
         "id": unicode(course_key),
         "blackouts": [
@@ -184,8 +189,7 @@ def get_course_topics(request, course_key):
         setting if absent)
         """
         return module.sort_key or module.discussion_target
-
-    course = _get_course_or_404(course_key, request.user)
+    course = _get_course(course_key, request.user)
     discussion_modules = get_accessible_discussion_modules(course, request.user)
     modules_by_category = defaultdict(list)
     for module in discussion_modules:
@@ -279,8 +283,8 @@ def get_thread_list(
     ValidationError: if an invalid value is passed for a field.
     ValueError: if more than one of the mutually exclusive parameters is
       provided
-    Http404: if the requesting user does not have access to the requested course
-      or a page beyond the last is requested
+    CourseNotFoundError: if the requesting user does not have access to the requested course
+    PageNotFoundError: if page requested is beyond the last
     """
     exclusive_param_count = sum(1 for param in [topic_id_list, text_search, following] if param)
     if exclusive_param_count > 1:  # pragma: no cover
@@ -297,7 +301,7 @@ def get_thread_list(
             "order_direction": ["Invalid value. '{}' must be 'asc' or 'desc'".format(order_direction)]
         })
 
-    course = _get_course_or_404(course_key, request.user)
+    course = _get_course(course_key, request.user)
     context = get_context(course, request)
 
     query_params = {
@@ -332,9 +336,9 @@ def get_thread_list(
         threads, result_page, num_pages, text_search_rewrite = Thread.search(query_params)
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
-    # behavior and return a 404 in that case
+    # behavior and return a PageNotFoundError in that case
     if result_page != page:
-        raise Http404
+        raise PageNotFoundError("Page not found (No results on this page).")
 
     results = [ThreadSerializer(thread, context=context).data for thread in threads]
     ret = get_paginated_data(request, results, page, num_pages)
@@ -402,9 +406,9 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
 
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
-    # behavior and return a 404 in that case
+    # behavior and return a PageNotFoundError in that case
     if not responses and page != 1:
-        raise Http404
+        raise PageNotFoundError("Page not found (No results on this page).")
     num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
 
     results = [CommentSerializer(response, context=context).data for response in responses]
@@ -535,8 +539,8 @@ def create_thread(request, thread_data):
         raise ValidationError({"course_id": ["This field is required."]})
     try:
         course_key = CourseKey.from_string(course_id)
-        course = _get_course_or_404(course_key, user)
-    except (Http404, InvalidKeyError):
+        course = _get_course(course_key, user)
+    except InvalidKeyError:
         raise ValidationError({"course_id": ["Invalid value."]})
 
     context = get_context(course, request)
@@ -581,10 +585,7 @@ def create_comment(request, comment_data):
     thread_id = comment_data.get("thread_id")
     if not thread_id:
         raise ValidationError({"thread_id": ["This field is required."]})
-    try:
-        cc_thread, context = _get_thread_and_context(request, thread_id)
-    except Http404:
-        raise ValidationError({"thread_id": ["Invalid value."]})
+    cc_thread, context = _get_thread_and_context(request, thread_id)
 
     # if a thread is closed; no new comments could be made to it
     if cc_thread['closed']:
@@ -660,8 +661,8 @@ def update_comment(request, comment_id, update_data):
 
     Raises:
 
-        Http404: if the comment does not exist or is not accessible to the
-          requesting user
+        CommentNotFoundError: if the comment does not exist or is not accessible
+        to the requesting user
 
         PermissionDenied: if the comment is accessible to but not editable by
           the requesting user
@@ -696,7 +697,11 @@ def get_thread(request, thread_id):
         thread_id: The id for the thread to retrieve
 
     """
-    cc_thread, context = _get_thread_and_context(request, thread_id)
+    cc_thread, context = _get_thread_and_context(
+        request,
+        thread_id,
+        retrieve_kwargs={"user_id": unicode(request.user.id)}
+    )
     serializer = ThreadSerializer(cc_thread, context=context)
     return serializer.data
 
@@ -748,7 +753,7 @@ def get_response_comments(request, comment_id, page, page_size):
         num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
         return get_paginated_data(request, results, page, num_pages)
     except CommentClientRequestError:
-        raise Http404
+        raise CommentNotFoundError("Comment not found")
 
 
 def delete_thread(request, thread_id):

@@ -2,6 +2,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from microsite_configuration.templatetags.microsite import platform_name
 %>
 
 %if verification_status == 'approved':
@@ -39,7 +40,7 @@ from django.core.urlresolvers import reverse
 
 %if verification_status in ['must_reverify', 'expired']:
 <li class="status status-verification is-denied">
-<span class="title status-title">${_("{platform_name} Verification Status").format(platform_name=settings.PLATFORM_NAME)}</span>
+<span class="title status-title">${_("{platform_name} Verification Status").format(platform_name=platform_name())}</span>
 
   <div class="status-data">
     <span class="status-data-message">${verification_msg}</span>

@@ -23,6 +23,16 @@ urlpatterns = patterns(
         }
     ),
 
+    # This is for A/B testing.
+    url(
+        r'^begin-flow/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
+        views.PayAndVerifyView.as_view(),
+        name="verify_student_begin_flow",
+        kwargs={
+            'message': views.PayAndVerifyView.FIRST_TIME_VERIFY_MSG
+        }
+    ),
+
     # The user is enrolled in a non-paid mode and wants to upgrade.
     # This is the same as the "start verification" flow,
     # except with slight messaging changes.

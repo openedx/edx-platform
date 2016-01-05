@@ -3,6 +3,7 @@ Courseware page.
 """
 
 from .course_page import CoursePage
+from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
 
 
@@ -170,6 +171,38 @@ class CoursewarePage(CoursePage):
         Returns True if the timed/proctored exam timer bar is visible on the courseware.
         """
         return self.q(css=".proctored_exam_status .exam-timer").is_present()
+
+    def active_usage_id(self):
+        """ Returns the usage id of active sequence item """
+        get_active = lambda el: 'active' in el.get_attribute('class')
+        attribute_value = lambda el: el.get_attribute('data-id')
+        return self.q(css='#sequence-list a').filter(get_active).map(attribute_value).results[0]
+
+    @property
+    def breadcrumb(self):
+        """ Return the course tree breadcrumb shown above the sequential bar """
+        return [part.strip() for part in self.q(css='.path').text[0].split('>')]
+
+    def bookmark_button_visible(self):
+        """ Check if bookmark button is visible """
+        EmptyPromise(lambda: self.q(css='.bookmark-button').visible, "Bookmark button visible").fulfill()
+        return True
+
+    @property
+    def bookmark_button_state(self):
+        """ Return `bookmarked` if button is in bookmarked state else '' """
+        return 'bookmarked' if self.q(css='.bookmark-button.bookmarked').present else ''
+
+    @property
+    def bookmark_icon_visible(self):
+        """ Check if bookmark icon is visible on active sequence nav item """
+        return self.q(css='.active .bookmark-icon').visible
+
+    def click_bookmark_unit_button(self):
+        """ Bookmark a unit by clicking on Bookmark button """
+        previous_state = self.bookmark_button_state
+        self.q(css='.bookmark-button').first.click()
+        EmptyPromise(lambda: self.bookmark_button_state != previous_state, "Bookmark button toggled").fulfill()
 
 
 class CoursewareSequentialTabPage(CoursePage):

@@ -3,6 +3,7 @@
 from tempfile import NamedTemporaryFile
 from django.core.management import call_command
 
+from course_modes.models import CourseMode
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from shoppingcart.models import Order, CertificateItem
@@ -16,6 +17,11 @@ class TestRetireOrder(ModuleStoreTestCase):
 
         course = CourseFactory.create()
         self.course_key = course.id
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name=CourseMode.HONOR
+        )
 
         # set up test carts
         self.cart, __ = self._create_cart()

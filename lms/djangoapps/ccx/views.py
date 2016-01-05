@@ -42,6 +42,7 @@ from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
+from instructor.access import allow_access
 from instructor.views.api import _split_input_list
 from instructor.views.gradebook_api import get_grade_book_page
 from instructor.views.tools import get_student_from_identifier
@@ -132,7 +133,10 @@ def dashboard(request, course, ccx=None):
     }
 
     if ccx:
-        ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)
+        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+        # At this point we are done with verification that current user is ccx coach.
+        assign_coach_role_to_ccx(ccx_locator, request.user, course.id)
+
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
             ccx, course, 'grading_policy', course.grading_policy)
@@ -147,6 +151,7 @@ def dashboard(request, course, ccx=None):
         context['grading_policy'] = json.dumps(grading_policy, indent=4)
         context['grading_policy_url'] = reverse(
             'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
+
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
@@ -208,7 +213,29 @@ def create_ccx(request, course, ccx=None):
         email_params=email_params,
     )
 
+    assign_coach_role_to_ccx(ccx_id, request.user, course.id)
+
     return redirect(url)
+
+
+def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
+    """
+    Check if user has ccx_coach role on master course then assign him coach role on ccx only
+    if role is not already assigned. Because of this coach can open dashboard from master course
+    as well as ccx.
+    :param ccx_locator: CCX key
+    :param user: User to whom we want to assign role.
+    :param master_course_id: Master course key
+    """
+    coach_role_on_master_course = CourseCcxCoachRole(master_course_id)
+    # check if user has coach role on master course
+    if coach_role_on_master_course.has_user(user):
+        # Check if user has coach role on ccx.
+        role = CourseCcxCoachRole(ccx_locator)
+        if not role.has_user(user):
+            # assign user role coach on ccx
+            with ccx_course(ccx_locator) as course:
+                allow_access(course, user, "ccx_coach", send_email=False)
 
 
 @ensure_csrf_cookie
@@ -247,10 +274,16 @@ def save_ccx(request, course, ccx=None):
                 ccx_ids_to_delete.append(get_override_for_ccx(ccx, block, 'start_id'))
                 clear_ccx_field_info_from_ccx_map(ccx, block, 'start')
 
-            due = parse_date(unit['due'])
-            if due:
-                override_field_for_ccx(ccx, block, 'due', due)
+            # Only subsection (aka sequential) and unit (aka vertical) have due dates.
+            if 'due' in unit:  # checking that the key (due) exist in dict (unit).
+                due = parse_date(unit['due'])
+                if due:
+                    override_field_for_ccx(ccx, block, 'due', due)
+                else:
+                    ccx_ids_to_delete.append(get_override_for_ccx(ccx, block, 'due_id'))
+                    clear_ccx_field_info_from_ccx_map(ccx, block, 'due')
             else:
+                # In case of section aka chapter we do not have due date.
                 ccx_ids_to_delete.append(get_override_for_ccx(ccx, block, 'due_id'))
                 clear_ccx_field_info_from_ccx_map(ccx, block, 'due')
 
@@ -371,6 +404,35 @@ def get_ccx_for_coach(course, coach):
     return None
 
 
+def get_date(ccx, node, date_type=None, parent_node=None):
+    """
+    This returns override or master date for section, subsection or a unit.
+
+    :param ccx: ccx instance
+    :param node: chapter, subsection or unit
+    :param date_type: start or due
+    :param parent_node: parent of node
+    :return: start or due date
+    """
+    date = get_override_for_ccx(ccx, node, date_type, None)
+    if date_type == "start":
+        master_date = node.start
+    else:
+        master_date = node.due
+
+    if date is not None:
+        # Setting override date [start or due]
+        date = date.strftime('%Y-%m-%d %H:%M')
+    elif not parent_node and master_date is not None:
+        # Setting date from master course
+        date = master_date.strftime('%Y-%m-%d %H:%M')
+    elif parent_node is not None:
+        # Set parent date (vertical has same dates as subsections)
+        date = get_date(ccx, node=parent_node, date_type=date_type)
+
+    return date
+
+
 def get_ccx_schedule(course, ccx):
     """
     Generate a JSON serializable CCX schedule.
@@ -382,28 +444,50 @@ def get_ccx_schedule(course, ccx):
         widgets, which use text inputs.
         Visits students visible nodes only; nodes children of hidden ones
         are skipped as well.
+
+        Dates:
+        Only start date is applicable to a section. If ccx coach did not override start date then
+        getting it from the master course.
+        Both start and due dates are applicable to a subsection (aka sequential). If ccx coach did not override
+        these dates then getting these dates from corresponding subsection in master course.
+        Unit inherits start date and due date from its subsection. If ccx coach did not override these dates
+        then getting them from corresponding subsection in master course.
         """
         for child in node.get_children():
             # in case the children are visible to staff only, skip them
             if child.visible_to_staff_only:
                 continue
-            start = get_override_for_ccx(ccx, child, 'start', None)
-            if start:
-                start = str(start)[:-9]
-            due = get_override_for_ccx(ccx, child, 'due', None)
-            if due:
-                due = str(due)[:-9]
+
             hidden = get_override_for_ccx(
                 ccx, child, 'visible_to_staff_only',
                 child.visible_to_staff_only)
-            visited = {
-                'location': str(child.location),
-                'display_name': child.display_name,
-                'category': child.category,
-                'start': start,
-                'due': due,
-                'hidden': hidden,
-            }
+
+            start = get_date(ccx, child, 'start')
+            if depth > 1:
+                # Subsection has both start and due dates and unit inherit dates from their subsections
+                if depth == 2:
+                    due = get_date(ccx, child, 'due')
+                elif depth == 3:
+                    # Get start and due date of subsection in case unit has not override dates.
+                    due = get_date(ccx, child, 'due', node)
+                    start = get_date(ccx, child, 'start', node)
+
+                visited = {
+                    'location': str(child.location),
+                    'display_name': child.display_name,
+                    'category': child.category,
+                    'start': start,
+                    'due': due,
+                    'hidden': hidden,
+                }
+            else:
+                visited = {
+                    'location': str(child.location),
+                    'display_name': child.display_name,
+                    'category': child.category,
+                    'start': start,
+                    'hidden': hidden,
+                }
             if depth < 3:
                 children = tuple(visit(child, depth + 1))
                 if children:

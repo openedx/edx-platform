@@ -10,7 +10,7 @@
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
             'jquery.form': 'xmodule_js/common_static/js/vendor/jquery.form',
             'jquery.markitup': 'xmodule_js/common_static/js/vendor/markitup/jquery.markitup',
-            'jquery.leanModal': 'xmodule_js/common_static/js/vendor/jquery.leanModal.min',
+            'jquery.leanModal': 'xmodule_js/common_static/js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'xmodule_js/common_static/js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min',
             'jquery.scrollTo': 'xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min',
@@ -85,6 +85,13 @@
 
             // Discussion classes loaded explicitly until they are converted to use RequireJS
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
+
+            'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
+            'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
+            'js/bookmarks/views/bookmarks_list_button': 'js/bookmarks/views/bookmarks_list_button',
+            'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
+            'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button',
+            'js/views/message_banner': 'js/views/message_banner',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
@@ -648,6 +655,8 @@
         'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
         'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
         'lms/include/js/spec/instructor_dashboard/certificates_exception_spec.js',
+        'lms/include/js/spec/instructor_dashboard/certificates_invalidation_spec.js',
+        'lms/include/js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
         'lms/include/js/spec/instructor_dashboard/certificates_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
@@ -674,6 +683,7 @@
         'lms/include/js/spec/verify_student/image_input_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
         'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
+        'lms/include/js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
         'lms/include/js/spec/edxnotes/utils/logger_spec.js',
         'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/views/shim_spec.js',
@@ -711,7 +721,11 @@
         'lms/include/js/spec/discovery/views/search_form_spec.js',
         'lms/include/js/spec/discovery/discovery_factory_spec.js',
         'lms/include/js/spec/ccx/schedule_spec.js',
-        'lms/include/support/js/spec/certificates_spec.js',
+        'lms/include/support/js/spec/collections/enrollment_spec.js',
+        'lms/include/support/js/spec/models/enrollment_spec.js',
+        'lms/include/support/js/spec/views/enrollment_modal_spec.js',
+        'lms/include/support/js/spec/views/enrollment_spec.js',
+        'lms/include/support/js/spec/views/certificates_spec.js',
         'lms/include/teams/js/spec/collections/topic_collection_spec.js',
         'lms/include/teams/js/spec/teams_tab_factory_spec.js',
         'lms/include/teams/js/spec/views/edit_team_spec.js',
@@ -726,7 +740,11 @@
         'lms/include/teams/js/spec/views/topic_card_spec.js',
         'lms/include/teams/js/spec/views/topic_teams_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js',
-        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js'
+        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js',
+        'lms/include/js/spec/financial-assistance/financial_assistance_form_view_spec.js',
+        'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
+        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
+        'lms/include/js/spec/views/message_banner_spec.js'
     ]);
 
 }).call(this, requirejs, define);

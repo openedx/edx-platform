@@ -16,15 +16,11 @@ import mock
 from PIL import Image
 
 from ..images import (
-    FILE_UPLOAD_TOO_LARGE,
-    FILE_UPLOAD_TOO_SMALL,
-    FILE_UPLOAD_BAD_TYPE,
-    FILE_UPLOAD_BAD_EXT,
-    FILE_UPLOAD_BAD_MIMETYPE,
     create_profile_images,
     ImageValidationError,
     remove_profile_images,
     validate_uploaded_image,
+    get_valid_file_types,
 )
 from .helpers import make_image_file, make_uploaded_file
 
@@ -35,6 +31,12 @@ class TestValidateUploadedImage(TestCase):
     """
     Test validate_uploaded_image
     """
+    FILE_UPLOAD_BAD_TYPE = (
+        u'The file must be one of the following types: {valid_file_types}.'.format(
+            valid_file_types=get_valid_file_types()
+        )
+    )
+
     def check_validation_result(self, uploaded_file, expected_failure_message):
         """
         Internal DRY helper.
@@ -48,10 +50,10 @@ class TestValidateUploadedImage(TestCase):
             self.assertEqual(uploaded_file.tell(), 0)
 
     @ddt.data(
-        (99, FILE_UPLOAD_TOO_SMALL),
+        (99, u"The file must be at least 100 bytes in size."),
         (100, ),
         (1024, ),
-        (1025, FILE_UPLOAD_TOO_LARGE),
+        (1025, u"The file must be smaller than 1 KB in size."),
     )
     @ddt.unpack
     @override_settings(PROFILE_IMAGE_MIN_BYTES=100, PROFILE_IMAGE_MAX_BYTES=1024)
@@ -85,6 +87,10 @@ class TestValidateUploadedImage(TestCase):
         Ensure that validation fails when the file extension does not match the
         file data.
         """
+        file_upload_bad_ext = (
+            u'The file name extension for this file does not match '
+            u'the file data. The file may be corrupted.'
+        )
         # make a bmp, try to fool the function into thinking it's a jpeg
         with make_image_file(extension=".bmp") as bmp_file:
             with closing(NamedTemporaryFile(suffix=".jpeg")) as fake_jpeg_file:
@@ -97,17 +103,21 @@ class TestValidateUploadedImage(TestCase):
                 )
                 with self.assertRaises(ImageValidationError) as ctx:
                     validate_uploaded_image(uploaded_file)
-                self.assertEqual(ctx.exception.message, FILE_UPLOAD_BAD_EXT)
+                self.assertEqual(ctx.exception.message, file_upload_bad_ext)
 
     def test_content_type(self):
         """
         Ensure that validation fails when the content_type header and file
         extension do not match
         """
+        file_upload_bad_mimetype = (
+            u'The Content-Type header for this file does not match '
+            u'the file data. The file may be corrupted.'
+        )
         with make_uploaded_file(extension=".jpeg", content_type="image/gif") as uploaded_file:
             with self.assertRaises(ImageValidationError) as ctx:
                 validate_uploaded_image(uploaded_file)
-            self.assertEqual(ctx.exception.message, FILE_UPLOAD_BAD_MIMETYPE)
+            self.assertEqual(ctx.exception.message, file_upload_bad_mimetype)
 
 
 @ddt.ddt

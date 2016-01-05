@@ -50,21 +50,21 @@ class EdxNotesTestMixin(UniqueCourseTest):
                             "html",
                             "Test HTML 1",
                             data="""
-                                <p><span class="{}">Annotate this text!</span></p>
-                                <p>Annotate this text</p>
+                                <p><span class="{}">Annotate this!</span></p>
+                                <p>Annotate this</p>
                             """.format(self.selector)
                         ),
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 2",
-                            data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
+                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                     XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 3",
-                            data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
+                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                 ),
@@ -74,7 +74,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
                             "html",
                             "Test HTML 4",
                             data="""
-                                <p><span class="{}">Annotate this text!</span></p>
+                                <p><span class="{}">Annotate this!</span></p>
                             """.format(self.selector)
                         ),
                     ),
@@ -87,13 +87,13 @@ class EdxNotesTestMixin(UniqueCourseTest):
                             "html",
                             "Test HTML 5",
                             data="""
-                                <p><span class="{}">Annotate this text!</span></p>
+                                <p><span class="{}">Annotate this!</span></p>
                             """.format(self.selector)
                         ),
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 6",
-                            data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
+                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                 ),
@@ -358,7 +358,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="First note",
-                quote="Annotate this text",
+                quote="Annotate this",
                 updated=datetime(2011, 1, 1, 1, 1, 1, 1).isoformat(),
             ),
             Note(
@@ -366,7 +366,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="",
-                quote=u"Annotate this text",
+                quote=u"Annotate this",
                 updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
                 tags=["Review", "cool"] if tags is None else tags
             ),
@@ -375,7 +375,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="Third note",
-                quote="Annotate this text",
+                quote="Annotate this",
                 updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
                 ranges=[Range(startOffset=0, endOffset=18)],
                 tags=["Cool", "TODO"] if tags is None else tags
@@ -394,7 +394,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="Fifth note",
-                quote="Annotate this text",
+                quote="Annotate this",
                 updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat()
             ),
         ]
@@ -498,7 +498,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
@@ -514,7 +514,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[2],
-            quote="Annotate this text",
+            quote="Annotate this",
             text=u"Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
@@ -523,7 +523,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[3],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -531,7 +531,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[4],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
@@ -573,7 +573,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
@@ -581,7 +581,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[1],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
@@ -590,7 +590,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[2],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -624,7 +624,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[4],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
@@ -658,7 +658,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
@@ -667,7 +667,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[1],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -690,7 +690,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[3],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -705,7 +705,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[4],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
@@ -721,7 +721,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[5],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
@@ -729,7 +729,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[6],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
@@ -816,7 +816,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
@@ -832,7 +832,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[2],
-            quote="Annotate this text",
+            quote="Annotate this",
             text=u"Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
@@ -841,7 +841,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[3],
-            quote=u"Annotate this text",
+            quote=u"Annotate this",
             text=u"First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
@@ -967,27 +967,27 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="Third note",
-                quote="Annotate this text",
+                quote="Annotate this",
                 updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
-                ranges=[Range(startOffset=0, endOffset=19)],
+                ranges=[Range(startOffset=0, endOffset=14)],
             ),
             Note(
                 usage_id=xblocks[2].locator,
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="Second note",
-                quote="Annotate this text",
+                quote="Annotate this",
                 updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
-                ranges=[Range(startOffset=0, endOffset=19)],
+                ranges=[Range(startOffset=0, endOffset=14)],
             ),
             Note(
                 usage_id=xblocks[0].locator,
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="First note",
-                quote="Annotate this text",
+                quote="Annotate this",
                 updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
-                ranges=[Range(startOffset=0, endOffset=19)],
+                ranges=[Range(startOffset=0, endOffset=14)],
             ),
         ])
         self.notes_page.visit()

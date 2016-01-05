@@ -99,7 +99,6 @@ class LibraryContentFields(object):
         values=_get_capa_types(),
         scope=Scope.settings,
     )
-    filters = String(default="")  # TBD
     has_score = Boolean(
         display_name=_("Scored"),
         help=_("Set this value to True if this module is either a graded assignment or a practice problem."),
@@ -317,6 +316,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
+            'show_bookmark_button': False,
         }))
         return fragment
 
