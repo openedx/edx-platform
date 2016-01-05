@@ -21,7 +21,7 @@ class ProgramsApiConfigMixin(object):
         'enable_studio_tab': True,
     }
 
-    def create_program_config(self, **kwargs):
+    def create_programs_config(self, **kwargs):
         """Creates a new ProgramsApiConfig with DEFAULTS, updated with any provided overrides."""
         fields = dict(self.DEFAULTS, **kwargs)
         ProgramsApiConfig(**fields).save()

@@ -17,7 +17,7 @@ class CredentialsApiConfigMixin(object):
         'enable_studio_authoring': True,
     }
 
-    def create_credential_config(self, **kwargs):
+    def create_credentials_config(self, **kwargs):
         """ Creates a new CredentialsApiConfig with DEFAULTS, updated with any
         provided overrides.
         """
@@ -126,7 +126,7 @@ class CredentialsDataMixin(object):
 
     def mock_credentials_api(self, user, data=None, status_code=200, reset_url=True, is_next_page=False):
         """Utility for mocking out Credentials API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Credentials API calls.')
         internal_api_url = CredentialsApiConfig.current().internal_api_url.strip('/')
 
         url = internal_api_url + '/user_credentials/?username=' + user.username
