@@ -16,6 +16,7 @@ class CredentialsApiConfig(ConfigurationModel):
     API.
     """
     OAUTH2_CLIENT_NAME = 'credentials'
+    API_NAME = 'credentials'
 
     internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
     public_service_url = models.URLField(verbose_name=_("Public Service URL"))

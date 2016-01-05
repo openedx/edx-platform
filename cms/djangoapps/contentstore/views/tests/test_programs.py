@@ -10,20 +10,18 @@ from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
-from openedx.core.djangoapps.util.mixins import MockApiMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-class TestProgramListing(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMixin, SharedModuleStoreTestCase):
+class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModuleStoreTestCase):
     """Verify Program listing behavior."""
     def setUp(self):
         super(TestProgramListing, self).setUp()
 
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
-        program_config = self.create_program_config()
-        self.url = program_config.internal_api_url.strip('/') + '/programs/'
+        self.create_program_config()
 
         self.staff = UserFactory(is_staff=True)
         self.client.login(username=self.staff.username, password='test')
@@ -34,7 +32,7 @@ class TestProgramListing(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMixin
     def test_programs_config_disabled(self):
         """Verify that the programs tab and creation button aren't rendered when config is disabled."""
         self.create_program_config(enable_studio_tab=False)
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
+        self.mock_programs_api()
 
         response = self.client.get(self.studio_home)
 
@@ -52,7 +50,7 @@ class TestProgramListing(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMixin
         student = UserFactory(is_staff=False)
         self.client.login(username=student.username, password='test')
 
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
+        self.mock_programs_api()
 
         response = self.client.get(self.studio_home)
         self.assertNotIn("You haven't created any programs yet.", response.content)
@@ -62,13 +60,13 @@ class TestProgramListing(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMixin
         """Verify that the programs tab and creation button can be rendered when config is enabled."""
 
         # When no data is provided, expect creation prompt.
-        self.mock_api(self.url, {'results': []})
+        self.mock_programs_api(data={'results': []})
 
         response = self.client.get(self.studio_home)
         self.assertIn("You haven't created any programs yet.", response.content)
 
         # When data is provided, expect a program listing.
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
+        self.mock_programs_api()
 
         response = self.client.get(self.studio_home)
         for program_name in self.PROGRAM_NAMES:

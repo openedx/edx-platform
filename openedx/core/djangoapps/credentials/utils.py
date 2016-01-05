@@ -2,11 +2,9 @@
 from __future__ import unicode_literals
 import logging
 
-from edx_rest_api_client.client import EdxRestApiClient
-
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.programs.utils import get_programs_for_credentials
-from openedx.core.lib.token_utils import get_id_token
+from openedx.core.lib.api_utils import get_api_data
 
 
 log = logging.getLogger(__name__)
@@ -14,42 +12,17 @@ log = logging.getLogger(__name__)
 
 def get_user_credentials(user):
     """Given a user, get credentials earned from the Credentials service.
-
     Arguments:
         user (User): The user to authenticate as when requesting credentials.
-
     Returns:
         list of dict, representing credentials returned by the Credentials
         service.
     """
-    credentials_config = CredentialsApiConfig.current()
-    credentials = []
-    if not credentials_config.enabled:
-        log.warning('Credentials configuration is disabled.')
-        return credentials
-
-    try:
-        jwt = get_id_token(user, credentials_config.OAUTH2_CLIENT_NAME)
-        api = EdxRestApiClient(credentials_config.internal_api_url, jwt=jwt)
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to initialize the Credentials API client.')
-        return credentials
-
-    try:
-        response = api.user_credentials.get(username=user.username)
-        credentials = response.get('results')
-        page = 1
-        next_page = response.get('next', None)
-        while next_page:
-            page += 1
-            response = api.user_credentials.get(page=page, username=user.username)
-            credentials += response.get('results')
-            next_page = response.get('next', None)
-
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to retrieve credentials from the Credentials API.')
-        return credentials
-
+    credential_configuration = CredentialsApiConfig.current()
+    user_query = {'username': user.username}
+    credentials = get_api_data(
+        credential_configuration, user, credential_configuration.API_NAME, 'user_credentials', querystring=user_query
+    )
     return credentials
 
 

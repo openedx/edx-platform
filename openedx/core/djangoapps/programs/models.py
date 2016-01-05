@@ -18,6 +18,7 @@ class ProgramsApiConfig(ConfigurationModel):
     """
     OAUTH2_CLIENT_NAME = 'programs'
     CACHE_KEY = 'programs.api.data'
+    API_NAME = 'programs'
 
     api_version_number = models.IntegerField(verbose_name=_("API Version"))
 

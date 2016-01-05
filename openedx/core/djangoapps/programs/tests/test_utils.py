@@ -2,7 +2,6 @@
 from django.core.cache import cache
 from django.test import TestCase
 import httpretty
-import mock
 from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
@@ -10,13 +9,12 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.utils import (
-    get_programs, get_programs_for_credentials, get_programs_for_dashboard
+     get_programs, get_programs_for_credentials, get_programs_for_dashboard
 )
-from openedx.core.djangoapps.util.mixins import MockApiMixin
 from student.tests.factories import UserFactory
 
 
-class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMixin,
+class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
                            CredentialsApiConfigMixin, TestCase):
     """Tests covering the retrieval of programs from the Programs service."""
     def setUp(self):
@@ -24,15 +22,14 @@ class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMix
 
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.user = UserFactory()
-        program_config = self.create_program_config()
-        self.url = program_config.internal_api_url.strip('/') + '/programs/'
+        self.create_program_config()
 
         cache.clear()
 
     @httpretty.activate
     def test_get_programs(self):
         """Verify programs data can be retrieved."""
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
+        self.mock_programs_api()
 
         actual = get_programs(self.user)
         self.assertEqual(
@@ -44,59 +41,9 @@ class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMix
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
     @httpretty.activate
-    def test_get_programs_caching(self):
-        """Verify that when enabled, the cache is used for non-staff users."""
-        program_config = self.create_program_config(cache_ttl=1)
-        self.url = program_config.internal_api_url.strip('/') + '/programs/'
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
-
-        # Warm up the cache.
-        get_programs(self.user)
-
-        # Hit the cache.
-        get_programs(self.user)
-
-        # Verify only one request was made.
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
-
-        staff_user = UserFactory(is_staff=True)
-
-        # Hit the Programs API twice.
-        for _ in range(2):
-            get_programs(staff_user)
-
-        # Verify that three requests have been made (one for student, two for staff).
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 3)
-
-    def test_get_programs_programs_disabled(self):
-        """Verify behavior when programs is disabled."""
-        self.create_program_config(enabled=False)
-
-        actual = get_programs(self.user)
-        self.assertEqual(actual, [])
-
-    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
-    def test_get_programs_client_initialization_failure(self, mock_init):
-        """Verify behavior when API client fails to initialize."""
-        self.create_program_config()
-        mock_init.side_effect = Exception
-
-        actual = get_programs(self.user)
-        self.assertEqual(actual, [])
-        self.assertTrue(mock_init.called)
-
-    @httpretty.activate
-    def test_get_programs_data_retrieval_failure(self):
-        """Verify behavior when data can't be retrieved from Programs."""
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE, status_code=500)
-
-        actual = get_programs(self.user)
-        self.assertEqual(actual, [])
-
-    @httpretty.activate
     def test_get_programs_for_dashboard(self):
         """Verify programs data can be retrieved and parsed correctly."""
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
+        self.mock_programs_api()
 
         actual = get_programs_for_dashboard(self.user, self.COURSE_KEYS)
         expected = {}
@@ -118,7 +65,7 @@ class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMix
     @httpretty.activate
     def test_get_programs_for_dashboard_no_data(self):
         """Verify behavior when no programs data is found for the user."""
-        self.mock_api(self.url, {'results': []})
+        self.mock_programs_api(data={'results': []})
 
         actual = get_programs_for_dashboard(self.user, self.COURSE_KEYS)
         self.assertEqual(actual, {})
@@ -127,7 +74,7 @@ class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMix
     def test_get_programs_for_dashboard_invalid_data(self):
         """Verify behavior when the Programs API returns invalid data and parsing fails."""
         invalid_program = {'invalid_key': 'invalid_data'}
-        self.mock_api(self.url, data={'results': [invalid_program]})
+        self.mock_programs_api(data={'results': [invalid_program]})
 
         actual = get_programs_for_dashboard(self.user, self.COURSE_KEYS)
         self.assertEqual(actual, {})
@@ -136,7 +83,7 @@ class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMix
     def test_get_program_for_certificates(self):
         """Verify programs data can be retrieved and parsed correctly for certificates."""
         credentials_config = self.create_credential_config()
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
+        self.mock_programs_api()
 
         actual = get_programs_for_credentials(self.user, self.PROGRAMS_CREDENTIALS_DATA)
         expected = self.PROGRAMS_API_RESPONSE['results']
@@ -151,7 +98,7 @@ class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMix
     def test_get_program_for_certificates_no_data(self):
         """Verify behavior when no programs data is found for the user."""
         self.create_credential_config()
-        self.mock_api(self.url, {'results': []})
+        self.mock_programs_api(data={'results': []})
 
         actual = get_programs_for_credentials(self.user, self.PROGRAMS_CREDENTIALS_DATA)
         self.assertEqual(actual, [])
@@ -162,7 +109,7 @@ class TestProgramRetrieval(MockApiMixin, ProgramsApiConfigMixin, ProgramsDataMix
         credentials exists.
         """
         self.create_credential_config()
-        self.mock_api(self.url, self.PROGRAMS_API_RESPONSE)
+        self.mock_programs_api()
         credential_data = [
             {
                 "id": 1,

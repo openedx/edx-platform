@@ -2,12 +2,9 @@
 import logging
 from urlparse import urljoin
 
-from django.core.cache import cache
-from edx_rest_api_client.client import EdxRestApiClient
-
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.lib.token_utils import get_id_token
+from openedx.core.lib.api_utils import get_api_data
 
 
 log = logging.getLogger(__name__)
@@ -15,7 +12,6 @@ log = logging.getLogger(__name__)
 
 def get_programs(user):
     """Given a user, get programs from the Programs service.
-
     Returned value is cached depending on user permissions. Staff users making requests
     against Programs will receive unpublished programs, while regular users will only receive
     published programs.
@@ -27,39 +23,11 @@ def get_programs(user):
         list of dict, representing programs returned by the Programs service.
     """
     programs_config = ProgramsApiConfig.current()
-    no_programs = []
 
     # Bypass caching for staff users, who may be creating Programs and want to see them displayed immediately.
     use_cache = programs_config.is_cache_enabled and not user.is_staff
+    return get_api_data(programs_config, user, programs_config.API_NAME, 'programs', use_cache=use_cache)
 
-    if not programs_config.enabled:
-        log.warning('Programs configuration is disabled.')
-        return no_programs
-
-    if use_cache:
-        cached = cache.get(programs_config.CACHE_KEY)
-        if cached is not None:
-            return cached
-
-    try:
-        jwt = get_id_token(user, programs_config.OAUTH2_CLIENT_NAME)
-        api = EdxRestApiClient(programs_config.internal_api_url, jwt=jwt)
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to initialize the Programs API client.')
-        return no_programs
-
-    try:
-        response = api.programs.get()
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to retrieve programs from the Programs API.')
-        return no_programs
-
-    results = response.get('results', no_programs)
-
-    if use_cache:
-        cache.set(programs_config.CACHE_KEY, results, programs_config.cache_ttl)
-
-    return results
 
 
 def get_programs_for_dashboard(user, course_keys):
@@ -121,6 +89,7 @@ def get_programs_for_credentials(user, programs_credentials):
     Returns:
         list, containing programs dictionaries.
     """
+    programs_config = ProgramsApiConfig.current()
     certificate_programs = []
 
     programs = get_programs(user)
