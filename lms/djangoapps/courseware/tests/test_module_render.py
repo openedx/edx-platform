@@ -1104,7 +1104,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
-            '/c4x/{org}/{course}/asset/_file.jpg'.format(
+            '/c4x/{org}/{course}/asset/file.jpg'.format(
                 org=self.course.location.org,
                 course=self.course.location.course,
             ),
