@@ -23,20 +23,16 @@
   }
 
   .page-header-secondary {
+    @include float(right);
     display: inline-block;
-    width: flex-grid(4, 12);
-    margin: 0;
+    margin: ($baseline/2);
     padding: ($baseline/2) ($baseline*0.75);
-    border: 1px solid $blue;
-    background-color: $homepage-background;
-    @extend %t-title8;
-    color: $blue-d1;
-    @extend %cont-truncated;
-    vertical-align: text-bottom;
+    background-color: $blue;
+    border-radius: 2px;
 
-    .last-accessed-message {
-      display: inline-block;
-      @include margin-left($baseline*0.75);
+    .last-accessed-link {
+      @extend %t-title6;
+      color: $very-light-text;
     }
   }
 }
