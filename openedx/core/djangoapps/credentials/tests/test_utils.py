@@ -26,41 +26,16 @@ class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, Credentials
 
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-        credential_config = self.create_credential_config()
+        self.create_credential_config()
         self.user = UserFactory()
-        self.url = credential_config.internal_api_url + 'user_credentials/?username=' + self.user.username
 
     @httpretty.activate
     def test_get_user_credentials(self):
         """Verify user credentials data can be retrieve."""
-        self.mock_api(self.url, self.CREDENTIALS_API_RESPONSE)
+        self.mock_credentials_api(self.user)
 
         actual = get_user_credentials(self.user)
         self.assertEqual(actual, self.CREDENTIALS_API_RESPONSE['results'])
-
-    def test_get_user_credentials_credentials_disabled(self):
-        """Verify behavior when Credentials is disabled."""
-        self.create_credential_config(enabled=False)
-
-        actual = get_user_credentials(self.user)
-        self.assertEqual(actual, [])
-
-    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
-    def test_get_credentials_client_initialization_failure(self, mock_init):
-        """Verify behavior when API client fails to initialize."""
-        mock_init.side_effect = Exception
-
-        actual = get_user_credentials(self.user)
-        self.assertEqual(actual, [])
-        self.assertTrue(mock_init.called)
-
-    @httpretty.activate
-    def test_get_user_credentials_retrieval_failure(self):
-        """Verify behavior when data can't be retrieved from Credentials."""
-        self.mock_api(self.url, self.CREDENTIALS_API_RESPONSE, status_code=500)
-
-        actual = get_user_credentials(self.user)
-        self.assertEqual(actual, [])
 
     def test_get_user_program_credentials_issuance_disable(self):
         """Verify that user program credentials cannot be retrieved if issuance is disabled."""
@@ -71,7 +46,7 @@ class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, Credentials
     @httpretty.activate
     def test_get_user_program_credentials_no_credential(self):
         """Verify behavior if no credential exist."""
-        self.mock_api(self.url, {'results': []})
+        self.mock_credentials_api(self.user, data={'results': []})
         actual = get_user_program_credentials(self.user)
         self.assertEqual(actual, [])
 
@@ -90,18 +65,17 @@ class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, Credentials
                 "uuid": "dummy-uuid-1"
             }
         ]}
-        self.mock_api(self.url, credential_data)
+        self.mock_credentials_api(self.user, data=credential_data)
         actual = get_user_program_credentials(self.user)
         self.assertEqual(actual, [])
 
     @httpretty.activate
-    def test_get_user_program(self):
+    def test_get_user_programs_credentials(self):
         """Verify program credentials data can be retrieved and parsed correctly."""
         credentials_config = self.create_credential_config()
         program_config = self.create_program_config()
-        program_url = program_config.internal_api_url.strip('/') + '/programs/'
-        self.mock_api(program_url, self.PROGRAMS_API_RESPONSE)
-        self.mock_api(self.url, self.CREDENTIALS_API_RESPONSE, reset_uri=False)
+        self.mock_programs_api()
+        self.mock_credentials_api(self.user, reset_url=False)
         actual = get_user_program_credentials(self.user)
         expected = self.PROGRAMS_API_RESPONSE['results']
         expected[0]['credential_url'] = \

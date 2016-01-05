@@ -1,4 +1,7 @@
 """Mixins for use during testing."""
+import json
+
+import httpretty
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
@@ -94,3 +97,59 @@ class CredentialsDataMixin(object):
             }
         ]
     }
+
+    CREDENTIALS_NEXT_API_RESPONSE = {
+        "next": 'next_page_url',
+        "results": [
+            {
+                "id": 7,
+                "username": "test",
+                "credential": {
+                    "credential_id": 7,
+                    "program_id": 7
+                },
+                "status": "awarded",
+                "uuid": "dummy-uuid-7"
+            },
+            {
+                "id": 8,
+                "username": "test",
+                "credential": {
+                    "credential_id": 8,
+                    "program_id": 8
+                },
+                "status": "awarded",
+                "uuid": "dummy-uuid-8"
+            }
+        ]
+    }
+
+    def mock_credentials_api(self, user, data=None, status_code=200, reset_url=True, is_next_page=False):
+        """Utility for mocking out Credentials API URLs."""
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
+        internal_api_url = CredentialsApiConfig.current().internal_api_url.strip('/')
+
+        url = internal_api_url + '/user_credentials/?username=' + user.username
+
+        if reset_url:
+            httpretty.reset()
+
+        if data is None:
+            data = self.CREDENTIALS_API_RESPONSE
+
+        body = json.dumps(data)
+
+        if is_next_page:
+            next_page_data = self.CREDENTIALS_NEXT_API_RESPONSE
+            next_page_body = json.dumps(next_page_data)
+            next_page_url = internal_api_url + '/user_credentials/?page=2&username=' + user.username
+            httpretty.register_uri(
+                httpretty.GET, next_page_url, body=body, content_type='application/json', status=status_code
+            )
+            httpretty.register_uri(
+                httpretty.GET, url, body=next_page_body, content_type='application/json', status=status_code
+            )
+        else:
+            httpretty.register_uri(
+                httpretty.GET, url, body=body, content_type='application/json', status=status_code
+            )

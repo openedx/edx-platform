@@ -1,4 +1,7 @@
 """Mixins for use during testing."""
+import json
+
+import httpretty
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
@@ -203,3 +206,17 @@ class ProgramsDataMixin(object):
             "uuid": "dummy-uuid-2"
         }
     ]
+
+    def mock_programs_api(self, data=None, status_code=200):
+        """Utility for mocking out Programs API URLs."""
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
+
+        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
+
+        if data is None:
+            data = self.PROGRAMS_API_RESPONSE
+
+        body = json.dumps(data)
+
+        httpretty.reset()
+        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json', status=status_code)
