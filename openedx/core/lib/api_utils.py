@@ -5,8 +5,6 @@ import logging
 from django.core.cache import cache
 from edx_rest_api_client.client import EdxRestApiClient
 
-from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.token_utils import get_id_token
 
 

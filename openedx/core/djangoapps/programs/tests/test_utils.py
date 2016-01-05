@@ -9,7 +9,7 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.utils import (
-     get_programs, get_programs_for_credentials, get_programs_for_dashboard
+    get_programs, get_programs_for_credentials, get_programs_for_dashboard
 )
 from student.tests.factories import UserFactory
 
