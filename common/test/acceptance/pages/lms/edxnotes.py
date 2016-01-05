@@ -384,7 +384,7 @@ class EdxNotesUnitPage(CoursePage):
         Moves mouse to the element that matches `selector(str)`.
         """
         body = self.q(css=selector)[0]
-        ActionChains(self.browser).move_to_element(body).release().perform()
+        ActionChains(self.browser).move_to_element(body).perform()
         return self
 
     def click(self, selector):
@@ -532,7 +532,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Creates selection for the element and clicks `add note` button.
         """
-        ActionChains(self.browser).double_click(self.element).release().perform()
+        ActionChains(self.browser).double_click(self.element).perform()
         self.wait_for_adder_visibility()
         self.q(css=self._bounded_selector(self.ADDER_SELECTOR)).first.click()
         self.wait_for_editor_visibility()
@@ -542,7 +542,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Clicks on the highlighted text.
         """
-        ActionChains(self.browser).move_to_element(self.element).click().release().perform()
+        ActionChains(self.browser).move_to_element(self.element).click().perform()
         return self
 
     def click_on_viewer(self):
@@ -556,7 +556,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Hover over highlighted text -> shows note.
         """
-        ActionChains(self.browser).move_to_element(self.element).release().perform()
+        ActionChains(self.browser).move_to_element(self.element).perform()
         self.wait_for_viewer_visibility()
         return self
 
