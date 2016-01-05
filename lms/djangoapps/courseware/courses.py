@@ -35,6 +35,21 @@ from lms.djangoapps.courseware.courseware_access_exception import CoursewareAcce
 from student.models import CourseEnrollment
 import branding
 
+# Libraries used for the updates filtered by date and locale date feature. 
+from xml.dom import minidom
+import lxml
+from lxml import etree
+from dateutil import parser
+from django.utils import timezone
+import datetime
+from django.utils.translation import ugettext as _, get_language
+import locale
+from openedx.core.djangoapps.user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
+from django.utils.dateformat import format
+from django.utils import formats
+
+
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -285,7 +300,32 @@ def get_course_info_section(request, user, course, section_key):
     html = ''
     if info_module is not None:
         try:
-            html = info_module.render(STUDENT_VIEW).content
+           # html = info_module.render(STUDENT_VIEW).content
+            html_pre = info_module.render(STUDENT_VIEW).content
+            root = lxml.html.fromstring(html_pre)
+            for article in root.findall('article'):
+                article_date = article.find('h2').text
+                # Updates later than now  are not shown.
+                try:
+                    if parser.parse(article_date) > datetime.datetime.now():
+                        root.remove(article)
+                except ValueError:
+                    pass
+            # Updates are shown with user locale format. Updates without date are not affected.
+            for article in root.findall('article'):
+                for heading in article.iter('h2'):
+                    try:
+                        heading.text = formats.date_format(parser.parse(heading.text))#"SHORT_DATE_FORMAT") 
+                    except ValueError:
+                        heading.text = heading.text
+
+
+            #Finally, the html is created.
+
+            html = lxml.html.tostring(root)
+
+
+
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
