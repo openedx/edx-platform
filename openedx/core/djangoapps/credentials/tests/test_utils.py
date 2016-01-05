@@ -1,7 +1,6 @@
 """Tests covering Credentials utilities."""
 from django.test import TestCase
 import httpretty
-import mock
 from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
@@ -12,11 +11,10 @@ from openedx.core.djangoapps.credentials.utils import (
 )
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.util.mixins import MockApiMixin
 from student.tests.factories import UserFactory
 
 
-class TestCredentialsRetrieval(MockApiMixin, ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
+class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
                                ProgramsDataMixin, TestCase):
     """ Tests covering the retrieval of user credentials from the Credentials
     service.

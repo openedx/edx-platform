@@ -29,7 +29,6 @@ def get_programs(user):
     return get_api_data(programs_config, user, programs_config.API_NAME, 'programs', use_cache=use_cache)
 
 
-
 def get_programs_for_dashboard(user, course_keys):
     """Build a dictionary of programs, keyed by course.
 
@@ -89,7 +88,7 @@ def get_programs_for_credentials(user, programs_credentials):
     Returns:
         list, containing programs dictionaries.
     """
-    programs_config = ProgramsApiConfig.current()
+    ProgramsApiConfig.current()
     certificate_programs = []
 
     programs = get_programs(user)

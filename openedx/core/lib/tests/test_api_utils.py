@@ -112,4 +112,3 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
         actual = get_api_data(credentials_config, self.user, 'credentials', 'user_credentials', querystring=querystring)
         expected_data = self.CREDENTIALS_NEXT_API_RESPONSE['results'] + self.CREDENTIALS_API_RESPONSE['results']
         self.assertEqual(actual, expected_data)
-
