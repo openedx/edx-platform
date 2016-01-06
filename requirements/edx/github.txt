@@ -97,6 +97,8 @@ git+https://github.com/edx/edx-organizations.git@release-2015-12-08#egg=edx-orga
 git+https://github.com/edx/edx-proctoring.git@0.12.4#egg=edx-proctoring==0.12.4
 git+https://github.com/edx/xblock-lti-consumer.git@v1.0.1#egg=xblock-lti-consumer==1.0.1
 
+git+https://github.com/edx/bok-choy.git@86ff048ea8bf843cc5e4448163b9e8dd395154e6#egg=bok-choy
+
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
 -e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
