@@ -120,17 +120,6 @@ class PureXBlockImportTest(BaseCourseTestCase):
 class ImportTestCase(BaseCourseTestCase):
     date = Date()
 
-    def test_fallback(self):
-        '''Check that malformed xml loads as an ErrorDescriptor.'''
-
-        # Use an exotic character to also flush out Unicode issues.
-        bad_xml = u'''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
-        system = self.get_system()
-
-        descriptor = system.process_xml(bad_xml)
-
-        self.assertEqual(descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
-
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
@@ -607,7 +596,7 @@ class ImportTestCase(BaseCourseTestCase):
         )
 
     def test_error_on_import(self):
-        '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''
+        '''Check that an exception is raised'''
 
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
         system = self.get_system(False)

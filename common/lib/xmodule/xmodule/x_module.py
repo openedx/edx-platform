@@ -1136,33 +1136,15 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         """
         if self.xmodule_runtime is None:
             raise UndefinedContext()
-        assert self.xmodule_runtime.error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
-            try:
-                self.xmodule_runtime.construct_xblock_from_class(
-                    self.module_class,
-                    descriptor=self,
-                    scope_ids=self.scope_ids,
-                    field_data=self._field_data,
-                    for_parent=self.get_parent() if self.has_cached_parent else None
-                )
-                self.xmodule_runtime.xmodule_instance.save()
-            except Exception:  # pylint: disable=broad-except
-                # xmodule_instance is set by the XModule.__init__. If we had an error after that,
-                # we need to clean it out so that we can set up the ErrorModule instead
-                self.xmodule_runtime.xmodule_instance = None
-
-                if isinstance(self, self.xmodule_runtime.error_descriptor_class):
-                    log.exception('Error creating an ErrorModule from an ErrorDescriptor')
-                    raise
-
-                log.exception('Error creating xmodule')
-                descriptor = self.xmodule_runtime.error_descriptor_class.from_descriptor(
-                    self,
-                    error_msg=exc_info_to_str(sys.exc_info())
-                )
-                descriptor.xmodule_runtime = self.xmodule_runtime
-                self.xmodule_runtime.xmodule_instance = descriptor._xmodule  # pylint: disable=protected-access
+            self.xmodule_runtime.construct_xblock_from_class(
+                self.module_class,
+                descriptor=self,
+                scope_ids=self.scope_ids,
+                field_data=self._field_data,
+                for_parent=self.get_parent() if self.has_cached_parent else None
+            )
+            self.xmodule_runtime.xmodule_instance.save()
         return self.xmodule_runtime.xmodule_instance
 
     course_id = module_attr('course_id')
@@ -1697,7 +1679,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         self.get_python_lib_zip = get_python_lib_zip or (lambda: None)
         self.replace_course_urls = replace_course_urls
         self.replace_jump_to_id_urls = replace_jump_to_id_urls
-        self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
         self.get_real_user = get_real_user

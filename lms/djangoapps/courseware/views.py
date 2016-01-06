@@ -583,23 +583,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             raise
 
         # In production, don't want to let a 500 out for any reason
-        if settings.DEBUG:
-            raise
-        else:
-            log.exception(
-                u"Error in index view: user=%s, effective_user=%s, course=%s, chapter=%s section=%s position=%s",
-                request.user, user, course, chapter, section, position
-            )
-            try:
-                result = render_to_response('courseware/courseware-error.html', {
-                    'staff_access': staff_access,
-                    'course': course
-                })
-            except:
-                # Let the exception propagate, relying on global config to at
-                # at least return a nice error message
-                log.exception("Error while rendering courseware-error page")
-                raise
+        raise
 
     return result
 

@@ -118,11 +118,7 @@ class ConditionalModule(ConditionalFields, XModule):
         if xml_value and self.required_modules:
             for module in self.required_modules:
                 if not hasattr(module, attr_name):
-                    # We don't throw an exception here because it is possible for
-                    # the descriptor of a required module to have a property but
-                    # for the resulting module to be a (flavor of) ErrorModule.
-                    # So just log and return false.
-                    log.warn('Error in conditional module: \
+                    raise ValueError('Error in conditional module: \
                         required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
                     return False
 

@@ -66,7 +66,6 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.lti_module import LTIModule
@@ -284,8 +283,7 @@ def get_module(user, request, usage_key, field_data_cache,
                                 inherit this lms key value.
 
     Returns: xmodule instance, or None if the user does not have access to the
-    module.  If there's an error, will try to return an instance of ErrorModule
-    if possible.  If not possible, return None.
+    module.  If there's an error, return None.
     """
     try:
         descriptor = modulestore().get_item(usage_key, depth=depth)
@@ -298,11 +296,6 @@ def get_module(user, request, usage_key, field_data_cache,
     except ItemNotFoundError:
         if log_if_not_found:
             log.debug("Error in get_module: ItemNotFoundError")
-        return None
-
-    except:
-        # Something has gone terribly wrong, but still not letting it turn into a 500.
-        log.exception("Error in get_module")
         return None
 
 
@@ -739,12 +732,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
     system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
-
-    # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-    if has_access(user, u'staff', descriptor.location, course_id):
-        system.error_descriptor_class = ErrorDescriptor
-    else:
-        system.error_descriptor_class = NonStaffErrorDescriptor
 
     return system, field_data
 

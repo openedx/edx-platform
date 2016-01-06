@@ -222,14 +222,7 @@ def get_course_about_section(request, course, section_key):
             html = ''
 
             if about_module is not None:
-                try:
-                    html = about_module.render(STUDENT_VIEW).content
-                except Exception:  # pylint: disable=broad-except
-                    html = render_to_string('courseware/error-message.html', None)
-                    log.exception(
-                        u"Error rendering course=%s, section_key=%s",
-                        course, section_key
-                    )
+                html = about_module.render(STUDENT_VIEW).content
             return html
 
         except ItemNotFoundError:

@@ -6,7 +6,6 @@ from mock import Mock, patch
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xmodule.error_module import NonStaffErrorDescriptor
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
 from xmodule.conditional_module import ConditionalDescriptor
@@ -48,23 +47,13 @@ class ConditionalFactory(object):
         return a dict of modules: the conditional with a single source and a single child.
         Keys are 'cond_module', 'source_module', and 'child_module'.
 
-        if the source_is_error_module flag is set, create a real ErrorModule for the source.
         """
         descriptor_system = get_test_descriptor_system()
 
         # construct source descriptor and module:
         source_location = Location("edX", "conditional_test", "test_run", "problem", "SampleProblem", None)
-        if source_is_error_module:
-            # Make an error descriptor and module
-            source_descriptor = NonStaffErrorDescriptor.from_xml(
-                'some random xml data',
-                system,
-                id_generator=CourseLocationManager(source_location.course_key),
-                error_msg='random error message'
-            )
-        else:
-            source_descriptor = Mock(name='source_descriptor')
-            source_descriptor.location = source_location
+        source_descriptor = Mock(name='source_descriptor')
+        source_descriptor.location = source_location
 
         source_descriptor.runtime = descriptor_system
         source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
@@ -160,17 +149,6 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         print "post-attempt ajax: ", ajax
         html = ajax['html']
         self.assertTrue(any(['This is a secret' in item for item in html]))
-
-    def test_error_as_source(self):
-        '''
-        Check that handle_ajax works properly if the source is really an ErrorModule,
-        and that the condition is not satisfied.
-        '''
-        modules = ConditionalFactory.create(self.test_system, source_is_error_module=True)
-        ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
-        modules['cond_module'].save()
-        html = ajax['html']
-        self.assertFalse(any(['This is a secret' in item for item in html]))
 
 
 class ConditionalModuleXmlTest(unittest.TestCase):
