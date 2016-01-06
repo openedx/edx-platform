@@ -80,6 +80,7 @@ class UsersPageMixin(PageObject):
         """ Submit the "New User" form """
         self.q(css='.form-create.create-user .action-primary').click()
         wait_for_ajax_or_reload(self.browser)
+        self.wait_for_element_visibility('.user-list', 'wait for team to load')
 
     def get_user(self, email):
         """ Gets user wrapper by email """
