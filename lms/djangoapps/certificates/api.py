@@ -80,7 +80,7 @@ def get_certificates_for_user(username):
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
-                               forced_grade=None):
+                               title='None', forced_grade=None):
     """
     It will add the add-cert request into the xqueue.
 
@@ -108,6 +108,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     generate_pdf = not has_html_certificates_enabled(course_key, course)
     status, cert = xqueue.add_cert(student, course_key,
                                    course=course,
+                                   title=title,
                                    generate_pdf=generate_pdf,
                                    forced_grade=forced_grade)
     if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
