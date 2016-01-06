@@ -8,6 +8,8 @@ import itertools
 from uuid import uuid4
 from collections import namedtuple
 
+from django.utils.http import urlquote
+
 from edxval import api
 from mobile_api.models import MobileApiConfig
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -497,7 +499,7 @@ class TestVideoSummaryList(
             'video_url': self.video_url_high,
             'duration': 12.0,
             'transcripts': {
-                'en': 'http://testserver/api/mobile/v0.5/video_outlines/transcripts/{}/testing_mobile_high_video/en'.format(self.course.id)  # pylint: disable=line-too-long
+                'en': 'http://testserver/api/mobile/v0.5/video_outlines/transcripts/{}/testing_mobile_high_video/en'.format(urlquote(unicode(self.course.id)))  # pylint: disable=line-too-long
             },
             'only_on_web': False,
             'encoded_videos': {

@@ -27,7 +27,7 @@ def clean_course_key(course_key, padding_char):
             string. The standard value for this is '='.
     """
     return "course_{}".format(
-        b32encode(unicode(course_key)).replace('=', padding_char)
+        b32encode(unicode(course_key).encode('utf-8')).replace('=', padding_char)
     )
 
 

@@ -9,6 +9,7 @@ import pytz
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.http import urlquote
 from django.template import defaultfilters
 from django.test import RequestFactory
 
@@ -91,10 +92,10 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(len(courses), 1)
 
         found_course = courses[0]['course']
-        self.assertIn('courses/{}/about'.format(self.course.id), found_course['course_about'])
-        self.assertIn('course_info/{}/updates'.format(self.course.id), found_course['course_updates'])
-        self.assertIn('course_info/{}/handouts'.format(self.course.id), found_course['course_handouts'])
-        self.assertIn('video_outlines/courses/{}'.format(self.course.id), found_course['video_outline'])
+        self.assertIn(urlquote('courses/{}/about'.format(self.course.id)), found_course['course_about'])
+        self.assertIn(urlquote('course_info/{}/updates'.format(self.course.id)), found_course['course_updates'])
+        self.assertIn(urlquote('course_info/{}/handouts'.format(self.course.id)), found_course['course_handouts'])
+        self.assertIn(urlquote('video_outlines/courses/{}'.format(self.course.id)), found_course['video_outline'])
         self.assertEqual(found_course['id'], unicode(self.course.id))
         self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
@@ -249,7 +250,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             certificate_data['url'],
             r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
                 user_id=self.user.id,
-                course_id=self.course.id,
+                course_id=urlquote(unicode(self.course.id)),
             )
         )
 
@@ -276,7 +277,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         response = self.api_response()
         response_discussion_url = response.data[0]['course']['discussion_url']  # pylint: disable=E1101
-        self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
+        self.assertIn(urlquote('/api/discussion/v1/courses/{}'.format(self.course.id)), response_discussion_url)
 
 
 class CourseStatusAPITestCase(MobileAPITestCase):
