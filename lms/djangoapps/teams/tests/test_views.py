@@ -69,7 +69,6 @@ class TestDashboard(SharedModuleStoreTestCase):
         anonymous_client = APIClient()
         response = anonymous_client.get(self.teams_url)
         redirect_url = u'{0}?next={1}'.format(settings.LOGIN_URL, self.teams_url)
-        from nose.tools import set_trace; set_trace()
         self.assertRedirects(response, redirect_url)
 
     def test_not_enrolled_not_staff(self):
