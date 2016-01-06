@@ -23,7 +23,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @setCurrentEditor(@markdown_editor)
       # Add listeners for toolbar buttons (only present for markdown editor)
       @element.on('click', '.xml-tab', @onShowXMLButton)
-      @element.on('click', '.format-buttons a', @onToolbarButton)
+      @element.on('click', '.format-buttons button', @onToolbarButton)
       @element.on('click', '.cheatsheet-toggle', @toggleCheatsheet)
       # Hide the XML text area
       $(@element.find('.xml-box')).hide()
@@ -131,7 +131,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   save: ->
     @element.off('click', '.xml-tab', @changeEditor)
-    @element.off('click', '.format-buttons a', @onToolbarButton)
+    @element.off('click', '.format-buttons button', @onToolbarButton)
     @element.off('click', '.cheatsheet-toggle', @toggleCheatsheet)
     if @current_editor == @markdown_editor
         {

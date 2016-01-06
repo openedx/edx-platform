@@ -13,24 +13,66 @@
         %if enable_markdown:
         <div class="editor-bar">
             <ul class="format-buttons">
-                <li><a href="#" class="header-button" data-tooltip="${_("Heading 1")}"><span
-                        class="problem-editor-icon heading1"></span></a></li>
-                <li><a href="#" class="multiple-choice-button" data-tooltip="${_("Multiple Choice")}"><span
-                        class="problem-editor-icon multiple-choice"></span></a></li>
-                <li><a href="#" class="checks-button" data-tooltip="${_("Checkboxes")}"><span
-                        class="problem-editor-icon checks"></span></a></li>
-                <li><a href="#" class="string-button" data-tooltip="${_("Text Input")}"><span
-                        class="problem-editor-icon string"></span></a></li>
-                <li><a href="#" class="number-button" data-tooltip="${_("Numerical Input")}"><span
-                        class="problem-editor-icon number"></span></a></li>
-                <li><a href="#" class="dropdown-button" data-tooltip="${_("Dropdown")}"><span
-                        class="problem-editor-icon dropdown"></span></a></li>
-                <li><a href="#" class="explanation-button" data-tooltip="${_("Explanation")}"><span
-                        class="problem-editor-icon explanation"></span></a></li>
+                <li>
+                    <button type="button" class="header-button" data-tooltip="${_("Heading 3")}">
+                        <span class="problem-editor-icon heading3">
+                            <span class="icon fa fa-header" aria-hidden="true"></span>
+                            <span class="sr">Insert a heading</span>
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="multiple-choice-button" data-tooltip="${_("Multiple Choice")}">
+                        <span class="problem-editor-icon multiple-choice">
+                            <span class="icon fa fa-list-ul" aria-hidden="true"></span>
+                            <span class="sr">Insert a multiple choice question</span>
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="checks-button" data-tooltip="${_("Checkboxes")}">
+                        <span class="problem-editor-icon checks">
+                            <span class="icon fa fa-check-square-o" aria-hidden="true"></span>
+                            <span class="sr">Insert a checkbox question</span>
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="string-button" data-tooltip="${_("Text Input")}">
+                        <span class="problem-editor-icon string">
+                            <span class="icon" aria-hidden="true">Abc</span>
+                            <span class="sr">Insert a text response question</span>
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="number-button" data-tooltip="${_("Numerical Input")}">
+                        <span class="problem-editor-icon number">
+                            <span class="icon" aria-hidden="true">123</span>
+                            <span class="sr">Insert a numerical response question</span>
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="dropdown-button" data-tooltip="${_("Dropdown")}">
+                        <span class="problem-editor-icon dropdown">
+                            <span class="icon fa fa-caret-square-o-down" aria-hidden="true"></span>
+                            <span class="sr">Insert a dropdown question</span>
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="explanation-button" data-tooltip="${_("Explanation")}">
+                        <span class="problem-editor-icon explanation">
+                            <span class="icon fa fa-lightbulb-o" aria-hidden="true"></span>
+                            <span class="sr">Insert an explanation</span>
+                        </span>
+                    </button>
+                </li>
             </ul>
             <ul class="editor-tabs">
-                <li><a href="#" class="xml-tab advanced-toggle" data-tab="xml">${_("Advanced Editor")}</a></li>
-                <li><a href="#" class="cheatsheet-toggle" data-tooltip="${_("Toggle Cheatsheet")}">?</a></li>
+                <li><button type="button" class="xml-tab advanced-toggle" data-tab="xml">${_("Advanced Editor")}</button></li>
+                <li><button type="button" class="cheatsheet-toggle" data-tooltip="${_("Toggle Cheatsheet")}">?</button></li>
             </ul>
         </div>
         <textarea class="markdown-box">${markdown | h}</textarea>
