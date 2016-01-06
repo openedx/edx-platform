@@ -14,58 +14,51 @@
         <div class="editor-bar">
             <ul class="format-buttons">
                 <li>
-                    <button type="button" class="header-button" data-tooltip="${_("Heading 3")}">
+                    <button type="button" class="header-button" data-tooltip="${_("Heading")}">
                         <span class="problem-editor-icon heading3">
-                            <span class="icon fa fa-header" aria-hidden="true"></span>
-                            <span class="sr">Insert a heading</span>
+                            <img class="icon" src="${static.url('images/cms-editor_heading.svg')}" alt="Insert a heading">
                         </span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="multiple-choice-button" data-tooltip="${_("Multiple Choice")}">
                         <span class="problem-editor-icon multiple-choice">
-                            <span class="icon fa fa-list-ul" aria-hidden="true"></span>
-                            <span class="sr">Insert a multiple choice question</span>
+                            <img class="icon" src="${static.url('images/cms-editor_radio.svg')}" alt="Add a multiple choice question">
                         </span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="checks-button" data-tooltip="${_("Checkboxes")}">
                         <span class="problem-editor-icon checks">
-                            <span class="icon fa fa-check-square-o" aria-hidden="true"></span>
-                            <span class="sr">Insert a checkbox question</span>
+                            <img class="icon" src="${static.url('images/cms-editor_checkbox.svg')}" alt="Add a question with checkboxes">
                         </span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="string-button" data-tooltip="${_("Text Input")}">
                         <span class="problem-editor-icon string">
-                            <span class="icon" aria-hidden="true">Abc</span>
-                            <span class="sr">Insert a text response question</span>
+                            <img class="icon" src="${static.url('images/cms-editor_text.svg')}" alt="Insert a text response">
                         </span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="number-button" data-tooltip="${_("Numerical Input")}">
                         <span class="problem-editor-icon number">
-                            <span class="icon" aria-hidden="true">123</span>
-                            <span class="sr">Insert a numerical response question</span>
+                            <img class="icon" src="${static.url('images/cms-editor_number.svg')}" alt="Insert a numerical response">
                         </span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="dropdown-button" data-tooltip="${_("Dropdown")}">
                         <span class="problem-editor-icon dropdown">
-                            <span class="icon fa fa-caret-square-o-down" aria-hidden="true"></span>
-                            <span class="sr">Insert a dropdown question</span>
+                            <img class="icon" src="${static.url('images/cms-editor_dropdown.svg')}" alt="Insert a dropdown response">
                         </span>
                     </button>
                 </li>
                 <li>
                     <button type="button" class="explanation-button" data-tooltip="${_("Explanation")}">
                         <span class="problem-editor-icon explanation">
-                            <span class="icon fa fa-lightbulb-o" aria-hidden="true"></span>
-                            <span class="sr">Insert an explanation</span>
+                            <img class="icon" src="${static.url('images/cms-editor_explanation.svg')}" alt="Add an explanation for this question">
                         </span>
                     </button>
                 </li>
@@ -85,12 +78,12 @@
     <article class="simple-editor-cheatsheet">
         <div class="cheatsheet-wrapper">
             <div class="row">
-                <h6>${_("Heading 1")}</h6>
+                <h6>${_("Heading")}</h6>
                 <div class="col sample heading-1">
-                    <img src="${static.url("images/header-example.png")}" />
+                    <img class="icon" src="${static.url('images/cms-editor_heading.svg')}" alt="Insert a heading">
                 </div>
                 <div class="col">
-<pre><code>H1
+<pre><code>H3
 =====
 </pre>
                 </div>
@@ -98,7 +91,7 @@
             <div class="row">
                 <h6>${_("Multiple Choice")}</h6>
                 <div class="col sample multiple-choice">
-                    <img src="${static.url("images/choice-example.png")}" />
+                    <img class="icon" src="${static.url('images/cms-editor_radio.svg')}" alt="Add a multiple choice question">
                 </div>
                 <div class="col">
 <pre><code>( ) red
@@ -109,7 +102,7 @@
             <div class="row">
                 <h6>${_("Checkboxes")}</h6>
                 <div class="col sample check-multiple">
-                    <img src="${static.url("images/multi-example.png")}" />
+                    <img class="icon" src="${static.url('images/cms-editor_checkbox.svg')}" alt="Add a question with checkboxes">
                 </div>
                 <div class="col">
 <pre><code>[x] earth
@@ -120,7 +113,7 @@
             <div class="row">
                 <h6>${_("Text Input")}</h6>
                 <div class="col sample string-response">
-                    <img src="${static.url("images/string-example.png")}" />
+                    <img class="icon" src="${static.url('images/cms-editor_text.svg')}" alt="Insert a text response">
                 </div>
                 <div class="col">
                     <pre><code>= dog
@@ -131,7 +124,7 @@ or= mouse</code></pre>
             <div class="row">
                 <h6>${_("Numerical Input")}</h6>
                 <div class="col sample numerical-response">
-                    <img src="${static.url("images/number-example.png")}" />
+                    <img class="icon" src="${static.url('images/cms-editor_number.svg')}" alt="Insert a numerical response">
                 </div>
                 <div class="col">
                     <pre><code>= 3.14 +- 2%</code></pre>
@@ -141,7 +134,7 @@ or= mouse</code></pre>
             <div class="row">
                 <h6>${_("Dropdown")}</h6>
                 <div class="col sample option-reponse">
-                    <img src="${static.url("images/select-example.png")}" />
+                    <img class="icon" src="${static.url('images/cms-editor_dropdown.svg')}" alt="Insert a dropdown response">
                 </div>
                 <div class="col">
                     <pre><code>[[wrong, (right)]]</code></pre>
@@ -156,7 +149,7 @@ or= mouse</code></pre>
             <div class="row">
                 <h6>${_("Explanation")}</h6>
                 <div class="col sample explanation">
-                    <img src="${static.url("images/explanation-example.png")}" />
+                    <img class="icon" src="${static.url('images/cms-editor_explanation.svg')}" alt="Add an explanation for this question">
                 </div>
                 <div class="col">
                     <pre><code>[explanation] A short explanation of the answer. [explanation]</code></pre>
