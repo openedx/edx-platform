@@ -17,6 +17,7 @@ class CredentialsApiConfig(ConfigurationModel):
     """
     OAUTH2_CLIENT_NAME = 'credentials'
     API_NAME = 'credentials'
+    CACHE_KEY = 'credentials.api.data'
 
     internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
     public_service_url = models.URLField(verbose_name=_("Public Service URL"))
@@ -33,6 +34,13 @@ class CredentialsApiConfig(ConfigurationModel):
         default=False,
         help_text=_(
             "Enable authoring of Credential Service credentials in Studio."
+        )
+    )
+    cache_ttl = models.PositiveIntegerField(
+        verbose_name=_("Cache Time To Live"),
+        default=0,
+        help_text=_(
+            "Specified in seconds. Enable caching by setting this to a value greater than 0."
         )
     )
 
@@ -67,3 +75,8 @@ class CredentialsApiConfig(ConfigurationModel):
         be enabled or not.
         """
         return self.enabled and self.enable_studio_authoring
+
+    @property
+    def is_cache_enabled(self):
+        """Whether responses from the Credentials API will be cached."""
+        return self.cache_ttl > 0

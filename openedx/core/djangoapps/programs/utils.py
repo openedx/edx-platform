@@ -26,7 +26,12 @@ def get_programs(user):
 
     # Bypass caching for staff users, who may be creating Programs and want to see them displayed immediately.
     use_cache = programs_config.is_cache_enabled and not user.is_staff
-    return get_api_data(programs_config, user, programs_config.API_NAME, 'programs', use_cache=use_cache)
+    cache_key = None
+    if use_cache:
+        cache_key = programs_config.CACHE_KEY
+    return get_api_data(
+        programs_config, user, programs_config.API_NAME, 'programs', use_cache=use_cache, cache_key=cache_key
+    )
 
 
 def get_programs_for_dashboard(user, course_keys):
