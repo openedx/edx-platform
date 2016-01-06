@@ -327,7 +327,7 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
     try:
         cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
     except CourseUserGroup.DoesNotExist:
-        raise Http404("Cohort (ID {cohort_id}) not found for {course_key_string}".format(
+        raise Http404(u"Cohort (ID {cohort_id}) not found for {course_key_string}".format(
             cohort_id=cohort_id,
             course_key_string=course_key_string
         ))

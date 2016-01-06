@@ -66,7 +66,7 @@ def topic_name_to_id(course, name):
     Given a discussion topic name, return an id for that name (includes
     course and url_name).
     """
-    return "{course}_{run}_{name}".format(
+    return u"{course}_{run}_{name}".format(
         course=course.location.course,
         run=course.url_name,
         name=name
