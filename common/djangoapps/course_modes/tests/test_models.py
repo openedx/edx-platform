@@ -430,3 +430,16 @@ class CourseModeModelTest(TestCase):
         verified_mode.expiration_datetime = None
         self.assertFalse(verified_mode.expiration_datetime_is_explicit)
         self.assertIsNone(verified_mode.expiration_datetime)
+
+    @ddt.data(
+        (CourseMode.AUDIT, False),
+        (CourseMode.HONOR, True),
+        (CourseMode.VERIFIED, True),
+        (CourseMode.CREDIT_MODE, True),
+        (CourseMode.PROFESSIONAL, True),
+        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
+    )
+    @ddt.unpack
+    def test_eligible_for_cert(self, mode_slug, expected_eligibility):
+        """Verify that non-audit modes are eligible for a cert."""
+        self.assertEqual(CourseMode.is_eligible_for_certificate(mode_slug), expected_eligibility)
