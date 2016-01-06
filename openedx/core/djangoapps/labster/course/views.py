@@ -2,6 +2,7 @@
 import logging
 
 from django.http import Http404
+from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -16,11 +17,24 @@ from contentstore.views.course import _create_or_rerun_course
 from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
-from openedx.core.djangoapps.labster.course.utils import set_staff
+from cms.djangoapps.contentstore.utils import add_instructor, remove_all_instructors
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 log = logging.getLogger(__name__)
+
+
+def set_staff(course_key, emails):
+    """
+    Sets course staff.
+    """
+    remove_all_instructors(course_key)
+    for email in emails:
+        try:
+            user = User.objects.get(email=email)
+            add_instructor(course_key, user, user)
+        except User.DoesNotExist:
+            log.info('User with email %s does not exist', email)
 
 
 def setup_course(course_key, staff=None):
