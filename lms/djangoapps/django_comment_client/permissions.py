@@ -86,7 +86,7 @@ def _check_condition(user, condition, content):
         try:
             commentable_id = content['commentable_id']
             request_cache_dict = RequestCache.get_request_cache().data
-            cache_key = "django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
+            cache_key = u"django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
             if cache_key in request_cache_dict:
                 return request_cache_dict[cache_key]
             team = get_team(commentable_id)
