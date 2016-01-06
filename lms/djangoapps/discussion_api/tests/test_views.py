@@ -360,7 +360,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
@@ -884,7 +884,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Thread not found."}
         )
 
     def test_basic(self):
@@ -976,7 +976,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
@@ -1013,6 +1013,39 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         })
         parsed_content = json.loads(response.content)
         self.assertEqual(parsed_content["results"][0]["id"], comment_id)
+
+    def test_question_invalid_endorsed(self):
+        response = self.client.get(self.url, {
+            "thread_id": self.thread_id,
+            "endorsed": "invalid-boolean"
+        })
+        self.assert_response_correct(
+            response,
+            400,
+            {"field_errors": {
+                "endorsed": {"developer_message": "Invalid Boolean Value."}
+            }}
+        )
+
+    def test_question_missing_endorsed(self):
+        self.register_get_user_response(self.user)
+        thread = self.make_minimal_cs_thread({
+            "thread_type": "question",
+            "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment"})],
+            "non_endorsed_responses": [make_minimal_cs_comment({"id": "non_endorsed_comment"})],
+            "non_endorsed_resp_total": 1,
+        })
+        self.register_get_thread_response(thread)
+        response = self.client.get(self.url, {
+            "thread_id": thread["id"]
+        })
+        self.assert_response_correct(
+            response,
+            400,
+            {"field_errors": {
+                "endorsed": {"developer_message": "This field is required for question threads."}
+            }}
+        )
 
 
 @httpretty.activate

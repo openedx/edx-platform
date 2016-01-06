@@ -73,31 +73,6 @@ FEATURES = {
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
-    # When True, will only publicly list courses by the subdomain.
-    'SUBDOMAIN_COURSE_LISTINGS': False,
-    # Expects you to define COURSE_LISTINGS, a dictionary mapping
-    # subdomains to lists of course_ids
-    # COURSE_LISTINGS = {
-    #     'default': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #         'HarvardX/CS50x/2012',
-    #         'MITx/3.091x/2012_Fall',
-    #     ],
-    #     'openedx': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #     ],
-    # }
-    # To see it in action, add the following to your /etc/hosts file:
-    #     127.0.0.1 openedx.dev
-
-    # When True, will override certain branding with university specific values
-    # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
-    # university to use for branding purposes
-    'SUBDOMAIN_BRANDING': False,
-
-    'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
-                                       # set to None to do no university selection
-
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
@@ -204,9 +179,6 @@ FEATURES = {
 
     # Enable Custom Courses for EdX
     'CUSTOM_COURSES_EDX': False,
-
-    # Enable legacy instructor dashboard
-    'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': False,
 
     # Is this an edX-owned domain? (used for edX specific messaging and images)
     'IS_EDX_DOMAIN': False,
@@ -602,6 +574,7 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
+USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
@@ -697,7 +670,6 @@ OPTIMIZELY_PROJECT_ID = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
-SUBDOMAIN_BRANDING = {}
 VIRTUAL_UNIVERSITIES = []
 
 ############# XBlock Configuration ##########
@@ -820,6 +792,10 @@ BUGS_EMAIL = 'bugs@example.com'
 UNIVERSITY_EMAIL = 'university@example.com'
 PRESS_EMAIL = 'press@example.com'
 FINANCE_EMAIL = ''
+
+# Platform mailing address
+CONTACT_MAILING_ADDRESS = ''
+
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -1257,7 +1233,7 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
     'js/vendor/afontgarde/afontgarde.js',
-    'js/vendor/afontgarde/edx-icons.js',
+    'js/vendor/afontgarde/edx-icons.js'
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
@@ -1934,6 +1910,9 @@ INSTALLED_APPS = (
     'lms.djangoapps.teams',
 
     'xblock_django',
+
+    # Bookmarks
+    'openedx.core.djangoapps.bookmarks',
 
     # programs support
     'openedx.core.djangoapps.programs',
@@ -2680,3 +2659,6 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 # financial assistance form
 FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
+
+# Course Content Bookmarks Settings
+MAX_BOOKMARKS_PER_COURSE = 100

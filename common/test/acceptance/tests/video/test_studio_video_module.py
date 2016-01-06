@@ -255,7 +255,6 @@ class CMSVideoTest(CMSVideoBaseTest):
         Then when I view the video it does show the captions
         """
         self._create_course_unit(subtitles=True)
-
         self.assertTrue(self.video.is_captions_visible())
 
     def test_captions_toggling(self):

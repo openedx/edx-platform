@@ -48,6 +48,7 @@ from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -165,7 +166,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
-            display_id = slugify(chapter.display_name_with_default)
+            display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
             if required_content:
                 if unicode(chapter.location) not in required_content:
@@ -183,7 +184,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                 if not section.hide_from_toc:
                     section_context = {
-                        'display_name': section.display_name_with_default,
+                        'display_name': section.display_name_with_default_escaped,
                         'url_name': section.url_name,
                         'format': section.format if section.format is not None else '',
                         'due': section.due,
@@ -246,7 +247,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                     sections.append(section_context)
             toc_chapters.append({
-                'display_name': chapter.display_name_with_default,
+                'display_name': chapter.display_name_with_default_escaped,
                 'display_id': display_id,
                 'url_name': chapter.url_name,
                 'sections': sections,
@@ -715,6 +716,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             "reverification": ReverificationService(),
             'proctoring': ProctoringService(),
             'credit': CreditService(),
+            'bookmarks': BookmarksService(user=user),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
@@ -939,7 +941,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
 
     tracking_context = {
         'module': {
-            'display_name': descriptor.display_name_with_default,
+            'display_name': descriptor.display_name_with_default_escaped,
             'usage_key': unicode(descriptor.location),
         }
     }

@@ -421,3 +421,12 @@ class CourseModeModelTest(TestCase):
 
         self.assertFalse(verified_mode.expiration_datetime_is_explicit)
         self.assertEqual(verified_mode.expiration_datetime, now)
+
+    def test_expiration_datetime_explicitly_set_to_none(self):
+        """ Verify that setting the _expiration_date property does not set the explicit flag. """
+        verified_mode, __ = self.create_mode('verified', 'Verified Certificate')
+        self.assertFalse(verified_mode.expiration_datetime_is_explicit)
+
+        verified_mode.expiration_datetime = None
+        self.assertFalse(verified_mode.expiration_datetime_is_explicit)
+        self.assertIsNone(verified_mode.expiration_datetime)

@@ -13,3 +13,4 @@ stevedore==0.14.1
 djangorestframework==3.2.3
 PyYAML>=3.10
 mock
+django-model-utils==2.3.1

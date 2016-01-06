@@ -195,6 +195,7 @@ class CertificatesBaseTestCase(object):
         self.assertTrue('must have name of the certificate' in context.exception)
 
 
+@ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
@@ -339,6 +340,40 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'verified')
         self.assertNotContains(response, 'audit')
+
+    def test_audit_only_disables_cert(self):
+        """
+        Tests audit course mode is skipped when rendering certificates page.
+        """
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
+        response = self.client.get_html(
+            self._url(),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This course does not use a mode that offers certificates.')
+        self.assertNotContains(response, 'This module is not enabled.')
+        self.assertNotContains(response, 'Loading')
+
+    @ddt.data(
+        ['audit', 'verified'],
+        ['verified'],
+        ['audit', 'verified', 'credit'],
+        ['verified', 'credit'],
+        ['professional']
+    )
+    def test_non_audit_enables_cert(self, slugs):
+        """
+        Tests audit course mode is skipped when rendering certificates page.
+        """
+        for slug in slugs:
+            CourseModeFactory.create(course_id=self.course.id, mode_slug=slug)
+        response = self.client.get_html(
+            self._url(),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'This course does not use a mode that offers certificates.')
+        self.assertNotContains(response, 'This module is not enabled.')
+        self.assertContains(response, 'Loading')
 
     def test_assign_unique_identifier_to_certificates(self):
         """

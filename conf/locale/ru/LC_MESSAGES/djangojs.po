@@ -30,6 +30,7 @@
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Peter Markushin, 2015
 # Katerina <rosemaily@gmail.com>, 2014
+# Sergey <sergey.sapogin@gmail.com>, 2015
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
@@ -71,12 +72,14 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Andrey Bochkarev <abocha@ya.ru>, 2015
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015
 # Nikolay K Medvedev <elsin16@gmail.com>, 2015
+# Sergey <sergey.sapogin@gmail.com>, 2015
 # webslavic <webslavic@yahoo.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014-2015
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
@@ -103,9 +106,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-12-03 21:15+0000\n"
-"PO-Revision-Date: 2015-12-09 23:06+0000\n"
-"Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
+"POT-Creation-Date: 2015-12-14 21:31+0000\n"
+"PO-Revision-Date: 2015-12-22 12:25+0000\n"
+"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -169,6 +172,16 @@ msgstr "ОК"
 #: common/static/common/templates/discussion/thread-response-edit.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -190,6 +203,8 @@ msgstr "Отмена"
 #: cms/templates/js/signatory-editor.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: common/static/common/templates/discussion/forum-action-delete.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-delete.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Удалить"
 
@@ -208,6 +223,7 @@ msgstr "Загрузка"
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "Имя"
 
@@ -243,6 +259,9 @@ msgstr "Загрузить файл"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Save"
 msgstr "Сохранить"
 
@@ -253,6 +272,10 @@ msgstr "Сохранить"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/common/templates/image-modal.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-close.underscore
 msgid "Close"
 msgstr "Закрыть"
 
@@ -369,6 +392,11 @@ msgstr "Ваша оценка не удовлетворяет критериям
 #: common/static/common/templates/discussion/thread-response.underscore
 #: common/static/common/templates/discussion/thread.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Submit"
 msgstr "Отправить на рассмотрение"
 
@@ -654,6 +682,7 @@ msgstr "Блок программного кода"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
 msgstr "Код"
 
@@ -767,6 +796,8 @@ msgstr "Удалить таблицу"
 #: cms/templates/js/group-configuration-editor.underscore
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Описание"
 
@@ -816,6 +847,8 @@ msgstr "Редактировать HTML"
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/forum-action-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -908,6 +941,8 @@ msgstr "Виды форматирования"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
+#: test_root/staticfiles/common/templates/image-modal.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Fullscreen"
 msgstr "Во весь экран"
 
@@ -1225,6 +1260,10 @@ msgstr "Новое окно"
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "Next"
 msgstr "Следующее"
 
@@ -1585,6 +1624,10 @@ msgstr ""
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Заголовок"
 
@@ -1648,6 +1691,8 @@ msgstr "пространство по вертикали"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
+#: test_root/staticfiles/templates/search/course_search_item.underscore
+#: test_root/staticfiles/templates/search/dashboard_search_item.underscore
 msgid "View"
 msgstr "Просмотреть"
 
@@ -1917,6 +1962,10 @@ msgid "Do not show again"
 msgstr "Не показывать снова"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn on closed captioning"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcript"
 msgstr "Отключить транскрипт"
 
@@ -1944,8 +1993,16 @@ msgstr ""
 "предыдущему пункту."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Caption will be displayed when "
-msgstr "Субтитры будут отображаться, когда"
+msgid "<li>Transcript will be displayed when "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Hide closed captions"
+msgstr "Спрятать субтитры"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "(Caption will be displayed when you start playing the video.)"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
@@ -2014,6 +2071,8 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "..."
 
@@ -2139,6 +2198,8 @@ msgstr "Текущая беседа"
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
+#: test_root/staticfiles/templates/search/course_search_results.underscore
+#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "Результаты поиска"
 
@@ -2231,6 +2292,10 @@ msgstr "Ваше сообщение будет удалено."
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "аноним"
 
@@ -2415,6 +2480,10 @@ msgstr "Дата публикации"
 #: common/static/common/templates/discussion/forum-actions.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-actions.underscore
+#: test_root/staticfiles/templates/discovery/facet.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-actions.underscore
 msgid "More"
 msgstr "Ещё"
 
@@ -2433,6 +2502,9 @@ msgstr "Общий доступ"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
+#: test_root/staticfiles/common/templates/components/search-field.underscore
+#: test_root/staticfiles/support/templates/certificates.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/search-field.underscore
 msgid "Search"
 msgstr "Поиск"
 
@@ -2486,6 +2558,7 @@ msgstr "Ответить"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Tags:"
 msgstr "Теги:"
 
@@ -2549,6 +2622,7 @@ msgstr "вакантные места"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
+#: test_root/staticfiles/templates/edxnotes/tab-item.underscore
 msgid "name"
 msgstr "имя"
 
@@ -2596,6 +2670,7 @@ msgstr "Язык"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid ""
 "The language that team members primarily use to communicate with each other."
 msgstr "Язык, на котором члены команды в основном общаются между собой."
@@ -2607,6 +2682,7 @@ msgstr "Страна"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "The country that team members primarily identify with."
 msgstr "Страна, с которой участники команды в основном отождествляют себя."
 
@@ -2673,6 +2749,7 @@ msgstr ""
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
+#: test_root/staticfiles/teams/templates/edit-team-member.underscore
 msgid "Remove"
 msgstr "Удалить"
 
@@ -2733,6 +2810,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Confirm"
 msgstr "Подтвердить"
 
@@ -2824,6 +2902,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
+#: test_root/staticfiles/teams/templates/team-profile-header-actions.underscore
 msgid "Edit Team"
 msgstr "Внести изменения в команду"
 
@@ -2945,6 +3024,8 @@ msgstr "Ошибка при создании личных данных студ�
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/templates/search/search_loading.underscore
 #: lms/templates/student_account/account_settings.underscore
+#: test_root/staticfiles/templates/search/search_loading.underscore
+#: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid "Loading"
 msgstr "Загрузка"
 
@@ -3351,7 +3432,7 @@ msgid ""
 "Make sure that entrance exam has problems in it and student identifier is "
 "correct."
 msgstr ""
-"Ошибка запуска задачи по пересчету вступительного испытания для студента "
+"Ошибка запуска задачи по перепроверке вступительного испытания для студента "
 "\"{student_id}\". Убедитесь, что вступительное испытание содержит задания и "
 "идентификатор студента верен."
 
@@ -3741,6 +3822,7 @@ msgstr "Все блоки"
 
 #: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr "Щёлкните, чтобы изменить"
 
@@ -3773,8 +3855,8 @@ msgid "Student username/email field is required and can not be empty. "
 msgstr "Имя пользователя/адрес электронной почты не могут быть пустыми."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Errors!"
-msgstr "Ошибки!"
+msgid "Uploaded file issues. Click on \"+\" to view."
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
@@ -3785,36 +3867,36 @@ msgid " learner is successfully added to the exception list"
 msgstr "учащийся успешно добавлен в список исключений"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format"
-msgstr "формат записей не поддерживается"
+msgid " records are not in correct format and not added to"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format"
-msgstr "формат записи не поддерживается"
+msgid " record is not in correct format and not added to the exception"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS"
-msgstr "учащиеся не найдены"
+msgid " learners do not exist in LMS and not added to the"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner does not exist in LMS"
-msgstr "учащийся не найден"
+msgid " learner does not exist in LMS and not added to the exception list"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed"
-msgstr "учащиеся уже в белом листе"
+msgid " learners are already white listed and not added to"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed"
-msgstr "учащийся уже в белом листе"
+msgid " learner is already white listed and not added to the exception "
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are not enrolled in course"
-msgstr "учащиеся не зачислены на курс"
+msgid " learners are not enrolled in course and not added to"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course"
-msgstr "учащийся не зачислен на курс"
+msgid " learner is not enrolled in course and not added to the exception"
+msgstr ""
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3823,6 +3905,8 @@ msgstr "Произошла ошибка при обработке обзора"
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/templates/discovery/facet.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Less"
 msgstr "Скрыть"
 
@@ -3854,6 +3938,7 @@ msgstr "Не удалось найти результатов для \"%s\"."
 
 #: lms/static/js/discovery/views/search_form.js
 #: lms/templates/search/search_error.underscore
+#: test_root/staticfiles/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "Произошла ошибка.  Попробуйте повторить поиск."
 
@@ -3918,6 +4003,16 @@ msgstr ""
 msgid "[no tags]"
 msgstr "[нет тегов]"
 
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Choose one"
+msgstr ""
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An error has occurred. Check your Internet connection and try again."
+msgstr ""
+"Произошла ошибка. Проверьте ваше интернет соединение и попробуйте ещё раз."
+
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
@@ -3928,6 +4023,7 @@ msgstr "Возникла ошибка.  Перезагрузите свой бр
 
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Selected tab"
 msgstr "Выбранная вкладка"
 
@@ -4009,6 +4105,7 @@ msgstr "У вас пока нет групп"
 
 #: lms/static/js/groups/views/cohorts.js
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Add Cohort"
 msgstr "Добавить группу"
 
@@ -4180,11 +4277,6 @@ msgid "Loading your courses"
 msgstr "Идёт загрузка Ваших курсов"
 
 #: lms/static/js/student_account/views/LoginView.js
-msgid "An error has occurred. Check your Internet connection and try again."
-msgstr ""
-"Произошла ошибка. Проверьте ваше интернет соединение и попробуйте ещё раз."
-
-#: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
@@ -4230,6 +4322,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
+#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "Password"
 msgstr "Пароль"
 
@@ -4239,6 +4332,7 @@ msgstr "Сбросить пароль"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
+#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "Изменить пароль"
 
@@ -4663,7 +4757,7 @@ msgstr "Удаление"
 msgid "OpenAssessment Save Error"
 msgstr "Ошибка сохранения OpenAssessment"
 
-#: cms/static/js/base.js cms/templates/js/checklist.underscore
+#: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
 msgstr "Эта ссылка откроется в новом окне или вкладке браузера"
 
@@ -4857,6 +4951,8 @@ msgstr ""
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
 msgid "Staff"
 msgstr "Сотрудник"
 
@@ -5016,12 +5112,19 @@ msgstr ""
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
+#: test_root/staticfiles/templates/student_account/hinted_login.underscore
+#: test_root/staticfiles/templates/student_account/institution_login.underscore
+#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "or"
 msgstr "или"
 
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
 msgstr "Компонент имеет подтвержденный результат"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Your video uploads are not complete."
+msgstr ""
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
@@ -5048,6 +5151,8 @@ msgstr "Дата добавления"
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Type"
 msgstr "Тип"
 
@@ -5076,6 +5181,7 @@ msgstr "Превышен максимальный размер файла"
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Choose File"
 msgstr "Выберите файл"
 
@@ -5740,6 +5846,7 @@ msgstr "Редактор"
 
 #: cms/static/js/views/xblock_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Settings"
 msgstr "Настройки"
 
@@ -5757,99 +5864,156 @@ msgstr "Предупреждение"
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Действия"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+msgid "Unscheduled"
+msgstr ""
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "Previous"
 msgstr "Предыдущее"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "Статус"
 
 #: common/static/common/templates/image-modal.underscore
+#: test_root/staticfiles/common/templates/image-modal.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Large"
 msgstr "Большой"
 
 #: common/static/common/templates/image-modal.underscore
+#: test_root/staticfiles/common/templates/image-modal.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Zoom In"
 msgstr "Приблизить"
 
 #: common/static/common/templates/image-modal.underscore
+#: test_root/staticfiles/common/templates/image-modal.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Zoom Out"
 msgstr "Отдалить"
 
 #: common/static/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
 msgid "Page number"
 msgstr "Номер страницы"
 
 #: common/static/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
 msgstr "Введите номер страницы, к которой Вы хотите перейти."
 
 #: common/static/common/templates/components/paging-header.underscore
+#: test_root/staticfiles/common/templates/components/paging-header.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-header.underscore
 msgid "Sorted by"
 msgstr "Сортировать по"
 
 #: common/static/common/templates/components/search-field.underscore
+#: test_root/staticfiles/common/templates/components/search-field.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/search-field.underscore
 msgid "Clear search"
 msgstr "Очистить поиск"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "DISCUSSION HOME:"
 msgstr "ОБСУЖДЕНИЯ: ГЛАВНАЯ СТРАНИЦА"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "Как пользоваться обсуждениями %(platform_name)s"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Find discussions"
 msgstr "Находите обсуждения"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Focus in on specific topics"
 msgstr "Выбирайте конкретные темы"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Search for specific posts"
 msgstr "Поиск по сообщениям"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Sort by date, vote, or comments"
 msgstr "Сортируйте по дате, количеству голосов или комментариев"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Engage with posts"
 msgstr "Оценивайте сообщения"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Upvote posts and good responses"
 msgstr "Голосуйте за сообщения и за хорошие ответы"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Report Forum Misuse"
 msgstr "Сообщайте о некорректном поведении"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Follow posts for updates"
 msgstr "Отслеживайте обновления в сообщениях"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Receive updates"
 msgstr "Получайте уведомления"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Toggle Notifications Setting"
 msgstr "Изменить Настройки Уведомлений"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid ""
 "Check this box to receive an email digest once a day notifying you about "
 "new, unread activity from posts you are following."
@@ -5858,66 +6022,98 @@ msgstr ""
 "комментариев и ответов на сообщения, которые Вы отслеживаете."
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
 msgid "Mark as Answer"
 msgstr "Отметить как ответ"
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
 msgid "Unmark as Answer"
 msgstr "Снять пометку ответа"
 
 #: common/static/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-close.underscore
 msgid "Open"
 msgstr "Открыть"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Endorse"
 msgstr "Подтвердить"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Unendorse"
 msgstr "Снять подтверждение"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
 msgid "Follow"
 msgstr "Отслеживать"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
 msgid "Unfollow"
 msgstr "Не отслеживать"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
 msgid "Pin"
 msgstr "Закрепить"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
 msgid "Unpin"
 msgstr "Открепить"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report abuse"
 msgstr "Сообщить о нарушении правил"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report"
 msgstr "Пожаловаться"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Unreport"
 msgstr "Отозвать жалобу"
 
 #: common/static/common/templates/discussion/forum-action-vote.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-vote.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-vote.underscore
 msgid "Vote for this post,"
 msgstr "Голосовать за это сообщениие"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Visible To:"
 msgstr "Видно:"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "All Groups"
 msgstr "Все группы"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
 "students or specify a single cohort."
@@ -5927,57 +6123,85 @@ msgstr ""
 "группы."
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Title:"
 msgstr "Заголовок:"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Add a clear and descriptive title to encourage participation."
 msgstr ""
 "Добавьте чётко сформулированный, содержательный заголовок, чтобы побудить "
 "других к участию."
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Enter your question or comment"
 msgstr "Введите свой вопрос или комментарий"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
 msgstr "отслеживать это сообщение"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "post anonymously"
 msgstr "оставить сообщение анонимно"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "post anonymously to classmates"
 msgstr "Оставить анонимное сообщение для одноклассников"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Add Post"
 msgstr "Добавить публикацию"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
 msgid "Community TA"
 msgstr "Староста сообщества"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "This thread is closed."
 msgstr "Эта тема закрыта."
 
 #: common/static/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
 msgid "View discussion"
 msgstr "Просмотреть тему"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
 msgid "Editing comment"
 msgstr "Редактирование комментария"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
 msgid "Update comment"
 msgstr "Обновить комментарий"
 
 #: common/static/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-show.underscore
 #, python-format
 msgid "posted %(time_ago)s by %(author)s"
 msgstr "опубликовано %(time_ago)s пользователем %(author)s"
@@ -5985,56 +6209,90 @@ msgstr "опубликовано %(time_ago)s пользователем %(autho
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Reported"
 msgstr "Повторно опубликовано"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Editing post"
 msgstr "Редактирование сообщения"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Edit post title"
 msgstr "Редактировать заголовок сообщения"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Update post"
 msgstr "Обновить сообщение"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "discussion"
 msgstr "обсуждение"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "answered question"
 msgstr "отвеченный вопрос"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "unanswered question"
 msgstr "вопрос без ответа"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Pinned"
 msgstr "Закреплено"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "Отслеживаемые"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "By: Staff"
 msgstr "   От: Администрация"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "By: Community TA"
 msgstr "От: Технический ассистент сообщества"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
 msgstr "fmt"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 #, python-format
 msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
@@ -6044,39 +6302,55 @@ msgstr ""
 "непрочитанных комментариев)%(span_close)s"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 #, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr "%(comments_count)s %(span_sr_open)sкомментариев %(span_close)s"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Editing response"
 msgstr "Редактирование ответа"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Update response"
 msgstr "Обновить ответ"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
 msgstr "отмечено как ответ %(time_ago)s пользователем %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
 msgstr "отмечено как ответ %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s by %(user)s"
 msgstr "подтверждено %(time_ago)s пользователем %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s"
 msgstr "подтверждено %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
@@ -6086,49 +6360,71 @@ msgstr[2] "Показать комментарии (%(num_comments)s)"
 msgstr[3] "Показать комментарии (%(num_comments)s)"
 
 #: common/static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
 msgid "fmts"
 msgstr "fmts"
 
 #: common/static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
 msgid "Add a comment"
 msgstr "Добавить комментарий"
 
 #: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
 msgstr "%(post_type)s опубликовано %(time_ago)s пользователем %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
 msgstr "Закрыт"
 
 #: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
 msgstr "Связано с: %(courseware_title_linked)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "This post is visible only to %(group_name)s."
 msgstr "Данный пост виден только %(group_name)s."
 
 #: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "This post is visible to everyone."
 msgstr "Данное сообщение видно всем."
 
 #: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Post type:"
 msgstr "Тип публикации:"
 
 #: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Question"
 msgstr "Вопрос"
 
 #: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Discussion"
 msgstr "Обсуждение"
 
 #: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations."
@@ -6137,93 +6433,125 @@ msgstr ""
 "делиться идеями и участвовать в дискуссиях."
 
 #: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
 msgstr "Ответить"
 
 #: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Post a response:"
 msgstr "Написать ответ:"
 
 #: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
 msgstr "Развернуть обсуждение"
 
 #: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Collapse discussion"
 msgstr "Свернуть обсуждение"
 
 #: common/static/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Topic Area:"
 msgstr "Тема:"
 
 #: common/static/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Discussion topics; current selection is: "
 msgstr "Темы обсуждения; текущий выбор:"
 
 #: common/static/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Filter topics"
 msgstr "Выборка тем"
 
 #: common/static/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
 msgstr ""
 "Поместите Ваше сообщение в подходящую тему, чтобы упростить другим "
 "пользователям его поиск."
 
 #: common/static/common/templates/discussion/user-profile.underscore
+#: test_root/staticfiles/common/templates/discussion/user-profile.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/user-profile.underscore
 msgid "Active Threads"
 msgstr "Активные темы"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
+#: test_root/staticfiles/support/templates/certificates.underscore
 msgid "username or email"
 msgstr "имя пользователя или электронный адрес"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr "Результаты отсутствуют"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Course Key"
 msgstr "Идентификатор курса"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Download URL"
 msgstr "Ссылка для скачивания"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Grade"
 msgstr "Оценка"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Last Updated"
 msgstr "Последнее обновление"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Download the user's certificate"
 msgstr "Скачать сертификат пользователя"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Not available"
 msgstr "Недоступно"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Regenerate"
 msgstr "Создать повторно"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Regenerate the user's certificate"
 msgstr "Повторно создать сертификат для данного пользователя"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
 msgstr "Не удалось создать Вашу команду."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Your team could not be updated."
 msgstr "Не удалось сохранить изменения в описании Вашей команды."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid ""
 "Enter information to describe your team. You cannot change these details "
 "after you create the team."
@@ -6232,10 +6560,12 @@ msgstr ""
 "описание после создания команды."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Optional Characteristics"
 msgstr "Дополнительные атрибуты"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid ""
 "Help other learners decide whether to join your team by specifying some "
 "characteristics for your team. Choose carefully, because fewer people might "
@@ -6246,123 +6576,174 @@ msgstr ""
 "ограничений, тем меньше людей захочет присоединиться к вашей команде."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Create team."
 msgstr "Создать команду."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Update team."
 msgstr "Обновить описание команды"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Cancel team creating."
 msgstr "Отменить создание команды."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Cancel team updating."
 msgstr "Отменить обновление команды"
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+#: test_root/staticfiles/teams/templates/instructor-tools.underscore
 msgid "Instructor tools"
 msgstr "Инструменты преподавателя"
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+#: test_root/staticfiles/teams/templates/instructor-tools.underscore
 msgid "Delete Team"
 msgstr "Удалить команду"
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
+#: test_root/staticfiles/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "Редактировать состав"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
+#: test_root/staticfiles/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr "Не можете найти себе команду?"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
+#: test_root/staticfiles/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
 msgstr "Присоединиться к команде"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "New Post"
 msgstr "Новая тема"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "О команде"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "You are a member of this team."
 msgstr "Вы член этой команды."
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team member profiles"
 msgstr "Профили членов команды"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team capacity"
 msgstr "Размер команды"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "country"
 msgstr "страна"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "language"
 msgstr "язык"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Leave Team"
 msgstr "Покинуть команду"
 
 #: lms/static/js/fixtures/donation.underscore
 #: lms/templates/dashboard/donation.underscore
+#: test_root/staticfiles/js/fixtures/donation.underscore
+#: test_root/staticfiles/templates/dashboard/donation.underscore
 msgid "Donate"
 msgstr "Пожертвовать"
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "Развернуть все"
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Collapse All"
 msgstr "Свернуть все"
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr "Блок"
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Дата начала"
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Due Date"
 msgstr "Срок сдачи"
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove all"
 msgstr "удалить всё"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "toggle chapter"
-msgstr "Развернуть/скрыть раздел"
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+msgid "gettext("
+msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "Раздел"
 
 #: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+msgid "N/A"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove chapter %(chapterDisplayName)s"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "удалить"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "toggle subsection"
-msgstr "Развернуть/скрыть подраздел"
-
-#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Subsection"
 msgstr "Подраздел"
 
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove subsection %(subsectionDisplayName)s"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "Remove unit %(unitName)s"
+msgstr ""
+
 #: lms/templates/commerce/provider.underscore
+#: test_root/staticfiles/templates/commerce/provider.underscore
 #, python-format
 msgid ""
 "You still need to visit the %(display_name)s website to complete the credit "
@@ -6370,6 +6751,7 @@ msgid ""
 msgstr "Вам нужно посетить %(display_name)s веб-сайт для завершения покупки."
 
 #: lms/templates/commerce/provider.underscore
+#: test_root/staticfiles/templates/commerce/provider.underscore
 #, python-format
 msgid ""
 "To finalize course credit, %(display_name)s requires %(platform_name)s "
@@ -6379,11 +6761,13 @@ msgstr ""
 "учащийся должен подать запрос."
 
 #: lms/templates/commerce/provider.underscore
+#: test_root/staticfiles/templates/commerce/provider.underscore
 #, python-format
 msgid "<img src='%s' alt='%s'></image>"
 msgstr "<img src='%s' alt='%s'></image>"
 
 #: lms/templates/commerce/provider.underscore
+#: test_root/staticfiles/templates/commerce/provider.underscore
 #, python-format
 msgid ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
@@ -6393,16 +6777,20 @@ msgstr ""
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
 
 #: lms/templates/commerce/provider.underscore
+#: test_root/staticfiles/templates/commerce/provider.underscore
 msgid "Get Credit"
 msgstr "Получить зачёт"
 
 #: lms/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
 #, python-format
 msgid "Thank you! We have received your payment for %(course_name)s."
 msgstr "Спасибо! Ваш платёж по курсу «%(course_name)s» успешно получен."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "Please print this page for your records; it serves as your receipt. You will"
 " also receive an email with the same information."
@@ -6412,50 +6800,73 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Order No."
 msgstr "Заказ №"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "Дата"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Amount"
 msgstr "Сумма"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Итого"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Please Note"
 msgstr "Обратите внимание!"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Crossed out items have been refunded."
 msgstr "Платежи за вычеркнутые пункты возвращены."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Billed to"
 msgstr "Счет на имя"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "No receipt available"
 msgstr "Нет квитанции об оплате"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Go to Dashboard"
 msgstr "Перейти к панели управления"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid ""
 "If you don't verify your identity now, you can still explore your course "
@@ -6468,171 +6879,268 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
 msgstr "Хотите подтвердить данные позже?"
 
 #: lms/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
 msgid "Verify Now"
 msgstr "Подтвердить"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
+#: test_root/staticfiles/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "Отметить экзамен, как завершённый"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid "timed"
 msgstr "приурочен"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
 msgstr "Завершить сдачу экзамена"
 
 #: lms/templates/discovery/course_card.underscore
+#: test_root/staticfiles/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "ПОДРОБНЕЕ"
 
 #: lms/templates/discovery/course_card.underscore
+#: test_root/staticfiles/templates/discovery/course_card.underscore
 #, python-format
 msgid "Starts: %(start_date)s"
 msgstr "Начало: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
+#: test_root/staticfiles/templates/discovery/course_card.underscore
 msgid "Starts"
 msgstr "Начало"
 
 #: lms/templates/discovery/filter_bar.underscore
+#: test_root/staticfiles/templates/discovery/filter_bar.underscore
 msgid "Clear All"
 msgstr "Сбросить всё"
 
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
 msgstr "Выделенный текст"
 
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Note"
 msgstr "Запись"
 
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "You commented..."
 msgstr "Вы прокомментировали..."
 
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Noted in:"
 msgstr "Запись сделана в:"
 
 #: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
 msgstr "Последняя модификация"
 
 #: lms/templates/edxnotes/tab-item.underscore
+#: test_root/staticfiles/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
 msgstr "Очистить результаты поиска"
 
 #: lms/templates/fields/field_dropdown.underscore
 #: lms/templates/fields/field_textarea.underscore
+#: test_root/staticfiles/templates/fields/field_dropdown.underscore
+#: test_root/staticfiles/templates/fields/field_textarea.underscore
 msgid "Click to edit"
 msgstr "Нажмите, чтобы редактировать"
 
 #: lms/templates/fields/field_text.underscore
+#: test_root/staticfiles/templates/fields/field_text.underscore
 msgid "title"
 msgstr "заголовок"
 
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Financial Assistance Application"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Unable to submit application"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid "About You"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid ""
+"The following information is already a part of your {platform} profile. "
+"We\\'ve included it here for your application."
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Email address"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Legal name"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Country of residence"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Back to {platform} FAQs"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Submit Application"
+msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid ""
+"Thank you for submitting your financial assistance application for "
+"{course_name}! You can expect a response in 2-4 business days."
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
 msgstr "Массовые исключения"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid ""
-"You can upload a CSV file of usernames or email addresses to be added to the"
-" certificate exceptions white list."
+"Upload a comma separated values (.csv) file that contains the usernames or "
+"email addresses of learners who have been given exceptions. Include the "
+"username or email address in the first comma separated field. You can "
+"include an optional note describing the reason for the exception in the "
+"second comma separated field."
 msgstr ""
-"Вы можете загрузить CSV-файл с именами пользователей или адресами "
-"электронной почты для добавления учащихся в список исключений. Этим "
-"пользователям будут выданы сертификаты."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Открыть в браузере"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Upload CSV"
-msgstr "Загрузить файл в формате CSV"
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Add to Exception List"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
 msgstr "Индивидуальные исключения"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
-"You can add a username or email address to be added to the certificate "
-"exceptions white list."
+"Enter the username or email address of each learner that you want to add as "
+"an exception."
 msgstr ""
-"Вы можете добавить имя пользователя или его электронную почту в список  "
-"исключений. Этим пользователям будут выданы сертификаты."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all "
-msgstr "Создать сертификаты для всех"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "New"
-msgstr "Новый"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "additions to the Exception list"
-msgstr "добавленных в список исключений"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
-msgstr "Создать сертификаты для всех пользователей в списке исключений"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
 msgstr "Создать сертификаты для исключительных случаев"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User ID"
-msgstr "Идентификатор пользователя"
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all "
+msgstr "Создать сертификаты для всех"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "New"
+msgstr "Новый"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "additions to the Exception list"
+msgstr "добавленных в список исключений"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Generate a Certificate for all users on the Exception list"
+msgstr "Создать сертификаты для всех пользователей в списке исключений"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
 msgstr "Адрес электронной почты пользователя"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Date Exception Granted"
-msgstr "Дата добавления исключения"
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Exception Granted"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Certificate Generated"
+msgstr "Cоздано сертификатов"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
 msgstr "Примечания"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Action"
 msgstr "Действие"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Remove from List"
 msgstr "Исключить из списка"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Specify whether discussion topics are divided by cohort"
 msgstr "Укажите, нужно ли обсуждать темы по отдельным группам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 msgid "Course-Wide Discussion Topics"
 msgstr "Общие темы для обсуждения в рамках курса"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 msgid ""
 "Select the course-wide discussion topics that you want to divide by cohort."
 msgstr "Выберите темы курса, которые нужно обсуждать по отдельным группам."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Content-Specific Discussion Topics"
 msgstr "Темы для обсуждения, связанные с конкретными материалами курса"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid ""
 "Specify whether content-specific discussion topics are divided by cohort."
 msgstr ""
@@ -6640,34 +7148,41 @@ msgstr ""
 " по отдельным группам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Always cohort content-specific discussion topics"
 msgstr ""
 "Всегда обсуждать темы, связанные с конкретными материалами курса, по "
 "отдельным группам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Cohort selected content-specific discussion topics"
 msgstr ""
 "Обсуждать темы, связанные с конкретными материалами курса, по отдельным "
 "группам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "No content-specific discussion topics exist."
 msgstr "В курсе нет тем для обсуждения, связанных с конкретными материалами."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
 msgid "Cohorted"
 msgstr "распределено по группам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Students"
 msgstr "Управление студентами"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add students to this cohort"
 msgstr "Добавить студентов в группу"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Note: Students can be in only one cohort. Adding students to this group "
 "overrides any previous group assignment."
@@ -6676,6 +7191,7 @@ msgstr ""
 "его в эту группу, он будет исключен из любой другой."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Enter email addresses and/or usernames, separated by new lines or commas, "
 "for the students you want to add. *"
@@ -6685,15 +7201,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "(Required Field)"
 msgstr "(поле, обязательное для заполнения)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
 msgstr ""
 "например mariaivanova@example.com, MariaIvanova, mashaivanova@example.com"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "You will not receive notification for emails that bounce, so double-check "
 "your spelling."
@@ -6702,34 +7222,42 @@ msgstr ""
 "проверьте адрес."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add Students"
 msgstr "Добавить студентов"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Add a New Cohort"
 msgstr "Добавить группу"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Enter the name of the cohort"
 msgstr "Введите название группы"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Name"
 msgstr "Название группы"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Assignment Method"
 msgstr "Способ распределения по группам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Automatic"
 msgstr "Автоматически"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Manual"
 msgstr "Вручную"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
 "There must be one cohort to which students can automatically be assigned."
 msgstr ""
@@ -6737,30 +7265,37 @@ msgstr ""
 "добавляться студенты."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Associated Content Group"
 msgstr "Соответствующие группы по изучаемому материалу"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "No Content Group"
 msgstr "Нет группы по изучаемым материалам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Select a Content Group"
 msgstr "Выбрать группу по изучаемым материалам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Choose a content group to associate"
 msgstr "Выбрать соответствующую группу по изучаемым материалам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Not selected"
 msgstr "Не выбрано"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
 msgstr "Удалённая группа по изучаемым материалам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #, python-format
 msgid ""
 "%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
@@ -6770,6 +7305,7 @@ msgstr ""
 "по изучаемому материалу удалена. Выберите другую группу."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #, python-format
 msgid ""
 "%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
@@ -6779,10 +7315,12 @@ msgstr ""
 " материалу."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
 msgstr "Создать группу по изучаемым материалам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 #, python-format
 msgid "(contains %(student_count)s student)"
 msgid_plural "(contains %(student_count)s students)"
@@ -6792,6 +7330,7 @@ msgstr[2] "(%(student_count)s студентов)"
 msgstr[3] "(%(student_count)s студентов)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
 "Students are added to this cohort only when you provide their email "
 "addresses or usernames on this page."
@@ -6800,39 +7339,48 @@ msgstr ""
 "почты или имена пользователей на этой странице."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid "What does this mean?"
 msgstr "Что это значит?"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid "Students are added to this cohort automatically."
 msgstr "Студенты добавляются в эту группу автоматически."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 msgid "Select a cohort"
 msgstr "Выбрать группу"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 #, python-format
 msgid "%(cohort_name)s (%(user_count)s)"
 msgstr "%(cohort_name)s (%(user_count)s)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Enable Cohorts"
 msgstr "Включить группы"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Select a cohort to manage"
 msgstr "Выберите группу для управления"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "View Cohort"
 msgstr "Посмотреть группу"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Assign students to cohorts by uploading a CSV file"
 msgstr "Распределить студентов по группам, загрузив файл CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 #, python-format
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
@@ -6844,15 +7392,19 @@ msgstr ""
 "лист на %(link_start)sстранице загрузки данных%(link_end)s."
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
 msgstr "Использовано"
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Valid"
 msgstr "Данные действительны"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
+#: test_root/staticfiles/templates/search/course_search_results.underscore
+#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 #, python-format
 msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
@@ -6863,26 +7415,33 @@ msgstr[3] "Загрузить следующие %(num_items)s результа�
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
+#: test_root/staticfiles/templates/search/course_search_results.underscore
+#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 msgid "Sorry, no results were found."
 msgstr "Ничего не найдено."
 
 #: lms/templates/search/dashboard_search_results.underscore
+#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 msgid "Back to Dashboard"
 msgstr "Вернуться к панели управления"
 
 #: lms/templates/student_account/account.underscore
+#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "New Address"
 msgstr "Новый адрес"
 
 #: lms/templates/student_account/account.underscore
+#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "Change My Email Address"
 msgstr "Изменить адрес электронной почты"
 
 #: lms/templates/student_account/account_settings.underscore
+#: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Настройки учётной записи"
 
 #: lms/templates/student_account/account_settings.underscore
+#: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid ""
 "These settings include basic information about your account. You can also "
 "specify additional information and see your linked social accounts on this "
@@ -6893,61 +7452,78 @@ msgstr ""
 "учётных записей в социальных сетях."
 
 #: lms/templates/student_account/account_settings.underscore
+#: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid "section.title"
 msgstr "section.title"
 
 #: lms/templates/student_account/account_settings.underscore
 #: lms/templates/student_profile/learner_profile.underscore
+#: test_root/staticfiles/templates/student_account/account_settings.underscore
+#: test_root/staticfiles/templates/student_profile/learner_profile.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Произошла ошибка. Перезагрузите страницу."
 
 #: lms/templates/student_account/form_field.underscore
+#: test_root/staticfiles/templates/student_account/form_field.underscore
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/hinted_login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Sign in"
 msgstr "Вход"
 
 #: lms/templates/student_account/hinted_login.underscore
+#: test_root/staticfiles/templates/student_account/hinted_login.underscore
 #, python-format
 msgid "Would you like to sign in using your %(providerName)s credentials?"
 msgstr "Войти с помощью логина и пароля %(providerName)s?"
 
 #: lms/templates/student_account/hinted_login.underscore
+#: test_root/staticfiles/templates/student_account/hinted_login.underscore
 #, python-format
 msgid "Sign in using %(providerName)s"
 msgstr "Войти через %(providerName)s"
 
 #: lms/templates/student_account/hinted_login.underscore
+#: test_root/staticfiles/templates/student_account/hinted_login.underscore
 msgid "Show me other ways to sign in or register"
 msgstr "Как ещё можно войти в систему или зарегистрироваться?"
 
 #: lms/templates/student_account/institution_login.underscore
+#: test_root/staticfiles/templates/student_account/institution_login.underscore
 msgid "Sign in with Institution/Campus Credentials"
 msgstr "Войти, используя логин и пароль студента или преподавателя"
 
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
+#: test_root/staticfiles/templates/student_account/institution_login.underscore
+#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "Choose your institution from the list below:"
 msgstr "Выберите Ваше учебное заведение."
 
 #: lms/templates/student_account/institution_login.underscore
+#: test_root/staticfiles/templates/student_account/institution_login.underscore
 msgid "Back to sign in"
 msgstr "Вернуться на страницу входа в систему"
 
 #: lms/templates/student_account/institution_register.underscore
+#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "Register with Institution/Campus Credentials"
 msgstr ""
 "Зарегистрироваться, используя логин и пароль студента или преподавателя"
 
 #: lms/templates/student_account/institution_register.underscore
+#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "Register through edX"
 msgstr "Зарегистрироваться через edX"
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
@@ -6959,25 +7535,30 @@ msgstr ""
 "%(platformName)s."
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "Инструкции по сбросу пароля отправлены"
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid ""
 "We've sent instructions for resetting your password to the email address you"
 " provided."
 msgstr "Мы отправили инструкции по изменению пароля на ваш электронный адрес."
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
 msgstr "Не удалось войти в систему."
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid "An error occurred when signing you in to %(platformName)s."
 msgstr "Произошла ошибка при входе в  %(platformName)s."
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -6986,46 +7567,58 @@ msgstr ""
 "используйте один из следующих аккаунтов."
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
 msgstr "Чтобы войти в систему, введите адрес электронной почты и пароль."
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "If you do not yet have an account, use the button below to register."
 msgstr "Ещё не зарегистрированы? Нажмите кнопку ниже."
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "или с помощью"
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
 msgstr "Войти через %(providerName)s"
 
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Use my institution/campus credentials"
 msgstr "Использовать логин и пароль студента или преподавателя"
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid "New to %(platformName)s?"
 msgstr "Впервые в %(platformName)s?"
 
 #: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Create an account"
 msgstr "Создать учётную запись"
 
 #: lms/templates/student_account/password_reset.underscore
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/password_reset.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "An error occurred."
 msgstr "Произошла ошибка"
 
 #: lms/templates/student_account/password_reset.underscore
+#: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid "Password assistance"
 msgstr "Помощь с паролем"
 
 #: lms/templates/student_account/password_reset.underscore
+#: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid ""
 "Please enter your email address below and we will send you instructions for "
 "setting a new password."
@@ -7034,19 +7627,23 @@ msgstr ""
 "установке нового пароля"
 
 #: lms/templates/student_account/password_reset.underscore
+#: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid "Reset my password"
 msgstr "Сбросить пароль"
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "We couldn't create your account."
 msgstr "Не удалось создать учётную запись."
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 #, python-format
 msgid "You've successfully signed into %(currentProvider)s."
 msgstr "Вы успешно вошли в %(currentProvider)s."
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 #, python-format
 msgid ""
 "We just need a little more information before you start learning with "
@@ -7054,77 +7651,95 @@ msgid ""
 msgstr "Перед началом учебы в %(platformName)s укажите некоторые данные."
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr "Создать учётную запись, используя"
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
 msgstr "Создать учётную запись в %(providerName)s."
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "или создать новую в этом сервисе"
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create a new account"
 msgstr "Создать новую учётную запись"
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create your account"
 msgstr "Создать учётную запись"
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Required field"
 msgstr "Обязательное поле"
 
 #: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Already have an account?"
 msgstr "Уже есть учётная запись?"
 
 #: lms/templates/student_profile/learner_profile.underscore
+#: test_root/staticfiles/templates/student_profile/learner_profile.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "Сейчас сокурсникам разрешен ограниченный доступ к Вашему профилю."
 
 #: lms/templates/student_profile/learner_profile.underscore
+#: test_root/staticfiles/templates/student_profile/learner_profile.underscore
 msgid "This edX learner is currently sharing a limited profile."
 msgstr "Пользователь ограничил доступ к своему профилю."
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Congratulations! You are now verified on %(platformName)s!"
 msgstr "Поздравляем! Ваши данные в %(platformName)s подтверждены."
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "You are now enrolled as a verified student for:"
 msgstr "Вы зачислены на следующие курсы:"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "A list of courses you have just enrolled in as a verified student"
 msgstr "Список курсов, на которые вы официально зачислены"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgstr "Курс"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Starts: %(start)s"
 msgstr "Начало: %(start)s"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
 msgstr "Просмотрите информацию о курсе"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Go to your Dashboard"
 msgstr "Перейти к панели управления"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Verified Status"
 msgstr "Подтверждённый статус"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid ""
 "Thank you for submitting your photos. We will review them shortly. You can "
@@ -7138,21 +7753,30 @@ msgstr ""
 "потребуется отправить фото повторно."
 
 #: lms/templates/verify_student/error.underscore
+#: test_root/staticfiles/templates/verify_student/error.underscore
 msgid "Error:"
 msgstr "Ошибка:"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "What You Need for Verification"
 msgstr "Что нужно для подтверждения личности"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Веб-камера"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid ""
 "You need a computer that has a webcam. When you receive a browser prompt, "
 "make sure that you allow access to the camera."
@@ -7161,10 +7785,12 @@ msgstr ""
 " убедитесь, что Вы разрешили ему доступ к камере."
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
 msgstr "Документ с фотографией"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid ""
 "You need a driver's license, passport, or other government-issued ID that "
 "has your name and photo."
@@ -7174,10 +7800,13 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Take Your Photo"
 msgstr "Сфотографируйте себя"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 #, python-format
 msgid ""
 "When your face is in position, use the camera button %(icon)s below to take "
@@ -7187,22 +7816,27 @@ msgstr ""
 "с изображением камеры %(icon)s, чтобы сделать снимок."
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
 msgstr "Чтобы сделать удачный снимок, удостоверьтесь, что:"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Your face is well-lit."
 msgstr "Ваше лицо хорошо освещено."
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Your entire face fits inside the frame."
 msgstr "Ваше лицо полностью помещается в рамку."
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "The photo of your face matches the photo on your ID."
 msgstr "Фото вашего лица соответствует фото в Вашем документе."
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 #, python-format
 msgid ""
 "To use the current photo, select the camera button %(icon)s. To take another"
@@ -7215,12 +7849,18 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Frequently Asked Questions"
 msgstr "Часто задаваемые вопросы"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "Why does %(platformName)s need my photo?"
 msgstr "Зачем %(platformName)s нужна моя фотография?"
@@ -7228,6 +7868,9 @@ msgstr "Зачем %(platformName)s нужна моя фотография?"
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "As part of the verification process, you take a photo of both your face and "
 "a government-issued photo ID. Our authorization service confirms your "
@@ -7241,6 +7884,9 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "What does %(platformName)s do with this photo?"
 msgstr "Для чего %(platformName)s нужен этот снимок?"
@@ -7248,6 +7894,9 @@ msgstr "Для чего %(platformName)s нужен этот снимок?"
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
@@ -7264,15 +7913,21 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "Далее: %(nextStepTitle)s"
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid "Take a Photo of Your ID"
 msgstr "Сделайте снимок документа, удостоверяющего вашу личность"
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid ""
 "Use your webcam to take a photo of your ID. We will match this photo with "
 "the photo of your face and the name on your account."
@@ -7282,6 +7937,7 @@ msgstr ""
 "записи."
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid ""
 "You need an ID with your name and photo. A driver's license, passport, or "
 "other government-issued IDs are all acceptable."
@@ -7292,18 +7948,23 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Tips on taking a successful photo"
 msgstr "Советы: как сделать удачный снимок"
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid "Ensure that you can see your photo and read your name"
 msgstr "Убедитесь в том, что Вы можете видеть Ваше фото и прочесть Ваше имя"
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid "Make sure your ID is well-lit"
 msgstr "Убедитесь, что Ваш документ хорошо освещён"
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 #, python-format
 msgid "Once in position, use the camera button %(icon)s to capture your ID"
 msgstr ""
@@ -7312,19 +7973,24 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Use the retake photo button if you are not pleased with your photo"
 msgstr "Используйте кнопку \"Повторный снимок\", если Вы недовольны фотографией"
 
 #: lms/templates/verify_student/image_input.underscore
+#: test_root/staticfiles/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
 msgstr "Посмотреть загруженную картинку"
 
 #: lms/templates/verify_student/image_input.underscore
+#: test_root/staticfiles/templates/verify_student/image_input.underscore
 msgid "Upload an image or capture one with your web or phone camera."
 msgstr ""
 "Загрузить картинку или сфотографировать с помощью веб камеры или смартфона."
 
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "Use your webcam to take a photo of your face. We will match this photo with "
 "the photo on your ID."
@@ -7333,14 +7999,17 @@ msgstr ""
 "снимок с фотографией в вашем удостоверении личности."
 
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Make sure your face is well-lit"
 msgstr "Убедитесь, что ваше лицо хорошо освещено"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Be sure your entire face is inside the frame"
 msgstr "Убедитесь, что всё Ваше лицо находится внутри рамки"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "Once in position, use the camera button %(icon)s to capture your photo"
 msgstr ""
@@ -7348,11 +8017,13 @@ msgstr ""
 "снимок"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
 "Можем ли мы сопоставить снимок, сделанный Вами, с фото в Вашем документе?"
 
 #: lms/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
 #, python-format
 msgid "Thanks for returning to verify your ID in: %(courseName)s"
 msgstr ""
@@ -7361,6 +8032,8 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You need to activate your account before you can enroll in courses. Check "
 "your inbox for an activation email. After you complete activation you can "
@@ -7373,20 +8046,30 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "Активируйте Свою Учётную Запись"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "Check Your Email"
 msgstr "Проверьте свою электронную почту"
 
 #: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "Удостоверение личности с фотографией"
 
 #: lms/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
 msgid ""
 "A driver's license, passport, or other government-issued ID with your name "
 "and photo"
@@ -7395,21 +8078,25 @@ msgstr ""
 "образца с Вашими именем и фотографией"
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 #, python-format
 msgid "You are enrolling in: %(courseName)s"
 msgstr "Вы записываетесь на курс: %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 #, python-format
 msgid "You are upgrading your enrollment for: %(courseName)s"
 msgstr "Вы меняете форму записи на курс: %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can now enter your payment information and complete your enrollment."
 msgstr "Теперь Вы можете ввести информацию о платеже и завершить регистрацию."
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 #, python-format
 msgid ""
 "You can pay now even if you don't have the following items available, but "
@@ -7421,6 +8108,7 @@ msgstr ""
 "сертификат."
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these to qualify to earn a Verified Certificate."
@@ -7429,10 +8117,12 @@ msgstr ""
 "будете их завершить, чтобы получить подтверждённый сертификат."
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
 msgstr "Удостоверение личности государственного образца с фотографией"
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "ID-Verification is not required for this Professional Education course."
 msgstr ""
@@ -7440,6 +8130,7 @@ msgstr ""
 "образования."
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "All professional education courses are fee-based, and require payment to "
 "complete the enrollment process."
@@ -7448,32 +8139,111 @@ msgstr ""
 "оплаты, чтобы завершить процесс регистрации."
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "You have already verified your ID!"
 msgstr "Вы уже подтвердили документ, удостоверяющий личность."
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 #, python-format
 msgid "Your verification status is good until %(verificationGoodUntil)s."
 msgstr "Ваш подтверждённый статус действует до %(verificationGoodUntil)s."
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "price"
 msgstr "цена"
 
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Account Not Activated"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "You are enrolling in %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Upgrade to a Verified Certificate for %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Before you upgrade to a certificate track, you must activate your account."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Check your email for an activation message."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Professional Certificate for %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid "Verified Certificate for %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+#, python-format
+msgid ""
+"To receive a certificate, you must also verify your identity before "
+"%(date)s."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "To receive a certificate, you must also verify your identity."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"To verify your identity, you need a webcam and a government-issued photo ID."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"Your ID must be a government-issued photo ID that clearly shows your face."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid ""
+"You will use your webcam to take a picture of your face and of your "
+"government-issued photo ID."
+msgstr ""
+
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Thank you! We have received your payment for %(courseName)s."
 msgstr "Благодарим Вас! Ваш платёж за курс %(courseName)s получен."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr "Далее: подтвердите подлинность данных"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Check your email"
 msgstr "Проверьте Свою Электронную Почту"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "You need to activate your account before you can enroll in courses. Check "
 "your inbox for an activation email."
@@ -7482,6 +8252,7 @@ msgstr ""
 "учётную запись.  Письмо для активации выслано вам на электронную почту."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "A driver's license, passport, or government-issued ID with your name and "
 "photo."
@@ -7490,10 +8261,12 @@ msgstr ""
 "государственного образца с Вашими именем и фотографией."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
+#: test_root/staticfiles/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "Данные отправлены на проверку"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
+#: test_root/staticfiles/templates/verify_student/reverify_success_step.underscore
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
@@ -7506,14 +8279,17 @@ msgstr ""
 "учебные материалы."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
+#: test_root/staticfiles/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
 msgstr "Вернуться в панель управления"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
 msgstr "Просмотреть фотографии"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid ""
 "Make sure we can verify your identity with the photos and information you "
 "have provided."
@@ -7522,33 +8298,40 @@ msgstr ""
 "информации, предоставленных Вами."
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Photo of %(fullName)s"
 msgstr "Фотография %(fullName)s"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Photo of %(fullName)s's ID"
 msgstr "Фотография документа, %(fullName)s"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Photo requirements:"
 msgstr "Требования к фотографии:"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "Видно ли на фотографии Ваше лицо целиком?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you match your ID photo?"
 msgstr ""
 "Сопоставима ли фотография с фотографией в Вашем удостоверении личности?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
 msgstr "Чётко ли отображается ваше имя в Вашем удостоверении личности?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Does the name on your ID match your account name: %(fullName)s?"
 msgstr ""
@@ -7556,10 +8339,12 @@ msgstr ""
 "учётной записи: %(fullName)s?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Edit Your Name"
 msgstr "Отредактируйте Своё Имя"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid ""
 "Make sure that the full name on your account matches the name on your ID."
 msgstr ""
@@ -7567,20 +8352,24 @@ msgstr ""
 "документе."
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Photos don't meet the requirements?"
 msgstr "Фото не соответствуют требованиям?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Retake Your Photos"
 msgstr "Сделать Снимки Повторно"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Before proceeding, please confirm that your details match"
 msgstr ""
 "Пожалуйста проверьте правильность введенной информации, перед тем как "
 "продолжить."
 
 #: lms/templates/verify_student/webcam_photo.underscore
+#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid ""
 "Don't see your picture? Make sure to allow your browser to use your camera "
 "when it asks for permission."
@@ -7589,16 +8378,73 @@ msgstr ""
 "использовать Вашу камеру, когда он запрашивает это."
 
 #: lms/templates/verify_student/webcam_photo.underscore
+#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid "Live view of webcam"
 msgstr "Видео с вебкамеры"
 
 #: lms/templates/verify_student/webcam_photo.underscore
+#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid "Retake Photo"
 msgstr "Повторный снимок"
 
 #: lms/templates/verify_student/webcam_photo.underscore
+#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid "Take Photo"
 msgstr "Сделать фото"
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+msgid "Add a New Allowance"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+msgid "Special Exam"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+msgid "Allowance Type"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+msgid "Value"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+msgid "Username or Email"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+msgid "Allowances"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+msgid "Add Allowance"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Exam Name"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+msgid "Allowance Value"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Time Limit"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Started At"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Completed At"
+msgstr ""
+
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Application not submitted"
+msgstr ""
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Drag and drop or click here to upload video files."
@@ -7689,6 +8535,7 @@ msgid "ID"
 msgstr "Идентификатор"
 
 #: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Details"
 msgstr "Реквизиты сертификата"
 
@@ -7775,18 +8622,6 @@ msgstr "Активировать"
 msgid "Deactivate"
 msgstr "Деактивировать"
 
-#: cms/templates/js/checklist.underscore
-msgid "{number}{pct_sign} of checklists completed"
-msgstr "{number}{pct_sign} опросников завершено"
-
-#: cms/templates/js/checklist.underscore
-msgid "%"
-msgstr "%"
-
-#: cms/templates/js/checklist.underscore
-msgid "Tasks Completed:"
-msgstr "Завершено заданий:"
-
 #: cms/templates/js/container-message.underscore
 msgid ""
 "Caution: The last published version of this unit is live. By publishing "
@@ -7847,11 +8682,11 @@ msgstr "Не оценивается"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
-msgstr "Пробный очный экзамен"
+msgstr "Пробное наблюдаемое испытание"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
-msgstr "Очный экзамен"
+msgstr "Наблюдаемое испытание"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
@@ -7889,11 +8724,6 @@ msgstr "Выпущено:"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Scheduled:"
 msgstr "Планируется выпустить:"
-
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-msgid "Unscheduled"
-msgstr "Дата выпуска не задана"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
@@ -8484,21 +9314,21 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Proctored"
-msgstr "Очный"
+msgstr "Наблюдаемое"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Proctored exams are timed, and software records video of each learner taking"
 " the exam. These videos are then reviewed by a third party."
 msgstr ""
-"Очные экзамены ограничены по времени, кроме того, с помощью "
+"Наблюдаемые испытания ограничены по времени, кроме того, с помощью "
 "специализированного программного обеспечения производится запись прохождения"
-" экзамена каждым слушателем. Затем видеозаписи просматриваются в стороннем "
+" испытания каждым слушателем. Затем видеозаписи просматриваются в стороннем "
 "сервисе."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
-msgstr "Пробный очный"
+msgstr "Пробное наблюдаемое"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -8506,9 +9336,9 @@ msgid ""
 "and processes. Results of the practice exam do not count towards the "
 "learner's grade."
 msgstr ""
-"Назначьте пробный очный экзамен для того, чтобы слушатели испытали "
-"инструменты и процесс прохождения очного экзамена. Результаты пробного "
-"экзамена не учитываются в итоговой оценке слушателей."
+"Назначьте пробное очное испытание для того, чтобы слушатели испытали "
+"инструменты и процесс прохождения наблюдаемого испытания. Результаты "
+"пробного испытания не учитываются в итоговой оценке слушателей."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Time Allotted (HH:MM):"

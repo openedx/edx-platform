@@ -9,7 +9,6 @@ import json
 import re
 
 import ddt
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 from pytz import UTC
 
@@ -19,11 +18,11 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class SupportViewTestCase(TestCase):
+class SupportViewTestCase(ModuleStoreTestCase):
     """
     Base class for support view tests.
     """
@@ -36,6 +35,7 @@ class SupportViewTestCase(TestCase):
         """Create a user and log in. """
         super(SupportViewTestCase, self).setUp()
         self.user = UserFactory(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+        self.course = CourseFactory.create()
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(success, msg="Could not log in")
 
@@ -129,16 +129,23 @@ class SupportViewCertificatesTests(SupportViewTestCase):
         super(SupportViewCertificatesTests, self).setUp()
         SupportStaffRole().add_users(self.user)
 
-    def test_certificates_no_query(self):
-        # Check that an empty initial query is passed to the JavaScript client correctly.
+    def test_certificates_no_filter(self):
+        # Check that an empty initial filter is passed to the JavaScript client correctly.
         response = self.client.get(reverse("support:certificates"))
-        self.assertContains(response, "userQuery: ''")
+        self.assertContains(response, "userFilter: ''")
 
-    def test_certificates_with_query(self):
-        # Check that an initial query is passed to the JavaScript client.
-        url = reverse("support:certificates") + "?query=student@example.com"
+    def test_certificates_with_user_filter(self):
+        # Check that an initial filter is passed to the JavaScript client.
+        url = reverse("support:certificates") + "?user=student@example.com"
         response = self.client.get(url)
-        self.assertContains(response, "userQuery: 'student@example.com'")
+        self.assertContains(response, "userFilter: 'student@example.com'")
+
+    def test_certificates_along_with_course_filter(self):
+        # Check that an initial filter is passed to the JavaScript client.
+        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + unicode(self.course.id)
+        response = self.client.get(url)
+        self.assertContains(response, "userFilter: 'student@example.com'")
+        self.assertContains(response, "courseFilter: '" + unicode(self.course.id) + "'")
 
 
 @ddt.ddt
@@ -163,7 +170,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         CourseEnrollmentFactory.create(mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id)  # pylint: disable=no-member
 
-        self.url = reverse('support:enrollment_list', kwargs={'username': self.student.username})
+        self.url = reverse('support:enrollment_list', kwargs={'username_or_email': self.student.username})
 
     def assert_enrollment(self, mode):
         """
@@ -172,8 +179,13 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         enrollment = CourseEnrollment.get_enrollment(self.student, self.course.id)  # pylint: disable=no-member
         self.assertEqual(enrollment.mode, mode)
 
-    def test_get_enrollments(self):
-        response = self.client.get(self.url)
+    @ddt.data('username', 'email')
+    def test_get_enrollments(self, search_string_type):
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(len(data), 1)
@@ -205,9 +217,14 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'reason': 'Financial Assistance',
         }, json.loads(response.content)[0]['manual_enrollment'])
 
-    def test_change_enrollment(self):
+    @ddt.data('username', 'email')
+    def test_change_enrollment(self, search_string_type):
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
-        response = self.client.post(self.url, data={
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.post(url, data={
             'course_id': unicode(self.course.id),  # pylint: disable=no-member
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,

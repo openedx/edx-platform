@@ -480,6 +480,7 @@ class EdxNoteHighlight(NoteChild):
     ADDER_SELECTOR = ".annotator-adder"
     VIEWER_SELECTOR = ".annotator-viewer"
     EDITOR_SELECTOR = ".annotator-editor"
+    NOTE_SELECTOR = ".annotator-note"
 
     def __init__(self, browser, element, parent_id):
         super(EdxNoteHighlight, self).__init__(browser, parent_id)
@@ -548,7 +549,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Clicks on the note viewer.
         """
-        self.q(css=self._bounded_selector(self.VIEWER_SELECTOR)).first.click()
+        self.q(css=self.NOTE_SELECTOR).first.click()
         return self
 
     def show(self):
@@ -563,7 +564,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Clicks cancel button.
         """
-        self.q(css=self._bounded_selector(".annotator-cancel")).first.click()
+        self.q(css=self._bounded_selector(".annotator-close")).first.click()
         self.wait_for_notes_invisibility("Note is canceled.")
         return self
 
@@ -604,8 +605,7 @@ class EdxNoteHighlight(NoteChild):
             text = element.text[0].strip()
         else:
             text = None
-        self.q(css=("body")).first.click()
-        self.wait_for_notes_invisibility()
+        self.cancel()
         return text
 
     @text.setter
@@ -628,8 +628,7 @@ class EdxNoteHighlight(NoteChild):
         if tags:
             for tag in tags:
                 tag_text.append(tag.text)
-        self.q(css="body").first.click()
-        self.wait_for_notes_invisibility()
+        self.cancel()
         return tag_text
 
     @tags.setter

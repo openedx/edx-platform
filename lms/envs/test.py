@@ -62,8 +62,6 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
-FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = True
-
 FEATURES['ENABLE_SHOPPING_CART'] = True
 
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
@@ -448,6 +446,11 @@ MICROSITE_CONFIGURATION = {
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
         "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "urls": {
+            'ABOUT': 'testmicrosite/about',
+            'PRIVACY': 'testmicrosite/privacy',
+            'TOS_AND_HONOR': 'testmicrosite/tos-and-honor',
+        },
     },
     "microsite_with_logistration": {
         "domain_prefix": "logistration",

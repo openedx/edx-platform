@@ -2297,7 +2297,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             "We have successfully verified your identity for the {assessment} "
             "assessment in the {course_name} course.".format(
                 assessment=self.assessment,
-                course_name=self.course.display_name_with_default
+                course_name=self.course.display_name_with_default_escaped
             ),
             body
         )
@@ -2316,7 +2316,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             "in the {course_name} course. You have used "
             "{used_attempts} out of {allowed_attempts} attempts to "
             "verify your identity".format(
-                course_name=self.course.display_name_with_default,
+                course_name=self.course.display_name_with_default_escaped,
                 assessment=self.assessment,
                 used_attempts=1,
                 allowed_attempts=self.allowed_attempts + 1
@@ -2361,7 +2361,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             "{used_attempts} out of {allowed_attempts} attempts to "
             "verify your identity, and verification is no longer "
             "possible".format(
-                course_name=self.course.display_name_with_default,
+                course_name=self.course.display_name_with_default_escaped,
                 assessment=self.assessment,
                 used_attempts=2,
                 allowed_attempts=self.allowed_attempts + 1
@@ -2385,7 +2385,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
                 "{used_attempts} out of {allowed_attempts} attempts to "
                 "verify your identity, and verification is no longer "
                 "possible".format(
-                    course_name=self.course.display_name_with_default,
+                    course_name=self.course.display_name_with_default_escaped,
                     assessment=self.assessment,
                     used_attempts=1,
                     allowed_attempts=self.allowed_attempts + 1
@@ -2494,7 +2494,7 @@ class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
             "{used_attempts} out of {allowed_attempts} attempts to "
             "verify your identity, and verification is no longer "
             "possible".format(
-                course_name=self.course.display_name_with_default,
+                course_name=self.course.display_name_with_default_escaped,
                 assessment=self.assessment,
                 used_attempts=1,
                 allowed_attempts=1

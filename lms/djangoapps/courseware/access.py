@@ -318,7 +318,7 @@ def _has_access_course(user, action, courselike):
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
         it's past the enrollment period, they should still see it.
         """
-        return ACCESS_GRANTED if (can_enroll() or can_load()) else ACCESS_DENIED
+        return ACCESS_GRANTED if (can_load() or can_enroll()) else ACCESS_DENIED
 
     def can_see_in_catalog():
         """

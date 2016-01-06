@@ -20,15 +20,11 @@ TEMPLATE_DEBUG = True
 HTTPS = 'off'
 FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
-FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
-FEATURES['SUBDOMAIN_BRANDING'] = True
-FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = False
 FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
 FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
@@ -129,16 +125,6 @@ COURSE_LISTINGS = {
     'harvard': ['HarvardX/CS50x/2012H'],
     'mit': ['MITx/3.091/MIT_2012_Fall'],
     'sjsu': ['MITx/6.002x-EE98/2012_Fall_SJSU'],
-}
-
-
-SUBDOMAIN_BRANDING = {
-    'sjsu': 'MITx',
-    'mit': 'MITx',
-    'berkeley': 'BerkeleyX',
-    'harvard': 'HarvardX',
-    'openedx': 'openedx',
-    'edge': 'edge',
 }
 
 # List of `university` landing pages to display, even though they may not

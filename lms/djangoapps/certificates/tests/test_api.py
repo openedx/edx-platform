@@ -1,6 +1,7 @@
 """Tests for the certificates Python API. """
 from contextlib import contextmanager
 import ddt
+from functools import wraps
 
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
@@ -28,6 +29,8 @@ from certificates.models import (
 )
 from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
 from certificates.tests.factories import GeneratedCertificateFactory
+
+from microsite_configuration import microsite
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -405,3 +408,94 @@ class GenerateExampleCertificatesTest(TestCase):
         """Check the example certificate status. """
         actual_status = certs_api.example_certificates_status(self.COURSE_KEY)
         self.assertEqual(list(expected_statuses), actual_status)
+
+
+def set_microsite(domain):
+    """
+    returns a decorator that can be used on a test_case to set a specific microsite for the current test case.
+    :param domain: Domain of the new microsite
+    """
+    def decorator(func):
+        """
+        Decorator to set current microsite according to domain
+        """
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            """
+            Execute the function after setting up the microsite.
+            """
+            microsite.set_by_domain(domain)
+            return func(request, *args, **kwargs)
+        return inner
+    return decorator
+
+
+@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+@attr('shard_1')
+class CertificatesBrandingTest(TestCase):
+    """Test certificates branding. """
+
+    COURSE_KEY = CourseLocator(org='test', course='test', run='test')
+
+    def setUp(self):
+        super(CertificatesBrandingTest, self).setUp()
+
+    @set_microsite(settings.MICROSITE_CONFIGURATION['test_microsite']['domain_prefix'])
+    def test_certificate_header_data(self):
+        """
+        Test that get_certificate_header_context from certificates api
+        returns data customized according to site branding.
+        """
+        # Generate certificates for the course
+        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
+        data = certs_api.get_certificate_header_context(is_secure=True)
+
+        # Make sure there are not unexpected keys in dict returned by 'get_certificate_header_context'
+        self.assertItemsEqual(
+            data.keys(),
+            ['logo_src', 'logo_url']
+        )
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']['logo_image_url'],
+            data['logo_src']
+        )
+
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']['SITE_NAME'],
+            data['logo_url']
+        )
+
+    @set_microsite(settings.MICROSITE_CONFIGURATION['test_microsite']['domain_prefix'])
+    def test_certificate_footer_data(self):
+        """
+        Test that get_certificate_footer_context from certificates api returns
+        data customized according to site branding.
+        """
+        # Generate certificates for the course
+        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
+        data = certs_api.get_certificate_footer_context()
+
+        # Make sure there are not unexpected keys in dict returned by 'get_certificate_footer_context'
+        self.assertItemsEqual(
+            data.keys(),
+            ['company_about_url', 'company_privacy_url', 'company_tos_url']
+        )
+
+        # ABOUT is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['ABOUT'],
+            data['company_about_url']
+        )
+
+        # PRIVACY is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['PRIVACY'],
+            data['company_privacy_url']
+        )
+
+        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_microsite']["urls"],
+        # so web certificate will use that url
+        self.assertIn(
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['TOS_AND_HONOR'],
+            data['company_tos_url']
+        )

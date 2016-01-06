@@ -3,7 +3,7 @@
     "pk": 99,
     "model": "certificates.certificategenerationconfiguration",
     "fields": {
-      "change_date": "2015-06-18 11:02:13",
+      "change_date": "2015-06-18 11:02:13.007790+00:00",
       "changed_by": 99,
       "enabled": true
     }
@@ -12,7 +12,7 @@
     "pk": 99,
     "model": "certificates.certificategenerationcoursesetting",
     "fields": {
-      "modified": "2015-06-18 11:02:13",
+      "modified": "2015-06-18 11:02:13.007790+00:00",
       "course_key": "course-v1:test_org+3355358979513794782079645765720179311111+test_run",
       "enabled": true
     }
@@ -21,7 +21,7 @@
     "pk": 99,
     "model": "auth.user",
     "fields": {
-      "date_joined": "2015-06-12 11:02:13",
+      "date_joined": "2015-06-12 11:02:13.007790+00:00",
       "username": "testcert",
       "first_name": "john",
       "last_name": "doe",
@@ -53,7 +53,7 @@
     "pk": 2,
     "model": "certificates.certificatehtmlviewconfiguration",
     "fields": {
-      "change_date": "2050-05-15 11:02:13",
+      "change_date": "2050-05-15 11:02:13.007790+00:00",
       "changed_by": 99,
       "enabled": true,
       "configuration": "{\"default\": {\"accomplishment_class_append\": \"accomplishment-certificate\",\"platform_name\": \"edX\",\"company_privacy_url\": \"http://www.edx.org/edx-privacy-policy\",\"company_about_url\": \"http://www.edx.org/about-us\",\"company_tos_url\": \"http://www.edx.org/edx-terms-service\",\"company_verified_certificate_url\": \"http://www.edx.org/verified-certificate\",\"document_stylesheet_url_application\": \"/static/certificates/sass/main-ltr.css\",\"logo_src\": \"/static/certificates/images/logo-edx.svg\",\"logo_url\": \"http://www.edx.org\"},\"honor\": {\"certificate_type\": \"Honor Code\",\"document_body_class_append\": \"is-honorcode\"},\"verified\": {\"certificate_type\": \"Verified\",\"document_body_class_append\": \"is-idverified\"},\"xseries\": {\"certificate_type\": \"XSeries\",\"document_body_class_append\": \"is-xseries\"}}"
@@ -73,8 +73,8 @@
       "verify_uuid": "52bfac10394d49219385dcd4cc17177e",
       "download_uuid": "52bfac10394d49219385dcd4cc17177r",
       "name": "testcert",
-      "created_date": "2015-06-12 11:02:13",
-      "modified_date": "2015-06-12 11:02:13",
+      "created_date": "2015-06-12 11:02:13.007790+00:00",
+      "modified_date": "2015-06-12 11:02:13.007790+00:00",
       "error_reason": "",
       "mode": "honor"
     }
@@ -93,8 +93,8 @@
       "verify_uuid": "52bfac10394d49219385dcd4cc17177e",
       "download_uuid": "52bfac10394d49219385dcd4cc17177r",
       "name": "testcert",
-      "created_date": "2015-06-12 11:02:13",
-      "modified_date": "2015-06-12 11:02:13",
+      "created_date": "2015-06-12 11:02:13.007790+00:00",
+      "modified_date": "2015-06-12 11:02:13.007790+00:00",
       "error_reason": "",
       "mode": "honor"
     }
@@ -103,7 +103,7 @@
     "pk": 1,
     "model": "student.linkedinaddtoprofileconfiguration",
     "fields": {
-      "change_date": "2050-06-15 11:02:13",
+      "change_date": "2050-06-15 11:02:13.007790+00:00",
       "changed_by": 99,
       "enabled": true,
       "dashboard_tracking_code": "edx-course-v1&TESTCOURSE",

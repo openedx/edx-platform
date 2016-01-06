@@ -23,6 +23,13 @@ class FormTestMixin(object):
         form = self.get_form(expected_valid=False)
         self.assertEqual(form.errors, {expected_field: [expected_message]})
 
+    def assert_valid(self, expected_cleaned_data):
+        """
+        Check that the form returns the expected data
+        """
+        form = self.get_form(expected_valid=True)
+        self.assertDictEqual(form.cleaned_data, expected_cleaned_data)
+
     def assert_field_value(self, field, expected_value):
         """
         Create a form bound to self.form_data, assert its validity, and assert

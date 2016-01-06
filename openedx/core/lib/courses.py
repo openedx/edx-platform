@@ -3,8 +3,10 @@ Common utility functions related to courses.
 """
 from django.conf import settings
 
-from xmodule.modulestore.django import modulestore
+from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -27,4 +29,18 @@ def course_image_url(course):
     else:
         loc = StaticContent.compute_location(course.id, course.course_image)
         url = StaticContent.serialize_asset_key_with_slash(loc)
+
     return url
+
+
+def create_course_image_thumbnail(course, dimensions):
+    """Create a course image thumbnail and return the URL.
+
+    - dimensions is a tuple of (width, height)
+    """
+    course_image_asset_key = StaticContent.compute_location(course.id, course.course_image)
+    course_image = AssetManager.find(course_image_asset_key)  # a StaticContent obj
+
+    _content, thumb_loc = contentstore().generate_thumbnail(course_image, dimensions=dimensions)
+
+    return StaticContent.serialize_asset_key_with_slash(thumb_loc)

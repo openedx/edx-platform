@@ -54,6 +54,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from courseware.models import StudentModuleHistory
 from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
@@ -97,11 +98,18 @@ from eventtracking import tracker
 import analytics
 from courseware.url_helpers import get_redirect_url
 
+from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+
+
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 
 CONTENT_DEPTH = 2
+# Only display the requirements on learner dashboard for
+# credit and verified modes.
+REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
 
 
 def user_groups(user):
@@ -136,7 +144,7 @@ def courses(request):
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user, request.META.get('HTTP_HOST'))
+        courses_list = get_courses(request.user)
 
         if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
@@ -399,6 +407,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if survey.utils.must_answer_survey(course, user):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
+    bookmarks_api_url = reverse('bookmarks')
+
     try:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
@@ -413,10 +423,14 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         studio_url = get_studio_url(course, 'course')
 
+        language_preference = get_user_preference(request.user, LANGUAGE_KEY)
+        if not language_preference:
+            language_preference = settings.LANGUAGE_CODE
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
-            'COURSE_TITLE': course.display_name_with_default,
+            'COURSE_TITLE': course.display_name_with_default_escaped,
             'course': course,
             'init': '',
             'fragment': Fragment(),
@@ -424,6 +438,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'studio_url': studio_url,
             'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
+            'bookmarks_api_url': bookmarks_api_url,
+            'language_preference': language_preference,
         }
 
         now = datetime.now(UTC())
@@ -526,7 +542,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             save_child_position(chapter_module, section)
             section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
             context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
-            context['section_title'] = section_descriptor.display_name_with_default
+            context['section_title'] = section_descriptor.display_name_with_default_escaped
         else:
             # section is none, so display a message
             studio_url = get_studio_url(course, 'course')
@@ -866,6 +882,9 @@ def course_about(request, course_id):
         # get prerequisite courses display names
         pre_requisite_courses = get_prerequisite_courses_display(course)
 
+        # Overview
+        overview = CourseOverview.get_from_id(course.id)
+
         return render_to_response('courseware/course_about.html', {
             'course': course,
             'staff_access': staff_access,
@@ -887,7 +906,8 @@ def course_about(request, course_id):
             'disable_courseware_header': True,
             'can_add_course_to_cart': can_add_course_to_cart,
             'cart_link': reverse('shoppingcart.views.show_cart'),
-            'pre_requisite_courses': pre_requisite_courses
+            'pre_requisite_courses': pre_requisite_courses,
+            'course_image_urls': overview.image_urls,
         })
 
 
@@ -1002,13 +1022,21 @@ def _credit_course_requirements(course_key, student):
         course_key (CourseKey): Identifier for the course.
         student (User): Currently logged in user.
 
-    Returns: dict
+    Returns: dict if the credit eligibility enabled and it is a credit course
+    and the user is enrolled in either verified or credit mode, and None otherwise.
 
     """
     # If credit eligibility is not enabled or this is not a credit course,
     # short-circuit and return `None`.  This indicates that credit requirements
     # should NOT be displayed on the progress page.
     if not (settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)):
+        return None
+
+    # If student is enrolled not enrolled in verified or credit mode,
+    # short-circuit and return None. This indicates that
+    # credit requirements should NOT be displayed on the progress page.
+    enrollment = CourseEnrollment.get_enrollment(student, course_key)
+    if enrollment.mode not in REQUIREMENTS_DISPLAY_MODES:
         return None
 
     # Credit requirement statuses for which user does not remain eligible to get credit.

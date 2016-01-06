@@ -301,19 +301,19 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"quote": u"quote text",
                     u"text": u"text",
                     u"chapter": {
-                        u"display_name": self.chapter.display_name_with_default,
+                        u"display_name": self.chapter.display_name_with_default_escaped,
                         u"index": 0,
                         u"location": unicode(self.chapter.location),
                         u"children": [unicode(self.sequential.location)]
                     },
                     u"section": {
-                        u"display_name": self.sequential.display_name_with_default,
+                        u"display_name": self.sequential.display_name_with_default_escaped,
                         u"location": unicode(self.sequential.location),
                         u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
                         u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                        u"display_name": self.vertical.display_name_with_default,
+                        u"display_name": self.vertical.display_name_with_default_escaped,
                         u"location": unicode(self.vertical.location),
                     },
                     u"usage_id": unicode(self.html_module_2.location),
@@ -323,13 +323,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"quote": u"quote text",
                     u"text": u"text",
                     u"chapter": {
-                        u"display_name": self.chapter.display_name_with_default,
+                        u"display_name": self.chapter.display_name_with_default_escaped,
                         u"index": 0,
                         u"location": unicode(self.chapter.location),
                         u"children": [unicode(self.sequential.location)]
                     },
                     u"section": {
-                        u"display_name": self.sequential.display_name_with_default,
+                        u"display_name": self.sequential.display_name_with_default_escaped,
                         u"location": unicode(self.sequential.location),
                         u"children": [
                             unicode(self.vertical.location),
@@ -337,7 +337,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     },
                     u"unit": {
                         u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                        u"display_name": self.vertical.display_name_with_default,
+                        u"display_name": self.vertical.display_name_with_default_escaped,
                         u"location": unicode(self.vertical.location),
                     },
                     u"usage_id": unicode(self.html_module_1.location),
@@ -394,13 +394,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default,
+                            u"display_name": self.chapter.display_name_with_default_escaped,
                             u"index": 0,
                             u"location": unicode(self.chapter.location),
                             u"children": [unicode(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default,
+                            u"display_name": self.sequential.display_name_with_default_escaped,
                             u"location": unicode(self.sequential.location),
                             u"children": [
                                 unicode(self.vertical.location),
@@ -408,7 +408,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default,
+                            u"display_name": self.vertical.display_name_with_default_escaped,
                             u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_2.location),
@@ -418,13 +418,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default,
+                            u"display_name": self.chapter.display_name_with_default_escaped,
                             u"index": 0,
                             u"location": unicode(self.chapter.location),
                             u"children": [unicode(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default,
+                            u"display_name": self.sequential.display_name_with_default_escaped,
                             u"location": unicode(self.sequential.location),
                             u"children": [
                                 unicode(self.vertical.location),
@@ -432,7 +432,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default,
+                            u"display_name": self.vertical.display_name_with_default_escaped,
                             u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_1.location),
@@ -492,19 +492,19 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"test &lt;script&gt;alert('test')&lt;/script&gt;",
                 u"text": u'text "&lt;&gt;&amp;\'',
                 u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default,
+                    u"display_name": self.chapter.display_name_with_default_escaped,
                     u"index": 0,
                     u"location": unicode(self.chapter.location),
                     u"children": [unicode(self.sequential.location)]
                 },
                 u"section": {
-                    u"display_name": self.sequential.display_name_with_default,
+                    u"display_name": self.sequential.display_name_with_default_escaped,
                     u"location": unicode(self.sequential.location),
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
                     u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default,
+                    u"display_name": self.vertical.display_name_with_default_escaped,
                     u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
@@ -537,19 +537,19 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text",
                 u"text": u"text",
                 u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default,
+                    u"display_name": self.chapter.display_name_with_default_escaped,
                     u"index": 0,
                     u"location": unicode(self.chapter.location),
                     u"children": [unicode(self.sequential.location)]
                 },
                 u"section": {
-                    u"display_name": self.sequential.display_name_with_default,
+                    u"display_name": self.sequential.display_name_with_default_escaped,
                     u"location": unicode(self.sequential.location),
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
                     u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default,
+                    u"display_name": self.vertical.display_name_with_default_escaped,
                     u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
@@ -583,19 +583,19 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text",
                 u"text": u"text",
                 u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default,
+                    u"display_name": self.chapter.display_name_with_default_escaped,
                     u"index": 0,
                     u"location": unicode(self.chapter.location),
                     u"children": [unicode(self.sequential.location)]
                 },
                 u"section": {
-                    u"display_name": self.sequential.display_name_with_default,
+                    u"display_name": self.sequential.display_name_with_default_escaped,
                     u"location": unicode(self.sequential.location),
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
                     u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default,
+                    u"display_name": self.vertical.display_name_with_default_escaped,
                     u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
@@ -646,7 +646,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.sequential.display_name_with_default,
+                u"display_name": self.sequential.display_name_with_default_escaped,
                 u"location": unicode(self.sequential.location),
                 u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)],
             },
@@ -659,7 +659,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.html_module_1.display_name_with_default,
+                u"display_name": self.html_module_1.display_name_with_default_escaped,
                 u"location": unicode(self.html_module_1.location),
             },
             helpers.get_module_context(self.course, self.html_module_1)
@@ -671,7 +671,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.chapter.display_name_with_default,
+                u"display_name": self.chapter.display_name_with_default_escaped,
                 u"index": 0,
                 u"location": unicode(self.chapter.location),
                 u"children": [unicode(self.sequential.location)],
@@ -680,7 +680,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         )
         self.assertDictEqual(
             {
-                u"display_name": self.chapter_2.display_name_with_default,
+                u"display_name": self.chapter_2.display_name_with_default_escaped,
                 u"index": 1,
                 u"location": unicode(self.chapter_2.location),
                 u"children": [],
@@ -760,7 +760,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
-        mock_chapter.display_name_with_default = 'Test Chapter Display Name'
+        mock_chapter.display_name_with_default_escaped = 'Test Chapter Display Name'
 
         mock_course_module.get_display_items.return_value = [mock_chapter]
 
@@ -790,7 +790,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_section = MagicMock()
         mock_section.url_name = 'section_url_name'
-        mock_section.display_name_with_default = 'Test Section Display Name'
+        mock_section.display_name_with_default_escaped = 'Test Section Display Name'
 
         mock_chapter.get_display_items.return_value = [mock_section]
         mock_section.get_display_items.return_value = [MagicMock()]

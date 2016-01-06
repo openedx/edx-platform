@@ -26,7 +26,8 @@ from certificates.models import (
     CertificateStatuses,
     CertificateSocialNetworks,
     CertificateTemplate,
-    CertificateHtmlViewConfiguration
+    CertificateHtmlViewConfiguration,
+    CertificateTemplateAsset,
 )
 
 from certificates.tests.factories import (
@@ -138,6 +139,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         Creates a custom certificate template entry in DB.
         """
         template_html = """
+            <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
                 lang: ${LANGUAGE_CODE}
@@ -145,6 +147,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 mode: ${course_mode}
                 ${accomplishment_copy_course_description}
                 ${twitter_url}
+                <img class="custom-logo" src="${static.certificate_asset_url('custom-logo')}" />
             </body>
             </html>
         """
@@ -221,6 +224,21 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         "CERTIFICATE_TWITTER": True,
         "CERTIFICATE_FACEBOOK": True,
     })
+    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
+        "test_microsite": dict(
+            settings.MICROSITE_CONFIGURATION['test_microsite'],
+            urls=dict(
+                ABOUT=None,
+                PRIVACY=None,
+                TOS_AND_HONOR=None,
+            ),
+        )
+    })
+    @patch.dict("django.conf.settings.MKTG_URL_LINK_MAP", {
+        'ABOUT': None,
+        'PRIVACY': None,
+        'TOS_AND_HONOR': None,
+    })
     def test_rendering_maximum_data(self):
         """
         Tests at least one data item from different context update methods to
@@ -265,7 +283,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         # Test an item from html cert configuration
         self.assertIn(
-            '<a class="logo" href="http://www.edx.org/honor_logo.png">',
+            '<a class="logo" href="http://test_microsite.localhost">',
             response.content
         )
         # Test an item from course info
@@ -275,7 +293,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         # Test an item from user info
         self.assertIn(
-            "{fullname}, you've earned a certificate!".format(fullname=self.user.profile.name),
+            "{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
             response.content
         )
         # Test an item from social info
@@ -290,8 +308,8 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         # Test an item from certificate/org info
         self.assertIn(
             "a course of study offered by {partner_short_name}, "
-            "an online learning initiative of {partner_long_name} "
-            "through {platform_name}.".format(
+            "an online learning initiative of "
+            "{partner_long_name}.".format(
                 partner_short_name=short_org_name,
                 partner_long_name=long_org_name,
                 platform_name='Test Microsite'
@@ -824,3 +842,173 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                         else:
                             self.assertContains(response, "Tweet this Accomplishment")
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    def test_certificate_asset_by_slug(self):
+        """
+        Tests certificate template asset display by slug using static.certificate_asset_url method.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(mode='honor')
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        # render certificate without template asset
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.return_value = []
+            response = self.client.get(test_url)
+            self.assertContains(response, '<img class="custom-logo" src="" />')
+
+        template_asset = CertificateTemplateAsset(
+            description='custom logo',
+            asset='certificate_template_assets/32/test_logo.png',
+            asset_slug='custom-logo',
+        )
+        template_asset.save()
+
+        # render certificate with template asset
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.return_value = []
+            response = self.client.get(test_url)
+            self.assertContains(
+                response, '<img class="custom-logo" src="{}certificate_template_assets/32/test_logo.png" />'.format(
+                    settings.MEDIA_URL
+                )
+            )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_certificate_branding(self):
+        """
+        Test that link urls in certificate web view are customized according to site branding and
+        microsite configuration.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        # logo_image_url Tis present in MICROSITE_CONFIGURATION['test_microsite']["urls"],
+        #  so web certificate will use that.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_microsite']['logo_image_url'],
+        )
+        # ABOUT is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['ABOUT'],
+        )
+        # PRIVACY is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['PRIVACY'],
+        )
+        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_microsite']["urls"],
+        #  so web certificate will use that url.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['TOS_AND_HONOR'],
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
+        "test_microsite": dict(
+            settings.MICROSITE_CONFIGURATION['test_microsite'],
+            urls=dict(
+                ABOUT=None,
+                PRIVACY=None,
+                TOS_AND_HONOR=None,
+            ),
+        )
+    })
+    def test_certificate_branding_without_microsite_urls(self):
+        """
+        Test that links from MKTG_URL_LINK_MAP setting are used if corresponding microsite urls are not present.
+        microsite configuration.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        configuration = CertificateHtmlViewConfiguration.get_config()
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        # ABOUT is not present in MICROSITE_CONFIGURATION['test_microsite']["urls"],
+        #  so web certificate will use MKTG_URL_LINK_MAP['ABOUT'] url.
+        self.assertContains(
+            response,
+            settings.MKTG_URL_LINK_MAP['ABOUT'],
+        )
+        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_microsite']["urls"],
+        # so web certificate will use MKTG_URL_LINK_MAP['PRIVACY'] url.
+        self.assertContains(
+            response,
+            settings.MKTG_URL_LINK_MAP['PRIVACY'],
+        )
+        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_microsite']["urls"] or MKTG_URL_LINK_MAP,
+        # so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['testmicrosite']['company_tos_url'],
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
+        "test_microsite": dict(
+            settings.MICROSITE_CONFIGURATION['test_microsite'],
+            urls=dict(
+                ABOUT=None,
+                PRIVACY=None,
+                TOS_AND_HONOR=None,
+            ),
+        )
+    })
+    @patch.dict("django.conf.settings.MKTG_URL_LINK_MAP", {
+        'ABOUT': None,
+        'PRIVACY': None,
+        'TOS_AND_HONOR': None,
+    })
+    def test_certificate_without_branding_urls(self):
+        """
+        Test that links from CertificateHtmlViewConfiguration are used if
+        corresponding microsite or marketing urls are not present.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        configuration = CertificateHtmlViewConfiguration.get_config()
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+
+        # ABOUT is not present in MICROSITE_CONFIGURATION['test_microsite']["urls"] or MKTG_URL_LINK_MAP,
+        #  so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['testmicrosite']['company_about_url'],
+        )
+        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_microsite']["urls"] or MKTG_URL_LINK_MAP,
+        # so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['testmicrosite']['company_privacy_url'],
+        )
+        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_microsite']["urls"] or MKTG_URL_LINK_MAP,
+        # so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['testmicrosite']['company_tos_url'],
+        )

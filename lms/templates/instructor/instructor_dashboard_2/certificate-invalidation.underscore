@@ -1,0 +1,43 @@
+<p class="under-heading info">
+ <%= gettext("To invalidate a certificate for a particular learner, add the username or email address below.") %>
+</p>
+
+<div class="add-certificate-invalidation">
+    <input class='student-username-or-email' id="certificate-invalidation-user" type="text" placeholder="<%= gettext('Username or email address') %>" aria-describedby='student-user-name-or-email-tip'>
+    <textarea class='notes-field' id="certificate-invalidation-notes" rows="10" placeholder="<%= gettext('Add notes about this learner') %>" aria-describedby='notes-field-tip'></textarea>
+    <br/>
+    <button type="button" class="btn-blue" id="invalidate-certificate"><%= gettext('Invalidate Certificate') %></button>
+</div>
+
+<div class="message hidden"></div>
+
+<div class="invalidation-history">
+    <% if (certificate_invalidations.length === 0) { %>
+        <p><%- gettext("No results") %></p>
+    <% } else { %>
+        <table>
+            <thead>
+                <tr>
+                    <th class='user-name'><%= gettext('Student') %></th>
+                    <th class='user-name'><%= gettext('Invalidated By') %></th>
+                    <th class='date'><%= gettext('Invalidated') %></th>
+                    <th class='notes'><%= gettext('Notes') %></th>
+                    <th class='action'><%= gettext('Action') %></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (var i = 0; i < certificate_invalidations.length; i++) {
+                    var certificate_invalidation = certificate_invalidations[i];
+                %>
+                <tr>
+                    <td><%- certificate_invalidation.get("user") %></td>
+                    <td><%- certificate_invalidation.get("invalidated_by") %></td>
+                    <td><%- certificate_invalidation.get("created") %></td>
+                    <td><%- certificate_invalidation.get("notes") %></td>
+                    <td><button class='re-validate-certificate' data-cid='<%- certificate_invalidation.cid %>'><%- gettext("Remove from Invalidation Table") %></button></td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    <% } %>
+</div>

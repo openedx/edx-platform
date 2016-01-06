@@ -4,6 +4,7 @@ Support tool for changing course enrollments.
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.generic import View
@@ -45,12 +46,17 @@ class EnrollmentSupportListView(GenericAPIView):
     """
 
     @method_decorator(require_support_permission)
-    def get(self, request, username):
+    def get(self, request, username_or_email):
         """
         Returns a list of enrollments for the given user, along with
         information about previous manual enrollment changes.
         """
-        enrollments = get_enrollments(username)
+        try:
+            user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
+        except User.DoesNotExist:
+            return JsonResponse([])
+
+        enrollments = get_enrollments(user.username)
         for enrollment in enrollments:
             # Folds the course_details field up into the main JSON object.
             enrollment.update(**enrollment.pop('course_details'))
@@ -62,28 +68,29 @@ class EnrollmentSupportListView(GenericAPIView):
         return JsonResponse(enrollments)
 
     @method_decorator(require_support_permission)
-    def post(self, request, username):
+    def post(self, request, username_or_email):
         """Allows support staff to alter a user's enrollment."""
         try:
+            user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
             course_id = request.data['course_id']
             course_key = CourseKey.from_string(course_id)
             old_mode = request.data['old_mode']
             new_mode = request.data['new_mode']
             reason = request.data['reason']
-            enrollment = CourseEnrollment.objects.get(course_id=course_key, user__username=username)
+            enrollment = CourseEnrollment.objects.get(user=user, course_id=course_key)
             if enrollment.mode != old_mode:
                 return HttpResponseBadRequest(u'User {username} is not enrolled with mode {old_mode}.'.format(
-                    username=username,
+                    username=user.username,
                     old_mode=old_mode
                 ))
         except KeyError as err:
             return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
         except InvalidKeyError:
             return HttpResponseBadRequest(u'Could not parse course key.')
-        except CourseEnrollment.DoesNotExist:
+        except (CourseEnrollment.DoesNotExist, User.DoesNotExist):
             return HttpResponseBadRequest(
                 u'Could not find enrollment for user {username} in course {course}.'.format(
-                    username=username,
+                    username=username_or_email,
                     course=unicode(course_key)
                 )
             )
@@ -91,7 +98,7 @@ class EnrollmentSupportListView(GenericAPIView):
             # Wrapped in a transaction so that we can be sure the
             # ManualEnrollmentAudit record is always created correctly.
             with transaction.atomic():
-                update_enrollment(username, course_id, mode=new_mode)
+                update_enrollment(user.username, course_id, mode=new_mode)
                 manual_enrollment = ManualEnrollmentAudit.create_manual_enrollment_audit(
                     request.user,
                     enrollment.user.email,

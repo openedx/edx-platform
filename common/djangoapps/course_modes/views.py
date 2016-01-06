@@ -120,7 +120,7 @@ class ChooseModeView(View):
             "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
             "modes": modes,
             "has_credit_upsell": has_credit_upsell,
-            "course_name": course.display_name_with_default,
+            "course_name": course.display_name_with_default_escaped,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,

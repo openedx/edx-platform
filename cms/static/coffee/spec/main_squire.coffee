@@ -7,7 +7,7 @@ requirejs.config({
         "jquery.ui": "xmodule_js/common_static/js/vendor/jquery-ui.min",
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
-        "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal.min",
+        "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
         "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
         "jquery.timepicker": "xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker",
