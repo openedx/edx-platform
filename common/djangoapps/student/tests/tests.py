@@ -898,6 +898,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
 
+# TODO: Clean up these tests so that they use the ProgramsDataMixin.
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
@@ -928,8 +929,11 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
     def _create_program_data(self, data):
         """Dry method to create testing programs data."""
         programs = {}
+        _id = 0
+
         for course, program_status in data:
             programs[unicode(course)] = {
+                'id': _id,
                 'category': self.category,
                 'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                 'marketing_slug': 'fake-marketing-slug-xseries-1',
@@ -955,6 +959,8 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 'name': self.program_name
             }
 
+            _id += 1
+
         return programs
 
     @ddt.data(
@@ -969,6 +975,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = {
                 u'edx/demox/Run_1': {
+                    'id': 0,
                     'category': self.category,
                     'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                     'marketing_slug': marketing_slug,
@@ -990,6 +997,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 self.assertEqual(
                     {
                         u'edx/demox/Run_1': {
+                            'program_id': 0,
                             'category': 'xseries',
                             'course_count': len(course_codes),
                             'display_name': self.program_name,
