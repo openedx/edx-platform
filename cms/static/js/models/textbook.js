@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "js/models/chapter", "js/collections/chapter",
+define(["backbone", "underscore", "gettext", "js/models/chapter", "js/collections/chapter",
         "backbone.associations", "coffee/src/main"],
-    function(Backbone, _, ChapterModel, ChapterCollection) {
+    function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
 
     var Textbook = Backbone.AssociatedModel.extend({
         defaults: function() {
@@ -60,13 +60,13 @@ define(["backbone", "underscore", "js/models/chapter", "js/collections/chapter",
         validate: function(attrs, options) {
             if (!attrs.name) {
                 return {
-                    message: "Textbook name is required",
+                    message: gettext("Textbook name is required"),
                     attributes: {name: true}
                 };
             }
             if (attrs.chapters.length === 0) {
                 return {
-                    message: "Please add at least one chapter",
+                    message: gettext("Please add at least one chapter"),
                     attributes: {chapters: true}
                 };
             } else {
@@ -79,7 +79,7 @@ define(["backbone", "underscore", "js/models/chapter", "js/collections/chapter",
                 });
                 if(!_.isEmpty(invalidChapters)) {
                     return {
-                        message: "All chapters must have a name and asset",
+                        message: gettext("All chapters must have a name and asset"),
                         attributes: {chapters: invalidChapters}
                     };
                 }
