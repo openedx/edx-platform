@@ -45,9 +45,14 @@
                         view.setBookmarkState(true);
                     },
                     error: function (jqXHR) {
-                        var response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
-                        var userMessage = response ? response.user_message : '';
-                        view.showError(userMessage);
+                        try {
+                            var response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
+                            var userMessage = response ? response.user_message : '';
+                            view.showError(userMessage);
+                        }
+                        catch(err) {
+                            view.showError();
+                        }
                     }
                 });
             },
