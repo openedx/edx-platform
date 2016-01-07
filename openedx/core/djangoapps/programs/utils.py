@@ -24,11 +24,11 @@ def get_programs(user):
     """
     programs_config = ProgramsApiConfig.current()
 
-    # Bypass caching for staff users, who may be creating Programs and want to see them displayed immediately.
+    # Bypass caching for staff users, who may be creating Programs and want
+    # to see them displayed immediately.
+    cache_key = None
     if programs_config.is_cache_enabled and not user.is_staff:
         cache_key = programs_config.CACHE_KEY
-    else:
-        cache_key = None
 
     return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
 

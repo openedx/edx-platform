@@ -22,10 +22,9 @@ def get_user_credentials(user):
     user_query = {'username': user.username}
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
+    cache_key = None
     if credential_configuration.is_cache_enabled and not user.is_staff:
         cache_key = credential_configuration.CACHE_KEY + '.' + user.username
-    else:
-        cache_key = None
 
     credentials = get_edx_api_data(
         credential_configuration, user, 'user_credentials', querystring=user_query, cache_key=cache_key
