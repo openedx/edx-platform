@@ -571,7 +571,7 @@ class HighLevelTabTest(UniqueCourseTest):
         course_fix.add_handout('demoPDF.pdf')
 
         course_fix.add_children(
-            XBlockFixtureDesc('static_tab', 'Test Static Tab'),
+            XBlockFixtureDesc('static_tab', 'Test Static Tab', data=r"static tab data with mathjax \(E=mc^2\)"),
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 1', data=load_data_str('multiple_choice.xml')),
@@ -630,6 +630,18 @@ class HighLevelTabTest(UniqueCourseTest):
         self.course_info_page.visit()
         self.tab_nav.go_to_tab('Test Static Tab')
         self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
+
+    def test_static_tab_with_mathjax(self):
+        """
+        Navigate to a static tab (course content)
+        """
+        # From the course info page, navigate to the static tab
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Test Static Tab')
+        self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
+
+        # Verify that Mathjax has rendered
+        self.tab_nav.mathjax_has_rendered()
 
     def test_wiki_tab_first_time(self):
         """
