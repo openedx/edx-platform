@@ -2553,6 +2553,9 @@ ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 
+# Credentials configuration
+CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
+
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
 
