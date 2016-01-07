@@ -1,7 +1,7 @@
 (function (undefined) {
     'use strict';
     describe('VideoPlayer Events plugin', function () {
-        var state, oldOTBD;
+        var state, oldOTBD, Logger = window.Logger;
 
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
@@ -32,13 +32,20 @@
             });
         });
 
-        it('can emit "play_video" event', function () {
+        it('can emit "play_video" event when canEmitPlayVideoEvent returns true', function () {
+            spyOn(state.videoPlayer, 'canEmitPlayVideoEvent').andReturn(true);
             state.el.trigger('play');
             expect(Logger.log).toHaveBeenCalledWith('play_video', {
                 id: 'id',
                 code: 'html5',
                 currentTime: 10
             });
+        });
+
+        it('can not emit "play_video" event when canEmitPlayVideoEvent returns false', function () {
+            spyOn(state.videoPlayer, 'canEmitPlayVideoEvent').andReturn(false);
+            state.el.trigger('play');
+            expect(Logger.log).not.toHaveBeenCalled();
         });
 
         it('can emit "pause_video" event', function () {

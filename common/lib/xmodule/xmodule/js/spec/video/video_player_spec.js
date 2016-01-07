@@ -5,7 +5,7 @@ require(
 ['video/03_video_player.js'],
 function (VideoPlayer) {
     describe('VideoPlayer', function () {
-        var state, oldOTBD;
+        var state, oldOTBD, Logger = window.Logger, YT = window.YT;
 
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
@@ -331,6 +331,46 @@ function (VideoPlayer) {
 
                 it('pause the video caption', function () {
                     expect($.fn.trigger).toHaveBeenCalledWith('ended', {});
+                });
+            });
+
+            describe('Video Player', function () {
+                beforeEach(function () {
+                    state = jasmine.initializePlayer();
+                    state.videoEl = $('video, iframe');
+                    spyOn(Logger, 'log');
+                });
+
+                it('will set emitPlayVideoEvent to false after onPlay is called', function () {
+                    expect(state.videoPlayer.emitPlayVideoEvent).toBeTruthy();
+                    state.videoPlayer.onPlay();
+                    expect(state.videoPlayer.emitPlayVideoEvent).toBeFalsy();
+                });
+
+                it('will set emitPlayVideoEvent to correct value in different states', function () {
+                    // Initially emitPlayVideoEvent should be set to true
+                    expect(state.videoPlayer.emitPlayVideoEvent).toBeTruthy();
+
+                    /**
+                     * @param {Integer} playerState - New state of the video player.
+                     * @param {Boolean} emitPlayVideoEvent - Expected value of emitPlayVideoEvent after 
+                     *                                       video player goes into playerState.
+                     */
+                    var verifyEmitPlayVideoEventValue = function (playerState, emitPlayVideoEvent) {
+                        state.videoPlayer.onStateChange({
+                            data: playerState
+                        });
+                        expect(state.videoPlayer.emitPlayVideoEvent).toBe(emitPlayVideoEvent);
+                    };
+
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.BUFFERING, true);
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.PLAYING, false);
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.BUFFERING, false);
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.PLAYING, false);
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.PAUSED, true);
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.PLAYING, false);
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.ENDED, true);
+                    verifyEmitPlayVideoEventValue(YT.PlayerState.PLAYING, false);
                 });
             });
         });

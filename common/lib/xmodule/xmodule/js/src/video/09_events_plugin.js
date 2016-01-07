@@ -61,7 +61,9 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onPlay: function () {
-            this.log('play_video', {currentTime: this.getCurrentTime()});
+            if (this.state.videoPlayer.canEmitPlayVideoEvent()) {
+                this.log('play_video', {currentTime: this.getCurrentTime()});
+            }
         },
 
         onPause: function () {
