@@ -108,11 +108,11 @@ from openedx.core.lib.courses import course_image_url
                   </div>
                   <button class="inc button" data-operation="inc">
                     <i class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></i>
-                    <span class="sr">Increase</span>
+                    <span class="sr">${_('Increase')}</span>
                   </button>
                   <button class="dec button" data-operation="dec">
                     <i class="icon fa fa-caret-down"></i>
-                    <span class="sr">Decrease</span>
+                    <span class="sr">${_('Decrease')}</span>
                   </button>
                       <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                   <span class="error-text hidden" id="students-${item.id}"></span>
@@ -122,7 +122,7 @@ from openedx.core.lib.courses import course_image_url
               <div class="col-3">
                  <button href="#" class="btn-remove" data-item-id="${item.id}">
                   <i class="icon fa fa-times-circle" aria-hidden="true"></i>
-                  <span class="sr">Remove</span>
+                  <span class="sr">${_('Remove')}</span>
                 </button>
               </div>
           </div>
@@ -136,7 +136,7 @@ from openedx.core.lib.courses import course_image_url
             <div class="code-text">
             % if not discount_applied:
               <div class="code-input" aria-live="polite">
-                <label for="input_code" class="sr">Discount or activation code</label>
+                <label for="input_code" class="sr">${_('Discount or activation code')}</label>
                 <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
                 <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
                 <span class="error-text hidden" id="code"></span>
