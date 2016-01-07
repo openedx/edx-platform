@@ -4,7 +4,7 @@ import logging
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.programs.utils import get_programs_for_credentials
-from openedx.core.lib.api_utils import get_api_data
+from openedx.core.lib.edx_api_utils import get_edx_api_data
 
 
 log = logging.getLogger(__name__)
@@ -22,14 +22,13 @@ def get_user_credentials(user):
     user_query = {'username': user.username}
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
-    use_cache = credential_configuration.is_cache_enabled and not user.is_staff
-    cache_key = None
-    if use_cache:
+    if credential_configuration.is_cache_enabled and not user.is_staff:
         cache_key = credential_configuration.CACHE_KEY + '.' + user.username
+    else:
+        cache_key = None
 
-    credentials = get_api_data(
-        credential_configuration, user, credential_configuration.API_NAME, 'user_credentials',
-        querystring=user_query, use_cache=use_cache, cache_key=cache_key
+    credentials = get_edx_api_data(
+        credential_configuration, user, 'user_credentials', querystring=user_query, cache_key=cache_key
     )
     return credentials
 
