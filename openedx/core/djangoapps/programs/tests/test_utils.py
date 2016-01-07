@@ -2,6 +2,7 @@
 from django.core.cache import cache
 from django.test import TestCase
 import httpretty
+import mock
 from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
@@ -39,6 +40,56 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
 
         # Verify the API was actually hit (not the cache).
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
+
+    @httpretty.activate
+    def test_get_programs_caching(self):
+        """Verify that when enabled, the cache is used for non-staff users."""
+        self.create_programs_config(cache_ttl=1)
+        self.mock_programs_api()
+
+        # Warm up the cache.
+        get_programs(self.user)
+
+        # Hit the cache.
+        get_programs(self.user)
+
+        # Verify only one request was made.
+        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
+
+        staff_user = UserFactory(is_staff=True)
+
+        # Hit the Programs API twice.
+        for _ in range(2):
+            get_programs(staff_user)
+
+        # Verify that three requests have been made (one for student, two for staff).
+        self.assertEqual(len(httpretty.httpretty.latest_requests), 3)
+
+    def test_get_programs_programs_disabled(self):
+        """Verify behavior when programs is disabled."""
+        self.create_programs_config(enabled=False)
+
+        actual = get_programs(self.user)
+        self.assertEqual(actual, [])
+
+    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
+    def test_get_programs_client_initialization_failure(self, mock_init):
+        """Verify behavior when API client fails to initialize."""
+        self.create_programs_config()
+        mock_init.side_effect = Exception
+
+        actual = get_programs(self.user)
+        self.assertEqual(actual, [])
+        self.assertTrue(mock_init.called)
+
+    @httpretty.activate
+    def test_get_programs_data_retrieval_failure(self):
+        """Verify behavior when data can't be retrieved from Programs."""
+        self.create_programs_config()
+        self.mock_programs_api(status_code=500)
+
+        actual = get_programs(self.user)
+        self.assertEqual(actual, [])
 
     @httpretty.activate
     def test_get_programs_for_dashboard(self):

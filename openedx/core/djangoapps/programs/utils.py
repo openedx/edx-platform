@@ -4,7 +4,7 @@ from urlparse import urljoin
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.lib.api_utils import get_api_data
+from openedx.core.lib.edx_api_utils import get_edx_api_data
 
 
 log = logging.getLogger(__name__)
@@ -25,13 +25,12 @@ def get_programs(user):
     programs_config = ProgramsApiConfig.current()
 
     # Bypass caching for staff users, who may be creating Programs and want to see them displayed immediately.
-    use_cache = programs_config.is_cache_enabled and not user.is_staff
-    cache_key = None
-    if use_cache:
+    if programs_config.is_cache_enabled and not user.is_staff:
         cache_key = programs_config.CACHE_KEY
-    return get_api_data(
-        programs_config, user, programs_config.API_NAME, 'programs', use_cache=use_cache, cache_key=cache_key
-    )
+    else:
+        cache_key = None
+
+    return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
 
 
 def get_programs_for_dashboard(user, course_keys):

@@ -2399,7 +2399,7 @@ def _get_xseries_credentials(user):
     programs_credentials = get_user_program_credentials(user)
     credentials_data = []
     for program in programs_credentials:
-        if program.get('status') == 'active':
+        if program.get('category') == 'xseries':
             try:
                 program_data = {
                     'display_name': program['name'],
