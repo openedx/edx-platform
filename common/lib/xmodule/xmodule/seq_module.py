@@ -191,7 +191,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         bookmarks_service = self.runtime.service(self, "bookmarks")
         context["username"] = self.runtime.service(self, "user").get_current_user().opt_attrs['edx-platform.username']
 
-        display_names = [self.get_parent().display_name or '', self.display_name or '']
+        parent_module = self.get_parent()
+        display_names = [
+            parent_module.display_name_with_default,
+            self.display_name_with_default
+        ]
 
         # We do this up here because proctored exam functionality could bypass
         # rendering after this section.
@@ -228,7 +232,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'type': child.get_icon_class(),
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
                 'bookmarked': is_bookmarked,
-                'path': " > ".join(display_names + [child.display_name or '']),
+                'path': " > ".join(display_names + [child.display_name_with_default]),
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default_escaped
