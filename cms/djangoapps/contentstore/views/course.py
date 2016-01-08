@@ -546,7 +546,7 @@ def course_index(request, course_key):
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
-            reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
+            reindex_link = u"/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.REQUEST.get('show', None)

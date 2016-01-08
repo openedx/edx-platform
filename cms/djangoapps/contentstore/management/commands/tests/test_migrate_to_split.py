@@ -68,7 +68,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         """
         call_command(
             "migrate_to_split",
-            str(self.course.id),
+            unicode(self.course.id),
             str(self.user.email),
         )
         split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
@@ -92,7 +92,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         # lack of error implies success
         call_command(
             "migrate_to_split",
-            str(self.course.id),
+            unicode(self.course.id),
             str(self.user.id),
         )
 
@@ -102,7 +102,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         """
         call_command(
             "migrate_to_split",
-            str(self.course.id),
+            unicode(self.course.id),
             str(self.user.id),
             "org.dept", "name", "run",
         )

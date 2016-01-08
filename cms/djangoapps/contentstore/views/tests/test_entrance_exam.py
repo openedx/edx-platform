@@ -7,6 +7,7 @@ from mock import patch
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
+from django.utils.http import urlquote
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
 from contentstore.utils import reverse_url
@@ -34,8 +35,8 @@ class EntranceExamHandlerTests(CourseTestCase):
         super(EntranceExamHandlerTests, self).setUp()
         self.course_key = self.course.id
         self.usage_key = self.course.location
-        self.course_url = '/course/{}'.format(unicode(self.course.id))
-        self.exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        self.course_url = u'/course/{}'.format(unicode(self.course.id))
+        self.exam_url = u'/course/{}/entrance_exam/'.format(unicode(self.course.id))
         milestones_helpers.seed_milestone_relationship_types()
         self.milestone_relationship_types = milestones_helpers.get_milestone_relationship_types()
 
@@ -175,7 +176,7 @@ class EntranceExamHandlerTests(CourseTestCase):
         user.save()
         milestones = milestones_helpers.get_course_milestones(unicode(self.course_key))
         self.assertEqual(len(milestones), 1)
-        milestone_key = '{}.{}'.format(milestones[0]['namespace'], milestones[0]['name'])
+        milestone_key = u'{}.{}'.format(milestones[0]['namespace'], milestones[0]['name'])
         paths = milestones_helpers.get_course_milestones_fulfillment_paths(
             unicode(self.course_key),
             milestones_helpers.serialize_user(user)

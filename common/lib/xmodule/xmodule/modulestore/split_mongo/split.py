@@ -1652,7 +1652,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         source_index = self.get_course_index_info(source_course_id)
         if source_index is None:
-            raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
+            raise ItemNotFoundError(u"Cannot find a course at {0}. Aborting".format(source_course_id))
 
         with self.bulk_operations(dest_course_id):
             new_course = self.create_course(
