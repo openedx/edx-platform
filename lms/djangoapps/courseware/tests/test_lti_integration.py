@@ -5,10 +5,10 @@ import json
 import mock
 from nose.plugins.attrib import attr
 import oauthlib
-import urllib
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.http import urlquote
 
 from courseware.tests import BaseTestXmodule
 from courseware.views import get_course_lti_endpoints
@@ -43,10 +43,10 @@ class TestLTI(BaseTestXmodule):
         context_id = self.item_descriptor.course_id.to_deprecated_string()
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
-        resource_link_id = unicode(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
+        resource_link_id = unicode(urlquote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
 
-        sourcedId = "{context}:{resource_link}:{user_id}".format(
-            context=urllib.quote(context_id),
+        sourcedId = u"{context}:{resource_link}:{user_id}".format(
+            context=urlquote(context_id),
             resource_link=resource_link_id,
             user_id=user_id
         )

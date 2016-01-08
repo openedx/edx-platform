@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.utils import translation
+from django.utils.http import urlquote
 from nose.plugins.attrib import attr
 from rest_framework.test import APITestCase, APIClient
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -68,7 +69,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         dashboard, and is redirected to the login page."""
         anonymous_client = APIClient()
         response = anonymous_client.get(self.teams_url)
-        redirect_url = u'{0}?next={1}'.format(settings.LOGIN_URL, self.teams_url)
+        redirect_url = u'{0}?next={1}'.format(settings.LOGIN_URL, urlquote(self.teams_url))
         self.assertRedirects(response, redirect_url)
 
     def test_not_enrolled_not_staff(self):

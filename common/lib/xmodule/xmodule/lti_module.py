@@ -66,6 +66,8 @@ from webob import Response
 import mock
 from xml.sax.saxutils import escape
 
+from django.utils.http import urlquote
+
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
@@ -511,8 +513,8 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         The TP should only retain the most recent value for this field for a particular resource_link_id / user_id.
         This field is generally optional, but is required for grading.
         """
-        return "{context}:{resource_link}:{user_id}".format(
-            context=urllib.quote(self.context_id),
+        return u"{context}:{resource_link}:{user_id}".format(
+            context=urlquote(self.context_id),
             resource_link=self.get_resource_link_id(),
             user_id=self.get_user_id()
         )

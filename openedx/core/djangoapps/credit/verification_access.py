@@ -111,7 +111,7 @@ def _other_partitions(verified_partitions, exclude_partitions, course_key):
                 "Disabled partition %s in course %s because the "
                 "associated in-course-reverification checkpoint does not exist."
             ),
-            partition.id, course_key
+            partition.id, unicode(course_key)
         )
 
     return results
@@ -138,7 +138,7 @@ def _set_verification_partitions(course_key, icrv_blocks):
 
     course = modulestore().get_course(course_key)
     if course is None:
-        log.error("Could not find course %s", course_key)
+        log.error("Could not find course %s", unicode(course_key))
         return []
 
     verified_partitions = course.get_user_partitions_for_scheme(scheme)
@@ -165,15 +165,14 @@ def _set_verification_partitions(course_key, icrv_blocks):
             ]
         )
         partitions.append(partition)
-
         log.info(
             (
                 "Configured partition %s for course %s using a verified partition scheme "
                 "for the in-course-reverification checkpoint at location %s"
             ),
             partition.id,
-            course_key,
-            partition.parameters["location"]
+            unicode(course_key),
+            unicode(partition.parameters["location"])
         )
 
     # Preserve existing, non-verified partitions from the course

@@ -1165,7 +1165,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
-            '/courses/{course_id}/bar/content'.format(
+            u'/courses/{course_id}/bar/content'.format(
                 course_id=self.course.id.to_deprecated_string()
             ),
             result_fragment.content

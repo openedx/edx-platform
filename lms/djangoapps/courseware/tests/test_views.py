@@ -16,6 +16,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
+from django.utils.http import urlquote
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -90,15 +91,15 @@ class TestJumpTo(ModuleStoreTestCase):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+        expected = u'courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
+            course_id=urlquote(unicode(course.id)),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
             activate_block_id=urlencode({'activate_block_id': unicode(section.location)})
         )
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+        jumpto_url = u'{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
+            urlquote(unicode(course.id)),
             unicode(section.location),
         )
         response = self.client.get(jumpto_url)
@@ -113,29 +114,29 @@ class TestJumpTo(ModuleStoreTestCase):
         module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+        expected = u'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
+            course_id=urlquote(unicode(course.id)),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
             activate_block_id=urlencode({'activate_block_id': unicode(module1.location)})
         )
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+        jumpto_url = u'{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
+            urlquote(unicode(course.id)),
             unicode(module1.location),
         )
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+        expected = u'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
+            course_id=urlquote(unicode(course.id)),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
             activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
         )
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+        jumpto_url = u'{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
+            urlquote(unicode(course.id)),
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)
@@ -155,15 +156,15 @@ class TestJumpTo(ModuleStoreTestCase):
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+        expected = u'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
+            course_id=urlquote(unicode(course.id)),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
             activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
         )
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+        jumpto_url = u'{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
+            urlquote(unicode(course.id)),
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)

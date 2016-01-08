@@ -355,7 +355,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
         milestone = {
             'name': 'Test Milestone',
-            'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
+            'namespace': u'{}.entrance_exams'.format(unicode(self.course.id)),
             'description': 'Testing Courseware Tabs'
         }
         self.user.is_staff = False

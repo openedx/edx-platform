@@ -328,7 +328,7 @@ from student.helpers import (
                   <b class="message-copy-bold">
                     ${_("Pursue a {cert_name_long} to highlight the knowledge and skills you gain in this course.").format(cert_name_long=cert_name_long)}
                   </b><br>
-                    ${_("It's official. It's easily shareable. It's a proven motivator to complete the course. <br>{link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}" class="verified-info" data-course-key="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT'), enrollment.course_id), link_end="</a>", cert_name_long=cert_name_long)}
+                    ${_(u"It's official. It's easily shareable. It's a proven motivator to complete the course. <br>{link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start=u'<a href="{}" class="verified-info" data-course-key="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT'), enrollment.course_id), link_end="</a>", cert_name_long=cert_name_long)}
                 </p>
                 <div class="action-upgrade-container">
                   <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
