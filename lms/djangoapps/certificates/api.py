@@ -122,8 +122,15 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     return status
 
 
-def regenerate_user_certificates(student, course_key, course=None,
-                                 forced_grade=None, template_file=None, insecure=False):
+def regenerate_user_certificates(
+            student,
+            course_key,
+            course=None,
+            designation='None',
+            forced_grade=None,
+            template_file=None,
+            insecure=False,
+    ):
     """
     It will add the regen-cert request into the xqueue.
 
@@ -151,6 +158,7 @@ def regenerate_user_certificates(student, course_key, course=None,
         student,
         course_key,
         course=course,
+        designation=designation,
         forced_grade=forced_grade,
         template_file=template_file,
         generate_pdf=generate_pdf
