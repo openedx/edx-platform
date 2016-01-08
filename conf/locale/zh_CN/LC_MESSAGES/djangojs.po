@@ -71,7 +71,7 @@
 # Harry Li <harry75369@gmail.com>, 2014
 # bnw, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
-# jsgang <jsgang9@gmail.com>, 2014-2015
+# jsgang <jsgang9@gmail.com>, 2014-2016
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Na Liu <nanamadier@gmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
@@ -99,7 +99,7 @@
 # Bill <power_free@126.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
-# jsgang <jsgang9@gmail.com>, 2014-2015
+# jsgang <jsgang9@gmail.com>, 2014-2016
 # Jun Hao Lin <xuxiao15994219982@gmail.com>, 2015
 # Lionel Chen <chenlinchuan@me.com>, 2014
 # LIU NIAN <lauraqq@gmail.com>, 2015
@@ -122,7 +122,7 @@
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # Dustin Yu <dustintt123@hotmail.com>, 2015
 # GoodLuck <1833447072@qq.com>, 2014
-# jsgang <jsgang9@gmail.com>, 2015
+# jsgang <jsgang9@gmail.com>, 2015-2016
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # peipeixiang <peipei0903@gmail.com>, 2015
 # Rom, 2015
@@ -135,7 +135,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2015-12-14 21:31+0000\n"
-"PO-Revision-Date: 2015-12-12 07:12+0000\n"
+"PO-Revision-Date: 2016-01-07 07:45+0000\n"
 "Last-Translator: jsgang <jsgang9@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"

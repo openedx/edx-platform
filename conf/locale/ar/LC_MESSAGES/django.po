@@ -84,7 +84,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
-# omarithawi <oithawi@qrf.org>, 2014-2015
+# omarithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # Soha Assali <soha+transifex@qordoba.com>, 2015
@@ -9923,7 +9923,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
-msgstr "اسعى للحصول على شهادة موثّقة"
+msgstr "اسعَ للحصول على شهادة موثّقة"
 
 #: common/templates/course_modes/choose.html
 msgid ""

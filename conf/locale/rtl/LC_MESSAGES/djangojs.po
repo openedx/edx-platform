@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-04 15:19+0000\n"
-"PO-Revision-Date: 2016-01-04 15:21:19.796218\n"
+"POT-Creation-Date: 2016-01-08 15:23+0000\n"
+"PO-Revision-Date: 2016-01-08 15:23:59.975483\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -108,6 +108,7 @@ msgstr "ذشرذثم"
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/show-textbook.underscore
@@ -640,6 +641,7 @@ msgstr "ثيهف افوم"
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-details.underscore
@@ -2755,7 +2757,6 @@ msgstr "ثققخق لثرثقشفهرل حقخزمثو لقشيث قثحخقف. 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "عسثقرشوث"
@@ -3480,6 +3481,7 @@ msgid "Enter Start Date and Time"
 msgstr "ثرفثق سفشقف يشفث شري فهوث"
 
 #: lms/static/js/certificates/models/certificate_exception.js
+#: lms/static/js/certificates/models/certificate_invalidation.js
 msgid "Student username/email field is required and can not be empty. "
 msgstr "سفعيثرف عسثقرشوث/ثوشهم بهثمي هس قثضعهقثي شري ذشر رخف زث ثوحفغ. "
 
@@ -3526,6 +3528,30 @@ msgstr " مثشقرثقس شقث رخف ثرقخممثي هر ذخعقسث شر�
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course and not added to the exception"
 msgstr " مثشقرثق هس رخف ثرقخممثي هر ذخعقسث شري رخف شييثي فخ فاث ثطذثحفهخر"
+
+#: lms/static/js/certificates/views/certificate_invalidation_view.js
+msgid "Certificate of "
+msgstr "ذثقفهبهذشفث خب "
+
+#: lms/static/js/certificates/views/certificate_invalidation_view.js
+msgid " has already been invalidated. Please check your spelling and retry."
+msgstr " اشس شمقثشيغ زثثر هردشمهيشفثي. حمثشسث ذاثذن غخعق سحثممهرل شري قثفقغ."
+
+#: lms/static/js/certificates/views/certificate_invalidation_view.js
+msgid "Certificate has been successfully invalidated for "
+msgstr "ذثقفهبهذشفث اشس زثثر سعذذثسسبعممغ هردشمهيشفثي بخق "
+
+#: lms/static/js/certificates/views/certificate_invalidation_view.js
+msgid "Server Error, Please refresh the page and try again."
+msgstr "سثقدثق ثققخق, حمثشسث قثبقثسا فاث حشلث شري فقغ شلشهر."
+
+#: lms/static/js/certificates/views/certificate_invalidation_view.js
+msgid "The certificate for this learner has been re-validated and "
+msgstr "فاث ذثقفهبهذشفث بخق فاهس مثشقرثق اشس زثثر قث-دشمهيشفثي شري "
+
+#: lms/static/js/certificates/views/certificate_invalidation_view.js
+msgid "Could not find Certificate Invalidation in the list. "
+msgstr "ذخعمي رخف بهري ذثقفهبهذشفث هردشمهيشفهخر هر فاث مهسف. "
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -4595,6 +4621,18 @@ msgstr "عحمخشي ذخوحمثفثي"
 msgid "Upload failed"
 msgstr "عحمخشي بشهمثي"
 
+#: cms/static/js/models/chapter.js
+msgid "Chapter name and asset_path are both required"
+msgstr "ذاشحفثق رشوث شري شسسثف_حشفا شقث زخفا قثضعهقثي"
+
+#: cms/static/js/models/chapter.js
+msgid "Chapter name is required"
+msgstr "ذاشحفثق رشوث هس قثضعهقثي"
+
+#: cms/static/js/models/chapter.js
+msgid "asset_path is required"
+msgstr "شسسثف_حشفا هس قثضعهقثي"
+
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
 msgstr "غخع وعسف سحثذهبغ ش رشوث"
@@ -4682,6 +4720,18 @@ msgstr "لقشذث حثقهخي وعسف زث سحثذهبهثي هر اا:وو 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr "رخف شزمث فخ سثف حشسسهرل لقشيث فخ مثسس فاشر %(minimum_grade_cutoff)s%."
+
+#: cms/static/js/models/textbook.js
+msgid "Textbook name is required"
+msgstr "فثطفزخخن رشوث هس قثضعهقثي"
+
+#: cms/static/js/models/textbook.js
+msgid "Please add at least one chapter"
+msgstr "حمثشسث شيي شف مثشسف خرث ذاشحفثق"
+
+#: cms/static/js/models/textbook.js
+msgid "All chapters must have a name and asset"
+msgstr "شمم ذاشحفثقس وعسف اشدث ش رشوث شري شسسثف"
 
 #: cms/static/js/models/uploads.js
 msgid ""
@@ -5437,6 +5487,12 @@ msgstr "شذفهخرس"
 msgid "Unscheduled"
 msgstr "عرسذاثيعمثي"
 
+#: cms/templates/js/course_info_update.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Date"
+msgstr "يشفث"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -5859,6 +5915,7 @@ msgid "course id"
 msgstr "ذخعقسث هي"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr "رخ قثسعمفس"
@@ -5926,6 +5983,11 @@ msgstr "ثطحمشهر هب خفاثق."
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Submit enrollment change"
 msgstr "سعزوهف ثرقخمموثرف ذاشرلث"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Username or email address"
+msgstr "عسثقرشوث خق ثوشهم شييقثسس"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
@@ -6215,11 +6277,6 @@ msgstr "خقيثق رخ."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "يشفث"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Amount"
 msgstr "شوخعرف"
 
@@ -6413,6 +6470,48 @@ msgstr "زقخصسث"
 msgid "Add to Exception List"
 msgstr "شيي فخ ثطذثحفهخر مهسف"
 
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid ""
+"To invalidate a certificate for a particular learner, add the username or "
+"email address below."
+msgstr ""
+"فخ هردشمهيشفث ش ذثقفهبهذشفث بخق ش حشقفهذعمشق مثشقرثق, شيي فاث عسثقرشوث خق "
+"ثوشهم شييقثسس زثمخص."
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Add notes about this learner"
+msgstr "شيي رخفثس شزخعف فاهس مثشقرثق"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Invalidate Certificate"
+msgstr "هردشمهيشفث ذثقفهبهذشفث"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Student"
+msgstr "سفعيثرف"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Invalidated By"
+msgstr "هردشمهيشفثي زغ"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Invalidated"
+msgstr "هردشمهيشفثي"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Notes"
+msgstr "رخفثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "شذفهخر"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+msgid "Remove from Invalidation Table"
+msgstr "قثوخدث بقخو هردشمهيشفهخر فشزمث"
+
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
 msgstr "هريهدهيعشم ثطذثحفهخرس"
@@ -6456,14 +6555,6 @@ msgstr "ثطذثحفهخر لقشرفثي"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Certificate Generated"
 msgstr "ذثقفهبهذشفث لثرثقشفثي"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Notes"
-msgstr "رخفثس"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Action"
-msgstr "شذفهخر"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Remove from List"
@@ -6640,10 +6731,10 @@ msgstr[1] "(ذخرفشهرس %(student_count)s سفعيثرفس)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
-"Students are added to this cohort only when you provide their email "
+"Learners are added to this cohort only when you provide their email "
 "addresses or usernames on this page."
 msgstr ""
-"سفعيثرفس شقث شييثي فخ فاهس ذخاخقف خرمغ صاثر غخع حقخدهيث فاثهق ثوشهم "
+"مثشقرثقس شقث شييثي فخ فاهس ذخاخقف خرمغ صاثر غخع حقخدهيث فاثهق ثوشهم "
 "شييقثسسثس خق عسثقرشوثس خر فاهس حشلث."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
@@ -6651,8 +6742,8 @@ msgid "What does this mean?"
 msgstr "صاشف يخثس فاهس وثشر?"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-msgid "Students are added to this cohort automatically."
-msgstr "سفعيثرفس شقث شييثي فخ فاهس ذخاخقف شعفخوشفهذشممغ."
+msgid "Learners are added to this cohort automatically."
+msgstr "مثشقرثقس شقث شييثي فخ فاهس ذخاخقف شعفخوشفهذشممغ."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 msgid "Select a cohort"
@@ -7504,6 +7595,10 @@ msgstr "فشنث حاخفخ"
 msgid "Drag and drop or click here to upload video files."
 msgstr "يقشل شري يقخح خق ذمهذن اثقث فخ عحمخشي دهيثخ بهمثس."
 
+#: cms/templates/js/active-video-upload-list.underscore
+msgid "Active Uploads"
+msgstr "شذفهدث عحمخشيس"
+
 #: cms/templates/js/active-video-upload.underscore
 msgid "status"
 msgstr "سفشفعس"
@@ -7537,6 +7632,14 @@ msgstr "مهسف خب عحمخشيثي بهمثس شري شسسثفس هر فا�
 #: cms/templates/js/asset-library.underscore
 msgid "- Sortable"
 msgstr "- سخقفشزمث"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Show All"
+msgstr "ساخص شمم"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr "خفاثق"
 
 #: cms/templates/js/asset-library.underscore
 msgid "URL"
@@ -7615,6 +7718,17 @@ msgstr "ذخعقسث رعوزثق خدثققهيث"
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Signatories"
 msgstr "ذثقفهبهذشفث سهلرشفخقهثس"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid ""
+"It is strongly recommended that you include four or fewer signatories. If "
+"you include additional signatories, preview the certificate in Print View to"
+" ensure the certificate will print correctly on one page."
+msgstr ""
+"هف هس سفقخرلمغ قثذخووثريثي فاشف غخع هرذمعيث بخعق خق بثصثق سهلرشفخقهثس. هب "
+"غخع هرذمعيث شييهفهخرشم سهلرشفخقهثس, حقثدهثص فاث ذثقفهبهذشفث هر حقهرف دهثص فخ"
+" ثرسعقث فاث ذثقفهبهذشفث صهمم حقهرف ذخققثذفمغ خر خرث حشلث."
 
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
@@ -8217,8 +8331,18 @@ msgid "View Live"
 msgstr "دهثص مهدث"
 
 #: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
+msgid "Signatory"
+msgstr "سهلرشفخقغ"
+
+#: cms/templates/js/signatory-details.underscore
 msgid "Organization"
 msgstr "خقلشرهظشفهخر"
+
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
+msgid "Signature Image"
+msgstr "سهلرشفعقث هوشلث"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Certificate Signatory Configuration"
@@ -8269,16 +8393,16 @@ msgstr ""
 "ذثقفهبهذشفثس."
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Signature Image"
-msgstr "سهلرشفعقث هوشلث"
-
-#: cms/templates/js/signatory-editor.underscore
 msgid "Path to Signature Image"
 msgstr "حشفا فخ سهلرشفعقث هوشلث"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Image must be in PNG format"
 msgstr "هوشلث وعسف زث هر حرل بخقوشف"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Upload Signature Image"
+msgstr "عحمخشي سهلرشفعقث هوشلث"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Student Visibility"
