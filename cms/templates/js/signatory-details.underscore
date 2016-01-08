@@ -6,7 +6,7 @@
     </span>
   </div>
   <% } %>
-  <div class="signatory-panel-header">Signatory <%= signatory_number %>&nbsp;</div>
+  <div class="signatory-panel-header"><%= gettext("Signatory") %> <%= signatory_number %>&nbsp;</div>
   <div class="signatory-panel-body">
     <div>
         <div>
@@ -25,7 +25,7 @@
     <div class="signatory-image">
       <% if (signature_image_path != "") { %>
             <div class="wrapper-signature-image">
-                <img class="signature-image" src="<%= signature_image_path %>" alt="Signature Image">
+                <img class="signature-image" src="<%= signature_image_path %>" alt="<%= gettext('Signature Image') %>">
             </div>
       <% } %>
     </div>
