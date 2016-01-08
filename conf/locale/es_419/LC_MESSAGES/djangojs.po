@@ -23,7 +23,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # karlman72 <karlman72@gmail.com>, 2014
 # Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2014
-# Laura Silva <lingison@edx.org>, 2015
+# Laura Silva <lingison@edx.org>, 2015-2016
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
@@ -74,6 +74,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
 # Juan <juan.marrero@utec.edu.uy>, 2015
+# Laura Silva <lingison@edx.org>, 2016
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
 # Nuri Plans Toral <nplans@gmail.com>, 2014
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
@@ -209,10 +210,16 @@ msgstr "Borrar"
 msgid "Uploading"
 msgstr "Subiendo"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/asset-library.underscore
+#: cms/templates/js/previous-video-upload-list.underscore
+#: cms/templates/js/signatory-details.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "Nombre"
 
@@ -2977,10 +2984,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "Nombre de usuario"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -3943,6 +3955,7 @@ msgstr "Elegir uno"
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An error has occurred. Check your Internet connection and try again."
 msgstr ""
+"Ha ocurrido un error. Revise su conexión a Internet e intente nuevamente."
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -4329,6 +4342,8 @@ msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
 "reset your password."
 msgstr ""
+"Hemos enviado un mensaje a {email_address}. Haga clic en el mensaje para "
+"restablecer su contraseña."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink"
@@ -4463,11 +4478,11 @@ msgstr "Pagar con {processor}"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "All payment options are currently unavailable."
-msgstr ""
+msgstr "Ningún método de pago está disponible en este momento."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Try the transaction again in a few minutes."
-msgstr ""
+msgstr "Intente la transacción nuevamente en algunos minutos."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "An error has occurred. Please try again."
@@ -5095,6 +5110,9 @@ msgid "Max file size exceeded"
 msgstr "Tamaño maximo del archivo excedido"
 
 #: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Choose File"
 msgstr "Elegir archivo"
 
@@ -5779,7 +5797,7 @@ msgstr "Acciones"
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Unscheduled"
-msgstr ""
+msgstr "No programado"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -6256,8 +6274,8 @@ msgstr "Validado hace %(time_ago)s"
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Mostrar Comentarios (%(num_comments)s)"
+msgstr[1] "Mostrar comentarios (%(num_comments)s)"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response.underscore
@@ -6366,7 +6384,7 @@ msgstr "Área Temática"
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Discussion topics; current selection is: "
-msgstr ""
+msgstr "Temas de discusión; la selección actual es: "
 
 #: common/static/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
@@ -6601,7 +6619,7 @@ msgstr "eliminar todo"
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "gettext("
-msgstr ""
+msgstr "gettext("
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
@@ -6633,13 +6651,13 @@ msgstr "Subsección"
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove subsection %(subsectionDisplayName)s"
-msgstr ""
+msgstr "Borrar subsección %(subsectionDisplayName)s"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove unit %(unitName)s"
-msgstr ""
+msgstr "Borrar unidad %(unitName)s"
 
 #: lms/templates/commerce/provider.underscore
 #: test_root/staticfiles/templates/commerce/provider.underscore
@@ -6871,7 +6889,7 @@ msgstr "Título"
 #: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 #: test_root/staticfiles/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
-msgstr ""
+msgstr "Solicitud de asistencia financiera"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Unable to submit application"
@@ -6892,22 +6910,22 @@ msgstr ""
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
-msgstr ""
+msgstr "Correo electrónico"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Legal name"
-msgstr ""
+msgstr "Nombre"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Country of residence"
-msgstr ""
+msgstr "País de residencia"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Back to {platform} FAQs"
-msgstr ""
+msgstr "Regresar a FAQs de {platform}"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
@@ -6939,19 +6957,19 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
-msgstr ""
+msgstr "Explorar"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
-msgstr ""
+msgstr "Agregar a lista de excepciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
-msgstr ""
+msgstr "Excepciones individuales"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -6963,17 +6981,17 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
-msgstr ""
+msgstr "Generar excepciones de certificados"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all "
-msgstr ""
+msgstr "Generar certificado para todos"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "New"
-msgstr ""
+msgstr "Nuevo"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -6988,7 +7006,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
-msgstr ""
+msgstr "Correo electrónico del usuario"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -6998,17 +7016,17 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Certificate Generated"
-msgstr ""
+msgstr "Certificado generado"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
-msgstr ""
+msgstr "Notas"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -8063,7 +8081,7 @@ msgstr "precio"
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Account Not Activated"
-msgstr ""
+msgstr "Cuenta no activada"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8086,19 +8104,19 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Check your email for an activation message."
-msgstr ""
+msgstr "Revise sus correos electrónicos para un mensaje de activación."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
 msgid "Professional Certificate for %(courseName)s"
-msgstr ""
+msgstr "Certificado Verificado para %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
 msgid "Verified Certificate for %(courseName)s"
-msgstr ""
+msgstr "Certificado Verificado para %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8107,11 +8125,13 @@ msgid ""
 "To receive a certificate, you must also verify your identity before "
 "%(date)s."
 msgstr ""
+"Para recibir un certificado, también debe verificar su identidad antes del "
+"%(date)s."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
-msgstr ""
+msgstr "Para recibir un certificado, también debe verificar su identidad."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8302,7 +8322,7 @@ msgstr ""
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Special Exam"
-msgstr ""
+msgstr "Exámen especial"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
@@ -8311,11 +8331,11 @@ msgstr ""
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Username or Email"
-msgstr ""
+msgstr "Nombre de usuario o correo electrónico"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowances"
@@ -8336,11 +8356,11 @@ msgstr ""
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Time Limit"
-msgstr ""
+msgstr "Tiempo límite"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Started At"
-msgstr ""
+msgstr "Iniciado a"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
