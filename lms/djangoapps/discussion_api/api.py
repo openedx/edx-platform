@@ -18,7 +18,6 @@ from courseware.courses import get_course_with_access
 
 from discussion_api.exceptions import ThreadNotFoundError, CommentNotFoundError, DiscussionDisabledError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
-from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
     can_delete,
     get_editable_fields,
@@ -38,6 +37,7 @@ from django_comment_common.signals import (
     comment_deleted,
 )
 from django_comment_client.utils import get_accessible_discussion_modules, is_commentable_cohorted
+from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
@@ -341,9 +341,12 @@ def get_thread_list(
         raise PageNotFoundError("Page not found (No results on this page).")
 
     results = [ThreadSerializer(thread, context=context).data for thread in threads]
-    ret = get_paginated_data(request, results, page, num_pages)
-    ret["text_search_rewrite"] = text_search_rewrite
-    return ret
+
+    paginator = DiscussionAPIPagination(request, result_page, num_pages)
+    return paginator.get_paginated_response({
+        "results": results,
+        "text_search_rewrite": text_search_rewrite,
+    })
 
 
 def get_comment_list(request, thread_id, endorsed, page, page_size):
@@ -412,7 +415,8 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
 
     results = [CommentSerializer(response, context=context).data for response in responses]
-    return get_paginated_data(request, results, page, num_pages)
+    paginator = DiscussionAPIPagination(request, page, num_pages)
+    return paginator.get_paginated_response(results)
 
 
 def _check_fields(allowed_fields, data, message):
@@ -751,7 +755,8 @@ def get_response_comments(request, comment_id, page, page_size):
 
         comments_count = len(response_comments)
         num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
-        return get_paginated_data(request, results, page, num_pages)
+        paginator = DiscussionAPIPagination(request, page, num_pages)
+        return paginator.get_paginated_response(results)
     except CommentClientRequestError:
         raise CommentNotFoundError("Comment not found")
 
