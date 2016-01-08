@@ -16,7 +16,7 @@ from student.tests.factories import UserFactory
 
 class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, ProgramsApiConfigMixin, ProgramsDataMixin,
                            TestCase):
-    """Test data retrieval from the api util function."""
+    """Test utility for API data retrieval."""
     def setUp(self):
         super(TestApiDataRetrieval, self).setUp()
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
@@ -27,7 +27,7 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
 
     @httpretty.activate
     def test_get_edx_api_data_programs(self):
-        """Verify programs data can be retrieve using get_edx_api_data."""
+        """Verify programs data can be retrieved using get_edx_api_data."""
         program_config = self.create_programs_config()
         self.mock_programs_api()
 
@@ -40,21 +40,8 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
         # Verify the API was actually hit (not the cache).
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
-    @httpretty.activate
-    def test_get_edx_api_data_credentials(self):
-        """Verify credentials data can be retrieve using get_edx_api_data."""
-        credentials_config = self.create_credentials_config()
-        self.mock_credentials_api(self.user)
-        querystring = {'username': self.user.username}
-
-        actual = get_edx_api_data(credentials_config, self.user, 'user_credentials', querystring=querystring)
-        self.assertEqual(
-            actual,
-            self.CREDENTIALS_API_RESPONSE['results']
-        )
-
     def test_get_edx_api_data_disable_config(self):
-        """Verify no data is retrieve if configuration is disabled."""
+        """Verify no data is retrieved if configuration is disabled."""
         program_config = self.create_programs_config(enabled=False)
 
         actual = get_edx_api_data(program_config, self.user, 'programs')
