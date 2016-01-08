@@ -32,7 +32,7 @@
                         <div class="nav-sub">
                             <ul>
                                 <li class="nav-item reset-filter">
-                                    <a class="column-filter-link" href="" data-assetfilter="ALL">Show All</a>
+                                    <a class="column-filter-link" href="" data-assetfilter="ALL"><%= gettext("Show All") %></a>
                                 </li>
                             <% _.each(typeData, function(type, key){ %>
                                 <li class="nav-item">
@@ -40,7 +40,7 @@
                                 </li>
                             <% }) %>
                                 <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="OTHER">Other</a>
+                                    <a class="column-filter-link" href="" data-assetfilter="OTHER"><%= gettext("Other") %></a>
                                 </li>
                             </ul>
                         </div>
