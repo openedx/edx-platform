@@ -77,26 +77,6 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
         self.assertEqual(actual, [])
 
     @httpretty.activate
-    def test_get_user_program_credentials_revoked(self):
-        """Verify behavior if credential revoked."""
-        self.create_credentials_config()
-        credential_data = {"results": [
-            {
-                "id": 1,
-                "username": "test",
-                "credential": {
-                    "credential_id": 1,
-                    "program_id": 1
-                },
-                "status": "revoked",
-                "uuid": "dummy-uuid-1"
-            }
-        ]}
-        self.mock_credentials_api(self.user, data=credential_data)
-        actual = get_user_program_credentials(self.user)
-        self.assertEqual(actual, [])
-
-    @httpretty.activate
     def test_get_user_programs_credentials(self):
         """Verify program credentials data can be retrieved and parsed correctly."""
         # create credentials and program configuration
@@ -118,4 +98,22 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
         self.assertEqual(len(actual), 2)
         self.assertEqual(actual, expected)
 
-        httpretty.reset()
+    @httpretty.activate
+    def test_get_user_program_credentials_revoked(self):
+        """Verify behavior if credential revoked."""
+        self.create_credentials_config()
+        credential_data = {"results": [
+            {
+                "id": 1,
+                "username": "test",
+                "credential": {
+                    "credential_id": 1,
+                    "program_id": 1
+                },
+                "status": "revoked",
+                "uuid": "dummy-uuid-1"
+            }
+        ]}
+        self.mock_credentials_api(self.user, data=credential_data)
+        actual = get_user_program_credentials(self.user)
+        self.assertEqual(actual, [])

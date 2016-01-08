@@ -12,14 +12,15 @@ log = logging.getLogger(__name__)
 
 
 def get_edx_api_data(api_config, user, resource, querystring=None, cache_key=None):
-    """Fetch the data from the API using provided API Configuration and
-    resource.
+    """Fetch data from an API using provided API configuration and resource
+        name.
 
     Arguments:
-        api_config(Api_configuration): The configuration model governing
+        api_config (ConfigurationModel): The configuration model governing
             interaction with the API.
         user (User): The user to authenticate as when requesting data.
-        resource(str): API resource for which data is being requested.
+        resource(str): Name of the API resource for which data is being
+            requested.
         querystring(dict): Querystring parameters that might be required to
             request data.
         cache_key(str): Where to cache retrieved data. Omitting this will cause the
