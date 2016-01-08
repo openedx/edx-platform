@@ -85,7 +85,7 @@ git+https://github.com/edx/i18n-tools.git@v0.1.4#egg=i18n-tools==v0.1.4
 git+https://github.com/edx/edx-oauth2-provider.git@0.5.8#egg=edx-oauth2-provider==0.5.8
 git+https://github.com/edx/edx-val.git@0.0.8#egg=edxval==0.0.8
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
--e git+https://github.com/jzoldak/FeedbackXBlock.git@3f9228d39e0ddbe6e94f9ee929b04fb5c9212e08#egg=feedback-xblock==0.0
+-e git+https://github.com/jzoldak/FeedbackXBlock.git@2b0a9515de80292241f01a36217ec8a64ffc661b#egg=feedback-xblock==0.0
 -e git+https://github.com/pmitros/DoneXBlock.git@857bf365f19c904d7e48364428f6b93ff153fabd#egg=done-xblock
 -e git+https://github.com/edx/edx-milestones.git@release-2015-11-17#egg=edx-milestones==0.1.5
 git+https://github.com/edx/edx-lint.git@v0.4.1#egg=edx_lint==0.4.1
