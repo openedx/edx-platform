@@ -32,6 +32,32 @@
     }
   }
 
+  .wrapper-xseries-certificates{
+    @include float(right);
+    @include margin-left(flex-gutter());
+    width: flex-grid(3);
+
+    .title{
+      @extend %t-title7;
+      @extend %t-weight4;
+    }
+
+    ul{
+      @include padding-left(0);
+      margin-top: ($baseline/2);
+    }
+
+    li{
+      @include line-height(20);
+      list-style-type: none;
+    }
+
+    .copy {
+      @extend %t-copy-sub1;
+      margin-top: ($baseline/2);
+    }
+  }
+
   .profile-sidebar {
     background: transparent;
     @include float(right);
