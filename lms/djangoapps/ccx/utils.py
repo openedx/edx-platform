@@ -29,15 +29,9 @@ from student.roles import CourseCcxCoachRole
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx
+from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
 
 log = logging.getLogger("edx.ccx")
-
-
-class CCXUserValidationException(Exception):
-    """
-    Custom Exception for validation of users in CCX
-    """
-    pass
 
 
 def get_ccx_from_ccx_locator(course_id):
