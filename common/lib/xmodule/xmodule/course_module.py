@@ -580,7 +580,7 @@ class CourseFields(object):
         help=_(
             "Enter the course number that you want to appear in the courseware. This setting overrides the course "
             "number that you entered when you created the course. To use the course number that you entered when "
-            "you created the course, enter null."
+            "you created the course, enter an empty string: \"\"."
         ),
         scope=Scope.settings,
         default=""
