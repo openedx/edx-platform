@@ -58,6 +58,7 @@ def edxnotes(request, course_id):
         "page_size": DEFAULT_PAGE_SIZE,
         "debug": json.dumps(settings.DEBUG),
         'position': None,
+        'disabled_tabs': settings.NOTES_DISABLED_TABS,
     }
 
     if len(json.loads(notes_info)['results']) == 0:

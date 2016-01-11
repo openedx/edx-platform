@@ -114,7 +114,7 @@ class EdxNotesPageItem(NoteChild):
     """
     BODY_SELECTOR = ".note"
     UNIT_LINK_SELECTOR = "a.reference-unit-link"
-    TAG_SELECTOR = "a.reference-tags"
+    TAG_SELECTOR = "span.reference-tags"
 
     def go_to_unit(self, unit_page=None):
         self.q(css=self._bounded_selector(self.UNIT_LINK_SELECTOR)).click()

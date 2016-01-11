@@ -111,6 +111,7 @@ import json
     <%block name="js_extra">
     <%static:require_module module_name="js/edxnotes/views/page_factory" class_name="NotesPageFactory">
         NotesPageFactory({
+            disabledTabs: ${disabled_tabs},
             notes: ${notes},
             notesEndpoint: '${notes_endpoint}',
             pageSize: '${page_size}',

@@ -142,6 +142,7 @@ def preprocess_collection(user, course, collection):
     store = modulestore()
     filtered_collection = list()
     cache = {}
+    include_extra_info = settings.NOTES_DISABLED_TABS == []
     with store.bulk_operations(course.id):
         for model in collection:
             update = {
@@ -177,42 +178,46 @@ def preprocess_collection(user, course, collection):
                 log.debug("Unit not found: %s", usage_key)
                 continue
 
-            section = unit.get_parent()
-            if not section:
-                log.debug("Section not found: %s", usage_key)
-                continue
-            if section in cache:
-                usage_context = cache[section]
-                usage_context.update({
-                    "unit": get_module_context(course, unit),
-                })
-                model.update(usage_context)
-                cache[usage_id] = cache[unit] = usage_context
-                filtered_collection.append(model)
-                continue
+            if include_extra_info:
+                section = unit.get_parent()
+                if not section:
+                    log.debug("Section not found: %s", usage_key)
+                    continue
+                if section in cache:
+                    usage_context = cache[section]
+                    usage_context.update({
+                        "unit": get_module_context(course, unit),
+                    })
+                    model.update(usage_context)
+                    cache[usage_id] = cache[unit] = usage_context
+                    filtered_collection.append(model)
+                    continue
 
-            chapter = section.get_parent()
-            if not chapter:
-                log.debug("Chapter not found: %s", usage_key)
-                continue
-            if chapter in cache:
-                usage_context = cache[chapter]
-                usage_context.update({
-                    "unit": get_module_context(course, unit),
-                    "section": get_module_context(course, section),
-                })
-                model.update(usage_context)
-                cache[usage_id] = cache[unit] = cache[section] = usage_context
-                filtered_collection.append(model)
-                continue
+                chapter = section.get_parent()
+                if not chapter:
+                    log.debug("Chapter not found: %s", usage_key)
+                    continue
+                if chapter in cache:
+                    usage_context = cache[chapter]
+                    usage_context.update({
+                        "unit": get_module_context(course, unit),
+                        "section": get_module_context(course, section),
+                    })
+                    model.update(usage_context)
+                    cache[usage_id] = cache[unit] = cache[section] = usage_context
+                    filtered_collection.append(model)
+                    continue
 
             usage_context = {
                 "unit": get_module_context(course, unit),
-                "section": get_module_context(course, section),
-                "chapter": get_module_context(course, chapter),
+                "section": get_module_context(course, section) if include_extra_info else {},
+                "chapter": get_module_context(course, chapter) if include_extra_info else {},
             }
             model.update(usage_context)
-            cache[usage_id] = cache[unit] = cache[section] = cache[chapter] = usage_context
+            if include_extra_info:
+                cache[section] = cache[chapter] = usage_context
+
+            cache[usage_id] = cache[unit] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
