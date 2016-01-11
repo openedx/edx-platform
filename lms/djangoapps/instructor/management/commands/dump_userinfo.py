@@ -166,9 +166,10 @@ class Command(BaseCommand):
 
         sys.stdout.write("Fetching enrolled students for {course}...".format(course=course_id))
 
-        certificates, profiles, registrations = self.query_database_for(course_id)
+        certificates, profiles, registrations, unpaid_registrations = self.query_database_for(course_id)
 
         registration_table = self.build_user_table(registrations)
+        unpaid_registration_table = self.build_user_table(unpaid_registrations)
         certificate_table = self.build_user_table(certificates)
 
         sys.stdout.write(" done.\n")
@@ -208,6 +209,9 @@ class Command(BaseCommand):
                 if student_dict['Payment Type'] == 'MasterCard':
                     student_dict['Payment Type'] = 'MC'
 
+            if 'Date Registered' not in student_dict:
+                student_dict['Date Registered'] = unpaid_registration_table[user_id].created.strftime("%m/%d/%Y")
+
             certificate = self.add_fields_to(student_dict, CERTIFICATE_FIELDS, certificate_table, user_id)
 
             # If the user has received a certificate, adjust their credits issued and course completion flag.
@@ -243,9 +247,12 @@ class Command(BaseCommand):
         cme_profiles = CourseEnrollment.objects.select_related('user__profile__cmeuserprofile').filter(course_id=course_id).values(
             *[field for field, label in PROFILE_FIELDS if 'untracked' not in field]
         ).order_by('user__username')
+
+        unpaid_registrations = CourseEnrollment.objects.filter(course_id=course_id)
         registrations = PaidCourseRegistration.objects.filter(status='purchased', course_id=course_id)
         certificates = GeneratedCertificate.objects.filter(course_id=course_id)
-        return certificates, cme_profiles, registrations
+        
+        return certificates, cme_profiles, registrations, unpaid_registrations
 
     def build_user_table(self, data_rows):
         table = {}
