@@ -71,7 +71,7 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
-    def register_get_threads_search_response(self, threads, rewrite):
+    def register_get_threads_search_response(self, threads, rewrite, num_pages=1):
         """Register a mock response for GET on the CS thread search endpoint"""
         httpretty.register_uri(
             httpretty.GET,
@@ -79,7 +79,7 @@ class CommentsServiceMockMixin(object):
             body=json.dumps({
                 "collection": threads,
                 "page": 1,
-                "num_pages": 1,
+                "num_pages": num_pages,
                 "corrected_text": rewrite,
             }),
             status=200
@@ -371,3 +371,18 @@ def make_minimal_cs_comment(overrides=None):
     }
     ret.update(overrides or {})
     return ret
+
+
+def make_paginated_api_response(results, count, num_pages, next, previous):
+    """
+    Generates the response dictionary of paginated APIs with passed data
+    """
+    return {
+        "pagination": {
+            "next": next,
+            "previous": previous,
+            "count": count,
+            "num_pages": num_pages,
+        },
+        "results": results
+    }
