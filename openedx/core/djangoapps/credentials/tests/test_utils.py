@@ -80,7 +80,7 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
     def test_get_user_programs_credentials(self):
         """Verify program credentials data can be retrieved and parsed correctly."""
         # create credentials and program configuration
-        credentials_config = self.create_credentials_config()
+        self.create_credentials_config()
         self.create_programs_config()
 
         # Mocking the API responses from programs and credentials
@@ -89,10 +89,6 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
 
         actual = get_user_program_credentials(self.user)
         expected = self.PROGRAMS_API_RESPONSE['results']
-        expected[0]['credential_url'] = \
-            credentials_config.public_service_url + 'credentials/' + self.PROGRAMS_CREDENTIALS_DATA[0]['uuid']
-        expected[1]['credential_url'] = \
-            credentials_config.public_service_url + 'credentials/' + self.PROGRAMS_CREDENTIALS_DATA[1]['uuid']
 
         # checking response from API is as expected
         self.assertEqual(len(actual), 2)

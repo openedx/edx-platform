@@ -56,6 +56,7 @@ class ProgramsDataMixin(object):
                 'category': 'xseries',
                 'status': 'unpublished',
                 'marketing_slug': '',
+                'credential_url': 'http://credentials.edx.org/credentials/dummy-uuid-1/',
                 'organizations': [
                     {
                         'display_name': 'Test Organization A',
@@ -122,6 +123,7 @@ class ProgramsDataMixin(object):
                 'category': 'xseries',
                 'status': 'unpublished',
                 'marketing_slug': '',
+                'credential_url': 'http://credentials.edx.org/credentials/dummy-uuid-2/',
                 'organizations': [
                     {
                         'display_name': 'Test Organization B',
@@ -193,7 +195,8 @@ class ProgramsDataMixin(object):
                 "program_id": 1
             },
             "status": "awarded",
-            "uuid": "dummy-uuid-1"
+            "uuid": "dummy-uuid-1",
+            "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-1/"
         },
         {
             "id": 2,
@@ -203,7 +206,8 @@ class ProgramsDataMixin(object):
                 "program_id": 2
             },
             "status": "awarded",
-            "uuid": "dummy-uuid-2"
+            "uuid": "dummy-uuid-2",
+            "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-2/"
         }
     ]
 

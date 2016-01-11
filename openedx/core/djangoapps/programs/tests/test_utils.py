@@ -137,15 +137,11 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
     def test_get_program_for_certificates(self):
         """Verify programs data can be retrieved and parsed correctly for certificates."""
         self.create_programs_config()
-        credentials_config = self.create_credentials_config()
         self.mock_programs_api()
 
         actual = get_programs_for_credentials(self.user, self.PROGRAMS_CREDENTIALS_DATA)
         expected = self.PROGRAMS_API_RESPONSE['results']
-        expected[0]['credential_url'] = \
-            credentials_config.public_service_url + 'credentials/' + self.PROGRAMS_CREDENTIALS_DATA[0]['uuid']
-        expected[1]['credential_url'] = \
-            credentials_config.public_service_url + 'credentials/' + self.PROGRAMS_CREDENTIALS_DATA[1]['uuid']
+
         self.assertEqual(len(actual), 2)
         self.assertEqual(actual, expected)
 
