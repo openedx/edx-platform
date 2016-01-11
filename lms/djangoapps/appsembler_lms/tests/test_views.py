@@ -67,7 +67,7 @@ class TestUserSignup(TestCase):
         # and associate it with the user
         john = User.objects.get(email="john@doe.com")
         acme = Organization.objects.get(key='acme')
-        self.assertEqual(john.profile.organization, acme)
+        self.assertIn(acme, john.organizations.all())
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, render_to_string('appsembler/emails/user_welcome_email_subject.txt'))
@@ -118,8 +118,7 @@ class TestUserSignup(TestCase):
         self.assertEqual(Organization.objects.all().count(), 1)
         organization = Organization.objects.get(key='acme')
         self.assertEqual(User.objects.filter(email='jane@doe.com').count(), 1)
-        self.assertEqual(User.objects.get(email='jane@doe.com').profile.organization,
-                         organization)
+        self.assertIn(organization, User.objects.get(email='jane@doe.com').organizations.all())
 
 
 

@@ -96,9 +96,7 @@ class UserSignupAPIView(GenericAPIView):
                                             display_name=data.get('org_name'))
                 organization.save()
 
-            # add the organization to the user
-            profile.organization = organization
-            profile.save()
+            organization.users.add(user)
 
             user.is_active = True
             user.save()

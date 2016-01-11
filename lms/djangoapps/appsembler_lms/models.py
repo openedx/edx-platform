@@ -26,6 +26,7 @@ class Organization(TimeStampedModel):
     )
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
+        related_name='organizations',
         help_text=_("List of users in an organization"),
         blank=True,
     )
