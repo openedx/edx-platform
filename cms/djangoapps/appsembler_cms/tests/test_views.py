@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from rest_framework import status
 
+from appsembler_lms.models import Organization
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -25,9 +26,11 @@ class TestUserSignup(ModuleStoreTestCase):
 
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_fails_for_nonexisting_user(self):
+        org = Organization.objects.create(key="acme")
         payload = {
             'email': 'john@doe.com',
-            'secret_key': 'secret_key'
+            'secret_key': 'secret_key',
+            'organization_key': 'acme'
         }
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -36,12 +39,26 @@ class TestUserSignup(ModuleStoreTestCase):
     @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_course_for_existing_user(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
+        org = Organization.objects.create(key="acme")
         self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
 
         payload = {
-           'email': 'john@doe.com',
-           'secret_key': 'secret_key'
+            'email': 'john@doe.com',
+            'secret_key': 'secret_key',
+            'organization_key': 'acme'
         }
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('/course/AppsemblerX/JohnDoe101/CurrentTerm', response.content)
+        self.assertIn('/course/acme/JohnDoe101/CurrentTerm', response.content)
+
+
+    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
+    def test_fails_for_nonexisting_organization(self):
+        user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
+        payload = {
+            'email': 'john@doe.com',
+            'secret_key': 'secret_key',
+            'organization_key': 'acme'
+        }
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

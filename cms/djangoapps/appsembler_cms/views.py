@@ -6,10 +6,11 @@ from rest_framework import status
 
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views.course import create_new_course_in_store
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 
+from appsembler_lms.models import Organization
 from appsembler_lms.permissions import SecretKeyPermission
 from .serializers import CreateCourseSerializer
 
@@ -30,15 +31,15 @@ class CreateCourseAPIView(GenericAPIView):
                 message = "User does not exist in academy.appsembler.com"
                 return Response(status=status.HTTP_404_NOT_FOUND, data=message)
 
+            store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
+            org = get_object_or_404(Organization, key=serializer.data.get('organization_key'))
+            number = "{}101".format(user.username)
+            run = "CurrentTerm"
+            fields = {
+                "display_name": "Your First Course"
+            }
             try:
-                store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
-                org = user.profile.organization.key
-                number = "{}101".format(user.username)
-                run = "CurrentTerm"
-                fields = {
-                    "display_name": "Your First Course"
-                }
-                new_course = create_new_course_in_store(store_for_new_course, user, org,
+                new_course = create_new_course_in_store(store_for_new_course, user, org.key,
                                                         number, run, fields)
                 new_course_url = reverse_course_url('course_handler', new_course.id)
                 response_data = {
