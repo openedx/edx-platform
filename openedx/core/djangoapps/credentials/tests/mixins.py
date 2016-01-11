@@ -41,7 +41,8 @@ class CredentialsDataMixin(object):
                     "program_id": 1
                 },
                 "status": "awarded",
-                "uuid": "dummy-uuid-1"
+                "uuid": "dummy-uuid-1",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-1/"
             },
             {
                 "id": 2,
@@ -51,7 +52,8 @@ class CredentialsDataMixin(object):
                     "program_id": 2
                 },
                 "status": "awarded",
-                "uuid": "dummy-uuid-2"
+                "uuid": "dummy-uuid-2",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-2/"
             },
             {
                 "id": 3,
@@ -61,7 +63,8 @@ class CredentialsDataMixin(object):
                     "program_id": 3
                 },
                 "status": "revoked",
-                "uuid": "dummy-uuid-3"
+                "uuid": "dummy-uuid-3",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-3/"
             },
             {
                 "id": 4,
@@ -72,7 +75,8 @@ class CredentialsDataMixin(object):
                     "certificate_type": "honor"
                 },
                 "status": "awarded",
-                "uuid": "dummy-uuid-4"
+                "uuid": "dummy-uuid-4",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-4/"
             },
             {
                 "id": 5,
@@ -83,7 +87,8 @@ class CredentialsDataMixin(object):
                     "certificate_type": "verified"
                 },
                 "status": "awarded",
-                "uuid": "dummy-uuid-5"
+                "uuid": "dummy-uuid-5",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-5/"
             },
             {
                 "id": 6,
@@ -94,7 +99,8 @@ class CredentialsDataMixin(object):
                     "certificate_type": "honor"
                 },
                 "status": "revoked",
-                "uuid": "dummy-uuid-6"
+                "uuid": "dummy-uuid-6",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-6/"
             }
         ]
     }
@@ -110,7 +116,8 @@ class CredentialsDataMixin(object):
                     "program_id": 7
                 },
                 "status": "awarded",
-                "uuid": "dummy-uuid-7"
+                "uuid": "dummy-uuid-7",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-7"
             },
             {
                 "id": 8,
@@ -120,7 +127,8 @@ class CredentialsDataMixin(object):
                     "program_id": 8
                 },
                 "status": "awarded",
-                "uuid": "dummy-uuid-8"
+                "uuid": "dummy-uuid-8",
+                "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-8/"
             }
         ]
     }
