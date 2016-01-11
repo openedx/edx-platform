@@ -524,10 +524,15 @@ class CourseImportManager(ImportManager):
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.
         if courselike_key != course.id:
+            if self.xml_module_store.course_run is None:
+                original_course_run = courselike_key.run
+            else:
+                original_course_run = self.xml_module_store.course_run
+
             original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
                 courselike_key.org,
                 courselike_key.course,
-                courselike_key.run
+                original_course_run,
             )
             if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == courselike_key.course:
                 course.wiki_slug = u'{0}.{1}.{2}'.format(

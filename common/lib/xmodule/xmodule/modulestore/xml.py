@@ -355,6 +355,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XBlock)
         self.courses = {}  # course_dir -> XBlock for the course
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
+        self.course_run = None  # course run for course being imported from
 
         if course_ids is not None:
             course_ids = [SlashSeparatedCourseKey.from_deprecated_string(course_id) for course_id in course_ids]
@@ -538,6 +539,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 else:
                     url_name = None
 
+            self.course_run = course_data.get('run')
             course_id = self.get_id(org, course, url_name)
 
             if course_ids is not None and course_id not in course_ids:
