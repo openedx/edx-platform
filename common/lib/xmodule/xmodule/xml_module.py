@@ -453,9 +453,10 @@ class XmlParserMixin(object):
 
         # Special case for course pointers:
         if self.category == 'course':
-            # add org and course attributes on the pointer tag
+            # add org, course and run attributes on the pointer tag
             node.set('org', self.location.org)
             node.set('course', self.location.course)
+            node.set('run', self.location.run)
 
     def definition_to_xml(self, resource_fs):
         """
