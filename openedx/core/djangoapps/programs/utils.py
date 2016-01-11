@@ -1,8 +1,6 @@
 """Helper functions for working with Programs."""
 import logging
-from urlparse import urljoin
 
-from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 
@@ -98,12 +96,10 @@ def get_programs_for_credentials(user, programs_credentials):
         log.debug('No programs found for the user with ID %d.', user.id)
         return certificate_programs
 
-    credential_configuration = CredentialsApiConfig.current()
     for program in programs:
         for credential in programs_credentials:
             if program['id'] == credential['credential']['program_id']:
-                credentials_url = 'credentials/' + credential['uuid']
-                program['credential_url'] = urljoin(credential_configuration.public_service_url, credentials_url)
+                program['credential_url'] = credential['certificate_url']
                 certificate_programs.append(program)
 
     return certificate_programs
