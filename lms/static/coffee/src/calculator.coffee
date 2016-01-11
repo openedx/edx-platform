@@ -14,7 +14,7 @@
 class @Calculator
   constructor: ->
     @hintButton = $('#calculator_hint')
-    @hintPopup = $('.calc-help-popup')
+    @hintPopup = $('.help')
     @hintsList = @hintPopup.find('.hint-item')
     @selectHint($('#' + @hintPopup.attr('aria-activedescendant')));
 
