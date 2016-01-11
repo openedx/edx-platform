@@ -252,7 +252,7 @@ class TestCourseIndex(CourseTestCase):
         """
         # Testing the response code by passing slash separated course id whose format is valid but no course
         # having this id exists.
-        invalid_course_key = '{}_blah_blah_blah'.format(self.course.id)
+        invalid_course_key = u'{}_blah_blah_blah'.format(unicode(self.course.id))
         course_updates_url = reverse_course_url('course_info_handler', invalid_course_key)
         response = self.client.get(course_updates_url)
         self.assertEqual(response.status_code, 404)
@@ -276,7 +276,7 @@ class TestCourseIndex(CourseTestCase):
         """
         # Testing the response code by passing slash separated course key, no course
         # having this key exists.
-        invalid_course_key = '{}_some_invalid_run'.format(self.course.id)
+        invalid_course_key = u'{}_some_invalid_run'.format(unicode(self.course.id))
         course_outline_url = reverse_course_url('course_handler', invalid_course_key)
         response = self.client.get_html(course_outline_url)
         self.assertEqual(response.status_code, 404)

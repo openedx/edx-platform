@@ -95,7 +95,7 @@ class ImportEntranceExamTestCase(CourseTestCase):
         """
         Check that pre existed entrance exam content should be overwrite with the imported course.
         """
-        exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        exam_url = u'/course/{}/entrance_exam/'.format(unicode(self.course.id))
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 

@@ -71,7 +71,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         )
 
     def local_resource_url(self, block, uri):
-        return 'resource/{usage_id}/{uri}'.format(
+        return u'resource/{usage_id}/{uri}'.format(
             usage_id=unicode(block.scope_ids.usage_id),
             uri=uri,
         )

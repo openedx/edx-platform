@@ -16,7 +16,7 @@ class HelpersTestCase(CourseTestCase):
     def test_xblock_studio_url(self):
 
         # Verify course URL
-        course_url = u'/course/{}'.format(unicode(self.course.id))
+        course_url = http.urlquote(u'/course/{}'.format(unicode(self.course.id)))
         self.assertEqual(xblock_studio_url(self.course), course_url)
 
         # Verify chapter URL

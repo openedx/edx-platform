@@ -221,7 +221,7 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         """
         with storebuilder.build() as (__, store):
             course = CourseFactory.create(modulestore=store)
-            fake_course_id = CourseKey.from_string("{}nothere/{}nothere/{}nothere".format(
+            fake_course_id = CourseKey.from_string(u"{}nothere/{}nothere/{}nothere".format(
                 course.id.org, course.id.course, course.id.run
             ))
             new_asset_loc = fake_course_id.make_asset_key('asset', 'burnside.jpg')
