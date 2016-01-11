@@ -9,7 +9,6 @@ from pytz import UTC
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.http import urlquote
 from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles

@@ -45,7 +45,7 @@ class TestLTI(BaseTestXmodule):
         hostname = self.item_descriptor.xmodule_runtime.hostname
         resource_link_id = unicode(urlquote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
 
-        sourcedId = u"{context}:{resource_link}:{user_id}".format(
+        sourced_id = u"{context}:{resource_link}:{user_id}".format(
             context=urlquote(context_id),
             resource_link=resource_link_id,
             user_id=user_id
@@ -61,7 +61,7 @@ class TestLTI(BaseTestXmodule):
             u'context_id': context_id,
 
             u'resource_link_id': resource_link_id,
-            u'lis_result_sourcedid': sourcedId,
+            u'lis_result_sourcedid': sourced_id,
 
             u'oauth_nonce': mocked_nonce,
             u'oauth_timestamp': mocked_timestamp,

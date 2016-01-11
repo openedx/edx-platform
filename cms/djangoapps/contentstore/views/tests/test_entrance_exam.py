@@ -7,7 +7,6 @@ from mock import patch
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
-from django.utils.http import urlquote
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
 from contentstore.utils import reverse_url
