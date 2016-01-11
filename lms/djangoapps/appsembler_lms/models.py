@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django.utils.translation import ugettext_lazy as _
@@ -22,6 +23,11 @@ class Organization(TimeStampedModel):
         help_text=_('The display name of this organization.'),
         unique=True,
         max_length=128,
+    )
+    users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        help_text=_("List of users in an organization"),
+        blank=True,
     )
 
     def __unicode__(self):
