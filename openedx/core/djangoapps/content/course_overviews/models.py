@@ -680,8 +680,9 @@ class CourseOverviewImageSet(TimeStampedModel):
         # an error or the course has no source course_image), our url fields
         # just keep their blank defaults.
         try:
-            image_set.save()
-            course_overview.image_set = image_set
+            with transaction.atomic():
+                image_set.save()
+                course_overview.image_set = image_set
         except (IntegrityError, ValueError):
             # In the event of a race condition that tries to save two image sets
             # to the same CourseOverview, we'll just silently pass on the one
