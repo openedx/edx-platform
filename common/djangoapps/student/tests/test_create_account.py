@@ -118,6 +118,7 @@ class TestCreateAccount(TestCase):
     @mock.patch('student.views.analytics.identify')
     def test_segment_tracking(self, mock_segment_identify, _):
         year = datetime.now().year
+        year_of_birth = year - 14
         self.params.update({
             "level_of_education": "a",
             "gender": "o",
@@ -125,7 +126,7 @@ class TestCreateAccount(TestCase):
             "city": "Exampleton",
             "country": "US",
             "goals": "To test this feature",
-            "year_of_birth": str(year),
+            "year_of_birth": str(year_of_birth),
             "extra1": "extra_value1",
             "extra2": "extra_value2",
         })
@@ -134,7 +135,7 @@ class TestCreateAccount(TestCase):
             'email': self.params['email'],
             'username': self.params['username'],
             'name': self.params['name'],
-            'age': 0,
+            'age': 13,
             'education': 'Associate degree',
             'address': self.params['mailing_address'],
             'gender': 'Other/Prefer Not to Say',
