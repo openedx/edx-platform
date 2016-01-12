@@ -379,9 +379,13 @@ def get_courses(user, domain=None):
     '''
     Returns a list of courses available, sorted by course.number
     '''
-    try:
-        courses = branding.get_visible_courses(user.profile.organization.key)
-    except (AttributeError, ObjectDoesNotExist):
+    if settings.FEATURES.get('SHOW_ONLY_APPSEMBLER_AND_OWNED_COURSES', False):
+        organizations = ['edX']
+        if user.is_authenticated():
+            user_organizations = user.organizations.values_list('key', flat=True)
+            organizations.extend(user_organizations)
+        courses = branding.get_visible_courses(organizations)
+    else:
         courses = branding.get_visible_courses()
 
     permission_name = microsite.get_value(

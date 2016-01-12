@@ -17,12 +17,16 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
-def get_visible_courses():
+def get_visible_courses(organizations=None):
     """
     Return the set of CourseDescriptors that should be visible in this branded instance
     """
     filtered_by_org = microsite.get_value('course_org_filter')
-    courses = CourseOverview.get_all_courses(org=filtered_by_org)
+
+    if organizations:
+        courses = CourseOverview.get_all_courses_from_organizations(organizations)
+    else:
+        courses = CourseOverview.get_all_courses(org=filtered_by_org)
     courses = sorted(courses, key=lambda course: course.number)
 
     # See if we have filtered course listings in this domain

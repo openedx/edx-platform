@@ -464,6 +464,23 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
+    def get_all_courses_from_organizations(cls, orgs=None):
+        """
+        Same as get_all_courses but allows a list of organizations to be passed
+
+        Arguments:
+            orgs (list): Optional parameter that allows filtering
+                by multiple organizations.
+        """
+        # Note: If a newly created course is not returned in this QueryList,
+        # make sure the "publish" signal was emitted when the course was
+        # created.  For tests using CourseFactory, use emit_signals=True.
+        course_overviews = CourseOverview.objects.all()
+        if orgs:
+            course_overviews = course_overviews.filter(org__in=orgs)
+        return course_overviews
+
+    @classmethod
     def get_all_course_keys(cls):
         """
         Returns all course keys from course overviews.
