@@ -196,6 +196,18 @@ To run a single test format the command like this.
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login
 
+It is also helpful to be able to speed up tests by skipping Django
+migrations during test development. To make test runs faster during
+test development by creating database tables directly from model
+definitions you can use the --without_migrations flag to skip all
+migrations when setting up the test database. For example to run a
+single test, without PIP installs, UX builds, or database migrations,
+you would format the paver command like this.
+
+::
+
+    paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login --fasttest --without_migrations
+
 To re-run all failing django tests from lms or cms, use the
 ``--failed``,\ ``-f`` flag (see note at end of section).
 

@@ -112,6 +112,9 @@ class SystemTestSuite(NoseTestSuite):
         super(SystemTestSuite, self).__init__(*args, **kwargs)
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
+        self.settings = kwargs.get('settings', 'test')
+        if kwargs.get('without_migrations', False):
+            self.settings = 'test_without_migrations'
 
     def __enter__(self):
         super(SystemTestSuite, self).__enter__()
@@ -120,12 +123,13 @@ class SystemTestSuite(NoseTestSuite):
     def cmd(self):
         cmd = (
             './manage.py {system} test --verbosity={verbosity} '
-            '{test_id} {test_opts} --settings=test {extra} '
+            '{test_id} {test_opts} --settings={settings} {extra} '
             '--with-xunit --xunit-file={xunit_report}'.format(
                 system=self.root,
                 verbosity=self.verbosity,
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
+                settings=self.settings,
                 extra=self.extra_args,
                 xunit_report=self.report_dir / "nosetests.xml",
             )
