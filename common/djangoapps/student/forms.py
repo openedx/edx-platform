@@ -1,6 +1,8 @@
 """
 Utility functions for validating forms
 """
+from importlib import import_module
+
 from django import forms
 from django.forms import widgets
 from django.core.exceptions import ValidationError
@@ -246,3 +248,18 @@ class AccountCreationForm(forms.Form):
             for key, value in self.cleaned_data.items()
             if key in self.extended_profile_fields and value is not None
         }
+
+
+def get_registration_extension_form(*args, **kwargs):
+    """
+    Convenience function for getting the custom form set in settings.REGISTRATION_EXTENSION_FORM.
+
+    An example form app for this can be found at http://github.com/open-craft/custom-form-app
+    """
+    if not settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION"):
+        return None
+    if not getattr(settings, 'REGISTRATION_EXTENSION_FORM', None):
+        return None
+    module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)
+    module = import_module(module)
+    return getattr(module, klass)(*args, **kwargs)

@@ -33,7 +33,7 @@ from rest_framework import status
 import newrelic.agent
 
 from courseware import grades
-from courseware.access import has_access, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
 from courseware.courses import (
@@ -97,6 +97,7 @@ from util.views import ensure_valid_course_key
 from eventtracking import tracker
 import analytics
 from courseware.url_helpers import get_redirect_url
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 
 from lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -704,9 +705,9 @@ def course_info(request, course_id):
             url_to_enroll = marketing_link('COURSES')
 
         show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(user, course.id)
-
         context = {
             'request': request,
+            'masquerade_user': user,
             'course_id': course_key.to_deprecated_string(),
             'cache': None,
             'course': course,
@@ -918,7 +919,7 @@ def course_about(request, course_id):
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     with modulestore().bulk_operations(course_key):
         return _progress(request, course_key, student_id)
@@ -940,13 +941,19 @@ def _progress(request, course_key, student_id):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
     staff_access = bool(has_access(request.user, 'staff', course))
+    try:
+        coach_access = has_ccx_coach_role(request.user, course_key)
+    except CCXLocatorValidationException:
+        coach_access = False
+
+    has_access_on_students_profiles = staff_access or coach_access
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
         student = request.user
     else:
         # Requesting access to a different student's profile
-        if not staff_access:
+        if not has_access_on_students_profiles:
             raise Http404
         try:
             student = User.objects.get(id=student_id)

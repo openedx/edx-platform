@@ -49,6 +49,14 @@ ANALYTICS_API_KEY = ""
 # dashboard to the Analytics Dashboard.
 ANALYTICS_DASHBOARD_URL = None
 
+############################ PYFS XBLOCKS SERVICE #############################
+# Set configuration for Django pyfilesystem
+
+DJFS = {
+    'type': 'osfs',
+    'directory_root': 'lms/static/djpyfs',
+    'url_root': '/static/djpyfs',
+}
 
 ################################ DEBUG TOOLBAR ################################
 
@@ -162,17 +170,16 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-_ = lambda s: s
-LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
+LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': 'Language'}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {
-        'name': _('Organization'),
+        'name': 'Organization',
     },
     'modes': {
-        'name': _('Course Type'),
+        'name': 'Course Type',
         'terms': {
-            'honor': _('Honor'),
-            'verified': _('Verified'),
+            'honor': 'Honor',
+            'verified': 'Verified',
         },
     },
     'language': LANGUAGE_MAP,

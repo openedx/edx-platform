@@ -8,6 +8,9 @@ import itertools
 import pytz
 
 from django.contrib.auth.models import User
+from ccx_keys.locator import CCXLocator
+from django.http import Http404
+from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from mock import Mock, patch
@@ -24,9 +27,14 @@ from courseware.tests.factories import (
     StaffFactory,
     UserFactory,
 )
+import courseware.views as views
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from edxmako.tests import mako_middleware_process_request
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
+from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
+    AdminFactory,
     AnonymousUserFactory,
     CourseEnrollmentAllowedFactory,
     CourseEnrollmentFactory,
@@ -37,7 +45,11 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE
+)
 
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -45,7 +57,96 @@ from util.milestones_helpers import (
     seed_milestone_relationship_types,
 )
 
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+
 # pylint: disable=protected-access
+
+
+class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test if user is coach on ccx.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up course for tests
+        """
+        super(CoachAccessTestCaseCCX, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(CoachAccessTestCaseCCX, self).setUp()
+
+        # Create ccx coach account
+        self.coach = AdminFactory.create(password="test")
+        self.client.login(username=self.coach.username, password="test")
+
+        # assign role to coach
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(self.coach)
+        self.request_factory = RequestFactory()
+
+    def make_ccx(self):
+        """
+        create ccx
+        """
+        ccx = CustomCourseForEdX(
+            course_id=self.course.id,
+            coach=self.coach,
+            display_name="Test CCX"
+        )
+        ccx.save()
+
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        role = CourseCcxCoachRole(ccx_locator)
+        role.add_users(self.coach)
+        CourseEnrollment.enroll(self.coach, ccx_locator)
+        return ccx_locator
+
+    def test_has_ccx_coach_role(self):
+        """
+        Assert that user has coach access on ccx.
+        """
+        ccx_locator = self.make_ccx()
+
+        # user have access as coach on ccx
+        self.assertTrue(access.has_ccx_coach_role(self.coach, ccx_locator))
+
+        # user dont have access as coach on ccx
+        self.setup_user()
+        self.assertFalse(access.has_ccx_coach_role(self.user, ccx_locator))
+
+    def test_access_student_progress_ccx(self):
+        """
+        Assert that only a coach can see progress of student.
+        """
+        ccx_locator = self.make_ccx()
+        student = UserFactory()
+
+        # Enroll user
+        CourseEnrollment.enroll(student, ccx_locator)
+
+        # Test for access of a coach
+        request = self.request_factory.get(reverse('about_course', args=[unicode(ccx_locator)]))
+        request.user = self.coach
+        mako_middleware_process_request(request)
+        resp = views.progress(request, course_id=unicode(ccx_locator), student_id=student.id)
+        self.assertEqual(resp.status_code, 200)
+
+        # Assert access of a student
+        request = self.request_factory.get(reverse('about_course', args=[unicode(ccx_locator)]))
+        request.user = student
+        mako_middleware_process_request(request)
+
+        with self.assertRaises(Http404) as context:
+            views.progress(request, course_id=unicode(ccx_locator), student_id=self.coach.id)
+
+        self.assertIsNotNone(context.exception)
 
 
 @attr('shard_1')

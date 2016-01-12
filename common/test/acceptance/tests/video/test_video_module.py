@@ -1155,7 +1155,7 @@ class YouTubeQualityTest(VideoBaseTest):
 
         self.video.click_player_button('play')
 
-        self.assertTrue(self.video.is_quality_button_visible)
+        self.video.wait_for(lambda: self.video.is_quality_button_visible, 'waiting for quality button to appear')
 
     @skip_if_browser('firefox')
     def test_quality_button_works_correctly(self):

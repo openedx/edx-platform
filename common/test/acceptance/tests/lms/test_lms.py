@@ -262,6 +262,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
             username=username,
             full_name="Test User",
             country="US",
+            favorite_movie="Mad Max: Fury Road",
             terms_of_service=True
         )
 
@@ -276,6 +277,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Enter a blank for the username field, which is required
         # Don't agree to the terms of service / honor code.
         # Don't specify a country code, which is required.
+        # Don't specify a favorite movie.
         username = "test_{uuid}".format(uuid=self.unique_id[0:6])
         email = "{user}@example.com".format(user=username)
         self.register_page.register(
@@ -291,6 +293,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertIn(u'Please enter your Public username.', errors)
         self.assertIn(u'You must agree to the edX Terms of Service and Honor Code.', errors)
         self.assertIn(u'Please select your Country.', errors)
+        self.assertIn(u'Please tell us your favorite movie.', errors)
 
     def test_toggle_to_login_form(self):
         self.register_page.visit().toggle_form()
@@ -317,7 +320,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertIn("Galactica1", self.register_page.username_value)
 
         # Set country, accept the terms, and submit the form:
-        self.register_page.register(country="US", terms_of_service=True)
+        self.register_page.register(country="US", favorite_movie="Battlestar Galactica", terms_of_service=True)
 
         # Expect that we reach the dashboard and we're auto-enrolled in the course
         course_names = self.dashboard_page.wait_for_page().available_courses
