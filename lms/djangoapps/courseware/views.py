@@ -441,6 +441,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'bookmarks_api_url': bookmarks_api_url,
             'language_preference': language_preference,
+            'disable_optimizely': True,
         }
 
         now = datetime.now(UTC())
