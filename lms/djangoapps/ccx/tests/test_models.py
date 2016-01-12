@@ -1,6 +1,7 @@
 """
 tests for the models
 """
+import json
 from datetime import datetime, timedelta
 from django.utils.timezone import UTC
 from mock import patch
@@ -30,11 +31,11 @@ class TestCCX(ModuleStoreTestCase):
     def setUp(self):
         """common setup for all tests"""
         super(TestCCX, self).setUp()
-        self.course = course = CourseFactory.create()
-        coach = AdminFactory.create()
-        role = CourseCcxCoachRole(course.id)
-        role.add_users(coach)
-        self.ccx = CcxFactory(course_id=course.id, coach=coach)
+        self.course = CourseFactory.create()
+        self.coach = AdminFactory.create()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(self.coach)
+        self.ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
 
     def set_ccx_override(self, field, value):
         """Create a field override for the test CCX on <field> with <value>"""
@@ -209,3 +210,28 @@ class TestCCX(ModuleStoreTestCase):
         self.set_ccx_override('max_student_enrollments_allowed', expected)
         actual = self.ccx.max_student_enrollments_allowed  # pylint: disable=no-member
         self.assertEqual(expected, actual)
+
+    def test_structure_json_default_empty(self):
+        """
+        By default structure_json does not contain anything
+        """
+        self.assertEqual(self.ccx.structure_json, None)  # pylint: disable=no-member
+        self.assertEqual(self.ccx.structure, None)  # pylint: disable=no-member
+
+    def test_structure_json(self):
+        """
+        Test a json stored in the structure_json
+        """
+        dummy_struct = [
+            "block-v1:Organization+CN101+CR-FALL15+type@chapter+block@Unit_4",
+            "block-v1:Organization+CN101+CR-FALL15+type@chapter+block@Unit_5",
+            "block-v1:Organization+CN101+CR-FALL15+type@chapter+block@Unit_11"
+        ]
+        json_struct = json.dumps(dummy_struct)
+        ccx = CcxFactory(
+            course_id=self.course.id,
+            coach=self.coach,
+            structure_json=json_struct
+        )
+        self.assertEqual(ccx.structure_json, json_struct)  # pylint: disable=no-member
+        self.assertEqual(ccx.structure, dummy_struct)  # pylint: disable=no-member
