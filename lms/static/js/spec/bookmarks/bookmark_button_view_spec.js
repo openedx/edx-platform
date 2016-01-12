@@ -85,6 +85,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                     bookmarkButtonView.$el.click();
 
+                    expect(bookmarkButtonView.$el).toHaveAttr('disabled', 'disabled');
+
                     AjaxHelpers.expectRequest(
                         requests, firstActionData.method,
                         firstActionData.url,
@@ -96,12 +98,14 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     expect(firstActionData.event).toHaveBeenTriggeredOn(bookmarkButtonView.$el);
                     bookmarkButtonView[firstActionData.handler].reset();
 
+                    expect(bookmarkButtonView.$el).not.toHaveAttr('disabled');
                     verifyBookmarkButtonState(bookmarkButtonView, secondActionData.bookmarked);
 
                     spyOn(bookmarkButtonView, secondActionData.handler).andCallThrough();
                     spyOnEvent(bookmarkButtonView.$el, secondActionData.event);
 
                     bookmarkButtonView.$el.click();
+                    expect(bookmarkButtonView.$el).toHaveAttr('disabled', 'disabled');
 
                     AjaxHelpers.expectRequest(
                         requests,
@@ -114,6 +118,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     AjaxHelpers.respondWithJson(requests, {});
                     expect(secondActionData.event).toHaveBeenTriggeredOn(bookmarkButtonView.$el);
 
+                    expect(bookmarkButtonView.$el).not.toHaveAttr('disabled');
                     verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
                     bookmarkButtonView.undelegateEvents();
                 });

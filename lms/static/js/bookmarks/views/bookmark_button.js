@@ -26,6 +26,8 @@
             toggleBookmark: function(event) {
                 event.preventDefault();
 
+                this.$el.prop('disabled', true);
+
                 if (this.$el.hasClass('bookmarked')) {
                     this.removeBookmark();
                 } else {
@@ -48,6 +50,9 @@
                         var response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
                         var userMessage = response ? response.user_message : '';
                         view.showError(userMessage);
+                    },
+                    complete: function () {
+                        view.$el.prop('disabled', false);
                     }
                 });
             },
@@ -65,6 +70,9 @@
                     },
                     error: function() {
                         view.showError();
+                    },
+                    complete: function() {
+                        view.$el.prop('disabled', false);
                     }
                 });
             },
