@@ -394,13 +394,39 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
     def setUpClass(cls):
         super(TestInstructorAPIBulkAccountCreationAndEnrollment, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.url = reverse('register_and_enroll_students', kwargs={'course_id': cls.course.id.to_deprecated_string()})
+
+        # Create a course with mode 'audit'
+        cls.audit_course = CourseFactory.create()
+        CourseModeFactory(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
+
+        cls.url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': cls.course.id.to_deprecated_string()}
+        )
+        cls.audit_course_url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': cls.audit_course.id.to_deprecated_string()}
+        )
 
     def setUp(self):
         super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()
 
+        # Create a course with mode 'honor' and with price
+        self.white_label_course = CourseFactory.create()
+        self.white_label_course_mode = CourseModeFactory(
+            course_id=self.white_label_course.id,
+            mode_slug=CourseMode.HONOR,
+            min_price=10,
+            suggested_prices='10',
+        )
+
+        self.white_label_course_url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': self.white_label_course.id.to_deprecated_string()}
+        )
+
         self.request = RequestFactory().request()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        self.audit_course_instructor = InstructorFactory(course_key=self.audit_course.id)
+        self.white_label_course_instructor = InstructorFactory(course_key=self.white_label_course.id)
+
         self.client.login(username=self.instructor.username, password='test')
 
         self.not_enrolled_student = UserFactory(
@@ -686,6 +712,89 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_audit_enrollment_mode(self):
+        """
+        Test that enrollment mode for audit courses (paid courses) is 'audit'.
+        """
+        # Login Audit Course instructor
+        self.client.login(username=self.audit_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.audit_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be 'audit'
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.AUDIT)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_honor_enrollment_mode(self):
+        """
+        Test that enrollment mode for unpaid honor courses is 'honor'.
+        """
+        # Remove white label course price
+        self.white_label_course_mode.min_price = 0
+        self.white_label_course_mode.suggested_prices = ''
+        self.white_label_course_mode.save()  # pylint: disable=no-member
+
+        # Login Audit Course instructor
+        self.client.login(username=self.white_label_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be 'honor'
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.HONOR)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_default_shopping_cart_enrollment_mode_for_white_label(self):
+        """
+        Test that enrollment mode for white label courses (paid courses) is DEFAULT_SHOPPINGCART_MODE_SLUG.
+        """
+        # Login white label course instructor
+        self.client.login(username=self.white_label_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
 
 
 @attr('shard_1')

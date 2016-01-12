@@ -343,6 +343,13 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
     row_errors = []
     general_errors = []
 
+    # for white labels we use 'shopping cart' which uses CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG as
+    # course mode for creating course enrollments.
+    if CourseMode.is_white_label(course_id):
+        course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+    else:
+        course_mode = None
+
     if 'students_list' in request.FILES:
         students = []
 
@@ -418,7 +425,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
 
                     # make sure user is enrolled in course
                     if not CourseEnrollment.is_enrolled(user, course_id):
-                        enrollment_obj = CourseEnrollment.enroll(user, course_id)
+                        enrollment_obj = CourseEnrollment.enroll(user, course_id, mode=course_mode)
                         reason = 'Enrolling via csv upload'
                         ManualEnrollmentAudit.create_manual_enrollment_audit(
                             request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
@@ -437,7 +444,9 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
 
                     try:
                         with transaction.atomic():
-                            enrollment_obj = create_and_enroll_user(email, username, name, country, password, course_id)
+                            enrollment_obj = create_and_enroll_user(
+                                email, username, name, country, password, course_id, course_mode
+                            )
                             reason = 'Enrolling via csv upload'
                             ManualEnrollmentAudit.create_manual_enrollment_audit(
                                 request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
@@ -497,7 +506,7 @@ def generate_unique_password(generated_passwords, password_length=12):
     return password
 
 
-def create_and_enroll_user(email, username, name, country, password, course_id):
+def create_and_enroll_user(email, username, name, country, password, course_id, course_mode=None):
     """ Creates a user and enroll him/her in the course"""
 
     user = User.objects.create_user(username, email, password)
@@ -510,7 +519,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id):
     profile.save()
 
     # try to enroll the user in this course
-    return CourseEnrollment.enroll(user, course_id)
+    return CourseEnrollment.enroll(user, course_id, mode=course_mode)
 
 
 @ensure_csrf_cookie
