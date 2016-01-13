@@ -1,5 +1,5 @@
 """
-django admin pages for credentials support models.
+Django admin pages for credentials support models.
 """
 
 from django.contrib import admin

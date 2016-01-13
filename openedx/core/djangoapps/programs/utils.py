@@ -88,12 +88,11 @@ def get_programs_for_credentials(user, programs_credentials):
     Returns:
         list, containing programs dictionaries.
     """
-    ProgramsApiConfig.current()
     certificate_programs = []
 
     programs = get_programs(user)
     if not programs:
-        log.debug('No programs found for the user with ID %d.', user.id)
+        log.debug('No programs for user %d.', user.id)
         return certificate_programs
 
     for program in programs:

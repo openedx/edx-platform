@@ -141,6 +141,8 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
 
         actual = get_programs_for_credentials(self.user, self.PROGRAMS_CREDENTIALS_DATA)
         expected = self.PROGRAMS_API_RESPONSE['results']
+        expected[0]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[0]['certificate_url']
+        expected[1]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[1]['certificate_url']
 
         self.assertEqual(len(actual), 2)
         self.assertEqual(actual, expected)

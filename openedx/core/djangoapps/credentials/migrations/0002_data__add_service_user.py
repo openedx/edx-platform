@@ -9,8 +9,9 @@ from django.contrib.auth.models import User
 
 def add_service_user(apps, schema_editor):
     """Add service user."""
-    user, created = User.objects.get_or_create(username=settings.CREDENTIALS_SERVICE_USERNAME, is_staff=True)
+    user, created = User.objects.get_or_create(username=settings.CREDENTIALS_SERVICE_USERNAME)
     if created:
+        user.is_staff = True
         user.set_unusable_password()
         user.save()
 
@@ -26,7 +27,7 @@ def remove_service_user(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('credentials', '0002_credentialsapiconfig_cache_ttl'),
+        ('credentials', '0001_initial'),
     ]
 
     operations = [

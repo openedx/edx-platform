@@ -1,10 +1,12 @@
 """Tests covering Api utils."""
+
 from django.core.cache import cache
 from django.test import TestCase
 import httpretty
 import mock
 from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
+from testfixtures import LogCapture
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
@@ -12,6 +14,9 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.tests.factories import UserFactory
+
+
+LOGGER_NAME = 'openedx.core.lib.edx_api_utils'
 
 
 class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, ProgramsApiConfigMixin, ProgramsDataMixin,
@@ -64,22 +69,31 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
 
     @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
     def test_get_edx_api_data_client_initialization_failure(self, mock_init):
-        """Verify behavior when API client fails to initialize."""
+        """Verify no data is retrieved and exception logged when API client
+        fails to initialize.
+        """
         program_config = self.create_programs_config()
         mock_init.side_effect = Exception
 
-        actual = get_edx_api_data(program_config, self.user, 'programs')
-        self.assertEqual(actual, [])
-        self.assertTrue(mock_init.called)
+        with LogCapture(LOGGER_NAME) as logger:
+            actual = get_edx_api_data(program_config, self.user, 'programs')
+            logger.check(
+                (LOGGER_NAME, 'ERROR', u'Failed to initialize the programs API client.')
+            )
+            self.assertEqual(actual, [])
+            self.assertTrue(mock_init.called)
 
     @httpretty.activate
     def test_get_edx_api_data_retrieval_failure(self):
-        """Verify behavior when data can't be retrieved from API."""
+        """Verify exception is logged when data can't be retrieved from API."""
         program_config = self.create_programs_config()
         self.mock_programs_api(status_code=500)
-
-        actual = get_edx_api_data(program_config, self.user, 'programs')
-        self.assertEqual(actual, [])
+        with LogCapture(LOGGER_NAME) as logger:
+            actual = get_edx_api_data(program_config, self.user, 'programs')
+            logger.check(
+                (LOGGER_NAME, 'ERROR', u'Failed to retrieve data from the programs API.')
+            )
+            self.assertEqual(actual, [])
 
     @httpretty.activate
     def test_get_edx_api_data_multiple_page(self):
