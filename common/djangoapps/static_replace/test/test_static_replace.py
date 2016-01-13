@@ -137,9 +137,6 @@ def test_raw_static_check():
     path = '"/static/foo.png?raw"'
     assert_equals(path, replace_static_urls(path, DATA_DIRECTORY))
 
-    text = 'text <tag a="/static/js/capa/protex/protex.nocache.js?raw"/><div class="'
-    assert_equals(path, replace_static_urls(path, text))
-
 
 @patch('static_replace.staticfiles_storage', autospec=True)
 @patch('static_replace.modulestore', autospec=True)
