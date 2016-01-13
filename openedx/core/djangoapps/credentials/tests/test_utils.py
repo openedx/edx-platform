@@ -89,6 +89,8 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
 
         actual = get_user_program_credentials(self.user)
         expected = self.PROGRAMS_API_RESPONSE['results']
+        expected[0]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[0]['certificate_url']
+        expected[1]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[1]['certificate_url']
 
         # checking response from API is as expected
         self.assertEqual(len(actual), 2)
