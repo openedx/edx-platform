@@ -1142,3 +1142,6 @@ PROCTORING_SETTINGS = {}
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
 OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
+
+# 5 minute expiration time for JWT id tokens issued for external API requests.
+OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
