@@ -525,43 +525,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             json.loads(helpers.get_notes(self.request, self.course))
         )
 
-    def test_preprocess_collection_escaping(self):
-        """
-        Tests the result if appropriate module is not found.
-        """
-        initial_collection = [{
-            u"quote": u"test <script>alert('test')</script>",
-            u"text": u"text \"<>&'",
-            u"usage_id": unicode(self.html_module_1.location),
-            u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat()
-        }]
-
-        self.assertItemsEqual(
-            [{
-                u"quote": u"test &lt;script&gt;alert('test')&lt;/script&gt;",
-                u"text": u'text "&lt;&gt;&amp;\'',
-                u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default_escaped,
-                    u"index": 0,
-                    u"location": unicode(self.chapter.location),
-                    u"children": [unicode(self.sequential.location)]
-                },
-                u"section": {
-                    u"display_name": self.sequential.display_name_with_default_escaped,
-                    u"location": unicode(self.sequential.location),
-                    u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
-                },
-                u"unit": {
-                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default_escaped,
-                    u"location": unicode(self.vertical.location),
-                },
-                u"usage_id": unicode(self.html_module_1.location),
-                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
-            }],
-            helpers.preprocess_collection(self.user, self.course, initial_collection)
-        )
-
     def test_preprocess_collection_no_item(self):
         """
         Tests the result if appropriate module is not found.
@@ -766,8 +729,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "course_id": unicode(self.course.id),
                 "text": "text",
                 "highlight": True,
-                "highlight_tag": "span",
-                "highlight_class": "note-highlight",
                 'page': 1,
                 'page_size': 10,
             }
