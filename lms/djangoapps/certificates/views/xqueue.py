@@ -48,17 +48,17 @@ def request_certificate(request):
             course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
             course = modulestore().get_course(course_key, depth=2)
 
-            title = 'None'
+            designation = 'None'
             if use_cme:
-                titlelist = CmeUserProfile.objects.filter(user=student).values('professional_designation')
-                if len(titlelist):
-                    title = titlelist[0]['professional_designation']
+                designations = CmeUserProfile.objects.filter(user=student).values('professional_designation')
+                if len(designations):
+                    designation = designations[0]['professional_designation']
 
             status = certificate_status_for_student(student, course_key)['status']
             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
                 log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
                 log.info(log_msg, username, course_key)
-                status = generate_user_certificates(student, course_key, course=course, title=title)
+                status = generate_user_certificates(student, course_key, course=course, designation=designation)
             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
 

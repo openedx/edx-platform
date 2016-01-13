@@ -105,7 +105,16 @@ class XQueueCertInterface(object):
         self.restricted = UserProfile.objects.filter(allow_certificate=False)
         self.use_https = True
 
-    def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
+    def regen_cert(
+            self,
+            student,
+            course_id,
+            course=None,
+            designation='None',
+            forced_grade=None,
+            template_file=None,
+            generate_pdf=True,
+    ):
         """(Re-)Make certificate for a particular student in a particular course
 
         Arguments:
@@ -159,6 +168,7 @@ class XQueueCertInterface(object):
             student,
             course_id,
             course=course,
+            title=designation,
             forced_grade=forced_grade,
             template_file=template_file,
             generate_pdf=generate_pdf
