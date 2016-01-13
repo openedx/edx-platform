@@ -16,7 +16,6 @@ from path import Path as path
 from contextlib import contextmanager
 from lazy import lazy
 
-from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import (
@@ -181,47 +180,19 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 self.used_names[tag].add(url_name)
                 xml_data.set('url_name', url_name)
 
-            try:
-                # VS[compat]
-                # TODO (cpennington): Remove this once all fall 2012 courses
-                # have been imported into the cms from xml
-                xml = clean_out_mako_templating(xml)
-                xml_data = etree.fromstring(xml)
+            # VS[compat]
+            # TODO (cpennington): Remove this once all fall 2012 courses
+            # have been imported into the cms from xml
+            xml = clean_out_mako_templating(xml)
+            xml_data = etree.fromstring(xml)
 
-                make_name_unique(xml_data)
+            make_name_unique(xml_data)
 
-                descriptor = self.xblock_from_node(
-                    xml_data,
-                    None,  # parent_id
-                    id_manager,
-                )
-            except Exception as err:  # pylint: disable=broad-except
-                if not self.load_error_modules:
-                    raise
-
-                # Didn't load properly.  Fall back on loading as an error
-                # descriptor.  This should never error due to formatting.
-
-                msg = "Error loading from xml. %s"
-                log.warning(
-                    msg,
-                    unicode(err)[:200],
-                    # Normally, we don't want lots of exception traces in our logs from common
-                    # content problems.  But if you're debugging the xml loading code itself,
-                    # uncomment the next line.
-                    # exc_info=True
-                )
-
-                msg = msg % (unicode(err)[:200])
-
-                self.error_tracker(msg)
-                err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
-                descriptor = ErrorDescriptor.from_xml(
-                    xml,
-                    self,
-                    id_manager,
-                    err_msg
-                )
+            descriptor = self.xblock_from_node(
+                xml_data,
+                None,  # parent_id
+                id_manager,
+            )
 
             descriptor.data_dir = course_dir
 
@@ -410,9 +381,6 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         if course_descriptor is None:
             pass
-        elif isinstance(course_descriptor, ErrorDescriptor):
-            # Didn't load course.  Instead, save the errors elsewhere.
-            self.errored_courses[course_dir] = errorlog
         else:
             self.courses[course_dir] = course_descriptor
             course_descriptor.parent = None
@@ -574,9 +542,6 @@ class XMLModuleStore(ModuleStoreReadBase):
                 target_course_id=target_course_id,
             )
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
-            # If we fail to load the course, then skip the rest of the loading steps
-            if isinstance(course_descriptor, ErrorDescriptor):
-                return course_descriptor
 
             self.content_importers(system, course_descriptor, course_dir, url_name)
 
@@ -830,8 +795,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
     def get_courses(self, **kwargs):
         """
-        Returns a list of course descriptors.  If there were errors on loading,
-        some of these may be ErrorDescriptors instead.
+        Returns a list of course descriptors.
         """
         return self.courses.values()
 

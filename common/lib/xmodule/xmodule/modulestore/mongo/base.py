@@ -40,7 +40,6 @@ from xblock.runtime import KvsFieldData
 
 from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
 from xmodule.course_module import CourseSummary
-from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
@@ -244,91 +243,82 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             return module
         else:
             # load the module and apply the inherited metadata
-            try:
-                category = json_data['location']['category']
-                class_ = self.load_block_type(category)
+            category = json_data['location']['category']
+            class_ = self.load_block_type(category)
 
-                definition = json_data.get('definition', {})
-                metadata = json_data.get('metadata', {})
-                for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
-                    if old_name in metadata:
-                        metadata[new_name] = metadata[old_name]
-                        del metadata[old_name]
+            definition = json_data.get('definition', {})
+            metadata = json_data.get('metadata', {})
+            for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
+                if old_name in metadata:
+                    metadata[new_name] = metadata[old_name]
+                    del metadata[old_name]
 
-                children = [
-                    self._convert_reference_to_key(childloc)
-                    for childloc in definition.get('children', [])
-                ]
+            children = [
+                self._convert_reference_to_key(childloc)
+                for childloc in definition.get('children', [])
+            ]
 
-                parent = None
-                if self.cached_metadata is not None:
-                    # fish the parent out of here if it's available
-                    parent_url = self.cached_metadata.get(unicode(location), {}).get('parent', {}).get(
-                        ModuleStoreEnum.Branch.published_only if location.revision is None
-                        else ModuleStoreEnum.Branch.draft_preferred
-                    )
-                    if parent_url:
-                        parent = self._convert_reference_to_key(parent_url)
-                if not parent and category not in _DETACHED_CATEGORIES + ['course']:
-                    # try looking it up just-in-time (but not if we're working with a detached block).
-                    parent = self.modulestore.get_parent_location(
-                        as_published(location),
-                        ModuleStoreEnum.RevisionOption.published_only if location.revision is None
-                        else ModuleStoreEnum.RevisionOption.draft_preferred
-                    )
-
-                data = definition.get('data', {})
-                if isinstance(data, basestring):
-                    data = {'data': data}
-
-                mixed_class = self.mixologist.mix(class_)
-                if data:  # empty or None means no work
-                    data = self._convert_reference_fields_to_keys(mixed_class, location.course_key, data)
-                metadata = self._convert_reference_fields_to_keys(mixed_class, location.course_key, metadata)
-                kvs = MongoKeyValueStore(
-                    data,
-                    parent,
-                    children,
-                    metadata,
+            parent = None
+            if self.cached_metadata is not None:
+                # fish the parent out of here if it's available
+                parent_url = self.cached_metadata.get(unicode(location), {}).get('parent', {}).get(
+                    ModuleStoreEnum.Branch.published_only if location.revision is None
+                    else ModuleStoreEnum.Branch.draft_preferred
+                )
+                if parent_url:
+                    parent = self._convert_reference_to_key(parent_url)
+            if not parent and category not in _DETACHED_CATEGORIES + ['course']:
+                # try looking it up just-in-time (but not if we're working with a detached block).
+                parent = self.modulestore.get_parent_location(
+                    as_published(location),
+                    ModuleStoreEnum.RevisionOption.published_only if location.revision is None
+                    else ModuleStoreEnum.RevisionOption.draft_preferred
                 )
 
-                field_data = KvsFieldData(kvs)
-                scope_ids = ScopeIds(None, category, location, location)
-                module = self.construct_xblock_from_class(class_, scope_ids, field_data, for_parent=for_parent)
-                if self.cached_metadata is not None:
-                    # parent container pointers don't differentiate between draft and non-draft
-                    # so when we do the lookup, we should do so with a non-draft location
-                    non_draft_loc = as_published(location)
+            data = definition.get('data', {})
+            if isinstance(data, basestring):
+                data = {'data': data}
 
-                    # Convert the serialized fields values in self.cached_metadata
-                    # to python values
-                    metadata_to_inherit = self.cached_metadata.get(unicode(non_draft_loc), {})
-                    inherit_metadata(module, metadata_to_inherit)
+            mixed_class = self.mixologist.mix(class_)
+            if data:  # empty or None means no work
+                data = self._convert_reference_fields_to_keys(mixed_class, location.course_key, data)
+            metadata = self._convert_reference_fields_to_keys(mixed_class, location.course_key, metadata)
+            kvs = MongoKeyValueStore(
+                data,
+                parent,
+                children,
+                metadata,
+            )
 
-                module._edit_info = json_data.get('edit_info')
+            field_data = KvsFieldData(kvs)
+            scope_ids = ScopeIds(None, category, location, location)
+            module = self.construct_xblock_from_class(class_, scope_ids, field_data, for_parent=for_parent)
+            if self.cached_metadata is not None:
+                # parent container pointers don't differentiate between draft and non-draft
+                # so when we do the lookup, we should do so with a non-draft location
+                non_draft_loc = as_published(location)
 
-                # migrate published_by and published_on if edit_info isn't present
-                if module._edit_info is None:
-                    module._edit_info = {}
-                    raw_metadata = json_data.get('metadata', {})
-                    # published_on was previously stored as a list of time components instead of a datetime
-                    if raw_metadata.get('published_date'):
-                        module._edit_info['published_date'] = datetime(
-                            *raw_metadata.get('published_date')[0:6]
-                        ).replace(tzinfo=UTC)
-                    module._edit_info['published_by'] = raw_metadata.get('published_by')
+                # Convert the serialized fields values in self.cached_metadata
+                # to python values
+                metadata_to_inherit = self.cached_metadata.get(unicode(non_draft_loc), {})
+                inherit_metadata(module, metadata_to_inherit)
 
-                # decache any computed pending field settings
-                module.save()
-                return module
-            except Exception:                   # pylint: disable=broad-except
-                log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
-                return ErrorDescriptor.from_json(
-                    json_data,
-                    self,
-                    location,
-                    error_msg=exc_info_to_str(sys.exc_info())
-                )
+            module._edit_info = json_data.get('edit_info')
+
+            # migrate published_by and published_on if edit_info isn't present
+            if module._edit_info is None:
+                module._edit_info = {}
+                raw_metadata = json_data.get('metadata', {})
+                # published_on was previously stored as a list of time components instead of a datetime
+                if raw_metadata.get('published_date'):
+                    module._edit_info['published_date'] = datetime(
+                        *raw_metadata.get('published_date')[0:6]
+                    ).replace(tzinfo=UTC)
+                module._edit_info['published_by'] = raw_metadata.get('published_by')
+
+            # decache any computed pending field settings
+            module.save()
+            return module
 
     def _convert_reference_to_key(self, ref_string):
         """
@@ -1034,7 +1024,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ],
             []
         )
-        return [course for course in base_list if not isinstance(course, ErrorDescriptor)]
+        return [course for course in base_list]
 
     @autoretry_read()
     def _find_one(self, location):

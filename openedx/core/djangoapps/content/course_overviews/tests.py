@@ -26,7 +26,6 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE,
 )
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -319,19 +318,6 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
         with self.assertRaises(CourseOverview.DoesNotExist):
             CourseOverview.get_from_id(store.make_course_key('Non', 'Existent', 'Course'))
-
-    def test_get_errored_course(self):
-        """
-        Test that getting an ErrorDescriptor back from the module store causes
-        load_from_module_store to raise an IOError.
-        """
-        mock_get_course = mock.Mock(return_value=ErrorDescriptor)
-        with mock.patch('xmodule.modulestore.mixed.MixedModuleStore.get_course', mock_get_course):
-            # This mock makes it so when the module store tries to load course data,
-            # an exception is thrown, which causes get_course to return an ErrorDescriptor,
-            # which causes get_from_id to raise an IOError.
-            with self.assertRaises(IOError):
-                CourseOverview.load_from_module_store(self.store.make_course_key('Non', 'Existent', 'Course'))
 
     def test_malformed_grading_policy(self):
         """

@@ -12,7 +12,6 @@ from edxmako.shortcuts import render_to_string
 from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, request_token
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.library_tools import LibraryToolsService
 from xmodule.services import SettingsService
@@ -194,7 +193,6 @@ def _preview_module_system(request, descriptor, field_data):
 
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
-        error_descriptor_class=ErrorDescriptor,
         get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

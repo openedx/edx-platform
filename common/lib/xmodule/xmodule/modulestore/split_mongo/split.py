@@ -83,7 +83,6 @@ from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
-from xmodule.error_module import ErrorDescriptor
 from collections import defaultdict
 from types import NoneType
 from xmodule.assetstore import AssetMetadata
@@ -922,8 +921,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             envelope = CourseEnvelope(locator, entry)
             root = entry['root']
             structures_list = self._load_items(envelope, [root], depth=0, **kwargs)
-            if not isinstance(structures_list[0], ErrorDescriptor):
-                result.append(structures_list[0])
+            result.append(structures_list[0])
         return result
 
     def _create_course_locator(self, course_info, branch):

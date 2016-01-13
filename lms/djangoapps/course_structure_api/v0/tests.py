@@ -13,7 +13,6 @@ from django.core.urlresolvers import reverse
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -285,24 +284,6 @@ class CourseListTests(CourseViewTestsMixin, SharedModuleStoreTestCase):
         response = self.http_get(url, HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(response.status_code, 200)
         self.assertDictContainsSubset({'count': 0, u'results': []}, response.data)
-
-    def test_course_error(self):
-        """
-        Ensure the view still returns results even if get_courses() returns an ErrorDescriptor. The ErrorDescriptor
-        should be filtered out.
-        """
-
-        error_descriptor = ErrorDescriptor.from_xml(
-            '<course></course>',
-            get_test_system(),
-            CourseLocationManager(CourseLocator(org='org', course='course', run='run')),
-            None
-        )
-
-        descriptors = [error_descriptor, self.empty_course, self.course]
-
-        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_courses', Mock(return_value=descriptors)):
-            self.test_get()
 
 
 class CourseDetailTests(CourseDetailTestMixin, CourseViewTestsMixin, SharedModuleStoreTestCase):

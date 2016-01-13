@@ -10,7 +10,6 @@ XMODULES = [
     "html = xmodule.html_module:HtmlDescriptor",
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "library_content = xmodule.library_content_module:LibraryContentDescriptor",
-    "error = xmodule.error_module:ErrorDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
     "problem = xmodule.capa_module:CapaDescriptor",
     "problemset = xmodule.seq_module:SequenceDescriptor",

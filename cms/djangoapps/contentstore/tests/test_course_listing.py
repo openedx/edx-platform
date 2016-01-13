@@ -22,7 +22,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locations import CourseLocator
-from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
 
 TOTAL_COURSES_COUNT = 500
@@ -90,32 +89,6 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 'xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS'),
-        (ModuleStoreEnum.Type.mongo, 'xmodule.modulestore.mongo.base.MongoKeyValueStore')
-    )
-    @ddt.unpack
-    def test_errored_course_global_staff(self, store, path_to_patch):
-        """
-        Test the course list for global staff when get_course returns an ErrorDescriptor
-        """
-        GlobalStaff().add_users(self.user)
-
-        with self.store.default_store(store):
-            course_key = self.store.make_course_key('Org1', 'Course1', 'Run1')
-            self._create_course_with_access_groups(course_key, self.user, store=store)
-
-            with patch(path_to_patch, Mock(side_effect=Exception)):
-                self.assertIsInstance(self.store.get_course(course_key), ErrorDescriptor)
-
-                # get courses through iterating all courses
-                courses_list, __ = _accessible_courses_list(self.request)
-                self.assertEqual(courses_list, [])
-
-                # get courses by reversing group name formats
-                courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
-                self.assertEqual(courses_list_by_groups, [])
-
-    @ddt.data(
         (ModuleStoreEnum.Type.split, 5),
         (ModuleStoreEnum.Type.mongo, 3)
     )
@@ -146,35 +119,6 @@ class TestCourseListing(ModuleStoreTestCase):
         # Now count the db queries for staff
         with check_mongo_calls(mongo_calls):
             _staff_accessible_course_list(self.request)
-
-    @ddt.data(
-        (ModuleStoreEnum.Type.split, 'xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS'),
-        (ModuleStoreEnum.Type.mongo, 'xmodule.modulestore.mongo.base.MongoKeyValueStore')
-    )
-    @ddt.unpack
-    def test_errored_course_regular_access(self, store, path_to_patch):
-        """
-        Test the course list for regular staff when get_course returns an ErrorDescriptor
-        """
-        GlobalStaff().remove_users(self.user)
-
-        with self.store.default_store(store):
-            CourseStaffRole(self.store.make_course_key('Non', 'Existent', 'Course')).add_users(self.user)
-
-            course_key = self.store.make_course_key('Org1', 'Course1', 'Run1')
-            self._create_course_with_access_groups(course_key, self.user, store)
-
-            with patch(path_to_patch, Mock(side_effect=Exception)):
-                self.assertIsInstance(self.store.get_course(course_key), ErrorDescriptor)
-
-                # get courses through iterating all courses
-                courses_list, __ = _accessible_courses_list(self.request)
-                self.assertEqual(courses_list, [])
-
-                # get courses by reversing group name formats
-                courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
-                self.assertEqual(courses_list_by_groups, [])
-                self.assertEqual(courses_list, courses_list_by_groups)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_get_course_list_with_invalid_course_location(self, store):

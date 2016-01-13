@@ -27,7 +27,6 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT,
 )
-from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
@@ -109,9 +108,6 @@ def has_access(user, action, obj, course_key=None):
 
     if isinstance(obj, CourseOverview):
         return _has_access_course(user, action, obj)
-
-    if isinstance(obj, ErrorDescriptor):
-        return _has_access_error_desc(user, action, obj, course_key)
 
     if isinstance(obj, XModule):
         return _has_access_xmodule(user, action, obj, course_key)

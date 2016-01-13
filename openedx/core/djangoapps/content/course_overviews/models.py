@@ -20,7 +20,6 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
 from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
@@ -228,9 +227,7 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    "Error while loading course {} from the module store: {}",
-                    unicode(course_id),
-                    course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                    unicode(course)
                 )
             else:
                 raise cls.DoesNotExist()

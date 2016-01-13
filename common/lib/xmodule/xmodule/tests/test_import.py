@@ -140,23 +140,6 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
 
-    def test_reimport(self):
-        '''Make sure an already-exported error xml tag loads properly'''
-
-        self.maxDiff = None
-        bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
-        system = self.get_system()
-        descriptor = system.process_xml(bad_xml)
-
-        node = etree.Element('unknown')
-        descriptor.add_xml_to_node(node)
-        re_import_descriptor = system.process_xml(etree.tostring(node))
-
-        self.assertEqual(re_import_descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
-
-        self.assertEqual(descriptor.contents, re_import_descriptor.contents)
-        self.assertEqual(descriptor.error_msg, re_import_descriptor.error_msg)
-
     def test_fixed_xml_tag(self):
         """Make sure a tag that's been fixed exports as the original tag type"""
 

@@ -10,7 +10,6 @@ from django.utils.timezone import UTC
 
 from lazy import lazy
 from xmodule_django.models import CourseKeyField, LocationKeyField
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
 
@@ -34,7 +33,7 @@ class CustomCourseForEdX(models.Model):
         store = modulestore()
         with store.bulk_operations(self.course_id):
             course = store.get_course(self.course_id)
-            if not course or isinstance(course, ErrorDescriptor):
+            if not course:
                 log.error("CCX {0} from {2} course {1}".format(  # pylint: disable=logging-format-interpolation
                     self.display_name, self.course_id, "broken" if course else "non-existent"
                 ))

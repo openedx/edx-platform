@@ -9,7 +9,6 @@ from xblock.core import XBlock
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, LibraryLocator, DefinitionLocator
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
@@ -209,37 +208,25 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             parent = course_key.make_usage_key(parent_key.type, parent_key.id)
         else:
             parent = None
-        try:
-            kvs = SplitMongoKVS(
-                definition_loader,
-                converted_fields,
-                converted_defaults,
-                parent=parent,
-                field_decorator=kwargs.get('field_decorator')
-            )
+        kvs = SplitMongoKVS(
+            definition_loader,
+            converted_fields,
+            converted_defaults,
+            parent=parent,
+            field_decorator=kwargs.get('field_decorator')
+        )
 
-            if InheritanceMixin in self.modulestore.xblock_mixins:
-                field_data = inheriting_field_data(kvs)
-            else:
-                field_data = KvsFieldData(kvs)
+        if InheritanceMixin in self.modulestore.xblock_mixins:
+            field_data = inheriting_field_data(kvs)
+        else:
+            field_data = KvsFieldData(kvs)
 
-            module = self.construct_xblock_from_class(
-                class_,
-                ScopeIds(None, block_key.type, definition_id, block_locator),
-                field_data,
-                for_parent=kwargs.get('for_parent')
-            )
-        except Exception:  # pylint: disable=broad-except
-            log.warning("Failed to load descriptor", exc_info=True)
-            return ErrorDescriptor.from_json(
-                block_data,
-                self,
-                course_entry_override.course_key.make_usage_key(
-                    block_type='error',
-                    block_id=block_key.id
-                ),
-                error_msg=exc_info_to_str(sys.exc_info())
-            )
+        module = self.construct_xblock_from_class(
+            class_,
+            ScopeIds(None, block_key.type, definition_id, block_locator),
+            field_data,
+            for_parent=kwargs.get('for_parent')
+        )
 
         edit_info = block_data.edit_info
         module._edited_by = edit_info.edited_by  # pylint: disable=protected-access

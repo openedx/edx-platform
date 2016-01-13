@@ -94,7 +94,6 @@ from util.string_utils import _has_non_ascii_characters
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
@@ -387,9 +386,6 @@ def _accessible_courses_list(request):
         """
         Filter out unusable and inaccessible courses
         """
-        if isinstance(course, ErrorDescriptor):
-            return False
-
         # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
@@ -434,7 +430,7 @@ def _accessible_courses_list_from_groups(request):
             except ItemNotFoundError:
                 # If a user has access to a course that doesn't exist, don't do anything with that course
                 pass
-            if course is not None and not isinstance(course, ErrorDescriptor):
+            if course is not None:
                 # ignore deleted or errored courses
                 courses_list[course_key] = course
 
@@ -445,7 +441,6 @@ def _accessible_libraries_list(user):
     """
     List all libraries available to the logged in user by iterating through all libraries
     """
-    # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
     return [lib for lib in modulestore().get_libraries() if has_studio_read_access(user, lib.location.library_key)]
 
 
@@ -657,7 +652,7 @@ def _remove_in_process_courses(courses, in_process_course_actions):
     courses = [
         format_course_for_view(course)
         for course in courses
-        if not isinstance(course, ErrorDescriptor) and (course.id not in in_process_action_course_keys)
+        if course.id not in in_process_action_course_keys
     ]
     return courses
 

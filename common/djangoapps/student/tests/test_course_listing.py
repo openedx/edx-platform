@@ -13,7 +13,6 @@ from student.models import CourseEnrollment
 from student.roles import GlobalStaff
 from student.tests.factories import UserFactory
 from student.views import get_course_enrollments
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -82,24 +81,6 @@ class TestCourseListing(ModuleStoreTestCase):
         # get dashboard
         courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 0)
-
-    def test_errored_course_regular_access(self):
-        """
-        Test the course list for regular staff when get_course returns an ErrorDescriptor
-        """
-        # pylint: disable=protected-access
-        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-        course_key = mongo_store.make_course_key('Org1', 'Course1', 'Run1')
-        self._create_course_with_access_groups(course_key, default_store=ModuleStoreEnum.Type.mongo)
-
-        with mock.patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', mock.Mock(side_effect=Exception)):
-            self.assertIsInstance(modulestore().get_course(course_key), ErrorDescriptor)
-
-            # Invalidate (e.g., delete) the corresponding CourseOverview, forcing get_course to be called.
-            CourseOverview.objects.filter(id=course_key).delete()
-
-            courses_list = list(get_course_enrollments(self.student, None, []))
-            self.assertEqual(courses_list, [])
 
     def test_course_listing_errored_deleted_courses(self):
         """
