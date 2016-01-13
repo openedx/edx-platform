@@ -254,6 +254,9 @@ class CourseOutlineContainer(CourseOutlineItem):
             """
             Returns whether or not this subsection is expanded.
             """
+            self.wait_for_element_presence(
+                self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Toggle control is present'
+            )
             add_button = self.q(css=self._bounded_selector(self.ADD_BUTTON_SELECTOR)).first.results
             return add_button and add_button[0].is_displayed()
 
