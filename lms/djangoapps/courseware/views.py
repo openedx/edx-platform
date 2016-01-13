@@ -571,19 +571,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             ))
 
         result = render_to_response('courseware/courseware.html', context)
-    except Exception as e:
-
-        # Doesn't bar Unicode characters from URL, but if Unicode characters do
-        # cause an error it is a graceful failure.
-        if isinstance(e, UnicodeEncodeError):
-            raise Http404("URL contains Unicode characters")
-
-        if isinstance(e, Http404):
-            # let it propagate
-            raise
-
-        # In production, don't want to let a 500 out for any reason
-        raise
+    except UnicodeEncodeError:
+        raise Http404("URL contains Unicode characters")
 
     return result
 

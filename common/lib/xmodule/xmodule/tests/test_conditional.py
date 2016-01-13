@@ -46,7 +46,6 @@ class ConditionalFactory(object):
         """
         return a dict of modules: the conditional with a single source and a single child.
         Keys are 'cond_module', 'source_module', and 'child_module'.
-
         """
         descriptor_system = get_test_descriptor_system()
 

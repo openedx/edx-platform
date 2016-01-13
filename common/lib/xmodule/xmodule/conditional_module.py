@@ -120,7 +120,6 @@ class ConditionalModule(ConditionalFields, XModule):
                 if not hasattr(module, attr_name):
                     raise ValueError('Error in conditional module: \
                         required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
-                    return False
 
                 attr = getattr(module, attr_name)
                 if callable(attr):
