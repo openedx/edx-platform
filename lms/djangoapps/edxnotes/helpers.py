@@ -20,7 +20,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
-from capa.util import sanitize_html
 from courseware.views import get_current_child
 from courseware.access import has_access
 from openedx.core.lib.token_utils import get_id_token
@@ -31,8 +30,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 log = logging.getLogger(__name__)
-HIGHLIGHT_TAG = "span"
-HIGHLIGHT_CLASS = "note-highlight"
 # OAuth2 Client name for edxnotes
 CLIENT_NAME = "edx-notes"
 DEFAULT_PAGE = 1
@@ -92,9 +89,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     if text:
         params.update({
             "text": text,
-            "highlight": True,
-            "highlight_tag": HIGHLIGHT_TAG,
-            "highlight_class": HIGHLIGHT_CLASS,
+            "highlight": True
         })
 
     try:
@@ -146,12 +141,9 @@ def preprocess_collection(user, course, collection):
     with store.bulk_operations(course.id):
         for model in collection:
             update = {
-                u"text": sanitize_html(model["text"]),
-                u"quote": sanitize_html(model["quote"]),
                 u"updated": dateutil_parse(model["updated"]),
             }
-            if "tags" in model:
-                update[u"tags"] = [sanitize_html(tag) for tag in model["tags"]]
+
             model.update(update)
             usage_id = model["usage_id"]
             if usage_id in cache:
