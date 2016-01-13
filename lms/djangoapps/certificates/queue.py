@@ -220,7 +220,8 @@ class XQueueCertInterface(object):
             status.deleted,
             status.error,
             status.notpassing,
-            status.downloadable
+            status.downloadable,
+            status.auditing,
         ]
 
         cert_status = certificate_status_for_student(student, course_id)['status']
