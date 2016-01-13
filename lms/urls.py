@@ -205,9 +205,12 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
     if key == "ROOT" or key == "COURSES":
         continue
 
-    # Make the assumptions that the templates are all in the same dir
-    # and that they all match the name of the key (plus extension)
-    template = "%s.html" % key.lower()
+    # The MKTG_URL_LINK_MAP key specifies the template filename
+    template = key.lower()
+    if '.' not in template:
+        # Append STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION if
+        # no file extension was specified in the key
+        template = "%s.%s" % (template, settings.STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION)
 
     # To allow theme templates to inherit from default templates,
     # prepend a standard prefix
