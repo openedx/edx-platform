@@ -8,6 +8,7 @@ from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
+from openedx.core.lib.api.authentication import JwtAuthentication
 from util.organizations_helpers import get_organization_by_short_name
 
 
@@ -15,7 +16,7 @@ class OrganizationsView(APIView):
     """
     View to get organization information.
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (OAuth2Authentication, SessionAuthentication, JwtAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, organization_key):

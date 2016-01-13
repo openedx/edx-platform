@@ -1,8 +1,15 @@
 """ Common Authentication Handlers used across projects. """
+import logging
+
+from django.contrib.auth.models import User
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework_oauth.compat import oauth2_provider, provider_now
+
+
+log = logging.getLogger(__name__)
 
 
 class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
@@ -81,3 +88,27 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
             raise AuthenticationFailed('Invalid token')
 
         return token.user, token
+
+
+class JwtAuthentication(JSONWebTokenAuthentication):
+    """
+    Custom authentication using JWT.
+    """
+
+    def authenticate_credentials(self, payload):
+        """
+        Return a user object to be associated with the present request, based on
+        the content of an already-decoded / verified JWT payload.
+        """
+        if 'preferred_username' not in payload:
+            log.warning('Invalid JWT payload: preferred_username not present.')
+            raise AuthenticationFailed()
+
+        username = payload['preferred_username']
+        try:
+            user = User.objects.get(username=username)  # pylint: disable=no-member
+            return user
+        except User.DoesNotExist:
+            msg = 'User retrieval failed.'
+            log.exception(msg)
+            raise AuthenticationFailed(msg)

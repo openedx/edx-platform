@@ -5,7 +5,10 @@ and updated to use our subclass of OAuth2Authentication.
 
 from __future__ import unicode_literals
 import datetime
+import time
 
+import ddt
+import mock
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -14,15 +17,19 @@ from django.utils import unittest
 from django.utils.http import urlencode
 
 from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_oauth import permissions
 from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.views import APIView
+from rest_framework_jwt.settings import api_settings as drf_jwt_settings
 
 from provider import scope, constants
 
-from ..authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser, JwtAuthentication
+from openedx.core.lib.api.tests.mixins import JwtMixin
+from student.tests.factories import UserFactory
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
@@ -233,3 +240,65 @@ class OAuth2Tests(TestCase):
         auth = self._create_authorization_header(token=read_write_access_token.token)
         response = self.csrf_client.post('/oauth2-with-scope-test/', HTTP_AUTHORIZATION=auth)
         self.assertEqual(response.status_code, 200)
+
+
+@ddt.ddt
+class JwtAuthenticationTests(JwtMixin, TestCase):
+    """Test JWT authentications."""
+    def setUp(self):
+        super(JwtAuthenticationTests, self).setUp()
+
+        self.user = UserFactory.create()
+        self.authentication = JwtAuthentication()
+
+    def test_user_exist(self):
+        """Ensure that service return user if user exists."""
+        user = self.authentication.authenticate_credentials({'preferred_username': self.user.username})
+        self.assertEqual(user.username, self.user.username)
+
+    def test_no_preferred_username(self):
+        """Ensure that service gracefully handles when no username is provided."""
+        with self.assertRaises(AuthenticationFailed):
+            self.authentication.authenticate_credentials({})
+
+    def test_nonexistent_user(self):
+        """Ensure that service gracefully handles when no user with provided
+        user exists.
+        """
+        with self.assertRaises(AuthenticationFailed):
+            self.authentication.authenticate_credentials({'preferred_username': 'test_user'})
+
+    @ddt.data(('exp', -1), ('iat', 1))
+    @ddt.unpack
+    def test_leeway(self, claim, offset):
+        """
+        Verify that the service allows the specified amount of leeway (in
+        seconds) when nonzero and validating "exp" and "iat" claims.
+        """
+        jwt_value = self.generate_id_token(self.user, **{claim: int(time.time()) + offset})
+        request = factory.get('dummy', HTTP_AUTHORIZATION='JWT {}'.format(jwt_value))
+
+        # with no leeway, these requests should not be authenticated
+        with mock.patch.object(drf_jwt_settings, 'JWT_LEEWAY', 0):
+            with self.assertRaises(AuthenticationFailed):
+                self.authentication.authenticate(request)
+
+        # with enough leeway, these requests should be authenticated
+        with mock.patch.object(drf_jwt_settings, 'JWT_LEEWAY', abs(offset)):
+            self.assertEqual(
+                (self.user, jwt_value),
+                self.authentication.authenticate(request)
+            )
+
+    @ddt.data('exp', 'iat')
+    def test_required_claims(self, claim):
+        """
+        Verify that tokens that do not carry 'exp' or 'iat' claims are rejected
+        """
+        user = UserFactory()
+        jwt_payload = self.default_payload(user)
+        del jwt_payload[claim]
+        jwt_value = self.generate_token(jwt_payload)
+        request = factory.get('dummy', HTTP_AUTHORIZATION='JWT {}'.format(jwt_value))
+        with self.assertRaises(AuthenticationFailed):
+            self.authentication.authenticate(request)

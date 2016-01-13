@@ -13,6 +13,7 @@ from rest_framework import permissions
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
+    JwtAuthentication,
 )
 from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -138,7 +139,9 @@ class AccountView(APIView):
 
             If the update is successful, updated user account data is returned.
     """
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
+    authentication_classes = (
+        OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JwtAuthentication
+    )
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 

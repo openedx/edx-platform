@@ -230,6 +230,14 @@ CORS_ORIGIN_ALLOW_ALL = True
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
     from .private import *  # pylint: disable=import-error,wildcard-import
 
+# do this after private.py, ensuring this section picks up credential overrides.
+JWT_AUTH.update({
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
+    'JWT_AUDIENCE': 'lms-key',
+})
+
 #####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
