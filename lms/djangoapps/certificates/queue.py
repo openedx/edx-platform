@@ -279,7 +279,7 @@ class XQueueCertInterface(object):
         if forced_grade:
             grade['grade'] = forced_grade
 
-        cert, __ = GeneratedCertificate.eligible_certificates.get_or_create(user=student, course_id=course_id)
+        cert, created = GeneratedCertificate.eligible_certificates.get_or_create(user=student, course_id=course_id)
 
         cert.mode = cert_mode
         cert.user = student
@@ -290,8 +290,9 @@ class XQueueCertInterface(object):
 
         # If this user's enrollment is not eligible to receive a
         # certificate, mark it as such for reporting and
-        # analytics.
-        if not is_eligible_for_certificate:
+        # analytics. Only do this if the certificate is new -- we
+        # don't want to mark existing audit certs as ineligible.
+        if created and not is_eligible_for_certificate:
             cert.eligible_for_certificate = False
             cert.status = CertificateStatuses.auditing
             cert.save()
