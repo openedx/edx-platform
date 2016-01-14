@@ -8,9 +8,11 @@ import logging
 import urllib
 import requests
 from urllib import urlencode
-from urlparse import parse_qs, urlsplit, urlunsplit
+from urlparse import parse_qs, urlsplit, urlunsplit, urlparse
 
 from django.conf import settings
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 from requests.exceptions import RequestException
 
@@ -39,43 +41,41 @@ def create_youtube_string(module):
     ])
 
 
-# def get_video_from_cdn(cdn_base_url, original_video_url, cdn_branding_logo_url):
-# Not sure if this third variable is necessary...
-def get_video_from_cdn(cdn_base_url, original_video_url):
+def rewrite_video_url(cdn_base_url, original_video_url):
     """
-    Get video URL from CDN.
+    Returns a re-written video URL for cases when an alternate source
+    has been configured and is selected using factors like
+    user location.
 
-    `original_video_url` is the existing video url.
-    Currently `cdn_base_url` equals 'http://api.xuetangx.com/edx/video?s3_url='
-    Example of CDN outcome:
-        {
-            "sources":
-                [
-                    "http://cm12.c110.play.bokecc.com/flvs/ca/QxcVl/u39EQbA0Ra-20.mp4",
-                    "http://bm1.42.play.bokecc.com/flvs/ca/QxcVl/u39EQbA0Ra-20.mp4"
-                ],
-            "s3_url": "http://s3.amazonaws.com/BESTech/CS169/download/CS169_v13_w5l2s3.mp4",
-        }
-    where `s3_url` is requested original video url and `sources` is the list of
-    alternative links.
+    Re-write rules for country codes are specified via the
+    EDX_VIDEO_CDN_URLS configuration structure.
+
+    :param cdn_base_url: The scheme, hostname, port and any relevant path prefix for the alternate CDN,
+    for example: https://mirror.example.cn/edx
+    :param original_video_url: The canonical source for this video, for example:
+    https://cdn.example.com/edx-course-videos/VIDEO101/001.mp4
+    :return: The re-written URL
     """
 
-    if not cdn_base_url:
+    if (not cdn_base_url) or (not original_video_url):
         return None
 
-    request_url = cdn_base_url + urllib.quote(original_video_url)
+    parsed = urlparse(original_video_url)
+    # Contruction of the rewrite url is intentionally very flexible of input.
+    # For example, https://www.edx.org/ + /foo.html will be rewritten to
+    # https://www.edx.org/foo.html.
+    rewritten_url = cdn_base_url.rstrip("/") + "/" + parsed.path.lstrip("/")
+    validator = URLValidator()
 
     try:
-        cdn_response = requests.get(request_url, timeout=0.5)
-    except RequestException as err:
-        log.info("Request timed out to CDN server: %s", request_url, exc_info=True)
-        return None
+        validator(rewritten_url)
+        return rewritten_url
+    except ValidationError:
+        log.warn("Invalid CDN rewrite URL encountered, %s", rewritten_url)
 
-    if cdn_response.status_code == 200:
-        cdn_content = json.loads(cdn_response.content)
-        return cdn_content['sources'][0]
-    else:
-        return None
+    # Mimic the behavior of removed get_video_from_cdn in this regard and
+    # return None causing the caller to use the original URL.
+    return None
 
 
 def get_poster(video):
