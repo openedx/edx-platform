@@ -247,11 +247,9 @@ class Command(BaseCommand):
         cme_profiles = CourseEnrollment.objects.select_related('user__profile__cmeuserprofile').filter(course_id=course_id).values(
             *[field for field, label in PROFILE_FIELDS if 'untracked' not in field]
         ).order_by('user__username')
-
         unpaid_registrations = CourseEnrollment.objects.filter(course_id=course_id)
         registrations = PaidCourseRegistration.objects.filter(status='purchased', course_id=course_id)
         certificates = GeneratedCertificate.objects.filter(course_id=course_id)
-        
         return certificates, cme_profiles, registrations, unpaid_registrations
 
     def build_user_table(self, data_rows):

@@ -172,12 +172,14 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.assertTrue(BadgeAssertion.objects.filter(user=self.user, course_id=key))
         self._run_command(
             username=self.user.email, course=unicode(key), noop=False, insecure=False, template_file=None,
+            designation=None,
             grade_value=None
         )
         xqueue.return_value.regen_cert.assert_called_with(
             self.user,
             key,
             course=self.course,
+            designation=None,
             forced_grade=None,
             template_file=None,
             generate_pdf=True
@@ -196,6 +198,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
         self._run_command(
             username=self.user.email, course=unicode(key), noop=False, insecure=True, template_file=None,
+            designation=None,
             grade_value=None
         )
         certificate = GeneratedCertificate.objects.get(

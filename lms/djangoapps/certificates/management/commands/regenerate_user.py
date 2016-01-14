@@ -60,7 +60,7 @@ class Command(BaseCommand):
             '--designation',
             metavar='DESIGNATION',
             dest='designation',
-            default='None',
+            default=None,
             help='Professional designation to pass to certificate generator',
         ),
     )
@@ -109,7 +109,8 @@ class Command(BaseCommand):
         course = modulestore().get_course(course_id, depth=2)
 
         designation = options['designation']
-        if designation == 'None' and use_cme:
+
+        if not designation and use_cme:
             designations = CmeUserProfile.objects.filter(user=student).values('professional_designation')
             if len(designations):
                 designation = designations[0]['professional_designation']

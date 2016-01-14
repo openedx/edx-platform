@@ -48,7 +48,7 @@ def request_certificate(request):
             course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
             course = modulestore().get_course(course_key, depth=2)
 
-            designation = 'None'
+            designation = None
             if use_cme:
                 designations = CmeUserProfile.objects.filter(user=student).values('professional_designation')
                 if len(designations):
