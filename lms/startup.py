@@ -33,13 +33,15 @@ def run():
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
 
-    microsite.enable_microsites(log)
+    microsite.enable_microsites_pre_startup(log)
 
     django.setup()
 
     autostartup()
 
     add_mimetypes()
+
+    microsite.enable_microsites(log)
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_stanford_theme()

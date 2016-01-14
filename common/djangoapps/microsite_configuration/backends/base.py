@@ -287,6 +287,17 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
                 microsites_root
             )
 
+    def enable_microsites_pre_startup(self, log):
+        """
+        The TEMPLATE_ENGINE directory to search for microsite templates
+        in non-mako templates must be loaded before the django startup
+        """
+        microsites_root = settings.MICROSITE_ROOT_DIR
+        microsite_config_dict = settings.MICROSITE_CONFIGURATION
+
+        if microsite_config_dict:
+            settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].append(microsites_root)
+
 
 class BaseMicrositeTemplateBackend(object):
     """
