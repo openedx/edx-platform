@@ -181,6 +181,30 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         self.assertFalse(certificate.eligible_for_certificate)
         self.assertEqual(certificate.mode, expected_mode)
 
+    @ddt.data(
+        (CertificateStatuses.restricted, False),
+        (CertificateStatuses.deleting, False),
+        (CertificateStatuses.generating, True),
+        (CertificateStatuses.unavailable, True),
+        (CertificateStatuses.deleted, True),
+        (CertificateStatuses.error, True),
+        (CertificateStatuses.notpassing, True),
+        (CertificateStatuses.downloadable, True),
+        (CertificateStatuses.auditing, True),
+    )
+    @ddt.unpack
+    def test_add_cert_statuses(self, status, should_generate):
+        """
+        Test that certificates can or cannot be generated with the given
+        certificate status.
+        """
+        with patch('certificates.queue.certificate_status_for_student', Mock(return_value={'status': status})):
+            mock_send = self.add_cert_to_queue('verified')
+            if should_generate:
+                self.assertTrue(mock_send.called)
+            else:
+                self.assertFalse(mock_send.called)
+
 
 @attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
