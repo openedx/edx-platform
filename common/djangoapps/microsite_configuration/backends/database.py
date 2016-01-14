@@ -129,7 +129,7 @@ class DatabaseMicrositeBackend(BaseMicrositeBackend):
 
         # we take the list of ORGs associated with this microsite from the database mapping
         # tables. NOTE, for now, we assume one ORG per microsite
-        organizations = microsite_object.get_organizaions()
+        organizations = microsite_object.get_organizations()
 
         # we must have at least one ORG defined
         if not organizations:

@@ -38,7 +38,7 @@ class Microsite(models.Model):
     def __unicode__(self):
         return self.key
 
-    def get_organizaions(self):
+    def get_organizations(self):
         """
         Helper method to return a list of organizations associated with our particular Microsite
         """
