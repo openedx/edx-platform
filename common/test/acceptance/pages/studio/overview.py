@@ -6,6 +6,7 @@ import datetime
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
+from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
@@ -262,7 +263,9 @@ class CourseOutlineContainer(CourseOutlineItem):
 
         currently_expanded = subsection_expanded()
 
-        self.q(css=self._bounded_selector('.ui-toggle-expansion')).first.click()
+        ele = self.browser.find_element_by_css_selector(self._bounded_selector('.ui-toggle-expansion i'))
+        ActionChains(self.browser).move_to_element_with_offset(ele, 1, 1).click().perform()
+        # self.q(css=self._bounded_selector('.ui-toggle-expansion i')).first.click()
         self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 
         EmptyPromise(
