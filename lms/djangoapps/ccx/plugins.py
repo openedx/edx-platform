@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_noop
 
 from xmodule.tabs import CourseTab
 from student.roles import CourseCcxCoachRole
+from courseware.access import has_access
 
 
 class CcxCourseTab(CourseTab):
@@ -28,5 +29,7 @@ class CcxCourseTab(CourseTab):
             return True
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False) or not course.enable_ccx:
             return False
+        if has_access(user, 'staff', course) or has_access(user, 'instructor', course):
+            return True
         role = CourseCcxCoachRole(course.id)
         return role.has_user(user)
