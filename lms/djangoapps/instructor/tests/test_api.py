@@ -29,6 +29,7 @@ from nose.tools import raises
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import UsageKey
+from xmodule.modulestore import ModuleStoreEnum
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
@@ -66,6 +67,7 @@ from certificates.tests.factories import GeneratedCertificateFactory
 from certificates.models import CertificateStatuses
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+from openedx.core.lib.xblock_utils import grade_histogram
 
 from .test_tools import msk_from_problem_urlname
 
@@ -3092,6 +3094,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
 
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+@ddt.ddt
 class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can rescore student grades,
@@ -3159,6 +3162,29 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
             state=json.dumps({'attempts': 10, 'done': True}),
         )
         self.ee_modules = [ee_module_to_reset1.module_state_key, ee_module_to_reset2.module_state_key]
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_grade_histogram(self, store):
+        """
+        Verify that a histogram has been created.
+        """
+        course = CourseFactory.create(default_store=store)
+
+        usage_key = course.id.make_usage_key('problem', 'first_problem')
+        StudentModule.objects.create(
+            student_id=1,
+            grade=100,
+            module_state_key=usage_key
+        )
+        StudentModule.objects.create(
+            student_id=2,
+            grade=50,
+            module_state_key=usage_key
+        )
+
+        grades = grade_histogram(usage_key)
+        self.assertEqual(grades[0], (50.0, 1))
+        self.assertEqual(grades[1], (100.0, 1))
 
     def test_reset_entrance_exam_student_attempts_deletall(self):
         """ Make sure no one can delete all students state on entrance exam. """
