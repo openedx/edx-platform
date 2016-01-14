@@ -7,7 +7,6 @@ import itertools
 from pytz import UTC
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
-from time import sleep
 
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
@@ -323,7 +322,6 @@ class WarningMessagesTest(CourseOutlineTest):
 
         name = unit_state.name
         self.course_outline_page.visit()
-        sleep(1)
         subsection = self.course_outline_page.section(name).subsection(name)
         subsection.expand_subsection()
 
