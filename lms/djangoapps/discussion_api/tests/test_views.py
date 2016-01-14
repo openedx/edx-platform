@@ -310,7 +310,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response = self.client.get(self.url, {"course_id": unicode(self.course.id), "following": ""})
         expected_respoonse = make_paginated_api_response(
             expected_threads,
-            0,
+            1,
             2,
             "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
             None
@@ -949,7 +949,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             200,
-            make_paginated_api_response(expected_comments, 0, 10, next_link, None)
+            make_paginated_api_response(expected_comments, 100, 10, next_link, None)
         )
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
