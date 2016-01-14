@@ -1420,6 +1420,7 @@ def change_setting(request):
 
 
 class AccountValidationError(Exception):
+
     def __init__(self, message, field):
         super(AccountValidationError, self).__init__(message)
         self.field = field
@@ -1583,7 +1584,10 @@ def create_account_with_params(request, params):
         not eamap.external_domain.startswith(
             external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
         )
-    )
+    ) and not (settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION") and
+               extra_fields.get("honor_code", "required") != 'required')
+    # Honor code is required by default, unless
+    # explicitly set to "optional" in Django settings.
 
     form = AccountCreationForm(
         data=params,
