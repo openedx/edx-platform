@@ -79,7 +79,7 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
         """
         microsite.set_by_domain(self.microsite.site.domain)
         self.assertEqual(
-            microsite.get_value_for_org(self.microsite.get_organizaions()[0], 'platform_name'),
+            microsite.get_value_for_org(self.microsite.get_organizations()[0], 'platform_name'),
             self.microsite.values['platform_name']
         )
 
@@ -90,7 +90,7 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
         microsite.set_by_domain(self.microsite.site.domain)
         self.assertEqual(
             microsite.get_all_orgs(),
-            set(self.microsite.get_organizaions())
+            set(self.microsite.get_organizations())
         )
 
     def test_clear(self):
@@ -105,9 +105,9 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
         microsite.clear()
         self.assertIsNone(microsite.get_value('platform_name'))
 
-    def test_enable_microsites(self):
+    def test_enable_microsites_pre_startup(self):
         """
-        Tests microsite.enable_microsites works as expected.
+        Tests microsite.test_enable_microsites_pre_startup works as expected.
         """
         # remove microsite root directory paths first
         settings.DEFAULT_TEMPLATE_ENGINE['DIRS'] = [
@@ -115,11 +115,30 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
             if path != settings.MICROSITE_ROOT_DIR
         ]
         with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': False}):
-            microsite.enable_microsites(log)
+            microsite.enable_microsites_pre_startup(log)
             self.assertNotIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
         with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': True}):
-            microsite.enable_microsites(log)
+            microsite.enable_microsites_pre_startup(log)
             self.assertIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+
+    @patch('edxmako.paths.add_lookup')
+    def test_enable_microsites(self, add_lookup):
+        """
+        Tests microsite.enable_microsites works as expected.
+        """
+        # remove microsite root directory paths first
+        settings.STATICFILES_DIRS = [
+            path for path in settings.STATICFILES_DIRS
+            if path != settings.MICROSITE_ROOT_DIR
+        ]
+        with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': False}):
+            microsite.enable_microsites(log)
+            self.assertNotIn(settings.MICROSITE_ROOT_DIR, settings.STATICFILES_DIRS)
+            add_lookup.assert_not_called()
+        with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': True}):
+            microsite.enable_microsites(log)
+            self.assertIn(settings.MICROSITE_ROOT_DIR, settings.STATICFILES_DIRS)
+            add_lookup.assert_called_once_with('main', settings.MICROSITE_ROOT_DIR)
 
     def test_get_all_configs(self):
         """
