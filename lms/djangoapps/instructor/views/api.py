@@ -423,17 +423,16 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                             email
                         )
 
-                    # make sure user is enrolled in course
+                    # enroll a user if it is not already enrolled.
                     if not CourseEnrollment.is_enrolled(user, course_id):
-                        enrollment_obj = CourseEnrollment.enroll(user, course_id, mode=course_mode)
-                        reason = 'Enrolling via csv upload'
-                        ManualEnrollmentAudit.create_manual_enrollment_audit(
-                            request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
-                        )
-                        log.info(
-                            u'user %s enrolled in the course %s',
-                            username,
-                            course.id,
+                        # Enroll user to the course and add manual enrollment audit trail
+                        create_manual_course_enrollment(
+                            user=user,
+                            course_id=course_id,
+                            mode=course_mode,
+                            enrolled_by=request.user,
+                            reason='Enrolling via csv upload',
+                            state_transition=UNENROLLED_TO_ENROLLED,
                         )
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
                 else:
@@ -441,31 +440,10 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                     # If username already exists in the database, then create_and_enroll_user
                     # will raise an IntegrityError exception.
                     password = generate_unique_password(generated_passwords)
-
-                    try:
-                        with transaction.atomic():
-                            enrollment_obj = create_and_enroll_user(
-                                email, username, name, country, password, course_id, course_mode
-                            )
-                            reason = 'Enrolling via csv upload'
-                            ManualEnrollmentAudit.create_manual_enrollment_audit(
-                                request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
-                            )
-                    except IntegrityError:
-                        row_errors.append({
-                            'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
-                    except Exception as ex:
-                        log.exception(type(ex).__name__)
-                        row_errors.append({
-                            'username': username, 'email': email, 'response': type(ex).__name__})
-                    else:
-                        # It's a new user, an email will be sent to each newly created user.
-                        email_params['message'] = 'account_creation_and_enrollment'
-                        email_params['email_address'] = email
-                        email_params['password'] = password
-                        email_params['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-                        send_mail_to_student(email, email_params)
-                        log.info(u'email sent to new created user at %s', email)
+                    errors = create_and_enroll_user(
+                        email, username, name, country, password, course_id, course_mode, request.user, email_params
+                    )
+                    row_errors.extend(errors)
 
     else:
         general_errors.append({
@@ -506,9 +484,18 @@ def generate_unique_password(generated_passwords, password_length=12):
     return password
 
 
-def create_and_enroll_user(email, username, name, country, password, course_id, course_mode=None):
-    """ Creates a user and enroll him/her in the course"""
+def create_user_and_user_profile(email, username, name, country, password):
+    """
+    Create a new user, add a new Registration instance for letting user verify its identity and create a user profile.
 
+    :param email: user's email address
+    :param username: user's username
+    :param name: user's name
+    :param country: user's country
+    :param password: user's password
+
+    :return: User instance of the new user.
+    """
     user = User.objects.create_user(username, email, password)
     reg = Registration()
     reg.register(user)
@@ -518,8 +505,102 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
     profile.country = country
     profile.save()
 
-    # try to enroll the user in this course
-    return CourseEnrollment.enroll(user, course_id, mode=course_mode)
+    return user
+
+
+def create_manual_course_enrollment(user, course_id, mode, enrolled_by, reason, state_transition):
+    """
+    Create course enrollment for the given student and create manual enrollment audit trail.
+
+    :param user: User who is to enroll in course
+    :param course_id: course identifier of the course in which to enroll the user.
+    :param mode: mode for user enrollment, e.g. 'honor', 'audit' etc.
+    :param enrolled_by: User who made the manual enrollment entry (usually instructor or support)
+    :param reason: Reason behind manual enrollment
+    :param state_transition: state transition denoting whether student enrolled from un-enrolled,
+            un-enrolled from enrolled etc.
+    :return CourseEnrollment instance.
+    """
+    enrollment_obj = CourseEnrollment.enroll(user, course_id, mode=mode)
+    ManualEnrollmentAudit.create_manual_enrollment_audit(
+        enrolled_by, user.email, state_transition, reason, enrollment_obj
+    )
+
+    log.info(u'user %s enrolled in the course %s', user.username, course_id)
+    return enrollment_obj
+
+
+def create_and_enroll_user(email, username, name, country, password, course_id, course_mode, enrolled_by, email_params):
+    """
+    Create a new user and enroll him/her to the given course, return list of errors in the following format
+        Error format:
+            each error is key-value pait dict with following key-value pairs.
+            1. username: username of the user to enroll
+            1. email: email of the user to enroll
+            1. response: readable error message
+
+    :param email: user's email address
+    :param username: user's username
+    :param name: user's name
+    :param country: user's country
+    :param password: user's password
+    :param course_id: course identifier of the course in which to enroll the user.
+    :param course_mode: mode for user enrollment, e.g. 'honor', 'audit' etc.
+    :param enrolled_by: User who made the manual enrollment entry (usually instructor or support)
+    :param email_params: information to send to the user via email
+
+    :return: list of errors
+    """
+    errors = list()
+    try:
+        with transaction.atomic():
+            # Create a new user
+            user = create_user_and_user_profile(email, username, name, country, password)
+
+            # Enroll user to the course and add manual enrollment audit trail
+            create_manual_course_enrollment(
+                user=user,
+                course_id=course_id,
+                mode=course_mode,
+                enrolled_by=enrolled_by,
+                reason='Enrolling via csv upload',
+                state_transition=UNENROLLED_TO_ENROLLED,
+            )
+    except IntegrityError:
+        errors.append({
+            'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)
+        })
+    except Exception as ex:  # pylint: disable=broad-except
+        log.exception(type(ex).__name__)
+        errors.append({
+            'username': username, 'email': email, 'response': type(ex).__name__,
+        })
+    else:
+        try:
+            # It's a new user, an email will be sent to each newly created user.
+            email_params.update({
+                'message': 'account_creation_and_enrollment',
+                'email_address': email,
+                'password': password,
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            })
+            send_mail_to_student(email, email_params)
+        except Exception as ex:  # pylint: disable=broad-except
+            log.exception(
+                "Exception '{exception}' raised while sending email to new user.".format(exception=type(ex).__name__)
+            )
+            errors.append({
+                'username': username,
+                'email': email,
+                'response':
+                    _("Error '{error}' while sending email to new user (user email={email}). "
+                      "Without the email student would not be able to login. "
+                      "Please contact support for further information.").format(error=type(ex).__name__, email=email),
+            })
+        else:
+            log.info(u'email sent to new created user at %s', email)
+
+    return errors
 
 
 @ensure_csrf_cookie

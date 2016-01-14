@@ -397,10 +397,10 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         CourseModeFactory(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
 
         cls.url = reverse(
-            'register_and_enroll_students', kwargs={'course_id': cls.course.id.to_deprecated_string()}
+            'register_and_enroll_students', kwargs={'course_id': unicode(cls.course.id)}
         )
         cls.audit_course_url = reverse(
-            'register_and_enroll_students', kwargs={'course_id': cls.audit_course.id.to_deprecated_string()}
+            'register_and_enroll_students', kwargs={'course_id': unicode(cls.audit_course.id)}
         )
 
     def setUp(self):
@@ -416,7 +416,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         )
 
         self.white_label_course_url = reverse(
-            'register_and_enroll_students', kwargs={'course_id': self.white_label_course.id.to_deprecated_string()}
+            'register_and_enroll_students', kwargs={'course_id': unicode(self.white_label_course.id)}
         )
 
         self.request = RequestFactory().request()
@@ -650,7 +650,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
                       "test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        with patch('instructor.views.api.create_and_enroll_user') as mock:
+        with patch('instructor.views.api.create_manual_course_enrollment') as mock:
             mock.side_effect = NonExistentCourseError()
             response = self.client.post(self.url, {'students_list': uploaded_file})
 
