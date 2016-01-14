@@ -129,10 +129,10 @@ class DatabaseMicrositeBackend(BaseMicrositeBackend):
 
         # we take the list of ORGs associated with this microsite from the database mapping
         # tables. NOTE, for now, we assume one ORG per microsite
-        organizaions = microsite_object.get_organizaions()
+        organizations = microsite_object.get_organizaions()
 
         # we must have at least one ORG defined
-        if not organizaions:
+        if not organizations:
             raise Exception(
                 'Configuration error. Microsite {key} does not have any ORGs mapped to it!'.format(
                     key=microsite_object.key
@@ -141,7 +141,7 @@ class DatabaseMicrositeBackend(BaseMicrositeBackend):
 
         # just take the first one for now, we'll have to change the upstream logic to allow
         # for more than one ORG binding
-        config['course_org_filter'] = organizaions[0]
+        config['course_org_filter'] = organizations[0]
         self.current_request_configuration.data = config
 
 

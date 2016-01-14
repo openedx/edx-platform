@@ -236,8 +236,6 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
         """
         org_filter_set = set()
 
-        # cdodge: is this really needed? Right now it could be expensive as it does
-        # a full table count...
         if not self.has_configuration_set():
             return org_filter_set
 
@@ -271,7 +269,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
 
     def enable_microsites(self, log):
         """
-        Enable the use of microsites, from a dynamic defined list in the db
+        Configure the paths for the microsites feature
         """
         microsites_root = settings.MICROSITE_ROOT_DIR
 
