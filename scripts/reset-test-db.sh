@@ -24,19 +24,17 @@
 
 DB_CACHE_DIR="common/test/db_cache"
 
-# Ensure a new test database exists. This means the same machine
-# can be used multiple times with the same MySQL instance (e.g.,
-# a build or development machine).
-echo "DROP DATABASE IF EXISTS edxtest;" | mysql -u root
-echo "CREATE DATABASE edxtest;" | mysql -u root
+# Ensure the test database exists.
+echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
 
-# Reset the test database
+# Clear out the test database
 #
-# To support multiple runs using the --serversonly / --testsonly switches
-# for paver test_bokchoy, we flush data from the database without affecting
-# schema through Django's 'flush' management command.
-echo "Flushing the bok_choy MySQL database."
-./manage.py lms --settings bok_choy flush --traceback --noinput
+# We are using the django-extensions's reset_db command which uses "DROP DATABASE" and
+# "CREATE DATABASE" in case the tests are being run in an environment (e.g. devstack
+# or a jenkins worker environment) that already ran tests on another commit that had
+# different migrations that created, dropped, or altered tables.
+echo "Issuing a reset_db command to the bok_choy MySQL database."
+./manage.py lms --settings bok_choy reset_db --traceback --noinput
 
 # If there are cached database schemas/data, load them
 if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_migrations_data.sql && -f $DB_CACHE_DIR/bok_choy_data.json ]]; then
