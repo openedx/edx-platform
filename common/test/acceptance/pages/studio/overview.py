@@ -262,7 +262,7 @@ class CourseOutlineContainer(CourseOutlineItem):
 
         currently_expanded = subsection_expanded()
 
-        self.q(css=self._bounded_selector('.ui-toggle-expansion i')).first.click()
+        self.q(css=self._bounded_selector('.ui-toggle-expansion')).first.click()
         self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 
         EmptyPromise(
