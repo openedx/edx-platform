@@ -125,7 +125,7 @@ django_debug_toolbar==1.3.2
 
 # Used for testing
 before_after==0.1.3
-bok-choy==0.4.7
+# bok-choy==0.4.7
 chrono==1.0.2
 coverage==4.0.2
 ddt==0.8.0
@@ -148,7 +148,7 @@ python-subunit==0.0.16
 pyquery==1.2.9
 radon==1.2
 rednose==0.4.3
-selenium==2.42.1
+selenium==2.48.0
 splinter==0.5.4
 testtools==0.9.34
 
