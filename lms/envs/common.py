@@ -367,6 +367,9 @@ FEATURES = {
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
+
+    # Show LMS Language selector
+    'SHOW_LANGUAGE_SELECTOR': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1249,6 +1252,7 @@ base_application_js = [
     'js/src/ie_shim.js',
     'js/src/accessibility_tools.js',
     'js/toggle_login_modal.js',
+    'js/src/lang_edx.js',
 ]
 
 dashboard_js = (

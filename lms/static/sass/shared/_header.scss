@@ -118,6 +118,10 @@ header.global {
     margin-top: ($baseline/4);
     padding-left: 0;
 
+    .settings-language-form {
+      margin-top: 4px;
+    }
+
     > .primary {
       display: block;
       @include float(left);

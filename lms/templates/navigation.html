@@ -11,6 +11,7 @@ from lms.djangoapps.ccx.overrides import get_current_ccx
 from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
+from lang_pref.api import released_languages
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -75,6 +76,28 @@ site_status_msg = get_site_status_msg(course_id)
       </%block>
     </ol>
     <ol class="user">
+        % if static.show_language_selector():
+        <% languages = released_languages() %>
+        % if len(languages) > 1:
+            <li class="primary">
+              <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                <input title="preference api" type="hidden" id="preference-api-url" value="${reverse('preferences_api', kwargs={'username': user.username})}">
+                <label><span class="sr">${_("Choose Language")}</span>
+                    <select class="input select" id="settings-language-value" name="language">
+                      % for language in languages:
+                        % if language[0] == LANGUAGE_CODE:
+                          <option value="${language[0]}" selected="selected">${language[1]}</option>
+                        % else:
+                          <option value="${language[0]}" >${language[1]}</option>
+                        % endif
+                      % endfor
+                    </select>
+                </label>
+              </form>
+            </li>
+        % endif
+        % endif
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="sr">${_("Dashboard for:")}</span>

@@ -124,3 +124,7 @@ else:
 <%def name="is_request_in_themed_site()"><%
     return is_request_in_themed_site()
 %></%def>
+
+<%def name="show_language_selector()"><%
+    return settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False)
+%></%def>
