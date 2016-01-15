@@ -80,5 +80,5 @@ git+https://github.com/edx/edx-proctoring.git@0.6.2#egg=edx-proctoring==0.6.2
 -e git+https://github.com/openlearninginitiative/xblock-image-coding.git@cee23e3d59943066159ca13839c82a12d9ccf749#egg=xblock_image_coding
 
 # Stanford XBlocks
--e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@a34e78871f79afc8b14ed47410cee813d96421e4#egg=xblock-qualtrics-survey
+-e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@653400485196f8bb05b859c9d89de378a22e0503#egg=xblock-qualtrics-survey
 -e git+https://github.com/Stanford-Online/xblock-free-text-response@666c23eafeecf7fbf91bb3f9871e8e7b71ff54a9#egg=xblock-free-text-response
