@@ -2,10 +2,12 @@
 API function for retrieving course blocks data
 """
 
+from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
+from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.proctored_exam import ProctoredExamTransformer
 from .serializers import BlockSerializer, BlockDictSerializer
-from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
 
 
 def get_blocks(
@@ -17,7 +19,7 @@ def get_blocks(
         requested_fields=None,
         block_counts=None,
         student_view_data=None,
-        return_type='dict'
+        return_type='dict',
 ):
     """
     Return a serialized representation of the course blocks.
@@ -43,25 +45,21 @@ def get_blocks(
         return_type (string): Possible values are 'dict' or 'list'. Indicates
             the format for returning the blocks.
     """
-    # construct BlocksAPITransformer
-    blocks_api_transformer = BlocksAPITransformer(
-        block_counts,
-        student_view_data,
-        depth,
-        nav_depth
-    )
-
-    # list of transformers to apply, adding user-specific ones if user is provided
-    transformers = []
+    # create ordered list of transformers, adding BlocksAPITransformer at end.
+    transformers = BlockStructureTransformers()
     if user is not None:
         transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS + [ProctoredExamTransformer()]
-    transformers += [blocks_api_transformer]
+    transformers += [
+        BlocksAPITransformer(
+            block_counts,
+            student_view_data,
+            depth,
+            nav_depth
+        )
+    ]
 
-    blocks = get_course_blocks(
-        user,
-        usage_key,
-        transformers=transformers,
-    )
+    # transform
+    blocks = get_course_blocks(user, usage_key, transformers)
 
     # serialize
     serializer_context = {

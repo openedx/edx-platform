@@ -1,5 +1,5 @@
 """
-The block_cache django app provides an extensible framework for caching
+The block_structure django app provides an extensible framework for caching
 data of block structures from the modulestore.
 
 Dual-Phase. The framework is meant to be used in 2 phases.
