@@ -114,6 +114,7 @@
 # MarnyLopez, 2014
 # Natalia, 2013
 # Natalia, 2013-2014
+# Ned Batchelder <ned@edx.org>, 2016
 # Nestor Alejandro Mendoza Espinoza <name1984@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # paul ochoa <palichis@solid-ec.org>, 2015
@@ -14410,7 +14411,7 @@ msgid ""
 "receive regenerated certificates and click <br/> Regenerate Certificates."
 msgstr ""
 "Para regenerar los certificados de su curso, seleccione a los estudiantes "
-"que recibirán un certificado nuevo y haga clic en <br /> Regenerar "
+"que recibirán un certificado nuevo y haga clic en <br/> Regenerar "
 "certificados."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html

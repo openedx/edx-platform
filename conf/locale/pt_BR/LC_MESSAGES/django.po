@@ -204,6 +204,7 @@
 # Mariana Moretti <mamoretti@gmail.com>, 2014
 # marianemurakami <mhmurakami@gmail.com>, 2014
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
+# Ned Batchelder <ned@edx.org>, 2016
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2015
@@ -15542,7 +15543,7 @@ msgid ""
 "in to start working within {studio_name}."
 msgstr ""
 "Esta conta, configurada usando{email}, já foi ativada.\n"
-"Por favor logue para começar a trabalhar com {nome_estudio}"
+"Por favor logue para começar a trabalhar com {studio_name}"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 msgid "Sign into {studio_name}"
