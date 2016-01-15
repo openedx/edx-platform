@@ -22,6 +22,7 @@
 # bnw, 2014
 # ifLab <webmaster@iflab.org>, 2015
 # Jerome Huang <canni3269@gmail.com>, 2014
+# jg Ma <jg20040308@126.com>, 2016
 # Jiadong Zhang <fighting-dong@qq.com>, 2015
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
@@ -133,6 +134,7 @@
 # j <786855796@qq.com>, 2015
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
+# jg Ma <jg20040308@126.com>, 2016
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
@@ -208,6 +210,7 @@
 # 李莉 <happylily0516@foxmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
+# jg Ma <jg20040308@126.com>, 2016
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014

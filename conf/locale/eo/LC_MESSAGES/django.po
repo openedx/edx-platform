@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-08 15:23+0000\n"
-"PO-Revision-Date: 2016-01-08 15:23:59.614964\n"
+"POT-Creation-Date: 2016-01-15 16:01+0000\n"
+"PO-Revision-Date: 2016-01-15 16:01:35.536892\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1725,7 +1725,7 @@ msgstr "érrör Ⱡ'σяєм ιρѕ#"
 #. to the site.
 #: common/lib/capa/capa/responsetypes.py
 #: common/templates/course_modes/choose.html lms/templates/login.html
-#: lms/templates/register.html
+#: lms/templates/register-form.html
 msgid "or"
 msgstr "ör Ⱡ'σя#"
 
@@ -6491,7 +6491,7 @@ msgstr "Bïrth Ýéär Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
 msgid "Gender"
 msgstr "Géndér Ⱡ'σяєм ιρѕυ#"
@@ -6502,7 +6502,8 @@ msgid "Level of Education"
 msgstr "Lévél öf Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Mäïlïng Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -7269,7 +7270,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
-#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Full Name"
@@ -7372,7 +7373,8 @@ msgstr "Çömpäný Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Title"
 msgstr "Tïtlé Ⱡ'σяєм ιρѕ#"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Ýéär öf Bïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -7380,7 +7382,7 @@ msgstr "Ýéär öf Bïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "City"
@@ -7390,7 +7392,7 @@ msgstr "Çïtý Ⱡ'σяєм ι#"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Country"
@@ -9482,7 +9484,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -10470,7 +10472,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
 #: cms/templates/register.html cms/templates/temp-course-landing.html
 #: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
 msgid "Password"
 msgstr "Pässwörd Ⱡ'σяєм ιρѕυм ∂#"
@@ -10515,7 +10517,7 @@ msgstr "Jäné Döé Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr ""
 "Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -11195,8 +11197,8 @@ msgstr "Çöürsés Ⱡ'σяєм ιρѕυм #"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/provider_login.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "E-mail"
 msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
 
@@ -11205,8 +11207,8 @@ msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
 #. address.
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
+#: lms/templates/login.html lms/templates/register-form.html
+#: lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "éxämplé: üsérnämé@dömäïn.çöm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
@@ -11216,20 +11218,20 @@ msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
-#: cms/templates/register.html lms/templates/register.html
+#: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
 msgstr "éxämplé: Jäné Döé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
-#: cms/templates/register.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/signup_modal.html
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Public Username"
 msgstr "Püßlïç Ûsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
-#: cms/templates/register.html lms/templates/register-shib.html
-#: lms/templates/register.html
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "éxämplé: JänéDöé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
@@ -12255,7 +12257,7 @@ msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/register.html themes/edx.org/lms/templates/header.html
+#: lms/templates/register-form.html themes/edx.org/lms/templates/header.html
 msgid "Register"
 msgstr "Régïstér Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -12340,6 +12342,132 @@ msgstr ""
 msgid "Return To %s"
 msgstr "Rétürn Tö %s Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
+"Wé'ré sörrý, ßüt thïs vérsïön öf ýöür ßröwsér ïs nöt süppörtéd. Trý ägäïn "
+"üsïng ä dïfférént ßröwsér ör ä néwér vérsïön öf ýöür ßröwsér. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr ""
+"Thé föllöwïng érrörs öççürréd whïlé pröçéssïng ýöür régïsträtïön: Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr "Sïgn üp wïth {provider_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr ""
+"Çréäté ýöür öwn {platform_name} äççöünt ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by <strong class=\"indicator\">bold text and an "
+"asterisk (*)</strong>."
+msgstr ""
+"Réqüïréd fïélds äré nötéd ßý <strong class=\"indicator\">ßöld téxt änd än "
+"ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: selected_provider is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr ""
+"Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr ""
+"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth "
+"{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr ""
+"Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr ""
+"Wïll ßé shöwn ïn äný dïsçüssïöns ör förüms ýöü pärtïçïpäté ïn Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr "çännöt ßé çhängéd lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "Wélçömé {username} Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr "Éntér ä Püßlïç Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr "Püßlïç Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/register-form.html
+msgid "example: New York"
+msgstr "éxämplé: Néw Ýörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr ""
+"Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr ""
+"Pléäsé shäré wïth üs ýöür réäsöns för régïstérïng wïth {platform_name} "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr "Àççöünt Àçknöwlédgéménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr ""
+"Ì ägréé tö thé {link_start}Térms öf Sérvïçé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr ""
+"Ì ägréé tö thé {link_start}Hönör Çödé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢т#"
+
+#: lms/templates/register-form.html lms/templates/signup_modal.html
+msgid "Create My Account"
+msgstr "Çréäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
 #: lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
 msgstr "Préférénçés för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
@@ -12354,61 +12482,9 @@ msgstr ""
 "Wélçömé {username}!  Pléäsé sét ýöür préférénçés ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-"Wé'ré sörrý, ßüt thïs vérsïön öf ýöür ßröwsér ïs nöt süppörtéd. Trý ägäïn "
-"üsïng ä dïfférént ßröwsér ör ä néwér vérsïön öf ýöür ßröwsér. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid "The following errors occurred while processing your registration:"
-msgstr ""
-"Thé föllöwïng érrörs öççürréd whïlé pröçéssïng ýöür régïsträtïön: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid ""
-"Required fields are noted by <strong class=\"indicator\">bold text and an "
-"asterisk (*)</strong>."
-msgstr ""
-"Réqüïréd fïélds äré nötéd ßý <strong class=\"indicator\">ßöld téxt änd än "
-"ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Enter a public username:"
 msgstr "Éntér ä püßlïç üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr ""
-"Wïll ßé shöwn ïn äný dïsçüssïöns ör förüms ýöü pärtïçïpäté ïn Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid "Account Acknowledgements"
-msgstr "Àççöünt Àçknöwlédgéménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr ""
-"Ì ägréé tö thé {link_start}Térms öf Sérvïçé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr ""
-"Ì ägréé tö thé {link_start}Hönör Çödé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢т#"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
@@ -12517,80 +12593,6 @@ msgid "Register below to create your {platform_name} account"
 msgstr ""
 "Régïstér ßélöw tö çréäté ýöür {platform_name} äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
 " αмєт, ¢σηѕє¢тєтυя #"
-
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register.html
-msgid "Sign up with {provider_name}"
-msgstr "Sïgn üp wïth {provider_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/register.html
-msgid "Create your own {platform_name} account below"
-msgstr ""
-"Çréäté ýöür öwn {platform_name} äççöünt ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тє#"
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr ""
-"Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/register.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth "
-"{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/register.html
-msgid "Please complete the following fields to register for an account. "
-msgstr ""
-"Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register.html
-msgid "cannot be changed later"
-msgstr "çännöt ßé çhängéd lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/register.html
-msgid "Welcome {username}"
-msgstr "Wélçömé {username} Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/register.html
-msgid "Enter a Public Display Name:"
-msgstr "Éntér ä Püßlïç Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/register.html
-msgid "Public Display Name"
-msgstr "Püßlïç Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/register.html
-msgid "Additional Personal Information"
-msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/register.html
-msgid "example: New York"
-msgstr "éxämplé: Néw Ýörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register.html
-msgid "Highest Level of Education Completed"
-msgstr ""
-"Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/register.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr ""
-"Pléäsé shäré wïth üs ýöür réäsöns för régïstérïng wïth {platform_name} "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register.html lms/templates/signup_modal.html
-msgid "Create My Account"
-msgstr "Çréäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -13090,14 +13092,6 @@ msgid "Hints"
 msgstr "Hïnts Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/calculator/toggle_calculator.html
-msgid "Calculate"
-msgstr "Çälçüläté Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Output"
-msgstr "Çälçülätör Öütpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/calculator/toggle_calculator.html
 msgid ""
 "For detailed information, see {math_link_start}Entering Mathematical and "
 "Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for"
@@ -13172,8 +13166,6 @@ msgstr "Fräçtïöns Ⱡ'σяєм ιρѕυм ∂σł#"
 msgid "Decimals"
 msgstr "Déçïmäls Ⱡ'σяєм ιρѕυм ∂#"
 
-#. Translators: This refers to mathematical operators such as `plus`, `minus`,
-#. `division` and others.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Operators"
 msgstr "Öpérätörs Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -13195,16 +13187,18 @@ msgstr "^ (räïsé tö ä pöwér) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 msgid "|| (parallel resistors)"
 msgstr "|| (pärällél résïstörs) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#. Translators: This refers to symbols that are mathematical constants, such
-#. as
-#. "i" (square root of -1)
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Greek letters"
+msgstr "Gréék léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Name of letter"
+msgstr "Nämé öf léttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Constants"
 msgstr "Çönstänts Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#. Translators: This refers to symbols that appear at the end of a number,
-#. such
-#. as the percent sign (%) and metric affixes
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Affixes"
 msgstr "Àffïxés Ⱡ'σяєм ιρѕυм #"
@@ -13215,13 +13209,10 @@ msgstr ""
 "Pérçént sïgn (%) änd métrïç äffïxés (d, ç, m, ü, n, p, k, M, G, T) Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#. Translators: This refers to basic mathematical functions such as "square
-#. root"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Basic functions"
 msgstr "Bäsïç fünçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#. Translators: This refers to mathematical Sine, Cosine and Tan
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Trigonometric functions"
 msgstr "Trïgönömétrïç fünçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
@@ -13246,6 +13237,14 @@ msgstr "é nötätïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "1e and the exponent"
 msgstr "1é änd thé éxpönént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculate"
+msgstr "Çälçüläté Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculator Output"
+msgstr "Çälçülätör Öütpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"

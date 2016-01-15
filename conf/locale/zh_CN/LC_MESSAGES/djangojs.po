@@ -22,6 +22,7 @@
 # hohomi <hohomi@gmail.com>, 2014
 # bnw, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
+# jg Ma <jg20040308@126.com>, 2016
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
@@ -99,6 +100,7 @@
 # Bill <power_free@126.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
+# jg Ma <jg20040308@126.com>, 2016
 # jsgang <jsgang9@gmail.com>, 2014-2016
 # Jun Hao Lin <xuxiao15994219982@gmail.com>, 2015
 # Lionel Chen <chenlinchuan@me.com>, 2014

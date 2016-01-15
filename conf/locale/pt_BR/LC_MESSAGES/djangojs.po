@@ -9,6 +9,7 @@
 # Andre Eduardo <andre_meneses2001@hotmail.com>, 2015
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
+# Angela Amaro <angelasimei@gmail.com>, 2016
 # brk0_0, 2013
 # brunojm <brunojm@gmail.com>, 2014
 # brunojm <brunojm@gmail.com>, 2014
@@ -107,6 +108,7 @@
 # Alan Mól <alan3df@gmail.com>, 2015
 # Ana Paula D'Almeida Oliveira <paulladalmeida@gmail.com>, 2015
 # Andrea Z. Bitencourt <azbitencourt@gmail.com>, 2015
+# Angela Amaro <angelasimei@gmail.com>, 2016
 # Bruno Sette <brunosette@gmail.com>, 2015
 # Cleomir Waiczyk <w.cleomir@gmail.com>, 2015
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
@@ -137,6 +139,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Angela Amaro <angelasimei@gmail.com>, 2016
 # Bruno Sette <brunosette@gmail.com>, 2015
 # Cleomir Waiczyk <w.cleomir@gmail.com>, 2015
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
@@ -161,7 +164,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2015-12-14 21:31+0000\n"
-"PO-Revision-Date: 2016-01-07 11:41+0000\n"
+"PO-Revision-Date: 2016-01-15 00:17+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -245,6 +248,20 @@ msgstr "Cancelar"
 #: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: common/static/common/templates/discussion/forum-action-delete.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-delete.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Apagar"
 
@@ -305,10 +322,17 @@ msgstr "Carregar arquivo"
 msgid "Save"
 msgstr "Salvar"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/templates/image-modal.underscore
+#: common/static/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/common/templates/image-modal.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-close.underscore
 msgid "Close"
 msgstr "Fechar"
 
@@ -419,6 +443,14 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Submit"
 msgstr "Enviar"
 
@@ -634,7 +666,7 @@ msgstr "Borda"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bottom"
-msgstr ""
+msgstr "Embaixo"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -702,9 +734,12 @@ msgstr "Limpar formatação"
 msgid "Code block"
 msgstr "Bloco de código"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
 msgstr "Código"
 
@@ -839,7 +874,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Div"
-msgstr ""
+msgstr "Div"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -955,9 +990,13 @@ msgstr "Formato"
 msgid "Formats"
 msgstr "Formatos"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/templates/image-modal.underscore
+#: test_root/staticfiles/common/templates/image-modal.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Fullscreen"
 msgstr "Tela cheia"
 
@@ -1268,9 +1307,17 @@ msgstr "Novo documento"
 msgid "New window"
 msgstr "Nova janela"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "Next"
 msgstr "Próximo"
 
@@ -1401,9 +1448,12 @@ msgstr "Substituir todos"
 msgid "Replace with"
 msgstr "Substituir com"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Replace"
 msgstr "Substituir"
 
@@ -1617,9 +1667,17 @@ msgstr ""
 "A URL que você inseriu parece ser um link externo. Deseja adicionar o "
 "prefixo obrigatório http://?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Título"
 
@@ -2041,6 +2099,9 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
+#: common/static/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "…"
 
@@ -2223,6 +2284,12 @@ msgid "Your post will be discarded."
 msgstr "Sua publicação será descartada."
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "anônimo"
 
@@ -2393,6 +2460,13 @@ msgstr "Data da publicação"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/forum-actions.underscore
+#: lms/templates/discovery/facet.underscore
+#: lms/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-actions.underscore
+#: test_root/staticfiles/templates/discovery/facet.underscore
+#: test_root/staticfiles/templates/edxnotes/note-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-actions.underscore
 msgid "More"
 msgstr "Mais"
 
@@ -2409,6 +2483,11 @@ msgid "Public"
 msgstr "Público"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
+#: test_root/staticfiles/common/templates/components/search-field.underscore
+#: test_root/staticfiles/support/templates/certificates.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/search-field.underscore
 msgid "Search"
 msgstr "Pesquisar"
 
@@ -2522,6 +2601,9 @@ msgid "team count"
 msgstr "Contagem de equipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
 msgid "Create"
 msgstr "Criar"
 
@@ -2627,6 +2709,9 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
+#: cms/templates/js/video/metadata-translations-item.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
+#: test_root/staticfiles/teams/templates/edit-team-member.underscore
 msgid "Remove"
 msgstr "Remover"
 
@@ -3918,13 +4003,11 @@ msgstr ""
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "You currently have no cohorts configured"
-msgstr ""
+msgstr "Atualmente você não tem grupos configurados"
 
 #: lms/static/js/groups/views/cohorts.js
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Add Cohort"
-msgstr ""
+msgstr "Adicionar Grupo"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
@@ -4543,7 +4626,7 @@ msgstr "Apagando"
 
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
-msgstr ""
+msgstr "Erro ao salvar o OpenAssessment"
 
 #: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
@@ -4551,7 +4634,7 @@ msgstr "Este link será aberto em uma nova janela/guia do navegador"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
-msgstr ""
+msgstr "Este link será aberto em uma janela modal"
 
 #: cms/static/js/certificates/collections/certificates.js
 msgid "Could not parse certificate JSON. %(message)s"
@@ -4559,42 +4642,44 @@ msgstr "Não foi possível verificar o certificado JSON. %(message)s"
 
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
-msgstr ""
+msgstr "O nome do certificado é obrigatório."
 
 #: cms/static/js/certificates/models/certificate.js
 msgid "Signatory field(s) has invalid data."
-msgstr ""
+msgstr "O campo(s) Emissor possui dados inválidos."
 
 #: cms/static/js/certificates/views/certificate_details.js
 msgid "Edit this certificate?"
-msgstr ""
+msgstr "Gostaria de editar este certificado?"
 
 #: cms/static/js/certificates/views/certificate_details.js
 msgid ""
 "This certificate has already been activated and is live. Are you sure you "
 "want to continue editing?"
 msgstr ""
+"Este certificado já foi ativado. Tem certeza que gostaria de seguir com a "
+"edição."
 
 #: cms/static/js/certificates/views/certificate_details.js
 msgid "Yes, allow edits to the active Certificate"
-msgstr ""
+msgstr "Sim, permita a edição para este certificado"
 
 #. Translators: This field pertains to the custom label for a certificate.
 #. Translators: this refers to a collection of certificates.
 #: cms/static/js/certificates/views/certificate_item.js
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "certificate"
-msgstr ""
+msgstr "certificado"
 
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
-msgstr ""
+msgstr "Emita seu certificado"
 
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "You have not created any certificates yet."
-msgstr ""
+msgstr "Você ainda não criou um certificado."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
@@ -4603,31 +4688,31 @@ msgstr "Apagar \"<%= signatoryName %>\" da lista de emissores?"
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "Esta ação não pode ser desfeita."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Upload signature image."
-msgstr ""
+msgstr "Atualizar a imagem do emissor."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Image must be in PNG format."
-msgstr ""
+msgstr "A imagem deve estar no formato PNG."
 
 #: cms/static/js/collections/group.js
 #, c-format
 msgid "Group %s"
-msgstr ""
+msgstr "Grupo %s"
 
 #. Translators: Dictionary used for creation ids that are used in
 #. default group names. For example: A, B, AA in Group A,
 #. Group B, ..., Group AA, etc.
 #: cms/static/js/collections/group.js
 msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-msgstr ""
+msgstr "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 #: cms/static/js/factories/export.js
 msgid "There has been an error while exporting."
-msgstr ""
+msgstr "Ocorreu um erro na exportação."
 
 #: cms/static/js/factories/export.js
 msgid ""
@@ -4636,6 +4721,10 @@ msgid ""
 "attempting another export. Please check that all components on the page are "
 "valid and do not display any error messages."
 msgstr ""
+"Houve uma falha de exportação para XML em pelo menos um componente. "
+"Recomenda-se que você vá para a página de edição e repare o erro antes de "
+"tentar outra exportação. Por favor, verifique que todos os componentes da "
+"página são válidos e não exibem qualquer mensagens de erro."
 
 #: cms/static/js/factories/export.js
 msgid "Correct failed component"
@@ -4643,7 +4732,7 @@ msgstr ""
 
 #: cms/static/js/factories/export.js
 msgid "Return to Export"
-msgstr ""
+msgstr "Retornar para Exportar"
 
 #: cms/static/js/factories/export.js
 msgid ""
@@ -4651,10 +4740,13 @@ msgid ""
 "to identify the failed component. Inspect your library to identify any "
 "problematic components and try again."
 msgstr ""
+"Sua biblioteca não pode ser exportada em XML. Não há informações suficientes"
+" para identificar qual é o componente com erro. Verifique sua biblioteca "
+"para identificar qualquer componente problemático e tente novamente."
 
 #: cms/static/js/factories/export.js
 msgid "Take me to the main library page"
-msgstr ""
+msgstr "Me leve à página principal da biblioteca"
 
 #: cms/static/js/factories/export.js
 msgid ""
@@ -4662,56 +4754,63 @@ msgid ""
 " identify the failed component. Inspect your course to identify any "
 "problematic components and try again."
 msgstr ""
+"Seu curso não pode ser exportado em XML. Não há informações suficientes para"
+" identificar qual é o componente com erro. Verifique seus cursos para "
+"identificar qualquer componente problemático e tente novamente."
 
 #: cms/static/js/factories/export.js
 msgid "Take me to the main course page"
-msgstr ""
+msgstr "Me leve à página principal do curso"
 
 #: cms/static/js/factories/export.js
 msgid "The raw error message is:"
-msgstr ""
+msgstr "A mensagem bruta de erro é:"
 
 #: cms/static/js/factories/export.js
 msgid "There has been an error with your export."
-msgstr ""
+msgstr "Ocorreu um erro com sua exportação."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while importing the new library to our database."
 msgstr ""
+"Detectamos um erro ao tentar importar a nova biblioteca para nossa base de "
+"dados."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while importing the new course to our database."
-msgstr ""
+msgstr "Ocorreu um erro ao importar o novo curso para a nossa base de dados."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "Ocorreu um erro durante o processo de envio."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "Ocorreu um erro ao descompactar o arquivo."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "Ocorreu um erro ao verificar o arquivo que você enviou."
 
 #: cms/static/js/factories/import.js
 msgid "Choose new file"
-msgstr ""
+msgstr "Selecione um novo arquivo"
 
 #: cms/static/js/factories/import.js
 msgid "Your import has failed."
-msgstr ""
+msgstr "A importação falhou."
 
 #: cms/static/js/factories/import.js
 msgid ""
 "File format not supported. Please upload a file with a {file_extension} "
 "extension."
 msgstr ""
+"Formato de arquivo não permitido. Por favor, carregue um arquivo com uma "
+"extensão {file_extension}."
 
 #: cms/static/js/factories/manage_users.js
 msgid "Already a course team member"
-msgstr ""
+msgstr "Já é um membro do grupo"
 
 #: cms/static/js/factories/manage_users.js
 msgid ""
@@ -4726,16 +4825,16 @@ msgstr ""
 #: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
 msgid "Staff"
-msgstr ""
+msgstr "Equipe"
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Admin"
-msgstr ""
+msgstr "Administrador"
 
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Already a library team member"
-msgstr ""
+msgstr "Você já é um membro da equipe de biblioteca"
 
 #: cms/static/js/factories/manage_users_lib.js
 msgid ""
@@ -4745,7 +4844,7 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Library User"
-msgstr ""
+msgstr "Usuário da Biblioteca"
 
 #: cms/static/js/factories/settings_advanced.js
 msgid "Hide Deprecated Settings"
@@ -4759,75 +4858,81 @@ msgstr "Exibir configurações obsoletas"
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
+"Você tem alterações não salvas. Você realmente deseja sair desta página?"
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
 msgid "Queued"
-msgstr ""
+msgstr "Em lista de espera."
 
 #. Translators: This is the status of a video upload that has
 #. completed successfully
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload completed"
-msgstr ""
+msgstr "Carregamento concluído"
 
 #. Translators: This is the status of a video upload that has failed
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload failed"
-msgstr ""
+msgstr "Carregamento falhou. "
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr ""
+msgstr "Você deve especificar um nome "
 
 #: cms/static/js/models/group.js
 msgid "Group name is required"
-msgstr ""
+msgstr "O nome do grupo é obrigatório"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group A"
-msgstr ""
+msgstr "Grupo A"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group B"
-msgstr ""
+msgstr "Grupo B"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group Configuration name is required."
-msgstr ""
+msgstr "Necessário um nome para a Configuração de Grupo"
 
 #: cms/static/js/models/group_configuration.js
 msgid "There must be at least one group."
-msgstr ""
+msgstr "É necessário possuir ao menos um grupo."
 
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a name."
-msgstr ""
+msgstr "Todos os grupos necessitam de um nome."
 
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a unique name."
-msgstr ""
+msgstr "Todos os grupos devem conter apenas um único nome. "
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
-msgstr ""
+msgstr "O curso deve ter uma data de início designada."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course end date must be later than the course start date."
 msgstr ""
+"A data do final do curso deve ser posterior à data de início da matrícula. "
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date must be later than the enrollment start date."
 msgstr ""
+"A data de início do curso deve ser posterior à data de início da matrícula. "
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
+"A data de início da matrícula não pode ser posterior à data final para a "
+"matrícula. "
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
 msgstr ""
+"A data final de matrícula não pode ser posterior à data do final do curso. "
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -4835,19 +4940,19 @@ msgstr "A chave deve conter apenas letras, números, _, ou -"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Please enter an integer between %(min)s and %(max)s."
-msgstr ""
+msgstr "Por favor, insira um número inteiro entre %(min)s e %(max)s."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
-msgstr ""
+msgstr "Já existe um outro tipo de tarefa com este nome."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
-msgstr ""
+msgstr "Insira um número inteiro entre 0 e 100."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer greater than 0."
-msgstr ""
+msgstr "Insira um número inteiro maior do que 0."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter non-negative integer."
@@ -4855,11 +4960,11 @@ msgstr "Insira um número inteiro não negativo."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr ""
+msgstr "Não é possível arrastar mais <% attrs.types %> do que os assinalados."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
-msgstr ""
+msgstr "O prazo de tolerância deve ser especificado no formato HH:MM. "
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
@@ -4872,24 +4977,20 @@ msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
+"Apenas arquivos <%= fileTypes %> podem ser enviados. Por favor selecione uma"
+" extensão de arquivo finalizando em <%= fileExtensions %> para enviar."
 
 #: cms/static/js/models/uploads.js
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/institution_login.underscore
-#: lms/templates/student_account/institution_register.underscore
-#: test_root/staticfiles/templates/student_account/hinted_login.underscore
-#: test_root/staticfiles/templates/student_account/institution_login.underscore
-#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "or"
-msgstr ""
+msgstr "ou"
 
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
-msgstr ""
+msgstr "Este componente tem problemas de validação."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
-msgstr ""
+msgstr "Os seus uploads de vídeo não estão completos."
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
@@ -4913,9 +5014,9 @@ msgstr "O seu arquivo foi apagado."
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
-msgstr ""
+msgstr "Data Adicionada"
 
-#: cms/templates/js/asset-library.underscore
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 #: test_root/staticfiles/support/templates/certificates_results.underscore
@@ -4924,47 +5025,49 @@ msgstr "Tipo"
 
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
-msgstr ""
+msgstr "O arquivo {filename} excede o tamanho máximo de {maxFileSizeInMBs} MB"
 
 #: cms/static/js/views/assets.js
 msgid ""
 "Please follow the instructions here to upload a file elsewhere and link to "
 "it: {maxFileSizeRedirectUrl}"
 msgstr ""
+"Por favor siga as instruções daqui para enviar um arquivo à outro lugar e "
+"criar um link para ele: {maxFileSizeRedirectUrl}"
 
 #: cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
-msgstr ""
+msgstr "Seu arquivo não pôde ser enviado."
 
 #: cms/static/js/views/assets.js
 msgid "Max file size exceeded"
-msgstr ""
+msgstr "Tamanho máximo de arquivo excedido."
 
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Choose File"
-msgstr ""
+msgstr "Escolher arquivo"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
-msgstr ""
+msgstr "Subir um Novo Arquivo"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
-msgstr ""
+msgstr "Carregar outro arquivo"
 
 #: cms/static/js/views/components/add_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding"
-msgstr ""
+msgstr "Adicionando"
 
 #: cms/static/js/views/content_group_details.js
 #: cms/static/js/views/group_configuration_details.js
 msgid "Not in Use"
-msgstr ""
+msgstr "Não utilizado"
 
 #. Translators: 'count' is number of units that the group
 #. configuration is used in.
@@ -4972,8 +5075,8 @@ msgstr ""
 #: cms/static/js/views/group_configuration_details.js
 msgid "Used in %(count)s unit"
 msgid_plural "Used in %(count)s units"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Utilizado em %(count)s unidade"
+msgstr[1] "Utilizado em %(count)s unidades"
 
 #. Translators: 'outlineAnchor' is an anchor pointing to
 #. the course outline page.
@@ -4982,26 +5085,28 @@ msgid ""
 "This content group is not in use. Add a content group to any unit from the "
 "%(outlineAnchor)s."
 msgstr ""
+"Este Grupo de Conteúdo não está em uso. Adicione um Grupo de Conteúdo a "
+"qualquer unidade a partir do %(outlineAnchor)s."
 
 #: cms/static/js/views/content_group_details.js
 #: cms/static/js/views/group_configuration_details.js
 msgid "Course Outline"
-msgstr ""
+msgstr "Esboço do Curso"
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
 #: cms/static/js/views/content_group_item.js
 #: cms/static/js/views/content_group_list.js
 msgid "content group"
-msgstr ""
+msgstr "grupo de conteúdo"
 
 #: cms/static/js/views/content_group_list.js
 msgid "Add your first content group"
-msgstr ""
+msgstr "Adicione seu primeiro grupo de conteúdo"
 
 #: cms/static/js/views/content_group_list.js
 msgid "You have not created any content groups yet."
-msgstr ""
+msgstr "Você não criou nenhum grupo de conteúdo ainda."
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
@@ -5009,15 +5114,15 @@ msgstr "Você tem certeza de que deseja apagar essa atualização?"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
-msgstr ""
+msgstr "Criar Reprise"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Processing Re-run Request"
-msgstr ""
+msgstr "Processando Requisição de Reprise"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr ""
+msgstr "Enviar um novo PDF para “<%= name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -5047,11 +5152,11 @@ msgstr ""
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "Add your first group configuration"
-msgstr ""
+msgstr "Adicione sua primeira configuração de grupo"
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "You have not created any group configurations yet."
-msgstr ""
+msgstr "Você ainda não criou uma configuração de grupo."
 
 #: cms/static/js/views/import.js
 msgid "Your import is in progress; navigating away will abort it."
@@ -5150,11 +5255,11 @@ msgstr ""
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "Error removing user"
-msgstr ""
+msgstr "Erro ao remover usuário"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "A valid email address is required"
-msgstr ""
+msgstr "É preciso um endereço de e-mail válido"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "You must enter a valid email address in order to add a new team member"
@@ -5202,11 +5307,10 @@ msgstr ""
 msgid "Publish all unpublished changes for this %(item)s?"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publish"
-msgstr ""
+msgstr "Publicar"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
@@ -5219,7 +5323,7 @@ msgstr ""
 
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
-msgstr ""
+msgstr "Erro de validação ao salvar"
 
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Undo Changes"
@@ -5255,7 +5359,7 @@ msgstr "Não avaliado"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
-msgstr ""
+msgstr "Data adicionada."
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/pages/container.js
@@ -5271,9 +5375,8 @@ msgid "Publishing"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
-#: cms/templates/js/publish-xblock.underscore
 msgid "Discard Changes"
-msgstr ""
+msgstr "Descartar alterações"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid ""
@@ -5283,11 +5386,11 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Discarding Changes"
-msgstr ""
+msgstr "Eliminando Alterações"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Hiding from Students"
-msgstr ""
+msgstr "Escondendo dos alunos"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Explicitly Hiding from Students"
@@ -5318,15 +5421,15 @@ msgstr ""
 
 #: cms/static/js/views/pages/course_outline.js
 msgid "There were errors reindexing course."
-msgstr ""
+msgstr "Houve erros ao reindexar o Curso."
 
 #: cms/static/js/views/pages/paged_container.js
 msgid "Hide Previews"
-msgstr ""
+msgstr "Ocultar Pré-visualizações"
 
 #: cms/static/js/views/pages/paged_container.js
 msgid "Show Previews"
-msgstr ""
+msgstr "Exibir pré-visualizações"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
@@ -5526,7 +5629,7 @@ msgstr ""
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "No sources"
-msgstr ""
+msgstr "Sem fontes"
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Link types should be unique."
@@ -5548,7 +5651,7 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
-msgstr ""
+msgstr "Enviar tradução"
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
@@ -5567,7 +5670,7 @@ msgstr ""
 #. e.g. "Warning: this component has not been configured yet".
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
-msgstr ""
+msgstr "Aviso"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
@@ -5583,7 +5686,7 @@ msgstr "Ações"
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Unscheduled"
-msgstr ""
+msgstr "Não agendado"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -5593,7 +5696,7 @@ msgstr ""
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
@@ -5602,122 +5705,122 @@ msgstr ""
 #: test_root/staticfiles/support/templates/certificates_results.underscore
 #: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: common/static/common/templates/image-modal.underscore
 #: test_root/staticfiles/common/templates/image-modal.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Large"
-msgstr ""
+msgstr "Grande"
 
 #: common/static/common/templates/image-modal.underscore
 #: test_root/staticfiles/common/templates/image-modal.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Zoom In"
-msgstr ""
+msgstr "Aumentar a tela"
 
 #: common/static/common/templates/image-modal.underscore
 #: test_root/staticfiles/common/templates/image-modal.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Zoom Out"
-msgstr ""
+msgstr "Diminuir a tela"
 
 #: common/static/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
 msgid "Page number"
-msgstr ""
+msgstr "Número da página"
 
 #: common/static/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
-msgstr ""
+msgstr "Entre com o número da página que você gostaria de acessar rapidamente"
 
 #: common/static/common/templates/components/paging-header.underscore
 #: test_root/staticfiles/common/templates/components/paging-header.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-header.underscore
 msgid "Sorted by"
-msgstr ""
+msgstr "Ordenado por "
 
 #: common/static/common/templates/components/search-field.underscore
 #: test_root/staticfiles/common/templates/components/search-field.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/components/search-field.underscore
 msgid "Clear search"
-msgstr ""
+msgstr "Limpar pesquisa"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "DISCUSSION HOME:"
-msgstr ""
+msgstr "PÁGINA INICIAL DA DISCUSSÃO:"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
-msgstr ""
+msgstr "Como usar  as discussões de %(platform_name)s"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Find discussions"
-msgstr ""
+msgstr "Encontrar discussões"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Focus in on specific topics"
-msgstr ""
+msgstr "Foco em tópicos específicos"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Search for specific posts"
-msgstr ""
+msgstr "Procurar postagem específica"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Sort by date, vote, or comments"
-msgstr ""
+msgstr "Ordenar por data, votos ou comentários"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Engage with posts"
-msgstr ""
+msgstr "Participar das publicações"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Upvote posts and good responses"
-msgstr ""
+msgstr "Vote nas mensagens e respostas que gostar"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Report Forum Misuse"
-msgstr ""
+msgstr "Denunciar abuso no fórum"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Follow posts for updates"
-msgstr ""
+msgstr "Seguir publicações para ver atualizações"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Receive updates"
-msgstr ""
+msgstr "Receber atualizações"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Toggle Notifications Setting"
-msgstr ""
+msgstr "Alterar Configurações de Notificação"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
@@ -5726,96 +5829,98 @@ msgid ""
 "Check this box to receive an email digest once a day notifying you about "
 "new, unread activity from posts you are following."
 msgstr ""
+"Marque esta alternativa para receber um e-mail uma vez por dia com um resumo"
+" das novidades das publicações não lidas as quais você segue."
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
 msgid "Mark as Answer"
-msgstr ""
+msgstr "Marcar como Resposta"
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
 msgid "Unmark as Answer"
-msgstr ""
+msgstr "Desmarcar como Respondido"
 
 #: common/static/common/templates/discussion/forum-action-close.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-close.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-close.underscore
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Endorse"
-msgstr ""
+msgstr "Aprovar"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Unendorse"
-msgstr ""
+msgstr "Cancelar aprovação"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
 msgid "Follow"
-msgstr ""
+msgstr "Seguir"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
 msgid "Unfollow"
-msgstr ""
+msgstr "Deixar de Seguir"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
 msgid "Pin"
-msgstr ""
+msgstr "Marcar"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
 msgid "Unpin"
-msgstr ""
+msgstr "Desmarcar"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report abuse"
-msgstr ""
+msgstr "Relatar mau uso"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report"
-msgstr ""
+msgstr "Reportar"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Unreport"
-msgstr ""
+msgstr "Retirar"
 
 #: common/static/common/templates/discussion/forum-action-vote.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-vote.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-vote.underscore
 msgid "Vote for this post,"
-msgstr ""
+msgstr "Vote nesta publicação,"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Visible To:"
-msgstr ""
+msgstr "Visível para:"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "All Groups"
-msgstr ""
+msgstr "Todos os grupos"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -5824,54 +5929,58 @@ msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
 "students or specify a single cohort."
 msgstr ""
+"Administradores de discussões, moderadores e assistentes de aula podem "
+"tornar seus post visíveis para todos os alunos ou especificar um único "
+"grupo."
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Title:"
-msgstr ""
+msgstr "Título:"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Add a clear and descriptive title to encourage participation."
 msgstr ""
+"Adicionar um título claro e descritivo para incentivar a participação."
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Enter your question or comment"
-msgstr ""
+msgstr "Insira sua pergunta ou comentário"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
-msgstr ""
+msgstr "seguir esta publicação"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "post anonymously"
-msgstr ""
+msgstr "publicar anonimamente"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "post anonymously to classmates"
-msgstr ""
+msgstr "publicar anonimamente para os colegas da turma"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Add Post"
-msgstr ""
+msgstr "Postar"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
 msgid "Community TA"
-msgstr ""
+msgstr "Assistente de ensino da comunidade"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -5880,32 +5989,32 @@ msgstr ""
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "This thread is closed."
-msgstr ""
+msgstr "Este tópico está fechado."
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
 msgid "View discussion"
-msgstr ""
+msgstr "Ver discussão"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
 msgid "Editing comment"
-msgstr ""
+msgstr "Editando comentários"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
 msgid "Update comment"
-msgstr ""
+msgstr "Atualizar comentário"
 
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #: test_root/staticfiles/common/templates/discussion/response-comment-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-show.underscore
 #, python-format
 msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "postado %(time_ago)s por %(author)s"
 
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
@@ -5917,43 +6026,43 @@ msgstr ""
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Reported"
-msgstr ""
+msgstr "Relatado"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Editing post"
-msgstr ""
+msgstr "Editando publicação"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Edit post title"
-msgstr ""
+msgstr "Editar título da publicação"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Update post"
-msgstr ""
+msgstr "Atualizar publicação"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "discussion"
-msgstr ""
+msgstr "discussão"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "answered question"
-msgstr ""
+msgstr "questão respondida"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "unanswered question"
-msgstr ""
+msgstr "questão não respondida"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
@@ -5962,25 +6071,25 @@ msgstr ""
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "Marcado"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
-msgstr ""
+msgstr "Seguindo"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "By: Staff"
-msgstr ""
+msgstr "Por: Equipe"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "By: Community TA"
-msgstr ""
+msgstr "Por: Comunidade TA"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
@@ -5989,7 +6098,7 @@ msgstr ""
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
-msgstr ""
+msgstr "fmt"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
@@ -5999,53 +6108,55 @@ msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
 msgstr ""
+"%(comments_count)s %(span_sr_open)scomentários (%(unread_comments_count)s "
+"comentários não lidos)%(span_close)s"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 #, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
+msgstr "%(comments_count)s %(span_sr_open)scomentários %(span_close)s"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Editing response"
-msgstr ""
+msgstr "Editar resposta"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Update response"
-msgstr ""
+msgstr "Atualizar resposta"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "marcado como resposta %(time_ago)s por %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
-msgstr ""
+msgstr "marcado como resposta %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "aprovado %(time_ago)s por %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s"
-msgstr ""
+msgstr "aprovado %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response.underscore
@@ -6053,71 +6164,71 @@ msgstr ""
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Mostrar Comentários (%(num_comments)s)"
+msgstr[1] "Mostrar Comentários (%(num_comments)s)"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
 msgid "fmts"
-msgstr ""
+msgstr "fmts"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
 msgid "Add a comment"
-msgstr ""
+msgstr "Adicionar comentário"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "%(post_type)s postado %(time_ago)s por %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
-msgstr ""
+msgstr "Fechado"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
+msgstr "Relacionado a: %(courseware_title_linked)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "This post is visible only to %(group_name)s."
-msgstr ""
+msgstr "Este post é visível apenas para %(group_name)s."
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "This post is visible to everyone."
-msgstr ""
+msgstr "Este post está visível para todos."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Post type:"
-msgstr ""
+msgstr "Tipo de postagem:"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Question"
-msgstr ""
+msgstr "Pergunta"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Discussion"
-msgstr ""
+msgstr "Discussão"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
@@ -6161,7 +6272,7 @@ msgstr ""
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Discussion topics; current selection is: "
-msgstr ""
+msgstr "Tópicos para discussão. A seleção atual é:"
 
 #: common/static/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
@@ -6241,7 +6352,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Your team could not be updated."
-msgstr ""
+msgstr "Sua equipe não pôde ser atualizada."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: test_root/staticfiles/teams/templates/edit-team.underscore
@@ -6281,7 +6392,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Cancel team updating."
-msgstr ""
+msgstr "Cancelar atualização de equipe."
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 #: test_root/staticfiles/teams/templates/instructor-tools.underscore
@@ -6306,7 +6417,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 #: test_root/staticfiles/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
-msgstr ""
+msgstr "Participe da Equipe"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
@@ -6346,7 +6457,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Leave Team"
-msgstr ""
+msgstr "Deixar Equipe"
 
 #: lms/static/js/fixtures/donation.underscore
 #: lms/templates/dashboard/donation.underscore
@@ -6390,7 +6501,7 @@ msgstr ""
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "gettext("
-msgstr ""
+msgstr "gettext("
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
@@ -6411,12 +6522,12 @@ msgstr ""
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove"
-msgstr ""
+msgstr "remover"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Subsection"
-msgstr ""
+msgstr "Subseção"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
@@ -6485,14 +6596,14 @@ msgstr ""
 #: test_root/staticfiles/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Order No."
-msgstr ""
+msgstr "Número do pedido"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6508,7 +6619,7 @@ msgstr ""
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6586,7 +6697,7 @@ msgstr ""
 #: lms/templates/discovery/course_card.underscore
 #: test_root/staticfiles/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
-msgstr ""
+msgstr "APRENDER MAIS"
 
 #: lms/templates/discovery/course_card.underscore
 #: test_root/staticfiles/templates/discovery/course_card.underscore
@@ -6597,12 +6708,12 @@ msgstr ""
 #: lms/templates/discovery/course_card.underscore
 #: test_root/staticfiles/templates/discovery/course_card.underscore
 msgid "Starts"
-msgstr ""
+msgstr "Iniciar"
 
 #: lms/templates/discovery/filter_bar.underscore
 #: test_root/staticfiles/templates/discovery/filter_bar.underscore
 msgid "Clear All"
-msgstr ""
+msgstr "Limpar Tudo"
 
 #: lms/templates/edxnotes/note-item.underscore
 #: test_root/staticfiles/templates/edxnotes/note-item.underscore
@@ -6753,7 +6864,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "New"
-msgstr ""
+msgstr "Novo"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -6873,7 +6984,7 @@ msgstr ""
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "(Required Field)"
-msgstr ""
+msgstr "(Campo Obrigatório)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -6915,12 +7026,12 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Automatic"
-msgstr ""
+msgstr "Automático"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Manual"
-msgstr ""
+msgstr "Manual"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -6936,27 +7047,27 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "No Content Group"
-msgstr ""
+msgstr "Nenhum Grupo de Conteúdo"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Select a Content Group"
-msgstr ""
+msgstr "Selecione um grupo de conteúdo"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Choose a content group to associate"
-msgstr ""
+msgstr "Selecione um grupo de conteúdo para se associar"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Not selected"
-msgstr ""
+msgstr "Não selecionado"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
-msgstr ""
+msgstr "Grupo de conteúdo deletado"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -7047,7 +7158,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
-msgstr ""
+msgstr "Usado"
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
@@ -7123,7 +7234,7 @@ msgstr ""
 #: test_root/staticfiles/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Sign in"
-msgstr ""
+msgstr "Entrar"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: test_root/staticfiles/templates/student_account/hinted_login.underscore
@@ -7252,7 +7363,7 @@ msgstr ""
 #: test_root/staticfiles/templates/student_account/password_reset.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
 msgid "An error occurred."
-msgstr ""
+msgstr "Ocorreu um erro."
 
 #: lms/templates/student_account/password_reset.underscore
 #: test_root/staticfiles/templates/student_account/password_reset.underscore
@@ -7421,7 +7532,7 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
-msgstr ""
+msgstr "Identificação pela foto"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
@@ -7453,7 +7564,7 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Your face is well-lit."
-msgstr ""
+msgstr "Seu rosto está bem iluminado."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
@@ -7650,14 +7761,14 @@ msgstr ""
 #: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
-msgstr ""
+msgstr "Ativar a sua conta"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: test_root/staticfiles/templates/verify_student/intro_step.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "Check Your Email"
-msgstr ""
+msgstr "Verifique seu e-mail"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -7712,7 +7823,7 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
-msgstr ""
+msgstr "Foto de um documento de identidade oficial"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
@@ -7769,13 +7880,13 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Check your email for an activation message."
-msgstr ""
+msgstr "Verifique o e-mail recebido com uma mensagem de ativação."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
 msgid "Professional Certificate for %(courseName)s"
-msgstr ""
+msgstr "Certificado profissional para %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8032,11 +8143,11 @@ msgstr "Adicionar componente:"
 #: cms/templates/js/add-xblock-component-menu.underscore
 #, python-format
 msgid "%(type)s Component Template Menu"
-msgstr ""
+msgstr "%(type)s Menu de Modelos de Componentes"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
-msgstr ""
+msgstr "Tipos Comuns de Problemas"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
@@ -8044,389 +8155,396 @@ msgstr "Adicionar Novo Componente"
 
 #: cms/templates/js/advanced_entry.underscore
 msgid "Deprecated"
-msgstr ""
+msgstr "Obsoleto"
 
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
-msgstr ""
+msgstr "Lista de arquivos e ativos enviados neste curso"
 
 #: cms/templates/js/asset-library.underscore
 msgid "- Sortable"
-msgstr ""
+msgstr "- Classificáveis"
 
 #: cms/templates/js/asset-library.underscore
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
-msgstr ""
+msgstr "Você não adicionou nenhum ativo a este curso ainda"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Upload your first asset"
-msgstr ""
+msgstr "Envie seu primeiro ativo"
 
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "close"
-msgstr ""
+msgstr "fechar"
 
 #: cms/templates/js/asset.underscore
 msgid "No description available"
-msgstr ""
+msgstr "Sem descrição disponível"
 
 #: cms/templates/js/asset.underscore
 msgid "Open/download this file"
-msgstr ""
+msgstr "Abrir/baixar este arquivo"
 
 #: cms/templates/js/asset.underscore
 msgid "Studio:"
-msgstr ""
+msgstr "Studio:"
 
 #: cms/templates/js/asset.underscore
 msgid "Web:"
-msgstr ""
+msgstr "Web:"
 
 #: cms/templates/js/asset.underscore
 msgid "Delete this asset"
-msgstr ""
+msgstr "Excluir este ativo"
 
 #: cms/templates/js/asset.underscore
 msgid "Lock this asset"
-msgstr ""
+msgstr "Travar este ativo"
 
 #: cms/templates/js/asset.underscore
 msgid "Lock/unlock file"
-msgstr ""
+msgstr "Travar/destravar arquivo"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Details"
-msgstr ""
+msgstr "Detalhes do Certificado"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Course Title"
-msgstr ""
+msgstr "Título do curso"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
-msgstr ""
+msgstr "Substituição do Título do Curso"
 
 #: cms/templates/js/certificate-details.underscore
 msgid "Course Number"
-msgstr ""
+msgstr "Número do curso"
 
 #: cms/templates/js/certificate-details.underscore
 msgid "Course Number Override"
-msgstr ""
+msgstr "Substitução do número do curso"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Signatories"
-msgstr ""
+msgstr "Signatários do Certificado"
 
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "error.message"
-msgstr ""
+msgstr "mensagem.erro"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Information"
-msgstr ""
+msgstr "Informações do Certificado"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Name"
-msgstr ""
+msgstr "Nome do Certificado"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Name of the certificate"
-msgstr ""
+msgstr "Nome do certificado"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Description of the certificate"
-msgstr ""
+msgstr "Descrição do certificado"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Course title"
-msgstr ""
+msgstr "Título do Curso"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid ""
 "Specify an alternative to the official course title to display on "
 "certificates. Leave blank to use the official course title."
 msgstr ""
+"Especifique uma alternativa para o título oficial do curso a ser exibido nos"
+" certificados. Deixe em branco para usar o título oficial do curso."
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Add Additional Signatory"
-msgstr ""
+msgstr "Adicionar signatário adicional"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "(Add signatories for a certificate)"
-msgstr ""
+msgstr "(Adicionar assinaturas para um certificado)"
 
 #: cms/templates/js/certificate-web-preview.underscore
 msgid "Choose mode"
-msgstr ""
+msgstr "Escolher modalidade"
 
 #: cms/templates/js/certificate-web-preview.underscore
 msgid "Preview Certificate"
-msgstr ""
+msgstr "Pré-visualizar o Certificado"
 
 #: cms/templates/js/certificate-web-preview.underscore
 msgid "Activate"
-msgstr ""
+msgstr "Ativar"
 
 #: cms/templates/js/certificate-web-preview.underscore
 msgid "Deactivate"
-msgstr ""
+msgstr "Desativar"
 
 #: cms/templates/js/container-message.underscore
 msgid ""
 "Caution: The last published version of this unit is live. By publishing "
 "changes you will change the student experience."
 msgstr ""
+"Cuidado: a última versão publicada dessa unidade está no ar. Ao publicar "
+"modificações você vai acabar alterando a experiência dos alunos."
 
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
 msgid "Cannot delete when in use by a unit"
-msgstr ""
+msgstr "Não pode ser deletado se estiver sendo utilizado por uma unidade"
 
 #: cms/templates/js/content-group-details.underscore
 msgid "This content group is used in:"
-msgstr ""
+msgstr "Esse grupo de conteúdo é utilizado em:"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
-msgstr ""
+msgstr "Nome do Grupo de Conteúdo"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group ID"
-msgstr ""
+msgstr "ID de Grupo de Conteúdo"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "This is the name of the group"
-msgstr ""
+msgstr "Esse é o nome do grupo"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "This content group is used in one or more units."
-msgstr ""
+msgstr "Este grupo de conteúdo é utilizado em uma ou mais unidades."
 
 #: cms/templates/js/course-outline.underscore
 msgid "Contains staff only content"
-msgstr ""
+msgstr "Possui conteúdo visível apenas para a equipe"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to live content"
-msgstr ""
+msgstr "Alterações de conteúdo ao vivo não publicadas "
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished units will not be released"
-msgstr ""
+msgstr "Unidades não publicadas não serão lançadas"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to content that will release in the future"
-msgstr ""
+msgstr "Alterações de conteúdo não publicadas que serão liberadas no futuro"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Ungraded"
-msgstr ""
+msgstr "Não corrigido"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
-msgstr ""
+msgstr "Exame Prático Supervisionado"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
-msgstr ""
+msgstr "Exame supervisionado"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "Exame cronometrado"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #, python-format
 msgid "Collapse/Expand this %(xblock_type)s"
-msgstr ""
+msgstr "Reduzir/Expandir este %(xblock_type)s"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
-msgstr ""
+msgstr "Exibir Nome"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
-msgstr ""
+msgstr "Configurar"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
-msgstr ""
+msgstr "Arraste para reordenar"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Release Status:"
-msgstr ""
+msgstr "Status do lançamento:"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "Released:"
-msgstr ""
+msgstr "Lançado:"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Scheduled:"
-msgstr ""
+msgstr "Agendado:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
-msgstr ""
+msgstr "Avaliado como:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
-msgstr ""
+msgstr "Prazo final:"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
-msgstr ""
+msgstr "Você ainda não adicionou nenhum conteúdo a este curso."
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
-msgstr ""
+msgstr "Clique para adicionar um novo %(xblock_type)s"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Assignment Type Name"
-msgstr ""
+msgstr "Nome do Tipo de Tarefa"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "e.g. Homework, Midterm Exams"
-msgstr ""
+msgstr "Ex. Tarefas para Casa, Exames Intermediários"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Abbreviation"
-msgstr ""
+msgstr "Abreviação"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "e.g. HW, Midterm"
-msgstr ""
+msgstr "Ex. Tarefas para Casa, Exames Intermediários"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Weight of Total Grade"
-msgstr ""
+msgstr "Peso da nota total"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "as a percent, e.g. 40"
-msgstr ""
+msgstr "como um percentual, Ex. 40"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Total Number"
-msgstr ""
+msgstr "Número Total"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "total exercises assigned"
-msgstr ""
+msgstr "total de exercícios atribuídos"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Number of Droppable"
-msgstr ""
+msgstr "Número de Canceláveis"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "total exercises that won't be graded"
-msgstr ""
+msgstr "total de exercícios que não serão avaliados"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
-msgstr ""
+msgstr "Apostilas do Curso"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
-msgstr ""
+msgstr "Você não tem apostilas definidas"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid ""
 "There is invalid code in your content. Please check to make sure it is valid"
 " HTML."
 msgstr ""
+"Existe um código inválido em seu conteúdo. Por favor, verifique para "
+"certificar-se que é um HTML válido."
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Send push notification to mobile apps"
-msgstr ""
+msgstr "Enviar notificação de envio para o aplicativo móvel"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Send notification to mobile apps"
-msgstr ""
+msgstr "Enviar notificação para o aplicativo móvel"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"
-msgstr ""
+msgstr "Enviar"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
-msgstr ""
+msgstr "Data de Vencimento"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Time in UTC:"
-msgstr ""
+msgstr "Data limite em UTC"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Clear Grading Due Date"
-msgstr ""
+msgstr "Limpar data limite para avaliação"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Name"
-msgstr ""
+msgstr "Nome do Capítulo"
 
 #: cms/templates/js/edit-chapter.underscore
 #, python-format
 msgid "Chapter %s"
-msgstr ""
+msgstr "Capítulo %s"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
-msgstr ""
+msgstr "forneça o título/nome do capítulo que será utilizado na navegação"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
-msgstr ""
+msgstr "Ativo do Capítulo"
 
 #: cms/templates/js/edit-chapter.underscore
 #, python-format
 msgid "path/to/introductionToCookieBaking-CH%d.pdf"
-msgstr ""
+msgstr "path/to/introductionToCookieBaking-CH%d.pdf"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
 msgstr ""
+"envie um arquivo PDF ou forneça o caminho para um arquivo de ativo de Studio"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Upload PDF"
-msgstr ""
+msgstr "Enviar PDF"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "delete chapter"
-msgstr ""
+msgstr "excluir capítulo"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Textbook information"
-msgstr ""
+msgstr "Informação do livro-texto"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Textbook Name"
-msgstr ""
+msgstr "Nome do Livro-texto"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Introduction to Cookie Baking"
-msgstr ""
+msgstr "Introdução a manufatura de Cookies"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid ""
@@ -8436,7 +8554,7 @@ msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Chapter information"
-msgstr ""
+msgstr "Informação do capítulo"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
@@ -8461,11 +8579,11 @@ msgstr ""
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration information"
-msgstr ""
+msgstr "Informações de Configuração de Grupo"
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration Name"
-msgstr ""
+msgstr "Nome da Configuração do Grupo"
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration ID"
@@ -8525,7 +8643,7 @@ msgstr ""
 
 #: cms/templates/js/license-selector.underscore
 msgid "Options for {license_name}"
-msgstr ""
+msgstr "Opções para {license_name}"
 
 #: cms/templates/js/license-selector.underscore
 msgid "The following options are available for the {license_name} license."
@@ -8552,7 +8670,7 @@ msgstr ""
 #: cms/templates/js/list.underscore
 #, python-format
 msgid "%(new_item_message)s"
-msgstr ""
+msgstr "%(new_item_message)s"
 
 #: cms/templates/js/list.underscore
 #, python-format
@@ -8618,7 +8736,7 @@ msgstr ""
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
-msgstr ""
+msgstr "mensagem"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -8651,7 +8769,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publishing Status"
-msgstr ""
+msgstr "Situação de Publicação"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
@@ -8669,11 +8787,11 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Will Be Visible To:"
-msgstr ""
+msgstr "Será visível para:"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff Only"
-msgstr ""
+msgstr "Apenas Funcionários"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
@@ -8682,7 +8800,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Students"
-msgstr ""
+msgstr "Equipe e Alunos"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Some content in this unit is visible only to particular content groups"
@@ -8715,7 +8833,7 @@ msgstr ""
 
 #: cms/templates/js/signatory-details.underscore
 msgid "Organization"
-msgstr ""
+msgstr "Organização"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Certificate Signatory Configuration"
@@ -8805,7 +8923,7 @@ msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
-msgstr ""
+msgstr "Papel Atual:"
 
 #: cms/templates/js/team-member.underscore
 msgid "You!"
@@ -8984,7 +9102,7 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Upload New Transcript"
-msgstr ""
+msgstr "Enviar Nova Transcrição"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
