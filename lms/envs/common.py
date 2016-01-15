@@ -117,7 +117,7 @@ FEATURES = {
     # It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled, since
     # subscribers who receive digests in that case will only be able to unsubscribe via links embedded
     # in their emails, and they will have no way to resubscribe.
-    'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
+    'ENABLE_DISCUSSION_EMAIL_DIGEST': True,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
