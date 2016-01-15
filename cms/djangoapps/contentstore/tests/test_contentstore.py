@@ -1603,6 +1603,47 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         course_module = self.store.get_course(target_id)
         self.assertEquals(course_module.wiki_slug, 'MITx.111.2013_Spring')
 
+    def test_course_wiki_slug_uniqueness_after_import(self):
+        """
+        When importing a course using split modulestore, Wiki for the course points to the old wiki.
+        This test ensures that after course import, wiki for the course doesn't points to the old course
+        wiki when using split modulestore.
+        """
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            # create new course, source_course
+            source_id = self.store.make_course_key('edX', '111', '2015_Spring')
+            course_data = {
+                'org': source_id.org,
+                'number': source_id.course,
+                'display_name': 'Robot Super Course',
+                'run': source_id.run
+            }
+            _create_course(self, source_id, course_data)
+
+            source_course_module = self.store.get_course(source_id)
+            url_name = source_course_module.url_name
+            root_dir = path(mkdtemp_clean())
+
+            # export out source_course to a tempdir
+            export_course_to_xml(self.store, contentstore(), source_course_module.id, root_dir, url_name)
+
+            # create another new course target_course
+            target_id = self.store.make_course_key('edX', '222', '2016_Spring')
+            course_data = {
+                'org': target_id.org,
+                'number': target_id.course,
+                'display_name': 'Robot Super Course',
+                'run': target_id.run
+            }
+            _create_course(self, target_id, course_data)
+
+            # Import source_course into target_course
+            import_course_from_xml(self.store, self.user.id, root_dir, [url_name], target_id=target_id)
+            course_module = self.store.get_course(target_id)
+
+            # and make sure target_course wiki do not points to source_course wiki
+            self.assertEquals(course_module.wiki_slug, 'edX.222.2016_Spring')
+
     def test_import_metadata_with_attempts_empty_string(self):
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'], create_if_not_present=True)
         did_load_item = False
