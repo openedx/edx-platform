@@ -107,6 +107,7 @@
 # may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
+# Ned Batchelder <ned@edx.org>, 2016
 # omarithawi <oithawi@qrf.org>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # Soha Assali <soha+transifex@qordoba.com>, 2015
@@ -16874,7 +16875,7 @@ msgid ""
 "role cannot edit or delete an activated certificate."
 msgstr ""
 "للبدء بإصدار الشهادات، يختار أحد أعضاء فريق المساق ممن يتمتّعون بصلاحيات "
-"المشرف {em_start} {تنشيط em_end}. لا يٌسمح لأعضاء الفريق من غير المشرفين "
+"المشرف {em_start}تنشيط{em_end}. لا يٌسمح لأعضاء الفريق من غير المشرفين "
 "بتعديل أو حذف شهادة مفعّلة."
 
 #: cms/templates/certificates.html

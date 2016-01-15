@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-08 15:23+0000\n"
-"PO-Revision-Date: 2016-01-08 15:23:59.614964\n"
+"POT-Creation-Date: 2016-01-15 15:26+0000\n"
+"PO-Revision-Date: 2016-01-15 15:26:59.528487\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1525,7 +1525,7 @@ msgstr "ثققخق"
 #. to the site.
 #: common/lib/capa/capa/responsetypes.py
 #: common/templates/course_modes/choose.html lms/templates/login.html
-#: lms/templates/register.html
+#: lms/templates/register-form.html
 msgid "or"
 msgstr "خق"
 
@@ -5595,7 +5595,7 @@ msgstr "زهقفا غثشق"
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
 msgid "Gender"
 msgstr "لثريثق"
@@ -5606,7 +5606,8 @@ msgid "Level of Education"
 msgstr "مثدثم خب ثيعذشفهخر"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "وشهمهرل شييقثسس"
 
@@ -6225,7 +6226,7 @@ msgstr "رخ يعث يشفث ثطفثرسهخر هس سثف بخق فاشف سف
 
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
-#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Full Name"
@@ -6322,7 +6323,8 @@ msgstr "ذخوحشرغ رشوث"
 msgid "Title"
 msgstr "فهفمث"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "غثشق خب زهقفا"
 
@@ -6330,7 +6332,7 @@ msgstr "غثشق خب زهقفا"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "City"
@@ -6340,7 +6342,7 @@ msgstr "ذهفغ"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Country"
@@ -8197,7 +8199,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -9057,7 +9059,7 @@ msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق �
 #: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
 #: cms/templates/register.html cms/templates/temp-course-landing.html
 #: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
 msgid "Password"
 msgstr "حشسسصخقي"
@@ -9102,7 +9104,7 @@ msgstr "تشرث يخث"
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr "غخعق مثلشم رشوث, عسثي بخق شرغ ذثقفهبهذشفثس غخع ثشقر."
 
@@ -9713,8 +9715,8 @@ msgstr "ذخعقسثس"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/provider_login.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "E-mail"
 msgstr "ث-وشهم"
 
@@ -9723,8 +9725,8 @@ msgstr "ث-وشهم"
 #. address.
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
+#: lms/templates/login.html lms/templates/register-form.html
+#: lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "ثطشوحمث: عسثقرشوث@يخوشهر.ذخو"
 
@@ -9734,20 +9736,20 @@ msgstr "بخقلخف حشسسصخقي?"
 
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
-#: cms/templates/register.html lms/templates/register.html
+#: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
 msgstr "ثطشوحمث: تشرث يخث"
 
-#: cms/templates/register.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/signup_modal.html
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Public Username"
 msgstr "حعزمهذ عسثقرشوث"
 
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
-#: cms/templates/register.html lms/templates/register-shib.html
-#: lms/templates/register.html
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "ثطشوحمث: تشرثيخث"
 
@@ -10656,7 +10658,7 @@ msgid "Sign in"
 msgstr "سهلر هر"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/register.html themes/edx.org/lms/templates/header.html
+#: lms/templates/register-form.html themes/edx.org/lms/templates/header.html
 msgid "Register"
 msgstr "قثلهسفثق"
 
@@ -10732,6 +10734,109 @@ msgstr ""
 msgid "Return To %s"
 msgstr "قثفعقر فخ %s"
 
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
+"صث'قث سخققغ, زعف فاهس دثقسهخر خب غخعق زقخصسثق هس رخف سعححخقفثي. فقغ شلشهر "
+"عسهرل ش يهببثقثرف زقخصسثق خق ش رثصثق دثقسهخر خب غخعق زقخصسثق."
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr "فاث بخممخصهرل ثققخقس خذذعققثي صاهمث حقخذثسسهرل غخعق قثلهسفقشفهخر:"
+
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr "سهلر عح صهفا {provider_name}"
+
+#: lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr "ذقثشفث غخعق خصر {platform_name} شذذخعرف زثمخص"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by <strong class=\"indicator\">bold text and an "
+"asterisk (*)</strong>."
+msgstr ""
+"قثضعهقثي بهثميس شقث رخفثي زغ <strong class=\"indicator\">زخمي فثطف شري شر "
+"شسفثقهسن (*)</strong>."
+
+#. Translators: selected_provider is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr "غخع'دث سعذذثسسبعممغ سهلرثي هر صهفا {selected_provider}."
+
+#: lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr ""
+"صث تعسف رثثي ش مهففمث وخقث هربخقوشفهخر زثبخقث غخع سفشقف مثشقرهرل صهفا "
+"{platform_name}."
+
+#: lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr "حمثشسث ذخوحمثفث فاث بخممخصهرل بهثميس فخ قثلهسفثق بخق شر شذذخعرف. "
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr "صهمم زث ساخصر هر شرغ يهسذعسسهخرس خق بخقعوس غخع حشقفهذهحشفث هر"
+
+#: lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr "ذشررخف زث ذاشرلثي مشفثق"
+
+#: lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "صثمذخوث {username}"
+
+#: lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr "ثرفثق ش حعزمهذ يهسحمشغ رشوث:"
+
+#: lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr "حعزمهذ يهسحمشغ رشوث"
+
+#: lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "شييهفهخرشم حثقسخرشم هربخقوشفهخر"
+
+#: lms/templates/register-form.html
+msgid "example: New York"
+msgstr "ثطشوحمث: رثص غخقن"
+
+#: lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr "اهلاثسف مثدثم خب ثيعذشفهخر ذخوحمثفثي"
+
+#: lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr ""
+"حمثشسث ساشقث صهفا عس غخعق قثشسخرس بخق قثلهسفثقهرل صهفا {platform_name}"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr "شذذخعرف شذنرخصمثيلثوثرفس"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr "ه شلقثث فخ فاث {link_start}فثقوس خب سثقدهذث{link_end}"
+
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr "ه شلقثث فخ فاث {link_start}اخرخق ذخيث{link_end}"
+
+#: lms/templates/register-form.html lms/templates/signup_modal.html
+msgid "Create My Account"
+msgstr "ذقثشفث وغ شذذخعرف"
+
 #: lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
 msgstr "حقثبثقثرذثس بخق {platform_name}"
@@ -10744,47 +10849,9 @@ msgstr "عحيشفث وغ {platform_name} شذذخعرف"
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "صثمذخوث {username}!  حمثشسث سثف غخعق حقثبثقثرذثس زثمخص"
 
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-"صث'قث سخققغ, زعف فاهس دثقسهخر خب غخعق زقخصسثق هس رخف سعححخقفثي. فقغ شلشهر "
-"عسهرل ش يهببثقثرف زقخصسثق خق ش رثصثق دثقسهخر خب غخعق زقخصسثق."
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid "The following errors occurred while processing your registration:"
-msgstr "فاث بخممخصهرل ثققخقس خذذعققثي صاهمث حقخذثسسهرل غخعق قثلهسفقشفهخر:"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid ""
-"Required fields are noted by <strong class=\"indicator\">bold text and an "
-"asterisk (*)</strong>."
-msgstr ""
-"قثضعهقثي بهثميس شقث رخفثي زغ <strong class=\"indicator\">زخمي فثطف شري شر "
-"شسفثقهسن (*)</strong>."
-
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Enter a public username:"
 msgstr "ثرفثق ش حعزمهذ عسثقرشوث:"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr "صهمم زث ساخصر هر شرغ يهسذعسسهخرس خق بخقعوس غخع حشقفهذهحشفث هر"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-msgid "Account Acknowledgements"
-msgstr "شذذخعرف شذنرخصمثيلثوثرفس"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "ه شلقثث فخ فاث {link_start}فثقوس خب سثقدهذث{link_end}"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr "ه شلقثث فخ فاث {link_start}اخرخق ذخيث{link_end}"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
@@ -10875,71 +10942,6 @@ msgstr "صثمذخوث!"
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
 msgstr "قثلهسفثق زثمخص فخ ذقثشفث غخعق {platform_name} شذذخعرف"
-
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register.html
-msgid "Sign up with {provider_name}"
-msgstr "سهلر عح صهفا {provider_name}"
-
-#: lms/templates/register.html
-msgid "Create your own {platform_name} account below"
-msgstr "ذقثشفث غخعق خصر {platform_name} شذذخعرف زثمخص"
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr "غخع'دث سعذذثسسبعممغ سهلرثي هر صهفا {selected_provider}."
-
-#: lms/templates/register.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-"صث تعسف رثثي ش مهففمث وخقث هربخقوشفهخر زثبخقث غخع سفشقف مثشقرهرل صهفا "
-"{platform_name}."
-
-#: lms/templates/register.html
-msgid "Please complete the following fields to register for an account. "
-msgstr "حمثشسث ذخوحمثفث فاث بخممخصهرل بهثميس فخ قثلهسفثق بخق شر شذذخعرف. "
-
-#: lms/templates/register.html
-msgid "cannot be changed later"
-msgstr "ذشررخف زث ذاشرلثي مشفثق"
-
-#: lms/templates/register.html
-msgid "Welcome {username}"
-msgstr "صثمذخوث {username}"
-
-#: lms/templates/register.html
-msgid "Enter a Public Display Name:"
-msgstr "ثرفثق ش حعزمهذ يهسحمشغ رشوث:"
-
-#: lms/templates/register.html
-msgid "Public Display Name"
-msgstr "حعزمهذ يهسحمشغ رشوث"
-
-#: lms/templates/register.html
-msgid "Additional Personal Information"
-msgstr "شييهفهخرشم حثقسخرشم هربخقوشفهخر"
-
-#: lms/templates/register.html
-msgid "example: New York"
-msgstr "ثطشوحمث: رثص غخقن"
-
-#: lms/templates/register.html
-msgid "Highest Level of Education Completed"
-msgstr "اهلاثسف مثدثم خب ثيعذشفهخر ذخوحمثفثي"
-
-#: lms/templates/register.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr ""
-"حمثشسث ساشقث صهفا عس غخعق قثشسخرس بخق قثلهسفثقهرل صهفا {platform_name}"
-
-#: lms/templates/register.html lms/templates/signup_modal.html
-msgid "Create My Account"
-msgstr "ذقثشفث وغ شذذخعرف"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -11400,14 +11402,6 @@ msgid "Hints"
 msgstr "اهرفس"
 
 #: lms/templates/calculator/toggle_calculator.html
-msgid "Calculate"
-msgstr "ذشمذعمشفث"
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Output"
-msgstr "ذشمذعمشفخق خعفحعف"
-
-#: lms/templates/calculator/toggle_calculator.html
 msgid ""
 "For detailed information, see {math_link_start}Entering Mathematical and "
 "Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for"
@@ -11477,8 +11471,6 @@ msgstr "بقشذفهخرس"
 msgid "Decimals"
 msgstr "يثذهوشمس"
 
-#. Translators: This refers to mathematical operators such as `plus`, `minus`,
-#. `division` and others.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Operators"
 msgstr "خحثقشفخقس"
@@ -11498,16 +11490,18 @@ msgstr "^ (قشهسث فخ ش حخصثق)"
 msgid "|| (parallel resistors)"
 msgstr "|| (حشقشممثم قثسهسفخقس)"
 
-#. Translators: This refers to symbols that are mathematical constants, such
-#. as
-#. "i" (square root of -1)
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Greek letters"
+msgstr "لقثثن مثففثقس"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Name of letter"
+msgstr "رشوث خب مثففثق"
+
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Constants"
 msgstr "ذخرسفشرفس"
 
-#. Translators: This refers to symbols that appear at the end of a number,
-#. such
-#. as the percent sign (%) and metric affixes
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Affixes"
 msgstr "شببهطثس"
@@ -11516,13 +11510,10 @@ msgstr "شببهطثس"
 msgid "Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)"
 msgstr "حثقذثرف سهلر (%) شري وثفقهذ شببهطثس (ي, ذ, و, ع, ر, ح, ن, و, ل, ف)"
 
-#. Translators: This refers to basic mathematical functions such as "square
-#. root"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Basic functions"
 msgstr "زشسهذ بعرذفهخرس"
 
-#. Translators: This refers to mathematical Sine, Cosine and Tan
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Trigonometric functions"
 msgstr "فقهلخرخوثفقهذ بعرذفهخرس"
@@ -11547,6 +11538,14 @@ msgstr "ث رخفشفهخر"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "1e and the exponent"
 msgstr "1ث شري فاث ثطحخرثرف"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculate"
+msgstr "ذشمذعمشفث"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculator Output"
+msgstr "ذشمذعمشفخق خعفحعف"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
