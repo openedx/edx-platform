@@ -695,7 +695,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         ]
 
         expected_result = make_paginated_api_response(
-            expected_threads, 0, 1, None, None
+            expected_threads, 2, 1, None, None
         )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(

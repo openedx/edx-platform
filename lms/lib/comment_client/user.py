@@ -113,7 +113,12 @@ class User(models.Model):
             metric_tags=self._metric_tags,
             paged_results=True
         )
-        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
+        return (
+            response.get('collection', []),
+            response.get('page', 1),
+            response.get('num_pages', 1),
+            response.get('thread_count')
+        )
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)

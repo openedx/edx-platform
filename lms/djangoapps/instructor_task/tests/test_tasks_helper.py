@@ -1802,7 +1802,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             },
             result
         )
-        generated_certificates = GeneratedCertificate.objects.filter(
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
             user__in=students,
             course_id=self.course.id,
             mode='honor'
@@ -1912,7 +1912,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             result
         )
 
-        generated_certificates = GeneratedCertificate.objects.filter(
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
             user__in=students,
             course_id=self.course.id,
             mode='honor'

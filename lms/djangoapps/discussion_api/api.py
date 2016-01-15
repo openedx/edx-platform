@@ -328,12 +328,12 @@ def get_thread_list(
             })
 
     if following:
-        threads, result_page, num_pages = context["cc_requester"].subscribed_threads(query_params)
+        threads, result_page, num_pages, thread_count = context["cc_requester"].subscribed_threads(query_params)
     else:
         query_params["course_id"] = unicode(course.id)
         query_params["commentable_ids"] = ",".join(topic_id_list) if topic_id_list else None
         query_params["text"] = text_search
-        threads, result_page, num_pages, text_search_rewrite = Thread.search(query_params)
+        threads, result_page, num_pages, text_search_rewrite, thread_count = Thread.search(query_params)
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
     # behavior and return a PageNotFoundError in that case
@@ -342,7 +342,7 @@ def get_thread_list(
 
     results = [ThreadSerializer(thread, context=context).data for thread in threads]
 
-    paginator = DiscussionAPIPagination(request, result_page, num_pages)
+    paginator = DiscussionAPIPagination(request, result_page, num_pages, thread_count)
     return paginator.get_paginated_response({
         "results": results,
         "text_search_rewrite": text_search_rewrite,
@@ -415,7 +415,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
 
     results = [CommentSerializer(response, context=context).data for response in responses]
-    paginator = DiscussionAPIPagination(request, page, num_pages)
+    paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
     return paginator.get_paginated_response(results)
 
 
@@ -755,7 +755,7 @@ def get_response_comments(request, comment_id, page, page_size):
 
         comments_count = len(response_comments)
         num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
-        paginator = DiscussionAPIPagination(request, page, num_pages)
+        paginator = DiscussionAPIPagination(request, page, num_pages, comments_count)
         return paginator.get_paginated_response(results)
     except CommentClientRequestError:
         raise CommentNotFoundError("Comment not found")

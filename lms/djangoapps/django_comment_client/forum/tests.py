@@ -96,7 +96,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
         # for the profiled user's active threads
-        mock_threads.return_value = [], 1, 1
+        mock_threads.return_value = [], 1, 1, 0
 
         # Mock the code that makes the HTTP request to the cs_comment_service app
         # that gets the current user's info

@@ -31,6 +31,9 @@ def run():
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
 
+    if settings.FEATURES.get('USE_MICROSITES', False):
+        enable_microsites_pre_startup()
+
     django.setup()
 
     autostartup()
@@ -116,6 +119,18 @@ def enable_stanford_theme():
     settings.LOCALE_PATHS = (theme_root / 'conf/locale',) + settings.LOCALE_PATHS
 
 
+def enable_microsites_pre_startup():
+    """
+    The TEMPLATE_ENGINE directory to search for microsite templates
+    in non-mako templates must be loaded before the django startup
+    """
+    microsites_root = settings.MICROSITE_ROOT_DIR
+    microsite_config_dict = settings.MICROSITE_CONFIGURATION
+
+    if microsite_config_dict:
+        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].append(microsites_root)
+
+
 def enable_microsites():
     """
     Enable the use of microsites, which are websites that allow
@@ -151,7 +166,6 @@ def enable_microsites():
 
     # if we have any valid microsites defined, let's wire in the Mako and STATIC_FILES search paths
     if microsite_config_dict:
-        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].append(microsites_root)
         edxmako.paths.add_lookup('main', microsites_root)
 
         settings.STATICFILES_DIRS.insert(0, microsites_root)

@@ -32,3 +32,10 @@ class MicroSiteTests(TestCase):
         expected = u'my | less specific | Page | edX'
         title = microsite.page_title_breadcrumbs_tag(None, *crumbs)
         self.assertEqual(expected, title)
+
+    def test_microsite_template_path(self):
+        """
+        When an unexistent path is passed to the filter, it should return the same path
+        """
+        path = microsite.microsite_template_path('footer.html')
+        self.assertEqual("footer.html", path)

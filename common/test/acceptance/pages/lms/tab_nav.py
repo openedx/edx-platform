@@ -36,6 +36,16 @@ class TabNavPage(PageObject):
         self.wait_for_page()
         self._is_on_tab_promise(tab_name).fulfill()
 
+    def mathjax_has_rendered(self):
+        """
+        Check that MathJax has rendered in tab content
+        """
+        mathjax_container = self.q(css=".static_tab_wrapper .MathJax .math")
+        EmptyPromise(
+            lambda: mathjax_container.present and mathjax_container.visible,
+            "MathJax is not visible"
+        ).fulfill()
+
     def is_on_tab(self, tab_name):
         """
         Return a boolean indicating whether the current tab is `tab_name`.

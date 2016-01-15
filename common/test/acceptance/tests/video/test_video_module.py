@@ -1172,11 +1172,13 @@ class YouTubeQualityTest(VideoBaseTest):
 
         self.video.click_player_button('play')
 
+        self.video.wait_for(lambda: self.video.is_quality_button_visible, 'waiting for quality button to appear')
+
         self.assertFalse(self.video.is_quality_button_active)
 
         self.video.click_player_button('quality')
 
-        self.assertTrue(self.video.is_quality_button_active)
+        self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
 @attr('a11y')
