@@ -250,6 +250,12 @@ class CourseOutlineContainer(CourseOutlineItem):
         # pylint: disable=no-member
         self.browser.execute_script("jQuery.fx.off = true;")
 
+        # Ensure we are in a subsection to begin with
+        self.wait_for_element_presence(
+            self._bounded_selector('.ui-toggle-expansion i'),
+            'waiting for action for expanding/collapsing to be available'
+        )
+
         def subsection_expanded():
             """
             Returns whether or not this subsection is expanded.
