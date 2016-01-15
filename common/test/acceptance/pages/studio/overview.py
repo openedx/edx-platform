@@ -263,14 +263,9 @@ class CourseOutlineContainer(CourseOutlineItem):
 
         currently_expanded = subsection_expanded()
 
-        # TODO: Special offset needed for newer firefox version. This was only tested with Firefox 42.
-        firefox_version = float(self.browser.capabilities['version'])
-        if firefox_version >= 42:
-            # Need to click slightly off-center in order for the click to be recognized.
-            ele = self.browser.find_element_by_css_selector(self._bounded_selector('.ui-toggle-expansion i'))
-            ActionChains(self.browser).move_to_element_with_offset(ele, 1, 1).click().perform()
-        else:
-            self.q(css=self._bounded_selector('.ui-toggle-expansion i')).first.click()
+        # Need to click slightly off-center in order for the click to be recognized.
+        ele = self.browser.find_element_by_css_selector(self._bounded_selector('.ui-toggle-expansion i'))
+        ActionChains(self.browser).move_to_element_with_offset(ele, 4, 4).click().perform()
         self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 
         EmptyPromise(
