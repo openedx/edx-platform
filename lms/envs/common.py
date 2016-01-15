@@ -2641,6 +2641,22 @@ JWT_ISSUER = None
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
 
+
+################################ Settings for Microsites ################################
+
+### Select an implementation for the microsite backend
+# for MICROSITE_BACKEND possible choices are
+# 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
+# 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
+MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
+# for MICROSITE_TEMPLATE_BACKEND possible choices are
+# 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
+# 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
+MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
+# TTL for microsite database template cache
+MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
+
+
 #### PROCTORING CONFIGURATION DEFAULTS
 
 PROCTORING_BACKEND_PROVIDER = {
