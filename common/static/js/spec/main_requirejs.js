@@ -159,7 +159,9 @@
         'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',
         'common-requirejs/include/common/js/spec/components/paging_collection_spec.js',
         'common-requirejs/include/common/js/spec/components/paging_header_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_footer_spec.js'
+        'common-requirejs/include/common/js/spec/components/paging_footer_spec.js',
+        'common-requirejs/include/common/js/spec/components/view_utils_spec.js',
+        'common-requirejs/include/common/js/spec/components/feedback_spec.js'
     ]);
 
 }).call(this, requirejs, define);

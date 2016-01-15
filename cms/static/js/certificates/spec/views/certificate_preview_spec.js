@@ -6,7 +6,7 @@ define([ // jshint ignore:line
     'js/models/course',
     'js/certificates/views/certificate_preview',
     'common/js/spec_helpers/template_helpers',
-    'js/spec_helpers/view_helpers',
+    'common/js/spec_helpers/view_helpers',
     'common/js/spec_helpers/ajax_helpers'
 ],
 function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHelpers) {

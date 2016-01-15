@@ -8,7 +8,7 @@
  *  - changes cause a refresh of the entire section rather than just the view for the changed xblock
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
-define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils", "js/views/utils/xblock_utils",
+define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components/utils/view_utils", "js/views/utils/xblock_utils",
         "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,

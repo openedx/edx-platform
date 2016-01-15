@@ -1,13 +1,12 @@
 define([
-    "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/view_helpers",
-    "js/factories/manage_users_lib", "js/views/utils/view_utils"
+    "jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/view_helpers",
+    "js/factories/manage_users_lib", "common/js/components/utils/view_utils"
 ],
 function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     "use strict";
     describe("Library Instructor Access Page", function () {
         const changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
         var team_member_fixture = readFixtures("team-member.underscore");
-        var systemFeedbackFixture = readFixtures("system-feedback.underscore");
 
         function setRole(email, role){
             var user_li = $("li.user-item[data-email="+ email + "]");
@@ -27,7 +26,6 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
                 appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
-                appendSetFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template"}).text(systemFeedbackFixture));
                 ManageUsersFactory(
                     "Mock Library",
                     [
@@ -122,7 +120,6 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
                 appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
-                appendSetFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template"}).text(systemFeedbackFixture));
                 ManageUsersFactory(
                     "Mock Library",
                     [

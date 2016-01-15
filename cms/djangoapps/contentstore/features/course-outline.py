@@ -75,7 +75,7 @@ def i_press_the_section_delete_icon(step):
 
 @step(u'I will confirm all alerts')
 def i_confirm_all_alerts(step):
-    confirm_locator = '.prompt .nav-actions a.action-primary'
+    confirm_locator = '.prompt .nav-actions button.action-primary'
     world.css_click(confirm_locator)
 
 

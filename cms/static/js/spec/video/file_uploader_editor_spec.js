@@ -12,7 +12,6 @@ function ($, _, Squire) {
                 'metadata-file-uploader-item.underscore'
             ),
             locator = 'locator',
-            feedbackTpl = readFixtures('system-feedback.underscore'),
             modelStub = {
                 default_value: 'http://example.org/test_1',
                 display_name: 'File Upload',

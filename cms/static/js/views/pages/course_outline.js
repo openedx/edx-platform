@@ -2,8 +2,8 @@
  * This page is used to show the user an outline of the course.
  */
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
-        "js/views/course_outline", "js/views/utils/view_utils", "js/views/feedback_alert",
-        "js/views/feedback_notification"],
+        "js/views/course_outline", "common/js/components/utils/view_utils", "common/js/components/views/feedback_alert",
+        "common/js/components/views/feedback_notification"],
     function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView) {
         var expandedLocators, CourseOutlinePage;
 
