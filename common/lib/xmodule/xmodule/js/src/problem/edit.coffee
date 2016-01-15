@@ -23,7 +23,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @setCurrentEditor(@markdown_editor)
       # Add listeners for toolbar buttons (only present for markdown editor)
       @element.on('click', '.xml-tab', @onShowXMLButton)
-      @element.on('click', '.format-buttons a', @onToolbarButton)
+      @element.on('click', '.format-buttons button', @onToolbarButton)
       @element.on('click', '.cheatsheet-toggle', @toggleCheatsheet)
       # Hide the XML text area
       $(@element.find('.xml-box')).hide()
@@ -131,7 +131,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   save: ->
     @element.off('click', '.xml-tab', @changeEditor)
-    @element.off('click', '.format-buttons a', @onToolbarButton)
+    @element.off('click', '.format-buttons button', @onToolbarButton)
     @element.off('click', '.cheatsheet-toggle', @toggleCheatsheet)
     if @current_editor == @markdown_editor
         {
@@ -202,7 +202,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\r\n/g, '\n');
 
       // replace headers
-      xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
+      xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h3 class="problem-header">$1</h3>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
       // Pull out demand hints,  || a hint ||
@@ -264,8 +264,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       //  ]]
       // <optionresponse>
       //  <optioninput>
-      //     <option  correct="True">AAA<optionhint  label="Good Job">Yes, multiple choice is the right answer.</optionhint> 
-      // Note: part of the option-response syntax looks like multiple-choice, so it must be processed first.   
+      //     <option  correct="True">AAA<optionhint  label="Good Job">Yes, multiple choice is the right answer.</optionhint>
+      // Note: part of the option-response syntax looks like multiple-choice, so it must be processed first.
       xml = xml.replace(/\[\[((.|\n)+?)\]\]/g, function(match, group1) {
           // decide if this is old style or new style
           if (match.indexOf('\n') == -1) {  // OLD style, [[ .... ]]  on one line
@@ -355,14 +355,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
           groupString += '  <checkboxgroup>\n';
           options = match.split('\n');
-          
+
           endHints = '';  // save these up to emit at the end
 
           for (i = 0; i < options.length; i += 1) {
               if(options[i].trim().length > 0) {
                   // detect the {{ ((A*B)) ...}} case first
                   // emits: <compoundhint value="A*B">AB hint</compoundhint>
-                                    
+
                   var abhint = /^\s*{{\s*\(\((.*?)\)\)(.*?)}}/.exec(options[i]);
                   if (abhint) {
                        // lone case of hint text processing outside of extractHint, since syntax here is unique
@@ -389,7 +389,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                       if (select) {
                           hints += '\n      <choicehint selected="false">' + select[2].trim() + '</choicehint>';
                       }
-                      
+
                       // Blank out the original text only if the specific "selected" syntax is found
                       // That way, if the user types it wrong, at least they can see it's not processed.
                       if (hints) {
@@ -502,16 +502,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
       });
 
-      
+
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
           var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
 
           return selectString;
       });
-      
+
       // replace labels
-      // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text. 
+      // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text.
       var split = xml.split('\n');
       var new_xml = [];
       var line, i, curlabel, prevlabel = '';
@@ -579,4 +579,3 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       return xml;
     }`
     return toXml markdown
-

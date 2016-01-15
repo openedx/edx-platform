@@ -1012,7 +1012,7 @@ class ProblemExecutionTest(UniqueCourseTest):
         self.course_nav.go_to_section('Test Section', 'Test Subsection')
 
         problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_name, 'PYTHON PROBLEM')
+        self.assertEqual(problem_page.problem_name, 'Python Problem')
 
         # Does the page have computation results?
         self.assertIn("What is the sum of 17 and 3?", problem_page.problem_text)
