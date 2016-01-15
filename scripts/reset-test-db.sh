@@ -33,9 +33,6 @@ echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
 # "CREATE DATABASE" in case the tests are being run in an environment (e.g. devstack
 # or a jenkins worker environment) that already ran tests on another commit that had
 # different migrations that created, dropped, or altered tables.
-#
-# Note that as a side effect, this might render the --serversonly / --testsonly
-# paver options useless or broken.
 echo "Issuing a reset_db command to the bok_choy MySQL database."
 ./manage.py lms --settings bok_choy reset_db --traceback --noinput
 
