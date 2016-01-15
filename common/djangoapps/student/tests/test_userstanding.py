@@ -58,6 +58,13 @@ class UserStandingTest(TestCase):
         # to skip tests for cms
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_can_access_manage_account_page(self):
+        response = self.admin_client.get(reverse('manage_user_standing'), {
+            'user': self.admin,
+        })
+        self.assertEqual(response.status_code, 200)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_disable_account(self):
         self.assertEqual(
             UserStanding.objects.filter(user=self.good_user).count(), 0

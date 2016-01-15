@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-04 15:21+0000\n"
-"PO-Revision-Date: 2016-01-04 15:21:19.459731\n"
+"POT-Creation-Date: 2016-01-08 15:23+0000\n"
+"PO-Revision-Date: 2016-01-08 15:23:59.614964\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -196,7 +196,7 @@ msgstr "هي دثقهبهذشفهخر حثريهرل"
 msgid "You're enrolled as a verified student"
 msgstr "غخع'قث ثرقخممثي شس ش دثقهبهثي سفعيثرف"
 
-#: common/djangoapps/course_modes/helpers.py lms/envs/devstack.py
+#: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "دثقهبهثي"
@@ -279,7 +279,7 @@ msgstr ""
 msgid "Audit"
 msgstr "شعيهف"
 
-#: common/djangoapps/course_modes/models.py lms/envs/devstack.py
+#: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
 msgstr "اخرخق"
@@ -4251,6 +4251,10 @@ msgstr "يخصرمخشي فاث {platform_name} وخزهمث شحح بقخو ل�
 msgid "CCX Coach"
 msgstr "ذذط ذخشذا"
 
+#: lms/djangoapps/ccx/utils.py
+msgid "The course is full: the limit is {max_student_enrollments_allowed}"
+msgstr "فاث ذخعقسث هس بعمم: فاث مهوهف هس {max_student_enrollments_allowed}"
+
 #: lms/djangoapps/ccx/views.py
 msgid "You must be a CCX Coach to access this view."
 msgstr "غخع وعسف زث ش ذذط ذخشذا فخ شذذثسس فاهس دهثص."
@@ -5568,12 +5572,13 @@ msgstr "عسثق هي"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: openedx/core/djangoapps/user_api/views.py
+#: cms/templates/temp-course-landing.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "ثوشهم"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/envs/devstack.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Language"
 msgstr "مشرلعشلث"
 
@@ -5927,19 +5932,19 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"The record is not in the correct format. Please add a valid username or "
-"email address."
-msgstr ""
-"فاث قثذخقي هس رخف هر فاث ذخققثذف بخقوشف. حمثشسث شيي ش دشمهي عسثقرشوث خق "
-"ثوشهم شييقثسس."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
 "Student username/email field is required and can not be empty. Kindly fill "
 "in username/email and then press \"Add to Exception List\" button."
 msgstr ""
 "سفعيثرف عسثقرشوث/ثوشهم بهثمي هس قثضعهقثي شري ذشر رخف زث ثوحفغ. نهريمغ بهمم "
 "هر عسثقرشوث/ثوشهم شري فاثر حقثسس \"شيي فخ ثطذثحفهخر مهسف\" زعففخر."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The record is not in the correct format. Please add a valid username or "
+"email address."
+msgstr ""
+"فاث قثذخقي هس رخف هر فاث ذخققثذف بخقوشف. حمثشسث شيي ش دشمهي عسثقرشوث خق "
+"ثوشهم شييقثسس."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5972,6 +5977,48 @@ msgstr "عسثق \"{user}\" هر قخص# {row}"
 #: lms/djangoapps/instructor/views/api.py
 msgid "user \"{username}\" in row# {row}"
 msgstr "عسثق \"{username}\" هر قخص# {row}"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate of {user} has already been invalidated. Please check your "
+"spelling and retry."
+msgstr ""
+"ذثقفهبهذشفث خب {user} اشس شمقثشيغ زثثر هردشمهيشفثي. حمثشسث ذاثذن غخعق "
+"سحثممهرل شري قثفقغ."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate for student {user} is already invalid, kindly verify that "
+"certificate was generated for this student and then proceed."
+msgstr ""
+"ذثقفهبهذشفث بخق سفعيثرف {user} هس شمقثشيغ هردشمهي, نهريمغ دثقهبغ فاشف "
+"ذثقفهبهذشفث صشس لثرثقشفثي بخق فاهس سفعيثرف شري فاثر حقخذثثي."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate Invalidation does not exist, Please refresh the page and try "
+"again."
+msgstr ""
+"ذثقفهبهذشفث هردشمهيشفهخر يخثس رخف ثطهسف, حمثشسث قثبقثسا فاث حشلث شري فقغ "
+"شلشهر."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Invalidate Certificate\" button."
+msgstr ""
+"سفعيثرف عسثقرشوث/ثوشهم بهثمي هس قثضعهقثي شري ذشر رخف زث ثوحفغ. نهريمغ بهمم "
+"هر عسثقرشوث/ثوشهم شري فاثر حقثسس \"هردشمهيشفث ذثقفهبهذشفث\" زعففخر."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The student {student} does not have certificate for the course {course}. "
+"Kindly verify student username/email and the selected course are correct and"
+" try again."
+msgstr ""
+"فاث سفعيثرف {student} يخثس رخف اشدث ذثقفهبهذشفث بخق فاث ذخعقسث {course}. "
+"نهريمغ دثقهبغ سفعيثرف عسثقرشوث/ثوشهم شري فاث سثمثذفثي ذخعقسث شقث ذخققثذف شري"
+" فقغ شلشهر."
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
@@ -8042,15 +8089,6 @@ msgstr "غخعفعزث"
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "سعزسذقهزث فخ فاث {platform_name} غخعفعزث ذاشررثم"
 
-#: lms/envs/devstack.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html cms/templates/settings.html
-msgid "Organization"
-msgstr "خقلشرهظشفهخر"
-
-#: lms/envs/devstack.py
-msgid "Course Type"
-msgstr "ذخعقسث فغحث"
-
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
@@ -9017,9 +9055,10 @@ msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق �
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
 #: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
-#: cms/templates/register.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: cms/templates/register.html cms/templates/temp-course-landing.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
 msgid "Password"
 msgstr "حشسسصخقي"
 
@@ -9619,6 +9658,7 @@ msgstr "حشلث رخف بخعري"
 #: cms/templates/container.html cms/templates/course_outline.html
 #: cms/templates/group_configurations.html cms/templates/library.html
 #: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/student_profile/learner_profile.html
 msgid "Loading"
@@ -11360,6 +11400,14 @@ msgid "Hints"
 msgstr "اهرفس"
 
 #: lms/templates/calculator/toggle_calculator.html
+msgid "Calculate"
+msgstr "ذشمذعمشفث"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculator Output"
+msgstr "ذشمذعمشفخق خعفحعف"
+
+#: lms/templates/calculator/toggle_calculator.html
 msgid ""
 "For detailed information, see {math_link_start}Entering Mathematical and "
 "Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for"
@@ -11429,6 +11477,8 @@ msgstr "بقشذفهخرس"
 msgid "Decimals"
 msgstr "يثذهوشمس"
 
+#. Translators: This refers to mathematical operators such as `plus`, `minus`,
+#. `division` and others.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Operators"
 msgstr "خحثقشفخقس"
@@ -11448,18 +11498,16 @@ msgstr "^ (قشهسث فخ ش حخصثق)"
 msgid "|| (parallel resistors)"
 msgstr "|| (حشقشممثم قثسهسفخقس)"
 
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Greek letters"
-msgstr "لقثثن مثففثقس"
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Name of letter"
-msgstr "رشوث خب مثففثق"
-
+#. Translators: This refers to symbols that are mathematical constants, such
+#. as
+#. "i" (square root of -1)
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Constants"
 msgstr "ذخرسفشرفس"
 
+#. Translators: This refers to symbols that appear at the end of a number,
+#. such
+#. as the percent sign (%) and metric affixes
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Affixes"
 msgstr "شببهطثس"
@@ -11468,10 +11516,13 @@ msgstr "شببهطثس"
 msgid "Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)"
 msgstr "حثقذثرف سهلر (%) شري وثفقهذ شببهطثس (ي, ذ, و, ع, ر, ح, ن, و, ل, ف)"
 
+#. Translators: This refers to basic mathematical functions such as "square
+#. root"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Basic functions"
 msgstr "زشسهذ بعرذفهخرس"
 
+#. Translators: This refers to mathematical Sine, Cosine and Tan
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Trigonometric functions"
 msgstr "فقهلخرخوثفقهذ بعرذفهخرس"
@@ -11496,14 +11547,6 @@ msgstr "ث رخفشفهخر"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "1e and the exponent"
 msgstr "1ث شري فاث ثطحخرثرف"
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Calculate"
-msgstr "ذشمذعمشفث"
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Output"
-msgstr "ذشمذعمشفخق خعفحعف"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -14061,6 +14104,10 @@ msgstr ""
 "غخع شيي مثشقرثقس فخ فاث ثطذثحفهخر مهسف, ذمهذن لثرثقشفث ثطذثحفهخر "
 "ذثقفهبهذشفثس زثمخص."
 
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Invalidate Certificates"
+msgstr "هردشمهيشفث ذثقفهبهذشفثس"
+
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "ثرقخمموثرف هربخقوشفهخر"
@@ -16153,6 +16200,22 @@ msgid "Input quantity and press enter."
 msgstr "هرحعف ضعشرفهفغ شري حقثسس ثرفثق."
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Increase"
+msgstr "هرذقثشسث"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Decrease"
+msgstr "يثذقثشسث"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Remove"
+msgstr "قثوخدث"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Discount or activation code"
+msgstr "يهسذخعرف خق شذفهدشفهخر ذخيث"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "discount or activation code"
 msgstr "يهسذخعرف خق شذفهدشفهخر ذخيث"
 
@@ -16763,6 +16826,10 @@ msgid "Max per-file size: {max_filesize}MB"
 msgstr "وشط حثق-بهمث سهظث: {max_filesize}وز"
 
 #: cms/templates/asset_index.html
+msgid "URL:"
+msgstr "عقم:"
+
+#: cms/templates/asset_index.html
 msgid "Choose File"
 msgstr "ذاخخسث بهمث"
 
@@ -17036,6 +17103,11 @@ msgid ""
 msgstr ""
 "فاث حعزمهذ يهسحمشغ رشوث بخق فاث رثص ذخعقسث. (فاهس رشوث هس خبفثر فاث سشوث شس "
 "فاث خقهلهرشم ذخعقسث رشوث.)"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+msgid "Organization"
+msgstr "خقلشرهظشفهخر"
 
 #. Translators: This is an example for the name of the organization sponsoring
 #. a course, seen when filling out the form to create a new course. The
@@ -18976,7 +19048,8 @@ msgstr ""
 msgid "Program Administration"
 msgstr "حقخلقشو شيوهرهسفقشفهخر"
 
-#: cms/templates/register.html cms/templates/widgets/header.html
+#: cms/templates/register.html cms/templates/temp-course-landing.html
+#: cms/templates/widgets/header.html
 msgid "Sign Up"
 msgstr "سهلر عح"
 
@@ -19626,6 +19699,50 @@ msgstr "دهسهزهمهفغ"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "فاهس زمخذن ذخرفشهرس وعمفهحمث ذخوحخرثرفس."
+
+#: cms/templates/temp-course-landing.html
+msgid "Circuits and Electronics"
+msgstr "ذهقذعهفس شري ثمثذفقخرهذس"
+
+#: cms/templates/temp-course-landing.html
+msgid "Massachusetts Institute of Technology"
+msgstr "وشسسشذاعسثففس هرسفهفعفث خب فثذارخمخلغ"
+
+#: cms/templates/temp-course-landing.html
+msgid "Forgot?"
+msgstr "بخقلخف?"
+
+#: cms/templates/temp-course-landing.html
+msgid ""
+"Ut laoreet dolore magna aliquam erat volutpat ut wisi enim ad minim veniam "
+"quis nostrud. Est usus legentis in iis qui, facit eorum claritatem "
+"Investigationes demonstraverunt lectores. Vel illum dolore eu feugiat nulla "
+"facilisis at vero eros, et accumsan et iusto? Te feugait nulla facilisi nam "
+"liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming!"
+" Et quinta decima eodem modo typi qui nunc nobis, videntur parum clari fiant"
+" sollemnes in? Diam nonummy nibh euismod tincidunt exerci tation "
+"ullamcorper, suscipit lobortis nisl ut aliquip ex? Nunc putamus parum, "
+"claram anteposuerit litterarum formas humanitatis per seacula quarta decima."
+msgstr ""
+"عف مشخقثثف يخمخقث وشلرش شمهضعشو ثقشف دخمعفحشف عف صهسه ثرهو شي وهرهو دثرهشو "
+"ضعهس رخسفقعي. ثسف عسعس مثلثرفهس هر ههس ضعه, بشذهف ثخقعو ذمشقهفشفثو "
+"هردثسفهلشفهخرثس يثوخرسفقشدثقعرف مثذفخقثس. دثم هممعو يخمخقث ثع بثعلهشف رعممش "
+"بشذهمهسهس شف دثقخ ثقخس, ثف شذذعوسشر ثف هعسفخ? فث بثعلشهف رعممش بشذهمهسه رشو "
+"مهزثق فثوحخق ذعو سخمعفش رخزهس ثمثهبثري خحفهخر ذخرلعث رهاهم هوحثقيهثف يخوهرل!"
+" ثف ضعهرفش يثذهوش ثخيثو وخيخ فغحه ضعه رعرذ رخزهس, دهيثرفعق حشقعو ذمشقه بهشرف"
+" سخممثورثس هر? يهشو رخرعووغ رهزا ثعهسوخي فهرذهيعرف ثطثقذه فشفهخر "
+"عممشوذخقحثق, سعسذهحهف مخزخقفهس رهسم عف شمهضعهح ثط? رعرذ حعفشوعس حشقعو, "
+"ذمشقشو شرفثحخسعثقهف مهففثقشقعو بخقوشس اعوشرهفشفهس حثق سثشذعمش ضعشقفش يثذهوش."
+
+#: cms/templates/temp-course-landing.html
+msgid ""
+"Gothica quam nunc putamus parum claram anteposuerit litterarum formas "
+"humanitatis per seacula. Facilisi nam liber tempor cum soluta nobis "
+"eleifend."
+msgstr ""
+"لخفاهذش ضعشو رعرذ حعفشوعس حشقعو ذمشقشو شرفثحخسعثقهف مهففثقشقعو بخقوشس "
+"اعوشرهفشفهس حثق سثشذعمش. بشذهمهسه رشو مهزثق فثوحخق ذعو سخمعفش رخزهس "
+"ثمثهبثري."
 
 #: cms/templates/temp-course-landing.html
 msgid "{platform_name} edge"

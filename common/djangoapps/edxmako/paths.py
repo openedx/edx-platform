@@ -10,6 +10,7 @@ import pkg_resources
 from django.conf import settings
 from mako.lookup import TemplateLookup
 
+from microsite_configuration import microsite
 from . import LOOKUP
 
 
@@ -45,6 +46,18 @@ class DynamicTemplateLookup(TemplateLookup):
         # Also clear the internal caches. Ick.
         self._collection.clear()
         self._uri_cache.clear()
+
+    def get_template(self, uri):
+        """
+        Overridden method which will hand-off the template lookup to the microsite subsystem
+        """
+        microsite_template = microsite.get_template(uri)
+
+        return (
+            microsite_template
+            if microsite_template
+            else super(DynamicTemplateLookup, self).get_template(uri)
+        )
 
 
 def clear_lookups(namespace):

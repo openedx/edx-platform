@@ -34,7 +34,7 @@
 # laurentFUN <laurent.at.fun@gmail.com>, 2014-2015
 # Marco Morales, 2014
 # moocit-france <contact@moocit.fr>, 2014-2015
-# mtyaka <mtyaka@gmail.com>, 2015
+# mtyaka <mtyaka@gmail.com>, 2015-2016
 # Nikolaos Maris, 2013
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
@@ -1997,6 +1997,8 @@ msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
 "them."
 msgstr ""
+"Vos réponses ont été enregistrées mais pas encore évaluées. Cliquez sur "
+"'{button_name}' pour les évaluer. "
 
 #. Translators: A student must "make an attempt" to solve the problem on the
 #. page before they can reset it.

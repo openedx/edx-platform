@@ -5,18 +5,26 @@ import mock
 from nose.plugins.attrib import attr
 from urllib import urlencode
 
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory
 
 from .helpers import LoginEnrollmentTestCase
+
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
 @attr('shard_1')
@@ -83,6 +91,42 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         url = reverse('info', args=['not/a/course'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+
+class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test for unenrolled student tries to access ccx.
+    Note: Only CCX coach can enroll a student in CCX. In sum self-registration not allowed.
+    """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @classmethod
+    def setUpClass(cls):
+        super(CourseInfoTestCaseCCX, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(CourseInfoTestCaseCCX, self).setUp()
+
+        # Create ccx coach account
+        self.coach = coach = AdminFactory.create(password="test")
+        self.client.login(username=coach.username, password="test")
+
+    def test_redirect_to_dashboard_unenrolled_ccx(self):
+        """
+        Assert that when unenroll student tries to access ccx do not allow him self-register.
+        Redirect him to his student dashboard
+        """
+        # create ccx
+        ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+
+        self.setup_user()
+        url = reverse('info', args=[ccx_locator])
+        response = self.client.get(url)
+        expected = reverse('dashboard')
+        self.assertRedirects(response, expected, status_code=302, target_status_code=200)
 
 
 @attr('shard_1')
