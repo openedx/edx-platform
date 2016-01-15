@@ -110,7 +110,7 @@ FEATURES = {
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
-    'ENABLE_DISCUSSION_HOME_PANEL': False,
+    'ENABLE_DISCUSSION_HOME_PANEL': True,
 
     # Set this to True if you want the discussion digest emails enabled automatically for new users.
     # This will be set on all new account registrations.
