@@ -276,8 +276,9 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_info_in_response(self):
         """
-        Test that certificate has been created and rendered properly.
+        Test that certificate has been created and rendered properly with non-audit course mode.
         """
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
         response = self.client.ajax_post(
             self._url(),
             data=CERTIFICATE_JSON_WITH_SIGNATORIES
@@ -297,6 +298,22 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         self.assertEqual(data[0]['name'], 'Test certificate')
         self.assertEqual(data[0]['description'], 'Test description')
         self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_certificate_info_not_in_response(self):
+        """
+        Test that certificate has not been rendered audit only course mode.
+        """
+        response = self.client.ajax_post(
+            self._url(),
+            data=CERTIFICATE_JSON_WITH_SIGNATORIES
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        # in html response
+        result = self.client.get_html(self._url())
+        self.assertNotIn('Test certificate', result.content)
 
     def test_unsupported_http_accept_header(self):
         """

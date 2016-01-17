@@ -2,21 +2,23 @@
 <%!
 import json
 
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
 %>
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="js_extra">
 <%static:require_module module_name="js/financial-assistance/financial_assistance_form_factory" class_name="FinancialAssistanceFactory">
 FinancialAssistanceFactory({
-    fields: ${escape_json_dumps(fields)},
-    user_details: ${escape_json_dumps(user_details)},
-    header_text: ${escape_json_dumps(header_text)},
-    student_faq_url: ${json.dumps(student_faq_url)},
-    dashboard_url: ${json.dumps(dashboard_url)},
-    account_settings_url: ${json.dumps(account_settings_url)},
-    platform_name: ${escape_json_dumps(platform_name)},
-    submit_url: ${json.dumps(submit_url)}
+    fields: ${fields | n, dump_js_escaped_json},
+    user_details: ${user_details | n, dump_js_escaped_json},
+    header_text: ${header_text | n, dump_js_escaped_json},
+    student_faq_url: '${student_faq_url | n, js_escaped_string}',
+    dashboard_url: '${dashboard_url | n, js_escaped_string}',
+    account_settings_url: '${account_settings_url | n, js_escaped_string}',
+    platform_name: '${platform_name | n, js_escaped_string}',
+    submit_url: '${submit_url | n, js_escaped_string}'
 });
 </%static:require_module>
 </%block>
