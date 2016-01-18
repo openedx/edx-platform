@@ -182,6 +182,9 @@ FEATURES = {
     'ENABLE_SPECIAL_EXAMS': False,
 
     'ORGANIZATIONS_APP': False,
+
+    # Enable reporting metrics to DataDog
+    'ENABLE_DATADOG_REPORTING': False,
 }
 
 ENABLE_JASMINE = False

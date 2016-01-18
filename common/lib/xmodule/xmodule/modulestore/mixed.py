@@ -332,7 +332,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # If there is a mapping that match this org/course/run, use that
         for key in possible_keys:
             if key in self.mappings:
-                return self.mappings[key]
+                return key
 
         # Otherwise, return the key created by the default store
         return self.default_modulestore.make_course_key(org, course, run)
