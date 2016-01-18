@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
-from microsite_configuration.templatetags.microsite import platform_name
 
 # App that handles subdomain specific branding
 import branding
@@ -41,7 +40,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
       <a href="${marketing_link('ROOT')}" itemprop="url">
         <%block name="navigation_logo">
-            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}" itemprop="logo" />
+            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
         </%block>
       </a>
     </h1>
