@@ -94,7 +94,13 @@ class Thread(models.Model):
                     total_results=total_results
                 )
             )
-        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1), response.get('corrected_text')
+        return (
+            response.get('collection', []),
+            response.get('page', 1),
+            response.get('num_pages', 1),
+            response.get('corrected_text'),
+            response.get('thread_count'),
+        )
 
     @classmethod
     def url_for_threads(cls, params={}):
