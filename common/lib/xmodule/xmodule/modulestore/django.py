@@ -123,8 +123,6 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-load_function_mapping = {}
-
 def create_modulestore_instance(
         engine,
         content_store,
@@ -138,11 +136,7 @@ def create_modulestore_instance(
     """
     This will return a new instance of a modulestore given an engine and options
     """
-    if engine in load_function_mapping:
-        class_ = load_function_mapping[engine]
-    else:
-        class_ = load_function(engine)
-        load_function_mapping[engine] = class_
+    class_ = load_function(engine)
 
     _options = {}
     _options.update(options)
