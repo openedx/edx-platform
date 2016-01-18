@@ -146,7 +146,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         )
     )
 
-    threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
+    threads, page, num_pages, corrected_text, _ = cc.Thread.search(query_params)
 
     # If not provided with a discussion id, filter threads by commentable ids
     # which are accessible to the current user.
@@ -511,7 +511,7 @@ def followed_threads(request, course_key, user_id):
         if group_id is not None:
             query_params['group_id'] = group_id
 
-        threads, page, num_pages = profiled_user.subscribed_threads(query_params)
+        threads, page, num_pages, _ = profiled_user.subscribed_threads(query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
