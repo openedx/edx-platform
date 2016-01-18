@@ -308,18 +308,18 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": unicode(self.course.id), "following": ""})
-        expected_respoonse = make_paginated_api_response(
+        expected_response = make_paginated_api_response(
             results=expected_threads,
-            count=0,
+            count=1,
             num_pages=2,
             next_link="http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
             previous_link=None
         )
-        expected_respoonse.update({"text_search_rewrite": None})
+        expected_response.update({"text_search_rewrite": None})
         self.assert_response_correct(
             response,
             200,
-            expected_respoonse
+            expected_response
         )
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
@@ -954,7 +954,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             response,
             200,
             make_paginated_api_response(
-                results=expected_comments, count=0, num_pages=10, next_link=next_link, previous_link=None
+                results=expected_comments, count=100, num_pages=10, next_link=next_link, previous_link=None
             )
         )
         self.assert_query_params_equal(
@@ -1440,3 +1440,29 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         self.register_get_comment_error_response(self.comment_id, 404)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
+
+    def test_pagination(self):
+        """
+        Test that pagination parameters are correctly plumbed through to the
+        comments service and that a 404 is correctly returned if a page past the
+        end is requested
+        """
+        self.register_get_user_response(self.user)
+        cs_comment_child = self.make_comment_data("test_child_comment", self.comment_id, children=[])
+        cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
+        cs_thread = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "children": [cs_comment],
+        })
+        self.register_get_thread_response(cs_thread)
+        self.register_get_comment_response(cs_comment)
+        response = self.client.get(
+            self.url,
+            {"comment_id": self.comment_id, "page": "18", "page_size": "4"}
+        )
+        self.assert_response_correct(
+            response,
+            404,
+            {"developer_message": "Page not found (No results on this page)."}
+        )

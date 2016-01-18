@@ -40,23 +40,22 @@ class DiscussionAPIPagination(NamespacedPageNumberPagination):
     Subclasses NamespacedPageNumberPagination to provide custom implementation of pagination metadata
     by overriding it's methods
     """
-    def __init__(self, request, page_num, num_pages):
+    def __init__(self, request, page_num, num_pages, result_count=0):
         """
         Overrides parent constructor to take information from discussion api
         essential for the parent method
         """
         self.page = _Page(page_num, num_pages)
         self.base_url = request.build_absolute_uri()
+        self.count = result_count
 
         super(DiscussionAPIPagination, self).__init__()
 
     def get_result_count(self):
         """
-        A count can't be calculated with the information coming from the
-        Forum's api, so returning 0 for the parent method to work
+        Returns total number of results
         """
-        # TODO: return actual count
-        return 0
+        return self.count
 
     def get_num_pages(self):
         """

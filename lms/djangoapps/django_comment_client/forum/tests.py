@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from edxmako.tests import mako_middleware_process_request
 
 from django_comment_common.utils import ThreadContext
@@ -96,7 +97,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
         # for the profiled user's active threads
-        mock_threads.return_value = [], 1, 1
+        mock_threads.return_value = CommentClientPaginatedResult(collection=[], page=1, num_pages=1)
 
         # Mock the code that makes the HTTP request to the cs_comment_service app
         # that gets the current user's info
