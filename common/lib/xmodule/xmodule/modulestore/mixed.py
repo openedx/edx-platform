@@ -324,11 +324,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         This key may represent a course that doesn't exist in this modulestore.
         """
+        possible_keys = [
+            store.make_course_key(org, course, run)
+            for store in self.modulestores
+        ]
+
         # If there is a mapping that match this org/course/run, use that
-        for course_id, store in self.mappings.iteritems():
-            candidate_key = store.make_course_key(org, course, run)
-            if candidate_key == course_id:
-                return candidate_key
+        for key in possible_keys:
+            if key in self.mappings:
+                return self.mappings[key]
 
         # Otherwise, return the key created by the default store
         return self.default_modulestore.make_course_key(org, course, run)
