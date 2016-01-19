@@ -173,7 +173,7 @@ def drag(page, source_index, target_index, placeholder_height=0):
     # from nose.tools import set_trace
     # set_trace()
     action.click_and_hold(source).move_to_element_with_offset(
-        target, 0, placeholder_height
+        target, 3, placeholder_height
     )
     if placeholder_height == 0:
         action.release(target).perform()
