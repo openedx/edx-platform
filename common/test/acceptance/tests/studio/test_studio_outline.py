@@ -110,7 +110,7 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
     def drag_and_verify(self, source, target, expected_ordering, outline_page=None):
         self.do_action_and_verify(
             outline_page,
-            lambda (outline): drag(outline, source, target),
+            lambda (outline): drag(outline, source, target, 3),
             expected_ordering
         )
 

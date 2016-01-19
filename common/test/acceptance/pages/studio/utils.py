@@ -165,13 +165,13 @@ def drag(page, source_index, target_index, placeholder_height=0):
     This should drag the element with the source_index drag handle BEFORE the
     one with the target_index drag handle.
     """
-    # from nose.tools import set_trace
-    # set_trace()
     draggables = page.q(css='.drag-handle')
     source = draggables[source_index]
     target = draggables[target_index]
     action = ActionChains(page.browser)
     # action.drag_and_drop(source, target).perform()
+    # from nose.tools import set_trace
+    # set_trace()
     action.click_and_hold(source).move_to_element_with_offset(
         target, 0, placeholder_height
     )
@@ -182,8 +182,8 @@ def drag(page, source_index, target_index, placeholder_height=0):
     # See the 'saving' widget appear, before waiting for it to disappear
     # page.wait_for_element_visibility('.wrapper-notification-mini.is-shown', 'See "saving" widget', timeout=7)
     page.wait_for_ajax()
-    from time import sleep
-    sleep(2)
+    # from time import sleep
+    # sleep(2)
     wait_for_notification(page)
 
 
