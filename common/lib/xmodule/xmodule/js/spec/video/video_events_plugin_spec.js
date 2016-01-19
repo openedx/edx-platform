@@ -32,18 +32,19 @@
             });
         });
 
-        it('can emit "play_video" event when canEmitPlayVideoEvent returns true', function () {
-            spyOn(state.videoPlayer, 'canEmitPlayVideoEvent').andReturn(true);
+        it('can emit "play_video" event when emitPlayVideoEvent is true', function () {
+            state.videoEventsPlugin.emitPlayVideoEvent = true;
             state.el.trigger('play');
             expect(Logger.log).toHaveBeenCalledWith('play_video', {
                 id: 'id',
                 code: 'html5',
                 currentTime: 10
             });
+            expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeFalsy();
         });
 
-        it('can not emit "play_video" event when canEmitPlayVideoEvent returns false', function () {
-            spyOn(state.videoPlayer, 'canEmitPlayVideoEvent').andReturn(false);
+        it('can not emit "play_video" event when emitPlayVideoEvent is false', function () {
+            state.videoEventsPlugin.emitPlayVideoEvent = false;
             state.el.trigger('play');
             expect(Logger.log).not.toHaveBeenCalled();
         });
@@ -55,6 +56,7 @@
                 code: 'html5',
                 currentTime: 10
             });
+            expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
 
         it('can emit "speed_change_video" event', function () {
@@ -86,6 +88,7 @@
                 code: 'html5',
                 currentTime: 10
             });
+            expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
 
             Logger.log.reset();
             state.el.trigger('stop');
@@ -94,6 +97,7 @@
                 code: 'html5',
                 currentTime: 10
             });
+            expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
 
         it('can emit "skip_video" event', function () {

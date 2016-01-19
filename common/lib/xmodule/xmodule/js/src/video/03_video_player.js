@@ -51,8 +51,7 @@ function (HTML5Video, Resizer) {
             update: update,
             figureOutStartEndTime: figureOutStartEndTime,
             figureOutStartingTime: figureOutStartingTime,
-            updatePlayTime: updatePlayTime,
-            canEmitPlayVideoEvent: canEmitPlayVideoEvent
+            updatePlayTime: updatePlayTime
         };
 
     VideoPlayer.prototype = methodsDict;
@@ -129,8 +128,6 @@ function (HTML5Video, Resizer) {
             state.videoPlayer.PlayerState = HTML5Video.PlayerState;
         }
 
-        state.videoPlayer.emitPlayVideoEvent = true;
-
         state.videoPlayer.currentTime = 0;
 
         state.videoPlayer.goToStartTime = true;
@@ -199,14 +196,6 @@ function (HTML5Video, Resizer) {
         if (state.isTouch) {
             dfd.resolve();
         }
-    }
-
-    function canEmitPlayVideoEvent() {
-        if (this.videoPlayer.emitPlayVideoEvent) {
-            this.videoPlayer.emitPlayVideoEvent = false;
-            return true;
-        }
-        return false;
     }
 
     function _updateVcrAndRegion(state, isYoutube) {
@@ -731,7 +720,6 @@ function (HTML5Video, Resizer) {
             case this.videoPlayer.PlayerState.PAUSED:
                 this.el.addClass('is-paused');
                 this.videoPlayer.onPause();
-                this.videoPlayer.emitPlayVideoEvent = true;
                 break;
             case this.videoPlayer.PlayerState.BUFFERING:
                 this.el.addClass('is-buffered');
@@ -740,7 +728,6 @@ function (HTML5Video, Resizer) {
             case this.videoPlayer.PlayerState.ENDED:
                 this.el.addClass('is-ended');
                 this.videoPlayer.onEnded();
-                this.videoPlayer.emitPlayVideoEvent = true;
                 break;
             case this.videoPlayer.PlayerState.CUED:
                 this.el.addClass('is-cued');
