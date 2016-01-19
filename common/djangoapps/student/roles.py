@@ -36,23 +36,25 @@ def register_access_role(cls):
 
 class RoleCache(object):
     """
-    A cache of the CourseAccessRoles held by a particular user
+    A cache of the CourseAccessRoles held by a particular user.
+
+    We do everything we can to avoid de-serialization overhead with CourseKeys,
+    since this is so frequently used.
     """
     def __init__(self, user):
         self._roles = set(
-            CourseAccessRole.objects.filter(user=user).all()
+            CourseAccessRole.objects.filter(user=user).values_list('role', 'course_id', 'org')
         )
 
     def has_role(self, role, course_id, org):
         """
         Return whether this RoleCache contains a role with the specified role, course_id, and org
         """
-        return any(
-            access_role.role == role and
-            access_role.course_id == course_id and
-            access_role.org == org
-            for access_role in self._roles
-        )
+        # OpaqueKeyField serialization is such that a blank in the DB gets
+        # translated to a None.
+        if course_id is None:
+            course_id = ''
+        return (role, unicode(course_id), org) in self._roles
 
 
 class AccessRole(object):
