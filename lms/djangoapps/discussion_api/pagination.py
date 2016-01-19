@@ -47,7 +47,6 @@ class DiscussionAPIPagination(NamespacedPageNumberPagination):
         """
         self.page = _Page(page_num, num_pages)
         self.base_url = request.build_absolute_uri()
-        self.num_pages = num_pages
 
         super(DiscussionAPIPagination, self).__init__()
 
@@ -63,7 +62,7 @@ class DiscussionAPIPagination(NamespacedPageNumberPagination):
         """
         Returns total number of pages the response is divided into
         """
-        return self.num_pages
+        return self.page.num_pages
 
     def get_next_link(self):
         """

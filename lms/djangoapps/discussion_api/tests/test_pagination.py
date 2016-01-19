@@ -23,31 +23,39 @@ class PaginationSerializerTest(TestCase):
 
     def test_empty(self):
         self.do_case(
-            [], 1, 0, make_paginated_api_response([], 0, 0, None, None)
+            [], 1, 0, make_paginated_api_response(
+                results=[], count=0, num_pages=0, next_link=None, previous_link=None
+            )
         )
 
     def test_only_page(self):
         self.do_case(
-            ["foo"], 1, 1, make_paginated_api_response(["foo"], 0, 1, None, None)
+            ["foo"], 1, 1, make_paginated_api_response(
+                results=["foo"], count=0, num_pages=1, next_link=None, previous_link=None
+            )
         )
 
     def test_first_of_many(self):
         self.do_case(
             ["foo"], 1, 3, make_paginated_api_response(
-                ["foo"], 0, 3, "http://testserver/test?page=2", None
+                results=["foo"], count=0, num_pages=3, next_link="http://testserver/test?page=2", previous_link=None
             )
         )
 
     def test_last_of_many(self):
         self.do_case(
             ["foo"], 3, 3, make_paginated_api_response(
-                ["foo"], 0, 3, None, "http://testserver/test?page=2"
+                results=["foo"], count=0, num_pages=3, next_link=None, previous_link="http://testserver/test?page=2"
             )
         )
 
     def test_middle_of_many(self):
         self.do_case(
             ["foo"], 2, 3, make_paginated_api_response(
-                ["foo"], 0, 3, "http://testserver/test?page=3", "http://testserver/test?page=1"
+                results=["foo"],
+                count=0,
+                num_pages=3,
+                next_link="http://testserver/test?page=3",
+                previous_link="http://testserver/test?page=1"
             )
         )

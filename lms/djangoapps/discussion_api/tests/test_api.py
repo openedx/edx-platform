@@ -695,7 +695,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         ]
 
         expected_result = make_paginated_api_response(
-            expected_threads, 0, 1, None, None
+            results=expected_threads, count=0, num_pages=1, next_link=None, previous_link=None
         )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
@@ -728,7 +728,9 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
     def test_pagination(self):
         # N.B. Empty thread list is not realistic but convenient for this test
-        expected_result = make_paginated_api_response([], 0, 3, "http://testserver/test_path?page=2", None)
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=3, next_link="http://testserver/test_path?page=2", previous_link=None
+        )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
             self.get_thread_list([], page=1, num_pages=3).data,
@@ -736,7 +738,11 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         )
 
         expected_result = make_paginated_api_response(
-            [], 0, 3, "http://testserver/test_path?page=3", "http://testserver/test_path?page=1"
+            results=[],
+            count=0,
+            num_pages=3,
+            next_link="http://testserver/test_path?page=3",
+            previous_link="http://testserver/test_path?page=1"
         )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
@@ -745,7 +751,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         )
 
         expected_result = make_paginated_api_response(
-            [], 0, 3, None, "http://testserver/test_path?page=2"
+            results=[], count=0, num_pages=3, next_link=None, previous_link="http://testserver/test_path?page=2"
         )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
@@ -761,7 +767,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
     @ddt.data(None, "rewritten search string")
     def test_text_search(self, text_search_rewrite):
         expected_result = make_paginated_api_response(
-            [], 0, 0, None, None
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
         expected_result.update({"text_search_rewrite": text_search_rewrite})
         self.register_get_threads_search_response([], text_search_rewrite, num_pages=0)
@@ -796,7 +802,9 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             following=True,
         ).data
 
-        expected_result = make_paginated_api_response([], 0, 0, None, None)
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
             result,
@@ -827,7 +835,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         ).data
 
         expected_result = make_paginated_api_response(
-            [], 0, 0, None, None
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
@@ -872,7 +880,9 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             order_by=http_query,
         ).data
 
-        expected_result = make_paginated_api_response([], 0, 0, None, None)
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(result, expected_result)
         self.assertEqual(
@@ -900,7 +910,9 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             order_direction=http_query,
         ).data
 
-        expected_result = make_paginated_api_response([], 0, 0, None, None)
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(result, expected_result)
         self.assertEqual(
@@ -1065,7 +1077,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         )
         self.assertEqual(
             self.get_comment_list(discussion_thread).data,
-            make_paginated_api_response([], 0, 1, None, None)
+            make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
         )
 
         question_thread = self.make_minimal_cs_thread({
@@ -1076,11 +1088,11 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         })
         self.assertEqual(
             self.get_comment_list(question_thread, endorsed=False).data,
-            make_paginated_api_response([], 0, 1, None, None)
+            make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
         )
         self.assertEqual(
             self.get_comment_list(question_thread, endorsed=True).data,
-            make_paginated_api_response([], 0, 1, None, None)
+            make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
         )
 
     def test_basic_query_params(self):

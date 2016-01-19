@@ -373,7 +373,7 @@ def make_minimal_cs_comment(overrides=None):
     return ret
 
 
-def make_paginated_api_response(results, count, num_pages, next_link, previous_link):
+def make_paginated_api_response(results=[], count=0, num_pages=0, next_link=None, previous_link=None):
     """
     Generates the response dictionary of paginated APIs with passed data
     """

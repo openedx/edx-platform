@@ -309,11 +309,11 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": unicode(self.course.id), "following": ""})
         expected_respoonse = make_paginated_api_response(
-            expected_threads,
-            0,
-            2,
-            "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
-            None
+            results=expected_threads,
+            count=0,
+            num_pages=2,
+            next_link="http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
+            previous_link=None
         )
         expected_respoonse.update({"text_search_rewrite": None})
         self.assert_response_correct(
@@ -384,7 +384,9 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {"course_id": unicode(self.course.id), "text_search": "test search string"}
         )
 
-        expected_response = make_paginated_api_response([], 0, 0, None, None)
+        expected_response = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
         expected_response.update({"text_search_rewrite": None})
         self.assert_response_correct(
             response,
@@ -414,7 +416,9 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             }
         )
 
-        expected_response = make_paginated_api_response([], 0, 0, None, None)
+        expected_response = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
         expected_response.update({"text_search_rewrite": None})
         self.assert_response_correct(
             response,
@@ -949,7 +953,9 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             200,
-            make_paginated_api_response(expected_comments, 0, 10, next_link, None)
+            make_paginated_api_response(
+                results=expected_comments, count=0, num_pages=10, next_link=next_link, previous_link=None
+            )
         )
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
