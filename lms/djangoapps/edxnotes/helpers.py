@@ -325,14 +325,15 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     try:
         collection = json.loads(response.content)
     except ValueError:
-        log.error("Invalid response received from notes api: response_content=%s", response.content)
-        raise EdxNotesParseError(_("Invalid response received from notes api."))
+        log.error("Invalid JSON response received from notes api: response_content=%s", response.content)
+        raise EdxNotesParseError(_("Invalid JSON response received from notes api."))
 
     # Verify response dict structure
     expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
     keys = collection.keys()
     if not keys or not all(key in expected_keys for key in keys):
-        raise EdxNotesParseError(_("Invalid response received from notes api."))
+        log.error("Incorrect data received from notes api: collection_data=%s", str(collection))
+        raise EdxNotesParseError(_("Incorrect data received from notes api."))
 
     filtered_results = preprocess_collection(request.user, course, collection['rows'])
     # Notes API is called from:
