@@ -15,12 +15,13 @@ import ddt
 import mock
 from PIL import Image
 
+from ..exceptions import ImageValidationError
 from ..images import (
     create_profile_images,
-    ImageValidationError,
     remove_profile_images,
     validate_uploaded_image,
-    get_valid_file_types,
+    _get_exif_orientation,
+    _get_valid_file_types,
 )
 from .helpers import make_image_file, make_uploaded_file
 
@@ -33,7 +34,7 @@ class TestValidateUploadedImage(TestCase):
     """
     FILE_UPLOAD_BAD_TYPE = (
         u'The file must be one of the following types: {valid_file_types}.'.format(
-            valid_file_types=get_valid_file_types()
+            valid_file_types=_get_valid_file_types()
         )
     )
 
@@ -146,24 +147,54 @@ class TestGenerateProfileImages(TestCase):
             100: "hundred.jpg",
             1000: "thousand.jpg",
         }
-        mock_storage = mock.Mock()
         with make_uploaded_file(dimensions=dimensions, extension=extension, content_type=content_type) as uploaded_file:
-            with mock.patch(
-                "openedx.core.djangoapps.profile_images.images.get_profile_image_storage",
-                return_value=mock_storage,
-            ):
-                create_profile_images(uploaded_file, requested_sizes)
-                names_and_files = [v[0] for v in mock_storage.save.call_args_list]
-                actual_sizes = {}
-                for name, file_ in names_and_files:
-                    # get the size of the image file and ensure it's square jpeg
-                    with closing(Image.open(file_)) as image_obj:
-                        width, height = image_obj.size
-                        self.assertEqual(width, height)
-                        self.assertEqual(image_obj.format, 'JPEG')
-                        actual_sizes[width] = name
-                self.assertEqual(requested_sizes, actual_sizes)
-                mock_storage.save.reset_mock()
+            names_and_files = self._create_mocked_profile_images(uploaded_file, requested_sizes)
+            actual_sizes = {}
+            self.assertEqual(len(names_and_files), 3)
+            for name, file_ in names_and_files:
+                # get the size of the image file and ensure it's square jpeg
+                with closing(Image.open(file_)) as image_obj:
+                    width, height = image_obj.size
+                    self.assertEqual(width, height)
+                    self.assertEqual(image_obj.format, 'JPEG')
+                    actual_sizes[width] = name
+            self.assertEqual(requested_sizes, actual_sizes)
+
+    def test_jpeg_with_exif_orientation(self):
+        requested_images = {10: "ten.jpg"}
+        rotate_90_clockwise = 8  # Value used in EXIF Orientation field.
+        with make_image_file(orientation=rotate_90_clockwise, extension='.jpg') as imfile:
+            names_and_files = self._create_mocked_profile_images(imfile, requested_images)
+        self.assertEqual(len(names_and_files), 1)
+        for file_ in [nf[1] for nf in names_and_files]:
+            with closing(Image.open(file_)) as image_obj:
+                self.assertEqual(image_obj.format, 'JPEG')
+                self.assertIn('exif', image_obj.info)
+                self.assertEqual(_get_exif_orientation(image_obj.info['exif']), rotate_90_clockwise)
+
+    def test_jpeg_without_exif_orientation(self):
+        requested_images = {10: "ten.jpg"}
+        with make_image_file(extension='.jpg') as imfile:
+            names_and_files = self._create_mocked_profile_images(imfile, requested_images)
+        self.assertEqual(len(names_and_files), 1)
+        for file_ in [nf[1] for nf in names_and_files]:
+            with closing(Image.open(file_)) as image_obj:
+                self.assertEqual(image_obj.format, 'JPEG')
+                self.assertNotIn('exif', image_obj.info)
+
+    def _create_mocked_profile_images(self, image_file, requested_images):
+        """
+        Create image files with mocked-out storage.  Return a list of tuples
+        consisting of the name and content of the file.
+        """
+        mock_storage = mock.Mock()
+        with mock.patch(
+            "openedx.core.djangoapps.profile_images.images.get_profile_image_storage",
+            return_value=mock_storage,
+        ):
+            create_profile_images(image_file, requested_images)
+        names_and_files = [v[0] for v in mock_storage.save.call_args_list]
+        return names_and_files
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
