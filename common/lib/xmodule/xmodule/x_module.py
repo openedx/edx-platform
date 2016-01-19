@@ -913,6 +913,7 @@ class ResourceTemplates(object):
     It finds the templates as directly in this directory under 'templates'.
     """
     template_packages = [__name__]
+    _cached_templates = {}
 
     @classmethod
     def templates(cls):
@@ -961,6 +962,9 @@ class ResourceTemplates(object):
         template_dir_name)
 
         """
+        if template_id in cls._cached_templates:
+            return cls._cached_templates[template_id]
+
         dirname = cls.get_template_dir()
         if dirname is not None:
             path = os.path.join(dirname, template_id)
@@ -969,6 +973,8 @@ class ResourceTemplates(object):
                     template_content = resource_string(pkg, path)
                     template = yaml.safe_load(template_content)
                     template['template_id'] = template_id
+
+                    cls._cached_templates[template_id] = template
                     return template
 
 
