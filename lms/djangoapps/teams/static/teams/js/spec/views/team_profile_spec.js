@@ -21,7 +21,7 @@ define([
             ];
 
         beforeEach(function () {
-            setFixtures('<div id="page-prompt"></div><div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>');
+            setFixtures('<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>');
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
@@ -74,29 +74,19 @@ define([
             return profileView;
         };
 
-        clickLeaveTeam = function(requests, view, confirmLeave) {
+        clickLeaveTeam = function(requests, view) {
             expect(view.$(leaveTeamLinkSelector).length).toBe(1);
 
             // click on Leave Team link under Team Details
             view.$(leaveTeamLinkSelector).click();
 
-            if (confirmLeave) {
-                // click on Confirm button on dialog
-                $('.prompt.warning .action-primary').click();
+            // expect a request to DELETE the team membership
+            AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'api/team/v0/team_membership/test-team,bilbo');
+            AjaxHelpers.respondWithNoContent(requests);
 
-                // expect a request to DELETE the team membership
-                AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'api/team/v0/team_membership/test-team,bilbo');
-                AjaxHelpers.respondWithNoContent(requests);
-
-                // expect a request to refetch the user's team memberships
-                AjaxHelpers.expectJsonRequest(requests, 'GET', '/api/team/v0/teams/test-team');
-                AjaxHelpers.respondWithJson(requests, createTeamModelData({country: 'US', language: 'en'}));
-            } else {
-                var requestCount = requests.length;
-                // click on Cancel button on dialog
-                $('.prompt.warning .action-secondary').click();
-                expect(requests.length).toBe(requestCount);
-            }
+            // expect a request to refetch the user's team memberships
+            AjaxHelpers.expectJsonRequest(requests, 'GET', '/api/team/v0/teams/test-team');
+            AjaxHelpers.respondWithJson(requests, createTeamModelData({country: 'US', language: 'en'}));
         };
 
         describe('DiscussionsView', function() {
@@ -121,7 +111,7 @@ define([
                     view = createTeamProfileView(requests, {membership: DEFAULT_MEMBERSHIP});
 
                 expect(view.$('.new-post-btn').length).toEqual(1);
-                clickLeaveTeam(requests, view, true);
+                clickLeaveTeam(requests, view);
                 expect(view.$('.new-post-btn').length).toEqual(0);
             });
         });
@@ -188,19 +178,8 @@ define([
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
                     assertTeamDetails(view, 1, true);
-                    clickLeaveTeam(requests, view, true);
+                    clickLeaveTeam(requests, view);
                     assertTeamDetails(view, 0, false);
-                });
-
-                it("wouldn't do anything if user click on Cancel button on dialog", function() {
-                    var requests = AjaxHelpers.requests(this);
-
-                    var view = createTeamProfileView(
-                        requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
-                    );
-                    assertTeamDetails(view, 1, true);
-                    clickLeaveTeam(requests, view, false);
-                    assertTeamDetails(view, 1, true);
                 });
 
                 it('shows correct error messages', function () {
@@ -210,10 +189,7 @@ define([
                         var view = createTeamProfileView(
                             requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                         );
-                        // click leave team link
                         view.$('.leave-team-link').click();
-                        // click Confirm button on dialog
-                        $('.prompt.warning .action-primary').click();
                         AjaxHelpers.respondWithTextError(requests, 400, errorMessage);
                         expect($('.msg-content .copy').text().trim()).toBe(expectedMessage);
                     };

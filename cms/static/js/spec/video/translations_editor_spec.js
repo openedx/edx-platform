@@ -12,6 +12,7 @@ function ($, _, Squire) {
             TranslationsItenTemplate = readFixtures(
                 'video/metadata-translations-item.underscore'
             ),
+            feedbackTpl = readFixtures('system-feedback.underscore'),
             modelStub = {
                 default_value: {
                     'en': 'en.srt',

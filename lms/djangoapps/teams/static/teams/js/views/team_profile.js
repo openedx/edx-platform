@@ -4,11 +4,10 @@
 ;(function (define) {
     'use strict';
     define(['backbone', 'underscore', 'gettext', 'teams/js/views/team_discussion',
-            'common/js/components/utils/view_utils',
             'teams/js/views/team_utils',
             'text!teams/templates/team-profile.underscore',
             'text!teams/templates/team-member.underscore'],
-        function (Backbone, _, gettext, TeamDiscussionView, ViewUtils, TeamUtils, teamTemplate, teamMemberTemplate) {
+        function (Backbone, _, gettext, TeamDiscussionView, TeamUtils, teamTemplate, teamMemberTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
                 errorMessage: gettext("An error occurred. Try again."),
@@ -73,28 +72,20 @@
                 leaveTeam: function (event) {
                     event.preventDefault();
                     var view = this;
-                    ViewUtils.confirmThenRunOperation(
-                        gettext("Leave this team?"),
-                        gettext("If you leave, you can no longer post in this team's discussions. Your place will be available to another learner."),
-                        gettext("Confirm"),
-                        function() {
-                            $.ajax({
-                                type: 'DELETE',
-                                url: view.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
-                            }).done(function (data) {
-                                view.model.fetch()
-                                    .done(function() {
-                                        view.teamEvents.trigger('teams:update', {
-                                            action: 'leave',
-                                            team: view.model
-                                        });
-                                    });
-                            }).fail(function (data) {
-                                TeamUtils.parseAndShowMessage(data, view.errorMessage);
+                    $.ajax({
+                        type: 'DELETE',
+                        url: view.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
+                    }).done(function (data) {
+                        view.model.fetch()
+                            .done(function() {
+                                view.teamEvents.trigger('teams:update', {
+                                    action: 'leave',
+                                    team: view.model
+                                });
                             });
-                        }
-                    );
-                    $('.wrapper-prompt').focus();
+                    }).fail(function (data) {
+                        TeamUtils.parseAndShowMessage(data, view.errorMessage);
+                    });
                 }
             });
 

@@ -1,5 +1,4 @@
-define(["js/views/baseview", "underscore", "gettext", "common/js/components/views/feedback_prompt",
-      "common/js/components/views/feedback_notification"],
+define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_prompt", "js/views/feedback_notification"],
     function(BaseView, _, gettext, PromptView, NotificationView) {
 var AssetView = BaseView.extend({
   initialize: function() {
