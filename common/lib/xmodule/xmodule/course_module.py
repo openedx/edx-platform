@@ -395,6 +395,16 @@ class CourseFields(object):
         default=False,
         scope=Scope.settings
     )
+    ccx_connector = String(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        display_name=_("CCX Connector URL"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        help=_(
+            "URL for CCX Connector application for managing creation of CCXs. (optional)."
+            " Ignored unless 'Enable CCX' is set to 'true'."
+        ),
+        scope=Scope.settings, default=""
+    )
     allow_anonymous = Boolean(
         display_name=_("Allow Anonymous Discussion Posts"),
         help=_("Enter true or false. If true, students can create discussion posts that are anonymous to all users."),

@@ -92,6 +92,7 @@ class CourseMetadata(object):
         # Do not show enable_ccx if feature is not enabled.
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX'):
             filtered_list.append('enable_ccx')
+            filtered_list.append('ccx_connector')
 
         return filtered_list
 
