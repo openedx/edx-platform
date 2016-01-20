@@ -19,7 +19,7 @@ from openedx.core.djangolib.markup import HTML, Text
   <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" ></p>
 </div>
 
-%if settings.FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
+%if settings.FEATURES.get('ENABLE_GRADE_DOWNLOADS'):
   <div class="reports-download-container action-type-container">
     <hr>
     <h3 class="hd hd-3">${_("Reports")}</h3>

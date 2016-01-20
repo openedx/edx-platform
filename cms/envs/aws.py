@@ -317,6 +317,20 @@ else:
 
 DATABASES = AUTH_TOKENS['DATABASES']
 
+# The normal database user does not have enough permissions to run migrations.
+# Migrations are run with separate credentials, given as DB_MIGRATION_*
+# environment variables
+for name, database in DATABASES.items():
+    if name != 'read_replica':
+        database.update({
+            'ENGINE': os.environ.get('DB_MIGRATION_ENGINE', database['ENGINE']),
+            'USER': os.environ.get('DB_MIGRATION_USER', database['USER']),
+            'PASSWORD': os.environ.get('DB_MIGRATION_PASS', database['PASSWORD']),
+            'NAME': os.environ.get('DB_MIGRATION_NAME', database['NAME']),
+            'HOST': os.environ.get('DB_MIGRATION_HOST', database['HOST']),
+            'PORT': os.environ.get('DB_MIGRATION_PORT', database['PORT']),
+        })
+
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ENV_TOKENS.get(

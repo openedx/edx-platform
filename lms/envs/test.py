@@ -67,7 +67,7 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
 # Enable this feature for course staff grade downloads, to enable acceptance tests
-FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
+FEATURES['ENABLE_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
 GRADES_DOWNLOAD['ROOT_PATH'] += "-{}".format(os.getpid())

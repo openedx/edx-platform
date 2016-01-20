@@ -3,30 +3,34 @@ Tests for django admin commands in the verify_student module
 
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
+import boto
 from nose.tools import assert_equals
 from mock import patch
 
 from django.test import TestCase
 from django.conf import settings
 
+from common.test.utils import MockS3Mixin
 from student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from django.core.management import call_command
 from lms.djangoapps.verify_student.tests.test_models import (
-    MockKey, MockS3Connection, mock_software_secure_post,
-    mock_software_secure_post_error, FAKE_SETTINGS,
+    mock_software_secure_post, mock_software_secure_post_error, FAKE_SETTINGS,
 )
 
 
-# Lots of patching to stub in our own settings, S3 substitutes, and HTTP posting
+# Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
-@patch('lms.djangoapps.verify_student.models.S3Connection', new=MockS3Connection)
-@patch('lms.djangoapps.verify_student.models.Key', new=MockKey)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestVerifyStudentCommand(TestCase):
+class TestVerifyStudentCommand(MockS3Mixin, TestCase):
     """
     Tests for django admin commands in the verify_student module
     """
+
+    def setUp(self):
+        super(TestVerifyStudentCommand, self).setUp()
+        connection = boto.connect_s3()
+        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
 
     def create_and_submit(self, username):
         """
