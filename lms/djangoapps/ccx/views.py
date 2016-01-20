@@ -57,6 +57,7 @@ from lms.djangoapps.ccx.utils import (
     ccx_course,
     ccx_students_enrolling_center,
     get_ccx_for_coach,
+    get_ccx_by_ccx_id,
     get_date,
     parse_date,
     prep_course_for_grading,
@@ -94,8 +95,8 @@ def coach_dashboard(view):
 
         # if there is a ccx, we must validate that it is the ccx for this coach
         if ccx is not None:
-            coach_ccx = get_ccx_for_coach(course, request.user)
-            if coach_ccx is None or coach_ccx.id != ccx.id:
+            coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
+            if coach_ccx is None:
                 return HttpResponseForbidden(
                     _('You must be the coach for this ccx to access this view')
                 )

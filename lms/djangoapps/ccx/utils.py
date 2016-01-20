@@ -128,6 +128,30 @@ def get_ccx_for_coach(course, coach):
     return None
 
 
+def get_ccx_by_ccx_id(course, coach, ccx_id):
+    """
+    Finds a CCX of given coach on given master course.
+
+    Arguments:
+        course (CourseDescriptor): Master course
+        coach (User): Coach to ccx
+        ccx_id (long): Id of ccx
+
+    Returns:
+     ccx (CustomCourseForEdX): Instance of CCX.
+    """
+    try:
+        ccx = CustomCourseForEdX.objects.get(
+            id=ccx_id,
+            course_id=course.id,
+            coach=coach
+        )
+    except CustomCourseForEdX.DoesNotExist:
+        return None
+
+    return ccx
+
+
 def get_valid_student_email(identifier):
     """
     Helper function to get an user email from an identifier and validate it.
