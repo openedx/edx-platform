@@ -1,6 +1,5 @@
 define(["js/views/baseview", "codemirror", "js/models/course_update",
-        "common/js/components/views/feedback_prompt", "common/js/components/views/feedback_notification",
-        "js/views/course_info_helper", "js/utils/modal", "common/js/components/utils/view_utils"],
+    "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal", "js/views/utils/view_utils"],
     function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils, ViewUtils) {
 
     var CourseInfoUpdateView = BaseView.extend({

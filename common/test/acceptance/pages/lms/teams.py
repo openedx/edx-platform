@@ -6,7 +6,6 @@ Teams pages.
 from .course_page import CoursePage
 from .discussion import InlineDiscussionPage
 from ..common.paging import PaginatedUIMixin
-from ...pages.studio.utils import confirm_prompt
 
 from .fields import FieldsMixin
 
@@ -321,17 +320,14 @@ class TeamPage(CoursePage, PaginatedUIMixin):
         """Verifies that team leave link is present"""
         return self.q(css='.leave-team-link').present
 
-    def click_leave_team_link(self, remaining_members=0, cancel=False):
+    def click_leave_team_link(self, remaining_members=0):
         """ Click on Leave Team link"""
         self.q(css='.leave-team-link').first.click()
-        confirm_prompt(self, cancel, require_notification=False)
-
-        if cancel is False:
-            self.wait_for(
-                lambda: self.join_team_button_present,
-                description="Join Team button did not become present"
-            )
-            self.wait_for_capacity_text(remaining_members)
+        self.wait_for(
+            lambda: self.join_team_button_present,
+            description="Join Team button did not become present"
+        )
+        self.wait_for_capacity_text(remaining_members)
 
     @property
     def team_members(self):

@@ -8,7 +8,7 @@ define([ // jshint ignore:line
     'js/views/baseview',
     'js/certificates/models/signatory',
     'js/certificates/views/signatory_details',
-    'common/js/components/utils/view_utils'
+    'js/views/utils/view_utils'
 ],
 function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils) {
     'use strict';

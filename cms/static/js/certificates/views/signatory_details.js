@@ -7,7 +7,7 @@ define([ // jshint ignore:line
     'backbone',
     'gettext',
     'js/utils/templates',
-    'common/js/components/utils/view_utils',
+    'js/views/utils/view_utils',
     'js/views/baseview',
     'js/certificates/views/signatory_editor'
 ],
