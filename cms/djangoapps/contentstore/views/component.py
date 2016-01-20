@@ -30,6 +30,11 @@ from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 
+try:
+    from xblock_django.models import XBlockDeprecatedAdvancedComponentConfig
+except ImportError:
+    XBlockDeprecatedAdvancedComponentConfig = None
+
 __all__ = [
     'ADVANCED_COMPONENT_POLICY_KEY',
     'container_handler',
@@ -69,8 +74,18 @@ def _advanced_component_types():
     """
     Return advanced component types which can be created.
     """
-    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in settings.DEPRECATED_ADVANCED_COMPONENT_TYPES]
+    if XBlockDeprecatedAdvancedComponentConfig:
+        deprecated_xblock_types = XBlockDeprecatedAdvancedComponentConfig.disabled_block_types()
+    else:
+        deprecated_xblock_types = ()
 
+    # Merge settings list with one in the admin config;
+    if hasattr(settings, 'DEPRECATED_ADVANCED_COMPONENT_TYPES'):
+        deprecated_xblock_types.extend(
+            c_type for c_type in settings.DEPRECATED_ADVANCED_COMPONENT_TYPES if c_type not in deprecated_xblock_types
+        )
+
+    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in deprecated_xblock_types]
 
 def _load_mixed_class(category):
     """

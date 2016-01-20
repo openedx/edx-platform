@@ -40,3 +40,31 @@ class XBlockDisableConfig(ConfigurationModel):
             return ()
 
         return config.disabled_blocks.split()
+
+
+class XBlockDeprecatedAdvancedComponentConfig(ConfigurationModel):
+    """
+    Configuration for deprecated XBlocks that should not be created in Studio.
+    """
+
+    class Meta(ConfigurationModel.Meta):
+        app_label = 'xblock_django'
+
+    disabled_blocks = TextField(
+        default='', blank=True,
+        help_text=_(
+            "Adding components in this list will disable the creation of new problem for "
+            "those components in Studio. Existing problems will work fine and one can edit"
+            "them in Studio."
+        )
+    )
+
+    @classmethod
+    def disabled_block_types(cls):
+        """ Return list of deprecated xblock types. """
+
+        config = cls.current()
+        if not config.enabled:
+            return ()
+
+        return config.disabled_blocks.split()

@@ -1054,6 +1054,8 @@ ADVANCED_COMPONENT_TYPES = [
 # Adding components in this list will disable the creation of new problem for
 # those components in Studio. Existing problems will work fine and one can edit
 # them in Studio.
+# Note: This setting is deprecated. This configuration has been moved to the
+# django admin and should be added there.
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 # Specify XBlocks that should be treated as advanced problems. Each entry is a
