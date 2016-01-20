@@ -23,6 +23,7 @@ from contentstore.views.item import (
 )
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
+from xblock_django.models import XBlockDisableConfig
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1328,6 +1329,11 @@ class TestComponentTemplates(CourseTestCase):
         super(TestComponentTemplates, self).setUp()
         self.templates = get_component_templates(self.course)
 
+        # Initialize the deprecated modules settings with empty list
+        XBlockDisableConfig.objects.create(
+            disabled_create_blocks='', enabled=True
+        )
+
     def get_templates_of_type(self, template_type):
         """
         Returns the templates for the specified type, or None if none is found.
@@ -1384,22 +1390,24 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(circuit_template.get('category'), 'problem')
         self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_deprecated_no_advance_component_button(self):
         """
         Test that there will be no `Advanced` button on unit page if units are
         deprecated provided that they are the only modules in `Advanced Module List`
         """
+        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
         self.course.advanced_modules.extend(['poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertNotIn('Advanced', button_names)
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_cannot_create_deprecated_problems(self):
         """
         Test that we can't create problems if they are deprecated
         """
+        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
         self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
@@ -1408,7 +1416,7 @@ class TestComponentTemplates(CourseTestCase):
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
         self.assertEqual(template_display_names, ['Annotation'])
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ['poll'])
     def test_create_non_deprecated_problems(self):
         """
         Test that we can create problems if they are not deprecated
@@ -1417,9 +1425,9 @@ class TestComponentTemplates(CourseTestCase):
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 3)
+        self.assertEqual(len(templates[0]['templates']), 2)
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation', 'Poll', 'Survey'])
+        self.assertEqual(template_display_names, ['Annotation', 'Survey'])
 
 
 @ddt.ddt
