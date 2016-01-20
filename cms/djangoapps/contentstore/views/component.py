@@ -262,38 +262,44 @@ def get_component_templates(courselike, library=False):
     # These modules should be specified as a list of strings, where the strings
     # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
     # enabled for the course.
-    course_advanced_keys = courselike.advanced_modules
-    advanced_component_templates = {"type": "advanced", "templates": [], "display_name": _("Advanced")}
+    course_advanced_keys = set(courselike.advanced_modules)
+    advanced_keys = sorted(course_advanced_keys.union(settings.DEFAULT_XBLOCKS))
+
+    advanced_component_templates = {
+        "type": "advanced",
+        "templates": [],
+        "display_name": _("Advanced")
+    }
     advanced_component_types = _advanced_component_types()
     # Set component types according to course policy file
-    if isinstance(course_advanced_keys, list):
-        for category in course_advanced_keys:
-            if category in advanced_component_types and category not in categories:
-                # boilerplates not supported for advanced components
-                try:
-                    component_display_name = xblock_type_display_name(category, default_display_name=category)
-                    advanced_component_templates['templates'].append(
-                        create_template_dict(
-                            component_display_name,
-                            category
-                        )
-                    )
-                    categories.add(category)
-                except PluginMissingError:
-                    # dhm: I got this once but it can happen any time the
-                    # course author configures an advanced component which does
-                    # not exist on the server. This code here merely
-                    # prevents any authors from trying to instantiate the
-                    # non-existent component type by not showing it in the menu
-                    log.warning(
-                        "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
+    for category in advanced_keys:
+        if category in advanced_component_types and category not in categories:
+            # boilerplates not supported for advanced components
+            try:
+                component_display_name = xblock_type_display_name(category, default_display_name=category)
+                advanced_component_templates['templates'].append(
+                    create_template_dict(
+                        component_display_name,
                         category
                     )
-    else:
-        log.error(
-            "Improper format for course advanced keys! %s",
-            course_advanced_keys
-        )
+                )
+                categories.add(category)
+            except PluginMissingError:
+                # This can happen any time the course author configures
+                # an advanced component which does not exist on the
+                # server. This code here merely prevents any authors
+                # from trying to instantiate the non-existent component
+                # type by not showing it in the menu.
+
+                # Ideally, we'd like something more nuanced here, which
+                # would raise a proper exception for missing edX components,
+                # and give course authors meaningful warnings about improper
+                # configurations.
+                log.warning(
+                    "Advanced component %s does not exist. It will "
+                    "not be added to the Studio new component menu.",
+                    category
+                )
     if len(advanced_component_templates['templates']) > 0:
         component_templates.insert(0, advanced_component_templates)
 

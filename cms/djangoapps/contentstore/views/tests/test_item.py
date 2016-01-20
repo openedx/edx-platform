@@ -1335,11 +1335,21 @@ class TestComponentTemplates(CourseTestCase):
         template_dict = next((template for template in self.templates if template.get('type') == template_type), None)
         return template_dict.get('templates') if template_dict else None
 
-    def get_template(self, templates, display_name):
+    def get_template(self, templates, category=None, display_name=None):
         """
-        Returns the template which has the specified display name.
+        Returns the template which matches the specified pattern
         """
-        return next((template for template in templates if template.get('display_name') == display_name), None)
+        def pmatch(template):
+            '''
+            Check whether a template matches the specified pattern.
+            '''
+            if category and template.get('category') != category:
+                return False
+            if display_name and template.get('display_name') != display_name:
+                return False
+            return True
+
+        return next((template for template in templates if pmatch(template)), None)
 
     def test_basic_components(self):
         """
@@ -1349,7 +1359,7 @@ class TestComponentTemplates(CourseTestCase):
         self.assertIsNotNone(self.get_templates_of_type('html'))
         self.assertIsNotNone(self.get_templates_of_type('problem'))
         self.assertIsNotNone(self.get_templates_of_type('video'))
-        self.assertIsNone(self.get_templates_of_type('advanced'))
+        self.assertIsNotNone(self.get_templates_of_type('advanced'))
 
     def test_advanced_components(self):
         """
@@ -1358,37 +1368,39 @@ class TestComponentTemplates(CourseTestCase):
         self.course.advanced_modules.append('word_cloud')
         self.templates = get_component_templates(self.course)
         advanced_templates = self.get_templates_of_type('advanced')
-        self.assertEqual(len(advanced_templates), 1)
-        world_cloud_template = advanced_templates[0]
-        self.assertEqual(world_cloud_template.get('category'), 'word_cloud')
-        self.assertEqual(world_cloud_template.get('display_name'), u'Word cloud')
-        self.assertIsNone(world_cloud_template.get('boilerplate_name', None))
+        word_cloud = self.get_template(advanced_templates, category='word_cloud')
+        self.assertIsNotNone(word_cloud)
+        self.assertEqual(word_cloud.get('display_name'), u'Word cloud')
+        self.assertIsNone(word_cloud.get('boilerplate_name', None))
 
         # Verify that non-advanced components are not added twice
         self.course.advanced_modules.append('video')
         self.course.advanced_modules.append('openassessment')
         self.templates = get_component_templates(self.course)
         advanced_templates = self.get_templates_of_type('advanced')
-        self.assertEqual(len(advanced_templates), 1)
-        only_template = advanced_templates[0]
-        self.assertNotEqual(only_template.get('category'), 'video')
-        self.assertNotEqual(only_template.get('category'), 'openassessment')
+        self.assertIsNone(self.get_template(advanced_templates, category='video'))
+        self.assertIsNone(self.get_template(advanced_templates, category='openassessment'))
 
     def test_advanced_problems(self):
         """
         Test the handling of advanced problem templates.
         """
         problem_templates = self.get_templates_of_type('problem')
-        circuit_template = self.get_template(problem_templates, u'Circuit Schematic Builder')
+        circuit_template = self.get_template(problem_templates,
+                                             display_name=u'Circuit Schematic Builder')
         self.assertIsNotNone(circuit_template)
         self.assertEqual(circuit_template.get('category'), 'problem')
-        self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
+        self.assertEqual(circuit_template.get('boilerplate_name'),
+                         'circuitschematic.yaml')
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES',
+           ["poll", "survey"])
+    @patch('django.conf.settings.DEFAULT_XBLOCKS', [])
     def test_deprecated_no_advance_component_button(self):
         """
-        Test that there will be no `Advanced` button on unit page if units are
-        deprecated provided that they are the only modules in `Advanced Module List`
+        Test that there will be no `Advanced` button on unit page if units
+        are deprecated provided that they are the only modules in
+        `Advanced Module List`
         """
         self.course.advanced_modules.extend(['poll', 'survey'])
         templates = get_component_templates(self.course)
@@ -1404,9 +1416,13 @@ class TestComponentTemplates(CourseTestCase):
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 1)
-        template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation'])
+        advanced_templates = templates[0]['templates']
+        self.assertIsNone(self.get_template(advanced_templates,
+                                            category=u'poll'))
+        self.assertIsNone(self.get_template(advanced_templates,
+                                            category=u'survey'))
+        self.assertIsNotNone(self.get_template(advanced_templates,
+                                               category=u'annotatable'))
 
     @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_create_non_deprecated_problems(self):
@@ -1417,9 +1433,13 @@ class TestComponentTemplates(CourseTestCase):
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 3)
-        template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation', 'Poll', 'Survey'])
+        advanced_templates = templates[0]['templates']
+        self.assertIsNotNone(self.get_template(advanced_templates,
+                                               category=u'poll'))
+        self.assertIsNotNone(self.get_template(advanced_templates,
+                                               category=u'survey'))
+        self.assertIsNotNone(self.get_template(advanced_templates,
+                                               category=u'annotatable'))
 
 
 @ddt.ddt

@@ -362,6 +362,21 @@ XBLOCK_MIXINS = (
 # xblocks can be added via advanced settings
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
+# This is a list of official, supported XBlocks which will be shown in
+# all courses to all course authors.
+DEFAULT_XBLOCKS = [
+    'done',
+    'google-calendar',
+    'google-document',
+    'library_content',
+    'lti_consumer',
+    'officemix',
+    'oppia',
+    'poll',
+    'recommender',
+    'split_test',
+    'survey']
+
 ############################ Modulestore Configuration ################################
 MODULESTORE_BRANCH = 'draft-preferred'
 
@@ -1003,6 +1018,8 @@ DEFAULT_COURSE_LANGUAGE = "en"
 #   )
 #
 # To use this block, add 'foobar-block' to the ADVANCED_COMPONENT_TYPES list.
+
+
 
 ADVANCED_COMPONENT_TYPES = [
     'annotatable',
