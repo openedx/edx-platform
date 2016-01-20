@@ -342,7 +342,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     else:
         # certificate is being viewed by learner or public
         try:
-            user_certificate = GeneratedCertificate.eligible_certificates.get(
+            user_certificate = GeneratedCertificate.objects.get(
                 user=user,
                 course_id=course_key,
                 status=CertificateStatuses.downloadable
@@ -459,7 +459,7 @@ def render_cert_by_uuid(request, certificate_uuid):
     This public view generates an HTML representation of the specified certificate
     """
     try:
-        certificate = GeneratedCertificate.eligible_certificates.get(
+        certificate = GeneratedCertificate.objects.get(
             verify_uuid=certificate_uuid,
             status=CertificateStatuses.downloadable
         )

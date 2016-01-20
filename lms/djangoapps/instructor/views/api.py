@@ -2875,7 +2875,7 @@ def add_certificate_exception(course_key, student, certificate_exception):
         }
     )
 
-    generated_certificate = GeneratedCertificate.eligible_certificates.filter(
+    generated_certificate = GeneratedCertificate.objects.filter(
         user=student,
         course_id=course_key,
         status=CertificateStatuses.downloadable,
@@ -2912,10 +2912,7 @@ def remove_certificate_exception(course_key, student):
         )
 
     try:
-        generated_certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
-            user=student,
-            course_id=course_key
-        )
+        generated_certificate = GeneratedCertificate.objects.get(user=student, course_id=course_key)
         generated_certificate.invalidate()
     except ObjectDoesNotExist:
         # Certificate has not been generated yet, so just remove the certificate exception from white list
