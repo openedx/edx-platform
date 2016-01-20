@@ -77,7 +77,7 @@ def _advanced_component_types():
     if XBlockDeprecatedAdvancedComponentConfig:
         deprecated_xblock_types = XBlockDeprecatedAdvancedComponentConfig.disabled_block_types()
     else:
-        deprecated_xblock_types = ()
+        deprecated_xblock_types = []
 
     # Merge settings list with one in the admin config;
     if hasattr(settings, 'DEPRECATED_ADVANCED_COMPONENT_TYPES'):
