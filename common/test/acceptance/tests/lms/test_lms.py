@@ -39,7 +39,7 @@ from ...pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
-@attr('shard_4')
+@attr('shard_8')
 class ForgotPasswordPageTest(UniqueCourseTest):
     """
     Test that forgot password forms is rendered if url contains 'forgot-password-modal'
@@ -59,7 +59,7 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.assertTrue(self.reset_password_page.is_form_visible())
 
 
-@attr('shard_4')
+@attr('shard_8')
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -229,7 +229,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr('shard_4')
+@attr('shard_8')
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -344,7 +344,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
 
-@attr('shard_4')
+@attr('shard_8')
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -694,6 +694,7 @@ class HighLevelTabTest(UniqueCourseTest):
             self.assertIn(expected, actual_items)
 
 
+@attr('shard_1')
 class PDFTextBooksTabTest(UniqueCourseTest):
     """
     Tests that verify each of the textbook tabs available within a course.

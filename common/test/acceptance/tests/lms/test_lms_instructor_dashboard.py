@@ -46,7 +46,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         return instructor_dashboard_page
 
 
-@attr('shard_1')
+@attr('shard_7')
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -119,7 +119,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
 
 
-@attr('shard_1')
+@attr('shard_7')
 class ProctoredExamsTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.
@@ -296,7 +296,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
-@attr('shard_1')
+@attr('shard_7')
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
     Tests for Entrance exam specific student grading tasks.
@@ -495,6 +495,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
         self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
 
 
+@attr('shard_7')
 class DataDownloadsTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab.
@@ -588,7 +589,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.verify_report_download(report_name)
 
 
-@attr('shard_1')
+@attr('shard_7')
 class CertificatesTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.
@@ -845,7 +846,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         )
 
 
-@attr('shard_1')
+@attr('shard_7')
 class CertificateInvalidationTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.
