@@ -1430,7 +1430,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
             html = '<script>alert("{name} XSS")</script>'.format(
                 name=xss
             )
-            self.assert_xss(resp, html)
+            self.assert_no_xss(resp, html)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
