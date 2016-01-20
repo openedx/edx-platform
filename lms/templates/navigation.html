@@ -5,7 +5,6 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from microsite_configuration import microsite
 from lms.djangoapps.ccx.overrides import get_current_ccx
 
 # App that handles subdomain specific branding
@@ -96,7 +95,7 @@ site_status_msg = get_site_status_msg(course_id)
         </ul>
       </li>
     </ol>
-      % if should_display_shopping_cart_func() and not (course and microsite.is_request_in_microsite()): # see shoppingcart.context_processor.user_has_cart_context_processor
+      % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
@@ -108,7 +107,7 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
-        % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+        % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>

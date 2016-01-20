@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
-from microsite_configuration import microsite
 from django.core.urlresolvers import reverse
 import json
 %>
@@ -175,7 +174,7 @@ import json
         </li>
         % endif
 
-        <%include file="${microsite.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+        <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
       </ul>
     </section>
