@@ -30,7 +30,7 @@ from certificates.models import (
     CertificateStatuses,
 )
 from certificates.queue import XQueueCertInterface
-from certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from certificates.tests.factories import CertificateWhitelistFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 
 
@@ -204,37 +204,6 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.assertTrue(mock_send.called)
             else:
                 self.assertFalse(mock_send.called)
-
-    def test_old_audit_cert_eligible(self):
-        """
-        Test that existing audit certificates remain eligible even if cert
-        generation is re-run.
-        """
-        # Create an existing audit enrollment and certificate
-        CourseEnrollmentFactory(
-            user=self.user_2,
-            course_id=self.course.id,
-            is_active=True,
-            mode=CourseMode.AUDIT,
-        )
-        GeneratedCertificateFactory(
-            user=self.user_2,
-            course_id=self.course.id,
-            grade='1.0',
-            status=CertificateStatuses.downloadable,
-            mode=GeneratedCertificate.MODES.audit,
-            eligible_for_certificate=True,
-        )
-
-        # Run grading/cert generation again
-        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
-            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
-                mock_send.return_value = (0, None)
-                self.xqueue.add_cert(self.user_2, self.course.id)
-
-        self.assertTrue(
-            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).eligible_for_certificate  # pylint: disable=no-member
-        )
 
 
 @attr('shard_1')
