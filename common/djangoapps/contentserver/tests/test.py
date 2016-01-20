@@ -10,6 +10,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
+from mock import patch
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
@@ -191,6 +192,34 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             first=(self.length_unlocked), last=(self.length_unlocked))
         )
         self.assertEqual(resp.status_code, 416)
+
+    def test_cors_headers_present_without_microsite(self):
+        """
+        Test that we're sending the correct CORS headers for asset requests.
+        """
+        base_url = settings.SITE_NAME
+
+        resp = self.client.get(self.url_unlocked)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(base_url, resp['Access-Control-Allow-Origin'])
+        self.assertEqual("frame-ancestors 'self' {}".format(base_url), resp['Content-Security-Policy'])
+        self.assertEqual('ALLOW-FROM {}'.format(base_url), resp['X-Frame-Options'])
+
+    @patch('microsite_configuration.microsite.get_value')
+    def test_cors_headers_present_with_microsite(self, mock_microsite_get_value):
+        """
+        Test that we're sending the correct CORS headers for asset requests.
+        """
+        base_url = settings.SITE_NAME
+        base_microsite_url = 'crouchingtiger.com'
+        mock_microsite_get_value.return_value = base_microsite_url
+
+        resp = self.client.get(self.url_unlocked)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotEqual(base_url, base_microsite_url)
+        self.assertEqual(base_microsite_url, resp['Access-Control-Allow-Origin'])
+        self.assertEqual("frame-ancestors 'self' {}".format(base_microsite_url), resp['Content-Security-Policy'])
+        self.assertEqual('ALLOW-FROM {}'.format(base_microsite_url), resp['X-Frame-Options'])
 
 
 @ddt.ddt

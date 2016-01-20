@@ -7,6 +7,8 @@ import logging
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden
 )
+from django.conf import settings
+from microsite_configuration import microsite
 from student.models import CourseEnrollment
 
 from xmodule.assetstore.assetmgr import AssetManager
@@ -145,6 +147,13 @@ class StaticContentServer(object):
             response['Accept-Ranges'] = 'bytes'
             response['Content-Type'] = content.content_type
             response['Last-Modified'] = last_modified_at_str
+
+            # Set CORS headers here.  Some courses pull assets via XHR or load them in iframes,
+            # so we want to definitively say that this is allowed.
+            base_url = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+            response['Access-Control-Allow-Origin'] = base_url
+            response['Content-Security-Policy'] = "frame-ancestors 'self' {base_url}".format(base_url=base_url)
+            response['X-Frame-Options'] = "ALLOW-FROM {base_url}".format(base_url=base_url)
 
             return response
 
