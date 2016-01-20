@@ -210,7 +210,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.user.profile.name = "Joe User"
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
-        self.cert = GeneratedCertificate.eligible_certificates.create(
+        self.cert = GeneratedCertificate.objects.create(
             user=self.user,
             course_id=self.course_id,
             download_uuid=uuid4(),
