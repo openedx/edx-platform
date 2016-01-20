@@ -205,8 +205,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             else:
                 self.assertFalse(mock_send.called)
 
-    @ddt.data(True, False)
-    def test_regen_audit_certs_eligibility(self, eligibility):
+    def test_old_audit_cert_eligible(self):
         """
         Test that existing audit certificates remain eligible even if cert
         generation is re-run.
@@ -224,7 +223,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             grade='1.0',
             status=CertificateStatuses.downloadable,
             mode=GeneratedCertificate.MODES.audit,
-            eligible_for_certificate=eligibility,
+            eligible_for_certificate=True,
         )
 
         # Run grading/cert generation again
@@ -233,9 +232,8 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)
 
-        self.assertEqual(
-            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).eligible_for_certificate,  # pylint: disable=no-member
-            eligibility
+        self.assertTrue(
+            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).eligible_for_certificate  # pylint: disable=no-member
         )
 
 

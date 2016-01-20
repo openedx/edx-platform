@@ -279,7 +279,7 @@ class XQueueCertInterface(object):
         if forced_grade:
             grade['grade'] = forced_grade
 
-        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)  # pylint: disable=no-member
+        cert, created = GeneratedCertificate.eligible_certificates.get_or_create(user=student, course_id=course_id)
 
         cert.mode = cert_mode
         cert.user = student
