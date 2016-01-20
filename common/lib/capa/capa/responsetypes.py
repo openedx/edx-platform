@@ -2208,7 +2208,7 @@ class CustomResponse(LoncapaResponse):
 
         # if <customresponse> has an "expect" (or "answer") attribute then save
         # that
-        self.expect = xml.get('expect') or xml.get('answer')
+        self.expect = contextualize_text(xml.get('expect') or xml.get('answer'), self.context)
 
         log.debug('answer_ids=%s', self.answer_ids)
 
