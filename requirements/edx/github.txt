@@ -89,7 +89,7 @@ git+https://github.com/edx/edx-val.git@0.0.8#egg=edxval==0.0.8
 -e git+https://github.com/edx/edx-search.git@release-2015-11-17#egg=edx-search==0.1.1
 -e git+https://github.com/edx/edx-milestones.git@release-2015-11-17#egg=edx-milestones==0.1.5
 git+https://github.com/edx/edx-lint.git@v0.3.2#egg=edx_lint==0.3.2
-git+https://github.com/edx/xblock-utils.git@v1.0.0#egg=xblock-utils==v1.0.0
+git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils==1.0.2
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
