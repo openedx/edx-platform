@@ -105,7 +105,16 @@ class XQueueCertInterface(object):
         self.restricted = UserProfile.objects.filter(allow_certificate=False)
         self.use_https = True
 
-    def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
+    def regen_cert(
+            self,
+            student,
+            course_id,
+            course=None,
+            designation=None,
+            forced_grade=None,
+            template_file=None,
+            generate_pdf=True,
+    ):
         """(Re-)Make certificate for a particular student in a particular course
 
         Arguments:
@@ -159,6 +168,7 @@ class XQueueCertInterface(object):
             student,
             course_id,
             course=course,
+            designation=designation,
             forced_grade=forced_grade,
             template_file=template_file,
             generate_pdf=generate_pdf
@@ -183,7 +193,7 @@ class XQueueCertInterface(object):
 
     # pylint: disable=too-many-statements
     def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None,
-                 title='None', generate_pdf=True):
+                 designation=None, generate_pdf=True):
         """
         Request a new certificate for a student.
 
@@ -247,7 +257,6 @@ class XQueueCertInterface(object):
                 course = modulestore().get_course(course_id, depth=0)
             profile = UserProfile.objects.get(user=student)
             profile_name = profile.name
-            profile_title = title
 
             # Needed
             self.request.user = student
@@ -342,7 +351,7 @@ class XQueueCertInterface(object):
                         'name': profile_name,
                         'grade': grade_contents,
                         'template_pdf': template_pdf,
-                        'designation': profile_title,
+                        'designation': designation,
                     }
                     if template_file:
                         contents['template_pdf'] = template_file

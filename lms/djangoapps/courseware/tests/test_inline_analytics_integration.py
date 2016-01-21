@@ -49,6 +49,7 @@ class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
         response = get_analytics_answer_dist(request)
         self.assertEquals(response.content, self.zendesk_response)
 
+    @override_settings(ZENDESK_URL=None)
     def test_no_url_no_zendesk(self):
         request = self.factory.post('', self.data)
         request.user = self.instructor
@@ -393,7 +394,7 @@ class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
                 'created': '2014-10-15T101351',
             },
         ]
-        
+
         question_types_by_part = {
             'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_2': 'option',
         }

@@ -192,7 +192,7 @@ FEATURES = {
     'ENABLE_CREDIT_ELIGIBILITY': ENABLE_CREDIT_ELIGIBILITY,
 
     # Can the visibility of the discussion tab be configured on a per-course basis?
-    'ALLOW_HIDING_DISCUSSION_TAB': False,
+    'ALLOW_HIDING_DISCUSSION_TAB': True,
 
     # Timed or Proctored Exams
     'ENABLE_PROCTORED_EXAMS': False,
