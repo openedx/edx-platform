@@ -69,6 +69,14 @@
   .larger {
     left: 0 !important;
     bottom: 100% !important;
+
+    img {
+      width: auto;
+    }
+  }
+
+  img {
+    width: 100%;
   }
 }
 // ====================
