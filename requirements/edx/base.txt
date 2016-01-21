@@ -157,7 +157,7 @@ analytics-python==0.4.4
 git+https://github.com/mfogel/django-settings-context-processor.git
 
 # XBlocks from PyPi
-xblock-image-modal >=0.1.2, <1.0.0
+xblock-image-modal >=0.2.0, <1.0.0
 
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2
