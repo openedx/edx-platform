@@ -105,7 +105,7 @@ def server_track(request, event_type, event, page=None):
         "event_source": "server",
         "event_type": event_type,
         "event": event,
-        "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
+        "agent": _get_request_header(request, 'HTTP_USER_AGENT').decode('latin1'),
         "page": page,
         "time": datetime.datetime.utcnow(),
         "host": _get_request_header(request, 'SERVER_NAME'),
