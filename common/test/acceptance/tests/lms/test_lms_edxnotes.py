@@ -401,7 +401,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat()
             ),
         ]
-        if extra_notes and isinstance(extra_notes, int):
+        if extra_notes > 0:
             for __ in range(extra_notes):
                 self.raw_note_list.append(
                     Note(
@@ -499,10 +499,15 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         """
         self.assertEqual(self.notes_page.count(), notes_count_on_current_page)
         self.assertEqual(self.notes_page.get_pagination_header_text(), header_text)
-        self.assertEqual(self.notes_page.is_previous_page_button_enabled(), previous_button_enabled)
-        self.assertEqual(self.notes_page.is_next_page_button_enabled(), next_button_enabled)
-        self.assertEqual(self.notes_page.get_current_page_number(), current_page_number)
-        self.assertEqual(self.notes_page.get_total_pages, total_pages)
+
+        if total_pages > 1:
+            self.assertEqual(self.notes_page.footer_visible, True)
+            self.assertEqual(self.notes_page.is_previous_page_button_enabled(), previous_button_enabled)
+            self.assertEqual(self.notes_page.is_next_page_button_enabled(), next_button_enabled)
+            self.assertEqual(self.notes_page.get_current_page_number(), current_page_number)
+            self.assertEqual(self.notes_page.get_total_pages, total_pages)
+        else:
+            self.assertEqual(self.notes_page.footer_visible, False)
 
     def search_and_verify(self):
         """
@@ -899,7 +904,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assert_viewed_event('Search Results')
         self.assert_search_event('note', 4)
 
-    @skip("scroll to tag functionality is removed")
+    @skip("scroll to tag functionality is disabled")
     def test_scroll_to_tag_recent_activity(self):
         """
         Scenario: Can scroll to a tag group from the Recent Activity view (default view)
@@ -911,7 +916,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.visit()
         self._scroll_to_tag_and_verify("pear", 3)
 
-    @skip("scroll to tag functionality is removed")
+    @skip("scroll to tag functionality is disabled")
     def test_scroll_to_tag_course_structure(self):
         """
         Scenario: Can scroll to a tag group from the Course Structure view
@@ -923,7 +928,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.visit().switch_to_tab("structure")
         self._scroll_to_tag_and_verify("squash", 5)
 
-    @skip("scroll to tag functionality is removed")
+    @skip("scroll to tag functionality is disabled")
     def test_scroll_to_tag_search(self):
         """
         Scenario: Can scroll to a tag group from the Search Results view
@@ -936,7 +941,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.visit().search("note")
         self._scroll_to_tag_and_verify("pumpkin", 4)
 
-    @skip("scroll to tag functionality is removed")
+    @skip("scroll to tag functionality is disabled")
     def test_scroll_to_tag_from_tag_view(self):
         """
         Scenario: Can scroll to a tag group from the Tags view

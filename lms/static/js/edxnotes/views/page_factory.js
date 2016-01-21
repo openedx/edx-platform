@@ -27,7 +27,6 @@ define([
             el: $('.wrapper-student-notes').get(0),
             collection: collection,
             debug: params.debugMode,
-            endpoint: params.endpoint,
             perPage: params.pageSize,
             disabledTabs: params.disabledTabs
         });

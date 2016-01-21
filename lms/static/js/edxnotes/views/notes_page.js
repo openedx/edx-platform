@@ -43,7 +43,9 @@ define([
                     tabsCollection: this.tabsCollection,
                     scrollToTag: scrollToTag
                 });
-
+            }
+            
+            if (!_.contains(this.options.disabledTabs, 'tags')) {
                 // Add the Tags model after the Course Structure model.
                 this.tabsCollection.push(tagsModel);
             }

@@ -137,7 +137,7 @@ def preprocess_collection(user, course, collection):
     store = modulestore()
     filtered_collection = list()
     cache = {}
-    include_extra_info = settings.NOTES_DISABLED_TABS == []
+    include_path_info = ('course_structure' not in settings.NOTES_DISABLED_TABS)
     with store.bulk_operations(course.id):
         for model in collection:
             update = {
@@ -170,7 +170,7 @@ def preprocess_collection(user, course, collection):
                 log.debug("Unit not found: %s", usage_key)
                 continue
 
-            if include_extra_info:
+            if include_path_info:
                 section = unit.get_parent()
                 if not section:
                     log.debug("Section not found: %s", usage_key)
@@ -202,11 +202,11 @@ def preprocess_collection(user, course, collection):
 
             usage_context = {
                 "unit": get_module_context(course, unit),
-                "section": get_module_context(course, section) if include_extra_info else {},
-                "chapter": get_module_context(course, chapter) if include_extra_info else {},
+                "section": get_module_context(course, section) if include_path_info else {},
+                "chapter": get_module_context(course, chapter) if include_path_info else {},
             }
             model.update(usage_context)
-            if include_extra_info:
+            if include_path_info:
                 cache[section] = cache[chapter] = usage_context
 
             cache[usage_id] = cache[unit] = usage_context

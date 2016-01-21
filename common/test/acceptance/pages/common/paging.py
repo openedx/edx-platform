@@ -63,3 +63,8 @@ class PaginatedUIMixin(object):
     def is_enabled(self, css):
         """Return whether the given element is not disabled."""
         return 'is-disabled' not in self.q(css=css).attrs('class')[0]
+
+    @property
+    def footer_visible(self):
+        """ Return True if footer is visible else False"""
+        return self.q(css='.pagination.bottom').visible
