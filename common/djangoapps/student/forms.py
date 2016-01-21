@@ -231,7 +231,7 @@ class AccountCreationForm(forms.Form):
 
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """
-        email = self.cleaned_data["email"]
+        email = self.cleaned_data.get("email")
         if settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED is not None:
             # This Open edX instance has restrictions on what email addresses are allowed.
             allowed_patterns = settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED
@@ -243,6 +243,8 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_("Unauthorized email address."))
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError(_("An account with the Email '{email}' already exists.").format(email=email))
         return email
 
     def clean_year_of_birth(self):
