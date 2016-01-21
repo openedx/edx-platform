@@ -64,7 +64,7 @@ class CertificateSupportTestCase(TestCase):
         )
 
         # Create certificates for the student
-        self.cert = GeneratedCertificate.objects.create(
+        self.cert = GeneratedCertificate.eligible_certificates.create(
             user=self.student,
             course_id=self.CERT_COURSE_KEY,
             grade=self.CERT_GRADE,
@@ -244,7 +244,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
         # we'd expect that the certificate status will be "notpassing"
-        cert = GeneratedCertificate.objects.get(user=self.student)
+        cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
         self.assertEqual(cert.status, CertificateStatuses.notpassing)
 
     def test_regenerate_certificate_missing_params(self):
@@ -283,7 +283,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
 
     def test_regenerate_user_has_no_certificate(self):
         # Delete the user's certificate
-        GeneratedCertificate.objects.all().delete()
+        GeneratedCertificate.eligible_certificates.all().delete()
 
         # Should be able to regenerate
         response = self._regenerate(
@@ -293,7 +293,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
         self.assertEqual(response.status_code, 200)
 
         # A new certificate is created
-        num_certs = GeneratedCertificate.objects.filter(user=self.student).count()
+        num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
         self.assertEqual(num_certs, 1)
 
     def _regenerate(self, course_key=None, username=None):
