@@ -76,7 +76,7 @@ define([
 
         it('displays a tab and content with proper data and order', function () {
             var view = getView(this.collection, this.tabsCollection);
-            Helpers.verifyPaginationInfo(view, "Showing 1-3 out of 3 total", 1, 1);
+            Helpers.verifyPaginationInfo(view, "Showing 1-3 out of 3 total", true, 1, 1);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, notes);
         });
 
@@ -107,10 +107,11 @@ define([
                     start: 0
                 }
             );
+
             var collection = new NotesCollection(notes, {perPage: 10, parse: true});
             var view = getView(collection, this.tabsCollection);
 
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 12 total", 1, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 12 total", false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, notes);
 
             view.$('input#page-number-input').val('2');
@@ -130,7 +131,7 @@ define([
                 }
             );
             Helpers.respondToRequest(requests, notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 11-12 out of 12 total", 2, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 11-12 out of 12 total", false, 2, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, notes);
         });
 
@@ -148,7 +149,7 @@ define([
             var collection = new NotesCollection(page1Notes, {perPage: 10, parse: true});
             var view = getView(collection, this.tabsCollection);
 
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", 1, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, page1Notes);
 
             view.$('.pagination .next-page-link').click();
@@ -166,7 +167,7 @@ define([
                 }
             );
             Helpers.respondToRequest(requests, page2Notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 11-15 out of 15 total", 2, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 11-15 out of 15 total", false, 2, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, page2Notes);
 
             view.$('.pagination .previous-page-link').click();
@@ -176,7 +177,7 @@ define([
             );
             Helpers.respondToRequest(requests, page1Notes);
 
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", 1, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, page1Notes);
         });
 

@@ -91,7 +91,7 @@ define([
             submitForm(view.searchBox, 'second');
             Helpers.respondToRequest(requests, responseJson, true);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, responseJson);
-            Helpers.verifyPaginationInfo(view, "Showing 1-3 out of 3 total", 1, 1);
+            Helpers.verifyPaginationInfo(view, "Showing 1-3 out of 3 total", true, 1, 1);
         });
 
         it('displays loading indicator when search is running', function () {
@@ -242,7 +242,7 @@ define([
 
             submitForm(view.searchBox, 'awesome');
             Helpers.respondToRequest(requests, notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 12 total", 1, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 12 total", false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, notes);
 
             view.$('input#page-number-input').val('2');
@@ -262,7 +262,7 @@ define([
                 }
             );
             Helpers.respondToRequest(requests, notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 11-12 out of 12 total", 2, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 11-12 out of 12 total", false, 2, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, notes);
         });
 
@@ -281,7 +281,7 @@ define([
 
             submitForm(view.searchBox, 'awesome');
             Helpers.respondToRequest(requests, page1Notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", 1, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, page1Notes);
 
             view.$('.pagination .next-page-link').click();
@@ -299,7 +299,7 @@ define([
                 }
             );
             Helpers.respondToRequest(requests, page2Notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 11-15 out of 15 total", 2, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 11-15 out of 15 total", false, 2, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, page2Notes);
 
             view.$('.pagination .previous-page-link').click();
@@ -309,7 +309,7 @@ define([
             );
             Helpers.respondToRequest(requests, page1Notes);
 
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", 1, 2);
+            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, page1Notes);
         });
 

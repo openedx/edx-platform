@@ -16,7 +16,7 @@ function (gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView
             this.children = [];
             if (this.options.createHeaderFooter) {
                 this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
-                this.pagingFooterView = new PagingFooterView({collection: this.collection});
+                this.pagingFooterView = new PagingFooterView({collection: this.collection, hideWhenOnePage: true});
             }
             if (this.hasOwnProperty('collection')) {
                 this.listenTo(this.collection, 'page_changed', this.render);

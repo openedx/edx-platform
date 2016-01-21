@@ -637,6 +637,59 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             [], helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
+    @override_settings(NOTES_DISABLED_TABS=['course_structure', 'tags'])
+    def test_preprocess_collection_with_disabled_tabs(self, ):
+        """
+        Tests that preprocess collection returns correct data if `course_structure` and `tags` are disabled.
+        """
+        initial_collection = [
+            {
+                u"quote": u"quote text1",
+                u"text": u"text1",
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2016, 01, 26, 8, 5, 16, 00000).isoformat(),
+            },
+            {
+                u"quote": u"quote text2",
+                u"text": u"text2",
+                u"usage_id": unicode(self.html_module_2.location),
+                u"updated": datetime(2016, 01, 26, 9, 6, 17, 00000).isoformat(),
+            },
+        ]
+
+        self.assertItemsEqual(
+            [
+                {
+
+                    'section': {},
+                    'chapter': {},
+                    "unit": {
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
+                        u"display_name": self.vertical.display_name_with_default_escaped,
+                        u"location": unicode(self.vertical.location),
+                    },
+                    u'text': u'text1',
+                    u'quote': u'quote text1',
+                    u'usage_id': unicode(self.html_module_1.location),
+                    u'updated': datetime(2016, 01, 26, 8, 5, 16)
+                },
+                {
+                    'section': {},
+                    'chapter': {},
+                    "unit": {
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
+                        u"display_name": self.vertical.display_name_with_default_escaped,
+                        u"location": unicode(self.vertical.location),
+                    },
+                    u'text': u'text2',
+                    u'quote': u'quote text2',
+                    u'usage_id': unicode(self.html_module_2.location),
+                    u'updated': datetime(2016, 01, 26, 9, 6, 17)
+                }
+            ],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
+        )
+
     def test_get_parent_unit(self):
         """
         Tests `get_parent_unit` method for the successful result.

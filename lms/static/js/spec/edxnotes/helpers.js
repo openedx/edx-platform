@@ -218,10 +218,13 @@ define(['underscore', 'URI', 'common/js/spec_helpers/ajax_helpers'], function(_,
         AjaxHelpers.respondWithJson(requests, responseJson);
     };
 
-    verifyPaginationInfo = function (view, headerMessage, currentPage, totalPages) {
+    verifyPaginationInfo = function (view, headerMessage, footerHidden, currentPage, totalPages) {
         expect(view.$('.search-count.listing-count').text().trim()).toBe(headerMessage);
-        expect(parseInt(view.$('.pagination span.current-page').text().trim())).toBe(currentPage);
-        expect(parseInt(view.$('.pagination span.total-pages').text().trim())).toBe(totalPages);
+        expect(view.$('.pagination.bottom').parent().hasClass('hidden')).toBe(footerHidden);
+        if (!footerHidden) {
+            expect(parseInt(view.$('.pagination span.current-page').text().trim())).toBe(currentPage);
+            expect(parseInt(view.$('.pagination span.total-pages').text().trim())).toBe(totalPages);
+        }
     };
 
     verifyPageData = function (view, tabsCollection, tabInfo, tabId, notes) {
