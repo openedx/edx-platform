@@ -125,14 +125,10 @@
 
 // extends -hidden elems - screenreaders
 %text-sr {
-  border: 0;
+  // clip has been deprecated but is still supported
   clip: rect(1px 1px 1px 1px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
+  clip: rect(1px, 1px, 1px, 1px);
   position: absolute;
-  width: 1px;
 }
 
 // extends - ensures proper contrast for automated checkers
