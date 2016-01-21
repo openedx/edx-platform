@@ -289,6 +289,32 @@ CREATE TABLE `assessment_rubric` (
   KEY `assessment_rubric_873e9e2d` (`structure_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_staffworkflow`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_staffworkflow` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `scorer_id` varchar(40) NOT NULL,
+  `course_id` varchar(40) NOT NULL,
+  `item_id` varchar(128) NOT NULL,
+  `submission_uuid` varchar(128) NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `grading_completed_at` datetime(6) DEFAULT NULL,
+  `grading_started_at` datetime(6) DEFAULT NULL,
+  `cancelled_at` datetime(6) DEFAULT NULL,
+  `assessment` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `submission_uuid` (`submission_uuid`),
+  KEY `assessment_staffworkflow_7b0042c0` (`scorer_id`),
+  KEY `assessment_staffworkflow_ea134da7` (`course_id`),
+  KEY `assessment_staffworkflow_82bfda79` (`item_id`),
+  KEY `assessment_staffworkflow_fde81f11` (`created_at`),
+  KEY `assessment_staffworkflow_85d183d8` (`grading_completed_at`),
+  KEY `assessment_staffworkflow_0af9deae` (`grading_started_at`),
+  KEY `assessment_staffworkflow_740da1db` (`cancelled_at`),
+  KEY `assessment_staffworkflow_5096c410` (`assessment`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `assessment_studenttrainingworkflow`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -386,7 +412,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=716 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=740 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1031,12 +1057,12 @@ CREATE TABLE `course_modes_coursemode` (
   `mode_display_name` varchar(255) NOT NULL,
   `min_price` int(11) NOT NULL,
   `currency` varchar(8) NOT NULL,
+  `expiration_datetime` datetime(6) DEFAULT NULL,
   `expiration_date` date DEFAULT NULL,
   `suggested_prices` varchar(255) NOT NULL,
   `description` longtext,
   `sku` varchar(255) DEFAULT NULL,
   `expiration_datetime_is_explicit` tinyint(1) NOT NULL,
-  `expiration_datetime` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `course_modes_coursemode_course_id_6fbb1796ace558b4_uniq` (`course_id`,`mode_slug`,`currency`),
   KEY `course_modes_coursemode_ea134da7` (`course_id`)
@@ -1575,7 +1601,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=238 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=246 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1586,7 +1612,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1978,6 +2004,102 @@ CREATE TABLE `lms_xblock_xblockasidesconfig` (
   PRIMARY KEY (`id`),
   KEY `lms_xblock_xblocka_changed_by_id_eabf5ef3e34dfb8_fk_auth_user_id` (`changed_by_id`),
   CONSTRAINT `lms_xblock_xblocka_changed_by_id_eabf5ef3e34dfb8_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `microsite_configuration_historicalmicrositeorganizationmapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `microsite_configuration_historicalmicrositeorganizationmapping` (
+  `id` int(11) NOT NULL,
+  `organization` varchar(63) NOT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  `microsite_id` int(11),
+  PRIMARY KEY (`history_id`),
+  KEY `microsite_confi_history_user_id_40846fe04877dd35_fk_auth_user_id` (`history_user_id`),
+  KEY `microsite_configuration_historicalmicrositeorganizationmappi1219` (`id`),
+  KEY `microsite_configuration_historicalmicrositeorganizationmappi74d9` (`organization`),
+  KEY `microsite_configuration_historicalmicrositeorganizationmappi5a96` (`microsite_id`),
+  CONSTRAINT `microsite_confi_history_user_id_40846fe04877dd35_fk_auth_user_id` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `microsite_configuration_historicalmicrositetemplate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `microsite_configuration_historicalmicrositetemplate` (
+  `id` int(11) NOT NULL,
+  `template_uri` varchar(255) NOT NULL,
+  `template` longtext NOT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  `microsite_id` int(11),
+  PRIMARY KEY (`history_id`),
+  KEY `microsite_confi_history_user_id_53e1b0dcb708d6ef_fk_auth_user_id` (`history_user_id`),
+  KEY `microsite_configuration_historicalmicrositetemplate_b80bb774` (`id`),
+  KEY `microsite_configuration_historicalmicrositetemplate_a8b249ec` (`template_uri`),
+  KEY `microsite_configuration_historicalmicrositetemplate_c9cd58ae` (`microsite_id`),
+  CONSTRAINT `microsite_confi_history_user_id_53e1b0dcb708d6ef_fk_auth_user_id` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `microsite_configuration_microsite`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `microsite_configuration_microsite` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `key` varchar(63) NOT NULL,
+  `values` longtext NOT NULL,
+  `site_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`),
+  UNIQUE KEY `site_id` (`site_id`),
+  CONSTRAINT `microsite_configuratio_site_id_3ebe20a76de5aa4_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `microsite_configuration_micrositehistory`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `microsite_configuration_micrositehistory` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `key` varchar(63) NOT NULL,
+  `values` longtext NOT NULL,
+  `site_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`),
+  UNIQUE KEY `site_id` (`site_id`),
+  CONSTRAINT `microsite_configurati_site_id_6977a04d3625a533_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `microsite_configuration_micrositeorganizationmapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `microsite_configuration_micrositeorganizationmapping` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organization` varchar(63) NOT NULL,
+  `microsite_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `organization` (`organization`),
+  KEY `D1c5d7dbbb2cde12ce18b38d46f71ee0` (`microsite_id`),
+  CONSTRAINT `D1c5d7dbbb2cde12ce18b38d46f71ee0` FOREIGN KEY (`microsite_id`) REFERENCES `microsite_configuration_microsite` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `microsite_configuration_micrositetemplate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `microsite_configuration_micrositetemplate` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `template_uri` varchar(255) NOT NULL,
+  `template` longtext NOT NULL,
+  `microsite_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `microsite_configuration_micros_microsite_id_80b3f3616d2e317_uniq` (`microsite_id`,`template_uri`),
+  KEY `microsite_configuration_micrositetemplate_a8b249ec` (`template_uri`),
+  CONSTRAINT `D4919cbc5f1414d3de93aa9ec9aa48f3` FOREIGN KEY (`microsite_id`) REFERENCES `microsite_configuration_microsite` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `milestones_coursecontentmilestone`;
@@ -2595,6 +2717,18 @@ CREATE TABLE `programs_programsapiconfig` (
   PRIMARY KEY (`id`),
   KEY `programs_programsa_changed_by_id_b7c3b49d5c0dcd3_fk_auth_user_id` (`changed_by_id`),
   CONSTRAINT `programs_programsa_changed_by_id_b7c3b49d5c0dcd3_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `rss_proxy_whitelistedrssurl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rss_proxy_whitelistedrssurl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `url` (`url`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `self_paced_selfpacedconfiguration`;
