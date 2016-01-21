@@ -20,19 +20,19 @@ Longer TODO:
    multiple sites, but we do need a way to map their data assets.
 
 When refering to XBlocks, we use the entry-point name. For example,
-|   setup(
-|       name='xblock-foobar',
-|       version='0.1',
-|       packages=[
-|           'foobar_xblock',
-|       ],
-|       entry_points={
-|           'xblock.v1': [
-|               'foobar-block = foobar_xblock:FoobarBlock',
-|           #    ^^^^^^^^^^^^ This is the one you want.
-|           ]
-|       },
-|   )
+    setup(
+        name='xblock-foobar',
+        version='0.1',
+        packages=[
+            'foobar_xblock',
+        ],
+        entry_points={
+            'xblock.v1': [
+                'foobar-block = foobar_xblock:FoobarBlock',
+            #    ^^^^^^^^^^^^ This is the one you want.
+            ]
+        },
+    )
 """
 
 # We intentionally define lots of variables that aren't used, and
