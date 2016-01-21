@@ -1,5 +1,5 @@
 $sequence--border-color: #C8C8C8;
-$link-color: rgb(26, 161, 222);
+$link-color: rgb(26, 161, 222) !default;
 // repeated extends - needed since LMS styling was referenced
 .block-link {
   border-left: 1px solid lighten($sequence--border-color, 10%);

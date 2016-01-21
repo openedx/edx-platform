@@ -15,68 +15,94 @@ var edx = edx || {};
             properties = {};
 
         properties.category = 'dashboard';
-        properties.label = $el.data("course-key");
+        properties.label = $el.data('course-key');
 
         return properties;
     };
 
-    edx.dashboard.TrackEvents = function() {
+    // Generate object to be passed with programs events
+    edx.dashboard.generateProgramProperties = function(element) {
+        var $el = $(element);
 
-         var course_title_link = $(".course-title > a"),
-            course_image_link = $(".cover"),
-            enter_course_link = $(".enter-course"),
-            options_dropdown = $(".wrapper-action-more"),
-            course_learn_verified = $(".verified-info"),
-            find_courses_btn = $(".btn-find-courses");
+        return {
+            category: 'dashboard',
+            course_id: $el.closest('.course-container').find('.info-course-id').html(),
+            program_id: $el.data('program-id')
+        };
+    };
 
-        // Emit an event when the "course title link" is clicked.
+    edx.dashboard.trackEvents = function() {
+        var $courseTitleLink = $('.course-title > a'),
+            $courseImageLink = $('.cover'),
+            $enterCourseLink = $('.enter-course'),
+            $optionsDropdown = $('.wrapper-action-more'),
+            $courseLearnVerified = $('.verified-info'),
+            $findCoursesBtn = $('.btn-find-courses'),
+            $xseriesBtn = $('.xseries-action .btn');
+
+        // Emit an event when the 'course title link' is clicked.
         window.analytics.trackLink(
-            course_title_link,
-            "edx.bi.dashboard.course_title.clicked",
+            $courseTitleLink,
+            'edx.bi.dashboard.course_title.clicked',
             edx.dashboard.generateTrackProperties
         );
 
-        // Emit an event  when the "course image" is clicked.
+        // Emit an event  when the 'course image' is clicked.
         window.analytics.trackLink(
-            course_image_link,
-            "edx.bi.dashboard.course_image.clicked",
+            $courseImageLink,
+            'edx.bi.dashboard.course_image.clicked',
             edx.dashboard.generateTrackProperties
         );
 
-        // Emit an event  when the "View Course" button is clicked.
+        // Emit an event  when the 'View Course' button is clicked.
         window.analytics.trackLink(
-            enter_course_link,
-            "edx.bi.dashboard.enter_course.clicked",
+            $enterCourseLink,
+            'edx.bi.dashboard.enter_course.clicked',
             edx.dashboard.generateTrackProperties
         );
 
         // Emit an event when the options dropdown is engaged.
         window.analytics.trackLink(
-            options_dropdown,
-            "edx.bi.dashboard.course_options_dropdown.clicked",
+            $optionsDropdown,
+            'edx.bi.dashboard.course_options_dropdown.clicked',
             edx.dashboard.generateTrackProperties
         );
 
-        // Emit an event  when the "Learn about verified" link is clicked.
+        // Emit an event  when the 'Learn about verified' link is clicked.
         window.analytics.trackLink(
-            course_learn_verified,
-            "edx.bi.dashboard.verified_info_link.clicked",
+            $courseLearnVerified,
+            'edx.bi.dashboard.verified_info_link.clicked',
             edx.dashboard.generateTrackProperties
         );
 
-        // Emit an event  when the "Find Courses" button is clicked.
+        // Emit an event  when the 'Find Courses' button is clicked.
         window.analytics.trackLink(
-            find_courses_btn,
-            "edx.bi.dashboard.find_courses_button.clicked",
+            $findCoursesBtn,
+            'edx.bi.dashboard.find_courses_button.clicked',
             {
-                category: "dashboard",
+                category: 'dashboard',
                 label: null
             }
         );
 
+        // Emit an event when the 'View XSeries Details' button is clicked
+        window.analytics.trackLink(
+            $xseriesBtn,
+            'edx.bi.dashboard.xseries_cta_message.clicked',
+            edx.dashboard.generateProgramProperties
+        );
+    };
+
+    edx.dashboard.xseriesTrackMessages = function() {
+        $('.xseries-action .btn').each(function(i, element) {
+            var data = edx.dashboard.generateProgramProperties($(element));
+
+            window.analytics.track( 'edx.bi.dashboard.xseries_cta_message.viewed', data );
+        });
     };
 
     $(document).ready(function() {
-        edx.dashboard.TrackEvents();
+        edx.dashboard.trackEvents();
+        edx.dashboard.xseriesTrackMessages();
     });
 })(jQuery);

@@ -1346,7 +1346,7 @@ def manage_user_standing(request):
     headers = ['username', 'account_changed_by']
     rows = []
     for user in all_disabled_users:
-        row = [user.username, user.standing.all()[0].changed_by]
+        row = [user.username, user.standing.changed_by]
         rows.append(row)
 
     context = {'headers': headers, 'rows': rows}
@@ -2378,6 +2378,7 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                     'course_count': len(program['course_codes']),
                     'display_name': program['name'],
                     'category': program.get('category'),
+                    'program_id': program['id'],
                     'program_marketing_url': urljoin(
                         settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
                     ).format(program['marketing_slug']),

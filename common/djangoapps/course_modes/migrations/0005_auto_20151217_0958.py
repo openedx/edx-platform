@@ -11,13 +11,18 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='coursemode',
-            name='expiration_datetime',
-        ),
-        migrations.AddField(
-            model_name='coursemode',
-            name='_expiration_datetime',
-            field=models.DateTimeField(db_column=b'expiration_datetime', default=None, blank=True, help_text='OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. Leave this blank if users can enroll in this mode until enrollment closes for the course.', null=True, verbose_name='Upgrade Deadline'),
-        ),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                    migrations.RemoveField(
+                        model_name='coursemode',
+                        name='expiration_datetime',
+                    ),
+                    migrations.AddField(
+                        model_name='coursemode',
+                        name='_expiration_datetime',
+                        field=models.DateTimeField(db_column=b'expiration_datetime', default=None, blank=True, help_text='OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. Leave this blank if users can enroll in this mode until enrollment closes for the course.', null=True, verbose_name='Upgrade Deadline'),
+                    ),
+            ]
+        )
     ]

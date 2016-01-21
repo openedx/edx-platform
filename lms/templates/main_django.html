@@ -19,7 +19,7 @@
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
 
-  {% optional_include "head-extra.html" %}
+  {% optional_include "head-extra.html"|microsite_template_path %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
@@ -28,14 +28,14 @@
   <div class="window-wrap" dir="${static.dir_rtl()}">
     <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to main content" %}</a>
     {% with course=request.course %}
-      {% include "header.html" %}
+      {% include "header.html"|microsite_template_path %}
     {% endwith %}
     <div class="content-wrapper" id="content">
       {% block body %}{% endblock %}
       {% block bodyextra %}{% endblock %}
     </div>
     {% with course=request.course %}
-      {% include "footer.html" %}
+      {% include "footer.html"|microsite_template_path %}
     {% endwith %}
 
   </div>

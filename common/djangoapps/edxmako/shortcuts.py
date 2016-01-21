@@ -166,8 +166,5 @@ def render_to_response(template_name, dictionary=None, context_instance=None, na
     lookup.get_template(args[0]).render with the passed arguments.
     """
 
-    # see if there is an override template defined in the microsite
-    template_name = microsite.get_template_path(template_name)
-
     dictionary = dictionary or {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

@@ -28,7 +28,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
-# Ned Batchelder <ned@edx.org>, 2015
+# Ned Batchelder <ned@edx.org>, 2015-2016
 # omarithawi <oithawi@qrf.org>, 2014-2015
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
@@ -84,7 +84,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
-# omarithawi <oithawi@qrf.org>, 2014-2015
+# omarithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # Soha Assali <soha+transifex@qordoba.com>, 2015
@@ -107,6 +107,7 @@
 # may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
+# Ned Batchelder <ned@edx.org>, 2016
 # omarithawi <oithawi@qrf.org>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # Soha Assali <soha+transifex@qordoba.com>, 2015
@@ -4637,13 +4638,13 @@ msgid ""
 "participated in {partner_short_name} {course_number}"
 msgstr ""
 "هذه شهادة صالحة من {platform_name} للمستخدم {user_name} الذي شارك في "
-"{partner_name} {course_number}"
+"{partner_short_name} {course_number}"
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
 msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
-msgstr "شهادة {partner_name} {course_number} | {platform_name}"
+msgstr "شهادة {partner_short_name} {course_number} | {platform_name}"
 
 #. Translators:  This text fragment appears after the student's name
 #. (displayed in a large font) on the certificate
@@ -4881,11 +4882,11 @@ msgstr "المسائل"
 
 #: lms/djangoapps/commerce/api/v1/serializers.py
 msgid "{course_id} is not a valid course key."
-msgstr "مفتاح المساق {course_key} غير صحيح"
+msgstr "مفتاح المساق {course_id} غير صحيح"
 
 #: lms/djangoapps/commerce/api/v1/serializers.py
 msgid "Course {course_id} does not exist."
-msgstr "المساق {course_key} غير موجود"
+msgstr "المساق {course_id} غير موجود"
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -7008,10 +7009,10 @@ msgid ""
 msgstr ""
 "عذرًا! أَرجَع لنا قسمنا المختصّ بمعالجة الدفعات رسالةً تالفة تخصّ خصم رسومك،"
 " الأمر الذي جعلنا غير قادرين على التثبّت فيما إذا كان مصدر الرسالة هو معالج "
-"الدفعات فعلًا. رسالة الخطأ المحدّدة هي: {error_msg}. نعتذر لعدم قدرتنا على "
-"التثبّت فيما إذا جرى خصم الرسوم فعلًا لاتّخاذ إجراء إضافي حيال طلبك. يُحتمل "
-"أن يكون المبلغ قد اقتُطِع من حساب بطاقتك الائتمانية. يُرجى مراسلتنا على "
-"العنوان {email} لنجيب عن أي استفسار يخصّ سداد الدفعات."
+"الدفعات فعلًا. رسالة الخطأ المحدّدة هي: {error_message}. نعتذر لعدم قدرتنا "
+"على التثبّت فيما إذا جرى خصم الرسوم فعلًا لاتّخاذ إجراء إضافي حيال طلبك. "
+"يُحتمل أن يكون المبلغ قد اقتُطِع من حساب بطاقتك الائتمانية. يُرجى مراسلتنا "
+"على العنوان {email} لنجيب عن أي استفسار يخصّ سداد الدفعات."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -9923,7 +9924,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
-msgstr "اسعى للحصول على شهادة موثّقة"
+msgstr "اسعَ للحصول على شهادة موثّقة"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -16874,7 +16875,7 @@ msgid ""
 "role cannot edit or delete an activated certificate."
 msgstr ""
 "للبدء بإصدار الشهادات، يختار أحد أعضاء فريق المساق ممن يتمتّعون بصلاحيات "
-"المشرف {em_start} {تنشيط em_end}. لا يٌسمح لأعضاء الفريق من غير المشرفين "
+"المشرف {em_start}تنشيط{em_end}. لا يٌسمح لأعضاء الفريق من غير المشرفين "
 "بتعديل أو حذف شهادة مفعّلة."
 
 #: cms/templates/certificates.html
