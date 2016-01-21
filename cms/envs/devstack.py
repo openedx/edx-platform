@@ -55,11 +55,6 @@ DJFS = {
     'url_root': '/static/djpyfs',
 }
 
-############################# ADVANCED COMPONENTS #############################
-
-# Make it easier to test advanced components in local dev
-FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
-
 ################################# CELERY ######################################
 
 # By default don't use a worker, execute tasks as if they were local functions

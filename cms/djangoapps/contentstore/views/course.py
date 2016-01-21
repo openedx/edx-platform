@@ -24,7 +24,6 @@ from opaque_keys.edx.locations import Location
 
 from .component import (
     ADVANCED_COMPONENT_TYPES,
-    SPLIT_TEST_COMPONENT_TYPE,
 )
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED
@@ -1598,8 +1597,8 @@ def are_content_experiments_enabled(course):
     Returns True if content experiments have been enabled for the course.
     """
     return (
-        SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
-        SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+        'split_test' in ADVANCED_COMPONENT_TYPES and
+        'split_test' in course.advanced_modules
     )
 
 
