@@ -13,7 +13,6 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from course_modes.models import CourseMode
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
@@ -97,8 +96,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         CourseEnrollmentFactory.create(
             user=self.user,
-            course_id=self.course_id,
-            mode=CourseMode.HONOR,
+            course_id=self.course_id
         )
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
@@ -380,32 +378,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertIn("Cannot Find Certificate", response.content)
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
-    @ddt.data(True, False)
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_audit_certificate_display(self, eligible_for_certificate):
-        """
-        Ensure that audit-mode certs are not shown in the web view.
-        """
-        # Convert the cert to audit, with the specified eligibility
-        self.cert.mode = 'audit'
-        self.cert.eligible_for_certificate = eligible_for_certificate
-        self.cert.save()
-
-        self._add_course_certificates(count=1, signatory_count=2)
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url)
-
-        if eligible_for_certificate:
-            self.assertIn(str(self.cert.verify_uuid), response.content)
-        else:
-            self.assertIn("Invalid Certificate", response.content)
-            self.assertIn("Cannot Find Certificate", response.content)
-            self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
-            self.assertNotIn(str(self.cert.verify_uuid), response.content)
-
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_invalid_certificate(self):
         """
@@ -561,7 +533,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             course_id=unicode(self.course.id)
         )
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
+        self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
 
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
@@ -584,7 +556,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         preview mode. Either the certificate is marked active or not.
         """
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
+        self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,

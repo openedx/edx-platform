@@ -75,7 +75,7 @@ def update_certificate(request):
         try:
             course_key = SlashSeparatedCourseKey.from_deprecated_string(xqueue_body['course_id'])
 
-            cert = GeneratedCertificate.eligible_certificates.get(
+            cert = GeneratedCertificate.objects.get(
                 user__username=xqueue_body['username'],
                 course_id=course_key,
                 key=xqueue_header['lms_key'])
