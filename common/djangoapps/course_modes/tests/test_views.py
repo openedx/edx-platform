@@ -14,6 +14,7 @@ from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode, Mode
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
 @ddt.ddt
@@ -324,7 +325,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEquals(course_modes, expected_modes)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    @with_is_edx_domain(True)
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:
