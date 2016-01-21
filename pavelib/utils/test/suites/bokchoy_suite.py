@@ -58,6 +58,7 @@ class BokChoyTestSuite(TestSuite):
         self.a11y_file = Env.BOK_CHOY_A11Y_CUSTOM_RULES_FILE
         self.imports_dir = kwargs.get('imports_dir', None)
         self.coveragerc = kwargs.get('coveragerc', None)
+        self.skip_youtube_tests = kwargs.get('skip_youtube_tests', False)
 
     def __enter__(self):
         super(BokChoyTestSuite, self).__enter__()
@@ -165,7 +166,7 @@ class BokChoyTestSuite(TestSuite):
         # Ensure the test servers are available
         msg = colorize('green', "Confirming servers are running...")
         print msg
-        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
+        bokchoy_utils.start_servers(self.default_store, self.coveragerc, self.skip_youtube_tests)
 
     def load_data(self):
         """
@@ -219,6 +220,9 @@ class BokChoyTestSuite(TestSuite):
             "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
+            "SKIP_YOUTUBE_TESTS={skip_youtube_tests}".format(
+                    skip_youtube_tests=True if self.skip_youtube_tests else ""
+            ),
             "nosetests",
             test_spec,
             "{}".format(self.verbosity_processes_string())

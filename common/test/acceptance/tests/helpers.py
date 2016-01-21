@@ -59,29 +59,15 @@ def is_youtube_available():
     """
     Check if the required youtube urls are available.
 
-    If a URL in `youtube_api_urls` is not reachable then subsequent URLs will not be checked.
+    If SKIP_YOUTUBE_TESTS is
 
     Returns:
         bool:
 
     """
-
-    youtube_api_urls = {
-        'main': 'https://www.youtube.com/',
-        'player': 'https://www.youtube.com/iframe_api',
-        # For transcripts, you need to check an actual video, so we will
-        # just specify our default video and see if that one is available.
-        'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
-    }
-
-    for url in youtube_api_urls.itervalues():
-        try:
-            response = requests.get(url, allow_redirects=False)
-        except requests.exceptions.ConnectionError:
-            return False
-
-        if response.status_code >= 300:
-            return False
+    skip_youtube_tests = os.environ.get('SKIP_YOUTUBE_TESTS', False)
+    if skip_youtube_tests:
+        return False
 
     return True
 

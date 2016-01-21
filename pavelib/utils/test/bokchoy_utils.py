@@ -18,7 +18,7 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-def start_servers(default_store, coveragerc=None):
+def start_servers(default_store, coveragerc=None, skip_youtube_tests=False):
     """
     Start the servers we will run tests on, returns PIDs for servers.
     """
@@ -34,11 +34,12 @@ def start_servers(default_store, coveragerc=None):
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
         address = "0.0.0.0:{}".format(info['port'])
         cmd = (
-            "DEFAULT_STORE={default_store} "
+            "DEFAULT_STORE={default_store} SKIP_YOUTUBE_TESTS={skip_youtube_tests}"
             "coverage run --rcfile={coveragerc} -m "
             "manage {service} --settings bok_choy runserver "
             "{address} --traceback --noreload".format(
                 default_store=default_store,
+                skip_youtube_tests=skip_youtube_tests,
                 coveragerc=coveragerc,
                 service=service,
                 address=address,
