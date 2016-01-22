@@ -33,7 +33,7 @@ from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.translation import ugettext_noop
 from django.core.cache import cache
 from django_countries.fields import CountryField
@@ -783,6 +783,12 @@ class LoginFailures(models.Model):
             return is_locked_out
         except ObjectDoesNotExist:
             return False
+        except MultipleObjectsReturned:
+            # Clean LoginFailures Table (keeping newest lockout_until) in case get_or_create had a race condition https://code.djangoproject.com/ticket/13906#no1
+            records = LoginFailures.objects.filter(user=user).order_by('-lockout_until')
+            for extra_record in records[1:]:
+                extra_record.delete()
+            return cls.is_user_locked_out(user)
 
     @classmethod
     def increment_lockout_counter(cls, user):
