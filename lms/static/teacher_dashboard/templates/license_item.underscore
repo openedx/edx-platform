@@ -28,7 +28,7 @@
     <div class="col-xs-4 col-sm-2 col-md-1 license-item-total is-metric hide">
       <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
       <%- questions_answered %>
-      <span class="hint">Completed rate</span>
+      <span class="hint">Progress</span>
     </div>
   </div>
 </div>
