@@ -1432,7 +1432,7 @@ def get_analytics_answer_dist(request):
     if not having_access or not url:
         return HttpResponseServerError(error_message)
 
-    client = Client(base_url=url, auth_token=auth_token)
+    client = Client(base_url=url, auth_token=auth_token, timeout=5)
     module = client.modules(course.id, module_id)
 
     try:
