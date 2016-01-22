@@ -13,13 +13,26 @@
       },
 
       isExpired: function() {
-        return moment(this.get("valid_to")) > moment();
+        return moment(this.get("valid_to")) < moment();
       },
 
       isExpiredSoon: function() {
         var validTo = moment(this.get("valid_to"));
 
         return validTo.diff(moment(), 'months') < 1;
+      },
+
+      getExpirationMessage: function() {
+        var msg = '', timeToExpire;
+
+        if (this.isExpired()) {
+          msg = "This license is expired.";
+        } else if (this.isExpiredSoon()) {
+          timeToExpire = moment(this.get("valid_to")).toNow();
+          msg = [
+            "This license is going to expire ", timeToExpire, "."].join('');
+        }
+        return msg;
       }
     });
 

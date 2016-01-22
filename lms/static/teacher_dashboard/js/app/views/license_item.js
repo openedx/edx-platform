@@ -33,17 +33,16 @@
       },
 
       getContext: function() {
-        var validTo = moment(this.model.get("valid_to"));
         return {
           "code": this.model.get("code"),
           "students_count": this.model.get("students_count"),
           "score": this.model.get("score"),
           "questions_answered": this.model.get("questions_answered"),
           "simulations_count": this.model.get("simulations_count"),
-          "is_expired_soon": this.model.isExpiredSoon(),
+          "display_expiration_message": this.model.isExpired() || this.model.isExpiredSoon(),
+          "expiration_message": this.model.getExpirationMessage(),
           "valid_from": moment(this.model.get("valid_from")).format(DATE_FORMAT),
-          "valid_to": validTo.format(DATE_FORMAT),
-          "expiration_time": validTo.toNow(),
+          "valid_to": moment(this.model.get("valid_to")).format(DATE_FORMAT),
           "is_expanded": this.isExpanded
         };
       },

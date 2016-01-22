@@ -23,6 +23,6 @@
   <% }); %>
 <% } else { %>
   <div class="user-item-empty is-empty-section">
-    There is no active users in the simulation.
+    There are no active users in the simulation.
   </div>
 <% } %>

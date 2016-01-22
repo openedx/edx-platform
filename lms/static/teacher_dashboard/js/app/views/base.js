@@ -20,14 +20,6 @@
         return this;
       },
 
-      beforeRender: function() {
-        this.$("[data-tooltip]").tooltip('destroy');
-      },
-
-      afterRender: function() {
-        this.$("[data-tooltip]").tooltip();
-      },
-
       getContext: function() {return {};},
 
       showLoadingBar: function() {

@@ -14,6 +14,6 @@
   </div>
   <div class="col-sm-1 is-metric hidden-xs">
     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-    <span class="hint hidden-sm">Completed rate</span>
+    <span class="hint hidden-sm">Progress</span>
   </div>
 </div>

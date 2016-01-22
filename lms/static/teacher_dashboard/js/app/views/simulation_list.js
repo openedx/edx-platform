@@ -24,7 +24,7 @@
           this.renderChildren();
         } else {
           this.$el.append(
-            "<div class='simulation-list-empty is-empty-section'>There is no available simulations.</div>"
+            "<div class='simulation-list-empty is-empty-section'>There are no available simulations.</div>"
           );
         }
         this.$(".simulation-list-info").stick_in_parent({offset_top: $(".navbar-fixed-top").height()});

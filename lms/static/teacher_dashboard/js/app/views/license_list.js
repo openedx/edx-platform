@@ -19,7 +19,7 @@
           this.renderChildren();
         } else {
           this.$el.html(
-            "<div class='simulation-list-empty is-empty-section'>There is no available Licenses.</div>"
+            "<div class='simulation-list-empty is-empty-section'>There are no available Licenses.</div>"
           );
         }
         return this;
