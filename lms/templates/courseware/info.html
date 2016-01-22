@@ -37,6 +37,9 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 <%static:require_module module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
         ToggleElementVisibility();
 </%static:require_module>
+<%static:require_module module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+        CourseHomeEvents();
+</%static:require_module>
 
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
