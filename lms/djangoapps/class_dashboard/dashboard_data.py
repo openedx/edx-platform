@@ -62,7 +62,7 @@ def get_problem_grade_distribution(course_id, enrollment):
     prob_grade_distrib = {}
     total_student_count = defaultdict(int)
 
-    if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB:
+    if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB or not settings.ANALYTICS_DATA_URL:
         # Aggregate query on studentmodule table for grade data for all problems in course
         queryset = models.StudentModule.objects.filter(
             course_id__exact=course_id,
@@ -95,7 +95,7 @@ def get_problem_grade_distribution(course_id, enrollment):
         course = modulestore().get_course(course_id, depth=4)
 
         # Connect to analytics data client
-        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN)
+        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN, timeout=5)
 
         for section in course.get_children():
             for subsection in section.get_children():
@@ -143,7 +143,7 @@ def get_sequential_open_distrib(course_id, enrollment):
 
     non_student_list = get_non_student_list(course_id)
 
-    if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB:
+    if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB or not settings.ANALYTICS_DATA_URL:
         # Aggregate query on studentmodule table for "opening a subsection" data
         queryset = models.StudentModule.objects.filter(
             course_id__exact=course_id,
@@ -158,7 +158,7 @@ def get_sequential_open_distrib(course_id, enrollment):
         course = modulestore().get_course(course_id, depth=2)
 
         # Connect to analytics data client
-        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN)
+        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN, timeout=5)
 
         for section in course.get_children():
             for subsection in section.get_children():
@@ -195,7 +195,7 @@ def get_problem_set_grade_distrib(course_id, problem_set, enrollment):
 
     prob_grade_distrib = {}
 
-    if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB:
+    if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB or not settings.ANALYTICS_DATA_URL:
         # Aggregate query on studentmodule table for grade data for set of problems in course
         queryset = models.StudentModule.objects.filter(
             course_id__exact=course_id,
@@ -224,7 +224,7 @@ def get_problem_set_grade_distrib(course_id, problem_set, enrollment):
                 curr_grade_distrib['max_grade'] = row['max_grade']
     else:
         # Connect to analytics data client
-        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN)
+        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN, timeout=5)
 
         for problem in problem_set:
             module = client.modules(course_id, problem)

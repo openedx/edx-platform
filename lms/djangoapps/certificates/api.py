@@ -79,8 +79,15 @@ def get_certificates_for_user(username):
     ]
 
 
-def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
-                               forced_grade=None):
+def generate_user_certificates(
+        student,
+        course_key,
+        course=None,
+        designation=None,
+        insecure=False,
+        generation_mode='batch',
+        forced_grade=None,
+):
     """
     It will add the add-cert request into the xqueue.
 
@@ -108,6 +115,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     generate_pdf = not has_html_certificates_enabled(course_key, course)
     status, cert = xqueue.add_cert(student, course_key,
                                    course=course,
+                                   designation=designation,
                                    generate_pdf=generate_pdf,
                                    forced_grade=forced_grade)
     if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
@@ -121,8 +129,15 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     return status
 
 
-def regenerate_user_certificates(student, course_key, course=None,
-                                 forced_grade=None, template_file=None, insecure=False):
+def regenerate_user_certificates(
+        student,
+        course_key,
+        course=None,
+        designation=None,
+        forced_grade=None,
+        template_file=None,
+        insecure=False,
+):
     """
     It will add the regen-cert request into the xqueue.
 
@@ -150,6 +165,7 @@ def regenerate_user_certificates(student, course_key, course=None,
         student,
         course_key,
         course=course,
+        designation=designation,
         forced_grade=forced_grade,
         template_file=template_file,
         generate_pdf=generate_pdf

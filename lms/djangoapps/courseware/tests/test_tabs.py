@@ -483,24 +483,6 @@ class TabListTestCase(TabTestCase):
             [{'type': 'unknown_type'}]
         ]
 
-        # tab types that should appear only once
-        unique_tab_types = [
-            CoursewareTab.type,
-            CourseInfoTab.type,
-            'textbooks',
-            'pdf_textbooks',
-            'html_textbooks',
-        ]
-
-        for unique_tab_type in unique_tab_types:
-            self.invalid_tabs.append([
-                {'type': CoursewareTab.type},
-                {'type': CourseInfoTab.type, 'name': 'fake_name'},
-                # add the unique tab multiple times
-                {'type': unique_tab_type},
-                {'type': unique_tab_type},
-            ])
-
         # valid tabs
         self.valid_tabs = [
             # any empty list is valid because a default list of tabs will be

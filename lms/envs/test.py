@@ -379,17 +379,6 @@ PASSWORD_HASHERS = (
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
-################################# CHAT ######################################
-# We'll use a SQLite DB just for the purposes of testing out the
-# Django side of things. In non-test environments, this should point
-# at a MySQL database that's been set up by the ejabberd provisioner.
-DATABASES['jabber'] = {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': TEST_ROOT / 'db' / 'jabber.db'
-}
-
-INSTALLED_APPS += ('jabber',)
-
 ########################## CLASS DASHBOARD ########################
 FEATURES['CLASS_DASHBOARD'] = True
 

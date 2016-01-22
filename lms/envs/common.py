@@ -110,14 +110,14 @@ FEATURES = {
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
-    'ENABLE_DISCUSSION_HOME_PANEL': False,
+    'ENABLE_DISCUSSION_HOME_PANEL': True,
 
     # Set this to True if you want the discussion digest emails enabled automatically for new users.
     # This will be set on all new account registrations.
     # It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled, since
     # subscribers who receive digests in that case will only be able to unsubscribe via links embedded
     # in their emails, and they will have no way to resubscribe.
-    'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
+    'ENABLE_DISCUSSION_EMAIL_DIGEST': True,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
@@ -2051,9 +2051,6 @@ TEMPLATE_VISIBLE_SETTINGS = [
     'FEATURES',
 ]
 
-############################### CHAT ################################
-JABBER = {}
-DATABASE_ROUTERS = []
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media
 # links in the footer.

@@ -3,6 +3,7 @@
 import logging
 import copy
 from optparse import make_option
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
@@ -11,6 +12,10 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from certificates.models import BadgeAssertion
 from certificates.api import regenerate_user_certificates
+
+use_cme = settings.FEATURES.get('USE_CME_REGISTRATION', False)
+if use_cme:
+    from cme_registration.models import CmeUserProfile
 
 LOGGER = logging.getLogger(__name__)
 
@@ -50,6 +55,14 @@ class Command(BaseCommand):
                     dest='template_file',
                     default=None,
                     help='The template file used to render this certificate, like "QMSE01-distinction.pdf"'),
+        make_option(
+            '-d',
+            '--designation',
+            metavar='DESIGNATION',
+            dest='designation',
+            default=None,
+            help='Professional designation to pass to certificate generator',
+        ),
     )
 
     def handle(self, *args, **options):
@@ -95,6 +108,13 @@ class Command(BaseCommand):
 
         course = modulestore().get_course(course_id, depth=2)
 
+        designation = options['designation']
+
+        if not designation and use_cme:
+            designations = CmeUserProfile.objects.filter(user=student).values('professional_designation')
+            if len(designations):
+                designation = designations[0]['professional_designation']
+
         if not options['noop']:
             LOGGER.info(
                 (
@@ -108,6 +128,7 @@ class Command(BaseCommand):
             # Add the certificate request to the queue
             ret = regenerate_user_certificates(
                 student, course_id, course=course,
+                designation=designation,
                 forced_grade=options['grade_value'],
                 template_file=options['template_file'],
                 insecure=options['insecure']

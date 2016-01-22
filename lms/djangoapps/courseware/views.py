@@ -1432,7 +1432,7 @@ def get_analytics_answer_dist(request):
     if not having_access or not url:
         return HttpResponseServerError(error_message)
 
-    client = Client(base_url=url, auth_token=auth_token)
+    client = Client(base_url=url, auth_token=auth_token, timeout=5)
     module = client.modules(course.id, module_id)
 
     try:
@@ -1511,7 +1511,7 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
             'totalLastIncorrectCount': 0,
         })
         count_dict['totalFirstAttemptCount'] = count_dict.get('totalFirstAttemptCount') + item['first_response_count']
-        count_dict['totalLastAttemptCount'] = count_dict.get('totalLastAttemptCount') + item['last_response_count'] 
+        count_dict['totalLastAttemptCount'] = count_dict.get('totalLastAttemptCount') + item['last_response_count']
         if item['correct']:
             count_dict['totalFirstCorrectCount'] = count_dict.get('totalFirstCorrectCount') + item['first_response_count']
             count_dict['totalLastCorrectCount'] = count_dict.get('totalLastCorrectCount') + item['last_response_count']
@@ -1584,7 +1584,7 @@ def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num
         question_types_by_part: dict of question types
         num_options_by_part: dict of number of options by question
         num_rows_by_part: dict of count of rows returned by API
-        part_id_set: set of part_ids 
+        part_id_set: set of part_ids
 
     Returns:
         True: if an error was detected

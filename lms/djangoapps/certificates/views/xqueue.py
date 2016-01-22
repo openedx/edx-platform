@@ -4,6 +4,7 @@ Views used by XQueue certificate generation.
 import json
 import logging
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
@@ -22,6 +23,10 @@ from certificates.models import (
     GeneratedCertificate,
     ExampleCertificate,
 )
+
+use_cme = settings.FEATURES.get('USE_CME_REGISTRATION', False)
+if use_cme:
+    from cme_registration.models import CmeUserProfile
 
 
 log = logging.getLogger(__name__)
@@ -43,11 +48,17 @@ def request_certificate(request):
             course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
             course = modulestore().get_course(course_key, depth=2)
 
+            designation = None
+            if use_cme:
+                designations = CmeUserProfile.objects.filter(user=student).values('professional_designation')
+                if len(designations):
+                    designation = designations[0]['professional_designation']
+
             status = certificate_status_for_student(student, course_key)['status']
             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
                 log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
                 log.info(log_msg, username, course_key)
-                status = generate_user_certificates(student, course_key, course=course)
+                status = generate_user_certificates(student, course_key, course=course, designation=designation)
             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
 
