@@ -67,6 +67,11 @@
                     'required': false
                 },
                 {
+                    'argument': 'designation',
+                    'display_name': gettext('designation'),
+                    'required': false
+                },
+                {
                     'argument': 'template_file',
                     'display_name': gettext('template'),
                     'required': false
