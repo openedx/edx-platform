@@ -72,9 +72,6 @@ def dashboard(request, course, ccx):
 
     if ccx:
         ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)
-        passports = get_override_for_ccx(ccx, course, 'lti_passports', course.lti_passports)
-        passports = map(lambda x: LtiPassport(x).as_dict(), passports)
-        context['passports'] = passports
         context['license'] = CourseLicense.get_license(ccx_locator)
         context['labster_license_url'] = reverse('labster_license_handler', kwargs={'course_id': ccx_locator})
     else:

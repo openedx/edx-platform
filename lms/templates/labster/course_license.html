@@ -65,29 +65,6 @@ from django.core.urlresolvers import reverse
           )}
         </p>
       %else:
-      % if passports:
-        <div style="margin-bottom: 40px;">
-          <h2> ${_("LTI Passport List")}</h2>
-          <table>
-            <thead>
-              <tr>
-                <td class="label">LTI id</td>
-                <td class="label">Consumer key</td>
-                <td class="label">Secret Key</td>
-              </tr>
-            </thead>
-            <tbody>
-              % for passport in passports:
-              <tr>
-                <td>${passport['lti_id']}</td>
-                <td>${passport['consumer_key']}</td>
-                <td>${passport['secret_key']}</td>
-              </tr>
-              %endfor
-            </tbody>
-          </table>
-        </div>
-      % endif
         <% license_code = license.license_code if license else '' %>
         <form action="${labster_license_url}" method="POST">
           <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
