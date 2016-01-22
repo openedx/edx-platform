@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 
 from openedx.core.djangoapps.labster.course.utils import LtiPassport
 
+from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
+from lms.djangoapps.ccx.overrides import get_override_for_ccx
+
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
@@ -48,8 +51,14 @@ def licenses_api_call(request):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         with modulestore().bulk_operations(course_key):
             course = get_course_by_id(course_key, depth=2)
-        passports = course.lti_passports
+
+        # CCX overrides doesn't work outside of Courseware, so we have to get them via
+        # get_override_for_ccx.
+        # Next 3 lines work well with both: ccx and simple courses.
+        ccx = get_ccx_from_ccx_locator(course_key)
+        passports = get_override_for_ccx(ccx, course, 'lti_passports', course.lti_passports)[:]
         consumer_keys = [LtiPassport(passport_str).consumer_key for passport_str in passports]
+
         url = settings.LABSTER_ENDPOINTS.get("licenses")
         response = _send_request(
             url,
