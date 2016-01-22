@@ -7,6 +7,8 @@ from django.utils.translation import ugettext as _
 
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from microsite_configuration import microsite
+from microsite_configuration.templatetags.microsite import platform_name
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
