@@ -8,13 +8,11 @@
       <% } %>
       <%- code %>
     </div>
-    <% if (is_expired_soon) { %>
+    <% if (display_expiration_message) { %>
     <div class="col-xs-12 col-md-1 license-item-warning is-metric"
-      data-tooltip title="This license is going to expire <%= expiration_time %>.">
+      data-tooltip title="<%- expiration_message %>">
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="visible-xs-inline visible-sm-inline text-warning">
-          This license is going to expire <%= expiration_time %>.
-        </span>
+        <span class="visible-xs-inline visible-sm-inline text-warning"><%- expiration_message %></span>
     </div>
     <% } %>
     <div class="col-xs-4 col-sm-2 col-md-1 license-item-students is-metric hide">
@@ -37,14 +35,14 @@
 <% if (is_expanded) { %>
   <div class="license-additional-info">
     <div class="row">
-      <% if (is_expired_soon) { %>
+      <% if (display_expiration_message) { %>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8 hidden-xs hidden-sm license-item-warning is-metric"
-        data-tooltip title="This license is going to expire <%= expiration_time %>.">
+        data-tooltip title="<%- expiration_message %>">
           <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-          <span class="text-warning">This license is going to expire <%= expiration_time %>.</span>
+          <span class="text-warning"><%- expiration_message %></span>
       </div>
       <% } %>
-      <div class="col-sm-3 col-md-2 col-lg-1 <% if (!is_expired_soon) {print('col-md-offset-6 col-lg-offset-8')} %>  is-metric">
+      <div class="col-sm-3 col-md-2 col-lg-1 <% if (!display_expiration_message) {print('col-md-offset-6 col-lg-offset-8')} %>  is-metric">
         <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
         <%- simulations_count %>
         <span class="hint hidden-xs hidden-sm">Number of Simulations</span>
