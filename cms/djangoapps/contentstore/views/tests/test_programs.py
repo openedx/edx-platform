@@ -29,7 +29,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
     @httpretty.activate
     def test_programs_config_disabled(self):
         """Verify that the programs tab and creation button aren't rendered when config is disabled."""
-        self.create_config(enable_studio_tab=False)
+        self.create_programs_config(enable_studio_tab=False)
         self.mock_programs_api()
 
         response = self.client.get(self.studio_home)
@@ -48,7 +48,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
         student = UserFactory(is_staff=False)
         self.client.login(username=student.username, password='test')
 
-        self.create_config()
+        self.create_programs_config()
         self.mock_programs_api()
 
         response = self.client.get(self.studio_home)
@@ -57,9 +57,9 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
     @httpretty.activate
     def test_programs_displayed(self):
         """Verify that the programs tab and creation button can be rendered when config is enabled."""
-        self.create_config()
 
         # When no data is provided, expect creation prompt.
+        self.create_programs_config()
         self.mock_programs_api(data={'results': []})
 
         response = self.client.get(self.studio_home)
@@ -102,7 +102,7 @@ class TestProgramAuthoringView(ProgramsApiConfigMixin, SharedModuleStoreTestCase
     def test_authoring_header(self):
         """Verify that the header contains the expected text."""
         self.client.login(username=self.staff.username, password='test')
-        self.create_config()
+        self.create_programs_config()
 
         response = self._assert_status(200)
         self.assertIn("Program Administration", response.content)
@@ -116,7 +116,7 @@ class TestProgramAuthoringView(ProgramsApiConfigMixin, SharedModuleStoreTestCase
         self._assert_status(404)
 
         # Enable Programs authoring interface
-        self.create_config()
+        self.create_programs_config()
 
         student = UserFactory(is_staff=False)
         self.client.login(username=student.username, password='test')
@@ -134,13 +134,13 @@ class TestProgramsIdTokenView(ProgramsApiConfigMixin, SharedModuleStoreTestCase)
 
     def test_config_disabled(self):
         """Ensure the endpoint returns 404 when Programs authoring is disabled."""
-        self.create_config(enable_studio_tab=False)
+        self.create_programs_config(enable_studio_tab=False)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 404)
 
     def test_not_logged_in(self):
         """Ensure the endpoint denies access to unauthenticated users."""
-        self.create_config()
+        self.create_programs_config()
         self.client.logout()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 302)
@@ -152,7 +152,7 @@ class TestProgramsIdTokenView(ProgramsApiConfigMixin, SharedModuleStoreTestCase)
         Ensure the endpoint responds with a valid JSON payload when authoring
         is enabled.
         """
-        self.create_config()
+        self.create_programs_config()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         payload = json.loads(response.content)
