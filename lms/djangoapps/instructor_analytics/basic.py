@@ -432,6 +432,7 @@ def dump_grading_context(course):
 
 def iterate_problem_components(course):
     """ Helper function for iterating through all problems of a course """
+
     for section in course.get_children():
         section_name = section.display_name_with_default
         for subsection in section.get_children():
@@ -441,7 +442,7 @@ def iterate_problem_components(course):
 
                 parent_metadata = [section_name, subsection_name, unit_name]
                 for component in unit.get_children():
-                    if component.category == 'problem':
+                    if component.category in settings.STUDENT_RESPONSES_REPORT_SUPPORTED_TYPES:
                         yield component, parent_metadata
 
 
@@ -462,12 +463,29 @@ def student_responses(course):
             for module in modules:
                 try:
                     state_dict = json.loads(module.state) if module.state else {}
-                    raw_answers = state_dict.get("student_answers", {})
                 except ValueError:
                     log.error("Student responses: Could not parse module state for " +
                               "StudentModule id={module_id}, course={course_id}".format(module_id=module.id, course_id=course.id))
                     continue
-                pretty_answers = u', '.join(u"{problem}={answer}".format(problem=problem, answer=answer) for (problem, answer) in raw_answers.items())
+
+                # Include other problems, e.g. Free Text Response, Submit And Compare Xblocks
+                # that write 'student_answer' to the state.
+                if 'student_answers' in state_dict:
+                    raw_answers = state_dict['student_answers']
+                    pretty_answers = u', '.join([
+                        u"{problem}={answer}".format(
+                            problem=problem,
+                            answer=answer,
+                        )
+                        for (problem, answer) in raw_answers.items()
+                    ])
+                elif 'student_answer' in state_dict:
+                    raw_answer = state_dict['student_answer']
+                    pretty_answers = u"{problem}={answer}".format(problem=problem_component.location, answer=raw_answer)
+                else:
+                    raw_answers = {}
+                    pretty_answers = None
+
                 yield problem_component_info + [module.student.username, pretty_answers]
                 if not has_answer:
                     has_answer = True
