@@ -20,6 +20,9 @@
         return this;
       },
 
+      beforeRender: function() {},
+      afterRender: function() {},
+
       getContext: function() {return {};},
 
       showLoadingBar: function() {
