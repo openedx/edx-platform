@@ -193,6 +193,7 @@ class CertificatesTest(StudioCourseTest):
 
         #Refreshing the page, So page have the updated certificate object.
         self.certificates_page.refresh()
+        self.certificates_page.wait_for_page()
         signatory = self.certificates_page.certificates[0].signatories[0]
         self.assertIn("Updated signatory name", signatory.name)
         self.assertIn("Update signatory title", signatory.title)
