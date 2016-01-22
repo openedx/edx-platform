@@ -28,7 +28,7 @@
         if (this.isExpired()) {
           msg = "This license is expired.";
         } else if (this.isExpiredSoon()) {
-          timeToExpire = moment(this.get("valid_to")).toNow();
+          timeToExpire = moment(this.get("valid_to")).fromNow();
           msg = [
             "This license is going to expire ", timeToExpire, "."].join('');
         }
