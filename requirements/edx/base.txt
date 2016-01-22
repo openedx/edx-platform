@@ -154,6 +154,7 @@ selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
 testfixtures==4.5.0
+zendesk==1.1.1
 
 # Used for Segment analytics
 analytics-python==1.1.0
