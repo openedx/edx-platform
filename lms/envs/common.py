@@ -1610,7 +1610,20 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # and defines some "args" function that returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
-
+# In production, the Django pipeline appends a file hash to JavaScript file names.
+# This makes it difficult for RequireJS to load its requirements, since module names
+# specified in JavaScript code do not include the hash.
+# For this reason, we calculate the actual path including the hash on the server
+# when rendering the page.  We then override the default paths provided to RequireJS
+# so it can resolve the module name to the correct URL.
+#
+# If you want to load JavaScript dependencies using RequireJS
+# but you don't want to include those dependencies in the JS bundle for the page,
+# then you need to add the js urls in this list.
+REQUIRE_JS_PATH_OVERRIDES = [
+    'js/bookmarks/views/bookmark_button.js',
+    'js/views/message_banner.js'
+]
 ################################# CELERY ######################################
 
 # Message configuration

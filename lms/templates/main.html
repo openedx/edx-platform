@@ -86,6 +86,9 @@ from branding import api as branding_api
   </script>
   <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
 
+  <%block name="js_overrides">
+  </%block>
+
   % if not disable_courseware_js:
     <%static:js group='module-js'/>
   % endif
