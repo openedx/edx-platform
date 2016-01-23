@@ -76,3 +76,17 @@ class TestProgramsApiConfig(ProgramsApiConfigMixin, TestCase):
 
         programs_config = self.create_programs_config()
         self.assertTrue(programs_config.is_studio_tab_enabled)
+
+    def test_is_certification_enabled(self, _mock_cache):
+        """
+        Verify that the property controlling certification-related functionality
+        for Programs behaves as expected.
+        """
+        programs_config = self.create_programs_config(enabled=False)
+        self.assertFalse(programs_config.is_certification_enabled)
+
+        programs_config = self.create_programs_config(enable_certification=False)
+        self.assertFalse(programs_config.is_certification_enabled)
+
+        programs_config = self.create_programs_config()
+        self.assertTrue(programs_config.is_certification_enabled)

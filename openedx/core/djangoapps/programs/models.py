@@ -54,8 +54,14 @@ class ProgramsApiConfig(ConfigurationModel):
         verbose_name=_("Enable Student Dashboard Displays"),
         default=False
     )
+
     enable_studio_tab = models.BooleanField(
         verbose_name=_("Enable Studio Authoring Interface"),
+        default=False
+    )
+
+    enable_certification = models.BooleanField(
+        verbose_name=_("Enable Program Certificate Generation"),
         default=False
     )
 
@@ -109,3 +115,11 @@ class ProgramsApiConfig(ConfigurationModel):
             bool(self.authoring_app_js_path) and
             bool(self.authoring_app_css_path)
         )
+
+    @property
+    def is_certification_enabled(self):
+        """
+        Indicates whether background tasks should be initiated to grant
+        certificates for Program completion.
+        """
+        return self.enabled and self.enable_certification

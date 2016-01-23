@@ -47,8 +47,8 @@ Eligibility:
 """
 import json
 import logging
-import uuid
 import os
+import uuid
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -62,12 +62,14 @@ from django_extensions.db.fields import CreationDateTimeField
 from django_extensions.db.fields.json import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
+
 from config_models.models import ConfigurationModel
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from course_modes.models import CourseMode
 from instructor_task.models import InstructorTask
+from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
+from xmodule.modulestore.django import modulestore
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -291,6 +293,24 @@ class GeneratedCertificate(models.Model):
         Return True if certificate is valid else return False.
         """
         return self.status == CertificateStatuses.downloadable
+
+    def save(self, *args, **kwargs):
+        """
+        After the base save() method finishes, fire the COURSE_CERT_AWARDED
+        signal iff we have stored a record of a learner passing the course.
+
+        The learner is assumed to have passed the course if certificate status
+        is either 'generating' or 'downloadable'.
+        """
+        super(GeneratedCertificate, self).save(*args, **kwargs)
+        if self.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+            COURSE_CERT_AWARDED.send_robust(
+                sender=self.__class__,
+                user=self.user,
+                course_key=self.course_id,
+                mode=self.mode,
+                status=self.status,
+            )
 
 
 class CertificateGenerationHistory(TimeStampedModel):
