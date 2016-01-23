@@ -244,7 +244,14 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             mock_submit_task.return_value = MagicMock()
             submit_course_forums_usage_task(request, self.course.id)
 
-            mock_submit_task.assert_called_once_with(request, 'course_forums', get_course_forums_usage, self.course.id, {}, '')
+            mock_submit_task.assert_called_once_with(
+                request,
+                'course_forums_usage',
+                get_course_forums_usage,
+                self.course.id,
+                {},
+                '',
+            )
 
     def test_submit_student_forums_usage_task(self):
         request = self.create_task_request(self.instructor)

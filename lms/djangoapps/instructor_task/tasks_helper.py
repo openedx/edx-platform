@@ -855,7 +855,7 @@ def push_course_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, 
     """
     Collect course forums usage data and upload them to S3 as a CSV
     """
-    return _push_csv_responses_to_s3(collect_course_forums_data, u'course_forums', course_id, action_name)
+    return _push_csv_responses_to_s3(collect_course_forums_data, u'course_forums_usage', course_id, action_name)
 
 
 def push_student_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
