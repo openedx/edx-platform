@@ -19,6 +19,7 @@ class MakoLoader(object):
     This is a Django loader object which will load the template as a
     Mako template if the first line is "## mako". It is based off BaseLoader
     in django.template.loader.
+    We need this in order to be able to include mako templates inside main_django.html.
     """
 
     is_usable = False
