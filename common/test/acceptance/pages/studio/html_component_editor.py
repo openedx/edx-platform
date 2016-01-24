@@ -55,6 +55,7 @@ class HtmlComponentEditorView(ComponentEditorView):
         """
         self.q(css=self.editor_mode_css).click()
         self.q(css='[aria-label="Edit HTML"]').click()
+        self.wait_for_element_visibility('.mce-title', 'Wait for CodeMirror editor')
 
         #Focus goes to the editor by default
         ActionChains(self.browser).send_keys([Keys.CONTROL, 'a']).\
