@@ -6,8 +6,8 @@ import os
 from tempfile import NamedTemporaryFile
 
 from django.core.files.uploadedfile import UploadedFile
-from PIL import Image
 import piexif
+from PIL import Image
 
 
 @contextmanager

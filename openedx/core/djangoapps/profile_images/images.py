@@ -210,7 +210,10 @@ def _update_exif_orientation(exif, orientation):
 
 
 def _get_exif_orientation(exif):
-    """Return the orientation value for the given Image object"""
+    """
+    Return the orientation value for the given Image object, or None if the
+    value is not set.
+    """
     exif_dict = piexif.load(exif)
     return exif_dict['0th'].get(piexif.ImageIFD.Orientation)
 
