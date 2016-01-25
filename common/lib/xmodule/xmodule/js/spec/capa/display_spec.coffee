@@ -109,6 +109,15 @@ describe 'Problem', ->
       @bind = @problem.bind
       spyOn @problem, 'bind'
 
+    describe 'error', ->
+      it 'show error message when not null', ->
+        @problem.render('', 'foo');
+        expect(@problem.el.find('.copy-error')).not.toHaveClass('is-hidden')
+
+      it 'hide error message when not null', ->
+        @problem.render()
+        expect(@problem.el.find('.copy-error')).toHaveClass('is-hidden')
+
     describe 'with content given', ->
       beforeEach ->
         @problem.render 'Hello World'
@@ -234,6 +243,16 @@ describe 'Problem', ->
   describe 'reset', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
+    it 'call render with error', ->
+      spyOn(@problem, 'render').andCallThrough()
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        response =
+          error: 'foo'
+        callback(response)
+        promise =
+          always: (callable) -> callable()
+      @problem.reset()
+      expect(@problem.render).toHaveBeenCalledWith undefined, 'foo'
 
     it 'log the problem_reset event', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->

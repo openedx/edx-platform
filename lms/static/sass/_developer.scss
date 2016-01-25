@@ -286,3 +286,12 @@
     }
   }
 }
+
+//mehrozezahid - TNL-1437
+// problem content in problem.html
+div.problem .action {
+  .copy-error {
+    @include font-size(14);
+    color: $error-color;
+  }
+}

@@ -150,7 +150,7 @@ class @Problem
     $.postWithPrefix "#{url}/input_ajax", data, callback
 
 
-  render: (content) ->
+  render: (content, error) ->
     if content
       @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
@@ -159,6 +159,9 @@ class @Problem
         @bind()
         @queueing()
       @el.attr('aria-busy', 'false')
+    else if error
+      @el.find('span.inline').html(error)
+      @el.find('.copy-error').removeClass('is-hidden')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
@@ -328,7 +331,7 @@ class @Problem
   reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
-        @render(response.html)
+        @render(response.html, response.error)
         @updateProgress response
 
   # TODO this needs modification to deal with javascript responses; perhaps we
