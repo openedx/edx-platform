@@ -53,6 +53,7 @@ from lms.djangoapps.ccx.overrides import (
 )
 from lms.djangoapps.ccx.utils import (
     assign_coach_role_to_ccx,
+    assign_discussion_admin_role,
     ccx_course,
     ccx_students_enrolling_center,
     get_ccx_for_coach,
@@ -208,6 +209,7 @@ def create_ccx(request, course, ccx=None):
     )
 
     assign_coach_role_to_ccx(ccx_id, request.user, course.id)
+    assign_discussion_admin_role(ccx_id, request.user)
 
     return redirect(url)
 
