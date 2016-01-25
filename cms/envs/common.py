@@ -840,8 +840,6 @@ INSTALLED_APPS = (
     # Microsite configuration application
     'microsite_configuration',
 
-    # Credentials support
-    'openedx.core.djangoapps.credentials',
 )
 
 

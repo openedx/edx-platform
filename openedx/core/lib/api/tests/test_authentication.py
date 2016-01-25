@@ -10,6 +10,7 @@ import itertools
 import json
 
 import ddt
+
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -25,8 +26,8 @@ from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.views import APIView
 
 from provider import scope, constants
-from openedx.core.lib.api import authentication
 
+from .. import authentication
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
