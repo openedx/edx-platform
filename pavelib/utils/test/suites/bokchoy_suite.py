@@ -68,7 +68,7 @@ class BokChoyTestSuite(TestSuite):
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()      # pylint: disable=no-value-for-parameter
 
-        if not (self.fasttest or self.skip_clean):
+        if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
