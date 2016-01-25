@@ -77,10 +77,7 @@ class CourseOverviewField(serializers.RelatedField):
                 request=request,
             ),
 
-            # Note: The following 2 should be deprecated.
-            'social_urls': {
-                'facebook': course_overview.facebook_url,
-            },
+            # Note: The following should be deprecated.
             'latest_updates': {
                 'video': None
             },
