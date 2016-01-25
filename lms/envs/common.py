@@ -445,8 +445,8 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
     'oauth2_handler.UserInfoHandler'
 )
 
-OAUTH_EXPIRE_DELTA = datetime.timedelta(days=365)
-OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=30)
+OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
+OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
