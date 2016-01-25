@@ -52,9 +52,10 @@ def get_blocks(
     )
 
     # list of transformers to apply, adding user-specific ones if user is provided
-    transformers = [blocks_api_transformer]
+    transformers = []
     if user is not None:
         transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS + [ProctoredExamTransformer()]
+    transformers += [blocks_api_transformer]
 
     blocks = get_course_blocks(
         user,
