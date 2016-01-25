@@ -18,6 +18,10 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from courseware.courses import get_course_by_id
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
+from django_comment_common.utils import seed_permissions_roles
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
+from lms.djangoapps.django_comment_client.utils import assign_discussion_role
+
 from instructor.enrollment import (
     enroll_email,
     unenroll_email,
@@ -250,3 +254,16 @@ def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
             # assign user role coach on ccx
             with ccx_course(ccx_locator) as course:
                 allow_access(course, user, "ccx_coach", send_email=False)
+
+
+def assign_discussion_admin_role(course_key, coach):
+    """
+    Assigns admin role to ccx coach on discussion forum.
+
+    Args:
+      coach (User): CCX Admin.
+      course_key (CourseKey): A key for the course to which role will assign.
+      role (str): Roles on discussion forum.
+    """
+    seed_permissions_roles(course_key)
+    assign_discussion_role(course_key, coach, role=FORUM_ROLE_ADMINISTRATOR)
