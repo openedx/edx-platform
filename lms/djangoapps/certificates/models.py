@@ -47,8 +47,8 @@ Eligibility:
 """
 import json
 import logging
-import uuid
 import os
+import uuid
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -62,12 +62,14 @@ from django_extensions.db.fields import CreationDateTimeField
 from django_extensions.db.fields.json import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
+
 from config_models.models import ConfigurationModel
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from course_modes.models import CourseMode
 from instructor_task.models import InstructorTask
+from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
+from xmodule.modulestore.django import modulestore
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -292,6 +294,24 @@ class GeneratedCertificate(models.Model):
         """
         return self.status == CertificateStatuses.downloadable
 
+    def save(self, *args, **kwargs):
+        """
+        After the base save() method finishes, fire the COURSE_CERT_AWARDED
+        signal iff we have stored a record of a learner passing the course.
+
+        The learner is assumed to have passed the course if certificate status
+        is either 'generating' or 'downloadable'.
+        """
+        super(GeneratedCertificate, self).save(*args, **kwargs)
+        if self.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+            COURSE_CERT_AWARDED.send_robust(
+                sender=self.__class__,
+                user=self.user,
+                course_key=self.course_id,
+                mode=self.mode,
+                status=self.status,
+            )
+
 
 class CertificateGenerationHistory(TimeStampedModel):
     """
@@ -401,16 +421,13 @@ class CertificateInvalidation(TimeStampedModel):
         return data
 
 
-@receiver(post_save, sender=GeneratedCertificate)
-def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=unused-argument
+@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
+def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
     """
-    Handles post_save signal of GeneratedCertificate, and mark user collected
-    course milestone entry if user has passed the course.
-    User is assumed to have passed the course if certificate status is either 'generating' or 'downloadable'.
+    Mark a milestone entry if user has passed the course.
     """
-    allowed_cert_states = [CertificateStatuses.generating, CertificateStatuses.downloadable]
-    if is_prerequisite_courses_enabled() and instance.status in allowed_cert_states:
-        fulfill_course_milestone(instance.course_id, instance.user)
+    if is_prerequisite_courses_enabled():
+        fulfill_course_milestone(course_key, user)
 
 
 def certificate_status_for_student(student, course_id):
@@ -1065,25 +1082,25 @@ class CertificateTemplateAsset(TimeStampedModel):
         app_label = "certificates"
 
 
-@receiver(post_save, sender=GeneratedCertificate)
+@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
 #pylint: disable=unused-argument
-def create_badge(sender, instance, **kwargs):
+def create_badge(sender, user, course_key, status, **kwargs):
     """
     Standard signal hook to create badges when a certificate has been generated.
     """
     if not settings.FEATURES.get('ENABLE_OPENBADGES', False):
         return
-    if not modulestore().get_course(instance.course_id).issue_badges:
+    if not modulestore().get_course(course_key).issue_badges:
         LOGGER.info("Course is not configured to issue badges.")
         return
-    if BadgeAssertion.objects.filter(user=instance.user, course_id=instance.course_id):
+    if BadgeAssertion.objects.filter(user=user, course_id=course_key):
         LOGGER.info("Badge already exists for this user on this course.")
         # Badge already exists. Skip.
         return
     # Don't bake a badge until the certificate is available. Prevents user-facing requests from being paused for this
     # by making sure it only gets run on the callback during normal workflow.
-    if not instance.status == CertificateStatuses.downloadable:
+    if not status == CertificateStatuses.downloadable:
         return
     from .badge_handler import BadgeHandler
-    handler = BadgeHandler(instance.course_id)
-    handler.award(instance.user)
+    handler = BadgeHandler(course_key)
+    handler.award(user)

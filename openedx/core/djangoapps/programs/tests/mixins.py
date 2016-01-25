@@ -19,6 +19,7 @@ class ProgramsApiConfigMixin(object):
         'cache_ttl': 0,
         'enable_student_dashboard': True,
         'enable_studio_tab': True,
+        'enable_certification': True,
     }
 
     def create_programs_config(self, **kwargs):
