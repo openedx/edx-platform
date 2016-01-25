@@ -60,10 +60,6 @@ from lms.envs.common import (
 
     # Django REST framework configuration
     REST_FRAMEWORK,
-
-    # the following setting is referenced in a migration in openedx that gets
-    # run under both lms and cms, so it must be available in both places.
-    CREDENTIALS_SERVICE_USERNAME
 )
 from path import Path as path
 from warnings import simplefilter
@@ -844,8 +840,6 @@ INSTALLED_APPS = (
     # Microsite configuration application
     'microsite_configuration',
 
-    # Credentials support
-    'openedx.core.djangoapps.credentials',
 )
 
 
