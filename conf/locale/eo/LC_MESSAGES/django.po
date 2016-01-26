@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-15 16:01+0000\n"
-"PO-Revision-Date: 2016-01-15 16:01:35.536892\n"
+"POT-Creation-Date: 2016-01-21 20:46+0000\n"
+"PO-Revision-Date: 2016-01-21 20:46:53.757815\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -558,6 +558,10 @@ msgstr ""
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "Pässwörd:  Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/djangoapps/student/forms.py
+msgid "Unauthorized email address."
+msgstr "Ûnäüthörïzéd émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -2684,6 +2688,20 @@ msgstr ""
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αт#"
 
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CCX Connector URL"
+msgstr "ÇÇX Çönnéçtör ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
+msgstr ""
+"ÛRL för ÇÇX Çönnéçtör äpplïçätïön för mänägïng çréätïön öf ÇÇXs. (öptïönäl)."
+" Ìgnöréd ünléss 'Énäßlé ÇÇX' ïs sét tö 'trüé'. Ⱡ'σяєм ιρѕ#"
+
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts"
 msgstr ""
@@ -3187,11 +3205,29 @@ msgstr "Téäms Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter configuration for the teams feature. Expects two entries: "
-"max_team_size and topics, where topics is a list of topics."
+"Specify the maximum team size and topics for teams inside the provided set "
+"of curly braces. Make sure that you enclose all of the sets of topic values "
+"within a set of square brackets, with a comma after the closing curly brace "
+"for each topic, and another comma after the closing square brackets. For "
+"example, to specify that teams should have a maximum of 5 participants and "
+"provide a list of 2 topics, enter the configuration in this format: "
+"{\"topics\": [{\"name\": \"Topic1Name\", \"description\": "
+"\"Topic1Description\", \"id\": \"Topic1ID\"}, {\"name\": \"Topic2Name\", "
+"\"description\": \"Topic2Description\", \"id\": \"Topic2ID\"}], "
+"\"max_team_size\": 5}. In \"id\" values, the only supported special "
+"characters are underscore, hyphen, and period."
 msgstr ""
-"Éntér çönfïgürätïön för thé téäms féätüré. Éxpéçts twö éntrïés: "
-"mäx_téäm_sïzé änd töpïçs, whéré töpïçs ïs ä lïst öf töpïçs. Ⱡ'σяєм ιρ#"
+"Spéçïfý thé mäxïmüm téäm sïzé änd töpïçs för téäms ïnsïdé thé prövïdéd sét "
+"öf çürlý ßräçés. Mäké süré thät ýöü énçlösé äll öf thé séts öf töpïç välüés "
+"wïthïn ä sét öf sqüäré ßräçkéts, wïth ä çömmä äftér thé çlösïng çürlý ßräçé "
+"för éäçh töpïç, änd änöthér çömmä äftér thé çlösïng sqüäré ßräçkéts. För "
+"éxämplé, tö spéçïfý thät téäms shöüld hävé ä mäxïmüm öf 5 pärtïçïpänts änd "
+"prövïdé ä lïst öf 2 töpïçs, éntér thé çönfïgürätïön ïn thïs förmät: "
+"{\"topics\": [{\"name\": \"Topic1Name\", \"description\": "
+"\"Topic1Description\", \"id\": \"Topic1ID\"}, {\"name\": \"Topic2Name\", "
+"\"description\": \"Topic2Description\", \"id\": \"Topic2ID\"}], "
+"\"mäx_téäm_sïzé\": 5}. Ìn \"ïd\" välüés, thé önlý süppörtéd spéçïäl "
+"çhäräçtérs äré ündérsçöré, hýphén, änd pérïöd.#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -6373,12 +6409,28 @@ msgstr ""
 " dïfférént. Énröllïng änýwäý wïth {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "File is not attached."
+msgstr "Fïlé ïs nöt ättäçhéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Username {user} already exists."
 msgstr "Ûsérnämé {user} älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "File is not attached."
-msgstr "Fïlé ïs nöt ättäçhéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid ""
+"Error '{error}' while sending email to new user (user email={email}). "
+"Without the email student would not be able to login. Please contact support"
+" for further information."
+msgstr ""
+"Érrör '{error}' whïlé séndïng émäïl tö néw üsér (üsér émäïl={email}). "
+"Wïthöüt thé émäïl stüdént wöüld nöt ßé äßlé tö lögïn. Pléäsé çöntäçt süppört"
+" för fürthér ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒι¢ια ∂є#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not find problem with this location."
@@ -11523,6 +11575,10 @@ msgstr "LÉÀRN MÖRÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Starts"
 msgstr "Stärts Ⱡ'σяєм ιρѕυ#"
 
+#: lms/templates/courses_list.html
+msgid "View all Courses"
+msgstr "Vïéw äll Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
@@ -11906,10 +11962,6 @@ msgstr ""
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
 msgstr "Séärçh för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/index.html
-msgid "View all Courses"
-msgstr "Vïéw äll Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"

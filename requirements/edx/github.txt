@@ -77,11 +77,11 @@ git+https://github.com/edx/XBlock.git@xblock-0.4.4#egg=XBlock==0.4.4
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@0.2.5#egg=ora2==0.2.5
+-e git+https://github.com/edx/edx-ora2.git@0.2.6#egg=ora2==0.2.6
 -e git+https://github.com/edx/edx-submissions.git@0.1.3#egg=edx-submissions==0.1.3
 -e git+https://github.com/edx/opaque-keys.git@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
-git+https://github.com/edx/i18n-tools.git@v0.1.4#egg=i18n-tools==v0.1.4
+git+https://github.com/edx/i18n-tools.git@v0.2#egg=i18n-tools==v0.2
 git+https://github.com/edx/edx-oauth2-provider.git@0.5.8#egg=edx-oauth2-provider==0.5.8
 git+https://github.com/edx/edx-val.git@0.0.8#egg=edxval==0.0.8
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
@@ -89,13 +89,13 @@ git+https://github.com/edx/edx-val.git@0.0.8#egg=edxval==0.0.8
 -e git+https://github.com/pmitros/DoneXBlock.git@857bf365f19c904d7e48364428f6b93ff153fabd#egg=done-xblock
 -e git+https://github.com/edx/edx-milestones.git@release-2015-11-17#egg=edx-milestones==0.1.5
 git+https://github.com/edx/edx-lint.git@v0.4.1#egg=edx_lint==0.4.1
-git+https://github.com/edx/xblock-utils.git@v1.0.0#egg=xblock-utils==v1.0.0
+git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils==1.0.2
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
 git+https://github.com/edx/edx-organizations.git@release-2015-12-08#egg=edx-organizations==0.2.0
 git+https://github.com/edx/edx-proctoring.git@0.12.5#egg=edx-proctoring==0.12.5
-git+https://github.com/edx/xblock-lti-consumer.git@v1.0.1#egg=xblock-lti-consumer==1.0.1
+git+https://github.com/edx/xblock-lti-consumer.git@v1.0.2#egg=xblock-lti-consumer==1.0.2
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga

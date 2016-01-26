@@ -3,10 +3,12 @@ Tests for discussion pages
 """
 
 import datetime
-from pytz import UTC
 from unittest import skip
 from uuid import uuid4
+
+from flaky import flaky
 from nose.plugins.attrib import attr
+from pytz import UTC
 
 from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
@@ -547,7 +549,6 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_comment_editable("comment_other_author"))
         self.edit_comment(page, "comment_self_author")
 
-    @skip  # TODO: See TNL-3943
     def test_edit_comment_as_moderator(self):
         self.setup_user(roles=["Moderator"])
         self.setup_view()
@@ -558,6 +559,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.edit_comment(page, "comment_self_author")
         self.edit_comment(page, "comment_other_author")
 
+    @flaky  # TODO: TNL-4057
     def test_cancel_comment_edit(self):
         self.setup_user()
         self.setup_view()

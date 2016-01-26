@@ -169,7 +169,27 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     context = {'courses': courses}
 
+    context['homepage_overlay_html'] = microsite.get_value('homepage_overlay_html')
+
+    # This appears to be an unused context parameter, at least for the master templates...
+    context['show_partners'] = microsite.get_value('show_partners', True)
+
+    # TO DISPLAY A YOUTUBE WELCOME VIDEO
+    # 1) Change False to True
+    context['show_homepage_promo_video'] = microsite.get_value('show_homepage_promo_video', False)
+
+    # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via microsite config
+    # Note: This value should be moved into a configuration setting and plumbed-through to the
+    # context via the microsite configuration workflow, versus living here
+    youtube_video_id = microsite.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
+    context['homepage_promo_video_youtube_id'] = youtube_video_id
+
+    # allow for microsite override of the courses list
+    context['courses_list'] = microsite.get_template_path('courses_list.html')
+
+    # Insert additional context for use in the template
     context.update(extra_context)
+
     return render_to_response('index.html', context)
 
 
@@ -294,6 +314,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
         CertificateStatuses.auditing: 'auditing',
+        CertificateStatuses.audit_passing: 'auditing',
+        CertificateStatuses.audit_notpassing: 'auditing',
     }
 
     default_status = 'processing'

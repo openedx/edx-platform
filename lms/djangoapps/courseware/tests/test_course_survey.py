@@ -233,4 +233,4 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase, XssTestMixi
                 kwargs={'course_id': unicode(self.course.id)}
             )
         )
-        self.assert_xss(response, '<script>alert("XSS")</script>')
+        self.assert_no_xss(response, '<script>alert("XSS")</script>')

@@ -3,8 +3,9 @@ Tests for block_cache.py
 """
 
 from django.core.cache import get_cache
+from django.conf import settings
 from mock import patch
-from unittest import TestCase
+from unittest import TestCase, skipUnless
 
 from ..block_cache import get_blocks
 from ..exceptions import TransformerException
@@ -96,6 +97,7 @@ class TestBlockCache(TestCase, ChildrenMapTestMixin):
                 transformers=self.transformers,
             )
 
+    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_block_caching(self, mock_available_transforms):
         mock_available_transforms.return_value = {transformer.name(): transformer for transformer in self.transformers}
 

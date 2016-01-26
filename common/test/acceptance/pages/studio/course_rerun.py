@@ -39,3 +39,5 @@ class CourseRerunPage(CoursePage):
         Clicks the create rerun button.
         """
         self.q(css='.rerun-course-save')[0].click()
+        # Clicking on the course will trigger an ajax event
+        self.wait_for_ajax()

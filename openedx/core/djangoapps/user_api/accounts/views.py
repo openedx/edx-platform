@@ -17,7 +17,6 @@ from openedx.core.lib.api.authentication import (
 from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
-from .serializers import PROFILE_IMAGE_KEY_PREFIX
 
 
 class AccountView(APIView):

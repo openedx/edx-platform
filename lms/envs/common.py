@@ -1860,6 +1860,9 @@ INSTALLED_APPS = (
     # Microsite configuration
     'microsite_configuration',
 
+    # RSS Proxy
+    'rss_proxy',
+
     # Student Identity Reverification
     'reverification',
 
@@ -2135,6 +2138,10 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
+
+# Optional setting to restrict registration / account creation to only emails
+# that match a regex in this list. Set to None to allow any email (default).
+REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
@@ -2656,6 +2663,9 @@ MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.Filebas
 # TTL for microsite database template cache
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
+################################ Settings for rss_proxy ################################
+
+RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from remote URLs in seconds
 
 #### PROCTORING CONFIGURATION DEFAULTS
 

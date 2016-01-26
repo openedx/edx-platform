@@ -938,7 +938,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
         url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
         resp = self.client.get(url)
-        self.assert_xss(resp, '<script>alert("XSS")</script>')
+        self.assert_no_xss(resp, '<script>alert("XSS")</script>')
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_reg_code_xss(self):
@@ -954,7 +954,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         redeem_url = reverse('register_code_redemption', args=[self.reg_code])
         redeem_response = self.client.get(redeem_url)
 
-        self.assert_xss(redeem_response, '<script>alert("XSS")</script>')
+        self.assert_no_xss(redeem_response, '<script>alert("XSS")</script>')
 
     def test_show_receipt_json_multiple_items(self):
         # Two different item types

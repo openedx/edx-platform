@@ -107,8 +107,7 @@ class PaginateSearchResultsTestCase(TestCase):
         id_range = get_object_range(page_number, page_size)
         db_objects = [build_mock_object(obj_id) for obj_id in id_range]
         self.mock_model.objects.filter = MagicMock(return_value=db_objects)
-
-        page = paginate_search_results(self.mock_model, self.search_results, self.default_size, 'last')
+        page = paginate_search_results(self.mock_model, self.search_results, page_size, 'last')
 
         self.mock_model.objects.filter.assert_called_with(pk__in=id_range)
         self.assertEquals(db_objects, page.object_list)

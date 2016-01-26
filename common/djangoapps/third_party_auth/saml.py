@@ -3,7 +3,7 @@ Slightly customized python-social-auth backend for SAML 2.0 support
 """
 import logging
 from social.backends.saml import SAMLAuth, OID_EDU_PERSON_ENTITLEMENT
-from social.exceptions import AuthForbidden
+from social.exceptions import AuthForbidden, AuthMissingParameter
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +32,20 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return self._config.get_setting(name)
         except KeyError:
             return self.strategy.setting(name, default)
+
+    def auth_url(self):
+        """
+        Check that the request includes an 'idp' parameter before getting the
+        URL to which we must redirect in order to authenticate the user.
+
+        raise AuthMissingParameter if the 'idp' parameter is missing.
+
+        TODO: remove this method once the fix is merged upstream:
+        https://github.com/omab/python-social-auth/pull/821
+        """
+        if 'idp' not in self.strategy.request_data():
+            raise AuthMissingParameter(self, 'idp')
+        return super(SAMLAuthBackend, self).auth_url()
 
     def _check_entitlements(self, idp, attributes):
         """

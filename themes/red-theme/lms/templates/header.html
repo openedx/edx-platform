@@ -11,7 +11,6 @@ import branding
 from status.status import get_site_status_msg
 
 from microsite_configuration import microsite
-from microsite_configuration.templatetags.microsite import platform_name
 from ccx.overrides import get_current_ccx
 %>
 
@@ -43,7 +42,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
-            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}"/>
+            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
         </%block>
       </a>
     </h1>

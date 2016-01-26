@@ -26,13 +26,19 @@ class TestDone(XBlockTestCase):
     # normal workbench scenarios
     test_configuration = [
         {
-            "urlname": "two_done_block_test_case",
+            "urlname": "two_done_block_test_case_0",
             #"olx": self.olx_scenarios[0],
             "xblocks": [  # Stopgap until we handle OLX
                 {
                     'blocktype': 'done',
                     'urlname': 'done_0'
-                },
+                }
+            ]
+        },
+        {
+            "urlname": "two_done_block_test_case_1",
+            #"olx": self.olx_scenarios[0],
+            "xblocks": [  # Stopgap until we handle OLX
                 {
                     'blocktype': 'done',
                     'urlname': 'done_1'

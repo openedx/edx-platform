@@ -14,7 +14,6 @@ from django.utils.timezone import UTC
 from django.test.utils import override_settings
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -910,14 +909,14 @@ class CourseMetadataEditingTest(CourseTestCase):
 
         # Now enable student notes and verify that the "My Notes" tab has been added
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+            'advanced_modules': {"value": ["notes"]}
         })
         course = modulestore().get_course(self.course.id)
         self.assertIn(self.notes_tab, course.tabs)
 
         # Disable student notes and verify that the "My Notes" tab is gone
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": [""]}
+            'advanced_modules': {"value": [""]}
         })
         course = modulestore().get_course(self.course.id)
         self.assertNotIn(self.notes_tab, course.tabs)
@@ -925,7 +924,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     def test_advanced_components_munge_tabs_validation_failure(self):
         with patch('contentstore.views.course._refresh_course_tabs', side_effect=InvalidTabsException):
             resp = self.client.ajax_post(self.course_setting_url, {
-                ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+                'advanced_modules': {"value": ["notes"]}
             })
             self.assertEqual(resp.status_code, 400)
 
@@ -949,7 +948,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.course.tabs = tab_list
         modulestore().update_item(self.course, self.user.id)
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+            'advanced_modules': {"value": ["notes"]}
         })
         course = modulestore().get_course(self.course.id)
         tab_list.append(self.notes_tab)
