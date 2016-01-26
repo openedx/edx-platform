@@ -29,9 +29,10 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
+import datetime
+import imp
 import sys
 import os
-import imp
 
 from path import Path as path
 from warnings import simplefilter
@@ -440,6 +441,9 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
     'oauth2_provider.oidc.handlers.EmailHandler',
     'oauth2_handler.UserInfoHandler'
 )
+
+OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
+OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
