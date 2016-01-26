@@ -23,6 +23,11 @@ from openedx.core.lib.js_utils import (
         ${settings.STUDIO_NAME}
     </title>
 
+    <%
+      jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    %>
+
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
 
