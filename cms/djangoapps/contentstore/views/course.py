@@ -358,7 +358,7 @@ def get_in_process_course_actions(request):
     ]
 
 
-def _staff_accessible_course_list(request):
+def _accessible_courses_summary_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
     """
@@ -621,14 +621,14 @@ def get_courses_accessible_to_user(request):
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _staff_accessible_course_list(request)
+        courses, in_process_course_actions = _accessible_courses_summary_list(request)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_list(request)
+            courses, in_process_course_actions = _accessible_courses_summary_list(request)
     return courses, in_process_course_actions
 
 
