@@ -32,6 +32,7 @@ django-method-override==0.1.0
 #djangorestframework>=3.1,<3.2
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
 django==1.8.7
+edx-opaque-keys==0.2.0
 edx-rest-api-client==1.2.1
 edx-search==0.1.1
 facebook-sdk==0.4.0
@@ -91,6 +92,7 @@ unicodecsv==0.9.4
 django-require==1.0.6
 pyuca==1.1
 wrapt==1.10.5
+zendesk==1.1.1
 
 # This needs to be installed *after* Cython, which is in pre.txt
 lxml==3.4.4
@@ -153,7 +155,6 @@ rednose==0.4.3
 selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
-zendesk==1.1.1
 
 # Used for Segment analytics
 analytics-python==1.1.0
