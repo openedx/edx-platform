@@ -180,9 +180,6 @@ FEATURES = {
     # Enable Custom Courses for EdX
     'CUSTOM_COURSES_EDX': False,
 
-    # Is this an edX-owned domain? (used for edX specific messaging and images)
-    'IS_EDX_DOMAIN': False,
-
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
@@ -495,9 +492,6 @@ TEMPLATES = [
 
                 # Hack to get required link URLs to password reset templates
                 'edxmako.shortcuts.marketing_link_context_processor',
-
-                # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.open_source_footer_context_processor',
 
                 # Shoppingcart processor (detects if request.user has a cart)
                 'shoppingcart.context_processor.user_has_cart_context_processor',

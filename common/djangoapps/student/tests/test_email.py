@@ -22,6 +22,7 @@ from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
 from util.testing import EventTestMixin
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
 class TestException(Exception):
@@ -99,7 +100,7 @@ class ActivationEmailTests(TestCase):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
 
-    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    @with_is_edx_domain(True)
     def test_activation_email_edx_domain(self):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.EDX_DOMAIN_FRAGMENTS)

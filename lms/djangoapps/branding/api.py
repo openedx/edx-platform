@@ -111,18 +111,13 @@ def _footer_copyright():
     Returns: unicode
 
     """
-    org_name = (
-        "edX Inc" if settings.FEATURES.get('IS_EDX_DOMAIN', False)
-        else microsite.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-    )
-
     return _(
         # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
         u"\u00A9 {org_name}.  All rights reserved except where noted.  "
         u"EdX, Open edX and the edX and Open EdX logos are registered trademarks "
         u"or trademarks of edX Inc."
-    ).format(org_name=org_name)
+    ).format(org_name=microsite.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
 def _footer_openedx_link():
@@ -389,9 +384,7 @@ def get_logo_url():
     # otherwise, use the legacy means to configure this
     university = microsite.get_value('university')
 
-    if university is None and settings.FEATURES.get('IS_EDX_DOMAIN', False):
-        return staticfiles_storage.url('images/edx-theme/edx-logo-77x36.png')
-    elif university:
+    if university:
         return staticfiles_storage.url('images/{uni}-on-edx-logo.png'.format(uni=university))
     else:
         return staticfiles_storage.url('images/logo.png')
