@@ -44,7 +44,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Forking Submissions repo for ORA2 score override function.
 -e git+https://github.com/Stanford-Online/edx-submissions.git@1e8d8ea9a15d0f15ea28d1d348c79cfa66016608#egg=edx-submissions
--e git+https://github.com/Stanford-Online/edx-analytics-data-api-client.git@7632d6e51108a4c5834a47007183870d49a47c94#egg=edx-analytics-data-api-client
+-e git+https://github.com/Stanford-Online/edx-analytics-data-api-client.git@1b8260ce8dd6edb999fffc46b09f77c83f87e1f9#egg=edx-analytics-data-api-client
 
 # This portion of requirements.txt is now maintained only for the Stanford fork, i.e. we should update as necessary
 # Third Party XBlocks
