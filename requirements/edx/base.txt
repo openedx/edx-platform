@@ -33,6 +33,7 @@ django-method-override==0.1.0
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
 django==1.8.7
 edx-opaque-keys==0.2.0
+edx-organizations==0.3.1
 edx-rest-api-client==1.2.1
 edx-search==0.1.1
 facebook-sdk==0.4.0
