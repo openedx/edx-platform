@@ -465,6 +465,10 @@ LANGUAGE_DICT = dict(LANGUAGES)
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_ROOT = PROJECT_ROOT / "static"
+
+STATICI18N_OUTPUT_DIR = lms.envs.common.STATICI18N_OUTPUT_DIR
+
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 
@@ -845,6 +849,9 @@ INSTALLED_APPS = (
 
     # edx-milestones service
     'milestones',
+
+    # Static i18n support
+    'statici18n',
 )
 
 

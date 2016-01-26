@@ -9,6 +9,23 @@ if (window) {
     window.MathJax = {
       menuSettings: {CHTMLpreview: false}
     };
+    // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
+    // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
+    // Note that when the optimizer executes this code, window will not be defined.
+    var defineDependency = function (globalVariable, name, noShim) {
+        if (window[globalVariable]) {
+            if (noShim) {
+                define(name, {});
+            }
+            else {
+                define(name, [], function() {return window[globalVariable];});
+            }
+        }
+        else {
+            console.error("Expected library to be included on page, but not found on window object: " + name);
+        }
+    };
+    defineDependency("gettext", "gettext");
 }
 
 require.config({
