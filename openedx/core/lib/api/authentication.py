@@ -1,23 +1,19 @@
-""" Common Authentication Handlers used across projects. """
+"""
+Common Authentication Handlers used across projects.
+"""
 
-import logging
 
 from rest_framework.authentication import SessionAuthentication
 from rest_framework import exceptions as drf_exceptions
 from rest_framework_oauth.authentication import OAuth2Authentication
+from .exceptions import AuthenticationFailed
 from rest_framework_oauth.compat import oauth2_provider, provider_now
-
-from openedx.core.lib.api.exceptions import AuthenticationFailed
-
 
 OAUTH2_TOKEN_ERROR = u'token_error'
 OAUTH2_TOKEN_ERROR_EXPIRED = u'token_expired'
 OAUTH2_TOKEN_ERROR_MALFORMED = u'token_malformed'
 OAUTH2_TOKEN_ERROR_NONEXISTENT = u'token_nonexistent'
 OAUTH2_TOKEN_ERROR_NOT_PROVIDED = u'token_not_provided'
-
-
-log = logging.getLogger(__name__)
 
 
 class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
