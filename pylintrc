@@ -53,7 +53,7 @@
 #
 # ------------------------------
 [MASTER]
-ignore = ,migrations
+ignore = ,.git,migrations,node_modules,.pycharm_helpers
 persistent = yes
 load-plugins = edx_lint.pylint,pylint_django,pylint_celery
 
@@ -180,4 +180,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# b98d7d902efebf1f5eaafb847960e366a35fd51b
+# 42ec1461de97fc01d7191c1c5f2fd5ec67671a61
