@@ -1448,7 +1448,7 @@ def generate_students_certificates(
             course=course
         )
 
-        if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+        if CertificateStatuses.is_passing_status(status):
             task_progress.succeeded += 1
         else:
             task_progress.failed += 1

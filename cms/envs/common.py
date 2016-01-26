@@ -1113,3 +1113,8 @@ OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
+
+
+################################ Settings for Credentials Service ################################
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'

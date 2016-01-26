@@ -97,6 +97,14 @@ class CertificateStatuses(object):
         error: "error states"
     }
 
+    @classmethod
+    def is_passing_status(cls, status):
+        """
+        Given the status of a certificate, return a boolean indicating whether
+        the student passed the course.
+        """
+        return status in [cls.downloadable, cls.generating]
+
 
 class CertificateSocialNetworks(object):
     """
@@ -297,13 +305,10 @@ class GeneratedCertificate(models.Model):
     def save(self, *args, **kwargs):
         """
         After the base save() method finishes, fire the COURSE_CERT_AWARDED
-        signal iff we have stored a record of a learner passing the course.
-
-        The learner is assumed to have passed the course if certificate status
-        is either 'generating' or 'downloadable'.
+        signal iff we are saving a record of a learner passing the course.
         """
         super(GeneratedCertificate, self).save(*args, **kwargs)
-        if self.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+        if CertificateStatuses.is_passing_status(self.status):
             COURSE_CERT_AWARDED.send_robust(
                 sender=self.__class__,
                 user=self.user,
