@@ -784,7 +784,8 @@ class LoginFailures(models.Model):
         except ObjectDoesNotExist:
             return False
         except MultipleObjectsReturned:
-            # Clean LoginFailures Table (keeping newest lockout_until) in case get_or_create had a race condition https://code.djangoproject.com/ticket/13906#no1
+            # Clean duplicate in LoginFailures Table (keeping newest lockout_until)
+            # in case the get_or_create had a race condition.  https://code.djangoproject.com/ticket/13906
             records = LoginFailures.objects.filter(user=user).order_by('-lockout_until')
             for extra_record in records[1:]:
                 extra_record.delete()
