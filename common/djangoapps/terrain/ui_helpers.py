@@ -42,9 +42,11 @@ REQUIREJS_WAIT = {
         "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
 
     # Content - Outline
-    # Note that calling your org, course number, or display name, 'course' will mess this up
+    # Note that calling your org, course number, or display name, 'course' will mess this up.
+    # Wait for the factories to load - they load everything else through dependencies.
+    # Specifying them individually as they are independent from each other.
     re.compile(r'^Course Outline \|'): [
-        "js/base", "js/models/course", "js/models/location", "js/models/section"],
+        "js/base", "js/factories/base.js", "js/factories/course.js", "js/factories/outline.js"],
 
     # Dashboard
     re.compile(r'^Studio Home \|'): [
