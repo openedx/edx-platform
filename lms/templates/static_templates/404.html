@@ -1,3 +1,4 @@
+<%namespace name='static' file='../static_content.html'/>
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
@@ -6,5 +7,6 @@
 <section class="outside-app">
 <h1>${_("Page not found")}</h1>
 <p>${_('The page that you were looking for was not found. Go back to the {link_start}homepage{link_end} or let us know about any pages that may have been moved at {email}.').format(
-    link_start='<a href="/">', link_end='</a>', email='<a href="mailto:{email}">{email}</a>'.format(email=settings.TECH_SUPPORT_EMAIL))}</p>
+    link_start='<a href="/">', link_end='</a>', email='<a href="mailto:{email}">{email}</a>'.format(email=static.get_tech_support_email_address())
+  )}</p>
 </section>

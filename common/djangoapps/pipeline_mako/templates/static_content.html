@@ -125,6 +125,10 @@ else:
     return is_request_in_themed_site()
 %></%def>
 
+<%def name="get_tech_support_email_address()"><%
+    return get_value('email_from_address', settings.TECH_SUPPORT_EMAIL)
+%></%def>
+
 <%def name="show_language_selector()"><%
     return settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False)
 %></%def>
