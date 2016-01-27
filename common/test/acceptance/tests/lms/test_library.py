@@ -139,7 +139,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         """
         Logout and login with given credentials.
         """
-        AutoAuthPage(self.browser, username=username, email=email,
+        AutoAuthPage(self.browser, username=username,
                      course_id=self.course_id, staff=staff).visit()
 
 

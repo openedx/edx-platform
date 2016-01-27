@@ -60,7 +60,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
-        StudioAutoAuthPage(self.browser, username=username, email=email,
+        StudioAutoAuthPage(self.browser, username=username,
                            course_id=self.course_id, staff=staff).visit()
 
     def _studio_reindex(self):

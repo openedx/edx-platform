@@ -42,7 +42,7 @@ class StaffViewTest(UniqueCourseTest):
 
         # Auto-auth register for the course.
         # Do this as global staff so that you will see the Staff View
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
+        AutoAuthPage(self.browser, username=self.USERNAME,
                      course_id=self.course_id, staff=True).visit()
 
     def _goto_staff_page(self):

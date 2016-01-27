@@ -52,7 +52,7 @@ class EntranceExamTest(UniqueCourseTest):
             course_fixture.create_xblock(entrance_exam_subsection['id'], problem)
 
         # Auto-auth register for the course.
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
+        AutoAuthPage(self.browser, username=self.USERNAME,
                      course_id=self.course_id, staff=False).visit()
 
     def get_problem(self):
