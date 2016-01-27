@@ -43,7 +43,7 @@ var JSInput = (function ($, undefined) {
             sectionAttr = function (e) { return $(section).attr(e); },
             iframe = $(elem).find('iframe[name^="iframe_"]').get(0),
             cWindow = iframe.contentWindow,
-            path = iframe.src.substring(0, iframe.src.lastIndexOf("/")+1),
+            path = window.location.origin,
             // Get the hidden input field to pass to customresponse
             inputField = $(elem).parent().find('input[id^="input_"]'),
             // Get the grade function name
