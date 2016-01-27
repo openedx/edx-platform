@@ -201,9 +201,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         resp = self.client.get(self.url_unlocked)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(base_url, resp['Access-Control-Allow-Origin'])
-        self.assertEqual("frame-ancestors 'self' {}".format(base_url), resp['Content-Security-Policy'])
-        self.assertEqual('ALLOW-FROM {}'.format(base_url), resp['X-Frame-Options'])
+        self.assertEqual("http://{}".format(base_url), resp['Access-Control-Allow-Origin'])
+        self.assertEqual("default-src 'self' http://{}".format(base_url), resp['Content-Security-Policy'])
+        self.assertEqual('ALLOW-FROM http://{}'.format(base_url), resp['X-Frame-Options'])
 
     @patch('microsite_configuration.microsite.get_value')
     def test_cors_headers_present_with_microsite(self, mock_microsite_get_value):
@@ -217,9 +217,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(self.url_unlocked)
         self.assertEqual(resp.status_code, 200)
         self.assertNotEqual(base_url, base_microsite_url)
-        self.assertEqual(base_microsite_url, resp['Access-Control-Allow-Origin'])
-        self.assertEqual("frame-ancestors 'self' {}".format(base_microsite_url), resp['Content-Security-Policy'])
-        self.assertEqual('ALLOW-FROM {}'.format(base_microsite_url), resp['X-Frame-Options'])
+        self.assertEqual("http://{}".format(base_microsite_url), resp['Access-Control-Allow-Origin'])
+        self.assertEqual("default-src 'self' http://{}".format(base_microsite_url), resp['Content-Security-Policy'])
+        self.assertEqual('ALLOW-FROM http://{}'.format(base_microsite_url), resp['X-Frame-Options'])
 
 
 @ddt.ddt

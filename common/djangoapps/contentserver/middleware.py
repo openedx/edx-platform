@@ -150,12 +150,21 @@ class StaticContentServer(object):
 
             # Set CORS headers here.  Some courses pull assets via XHR or load them in iframes,
             # so we want to definitively say that this is allowed.
-            base_url = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-            response['Access-Control-Allow-Origin'] = base_url
-            response['Content-Security-Policy'] = "frame-ancestors 'self' {base_url}".format(base_url=base_url)
-            response['X-Frame-Options'] = "ALLOW-FROM {base_url}".format(base_url=base_url)
+            self.set_cors_headers(request, response)
 
             return response
+
+    def set_cors_headers(self, request, response):
+        """Set CORS headers so an asset can be used via XHR or an iframe."""
+        base_url = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+        scheme = request.scheme
+
+        # Allow this resource to be load asynchronously via XHR.
+        response['Access-Control-Allow-Origin'] = "{}://{}".format(scheme, base_url)
+
+        # Allow this resource to be embedded as an iframe.
+        response['Content-Security-Policy'] = "default-src 'self' {}://{}".format(scheme, base_url)
+        response['X-Frame-Options'] = "ALLOW-FROM {}://{}".format(scheme, base_url)
 
 
 def parse_range_header(header_value, content_length):
