@@ -324,6 +324,10 @@ def update_assets(args):
         help="Skip collection of static assets",
     )
     parser.add_argument(
+        '--skip-coffee', dest='coffee', action='store_false', default=True,
+        help="Skip coffeescript compilation",
+    )
+    parser.add_argument(
         '--watch', action='store_true', default=False,
         help="Watch files for changes",
     )
@@ -331,7 +335,10 @@ def update_assets(args):
 
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
-    compile_coffeescript()
+    if args.coffee:
+        compile_coffeescript()
+    else:
+        print("Skipping coffeescript compilation")
     call_task('pavelib.assets.compile_sass', options={'debug': args.debug})
 
     if args.collect:
