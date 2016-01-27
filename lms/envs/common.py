@@ -1072,6 +1072,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'clean_headers.middleware.CleanHeadersMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -1755,6 +1756,9 @@ INSTALLED_APPS = (
     'edxmako',
     'pipeline',
     'static_replace',
+
+    # For content serving
+    'contentserver',
 
     # Theming
     'openedx.core.djangoapps.theming',
