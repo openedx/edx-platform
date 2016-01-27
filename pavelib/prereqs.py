@@ -21,9 +21,9 @@ NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 # prerequisites are installed for builds on circleci.com
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
-    'requirements/edx/github.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
+    'requirements/edx/github.txt',
     'requirements/edx/post.txt',
 ]
 
