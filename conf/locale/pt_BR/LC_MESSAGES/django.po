@@ -6023,7 +6023,7 @@ msgstr "Download de dados"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "For analytics about your course, go to {analytics_dashboard_name}."
-msgstr "Para analíticas sobre o curso, entre em {analytics_dashboad_name}"
+msgstr "Para analíticas sobre o curso, entre em {analytics_dashboard_name}"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"

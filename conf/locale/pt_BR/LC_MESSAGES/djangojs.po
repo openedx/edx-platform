@@ -5643,7 +5643,7 @@ msgstr "Configurações"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New %(component_type)s"
-msgstr "Novos %(component_types)s"
+msgstr "Novos %(component_type)s"
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
