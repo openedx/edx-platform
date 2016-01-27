@@ -57,7 +57,6 @@ class StudioCourseTest(UniqueCourseTest):
             self.browser,
             staff=is_staff,
             username=user.get('username'),
-            email=user.get('email'),
             password=user.get('password')
         )
         self.auth_page.visit()
