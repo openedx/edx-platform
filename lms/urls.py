@@ -935,6 +935,7 @@ if settings.FEATURES["CUSTOM_COURSES_EDX"]:
     urlpatterns += (
         url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
             include('ccx.urls')),
+        url(r'^api/ccx/', include('lms.djangoapps.ccx.api.urls', namespace='ccx_api')),
     )
 
 # Access to courseware as an LTI provider
