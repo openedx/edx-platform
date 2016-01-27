@@ -1077,11 +1077,15 @@ MIDDLEWARE_CLASSES = (
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # Instead of SessionMiddleware, we use a more secure version
+    # 'django.contrib.sessions.middleware.SessionMiddleware',
+    'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
@@ -2702,3 +2706,8 @@ MAX_BOOKMARKS_PER_COURSE = 100
 # lms.env.json file.
 
 REGISTRATION_EXTENSION_FORM = None
+
+# Identifier included in the User Agent from open edX mobile apps.
+MOBILE_APP_USER_AGENT_REGEXES = [
+    r'edX/org.edx.mobile',
+]

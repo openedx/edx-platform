@@ -268,7 +268,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         self.assertEqual(response.data['user_message'], u'An error has occurred. Please try again.')
 
         # Send data without usage_id.
-        with self.assertNumQueries(7):  # No queries for bookmark table.
+        with self.assertNumQueries(6):  # No queries for bookmark table.
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -279,7 +279,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         self.assertEqual(response.data['developer_message'], u'Parameter usage_id not provided.')
 
         # Send empty data dictionary.
-        with self.assertNumQueries(7):  # No queries for bookmark table.
+        with self.assertNumQueries(6):  # No queries for bookmark table.
             response = self.send_post(
                 client=self.client,
                 url=reverse('bookmarks'),
@@ -489,7 +489,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         bookmarks_data = response.data['results']
         self.assertEqual(len(bookmarks_data), 2)
 
-        with self.assertNumQueries(10):  # 2 queries for bookmark table.
+        with self.assertNumQueries(9):  # 2 queries for bookmark table.
             self.send_delete(
                 client=self.client,
                 url=reverse(
@@ -562,5 +562,5 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         with self.assertNumQueries(8):  # No queries for bookmark table.
             self.assertEqual(405, self.client.put(url).status_code)
 
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(7):
             self.assertEqual(405, self.client.post(url).status_code)
