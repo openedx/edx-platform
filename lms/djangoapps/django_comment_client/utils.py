@@ -129,7 +129,7 @@ def get_accessible_discussion_modules(course, user, include_all=False):  # pylin
     Return a list of all valid discussion modules in this course that
     are accessible to the given user.
     """
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, include_orphans=False)
 
     return [
         module for module in all_modules
