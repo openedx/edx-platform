@@ -22,7 +22,7 @@ class CourseTeamPageTest(StudioCourseTest):
         }
         AutoAuthPage(
             self.browser, no_login=True,
-            username=user.get('username'), email=user.get('email'), password=user.get('password')
+            username=user.get('username'), password=user.get('password')
         ).visit()
         return user
 
