@@ -101,17 +101,12 @@ class CMSVideoBaseTest(UniqueCourseTest):
         ).install()
 
         # Auto login and register the course
-        username = 'hasnain123'
-        from random import randint
-        a = randint(0, 9099)
-        email = 'hasnain' + str(a) + '@gmail.com'
-        password = '123'
         AutoAuthPage(
             self.browser,
             staff=False,
-            username=username,
-            email=email,
-            password=password
+            username=self.course_fixture.user.get('username'),
+            email=self.course_fixture.user.get('email'),
+            password=self.course_fixture.user.get('password')
         ).visit()
 
     def _navigate_to_course_unit_page(self):
