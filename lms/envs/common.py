@@ -1204,19 +1204,22 @@ proctoring_js = (
     [
         'proctoring/js/models/proctored_exam_allowance_model.js',
         'proctoring/js/models/proctored_exam_attempt_model.js',
-        'proctoring/js/models/proctored_exam_model.js'
+        'proctoring/js/models/proctored_exam_model.js',
+        'proctoring/js/models/proctoring_services_model.js',
     ] +
     [
         'proctoring/js/collections/proctored_exam_allowance_collection.js',
         'proctoring/js/collections/proctored_exam_attempt_collection.js',
-        'proctoring/js/collections/proctored_exam_collection.js'
+        'proctoring/js/collections/proctored_exam_collection.js',
+        'proctoring/js/collections/proctoring_services_collection.js',
     ] +
     [
         'proctoring/js/views/Backbone.ModalDialog.js',
         'proctoring/js/views/proctored_exam_add_allowance_view.js',
         'proctoring/js/views/proctored_exam_allowance_view.js',
         'proctoring/js/views/proctored_exam_attempt_view.js',
-        'proctoring/js/views/proctored_exam_view.js'
+        'proctoring/js/views/proctored_exam_view.js',
+        'proctoring/js/views/proctoring_services_view.js',
     ] +
     [
         'proctoring/js/proctored_app.js'
@@ -2745,7 +2748,7 @@ RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from
 
 #### PROCTORING CONFIGURATION DEFAULTS
 
-PROCTORING_BACKEND_PROVIDER = {
+PROCTORING_BACKEND_PROVIDERS = {
     'class': 'edx_proctoring.backends.null.NullBackendProvider',
     'options': {},
 }

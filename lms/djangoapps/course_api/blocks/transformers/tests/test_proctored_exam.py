@@ -84,6 +84,7 @@ class ProctoredExamTransformerTestCase(CourseStructureTestCase):
                 'org': 'ProctoredExamTransformer',
                 'course': 'PE101F',
                 'run': 'test_run',
+                'proctoring_service': 'TEST_PROCTOR',
                 '#type': 'course',
                 '#ref': 'course',
             },

@@ -34,6 +34,15 @@ CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
 
+def get_proctoring_list():
+    from django.conf import settings
+    try:
+        proctoring_providers = settings.PROCTORING_BACKEND_PROVIDERS
+    except AttributeError:
+        return ''
+    return ",".join(proctoring_providers.keys())
+
+
 class StringOrDate(Date):
     def from_json(self, value):
         """
@@ -720,6 +729,24 @@ class CourseFields(object):
         ),
         default=False,
         scope=Scope.settings
+    )
+
+    available_proctoring_services = String(
+        display_name=_("Available Proctoring services"),
+        help=_("Comma-separated list of services available for this course. "
+               "For example: \"{}\"".format(get_proctoring_list())),
+        default="",
+        scope=Scope.settings,
+    )
+
+    proctoring_service = String(
+        display_name=_("Proctoring service"),
+        help=_(
+            "Defines the proctoring Service for this Course. Choose one of the following"
+            " services: {}".format(get_proctoring_list())
+        ),
+        default="",
+        scope=Scope.settings,
     )
 
     enable_timed_exams = Boolean(

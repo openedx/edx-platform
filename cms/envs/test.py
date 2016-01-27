@@ -319,3 +319,31 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ######### custom courses #########
 INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
+
+PROCTORING_BACKEND_PROVIDERS = {
+        "TEST_PROCTOR": {
+            'class': 'edx_proctoring.backends.null.NullBackendProvider',
+            'options': {},
+            "settings": {
+                "LINK_URLS": {
+                    "contact_us": "{add link here}",
+                    "faq": "{add link here}",
+                    "online_proctoring_rules": "{add link here}",
+                    "tech_requirements": "{add link here}"
+                }
+            }
+        },
+        "TEST_PROCTOR_2": {
+            'class': 'edx_proctoring.backends.null.NullBackendProvider',
+            'options': {},
+            "settings": {
+                "LINK_URLS": {
+                    "contact_us": "{add link here}",
+                    "faq": "{add link here}",
+                    "online_proctoring_rules": "{add link here}",
+                    "tech_requirements": "{add link here}"
+                }
+            }
+        },
+    }
+
